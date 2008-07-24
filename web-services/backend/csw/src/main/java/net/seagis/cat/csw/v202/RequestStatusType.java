@@ -104,7 +104,9 @@ public class RequestStatusType {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[requestStatusType] ").append("timeStamp:").append(timestamp);
+        StringBuilder s = new StringBuilder("[requestStatusType]");
+        if (timestamp != null)
+            s.append("timeStamp:").append(timestamp);
         return s.toString();
     }
 

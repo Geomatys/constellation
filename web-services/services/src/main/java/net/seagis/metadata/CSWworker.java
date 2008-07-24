@@ -108,6 +108,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
+import net.seagis.dublincore.AbstractSimpleLiteral;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -402,7 +403,7 @@ public class CSWworker {
     /**
      * The queryable element from DublinCore and their path id.
      */
-    private static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
+    protected static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
     static {
         DUBLIN_CORE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
@@ -572,7 +573,7 @@ public class CSWworker {
         cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         File f            = null;
-        File env          = new File("/opt/tomcat/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
+        File env          = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
         logger.info("Path to config file=" + env);
         isStarted = true;
         try {
@@ -696,10 +697,9 @@ public class CSWworker {
             
         SectionsType sections = requestCapabilities.getSections();
         
-        //if the users specify a empty list of sections we return the OperationsMetadata part
-        if (sections.getSection().size() == 0) {
-            sections.add("OperationsMetadata");
-        }
+        //according to CITE test a GetCapabilities must always return Filter_Capabilities
+        if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All"))
+            sections.add("Filter_Capabilities");
         
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
@@ -800,7 +800,7 @@ public class CSWworker {
         // we get the element set type (BRIEF, SUMMARY OR FULL)
         ElementSetNameType setName = query.getElementSetName();
         ElementSetType set         = ElementSetType.BRIEF;
-        if (setName == null) {
+        if (setName != null) {
             set = setName.getValue();
         }
         SearchResultsType searchResults = null;
@@ -833,17 +833,18 @@ public class CSWworker {
             
                 // we return only the number of result matching
                 if (resultType.equals(ResultType.HITS)) {
-                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size());
+                    searchResults = new SearchResultsType(ID, set, results.size());
                 
                 // we return a list of Record
                 } else if (resultType.equals(ResultType.RESULTS)) {
                 
                     List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-                    for (String id: results) {
-                        records.add((AbstractRecordType)MDReader.getMetadata(id, DUBLINCORE, set));
+                    
+                    for (int i = 0; i < maxRecord; i++) {
+                        records.add((AbstractRecordType)MDReader.getMetadata(results.get(i), DUBLINCORE, set));
                     }
                     searchResults = new SearchResultsType(ID, 
-                                                          query.getElementSetName().getValue(), 
+                                                          set, 
                                                           results.size(),
                                                           records,
                                                           maxRecord);
@@ -1128,7 +1129,10 @@ public class CSWworker {
                             ex.printStackTrace();
                             throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
                                                              NO_APPLICABLE_CODE, null, version);
-                        } 
+                        } catch (IllegalArgumentException e) {
+                            logger.severe("already that title.");
+                            totalUpdated++;
+                        }
                 }
             } else if (transaction instanceof DeleteType) {
                 DeleteType deleteRequest = (DeleteType)transaction;
@@ -1220,7 +1224,7 @@ public class CSWworker {
     private String findName(Object obj) {
         
         //here we try to get the title
-        SimpleLiteral titleSL = null;
+        AbstractSimpleLiteral titleSL = null;
         String title = "unknow title";
         if (obj instanceof RecordType) {
             titleSL = ((RecordType) obj).getTitle();
@@ -1231,7 +1235,7 @@ public class CSWworker {
             if (titleSL == null) {
                 title = "unknow title";
             } else {
-                if (titleSL.getContent() != null && titleSL.getContent().size() > 0)
+                if (titleSL.getContent().size() > 0)
                     title = titleSL.getContent().get(0);
             }
                             
@@ -1245,24 +1249,32 @@ public class CSWworker {
             }
         } else {
             Method nameGetter = null;
+            String methodName = "";
             int i = 0;
-            while (i < 2) {
+            while (i < 3) {
                 try {
                     switch (i) {
-                        case 0: nameGetter = obj.getClass().getMethod("getName");
+                        case 0: methodName = "getTitle";
+                                nameGetter = obj.getClass().getMethod(methodName);
                                 break;
-                        case 1: nameGetter = obj.getClass().getMethod("getId");
+                                 
+                        case 1: methodName = "getName";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                                
+                        case 2: methodName = "getId";
+                                nameGetter = obj.getClass().getMethod(methodName);
                                 break;
                     }
                 
                 
                 } catch (NoSuchMethodException ex) {
-                    logger.finer("not getName() method in " + obj.getClass().getSimpleName());
+                    logger.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
                 } catch (SecurityException ex) {
                     logger.severe(" security exception while getting the title of the object.");
                 }
                 if (nameGetter != null) {
-                    i = 2;
+                    i = 3;
                 } else {
                     i++;
                 }
@@ -1270,14 +1282,31 @@ public class CSWworker {
             
             if (nameGetter != null) {
                 try {
-                    title = (String) nameGetter.invoke(obj);
+                    Object objT = nameGetter.invoke(obj);
+                    if (objT instanceof String) {
+                        title = (String) obj;
                     
+                    } else if (objT instanceof AbstractSimpleLiteral) {
+                        titleSL = (AbstractSimpleLiteral) objT;
+                        if (titleSL.getContent().size() > 0)
+                            title = titleSL.getContent().get(0);
+                        else title = "unknow title";
+                    
+                    } else {
+                        title = "unknow title";
+                    }
+                    
+                    if (title == null)
+                        title = "unknow title";
                 } catch (IllegalAccessException ex) {
-                    logger.severe("illegal access for method getName() in " + obj.getClass().getSimpleName());
+                    logger.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
+                                  "cause: " + ex.getMessage());
                 } catch (IllegalArgumentException ex) {
-                    logger.severe("illegal argument for method getName() in " + obj.getClass().getSimpleName());
+                    logger.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                                  "cause: " + ex.getMessage());
                 } catch (InvocationTargetException ex) {
-                    logger.severe("invocation target exception for method getName() in " + obj.getClass().getSimpleName());
+                    logger.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                                  "cause: " + ex.getMessage());
                 }
             }
             

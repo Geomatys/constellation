@@ -48,5 +48,7 @@ import javax.xml.namespace.QName;
 public abstract class AbstractQueryType {
 
     public abstract void setTypeNames(List<QName> typeNames);
+    
+    public abstract void setConstraint(QueryConstraintType value);
 
 }

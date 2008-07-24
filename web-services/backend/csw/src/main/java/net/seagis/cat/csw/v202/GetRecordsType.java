@@ -265,4 +265,11 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
             query.setTypeNames(typenames);
         }
     }
+
+    public void removeConstraint() {
+        if (abstractQuery != null && abstractQuery.getValue() != null) {
+            AbstractQueryType query = abstractQuery.getValue();
+            query.setConstraint(null);
+        }
+    }
 }

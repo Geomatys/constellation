@@ -83,7 +83,8 @@ public class ExceptionReport {
     public ExceptionReport(String exceptionText, String exceptionCode, String locator, ServiceVersion version) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
-        this.version = version.toString();
+        if (version != null)
+            this.version = version.toString();
     }
     
     /**

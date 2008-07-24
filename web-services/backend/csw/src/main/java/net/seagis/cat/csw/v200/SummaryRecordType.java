@@ -66,15 +66,15 @@ import net.seagis.dublincore.v1.elements.SimpleLiteral;
 public class SummaryRecordType extends AbstractRecordType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "type", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
-        @XmlElementRef(name = "modified", namespace = "http://www.purl.org/dc/terms/", type = JAXBElement.class),
-        @XmlElementRef(name = "subject", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
-        @XmlElementRef(name = "spatial", namespace = "http://www.purl.org/dc/terms/", type = JAXBElement.class),
-        @XmlElementRef(name = "title", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
-        @XmlElementRef(name = "abstract", namespace = "http://www.purl.org/dc/terms/", type = JAXBElement.class),
-        @XmlElementRef(name = "format", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
+        @XmlElementRef(name = "type"      , namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
+        @XmlElementRef(name = "modified"  , namespace = "http://www.purl.org/dc/terms/"       , type = JAXBElement.class),
+        @XmlElementRef(name = "subject"   , namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
+        @XmlElementRef(name = "spatial"   , namespace = "http://www.purl.org/dc/terms/"       , type = JAXBElement.class),
+        @XmlElementRef(name = "title"     , namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
+        @XmlElementRef(name = "abstract"  , namespace = "http://www.purl.org/dc/terms/"       , type = JAXBElement.class),
+        @XmlElementRef(name = "format"    , namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
         @XmlElementRef(name = "identifier", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
-        @XmlElementRef(name = "relation", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
+        @XmlElementRef(name = "relation"  , namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
     })
     private List<JAXBElement<SimpleLiteral>> identifierOrTypeOrTitle;
 

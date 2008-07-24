@@ -121,11 +121,14 @@ public class GetRecordsResponseType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[GetRecordsResponseType] version=").append(version).append(":").append('\n');
+        if (requestId != null) {
+            s.append("Request ID: ").append(requestId).append('\n');
+        }
         if (searchStatus != null) {
-            s.append("searchStatus:").append(searchStatus).append('\n');
+            s.append("searchStatus: ").append(searchStatus).append('\n');
         }
         if (searchResults != null) {
-            s.append("searchResult:").append(searchResults).append('\n');
+            s.append("searchResult: ").append(searchResults).append('\n');
         }
         return s.toString();
     }

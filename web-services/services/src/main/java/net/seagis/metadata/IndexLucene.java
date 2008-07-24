@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 // Lucene dependencies
@@ -63,7 +64,7 @@ import static net.seagis.metadata.CSWworker.*;
  */
 public class IndexLucene extends AbstractIndex {
 
-    private final Logger logger = Logger.getLogger("net.seagis.coverage");
+    private final Logger logger = Logger.getLogger("net.seagis.metadata");
     
     /**
      * The Reader of this lucene index.
@@ -110,6 +111,7 @@ public class IndexLucene extends AbstractIndex {
                 List<Catalog> cats = reader.getCatalogs();
                 nbCatalogs = cats.size();
                 List<Form> results = reader.getAllForm(cats);
+                logger.info("end read form");
                 nbForms    =  results.size();
                 for (Form form : results) {
                     indexDocument(writer, form);
@@ -118,10 +120,13 @@ public class IndexLucene extends AbstractIndex {
                 writer.close();
                 
             } catch (CorruptIndexException ex) {
+                logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
                 ex.printStackTrace();
             } catch (LockObtainFailedException ex) {
+                logger.severe("LockObtainException while indexing document: " + ex.getMessage());
                 ex.printStackTrace();
             } catch (IOException ex) {
+                logger.severe("IOException while indexing document: " + ex.getMessage());
                 ex.printStackTrace();
             }
             logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
@@ -149,12 +154,16 @@ public class IndexLucene extends AbstractIndex {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(r));
+            logger.info("Form: " + r.getTitle() + " indexed");
+            
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
             ex.printStackTrace();
         } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
             ex.printStackTrace();
         } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -167,9 +176,10 @@ public class IndexLucene extends AbstractIndex {
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(String term, Form form) throws SQLException {
+    private String getValues(String term, Form form, Map<String,List<String>> queryable) throws SQLException {
         StringBuilder response  = new StringBuilder("");
-        for (String pathID: ISO_QUERYABLE.get(term)) {
+        List<String> paths = queryable.get(term);
+        for (String pathID: paths) {
             Path path   = reader.getPath(pathID);
             List<Value> values = form.getValueFromPath(path);
             for (Value v: values) {
@@ -202,33 +212,92 @@ public class IndexLucene extends AbstractIndex {
         doc.add(new Field("id",    form.getId() + "", Field.Store.YES, Field.Index.TOKENIZED));
         doc.add(new Field("Title", form.getTitle(),   Field.Store.YES, Field.Index.TOKENIZED));
         
-        //TODO add ANyText
-        for (String term :ISO_QUERYABLE.keySet()) {
-            doc.add(new Field(term, getValues(term,  form),   Field.Store.YES, Field.Index.TOKENIZED));
+        // For an ISO 19115 form
+        if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
+            //TODO add ANyText
+            for (String term :ISO_QUERYABLE.keySet()) {
+                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE),   Field.Store.YES, Field.Index.TOKENIZED));
+            }
+        
+            //we add the geometry parts
+            String coord = "null";
+            try {
+                coord = getValues("WestBoundLongitude", form, ISO_QUERYABLE);
+                int coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(0, coma);
+                double minx = Double.parseDouble(coord);
+                coord = getValues("EastBoundLongitude", form, ISO_QUERYABLE);
+                coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(coma + 1, coord.length());
+                double maxx = Double.parseDouble(coord);
+            
+                coord = getValues("NorthBoundLatitude", form, ISO_QUERYABLE);
+                coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(0, coma);
+                double maxy = Double.parseDouble(coord);
+            
+                coord = getValues("SouthBoundLatitude", form, ISO_QUERYABLE);
+                if (coma != -1)
+                    coord = coord.substring(coma + 1, coord.length());
+                double miny = Double.parseDouble(coord);
+                logger.info("before addBBOX");
+                addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+            
+            } catch (NumberFormatException e) {
+                if (!coord.equals("null"))
+                    logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
+                                  "cause:  unable to parse double: " + coord);
+            }
+        
+        // for a CSW Record    
+        } else if (form.getTopValue().getType().getName().equals("Record")) {
+            
+            for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+                doc.add(new Field(term, getValues(term,  form, DUBLIN_CORE_QUERYABLE),   Field.Store.YES, Field.Index.TOKENIZED));
+            }
+            
+            //we add the geometry parts
+            String coord = "null";
+            try {
+                coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE);
+                int coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(0, coma);
+                double minx = Double.parseDouble(coord);
+                
+                coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE);
+                coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(coma + 1, coord.length());
+                double maxx = Double.parseDouble(coord);
+            
+                coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE);
+                coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(0, coma);
+                double maxy = Double.parseDouble(coord);
+            
+                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE);
+                coma = coord.indexOf(',');
+                if (coma != -1)
+                    coord = coord.substring(coma + 1, coord.length());
+                double miny = Double.parseDouble(coord);
+            
+                addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+            
+            } catch (NumberFormatException e) {
+                if (!coord.equals("null"))
+                    logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
+                                  "cause:  unable to parse double: " + coord);
+            }
+            
+        } else {
+            logger.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
         }
         
-        //we add the geometry parts
-        String coord = "null";
-        try {
-            coord = getValues("WestBoundLongitude", form);
-            double minx = Double.parseDouble(coord);
-            
-            coord = getValues("EastBoundLongitude", form);
-            double maxx = Double.parseDouble(coord);
-            
-            coord = getValues("NorthBoundLatitude", form);
-            double maxy = Double.parseDouble(coord);
-            
-            coord = getValues("SouthBoundLatitude", form);
-            double miny = Double.parseDouble(coord);
-            
-            addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
-            
-        } catch (NumberFormatException e) {
-            if (!coord.equals("null"))
-                logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
-                              "cause:  unable to parse double: " + coord);
-        }    
         // add a default meta field to make searching all documents easy 
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
         
@@ -317,8 +386,7 @@ public class IndexLucene extends AbstractIndex {
         }
         
         logger.info(results.size() + " total matching documents");
-        for (String s: results)
-            logger.info(s);
+        
         ireader.close();
         
         return results;

@@ -16,12 +16,12 @@
 
 package net.seagis.cat.csw.v200;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
@@ -74,12 +74,16 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SearchResultsType", propOrder = {
-    "abstractRecord"
+    "abstractRecord",
+    "any"
 })
 public class SearchResultsType {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
+    @XmlAnyElement(lax = true)
+    private List<Object> any;
+    
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String resultSetId;
@@ -90,13 +94,13 @@ public class SearchResultsType {
     private String recordSchema;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger numberOfRecordsMatched;
+    private int numberOfRecordsMatched;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger numberOfRecordsReturned;
+    private int numberOfRecordsReturned;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger nextRecord;
+    private int nextRecord;
     @XmlAttribute
     private XMLGregorianCalendar expires;
 
@@ -163,7 +167,7 @@ public class SearchResultsType {
      * Gets the value of the numberOfRecordsMatched property.
      * 
      */
-    public BigInteger getNumberOfRecordsMatched() {
+    public int getNumberOfRecordsMatched() {
         return numberOfRecordsMatched;
     }
 
@@ -171,7 +175,7 @@ public class SearchResultsType {
      * Sets the value of the numberOfRecordsMatched property.
      * 
      */
-    public void setNumberOfRecordsMatched(BigInteger value) {
+    public void setNumberOfRecordsMatched(int value) {
         this.numberOfRecordsMatched = value;
     }
 
@@ -179,7 +183,7 @@ public class SearchResultsType {
      * Gets the value of the numberOfRecordsReturned property.
      * 
      */
-    public BigInteger getNumberOfRecordsReturned() {
+    public int getNumberOfRecordsReturned() {
         return numberOfRecordsReturned;
     }
 
@@ -187,7 +191,7 @@ public class SearchResultsType {
      * Sets the value of the numberOfRecordsReturned property.
      * 
      */
-    public void setNumberOfRecordsReturned(BigInteger value) {
+    public void setNumberOfRecordsReturned(int value) {
         this.numberOfRecordsReturned = value;
     }
 
@@ -195,7 +199,7 @@ public class SearchResultsType {
      * Gets the value of the nextRecord property.
      * 
      */
-    public BigInteger getNextRecord() {
+    public int getNextRecord() {
         return nextRecord;
     }
 
@@ -203,7 +207,7 @@ public class SearchResultsType {
      * Sets the value of the nextRecord property.
      * 
      */
-    public void setNextRecord(BigInteger value) {
+    public void setNextRecord(int value) {
         this.nextRecord = value;
     }
 
@@ -223,4 +227,30 @@ public class SearchResultsType {
         this.expires = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[SearchResultType] :").append('\n');
+        if (resultSetId != null)
+            s.append("resultSetId: ").append(resultSetId).append('\n');
+        if (elementSet != null)
+            s.append("elementSet:").append(elementSet.value()).append('\n');
+        if (recordSchema != null)
+            s.append("recordShema: ").append(recordSchema).append('\n');
+        
+        s.append("nbRec Matched = ").append(numberOfRecordsMatched).append(" ").append("nbRec Returned = ").append(numberOfRecordsReturned);
+        s.append("next record = ").append(nextRecord).append('\n');
+        
+        if (expires != null) {
+            s.append("expires at: ").append(expires);
+        }
+        
+        if (abstractRecord != null && abstractRecord.size() != 0) {
+            s.append("nb CSW records: ").append(abstractRecord.size());
+            
+        }
+        if (any != null && any.size() != 0) {
+            s.append("nb Other records: ").append(any.size());
+        }
+        return s.toString();
+    }
 }

@@ -99,5 +99,11 @@ public interface GetRecordsRequest  {
      * Set the typeNames field of the Query part.
      */
     public void setTypeNames(List<QName> typenames);
+    
+    /**
+     * Remove all the Query constraint.
+     */
+    public void removeConstraint();
+    
 
 }

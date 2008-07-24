@@ -53,7 +53,7 @@ public class MetadataWriter {
     /**
      * A debugging logger.
      */
-    private Logger logger = Logger.getLogger("net.seagis.coverage.wms");
+    private Logger logger = Logger.getLogger("net.seagis.metadata");
     
     /**
      * A MDWeb catalogs where write the form.

@@ -103,7 +103,7 @@ public class SectionsType {
         if (section == null){
             section = new ArrayList<String>();
         }
-       return Collections.unmodifiableList(section);
+       return section;
     }
     
      /**
@@ -119,7 +119,7 @@ public class SectionsType {
      * Return a List of all the existing sections. 
      */
     public static List<String> getExistingSections() {
-        return Collections.unmodifiableList(existingSections);
+        return existingSections;
     }
     
     /**

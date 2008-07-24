@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 
 // Seagis dependencies
 import net.seagis.cat.csw.v202.QueryConstraintType;
+import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.gml.v311.CoordinatesType;
@@ -104,7 +105,13 @@ public class FilterParser {
      * Build a new FilterParser with the specified version.
      */
     public FilterParser(final ServiceVersion version) throws JAXBException {
-        this.version = version;
+        if (version == null) {
+            // TODO restore this throw new IllegalArgumentException("version must not null");
+            this.version = new ServiceVersion(Service.OWS, "2.0.2");
+        } else {
+            this.version = version;
+        }
+            
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml.v311");
         filterMarshaller = jbcontext.createMarshaller();
         filterMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

@@ -85,5 +85,16 @@ public class RequestStatusType {
     public void setTimestamp(XMLGregorianCalendar value) {
         this.timestamp = value;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[requestStatusType]");
+        if (status != null)
+            s.append("status: ").append(status.value()).append('\n');
+        
+        if (timestamp != null)
+            s.append("timeStamp: ").append(timestamp);
+        return s.toString();
+    }
 
 }

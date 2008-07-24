@@ -42,8 +42,11 @@ import static org.junit.Assert.*;
 public class RecordMarshallingTest {
     
     private Logger       logger = Logger.getLogger("net.seagis.filter");
-    private Unmarshaller recordUnmarshaller;
-    private Marshaller   recordMarshaller;
+    private Unmarshaller recordUnmarshaller202;
+    private Marshaller   recordMarshaller202;
+    
+    private Unmarshaller recordUnmarshaller200;
+    private Marshaller   recordMarshaller200;
    
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -55,11 +58,17 @@ public class RecordMarshallingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.cat.csw.v202");
-        recordUnmarshaller    = jbcontext.createUnmarshaller();
-        recordMarshaller      = jbcontext.createMarshaller();
-        recordMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        recordMarshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+        JAXBContext jbcontext202 = JAXBContext.newInstance("net.seagis.cat.csw.v202");
+        recordUnmarshaller202    = jbcontext202.createUnmarshaller();
+        recordMarshaller202      = jbcontext202.createMarshaller();
+        recordMarshaller202.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        recordMarshaller202.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+        
+        JAXBContext jbcontext200 = JAXBContext.newInstance("net.seagis.cat.csw.v200:net.seagis.dublincore.v1.terms:net.seagis.dublincore.v2.terms");
+        recordUnmarshaller200    = jbcontext200.createUnmarshaller();
+        recordMarshaller200      = jbcontext200.createMarshaller();
+        recordMarshaller200.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        recordMarshaller200.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
     }
 
     @After
@@ -73,6 +82,10 @@ public class RecordMarshallingTest {
      */
     @Test
     public void recordMarshalingTest() throws Exception {
+        
+        /*
+         * Test marshalling csw Record v2.0.2
+         */
         
         SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
         SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
@@ -93,7 +106,7 @@ public class RecordMarshallingTest {
         RecordType record = new RecordType(id, title, type, subject, null, modified, Abstract, bbox, null, null, null, spatial, references);
         
         StringWriter sw = new StringWriter();
-        recordMarshaller.marshal(record, sw);
+        recordMarshaller202.marshal(record, sw);
         
         String result = sw.toString();
         String expResult = 
@@ -115,6 +128,10 @@ public class RecordMarshallingTest {
         "</csw:Record>" + '\n';
     
         assertEquals(expResult, result);
+        
+        /*
+         * Test marshalling csw Record v2.0.2
+         */
     }
     
     /**
@@ -124,6 +141,11 @@ public class RecordMarshallingTest {
      */
     @Test
     public void recordUnmarshalingTest() throws Exception {
+        
+        /*
+         * Test Unmarshalling csw Record v2.0.2
+         */
+        
         String xml = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
         "<csw:Record xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
@@ -144,7 +166,7 @@ public class RecordMarshallingTest {
         
         StringReader sr = new StringReader(xml);
         
-        JAXBElement jb = (JAXBElement) recordUnmarshaller.unmarshal(sr);
+        JAXBElement jb = (JAXBElement) recordUnmarshaller202.unmarshal(sr);
         RecordType result = (RecordType) jb.getValue();
         
         SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
@@ -170,6 +192,82 @@ public class RecordMarshallingTest {
         logger.finer("EXPRESULT: " + expResult.toString());
         logger.finer("-----------------------------------------------------------");
         assertEquals(expResult, result);
+        
+        /*
+         * Test Unmarshalling csw Record v2.0.0 with http://purl... DC namespace
+         */
+        
+        xml = 
+        "<csw:Record xmlns:csw=\"http://www.opengis.net/cat/csw\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">" + '\n' +
+        "   <dc:identifier>ESIGNGRAVIMÉTRICOPENINSULAYBALEARES200703070000</dc:identifier>"                      + '\n' +
+        "   <dc:title>Estudio Gravimétrico de la Península Ibérica y Baleares</dc:title>"                        + '\n' +      
+        "   <dc:title>Mapa de Anomalías Gravimétricas</dc:title>"                                                + '\n' +
+        "   <dc:creator>Instituto Geográfico Nacional</dc:creator>"                                              + '\n' +
+        "   <dc:subject>http://www.fao.org/aos/concept#4668.Gravimetría</dc:subject>"                            + '\n' +
+        "   <dc:subject>Anomalías Gravimétricas</dc:subject>"                                                    + '\n' +
+        "   <dc:subject>Anomalías Aire Libre</dc:subject>"                                                       + '\n' +
+        "   <dc:subject>Anomalías Bouguer</dc:subject>"                                                          + '\n' +
+        "   <dc:subject>Información geocientífica</dc:subject>"                                                  + '\n' +
+        "   <dc:description>El Estudio Gravimétrico de la Península Ibérica y Baleares, que representa las anomalías gravimétricas de esa zona, fue generado por el Instituto Geográfico Nacional en el año 1996. El estudio está constituido por dos mapas; Anomalías Gravimétricas Aire Libre de la Península Ibérica y Baleares, Anomalías Gravimétricas Bouguer de la Península Ibérica y Baleares más una memoria. Inicialmente para su generación se creó una base de datos gravimétrica homogénea a partir de observaciones de distinta procedencia, también se formó un modelo digital del terreno homogéneo a partir de otros modelos digitales del terreno procedentes de España, Portugal y Francia. Los mapas contienen isolíneas de anomalías gravimétricas en intervalos de 2mGal. Los datos se almacenan en formato DGN.</dc:description>" + '\n' +
+        "   <dc:date>2007-03-07</dc:date>"                                                                       + '\n' +
+        "   <dc:type>mapHardcopy</dc:type>"                                                                      + '\n' +
+        "   <dc:type>mapDigital</dc:type>"                                                                       + '\n' +
+        "   <dc:type>documentHardcopy</dc:type>"                                                                 + '\n' +
+        "   <dc:format>DGN - Microstation format (Intergraph Corporation)</dc:format>"                           + '\n' +
+        "   <dc:format>Papel</dc:format>"                                                                        + '\n' +
+        "   <dc:identifier>www.cnig.es</dc:identifier>"                                                          + '\n' +
+        "   <dc:source>El Banco de Datos Gravimétricos es una base de datos compuesta principalmente por las observaciones realizadas por el Instituto Geográfico Nacional desde 1960. Además se han añadido los datos del Instituto Portugués de Geografía y Catastro, del proyecto ECORS, de la Universidad de Cantabria y del Bureau Gravimétrico Internacional.</dc:source>" + '\n' +
+        "   <dc:source>Para la creación del Modelo Digital del Terreno a escala 1:200.000 para toda la Península Ibérica, áreas marinas y terrestres adyacentes, en particular, se ha dispuesto de la siguiente información; Modelo Digital del Terreno a escala 1:200.000, Modelo Digital del Terreno obtenido del Defense Mapping Agency de los Estados Unidos, para completar la zona de Portugal; Modelo Digital del Terreno obtenido del Instituto Geográfico Nacional de Francia para la parte francesa del Pirineo y el Modelo Digital del Terreno generado a partir de las cartas náuticas del Instituto Hidrográfico de la Marina de España, que completa la parte marina hasta los 167 km. de la costa con un ancho de malla de 5 km.</dc:source>" + '\n' +
+        "   <dc:language>es</dc:language>"                                                                       + '\n' +
+        "   <dcterms:spatial>northlimit=43.83; southlimit=36.00; westlimit=-9.35; eastlimit=4.32;</dcterms:spatial>" + '\n' +
+        "   <dcterms:spatial>ESPAÑA.ANDALUCÍA</dcterms:spatial>"                                                 + '\n' +
+        "   <dcterms:spatial>ESPAÑA.ARAGÓN</dcterms:spatial>"                                                    + '\n' +
+        "</csw:Record>";
+        
+        sr = new StringReader(xml);
+        
+        jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
+        net.seagis.cat.csw.v200.RecordType result2 = (net.seagis.cat.csw.v200.RecordType) jb.getValue();
+        
+        logger.info("result:" + result2.toString());
+        
+         /*
+         * Test Unmarshalling csw Record v2.0.0 with http://www.purl... DC namespace
+         */
+        
+        xml = 
+        "<csw:Record xmlns:csw=\"http://www.opengis.net/cat/csw\" xmlns:dcterms=\"http://www.purl.org/dc/terms/\" xmlns:dc=\"http://www.purl.org/dc/elements/1.1/\">" + '\n' +
+        "   <dc:identifier>ESIGNGRAVIMÉTRICOPENINSULAYBALEARES200703070000</dc:identifier>"                      + '\n' +
+        "   <dc:title>Estudio Gravimétrico de la Península Ibérica y Baleares</dc:title>"                        + '\n' +      
+        "   <dc:title>Mapa de Anomalías Gravimétricas</dc:title>"                                                + '\n' +
+        "   <dc:creator>Instituto Geográfico Nacional</dc:creator>"                                              + '\n' +
+        "   <dc:subject>http://www.fao.org/aos/concept#4668.Gravimetría</dc:subject>"                            + '\n' +
+        "   <dc:subject>Anomalías Gravimétricas</dc:subject>"                                                    + '\n' +
+        "   <dc:subject>Anomalías Aire Libre</dc:subject>"                                                       + '\n' +
+        "   <dc:subject>Anomalías Bouguer</dc:subject>"                                                          + '\n' +
+        "   <dc:subject>Información geocientífica</dc:subject>"                                                  + '\n' +
+        "   <dc:description>El Estudio Gravimétrico de la Península Ibérica y Baleares, que representa las anomalías gravimétricas de esa zona, fue generado por el Instituto Geográfico Nacional en el año 1996. El estudio está constituido por dos mapas; Anomalías Gravimétricas Aire Libre de la Península Ibérica y Baleares, Anomalías Gravimétricas Bouguer de la Península Ibérica y Baleares más una memoria. Inicialmente para su generación se creó una base de datos gravimétrica homogénea a partir de observaciones de distinta procedencia, también se formó un modelo digital del terreno homogéneo a partir de otros modelos digitales del terreno procedentes de España, Portugal y Francia. Los mapas contienen isolíneas de anomalías gravimétricas en intervalos de 2mGal. Los datos se almacenan en formato DGN.</dc:description>" + '\n' +
+        "   <dc:date>2007-03-07</dc:date>"                                                                       + '\n' +
+        "   <dc:type>mapHardcopy</dc:type>"                                                                      + '\n' +
+        "   <dc:type>mapDigital</dc:type>"                                                                       + '\n' +
+        "   <dc:type>documentHardcopy</dc:type>"                                                                 + '\n' +
+        "   <dc:format>DGN - Microstation format (Intergraph Corporation)</dc:format>"                           + '\n' +
+        "   <dc:format>Papel</dc:format>"                                                                        + '\n' +
+        "   <dc:identifier>www.cnig.es</dc:identifier>"                                                          + '\n' +
+        "   <dc:source>El Banco de Datos Gravimétricos es una base de datos compuesta principalmente por las observaciones realizadas por el Instituto Geográfico Nacional desde 1960. Además se han añadido los datos del Instituto Portugués de Geografía y Catastro, del proyecto ECORS, de la Universidad de Cantabria y del Bureau Gravimétrico Internacional.</dc:source>" + '\n' +
+        "   <dc:source>Para la creación del Modelo Digital del Terreno a escala 1:200.000 para toda la Península Ibérica, áreas marinas y terrestres adyacentes, en particular, se ha dispuesto de la siguiente información; Modelo Digital del Terreno a escala 1:200.000, Modelo Digital del Terreno obtenido del Defense Mapping Agency de los Estados Unidos, para completar la zona de Portugal; Modelo Digital del Terreno obtenido del Instituto Geográfico Nacional de Francia para la parte francesa del Pirineo y el Modelo Digital del Terreno generado a partir de las cartas náuticas del Instituto Hidrográfico de la Marina de España, que completa la parte marina hasta los 167 km. de la costa con un ancho de malla de 5 km.</dc:source>" + '\n' +
+        "   <dc:language>es</dc:language>"                                                                       + '\n' +
+        "   <dcterms:spatial>northlimit=43.83; southlimit=36.00; westlimit=-9.35; eastlimit=4.32;</dcterms:spatial>" + '\n' +
+        "   <dcterms:spatial>ESPAÑA.ANDALUCÍA</dcterms:spatial>"                                                 + '\n' +
+        "   <dcterms:spatial>ESPAÑA.ARAGÓN</dcterms:spatial>"                                                    + '\n' +
+        "</csw:Record>";
+        
+        sr = new StringReader(xml);
+        
+        jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
+        result2 = (net.seagis.cat.csw.v200.RecordType) jb.getValue();
+        
+        logger.info("result:" + result2.toString());
     }
 
 }

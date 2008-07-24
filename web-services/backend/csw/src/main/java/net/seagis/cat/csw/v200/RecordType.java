@@ -16,12 +16,16 @@
 
 package net.seagis.cat.csw.v200;
 
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.dublincore.v1.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
+import net.seagis.ows.v100.WGS84BoundingBoxType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -56,6 +60,31 @@ public class RecordType extends DCMIRecordType {
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)
     private JAXBElement<? extends BoundingBoxType> boundingBox;
 
+     /**
+     * An empty constructor used by JAXB
+     */
+    public RecordType() {
+        
+    }
+    
+    /**
+     * Build a new Record TODO add contributor, source , spatial, right, relation
+     */
+    public RecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
+            List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
+            BoundingBoxType bbox, SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language, 
+            SimpleLiteral spatial,SimpleLiteral references) {
+        
+        super(identifier, title,type, subject, format, modified, _abstract, creator, distributor, language, spatial, references);
+        
+        if (bbox instanceof WGS84BoundingBoxType)
+            this.boundingBox = owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox);
+        else
+            this.boundingBox = owsFactory.createBoundingBox(bbox);
+        
+        
+    }
+    
     /**
      * Gets the value of the boundingBox property.
      * 
@@ -70,6 +99,45 @@ public class RecordType extends DCMIRecordType {
      */
     public void setBoundingBox(JAXBElement<? extends BoundingBoxType> value) {
         this.boundingBox = ((JAXBElement<? extends BoundingBoxType> ) value);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (boundingBox != null && boundingBox.getValue() != null) {
+            s.append("bounding box:").append('\n');
+            s.append(boundingBox.getValue().toString()).append('\n');
+        }
+        return s.toString();
+    }
+    
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof RecordType && super.equals(object)) {
+            final RecordType that = (RecordType) object;
+            
+            if (this.boundingBox != null && that.boundingBox != null) {
+                return Utilities.equals(this.boundingBox.getValue(),   that.boundingBox.getValue());
+                
+            } else {
+                 if (this.boundingBox == null && that.boundingBox == null) {
+                     return true;
+                 }
+                 return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

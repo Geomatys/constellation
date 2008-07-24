@@ -47,5 +47,7 @@ import javax.xml.bind.annotation.XmlType;
 public abstract class AbstractQueryType {
 
     public abstract void setTypeNames(List<String> typeNames);
+    
+    public abstract void setConstraint(QueryConstraintType value);
 
 }

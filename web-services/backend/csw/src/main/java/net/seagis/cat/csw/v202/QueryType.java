@@ -124,6 +124,11 @@ public class QueryType extends AbstractQueryType {
     public QueryConstraintType getConstraint() {
         return constraint;
     }
+    
+    @Override
+    public void setConstraint(QueryConstraintType value) {
+       this.constraint = value;
+    }
 
     /**
      * Gets the value of the sortBy property.
@@ -146,5 +151,7 @@ public class QueryType extends AbstractQueryType {
     public void setTypeNames(List<QName> typeNames) {
         this.typeNames = typeNames;
     }
+
+   
 
 }

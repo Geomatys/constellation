@@ -52,6 +52,7 @@ import net.seagis.cat.csw.v202.ResultType;
 import net.seagis.cat.csw.v202.SearchResultsType;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterType;
+import net.seagis.ogc.NotType;
 import net.seagis.ogc.PropertyIsLikeType;
 import net.seagis.ogc.PropertyNameType;
 import net.seagis.ows.v100.AcceptFormatsType;
@@ -153,10 +154,11 @@ public class CatalogueHarvester {
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
          */ 
-        List<QName> typeNames          = new ArrayList<QName>();
-        PropertyNameType pname         = new PropertyNameType("dc:Title");
-        PropertyIsLikeType pil         = new PropertyIsLikeType(pname, "*", "*", "?", "\\");
-        FilterType filter1              = new FilterType(pil);
+        List<QName> typeNames  = new ArrayList<QName>();
+        PropertyNameType pname = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
+        NotType n              = new NotType(pil);
+        FilterType filter1     = new FilterType(n);
         
         /*
          * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
@@ -164,7 +166,8 @@ public class CatalogueHarvester {
         typeNames          = new ArrayList<QName>();
         pname              = new PropertyNameType("title");
         pil                = new PropertyIsLikeType(pname, "something", null, null, null);
-        FilterType filter2 = new FilterType(pil);
+        n                  = new NotType(pil);
+        FilterType filter2 = new FilterType(n);
         
         
         //we build the base request to harvest another CSW service (2.0.2)
@@ -245,9 +248,11 @@ public class CatalogueHarvester {
         
         //we initialize the getRecords request
         getRecordRequest.setStartPosition(1);
+        int startPosition    = 1;
         int nbRecordInserted = 0;
         int nbRecordUpdated  = 0;
         boolean succeed      = false;
+        boolean noFilter     = false;
         
         //we prepare to store the distant serviceException and send it later if this is necessary
         List<WebServiceException> distantException = new ArrayList<WebServiceException>();
@@ -263,12 +268,20 @@ public class CatalogueHarvester {
             //we make multiple request by pack of 20 record 
             while (moreResults) {
         
+                if (noFilter) {
+                    getRecordRequest.removeConstraint();
+                    noFilter = false;
+                }
+                    
                 Object harvested = sendRequest(sourceURL, getRecordRequest);
         
                 // if the service respond with non xml or unstandardized response
                 if (harvested == null) {
-                    throw new OWSWebServiceException("The distant service does not respond correctly.",
+                    WebServiceException exe =new OWSWebServiceException("The distant service does not respond correctly.",
                                                      NO_APPLICABLE_CODE, null, worker.getVersion());
+                    logger.severe("The distant service does not respond correctly");
+                    distantException.add(exe);
+                    moreResults = false;
             
                 // if the service respond correctly    
                 } else if (harvested instanceof GetRecordsResponseType) {
@@ -292,9 +305,38 @@ public class CatalogueHarvester {
                     //if there is more results we need to make another request
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
-                        fullGetRecordsRequestv202.setStartPosition(results.getNextRecord());
-                    }
+                        startPosition = startPosition + results.getAbstractRecord().size();
+                        logger.info("startPosition=" + startPosition);
+                        getRecordRequest.setStartPosition(startPosition);
+                    } 
                     
+                // a correct response v2.0.0
+                } else if (harvested instanceof net.seagis.cat.csw.v200.GetRecordsResponseType) {
+                    succeed = true;
+                    logger.info("Response of distant service:" + '\n' + harvested.toString());
+                    net.seagis.cat.csw.v200.GetRecordsResponseType serviceResponse = (net.seagis.cat.csw.v200.GetRecordsResponseType) harvested;
+                    net.seagis.cat.csw.v200.SearchResultsType results = serviceResponse.getSearchResults();
+            
+                    for (JAXBElement<? extends net.seagis.cat.csw.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
+                        net.seagis.cat.csw.v200.AbstractRecordType record = JBrecord.getValue();
+                        
+                        //Temporary ugly patch TODO handle update in CSW
+                        try {
+                            if (worker.storeMetadata(record))
+                                nbRecordInserted++;
+                        } catch (IllegalArgumentException e) {
+                            nbRecordUpdated++;
+                        }
+                    }
+                
+                    //if there is more results we need to make another request
+                    moreResults = results.getNumberOfRecordsReturned() != 0;
+                    if (moreResults) {
+                        startPosition = startPosition + results.getAbstractRecord().size();
+                        logger.info("startPosition=" + startPosition);
+                        getRecordRequest.setStartPosition(startPosition);
+                    }
+                     
                 // if the distant service has launch a standardized exception    
                 } else if (harvested instanceof ExceptionReport) {
                     ExceptionReport ex = (ExceptionReport) harvested;
@@ -305,9 +347,10 @@ public class CatalogueHarvester {
                                 msg = msg + s + '\n';
                         }
                     }
-                    logger.severe("The distant service has throw a webService exception: ");
-                    distantException.add(new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
-                                                 NO_APPLICABLE_CODE, null, worker.getVersion()));
+                    WebServiceException exe = new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                                                                         NO_APPLICABLE_CODE, null, worker.getVersion());
+                    logger.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
+                    distantException.add(exe);
                     moreResults = false;
                 
                 // if we obtain an object that we don't expect    
@@ -315,12 +358,17 @@ public class CatalogueHarvester {
                     throw new OWSWebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
                                                  NO_APPLICABLE_CODE, null, worker.getVersion());
                 }
+                
+                //if we don't have succed we try without constraint part
+                if (succeed == false) {
+                    moreResults = true;
+                    noFilter    = true;
+                }
             }
         }
         
         
         if (!succeed && distantException.size() > 0) {
-            // TODO see how return multiple exception in one
             throw distantException.get(0);
         }
         
@@ -328,6 +376,8 @@ public class CatalogueHarvester {
         result[0]    = nbRecordInserted;
         result[1]    = nbRecordUpdated;
         result[2]    = 0;
+        
+        specialCase1 = false;
         
         return result;
     }
@@ -526,13 +576,15 @@ public class CatalogueHarvester {
             // in the special case 1 we need to remove ogc prefix inside  the >Filter
             if (specialCase1) {
                 XMLRequest = XMLRequest.replace("<ogc:", "<");
+                XMLRequest = XMLRequest.replace("</ogc:", "</");
                 XMLRequest = XMLRequest.replace("<Filter", "<ogc:Filter");
                 XMLRequest = XMLRequest.replace("</Filter", "</ogc:Filter");
-                XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\"", "");
-                XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\"", "");
-                XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"" , ""); 
-                XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"" , "");
-                        logger.info("special obtained request: " + '\n' + XMLRequest);
+                XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\""    , "");
+                XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\""    , "");
+                XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , ""); 
+                XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
+                XMLRequest = XMLRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
+                logger.info("special obtained request: " + '\n' + XMLRequest);
             }
             
             wr.write(XMLRequest);
@@ -593,6 +645,9 @@ public class CatalogueHarvester {
             else if (prefix.equals("ebrim"))
                 return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
             
+            else if (prefix.equals("gmd"))
+                return "http://www.isotc211.org/2005/gmd";
+            
             else 
                 throw new IllegalArgumentException("prefix unsupported: " + prefix);
         } else {
@@ -601,6 +656,9 @@ public class CatalogueHarvester {
             
             else if (prefix.equals("ebrim"))
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
+            
+            else if (prefix.equals("gmd"))
+                return "http://www.isotc211.org/2005/gmd";
             
             else 
                 throw new IllegalArgumentException("prefix unsupported: " + prefix);

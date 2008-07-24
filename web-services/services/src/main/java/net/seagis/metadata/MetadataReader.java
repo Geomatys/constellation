@@ -189,13 +189,24 @@ public class MetadataReader {
      */
     public Object getMetadata(String identifier, int mode, ElementSetType type) throws SQLException, OWSWebServiceException {
         Object result;
-        int id = getIDFromFileIdentifier(identifier);
-        if (id == -1) {
-            id = getIDFromTitle(identifier);
-            if (id == -1)
-                throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
-                                              INVALID_PARAMETER_VALUE, "id", version);
-        } 
+        int id;
+        
+        //if the identifier is an int we assme that is directly the Form ID
+        try  {
+            id = Integer.parseInt(identifier);
+        
+        //else we search for an Identifier or a title
+        } catch (NumberFormatException e) {
+            id = getIDFromFileIdentifier(identifier);
+            if (id == -1) {
+                id = getIDFromTitle(identifier);
+                if (id == -1)
+                    throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
+                                                     INVALID_PARAMETER_VALUE, "id", version);
+            }
+        }
+        
+        
         alreadyRead.clear();
         if (mode == ISO_19115) {
             result = metadatas.get(identifier);
