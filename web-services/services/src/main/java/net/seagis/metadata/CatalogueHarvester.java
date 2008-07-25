@@ -133,6 +133,11 @@ public class CatalogueHarvester {
     private boolean specialCase1 = false;
     
     /**
+     * A flag indicating that we are harvesting a CSW special case 2
+     */
+    private boolean specialCase2 = false;
+    
+    /**
      * Build a new catalogue harvester.
      * 
      * @param worker
@@ -148,8 +153,6 @@ public class CatalogueHarvester {
      * Initialize The object request to harvest distant CSW
      */
     public void initializeRequest() {
-        
-        
         
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
@@ -252,7 +255,8 @@ public class CatalogueHarvester {
         int nbRecordInserted = 0;
         int nbRecordUpdated  = 0;
         boolean succeed      = false;
-        boolean noFilter     = false;
+        boolean firstTry     = true;
+        boolean secondTry    = false;
         
         //we prepare to store the distant serviceException and send it later if this is necessary
         List<WebServiceException> distantException = new ArrayList<WebServiceException>();
@@ -268,11 +272,6 @@ public class CatalogueHarvester {
             //we make multiple request by pack of 20 record 
             while (moreResults) {
         
-                if (noFilter) {
-                    getRecordRequest.removeConstraint();
-                    noFilter = false;
-                }
-                    
                 Object harvested = sendRequest(sourceURL, getRecordRequest);
         
                 // if the service respond with non xml or unstandardized response
@@ -290,6 +289,7 @@ public class CatalogueHarvester {
                     GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
                     SearchResultsType results = serviceResponse.getSearchResults();
             
+                    //we looking for CSW record
                     for (JAXBElement<? extends AbstractRecordType> JBrecord: results.getAbstractRecord()) {
                         AbstractRecordType record = JBrecord.getValue();
                         
@@ -301,11 +301,27 @@ public class CatalogueHarvester {
                             nbRecordUpdated++;
                         }
                     }
+                    
+                    //we looking for any other Record type
+                    for (Object otherRecord: results.getAny()) {
+                        if (otherRecord instanceof JAXBElement)
+                            otherRecord = ((JAXBElement)otherRecord).getValue();
+                        
+                        logger.info("other Record Type: " + otherRecord.getClass().getSimpleName());
+                        
+                        //Temporary ugly patch TODO handle update in CSW
+                        try {
+                            if (worker.storeMetadata(otherRecord))
+                                nbRecordInserted++;
+                        } catch (IllegalArgumentException e) {
+                            nbRecordUpdated++;
+                        }
+                    }
                 
                     //if there is more results we need to make another request
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
-                        startPosition = startPosition + results.getAbstractRecord().size();
+                        startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
                         logger.info("startPosition=" + startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     } 
@@ -317,6 +333,7 @@ public class CatalogueHarvester {
                     net.seagis.cat.csw.v200.GetRecordsResponseType serviceResponse = (net.seagis.cat.csw.v200.GetRecordsResponseType) harvested;
                     net.seagis.cat.csw.v200.SearchResultsType results = serviceResponse.getSearchResults();
             
+                    //we looking for CSW record
                     for (JAXBElement<? extends net.seagis.cat.csw.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
                         net.seagis.cat.csw.v200.AbstractRecordType record = JBrecord.getValue();
                         
@@ -329,10 +346,24 @@ public class CatalogueHarvester {
                         }
                     }
                 
+                    //we looking for any other Record type
+                    for (Object otherRecord: results.getAny()) {
+                        if (otherRecord instanceof JAXBElement)
+                            otherRecord = ((JAXBElement)otherRecord).getValue();
+                        
+                        //Temporary ugly patch TODO handle update in CSW
+                        try {
+                            if (worker.storeMetadata(otherRecord))
+                                nbRecordInserted++;
+                        } catch (IllegalArgumentException e) {
+                            nbRecordUpdated++;
+                        }
+                    }
+                    
                     //if there is more results we need to make another request
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
-                        startPosition = startPosition + results.getAbstractRecord().size();
+                        startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
                         logger.info("startPosition=" + startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     }
@@ -359,10 +390,20 @@ public class CatalogueHarvester {
                                                  NO_APPLICABLE_CODE, null, worker.getVersion());
                 }
                 
-                //if we don't have succed we try without constraint part
-                if (succeed == false) {
+                //if we don't have succeed we try without constraint part
+                if (firstTry && !succeed) {
                     moreResults = true;
-                    noFilter    = true;
+                    getRecordRequest.removeConstraint();
+                    firstTry    = false;
+                    secondTry   = true;
+                    logger.info("trying with no constraint request");
+                
+                //if we don't succeed agin we try with CQL constraint    
+                } else if (secondTry && ! succeed) {
+                    secondTry   = false;
+                    moreResults = true;
+                    getRecordRequest.setCQLConstraint("title NOT LIKE 'something'");
+                    logger.info("trying with CQL constraint request");
                 }
             }
         }
@@ -378,6 +419,7 @@ public class CatalogueHarvester {
         result[2]    = 0;
         
         specialCase1 = false;
+        specialCase2 = false;
         
         return result;
     }
@@ -407,6 +449,11 @@ public class CatalogueHarvester {
             specialCase1 = true;
             request      = fullGetRecordsRequestv200_Special1;
             special      = "Special case 1";
+            
+        // Special case 2    
+        } else if (serviceName.contains("INSPIRE EU Geoportal Catalogue")) {
+            specialCase2 = true;
+            special      = "Special case 2";
         }
         
         report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append(" ").append(special).append('\n');
@@ -510,6 +557,12 @@ public class CatalogueHarvester {
                 
                 report.append("TypeNames supported:").append('\n');
                 for (String osc: typeNames) {
+                    
+                    //we remove the bad character before the real value
+                    while ((osc.startsWith(" ") || osc.startsWith("\n") || osc.startsWith("/t")) && osc.length() > 0) {
+                        osc = osc.substring(1);
+                    }
+                    
                     report.append('\t').append("- ").append(osc).append('\n');
                     String prefix, localPart;
                     
@@ -552,86 +605,146 @@ public class CatalogueHarvester {
      * @throws java.io.IOException
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException, WebServiceException {
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, WebServiceException, IOException {
+        
         
         URL source         = new URL(sourceURL);
         URLConnection conec = source.openConnection();
-        
-
-        // for a POST request
-        if (request != null) {
-        
-            conec.setDoOutput(true);
-            conec.setRequestProperty("Content-Type","text/xml");
-            OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-            StringWriter sw = new StringWriter();
-            try {
-                worker.marshaller.marshal(request, sw);
-            } catch (JAXBException ex) {
-                throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, null, worker.getVersion());
-            }
-            String XMLRequest = sw.toString();
-            
-            // in the special case 1 we need to remove ogc prefix inside  the >Filter
-            if (specialCase1) {
-                XMLRequest = XMLRequest.replace("<ogc:", "<");
-                XMLRequest = XMLRequest.replace("</ogc:", "</");
-                XMLRequest = XMLRequest.replace("<Filter", "<ogc:Filter");
-                XMLRequest = XMLRequest.replace("</Filter", "</ogc:Filter");
-                XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\""    , "");
-                XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\""    , "");
-                XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , ""); 
-                XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
-                XMLRequest = XMLRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
-                logger.info("special obtained request: " + '\n' + XMLRequest);
-            }
-            
-            wr.write(XMLRequest);
-            wr.flush();
-        }
-        
-        // we get the response document
-        InputStream in = conec.getInputStream();
-        StringWriter out = new StringWriter();
-        byte[] buffer = new byte[1024];
-        int size;
-
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            out.write(new String(buffer, 0, size));
-        }
-
-        //we convert the brut String value into UTF-8 encoding
-        String brutString = out.toString();
-
-        //we need to replace % character by "percent because they are reserved char for url encoding
-        brutString = brutString.replaceAll("%", "percent");
-        String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
-
-         /*
-         * Some implemention replace the standardized namespace "http://www.opengis.net/cat/csw" by "http://www.opengis.net/csw"
-         * if we detect this we replace this namespace before unmarshalling the object.
-         * 
-         * TODO replace even when the prefix is not "csw" or blank
-         */ 
-        if (decodedString.contains("xmlns:csw=\"http://www.opengis.net/csw\"")) {
-            decodedString = decodedString.replace("xmlns:csw=\"http://www.opengis.net/csw\"", "xmlns:csw=\"http://www.opengis.net/cat/csw\"");
-        }
-        
         Object harvested = null;
+        
         try {
-            harvested = worker.unmarshaller.unmarshal(new StringReader(decodedString));
-            if (harvested != null && harvested instanceof JAXBElement) {
-                harvested = ((JAXBElement) harvested).getValue();
+        
+            // for a POST request
+            if (request != null) {
+        
+                conec.setDoOutput(true);
+                conec.setRequestProperty("Content-Type","text/xml");
+                OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+                StringWriter sw = new StringWriter();
+                try {
+                    worker.marshaller.marshal(request, sw);
+                } catch (JAXBException ex) {
+                    throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                                                     NO_APPLICABLE_CODE, null, worker.getVersion());
+                }
+                String XMLRequest = sw.toString();
+            
+                // in the special case 1 we need to remove ogc prefix inside  the >Filter
+                if (specialCase1) {
+                    XMLRequest = XMLRequest.replace("<ogc:", "<");
+                    XMLRequest = XMLRequest.replace("</ogc:", "</");
+                    XMLRequest = XMLRequest.replace("<Filter", "<ogc:Filter");
+                    XMLRequest = XMLRequest.replace("</Filter", "</ogc:Filter");
+                    XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\""    , "");
+                    XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\""    , "");
+                    XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , ""); 
+                    XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
+                    XMLRequest = XMLRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
+                    logger.info("special obtained request: " + '\n' + XMLRequest);
+                }
+            
+                wr.write(XMLRequest);
+                wr.flush();
             }
-        } catch (JAXBException ex) {
-            logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                    "cause: " + ex.getMessage());
+        
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(new String(buffer, 0, size));
+            }
+
+            //we convert the brut String value into UTF-8 encoding
+            String brutString = out.toString();
+
+            //we need to replace % character by "percent because they are reserved char for url encoding
+            brutString = brutString.replaceAll("%", "percent");
+            String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
+
+            // Special case 2 we reformat the response of the distant service
+            if (specialCase2)
+                decodedString = restoreGoodNamespace(decodedString); 
+            
+            /*
+            * Some implemention replace the standardized namespace "http://www.opengis.net/cat/csw" by "http://www.opengis.net/csw"
+            * if we detect this we replace this namespace before unmarshalling the object.
+            * 
+            * TODO replace even when the prefix is not "csw" or blank
+            */ 
+            if (decodedString.contains("xmlns:csw=\"http://www.opengis.net/csw\"")) {
+                decodedString = decodedString.replace("xmlns:csw=\"http://www.opengis.net/csw\"", "xmlns:csw=\"http://www.opengis.net/cat/csw\"");
+            }
+        
+            try {
+                harvested = worker.unmarshaller.unmarshal(new StringReader(decodedString));
+                if (harvested != null && harvested instanceof JAXBElement) {
+                    harvested = ((JAXBElement) harvested).getValue();
+                }
+            } catch (JAXBException ex) {
+                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                        "cause: " + ex.getMessage());
+            }
+        } catch (IOException ex) {
+            logger.severe("The Distant service have made an error");
+            return null;
         }
         return harvested;
     }
     
+    
     /**
+     * Replace the special namespace by those of ISO/TC
+     * 
+     * @param s An xml piece before unmarshaling.
+     * @return
+     */
+    public String restoreGoodNamespace(String s) {
+       s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
+       s = s.replace("http://schemas.opengis.net/iso19115full", "http://www.isotc211.org/2005/gmd");
+       s = s.replace("http://metadata.dgiwg.org/smXML", "http://www.isotc211.org/2005/gmd");
+       s = replacePrefix(s, "CharacterString");
+       return s;
+   } 
+   
+   /**
+    * Replace all the <ns**:localPart and </ns**:localPart by <prefix:localPart and </prefix:localPart
+    * 
+    * @param s
+    * @param localPart
+    * @return
+    */ 
+   public String replacePrefix(String s, String localPart) {
+   
+       int position = 0;
+       boolean end  = false;
+       while (!end) {
+           
+           int prefixSize = 4;
+           int i = s.indexOf(':' + localPart, position);
+           if (i == -1) {
+               end = true;
+           } else {
+            
+               String previousPrefix = s.substring(i - prefixSize, i);
+               if (previousPrefix.indexOf('<') == -1) {
+                   prefixSize++;
+                   previousPrefix = s.substring(i - prefixSize, i);
+               }
+            
+               s = s.replace(previousPrefix +':'+localPart, "<gco:" + localPart);
+               s = s.replace(previousPrefix.charAt(0) + "/" + previousPrefix.substring(1) +':'+localPart, "</gco:" + localPart);
+               position = position + s.lastIndexOf("</gco:") + 6 + localPart.length();
+           }
+       }
+       return s;
+   }
+   
+    /**
+     * return The namespace URI for the specified prefix end version.
+     * caution: the prefix are not dynamically attributed.
      * 
      * @param prefix
      * @param distantVersion
@@ -649,7 +762,7 @@ public class CatalogueHarvester {
                 return "http://www.isotc211.org/2005/gmd";
             
             else 
-                throw new IllegalArgumentException("prefix unsupported: " + prefix);
+                throw new IllegalArgumentException("2.0.2 prefix unsupported: " + prefix + ".");
         } else {
             if (prefix.equals("csw"))
                 return "http://www.opengis.net/cat/csw";
@@ -661,7 +774,7 @@ public class CatalogueHarvester {
                 return "http://www.isotc211.org/2005/gmd";
             
             else 
-                throw new IllegalArgumentException("prefix unsupported: " + prefix);
+                throw new IllegalArgumentException("2.0.0 prefix unsupported: " + prefix + ".");
         }
     }
 }

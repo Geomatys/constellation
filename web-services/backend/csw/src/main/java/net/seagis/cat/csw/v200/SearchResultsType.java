@@ -17,6 +17,7 @@
 package net.seagis.cat.csw.v200;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -81,7 +82,7 @@ public class SearchResultsType {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
-    @XmlAnyElement(lax = true)
+    //@XmlAnyElement(lax = true)
     private List<Object> any;
     
     @XmlAttribute
@@ -113,6 +114,17 @@ public class SearchResultsType {
             abstractRecord = new ArrayList<JAXBElement<? extends AbstractRecordType>>();
         }
         return this.abstractRecord;
+    }
+    
+    /**
+     * Gets the value of the any property.
+     * (unModifiable)
+     */
+    public List<Object> getAny() {
+        if (any == null) {
+            any = new ArrayList<Object>();
+        }
+        return Collections.unmodifiableList(any);
     }
 
     /**

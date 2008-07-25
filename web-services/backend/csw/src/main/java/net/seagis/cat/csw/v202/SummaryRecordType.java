@@ -30,10 +30,8 @@ import net.seagis.dublincore.v2.elements.SimpleLiteral;
 
 
 /**
- * 
- *             This type defines a summary representation of the common record
- *             format.  It extends AbstractRecordType to include the core
- *             properties.
+ *  This type defines a summary representation of the common record format.
+ * It extends AbstractRecordType to include the core properties.
  *          
  * 
  * <p>Java class for SummaryRecordType complex type.
@@ -114,10 +112,12 @@ public class SummaryRecordType extends AbstractRecordType {
             List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract){
         
         this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
-        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        if (identifier != null)
+            this.identifier.add(dublinFactory.createIdentifier(identifier));
         
         this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
-        this.title.add(dublinFactory.createTitle(title));
+        if (title != null)
+            this.title.add(dublinFactory.createTitle(title));
         
         this.type = type;
         
@@ -128,13 +128,16 @@ public class SummaryRecordType extends AbstractRecordType {
         this.subject = subject;
         
         this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
-        this.format.add(dublinFactory.createFormat(format));
+        if (format != null)
+            this.format.add(dublinFactory.createFormat(format));
         
         this.modified = new ArrayList<SimpleLiteral>();
-        this.modified.add(modified);
+        if (modified != null)
+            this.modified.add(modified);
         
         this._abstract = new ArrayList<SimpleLiteral>();
-        this._abstract.add(_abstract);
+        if (_abstract != null)
+            this._abstract.add(_abstract);
         
         
     }

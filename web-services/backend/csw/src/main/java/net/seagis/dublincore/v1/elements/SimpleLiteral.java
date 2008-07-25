@@ -65,6 +65,39 @@ public class SimpleLiteral extends AbstractSimpleLiteral {
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String scheme;
+    
+     /**
+     * An empty constructor used by JAXB
+     */
+    public SimpleLiteral() {
+        
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String content) {
+        this.content = new ArrayList<String>();
+        this.content.add(content);
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String scheme, String content) {
+        this.scheme  = scheme;
+        this.content = new ArrayList<String>();
+        this.content.add(content);
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String scheme, List<String> content) {
+        this.scheme  = scheme;
+        this.content = content;
+    }
+    
 
     /**
      * This is the default type for all of the DC elements. 

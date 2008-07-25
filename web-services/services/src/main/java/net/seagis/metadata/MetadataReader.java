@@ -41,9 +41,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Seagis Dependencies
+import javax.xml.namespace.QName;
 import net.seagis.cat.csw.v202.AbstractRecordType;
 import net.seagis.cat.csw.v202.BriefRecordType;
 import net.seagis.cat.csw.v202.ElementSetType;
@@ -187,7 +189,7 @@ public class MetadataReader {
      * @return An metadata object.
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type) throws SQLException, OWSWebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
         Object result;
         int id;
         
@@ -221,12 +223,13 @@ public class MetadataReader {
                     metadatas.put(identifier, result);
                 }
             }
+            
         } else {
             Form f = MDReader.getForm(MDCatalogs.get(0), id);
             if (f == null) {
                 MDReader.getForm(MDCatalogs.get(1), id);
             }
-            result = getRecordFromForm(f, type);
+            result = getRecordFromForm(f, type, elementName);
         }
         return result;
     }
@@ -268,17 +271,69 @@ public class MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(Form form, ElementSetType type) throws SQLException {
+    private AbstractRecordType getRecordFromForm(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
         if (recordStandard.equals(Standard.ISO_19115)) {
             return getRecordFromMDForm(form, type);
         } else {
             Object obj =  getObjectFromForm(form);
-            if (obj instanceof AbstractRecordType)
-                return (AbstractRecordType) obj;
+            RecordType record;
+            if (obj instanceof RecordType)
+                record =  (RecordType) obj;
             else
                 return null;
+            
+            // for an ElementSetName mode
+            if (elementName == null || elementName.size() == 0) {
+                
+                // for a element set FULL we return the record directly
+                if (type == null || type.equals(ElementSetType.FULL)) {
+                    return record;
+            
+                // Summary view
+                } else if (type.equals(ElementSetType.SUMMARY)) {
+                    return record.toSummaryRecord();
+           
+                // Brief view
+                } else  if (type.equals(ElementSetType.BRIEF)) {
+                    return record.toBriefRecord();
+            
+                // this case must never happen
+                } else {
+                    return null;
+                }
+            
+            // for an element name mode    
+            } else {
+                RecordType result = new RecordType();
+                Class recordClass = RecordType.class;
+                for (QName qn: elementName) {
+
+                    String getterName = "get" + firstToUpper(qn.getLocalPart());
+                    String setterName = "set" + firstToUpper(qn.getLocalPart());
+                    try {
+                        Method getter = recordClass.getMethod(getterName);
+                        Object param  = getter.invoke(record);
+                        
+                        Method setter = recordClass.getMethod(setterName, param.getClass());
+                        setter.invoke(result, param);
+
+                    } catch (IllegalAccessException ex) {
+                        logger.info("Illegal Access exception while invoking the method " + getterName + " in the classe RecordType");
+                    } catch (IllegalArgumentException ex) {
+                       logger.info("illegal argument exception while invoking the method " + getterName + " in the classe RecordType");
+                    } catch (InvocationTargetException ex) {
+                        logger.info("Invocation Target exception while invoking the method " + getterName + " in the classe RecordType");
+                    } catch (NoSuchMethodException ex) {
+                        logger.info("The method " + getterName + " does not exists in the classe RecordType");
+                    } catch (SecurityException ex) {
+                        logger.info("Security exception while getting the method " + getterName + " in the classe RecordType");
+                    }
+                    
+                }
+                return result;
+            }
         }
         
     }

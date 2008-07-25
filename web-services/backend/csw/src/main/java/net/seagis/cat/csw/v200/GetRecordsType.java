@@ -295,4 +295,11 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         }
     }
 
+    public void setCQLConstraint(String CQLQuery) {
+        if (abstractQuery != null && abstractQuery.getValue() != null) {
+                AbstractQueryType query = abstractQuery.getValue();
+                query.setConstraint(new QueryConstraintType(CQLQuery, "1.1.0"));
+        } 
+    }
+
 }

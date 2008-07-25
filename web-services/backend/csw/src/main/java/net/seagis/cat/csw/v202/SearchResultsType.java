@@ -156,9 +156,10 @@ public class SearchResultsType {
        
         
     }
+    
     /**
-     * build a new search results. (RESULTS MODE)
-     * One of any or abstract record have to be null.
+     * build a new search results. (RESULTS mode - OGCCORE mode).
+     * 
      */
     public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched,
             List<AbstractRecordType> records, Integer numberOfRecordsReturned) {
@@ -172,18 +173,34 @@ public class SearchResultsType {
             
             AbstractRecordType record = records.get(i);
             
+            if (record == null) continue;
+            
             if (record instanceof BriefRecordType) {
                 abstractRecord.add(factory.createBriefRecord((BriefRecordType)record));
+            } else if (record instanceof RecordType) {
+                abstractRecord.add(factory.createRecord((RecordType)record));
             } else if (record instanceof SummaryRecordType) {
                 abstractRecord.add(factory.createSummaryRecord((SummaryRecordType)record));
             } else if (record instanceof DCMIRecordType) {
                 abstractRecord.add(factory.createDCMIRecord((DCMIRecordType)record));
-            } else if (record instanceof RecordType) {
-                abstractRecord.add(factory.createRecord((RecordType)record));
             } else {
                 throw new IllegalArgumentException(" unknow AbstractRecord subType:" + record.getClass().getSimpleName());
             }
         }
+        
+    }
+    
+    /**
+     * build a new search results. (RESULTS mode - ISO19139 mode).
+     * 
+     */
+    public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched,
+            Integer numberOfRecordsReturned, List<Object> records) {
+        this.resultSetId             = resultSetId;
+        this.elementSet              = elementSet;
+        this.numberOfRecordsMatched  = numberOfResultMatched;
+        this.numberOfRecordsReturned = numberOfRecordsReturned;
+        this.any                     = records;
         
     }
     

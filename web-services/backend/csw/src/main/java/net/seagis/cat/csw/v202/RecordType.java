@@ -151,6 +151,26 @@ public class RecordType extends DCMIRecordType {
         return s.toString();
     }
     
+    /**
+     * Transform the recordType into a SUmmaryRecordType
+     * @return
+     */
+    public SummaryRecordType toSummaryRecord() {
+        List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+        for (JAXBElement<? extends BoundingBoxType> bb: getBoundingBox()) {
+                bboxes.add(bb.getValue());
+        }
+        return new SummaryRecordType(getIdentifier(), getTitle(), getType(), bboxes, getSubject(), getFormat(), getModified(), getAbstract());
+    }
+    
+    public BriefRecordType toBriefRecord() {
+        List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+        for (JAXBElement<? extends BoundingBoxType> bb: getBoundingBox()) {
+                bboxes.add(bb.getValue());
+        }
+        return new BriefRecordType(getIdentifier(), getTitle(), getType(), bboxes);
+    }
+    
      /**
      * Verify if this entry is identical to the specified object.
      */

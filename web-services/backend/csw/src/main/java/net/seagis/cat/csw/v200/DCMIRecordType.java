@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.dublincore.AbstractSimpleLiteral;
@@ -75,6 +76,7 @@ import org.geotools.util.Utilities;
 @XmlSeeAlso({
     RecordType.class
 })
+@XmlRootElement(name="DCMIRecord")        
 public class DCMIRecordType extends AbstractRecordType {
 
   

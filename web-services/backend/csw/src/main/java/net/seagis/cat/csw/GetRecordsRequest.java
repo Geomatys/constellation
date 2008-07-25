@@ -105,5 +105,10 @@ public interface GetRecordsRequest  {
      */
     public void removeConstraint();
     
+    /**
+     * replace the Query constraint by a new COnstraint with the specified CQL text.
+     */
+    public void setCQLConstraint(String CQLQuery);
+    
 
 }

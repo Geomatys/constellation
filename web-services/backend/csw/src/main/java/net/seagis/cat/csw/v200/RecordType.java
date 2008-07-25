@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.dublincore.v1.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
@@ -55,6 +56,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "RecordType", propOrder = {
     "boundingBox"
 })
+@XmlRootElement(name= "Record")
 public class RecordType extends DCMIRecordType {
 
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)

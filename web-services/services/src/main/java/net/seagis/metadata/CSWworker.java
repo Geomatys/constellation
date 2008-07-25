@@ -76,7 +76,6 @@ import net.seagis.cat.csw.v202.TransactionType;
 import net.seagis.cat.csw.v202.UpdateType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.filter.FilterParser;
 import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
@@ -573,7 +572,7 @@ public class CSWworker {
         cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         File f            = null;
-        File env          = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
+        File env          = new File("/opt/tomcat/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
         logger.info("Path to config file=" + env);
         isStarted = true;
         try {
@@ -799,10 +798,12 @@ public class CSWworker {
         
         // we get the element set type (BRIEF, SUMMARY OR FULL)
         ElementSetNameType setName = query.getElementSetName();
-        ElementSetType set         = ElementSetType.BRIEF;
+        ElementSetType set         = ElementSetType.SUMMARY;
+        List<QName> elementName    = query.getElementName();
         if (setName != null) {
             set = setName.getValue();
         }
+        
         SearchResultsType searchResults = null;
         
         //we get the maxRecords wanted and start position
@@ -841,7 +842,7 @@ public class CSWworker {
                     List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
                     
                     for (int i = 0; i < maxRecord; i++) {
-                        records.add((AbstractRecordType)MDReader.getMetadata(results.get(i), DUBLINCORE, set));
+                        records.add((AbstractRecordType)MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName));
                     }
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
@@ -861,6 +862,16 @@ public class CSWworker {
                     searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size());
                 } else if (resultType.equals(ResultType.RESULTS)) {
                 
+                    List<Object> records = new ArrayList<Object>();
+                    
+                    for (int i = 0; i < maxRecord; i++) {
+                        records.add((MetaDataImpl)MDReader.getMetadata(results.get(i), ISO_19115, set, elementName));
+                    }
+                    searchResults = new SearchResultsType(ID, 
+                                                          set, 
+                                                          results.size(),
+                                                          maxRecord,
+                                                          records);
                 //TODO
                 } else if (resultType.equals(ResultType.VALIDATE)) {
                     throw new OWSWebServiceException("The service does not yet handle the VALIDATE resultType.",
@@ -925,7 +936,7 @@ public class CSWworker {
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
                 try {
-                    Object o = MDReader.getMetadata(id, DUBLINCORE, set);
+                    Object o = MDReader.getMetadata(id, DUBLINCORE, set, null);
                     if (o instanceof BriefRecordType) {
                         records.add(cswFactory202.createBriefRecord((BriefRecordType)o));
                     } else if (o instanceof SummaryRecordType) {
@@ -946,7 +957,7 @@ public class CSWworker {
            List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
            for (String id:request.getId()) {
                 try {
-                    Object o = MDReader.getMetadata(id, ISO_19115, set);
+                    Object o = MDReader.getMetadata(id, ISO_19115, set, null);
                     if (o instanceof MetaDataImpl) {
                         records.add((MetaDataImpl)o);
                     }
@@ -962,7 +973,7 @@ public class CSWworker {
            List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
                 try {
-                    Object o = MDReader.getMetadata(id, ISO_19115, set);
+                    Object o = MDReader.getMetadata(id, ISO_19115, set, null);
                     if (o != null) {
                         records.add(o);
                     }
