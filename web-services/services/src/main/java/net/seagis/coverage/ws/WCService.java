@@ -43,6 +43,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
@@ -165,20 +166,18 @@ public class WCService extends WebService {
             if (props == null) {
                 throw new NamingException("\"Coverages Properties\" JNDI reference is not defined.");
             }
-            final String permission = (String) props.get("Permission").getContent();
-            final String rootDir    = (String) props.get("RootDirectory").getContent();
-            final String readOnly   = (String) props.get("ReadOnly").getContent();
-            /* Put all properties found in the JNDI reference into the Properties HashMap
-             */
             final Properties properties = new Properties();
+            final RefAddr permission  = (RefAddr) props.get("Permission");
             if (permission != null) {
-                properties.setProperty(ConfigurationKey.PERMISSION.getKey(), permission);
+                properties.setProperty(ConfigurationKey.PERMISSION.getKey(), (String)permission.getContent());
             }
+            final RefAddr rootDir = (RefAddr) props.get("RootDirectory");
             if (rootDir != null) {
-                properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), rootDir);
+                properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), (String)rootDir.getContent());
             }
+            final RefAddr readOnly   = (RefAddr) props.get("ReadOnly");
             if (readOnly != null) {
-                properties.setProperty(ConfigurationKey.READONLY.getKey(), readOnly);
+                properties.setProperty(ConfigurationKey.READONLY.getKey(), (String)readOnly.getContent());
             }
             final Database database;
             try {
