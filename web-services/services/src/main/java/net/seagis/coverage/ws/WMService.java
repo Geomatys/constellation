@@ -42,8 +42,6 @@ import java.sql.Connection;
 
 import java.util.Properties;
 import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
@@ -105,7 +103,6 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 @Path("wms")
 @Singleton
 public class WMService extends WebService {
-    private final static Logger LOGGER = Logger.getLogger("net.seagis.coverage.ws");
     /**
      * A list of layer initialized a begining;
      */
@@ -123,49 +120,59 @@ public class WMService extends WebService {
      * @throws NamingException if an error in getting properties from JNDI references occured.
      * @throws SQLException if an error occured while configuring the connection.
      */
-    private static synchronized void ensureWorkerInitialized() throws NamingException, SQLException {
+    private static synchronized void ensureWorkerInitialized() throws SQLException, IOException {
         if (webServiceWorker == null) {
-            final InitialContext ctx = new InitialContext();
-            // Initialize the database connection
-            final DataSource ds = (DataSource) ctx.lookup("Coverages");
-            if (ds == null) {
-                throw new NamingException("DataSource \"Coverages\" is not defined.");
-            }
-            final Connection connection = ds.getConnection();
-            // Gets properties defined in the JNDI reference "Coverages Properties"
-            final Reference props = (Reference) ctx.lookup("Coverages Properties");
-            if (props == null) {
-                throw new NamingException("\"Coverages Properties\" JNDI reference is not defined.");
-            }
-            /* Put all properties found in the JNDI reference into the Properties HashMap
-             */
-            final Properties properties = new Properties();
-            final RefAddr permission  = (RefAddr) props.get("Permission");
-            if (permission != null) {
-                properties.setProperty(ConfigurationKey.PERMISSION.getKey(), (String)permission.getContent());
-            }
-            final RefAddr rootDir = (RefAddr) props.get("RootDirectory");
-            if (rootDir != null) {
-                properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), (String)rootDir.getContent());
-            }
-            final RefAddr readOnly   = (RefAddr) props.get("ReadOnly");
-            if (readOnly != null) {
-                properties.setProperty(ConfigurationKey.READONLY.getKey(), (String)readOnly.getContent());
-            }
-            final Database database;
+            Database database;
             try {
-                database = new Database(connection, properties);
-            } catch (IOException io) {
-                /* This error should never appear, because the IOException on the Database
-                 * constructor can only overcome if we use the constructor
-                 * Database(DataSource, Properties, String), and here the string for the
-                 * configuration file is null, so no reading method on a file will be used.
-                 * Anyways if this error occurs, an AssertionError is then thrown.
+                final InitialContext ctx = new InitialContext();
+                // Initialize the database connection
+                final DataSource ds = (DataSource) ctx.lookup("Coverages");
+                if (ds == null) {
+                    throw new NamingException("DataSource \"Coverages\" is not defined.");
+                }
+                final Connection connection = ds.getConnection();
+                // Gets properties defined in the JNDI reference "Coverages Properties"
+                final Reference props = (Reference) ctx.lookup("Coverages Properties");
+                if (props == null) {
+                    throw new NamingException("\"Coverages Properties\" JNDI reference is not defined.");
+                }
+                /* Put all properties found in the JNDI reference into the Properties HashMap
                  */
-                throw new AssertionError(io);
+                final Properties properties = new Properties();
+                final RefAddr permission = (RefAddr) props.get("Permission");
+                if (permission != null) {
+                    properties.setProperty(ConfigurationKey.PERMISSION.getKey(), (String) permission.getContent());
+                }
+                final RefAddr rootDir = (RefAddr) props.get("RootDirectory");
+                if (rootDir != null) {
+                    properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), (String) rootDir.getContent());
+                }
+                final RefAddr readOnly = (RefAddr) props.get("ReadOnly");
+                if (readOnly != null) {
+                    properties.setProperty(ConfigurationKey.READONLY.getKey(), (String) readOnly.getContent());
+                }
+
+                try {
+                    database = new Database(connection, properties);
+                } catch (IOException io) {
+                    /* This error should never appear, because the IOException on the Database
+                     * constructor can only overcome if we use the constructor
+                     * Database(DataSource, Properties, String), and here the string for the
+                     * configuration file is null, so no reading method on a file will be used.
+                     * Anyways if this error occurs, an AssertionError is then thrown.
+                     */
+                    throw new AssertionError(io);
+                }
+            } catch (NamingException n) {
+                /* If a NamingException occurs, it is because the JNDI connection is not
+                 * correctly defined, and some information are lacking.
+                 * In this case we try to use the old system of configuration file.
+                 */
+                database = new Database();
             }
             final WebServiceWorker initialValue = new WebServiceWorker(database, true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
+
                 @Override
                 protected WebServiceWorker initialValue() {
                     return new WebServiceWorker(initialValue);
@@ -177,7 +184,7 @@ public class WMService extends WebService {
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
-    public WMService() throws JAXBException, WebServiceException, NamingException, SQLException {
+    public WMService() throws JAXBException, WebServiceException, SQLException, IOException {
         super("WMS", new ServiceVersion(Service.WMS, "1.3.0"), new ServiceVersion(Service.WMS, "1.1.1"));
         ensureWorkerInitialized();
 
