@@ -149,10 +149,11 @@ public class SearchResultsType {
     /**
      * build a new search results (HITS MODE).
      */
-    public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched) {
+    public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched, int nextRecord) {
         this.resultSetId            = resultSetId;
         this.elementSet             = elementSet;
         this.numberOfRecordsMatched = numberOfResultMatched;
+        this.nextRecord             = nextRecord;
        
         
     }
@@ -162,11 +163,12 @@ public class SearchResultsType {
      * 
      */
     public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched,
-            List<AbstractRecordType> records, Integer numberOfRecordsReturned) {
+            List<AbstractRecordType> records, Integer numberOfRecordsReturned, int nextRecord) {
         this.resultSetId             = resultSetId;
         this.elementSet              = elementSet;
         this.numberOfRecordsMatched  = numberOfResultMatched;
         this.numberOfRecordsReturned = numberOfRecordsReturned;
+        this.nextRecord              = nextRecord;
         
         abstractRecord = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
         for (int i = 0; i < records.size(); i++) {

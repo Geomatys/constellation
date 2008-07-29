@@ -245,7 +245,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      */
     public Integer getMaxRecords() {
         if (maxRecords == null) {
-            return new Integer("10");
+            return 10;
         } else {
             return maxRecords;
         }

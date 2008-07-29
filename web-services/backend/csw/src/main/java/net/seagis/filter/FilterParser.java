@@ -448,7 +448,7 @@ public class FilterParser {
                    response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")) {
+                    if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)
@@ -460,11 +460,12 @@ public class FilterParser {
                         dateValue = dateValue.replace("-", "");
                         response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
                     } else {
-                        throw new IllegalArgumentException("not supported yet no date range");
+                        throw new OWSWebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")) {
+                    if (propertyName.contains("Date") || propertyName.contains("Modified") || propertyName.contains("date")) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)
@@ -476,11 +477,12 @@ public class FilterParser {
                         dateValue = dateValue.replace("-", "");
                         response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
                     } else {
-                        throw new IllegalArgumentException("not supported yet no date range");
+                        throw new OWSWebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")) {
+                    if (propertyName.contains("Date") || propertyName.contains("Modified") || propertyName.contains("date")) {
                         //if we are passed by CQL we must format the date
                         String dateValue = literal.getStringValue();
                         try {
@@ -493,11 +495,12 @@ public class FilterParser {
                         dateValue = dateValue.replace("-", "");
                         response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
                     } else {
-                        throw new IllegalArgumentException("not supported yet no date range");
+                        throw new OWSWebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")) {
+                    if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)
@@ -509,7 +512,8 @@ public class FilterParser {
                         dateValue = dateValue.replace("-", "");
                         response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
                     } else {
-                        throw new IllegalArgumentException("not supported yet no date range");
+                         throw new OWSWebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
                     }
                 } else {
                     throw new OWSWebServiceException("Unkwnow comparison operator: " + operator,

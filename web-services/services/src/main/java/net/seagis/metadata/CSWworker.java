@@ -108,12 +108,16 @@ import javax.xml.namespace.QName;
 
 //mdweb model dependencies
 import net.seagis.dublincore.AbstractSimpleLiteral;
+import net.seagis.ogc.SortByType;
+import net.seagis.ogc.SortPropertyType;
+import org.apache.lucene.search.Sort;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
 import org.mdweb.sql.v20.Writer20;
 
 // GeoAPI dependencies
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.metadata.identification.Identification;
 
 // PostgreSQL dependencies
@@ -412,56 +416,57 @@ public class CSWworker {
          */
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
-        paths.add("Catalog Web Service:Record:title");
+        paths.add("Catalog Web Service:Record:title:content");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
         //TODO verify codelist=originator
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
-        paths.add("Catalog Web Service:Record:creator");
+        paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
-        paths.add("Catalog Web Service:Record:subject");
+        paths.add("Catalog Web Service:Record:subject:content");
         DUBLIN_CORE_QUERYABLE.put("description", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
-        paths.add("Catalog Web Service:Record:abstract");
+        paths.add("Catalog Web Service:Record:abstract:content");
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
         
         //TODO verify codelist=publisher
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
-        paths.add("Catalog Web Service:Record:publisher");
+        paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
         
         //TODO verify codelist=contributor
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
-        paths.add("Catalog Web Service:Record:contributor");
+        paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:dateStamp");
-        paths.add("Catalog Web Service:Record:date");
+        paths.add("Catalog Web Service:Record:date:content");
         DUBLIN_CORE_QUERYABLE.put("date", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
-        paths.add("Catalog Web Service:Record:type");
+        paths.add("Catalog Web Service:Record:type:content");
         DUBLIN_CORE_QUERYABLE.put("type", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
-        paths.add("Catalog Web Service:Record:format");
+        paths.add("Catalog Web Service:Record:format:content");
         DUBLIN_CORE_QUERYABLE.put("format", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
-        paths.add("Catalog Web Service:Record:identifier");
+        paths.add("Catalog Web Service:Record:identifier:content");
+        paths.add("ISO 19110:FC_FeatureCatalogue:id");
         DUBLIN_CORE_QUERYABLE.put("identifier", paths);
         
         paths = new ArrayList<String>();
@@ -470,17 +475,17 @@ public class CSWworker {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:language");
-        paths.add("Catalog Web Service:Record:language");
+        paths.add("Catalog Web Service:Record:language:content");
         DUBLIN_CORE_QUERYABLE.put("language", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo");
-        paths.add("Catalog Web Service:Record:relation");
+        paths.add("Catalog Web Service:Record:relation:content");
         DUBLIN_CORE_QUERYABLE.put("relation", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
-        paths.add("Catalog Web Service:Record:rights");
+        paths.add("Catalog Web Service:Record:rights:content");
         DUBLIN_CORE_QUERYABLE.put("rigths", paths);
         
         /*
@@ -736,7 +741,7 @@ public class CSWworker {
     }
     
     /**
-     * TODO
+     * Web service operation which permits to search the catalogue.
      * 
      * @param request
      * @return
@@ -754,6 +759,14 @@ public class CSWworker {
         String format = request.getOutputFormat();
         if (format != null && isSupportedFormat(format)) {
             outputFormat = format;
+        } else if (format != null && !isSupportedFormat(format)) {
+            String supportedFormat = "";
+            for (String s: ACCEPTED_OUTPUT_FORMATS) {
+                supportedFormat = supportedFormat  + s + '\n';
+            } 
+            throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
+                                             " supported ones are: " + '\n' + supportedFormat,
+                                             INVALID_PARAMETER_VALUE, "outputFormat", version);
         }
         
         //we get the output schema and verify that we handle it
@@ -812,6 +825,27 @@ public class CSWworker {
         
         // build the lucene query from the specified filter
         SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
+        
+        //we look for a sorting request (for now only one sort is used)
+        SortByType sortBy = query.getSortBy();
+        if (sortBy != null && sortBy.getSortProperty().size() > 0) {
+            SortPropertyType first = sortBy.getSortProperty().get(0);
+            if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
+                throw new OWSWebServiceException("A SortBy filter must specify a propertyName.",
+                                             NO_APPLICABLE_CODE, null, version);
+            String propertyName = removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+            
+            Sort sortFilter;
+            if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
+                sortFilter = new Sort(propertyName, false);
+                logger.info("sort ASC");
+            } else {
+                sortFilter = new Sort(propertyName, true);
+                logger.info("sort DSC");
+            }
+            luceneQuery.setSort(sortFilter);
+        }
+        
         logger.info("Lucene query obtained:" + luceneQuery);
         // we try to execute the query
         List<String> results;
@@ -829,26 +863,37 @@ public class CSWworker {
                                              NO_APPLICABLE_CODE, null, version);
         }
         
+        //we update the maxRecords attribute.
+        if (results.size() < maxRecord) {
+            maxRecord = results.size();
+        }
+        int nextRecord = startPos + maxRecord;
+        
         try {
             if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
             
                 // we return only the number of result matching
                 if (resultType.equals(ResultType.HITS)) {
-                    searchResults = new SearchResultsType(ID, set, results.size());
+                    searchResults = new SearchResultsType(ID, set, results.size(), nextRecord);
                 
                 // we return a list of Record
                 } else if (resultType.equals(ResultType.RESULTS)) {
                 
                     List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-                    
-                    for (int i = 0; i < maxRecord; i++) {
-                        records.add((AbstractRecordType)MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName));
+                    int max = maxRecord;
+                    for (int i = startPos -1; i < max; i++) {
+                        Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
+                        if (obj == null)
+                            max++;
+                        else
+                            records.add((AbstractRecordType)obj);
                     }
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
                                                           results.size(),
                                                           records,
-                                                          maxRecord);
+                                                          maxRecord,
+                                                          nextRecord);
                         
                 // TODO
                 } else if (resultType.equals(ResultType.VALIDATE)) {
@@ -859,13 +904,16 @@ public class CSWworker {
             
                 // we return only the number of result matching
                 if (resultType.equals(ResultType.HITS)) {
-                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size());
+                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size(), nextRecord);
+                
                 } else if (resultType.equals(ResultType.RESULTS)) {
                 
                     List<Object> records = new ArrayList<Object>();
                     
-                    for (int i = 0; i < maxRecord; i++) {
-                        records.add((MetaDataImpl)MDReader.getMetadata(results.get(i), ISO_19115, set, elementName));
+                    for (int i = startPos -1; i < maxRecord; i++) {
+                        Object obj = MDReader.getMetadata(results.get(i), ISO_19115, set, elementName);
+                        if (obj instanceof MetaDataImpl)
+                            records.add((MetaDataImpl)obj);
                     }
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
@@ -892,7 +940,7 @@ public class CSWworker {
     }
     
     /**
-     * TODO
+     * web service operation return one or more records specified by there identifier.
      * 
      * @param request
      * @return
@@ -905,6 +953,14 @@ public class CSWworker {
         String format = request.getOutputFormat();
         if (format != null && isSupportedFormat(format)) {
             outputFormat = format;
+        } else if (format != null && !isSupportedFormat(format)) {
+            String supportedFormat = "";
+            for (String s: ACCEPTED_OUTPUT_FORMATS) {
+                supportedFormat = supportedFormat  + s + '\n';
+            } 
+            throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
+                                             " supported ones are: " + '\n' + supportedFormat,
+                                             INVALID_PARAMETER_VALUE, "outputFormat", version);
         }
         
         
@@ -933,6 +989,7 @@ public class CSWworker {
         
         //we build dublin core object
         if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+            List<String> unexistingID = new ArrayList<String>();
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
                 try {
@@ -948,7 +1005,28 @@ public class CSWworker {
                 } catch (SQLException e) {
                     throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
                                                       NO_APPLICABLE_CODE, "id", version);
+                /* here we catch the exception reporting the non-existenz of identifier.
+                 * if at least one id match we return the record, else we throw the exception
+                 */ 
+                } catch (OWSWebServiceException e) {
+                   if (e.getLocator().equals("id")) {
+                       unexistingID.add(id);
+                       logger.severe("unexisting id:" + id);
+                   } else {
+                       throw e;
+                   }
                 }
+            }
+            if (records.size() == 0) {
+                String identifiers = "";
+                for (String s: unexistingID) {
+                    identifiers = identifiers + s + ',';
+                }
+                if (identifiers.lastIndexOf(',') != -1)
+                    identifiers.substring(0, identifiers.length() - 1);
+                
+                throw new OWSWebServiceException("The identifiers " + identifiers + " does not exist",
+                                                     INVALID_PARAMETER_VALUE, "id", version);
             }
         
             response = new GetRecordByIdResponseType(records, null, null);
@@ -1532,6 +1610,17 @@ public class CSWworker {
                                           NO_APPLICABLE_CODE, null, version);
          }  
         
+    }
+    
+    /**
+     * Remove the prefix on propertyName.
+     */
+    private String removePrefix(String s) {
+        int i = s.indexOf(':');
+        if ( i != -1) {
+            s = s.substring(i + 1, s.length());
+        }
+        return s;
     }
     
 }

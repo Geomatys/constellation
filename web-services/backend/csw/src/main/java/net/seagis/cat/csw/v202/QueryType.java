@@ -90,6 +90,11 @@ public class QueryType extends AbstractQueryType {
     
     /**
      * Build a new Query
+     * 
+     * @param typeNames A list of QName describing the different types of Record.
+     * @param elementSetName The element set required for this query.
+     * @param sortBy A sort by Object.
+     * @param constraint A constraint object containing the different filters to constraint the query.            
      */
     public QueryType(List<QName> typeNames, ElementSetNameType elementSetName, SortByType sortBy,
             QueryConstraintType constraint) {

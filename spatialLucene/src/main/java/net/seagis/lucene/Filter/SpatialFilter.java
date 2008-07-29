@@ -312,7 +312,8 @@ public class SpatialFilter extends Filter {
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             GeneralEnvelope tempBox = readBoundingBox(reader.document(docNum));
-            
+            if (tempBox == null)
+                continue;
             switch (filterType) {
 
                 case CONTAINS:
@@ -561,15 +562,27 @@ public class SpatialFilter extends Filter {
         
         double[] min = {minx, miny};
         double[] max = {maxx, maxy};
-        GeneralEnvelope result = new GeneralEnvelope(min, max);
+        GeneralEnvelope result = null;
         
         try {
-            if (sourceCRSName.equals(geometryCRSName)) {
-                result.setCoordinateReferenceSystem(geometryCRS);
-            } else {
-                result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
-                result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
+            result = new GeneralEnvelope(min, max);
+        
+        } catch (IllegalArgumentException e) {
+            String s = doc.getField("Title").stringValue();
+        
+            logger.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
+                          "cause: " + e.getMessage());
+            e.printStackTrace();
+        }
+        try {
+            if (result != null) {
+                if (sourceCRSName.equals(geometryCRSName)) {
+                    result.setCoordinateReferenceSystem(geometryCRS);
+                } else {
+                    result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
+                    result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
                 
+                }
             }
         
         } catch (NoSuchAuthorityCodeException ex) {

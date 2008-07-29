@@ -170,7 +170,7 @@ public class CSWService extends WebService {
     @Override
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         try {
-            
+             
             if (worker != null) {
             
                 worker.setServiceURL(getServiceURL());

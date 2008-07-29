@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.dublincore.v2.elements.SimpleLiteral;
+import net.seagis.ows.v100.WGS84BoundingBoxType;
 
 
 /**
@@ -112,18 +113,23 @@ public class SummaryRecordType extends AbstractRecordType {
             List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract){
         
         this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
-        if (identifier != null)
-            this.identifier.add(dublinFactory.createIdentifier(identifier));
+        if (identifier == null)
+            identifier = new SimpleLiteral();
+        this.identifier.add(dublinFactory.createIdentifier(identifier));
         
         this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
-        if (title != null)
-            this.title.add(dublinFactory.createTitle(title));
+        if (title == null)
+            title = new SimpleLiteral();
+        this.title.add(dublinFactory.createTitle(title));
         
         this.type = type;
         
         this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         for (BoundingBoxType bbox: bboxes) {
-            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else if (bbox != null)
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
         }
         this.subject = subject;
         

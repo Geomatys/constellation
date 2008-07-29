@@ -98,6 +98,6 @@ public class SortPropertyType implements SortBy {
         else if (sortOrder != null && sortOrder.equals(SortOrderType.DESC))
             return SortOrder.DESCENDING;
         else
-            return null;
+            return SortOrder.ASCENDING;
     }
 }

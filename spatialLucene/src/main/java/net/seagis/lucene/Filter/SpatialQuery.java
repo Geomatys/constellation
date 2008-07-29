@@ -19,6 +19,7 @@ package net.seagis.lucene.Filter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Sort;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.TransformException;
@@ -49,6 +50,11 @@ public class SpatialQuery {
      * A list of sub-queries with have to be executed separely.
      */
     private List<SpatialQuery> subQueries;
+    
+    /**
+     * An lucene Sort object allowing to sort the results
+     */
+    private Sort sort;
    
     
     /**
@@ -117,8 +123,8 @@ public class SpatialQuery {
      * Return the lucene query associated with the filter. 
      */
     public String getQuery() {
-        if (query == null)
-            return "";
+        if (query == null || query.toString().equals("") || query.toString().equals(" "))
+            return "metafile:doc";
         
         return query.toString();
     }
@@ -128,6 +134,25 @@ public class SpatialQuery {
      */
     public int getLogicalOperator() {
         return logicalOperator;
+    }
+    
+    /**
+     * Return the sort Object joinded to this Query. 
+     */
+    public Sort getSort() {
+        return sort;
+    }
+
+    /**
+     * Add a sort Object to the query
+     * 
+     * @param sort
+     */
+    public void setSort(Sort sort) {
+        this.sort = sort;
+        for (SpatialQuery sub: getSubQueries()) {
+            sub.setSort(sort);
+        }
     }
     
     /**
@@ -183,7 +208,7 @@ public class SpatialQuery {
             s.append("query: NOT <").append(query).append(">").append('\n');
             
         } else if (!query.equals("")) {
-            s.append('\t').append("query: ").append(query).append('\n');
+            s.append('\t').append("query: |").append(query).append('|').append('\n');
         }
             
         if (spatialFilter != null && !query.equals("")) {
@@ -201,7 +226,9 @@ public class SpatialQuery {
                 i++;
             }
         }
+        if (sort != null) {
+            s.append("Sort: ").append(sort).append('\n');
+        }
         return s.toString();
     }
-
 }

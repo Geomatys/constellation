@@ -76,6 +76,18 @@ public class OWSWebServiceException extends WebServiceException {
     }
     
     /**
+     * Returns the locator of the first exception in the report.
+     * or an empty String if there is no exception report.
+     */
+    public String getLocator() {
+        String locator = "";
+        if (exception != null && !exception.getException().isEmpty() &&  exception.getException().get(0).getLocator() != null) {
+            locator = exception.getException().get(0).getLocator();
+        } 
+        return locator;
+    }
+    
+    /**
      * Return the version number
      */
     public String getVersion() {

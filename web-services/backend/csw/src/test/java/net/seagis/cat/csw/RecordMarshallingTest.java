@@ -16,21 +16,27 @@
 
 package net.seagis.cat.csw;
 
-// JUnit dependencies
+// J2SE dependencies
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+//seagis dependencies
 import net.seagis.cat.csw.v202.RecordType;
 import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
 import net.seagis.ws.rs.NamespacePrefixMapperImpl;
+
+//Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 

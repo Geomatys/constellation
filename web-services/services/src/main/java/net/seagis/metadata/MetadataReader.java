@@ -41,7 +41,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Seagis Dependencies
@@ -274,8 +273,10 @@ public class MetadataReader {
     private AbstractRecordType getRecordFromForm(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
+        
         if (recordStandard.equals(Standard.ISO_19115)) {
             return getRecordFromMDForm(form, type);
+        
         } else {
             Object obj =  getObjectFromForm(form);
             RecordType record;
@@ -316,9 +317,13 @@ public class MetadataReader {
                         Method getter = recordClass.getMethod(getterName);
                         Object param  = getter.invoke(record);
                         
-                        Method setter = recordClass.getMethod(setterName, param.getClass());
-                        setter.invoke(result, param);
-
+                        Method setter = null;
+                        if (param != null) 
+                            setter = recordClass.getMethod(setterName, param.getClass());
+                        
+                        if (setter != null)
+                            setter.invoke(result, param);
+                        
                     } catch (IllegalAccessException ex) {
                         logger.info("Illegal Access exception while invoking the method " + getterName + " in the classe RecordType");
                     } catch (IllegalArgumentException ex) {

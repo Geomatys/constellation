@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
@@ -82,7 +84,12 @@ public class IndexLucene extends AbstractIndex {
     private final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
     
     /**
-     * Creates a new Lucene Index.
+     * A Map containg all the paths (used when reader is null)
+     */
+    private final Map<String, Path> pathMap;
+    
+    /**
+     * Creates a new Lucene Index with the specified MDweb reader.
      * 
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
@@ -91,6 +98,7 @@ public class IndexLucene extends AbstractIndex {
         
         this.reader = reader;
         analyzer    = new StandardAnalyzer();
+        pathMap     = null;
         
         // we get the configuration file
         File f = new File(configDirectory, "index");
@@ -98,7 +106,7 @@ public class IndexLucene extends AbstractIndex {
         setFileDirectory(f);
         
         //if the index File exists we don't need to index the documents again.
-        if(!getFileDirectory().exists()){
+        if(!getFileDirectory().exists()) {
             logger.info("Creating lucene index for the first time...");
             long time = System.currentTimeMillis();
             IndexWriter writer;
@@ -114,6 +122,64 @@ public class IndexLucene extends AbstractIndex {
                 logger.info("end read form");
                 nbForms    =  results.size();
                 for (Form form : results) {
+                    indexDocument(writer, form);
+                }
+                writer.optimize();
+                writer.close();
+                
+            } catch (CorruptIndexException ex) {
+                logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            } catch (LockObtainFailedException ex) {
+                logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                logger.severe("IOException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
+                        "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
+        } else {
+            logger.info("Index already created");
+        }
+    }
+    
+    /**
+     * Creates a new Lucene Index with the specified list of Form.
+     * This mode of lucene index don't use a MDweb reader (he don't need a database).
+     * for now it is used only in JUnit test.
+     * 
+     * @param forms The list of MDweb formular to index
+     * @param paths The list of path used in the forms (necesary because of there is no reader)
+     * @param configDirectory A directory where the index can write indexation file. 
+     */
+    protected IndexLucene(List<Form> forms, List<Path> paths, File configDirectory) throws SQLException {
+        
+        analyzer    = new StandardAnalyzer();
+        reader      = null;
+        
+        //we fill the map of path
+        pathMap = new HashMap<String, Path>();
+        for (Path p: paths) {
+            pathMap.put(p.getId(), p);
+        }
+
+        // we get the configuration file
+        File f = new File(configDirectory, "index");
+        
+        setFileDirectory(f);
+        
+        //if the index File exists we don't need to index the documents again.
+        if(!getFileDirectory().exists()) {
+            logger.info("Creating lucene index for the first time...");
+            long time = System.currentTimeMillis();
+            IndexWriter writer;
+            int nbCatalogs = 0;
+            int nbForms    = 0; 
+            try {
+                writer = new IndexWriter(getFileDirectory(), analyzer, true);
+                nbForms    =  forms.size();
+                for (Form form : forms) {
                     indexDocument(writer, form);
                 }
                 writer.optimize();
@@ -173,20 +239,29 @@ public class IndexLucene extends AbstractIndex {
      * 
      * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
      * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
+     * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(String term, Form form, Map<String,List<String>> queryable) throws SQLException {
+    private String getValues(String term, Form form, Map<String,List<String>> queryable, int ordinal) throws SQLException {
         StringBuilder response  = new StringBuilder("");
         List<String> paths = queryable.get(term);
+        
         for (String pathID: paths) {
-            Path path   = reader.getPath(pathID);
+            Path path;
+            if (reader != null) {
+                path   = reader.getPath(pathID);
+            } else {
+                path = pathMap.get(pathID);
+            }
             List<Value> values = form.getValueFromPath(path);
             for (Value v: values) {
-                if (v instanceof TextValue) {
+                if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
+                
                     TextValue tv = (TextValue) v;
                     response.append(tv.getValue()).append(','); 
-                }
+                
+                } 
             }
         }
         if (response.toString().equals("")) {
@@ -214,36 +289,29 @@ public class IndexLucene extends AbstractIndex {
         
         // For an ISO 19115 form
         if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
+            
+            logger.info("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
             for (String term :ISO_QUERYABLE.keySet()) {
-                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE),   Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }
         
             //we add the geometry parts
             String coord = "null";
             try {
-                coord = getValues("WestBoundLongitude", form, ISO_QUERYABLE);
-                int coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(0, coma);
+                coord = getValues("WestBoundLongitude", form, ISO_QUERYABLE, -1);
                 double minx = Double.parseDouble(coord);
-                coord = getValues("EastBoundLongitude", form, ISO_QUERYABLE);
-                coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(coma + 1, coord.length());
+
+                coord = getValues("EastBoundLongitude", form, ISO_QUERYABLE, -1);
                 double maxx = Double.parseDouble(coord);
             
-                coord = getValues("NorthBoundLatitude", form, ISO_QUERYABLE);
-                coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(0, coma);
+                coord = getValues("NorthBoundLatitude", form, ISO_QUERYABLE, -1);
                 double maxy = Double.parseDouble(coord);
             
-                coord = getValues("SouthBoundLatitude", form, ISO_QUERYABLE);
-                if (coma != -1)
-                    coord = coord.substring(coma + 1, coord.length());
+                coord = getValues("SouthBoundLatitude", form, ISO_QUERYABLE, -1);
                 double miny = Double.parseDouble(coord);
-                logger.info("before addBBOX");
+                
                 addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
             
             } catch (NumberFormatException e) {
@@ -251,39 +319,34 @@ public class IndexLucene extends AbstractIndex {
                     logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
+        }
         
-        // for a CSW Record    
-        } else if (form.getTopValue().getType().getName().equals("Record")) {
+        // for a CSW Record  and ISO 19115 form  
+        if (form.getTopValue().getType().getName().equals("Record") || form.getTopValue().getType().getName().equals("MD_Metadata") || form.getTopValue().getType().getName().equals("FC_FeatureCatalogue")) {
             
+            logger.info("indexing CSW Record");
             for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-                doc.add(new Field(term, getValues(term,  form, DUBLIN_CORE_QUERYABLE),   Field.Store.YES, Field.Index.TOKENIZED));
+                String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
+                if (!values.equals("null"))
+                    logger.info("put " + term + " values: " + values);
+                
+                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }
             
             //we add the geometry parts
             String coord = "null";
             try {
-                coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE);
-                int coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(0, coma);
+                coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
                 double minx = Double.parseDouble(coord);
                 
-                coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE);
-                coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(coma + 1, coord.length());
+                coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
                 double maxx = Double.parseDouble(coord);
             
-                coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE);
-                coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(0, coma);
+                coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
                 double maxy = Double.parseDouble(coord);
             
-                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE);
-                coma = coord.indexOf(',');
-                if (coma != -1)
-                    coord = coord.substring(coma + 1, coord.length());
+                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
                 double miny = Double.parseDouble(coord);
             
                 addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
@@ -293,7 +356,7 @@ public class IndexLucene extends AbstractIndex {
                     logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
-            
+        
         } else {
             logger.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
         }
@@ -322,16 +385,22 @@ public class IndexLucene extends AbstractIndex {
         if (spatialQuery.getQuery().indexOf(":*") != -1)
             parser.setAllowLeadingWildcard(true);
         
-        Query query  = parser.parse(spatialQuery.getQuery());
-        Filter f     = spatialQuery.getSpatialFilter();
-        int operator = spatialQuery.getLogicalOperator();
+        Query query   = parser.parse(spatialQuery.getQuery());
+        Filter f      = spatialQuery.getSpatialFilter();
+        int operator  = spatialQuery.getLogicalOperator();
+        Sort sort     = spatialQuery.getSort();
+        String sorted = "";
+        if (sort != null)
+            sorted = "order by: " + sort.toString();
+        
         logger.info("Searching for: "    + query.toString(field) + '\n' +
-                    SerialChainFilter.ValueOf(operator) + '\n' +
-                    f + '\n');
+                    SerialChainFilter.ValueOf(operator)          + '\n' +
+                    f                                            + '\n' +
+                    sorted                                       + '\n');
         
         // simple query with an AND
         if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
-            Hits hits = searcher.search(query, f);
+            Hits hits = searcher.search(query, f, sort);
         
             for (int i = 0; i < hits.length(); i ++) {
             
@@ -340,8 +409,8 @@ public class IndexLucene extends AbstractIndex {
         
         // for a OR we need to perform many request 
         } else if (operator == SerialChainFilter.OR) {
-            Hits hits1 = searcher.search(query);
-            Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+            Hits hits1 = searcher.search(query, sort);
+            Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), sort);
             
             for (int i = 0; i < hits1.length(); i++) {
                 results.add(hits1.doc(i).get("id"));
@@ -356,14 +425,14 @@ public class IndexLucene extends AbstractIndex {
             
         // for a NOT we need to perform many request 
         } else if (operator == SerialChainFilter.NOT) {
-            Hits hits1 = searcher.search(query);
+            Hits hits1 = searcher.search(query, sort);
             
             List<String> unWanteds = new ArrayList<String>();
             for (int i = 0; i < hits1.length(); i++) {
                 unWanteds.add(hits1.doc(i).get("id"));
             }
             
-            Hits hits2 = searcher.search(simpleQuery);
+            Hits hits2 = searcher.search(simpleQuery, sort);
             for (int i = 0; i < hits2.length(); i++) {
                 String id = hits2.doc(i).get("id");
                 if (!unWanteds.contains(id)) {
@@ -377,7 +446,8 @@ public class IndexLucene extends AbstractIndex {
         
         // if we have some subQueries we execute it separely and merge the result
         if (spatialQuery.getSubQueries().size() > 0) {
-            List<String> subResults =  doSearch(spatialQuery.getSubQueries().get(0));
+            SpatialQuery sub = spatialQuery.getSubQueries().get(0);
+            List<String> subResults =  doSearch(sub);
             for (String r: results) {
                 if (!subResults.contains(r)) {
                     results.remove(r);
@@ -386,9 +456,15 @@ public class IndexLucene extends AbstractIndex {
         }
         
         logger.info(results.size() + " total matching documents");
+        //TODO remove
+        String titles = "results titles:" + '\n';
+        for (String s: results) {
+            titles = titles + s + '\n';
+        }
+        logger.info(titles);
+        //
         
         ireader.close();
-        
         return results;
     }  
     
@@ -411,7 +487,7 @@ public class IndexLucene extends AbstractIndex {
         doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        logger.info("added boundingBox");
+        logger.info("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
     }
     
     /**
