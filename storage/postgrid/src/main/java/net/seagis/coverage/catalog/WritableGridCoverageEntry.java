@@ -371,13 +371,15 @@ public class WritableGridCoverageEntry {
             throws IOException, CatalogException
     {
         AffineTransform gridToCRS = tile.getGridToCRS();
-        if (gridToCRS != null && translate) {
-            // The entry to be recorded in the database has its origin to (0,0).
-            // If the tile has an other origin, we need to translate it accordingly.
-            final Point origin = getGridOffset();
-            if (origin.x != 0 || origin.y != 0) {
-                gridToCRS = new AffineTransform(gridToCRS);
-                gridToCRS.translate(origin.x, origin.y);
+        if (gridToCRS != null) {
+            if (translate) {
+                // The entry to be recorded in the database has its origin to (0,0).
+                // If the tile has an other origin, we need to translate it accordingly.
+                final Point origin = getGridOffset();
+                if (origin.x != 0 || origin.y != 0) {
+                    gridToCRS = new AffineTransform(gridToCRS);
+                    gridToCRS.translate(origin.x, origin.y);
+                }
             }
         } else if (metadata != null) {
             // No translation to apply here because the 'gridToCRS' transform
