@@ -123,7 +123,7 @@
     par défaut sera celle qui est déclarée ci-dessous.
   -->
   <properties>
-    <geotools.version>2.5-SNAPSHOT</geotools.version>
+    <geotools.version>2.6-SNAPSHOT</geotools.version>
   </properties>
   <dependencyManagement>
     <dependencies>
