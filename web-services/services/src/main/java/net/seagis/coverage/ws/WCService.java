@@ -200,7 +200,24 @@ public class WCService extends WebService {
                  * correctly defined, and some information are lacking.
                  * In this case we try to use the old system of configuration file.
                  */
-                database = new Database();
+
+                /* Ifremer's server does not contain any .sicade directory, so the
+                 * configuration file is put under the WEB-INF directory of constellation.
+                 * todo: get the webservice name (here ifremerWS) from the servlet context.
+                 */
+                File configFile = null;
+                File dirCatalina = null;
+                final String catalinaPath = System.getenv().get("CATALINA_HOME");
+                if (catalinaPath != null) {
+                    dirCatalina = new File(catalinaPath);
+                }
+                if (dirCatalina != null && dirCatalina.exists()) {
+                    configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
+                    if (!configFile.exists()) {
+                        configFile = null;
+                    }
+                }
+                database = (configFile != null) ? new Database(configFile) : new Database();
             }
             final WebServiceWorker initialValue = new WebServiceWorker(database, true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
