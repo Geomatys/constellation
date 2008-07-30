@@ -266,6 +266,30 @@ public class IndexLuceneTest {
         expectedResult.add("4");
         
         assertEquals(expectedResult, result);
+        
+        /**
+         * Test 1 spatial search: NOT BBOX filter
+         */
+        resultReport = "";
+        List<Filter> lf = new ArrayList<Filter>();
+        sf           = new SpatialFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326", SpatialFilter.BBOX);
+        lf.add(sf);
+        int[] op = {SerialChainFilter.NOT};
+        SerialChainFilter f = new SerialChainFilter(lf, op);
+        spatialQuery = new SpatialQuery("metafile:doc", f, SerialChainFilter.AND);
+        
+        result = indexLucene.doSearch(spatialQuery);
+        
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+        
+        logger.info("spatialSearch 2:" + '\n' + resultReport);
+        
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("1");
+        expectedResult.add("2");
+        
+        assertEquals(expectedResult, result);
     }
 
     

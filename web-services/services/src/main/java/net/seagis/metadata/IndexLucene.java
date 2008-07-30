@@ -325,14 +325,23 @@ public class IndexLucene extends AbstractIndex {
         if (form.getTopValue().getType().getName().equals("Record") || form.getTopValue().getType().getName().equals("MD_Metadata") || form.getTopValue().getType().getName().equals("FC_FeatureCatalogue")) {
             
             logger.info("indexing CSW Record");
+            StringBuilder anyText = new StringBuilder();
             for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-                String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
-                if (!values.equals("null"))
-                    logger.info("put " + term + " values: " + values);
                 
+                String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
+                if (!values.equals("null")) {
+                    logger.info("put " + term + " values: " + values);
+                    anyText.append(values).append(" ");
+                }
+                if (term.equals("date") || term.equals("modified")) {
+                    values = values.replaceAll("-","");
+                }
                 doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
                 doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }
+            
+            //we add the anyText values
+            doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
             
             //we add the geometry parts
             String coord = "null";
@@ -425,7 +434,7 @@ public class IndexLucene extends AbstractIndex {
             
         // for a NOT we need to perform many request 
         } else if (operator == SerialChainFilter.NOT) {
-            Hits hits1 = searcher.search(query, sort);
+            Hits hits1 = searcher.search(query, f, sort);
             
             List<String> unWanteds = new ArrayList<String>();
             for (int i = 0; i < hits1.length(); i++) {
@@ -456,13 +465,6 @@ public class IndexLucene extends AbstractIndex {
         }
         
         logger.info(results.size() + " total matching documents");
-        //TODO remove
-        String titles = "results titles:" + '\n';
-        for (String s: results) {
-            titles = titles + s + '\n';
-        }
-        logger.info(titles);
-        //
         
         ireader.close();
         return results;

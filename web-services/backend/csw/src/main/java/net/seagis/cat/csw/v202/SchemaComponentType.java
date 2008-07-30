@@ -28,10 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * A schema component includes a schema fragment (type
- *          definition) or an entire schema from some target namespace;
- *          the schema language is identified by URI. If the component
- *          is a schema fragment its parent MUST be referenced (parentSchema).
+ * A schema component includes a schema fragment (type definition) or an entire schema from some target namespace;
+ * the schema language is identified by URI. 
+ * If the component is a schema fragment its parent MUST be referenced (parentSchema).
  * 
  * <p>Java class for SchemaComponentType complex type.
  * 
@@ -74,10 +73,27 @@ public class SchemaComponentType {
     private String schemaLanguage;
 
     /**
-     * A schema component includes a schema fragment (type
-     *          definition) or an entire schema from some target namespace;
-     *          the schema language is identified by URI. If the component
-     *          is a schema fragment its parent MUST be referenced (parentSchema).Gets the value of the content property.
+     * An empty constructor used by JAXB.
+     */
+    public SchemaComponentType() {
+        
+    }
+    
+    /**
+     * Build a new Schema Component.
+     */
+    public SchemaComponentType(String targetNamespace, String schemaLanguage, Object xsd) {
+        this.targetNamespace = targetNamespace;
+        this.schemaLanguage  = schemaLanguage; 
+        this.content         = new ArrayList<Object>();
+        content.add(xsd);
+    }
+    
+    /**
+     * A schema component includes a schema fragment (type definition) or an entire schema from some target namespace;
+     * the schema language is identified by URI. 
+     * If the component is a schema fragment its parent MUST be referenced (parentSchema).
+     * Gets the value of the content property.
      * (unmodifiable)
      */
     public List<Object> getContent() {
@@ -101,9 +117,7 @@ public class SchemaComponentType {
     public String getParentSchema() {
         return parentSchema;
     }
-
     
-
     /**
      * Gets the value of the schemaLanguage property.
      * 

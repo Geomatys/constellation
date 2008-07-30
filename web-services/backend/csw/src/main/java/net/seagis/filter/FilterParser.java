@@ -132,7 +132,11 @@ public class FilterParser {
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
+            throw new OWSWebServiceException("The query constraint must contain a Filter or a CQL query.",
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
         }
+        
         if (constraint.getCqlText() != null) {
             try {
                 filter = CQLtoFilter(constraint.getCqlText());
@@ -204,22 +208,23 @@ public class FilterParser {
         //for ambigous purpose
         Filter nullFilter     = null;
         
-        // we treat logical Operators like AND, OR, ...
-        if (filter.getLogicOps() != null) {
-            response = treatLogicalOperator(filter.getLogicOps());
+        if (filter != null) { 
+            // we treat logical Operators like AND, OR, ...
+            if (filter.getLogicOps() != null) {
+                response = treatLogicalOperator(filter.getLogicOps());
             
-        // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
-        } else if (filter.getComparisonOps() != null) {
-            response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), nullFilter, SerialChainFilter.AND);
+            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
+            } else if (filter.getComparisonOps() != null) {
+                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), nullFilter, SerialChainFilter.AND);
                 
-        // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
-        } else if (filter.getSpatialOps() != null) {
-            response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
+            } else if (filter.getSpatialOps() != null) {
+                response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
                 
-        } else if (filter.getId() != null) {
-            response = new SpatialQuery(treatIDOperator(filter.getId()), nullFilter, SerialChainFilter.AND);
-        }  
-        
+            } else if (filter.getId() != null) {
+                response = new SpatialQuery(treatIDOperator(filter.getId()), nullFilter, SerialChainFilter.AND);
+            }  
+        }
         return response;
     }
     
@@ -339,11 +344,18 @@ public class FilterParser {
         int logicalOperand = SerialChainFilter.valueOf(operator);
         
         Filter spatialFilter = null;
+        String query = queryBuilder.toString();
+        if (query.equals("()"))
+            query = "";
+       
         if (filters.size() == 1) {
             
             if (logicalOperand == SerialChainFilter.NOT) {
                 int filterType[] = {SerialChainFilter.NOT};
                 spatialFilter = new SerialChainFilter(filters, filterType);
+                if (query.equals("")) {
+                    logicalOperand = SerialChainFilter.AND;
+                } 
             } else {
                 spatialFilter = filters.get(0);
             }
@@ -356,9 +368,7 @@ public class FilterParser {
             }
             spatialFilter = new SerialChainFilter(filters, filterType);
         }
-        String query = queryBuilder.toString();
-        if (query.equals("()"))
-            query = "";
+        
             
         SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
         response.setSubQueries(subQueries);
@@ -457,7 +467,8 @@ public class FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replace("-", "");
+                        dateValue = dateValue.replaceAll("-", "");
+                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
                     } else {
                         throw new OWSWebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
@@ -474,7 +485,8 @@ public class FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replace("-", "");
+                        dateValue = dateValue.replaceAll("-", "");
+                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
                     } else {
                         throw new OWSWebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
@@ -492,7 +504,8 @@ public class FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replace("-", "");
+                        dateValue = dateValue.replaceAll("-", "");
+                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
                     } else {
                         throw new OWSWebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
@@ -509,7 +522,8 @@ public class FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replace("-", "");
+                        dateValue = dateValue.replaceAll("-", "");
+                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
                     } else {
                          throw new OWSWebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,

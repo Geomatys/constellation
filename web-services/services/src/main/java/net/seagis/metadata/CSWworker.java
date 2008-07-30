@@ -41,6 +41,12 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+// W3C DOM dependecies
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+
 //seaGIS dependencies
 import net.seagis.cat.csw.v202.AbstractRecordType;
 import net.seagis.cat.csw.v202.AcknowledgementType;
@@ -74,11 +80,15 @@ import net.seagis.cat.csw.v202.TransactionResponseType;
 import net.seagis.cat.csw.v202.TransactionSummaryType;
 import net.seagis.cat.csw.v202.TransactionType;
 import net.seagis.cat.csw.v202.UpdateType;
+import net.seagis.cat.csw.v202.SchemaComponentType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.dublincore.AbstractSimpleLiteral;
 import net.seagis.filter.FilterParser;
 import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
+import net.seagis.ogc.SortByType;
+import net.seagis.ogc.SortPropertyType;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.DomainType;
@@ -95,6 +105,7 @@ import static net.seagis.metadata.MetadataReader.*;
 // Apache Lucene dependencies
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Sort;
 
 //geotols dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -107,10 +118,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
-import net.seagis.dublincore.AbstractSimpleLiteral;
-import net.seagis.ogc.SortByType;
-import net.seagis.ogc.SortPropertyType;
-import org.apache.lucene.search.Sort;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -122,6 +129,7 @@ import org.opengis.metadata.identification.Identification;
 
 // PostgreSQL dependencies
 import org.postgresql.ds.PGSimpleDataSource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -219,6 +227,11 @@ public class CSWworker {
      * A catalogue Harvester comunicating with other CSW 
      */
     private final CatalogueHarvester catalogueHarvester;
+    
+    /**
+     * A File directory where we find the resource file (xsd files)
+     */
+    private File resourceDirectory;
             
     /**
      * The queryable element from ISO 19115 and their path id.
@@ -430,6 +443,7 @@ public class CSWworker {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         paths.add("Catalog Web Service:Record:subject:content");
         DUBLIN_CORE_QUERYABLE.put("description", paths);
+        DUBLIN_CORE_QUERYABLE.put("subject", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
@@ -798,7 +812,8 @@ public class CSWworker {
             } else {
                 for (QName type:typeNames) {
                     if (!SUPPORTED_TYPE_NAME.contains(type)) {
-                        throw new OWSWebServiceException("The typeName " + type.getLocalPart() + " is not supported by the service" ,
+                        throw new OWSWebServiceException("The typeName " + type.getLocalPart() + " is not supported by the service:" +'\n' +
+                                                         "supported one are:" + '\n' + supportedTypeNames(),
                                                          INVALID_PARAMETER_VALUE, "TypeNames", version);
                     }
                 }
@@ -883,7 +898,7 @@ public class CSWworker {
                     int max = maxRecord;
                     for (int i = startPos -1; i < max; i++) {
                         Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
-                        if (obj == null)
+                        if (obj == null && (max + 1) < results.size())
                             max++;
                         else
                             records.add((AbstractRecordType)obj);
@@ -1079,9 +1094,77 @@ public class CSWworker {
      * @return
      */
     public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws WebServiceException{
-        verifyBaseRequest(request);
+        logger.info("DescribeRecords request processing" + '\n');
+        DescribeRecordResponseType response;
+        try {
+            
+            verifyBaseRequest(request);
+            
+            // we initialize the output format of the response
+            String format = request.getOutputFormat();
+            if (format != null && isSupportedFormat(format)) {
+                outputFormat = format;
+            } else if (format != null && !isSupportedFormat(format)) {
+                String supportedFormat = "";
+                for (String s: ACCEPTED_OUTPUT_FORMATS) {
+                    supportedFormat = supportedFormat  + s + '\n';
+                } 
+                throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
+                                                 " supported ones are: " + '\n' + supportedFormat,
+                                                  INVALID_PARAMETER_VALUE, "outputFormat", version);
+            }
         
-        return new DescribeRecordResponseType();
+            // we initialize the type names
+            List<QName> typeNames = request.getTypeName();
+            if (typeNames == null || typeNames.size() == 0) {
+                typeNames = SUPPORTED_TYPE_NAME;
+            }
+            
+            // we initialize the schema language
+            String schemaLanguage = request.getSchemaLanguage(); 
+            if (schemaLanguage == null) {
+                schemaLanguage = "http://www.w3.org/XML/Schema";
+            
+            } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
+               
+                throw new OWSWebServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
+                                                 " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
+                                                  INVALID_PARAMETER_VALUE, "schemaLanguage", version); 
+            }
+            
+            List<SchemaComponentType> components = new ArrayList<SchemaComponentType>();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder constructor = factory.newDocumentBuilder();
+
+            if (typeNames.contains(_Record_QNAME)) {
+
+                InputStream in = new FileInputStream(new File(resourceDirectory, "record.xsd"));
+                Document d = constructor.parse(in);
+                SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2.", schemaLanguage, d.getDocumentElement());
+                components.add(component);
+            }
+            
+            if (typeNames.contains(_Metadata_QNAME)) {
+
+                InputStream in = new FileInputStream(new File(resourceDirectory, "metadata.xsd"));
+                Document d = constructor.parse(in);
+                SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
+                components.add(component);
+            }
+            
+            response  = new DescribeRecordResponseType(components);
+            
+        } catch (ParserConfigurationException ex) {
+            throw new OWSWebServiceException("Parser Configuration Exception while creating the DocumentBuilder",
+                                                          NO_APPLICABLE_CODE, null, version);
+        } catch (IOException ex) {
+            throw new OWSWebServiceException("IO Exception when trying to access xsd file",
+                                                          NO_APPLICABLE_CODE, null, version);
+        } catch (SAXException ex) {
+            throw new OWSWebServiceException("SAX Exception when trying to parse xsd file",
+                                                          NO_APPLICABLE_CODE, null, version);
+        }
+        return response;
     }
     
     /**
@@ -1577,6 +1660,13 @@ public class CSWworker {
     }
     
     /**
+     * 
+     */
+    public void setResourceDirectory(File directory) {
+        this.resourceDirectory = directory;
+    }
+    
+    /**
      * Verify that the bases request attributes are correct.
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
@@ -1610,6 +1700,17 @@ public class CSWworker {
                                           NO_APPLICABLE_CODE, null, version);
          }  
         
+    }
+    
+    /**
+     * Return a string list of the supported TypeName
+     */
+    private String supportedTypeNames() {
+        StringBuilder result = new StringBuilder();
+        for (QName qn: SUPPORTED_TYPE_NAME) {
+            result.append(qn.getPrefix()).append(qn.getLocalPart()).append('\n');
+        }
+        return result.toString();
     }
     
     /**

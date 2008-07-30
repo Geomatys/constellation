@@ -529,6 +529,11 @@ public abstract class WebService {
         }
     }
     
+    /**
+     * 
+     * @param fileName
+     * @return
+     */
     public File getFile(String fileName) {
          File path;
          String appName = context.getBaseUri().getPath();
@@ -542,8 +547,11 @@ public abstract class WebService {
             } else {
                 path = new File(home, UNIX_DIRECTORY);
             }
-         } 
-         return new File(path, fileName);
+         }
+         if (fileName != null)
+            return new File(path, fileName);
+         
+         else return path;
     }
     /**
      * Return the service url obtain by the first request made.

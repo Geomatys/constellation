@@ -244,6 +244,7 @@ public class CSWService extends WebService {
                 
                 } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
                 
+                    worker.setResourceDirectory(getFile(null));
                     DescribeRecordType dr = (DescribeRecordType)objectRequest;
                 
                     if (dr == null) {

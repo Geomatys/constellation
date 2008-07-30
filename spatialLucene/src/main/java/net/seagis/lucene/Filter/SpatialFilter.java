@@ -578,10 +578,21 @@ public class SpatialFilter extends Filter {
             if (result != null) {
                 if (sourceCRSName.equals(geometryCRSName)) {
                     result.setCoordinateReferenceSystem(geometryCRS);
-                } else {
-                    result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
-                    result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
                 
+                } else {
+                
+                    CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
+                    result.setCoordinateReferenceSystem(sourceCRS);
+                    String boxbefore = result.toString(); 
+                    if (!CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS)) {
+                        logger.finer("sourceCRS:" + sourceCRS + '\n' +
+                                    "geometryCRS:" + geometryCRS + '\n' +
+                                    "equals? " + CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS)); 
+                        result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
+                        logger.finer("reprojecting from " + sourceCRSName + " to " + geometryCRSName + '\n' +
+                                    "bbox before: " + boxbefore + '\n' +
+                                    "bbox after : " + result.toString());
+                    }
                 }
             }
         
@@ -612,7 +623,9 @@ public class SpatialFilter extends Filter {
         Line2D result = new Line2D.Double(x1, y1, x2, y2);
         try {
             if (!sourceCRSName.equals(geometryCRSName)) {
-                result =  (Line2D) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
+                CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
+                if (!CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS))
+                    result =  (Line2D) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
@@ -645,9 +658,12 @@ public class SpatialFilter extends Filter {
                 result.setCoordinateReferenceSystem(geometryCRS);
                 
             } else {
-                result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
-                result = (GeneralDirectPosition) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
-                result.setCoordinateReferenceSystem(geometryCRS); 
+                CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
+                result.setCoordinateReferenceSystem(sourceCRS);
+                if (!CRS.equalsIgnoreMetadata(geometryCRS, sourceCRS)) {
+                    result = (GeneralDirectPosition) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
+                    result.setCoordinateReferenceSystem(geometryCRS); 
+                }
             }
         
         } catch (NoSuchAuthorityCodeException ex) {

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -51,11 +52,36 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "DescribeRecordResponseType", propOrder = {
     "schemaComponent"
 })
+@XmlRootElement(name = "DescribeRecordResponse")
 public class DescribeRecordResponseType {
 
     @XmlElement(name = "SchemaComponent")
     private List<SchemaComponentType> schemaComponent;
 
+    /**
+     * An empty constructor used by JAXB.
+     */
+    public DescribeRecordResponseType() {
+        
+    }
+    
+    /**
+     * Build a new response to a describeRecord request.
+     */
+    public DescribeRecordResponseType(SchemaComponentType... schemaCompo) {
+        schemaComponent = new ArrayList<SchemaComponentType>();
+        for (SchemaComponentType sc: schemaCompo) {
+            schemaComponent.add(sc);
+        }
+    }
+    
+    /**
+     * Build a new response to a describeRecord request.
+     */
+    public DescribeRecordResponseType(List<SchemaComponentType> schemaComponent) {
+        this.schemaComponent = schemaComponent;
+    }
+    
     /**
      * Gets the value of the schemaComponent property.
      * (unmodifiable)
