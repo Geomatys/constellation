@@ -173,7 +173,7 @@ public class CSWService {
      * Web service operation
      */
     @WebMethod(action="getRecords")
-    public GetRecordsResponseType getRecords(@WebParam(name = "GetRecords") GetRecordsType requestRecords) throws SOAPServiceException {
+    public Object getRecords(@WebParam(name = "GetRecords") GetRecordsType requestRecords) throws SOAPServiceException {
         try {
             logger.info("received SOAP getRecords request");
             return worker.getRecords(requestRecords);

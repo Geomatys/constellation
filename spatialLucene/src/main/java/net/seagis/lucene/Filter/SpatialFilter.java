@@ -597,7 +597,7 @@ public class SpatialFilter extends Filter {
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
-            logger.severe("No such Authority exception while reading boundingBox");
+            logger.severe("No such Authority exception while reading boundingBox:" + ex.getAuthority() + ':' + ex.getAuthorityCode());
         } catch (FactoryException ex) {
             logger.severe("Factory exception while reading boundingBox");
         }  catch (TransformException ex) {

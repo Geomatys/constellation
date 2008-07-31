@@ -124,7 +124,7 @@ public class FilterParser {
      */
     public SpatialQuery getLuceneQuery(final QueryConstraintType constraint) throws WebServiceException {
         FilterType filter = null;
-        //if the constraint is null we make a full filter
+        //if the constraint is null we make a null filter
         if (constraint == null)  {
             Filter nullFilter = null;
             return new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
@@ -389,9 +389,10 @@ public class FilterParser {
         
         if (comparisonOps instanceof PropertyIsLikeType ) {
             PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
-            
+            String propertyName    = "";
             //we get the field
             if (pil.getPropertyName() != null) {
+                propertyName = pil.getPropertyName().getContent();
                 response.append(removePrefix(pil.getPropertyName().getContent())).append(':');
             } else {
                 throw new OWSWebServiceException("An operator propertyIsLike must specified the propertyName.",

@@ -16,22 +16,24 @@
 
 package net.seagis.cat.csw.v202;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * This is a general acknowledgement response message for all requests 
- *          that may be processed in an asynchronous manner.
- *          EchoedRequest - Echoes the submitted request message
- *          RequestId     - identifier for polling purposes (if no response 
- *                          handler is available, or the URL scheme is
- *                          unsupported)
+ * This is a general acknowledgement response message for all requests that may be processed in an asynchronous manner.
+ * 
+ * EchoedRequest - Echoes the submitted request message
+ * RequestId     - identifier for polling purposes (if no response handler is available, or the URL scheme is unsupported)
  * 
  * <p>Java class for AcknowledgementType complex type.
  * 
@@ -69,6 +71,28 @@ public class AcknowledgementType {
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar timeStamp;
 
+    /**
+     * An empty constructor used by JAXB 
+     */
+    public AcknowledgementType() {
+        
+    }
+    
+    /**
+     * Build a new Anknowledgement message. 
+     */
+    public AcknowledgementType(String requestId, EchoedRequestType echoedRequest, Long timeStamp) throws DatatypeConfigurationException {
+        this.requestId     = requestId;
+        this.echoedRequest = echoedRequest;
+        if (timeStamp != null) {
+            Date d = new Date(timeStamp);
+            GregorianCalendar cal = new  GregorianCalendar();
+            cal.setTime(d);
+            DatatypeFactory factory = DatatypeFactory.newInstance();
+            this.timeStamp = factory.newXMLGregorianCalendar(cal);
+        }
+    }
+            
     /**
      * Gets the value of the echoedRequest property.
      */

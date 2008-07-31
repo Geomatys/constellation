@@ -38,6 +38,7 @@ import javax.imageio.ImageIO;
 //geotools dependencies
 
 // jersey dependencies
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -126,11 +127,17 @@ public abstract class WebService {
      */
     private String serviceURL;
     
-     /**
+    /**
      * The http context containing the request parameter
      */
     @Context
     private UriInfo context;
+    
+    /**
+     * A servlet context used for access deployed file
+     */
+    @Context 
+    protected ServletContext servletcontext;
     
     /**
      * The last update sequence
@@ -141,6 +148,7 @@ public abstract class WebService {
     /**
      * Initialize the basic attribute of a web service.
      * 
+     * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
      * @param versions A list of the supported version of this service.
      */
     public WebService(String service, ServiceVersion... versions) {
@@ -450,6 +458,12 @@ public abstract class WebService {
         }
     }
     
+    /**
+     * Treat the incomming POST request encoded in text plain.
+     * 
+     * @return an xml exception report.
+     * @throw JAXBException
+     */
     @POST
     @ConsumeMime("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
@@ -504,13 +518,20 @@ public abstract class WebService {
            p.put("update", "false");
        }
        
+       //we recup the capabilities file and unmarshall it
        if (fileName == null) {
            return null;
+       
        } else {
-           Object response = capabilities.get(fileName);
            
-           if (response == null || p.getProperty("update").equals("true")) {
-               logger.info("updating metadata");
+           //we look if we have already put it in cache
+           Object response = capabilities.get(fileName);
+           boolean update  = p.getProperty("update").equals("true");
+                   
+           if (response == null || update) {
+               if (update)
+                    logger.info("updating metadata");
+               
                File f = getFile(fileName);
                response = unmarshaller.unmarshal(f);
                capabilities.put(fileName, response);
@@ -530,29 +551,42 @@ public abstract class WebService {
     }
     
     /**
+     * Return a file located in WEB-INF deployed directory.
      * 
-     * @param fileName
-     * @return
+     * @param fileName The name of the file requested.
+     * @return The specified file.
      */
     public File getFile(String fileName) {
          File path;
-         String appName = context.getBaseUri().getPath();
-         //we delete the /WS
-         appName = appName.substring(0, appName.length()-3);
-         String home = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
+         
+         //we try to get the deployed "WEB-INF" directory
+         String home = servletcontext.getRealPath("WEB-INF");
+         
          if (home == null || !(path = new File(home)).isDirectory()) {
-            home = System.getProperty("user.home");
-            if (System.getProperty("os.name", "").startsWith("Windows")) {
-                path = new File(home, WINDOWS_DIRECTORY);
-            } else {
-                path = new File(home, UNIX_DIRECTORY);
-            }
+            path = getSicadeDirectory();
          }
          if (fileName != null)
             return new File(path, fileName);
-         
          else return path;
     }
+    
+    /**
+     * Return the ".sicade" directory.
+     * 
+     * @return The ".sicade" directory containing .
+     */
+    public File getSicadeDirectory() {
+        File sicadeDirectory;
+        String home = System.getProperty("user.home");
+        
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
+        } else {
+             sicadeDirectory = new File(home, UNIX_DIRECTORY);
+        }
+        return sicadeDirectory;
+    }
+    
     /**
      * Return the service url obtain by the first request made.
      * 
@@ -646,7 +680,9 @@ public abstract class WebService {
     }
     
     /**
+     * If the requested version number is not available we choose the best version to return.
      * 
+     * @param A service version number.
      */
     protected ServiceVersion getBestVersion(String number) {
         for (ServiceVersion v : versions) {
@@ -669,6 +705,8 @@ public abstract class WebService {
      * Update all the url in a OWS capabilities document.
      * 
      * @param operations A list of OWS operation.
+     * @param url The url of the web application.
+     * @param service the initials of the web service (WMS, SOS, WCS, CSW, ...). This string correspound to the resource name in lower case.
      */
     public static void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
         for (AbstractOperation op:operations) {
@@ -679,10 +717,18 @@ public abstract class WebService {
        }
     }
 
+    /**
+     * return the last time that the capabilities have been updated (not yet really used)
+     */
     public long getLastUpdateSequence() {
         return lastUpdateSequence;
     }
 
+    /**
+     * set the last time that the capabilities have been updated (not yet really used)
+     * 
+     * @param lastUpdateSequence A Date.
+     */
     public void setLastUpdateSequence(long lastUpdateSequence) {
         this.lastUpdateSequence = lastUpdateSequence;
     }

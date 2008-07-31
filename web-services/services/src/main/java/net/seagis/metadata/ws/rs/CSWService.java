@@ -164,13 +164,12 @@ public class CSWService extends WebService {
                           " error  : " + ex.getMessage()          + '\n' + 
                           " details: " + ex.toString());
         }
-        
     }
 
     @Override
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         try {
-             
+            
             if (worker != null) {
             
                 worker.setServiceURL(getServiceURL());
@@ -206,7 +205,7 @@ public class CSWService extends WebService {
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getCapabilities(gc), sw);
         
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
                 } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsType)) {
                 
@@ -258,7 +257,7 @@ public class CSWService extends WebService {
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.describeRecord(dr), sw);
         
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
                 } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomainType)) {
                 
@@ -281,7 +280,7 @@ public class CSWService extends WebService {
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getDomain(gd), sw);
         
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
                 } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
                 
@@ -295,7 +294,7 @@ public class CSWService extends WebService {
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.transaction(t), sw);
         
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
                 } else if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
                 
@@ -312,7 +311,7 @@ public class CSWService extends WebService {
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.harvest(h), sw);
         
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
                 } else {
                     if (request.equals("") && objectRequest != null)

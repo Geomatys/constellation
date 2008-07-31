@@ -26,9 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * 
- *       This complexType is included as a convenience for schema authors who 
- *       need to define a root or container element for all of the DC elements.
+ * This complexType is included as a convenience for schema authors who need to define a root or container element for all of the DC elements.
  *       
  * 
  * <p>Java class for elementContainer complex type.

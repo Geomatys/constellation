@@ -24,17 +24,12 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the net.opengis.cat.csw._2_0 package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
- * provided in this class.
+ * This object contains factory methods for each Java content interface and Java element interface 
+ * generated in the net.seagis.cat.csw.v202 package. 
+ * An ObjectFactory allows you to programatically construct new instances of the Java representation for XML content. 
+ * The Java representation of XML content can consist of schema derived interfaces and classes representing the binding of schema 
+ * type definitions, element declarations and model groups.  
+ * Factory methods for each of these are provided in this class.
  * 
  */
 @XmlRegistry
@@ -67,7 +62,7 @@ public class ObjectFactory {
     private final static QName _TransactionResponse_QNAME    = new QName("http://www.opengis.net/cat/csw/2.0.2", "TransactionResponse");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.cat.csw._2_0
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.seagis.cat.csw.v202
      * 
      */
     public ObjectFactory() {

@@ -115,6 +115,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
@@ -524,6 +525,10 @@ public class CSWworker {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
         DUBLIN_CORE_QUERYABLE.put("SouthBoundLatitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Catalog Web Service:Record:BoundingBox:crs");
+        DUBLIN_CORE_QUERYABLE.put("CRS",     paths);
     }
     
     /**
@@ -675,6 +680,8 @@ public class CSWworker {
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException {
         logger.info("getCapabilities request processing" + '\n');
+        long startTime = System.currentTimeMillis();
+        
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("CSW")) {
@@ -698,7 +705,7 @@ public class CSWworker {
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
             /*
-             * Acoording to the CITE test this case does not return an exception
+             * Acording to the CITE test this case does not return an exception
              throw new OWSWebServiceException("accepted format : text/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
@@ -749,9 +756,9 @@ public class CSWworker {
             
             
         c = new Capabilities(si, sp, om, "2.0.2", null, fc);
-            
+
+        logger.info("GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + " ms"); 
         return c;
-        
     }
     
     /**
@@ -760,8 +767,9 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException {
+    public Object getRecords(GetRecordsType request) throws WebServiceException {
         logger.info("GetRecords request processing" + '\n');
+        long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
         //we prepare the response
@@ -937,8 +945,13 @@ public class CSWworker {
                                                           records);
                 //TODO
                 } else if (resultType.equals(ResultType.VALIDATE)) {
-                    throw new OWSWebServiceException("The service does not yet handle the VALIDATE resultType.",
-                                                 NO_APPLICABLE_CODE, "resultType", version);
+                    try {
+                        return new AcknowledgementType(ID, null, System.currentTimeMillis());
+                    
+                    } catch(DatatypeConfigurationException ex) {
+                        throw new OWSWebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                         NO_APPLICABLE_CODE, null, version);
+                    }
                 }
         
                 // this case must never append
@@ -951,6 +964,7 @@ public class CSWworker {
                                               NO_APPLICABLE_CODE, null, version);
         }
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), version.toString(), searchResults);
+        logger.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
     }
     
@@ -962,6 +976,7 @@ public class CSWworker {
      */
     public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws WebServiceException {
         logger.info("GetRecordById request processing" + '\n');
+        long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
         // we initialize the output format of the response
@@ -1083,7 +1098,7 @@ public class CSWworker {
             response = null;
         }
         
-                
+        logger.info("GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + " ms");        
         return response;
     }
     
@@ -1095,6 +1110,7 @@ public class CSWworker {
      */
     public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws WebServiceException{
         logger.info("DescribeRecords request processing" + '\n');
+        long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
         try {
             
@@ -1140,7 +1156,7 @@ public class CSWworker {
 
                 InputStream in = new FileInputStream(new File(resourceDirectory, "record.xsd"));
                 Document d = constructor.parse(in);
-                SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2.", schemaLanguage, d.getDocumentElement());
+                SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
@@ -1164,6 +1180,7 @@ public class CSWworker {
             throw new OWSWebServiceException("SAX Exception when trying to parse xsd file",
                                                           NO_APPLICABLE_CODE, null, version);
         }
+        logger.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return response;
     }
     
@@ -1175,6 +1192,7 @@ public class CSWworker {
      */
     public GetDomainResponseType getDomain(GetDomainType request) throws WebServiceException{
         logger.info("GetDomain request processing" + '\n');
+        long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the response
         List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
@@ -1267,6 +1285,7 @@ public class CSWworker {
             throw new OWSWebServiceException("One of propertyName or parameterName must be filled",
                                              MISSING_PARAMETER_VALUE, "parameterName, propertyName", version);
         }
+        logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return new GetDomainResponseType(responseList);
     }
     
@@ -1278,6 +1297,7 @@ public class CSWworker {
      */
     public TransactionResponseType transaction(TransactionType request) throws WebServiceException {
         logger.info("Transaction request processing" + '\n');
+        long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the report
         int totalInserted = 0;
@@ -1333,6 +1353,7 @@ public class CSWworker {
                                                                     totalDeleted,
                                                                     requestID); 
         TransactionResponseType response = new TransactionResponseType(summary, null, version.toString());
+        logger.info("Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return response;
     }
     

@@ -357,8 +357,12 @@ public class IndexLucene extends AbstractIndex {
             
                 coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
                 double miny = Double.parseDouble(coord);
+                
+                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
             
-                addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+                String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
+                
+                addBoundingBox(doc, minx, maxx, miny, maxy, crs);
             
             } catch (NumberFormatException e) {
                 if (!coord.equals("null"))

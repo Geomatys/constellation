@@ -215,7 +215,7 @@ public class MetadataReader {
                 //TODO gere plusieur catalogue proprement
                 Form f = MDReader.getForm(MDCatalogs.get(0), id);
                 if (f == null) {
-                    MDReader.getForm(MDCatalogs.get(1), id);
+                    f = MDReader.getForm(MDCatalogs.get(1), id);
                 }
                 result = getObjectFromForm(f);
                 if (result != null) {
@@ -226,7 +226,7 @@ public class MetadataReader {
         } else {
             Form f = MDReader.getForm(MDCatalogs.get(0), id);
             if (f == null) {
-                MDReader.getForm(MDCatalogs.get(1), id);
+                f = MDReader.getForm(MDCatalogs.get(1), id);
             }
             result = getRecordFromForm(f, type, elementName);
         }

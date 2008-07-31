@@ -131,6 +131,10 @@ public class RecordType extends DCMIRecordType {
         }
     }
     
+    public void setBoundingBox(List<JAXBElement<? extends BoundingBoxType>> bboxes) {
+        this.boundingBox = bboxes;
+    }
+    
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());

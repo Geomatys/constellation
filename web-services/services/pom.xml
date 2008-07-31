@@ -125,7 +125,11 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
+    </dependency>
     <dependency>
       <groupId>org.mdweb</groupId>
       <artifactId>model</artifactId>
