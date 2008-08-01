@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -60,6 +61,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "echoedRequest",
     "requestId"
 })
+@XmlRootElement( name ="Acknowledgement" )
 public class AcknowledgementType {
 
     @XmlElement(name = "EchoedRequest", required = true)

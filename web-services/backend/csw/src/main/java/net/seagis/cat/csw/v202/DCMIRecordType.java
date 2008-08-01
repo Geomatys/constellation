@@ -69,6 +69,7 @@ import org.geotools.util.Utilities;
     "creator"     ,
     "dcElement"   ,
     "modified"    ,
+    "date"        ,    
     "_abstract"   ,
     "references"  ,
     "spatial"
@@ -109,6 +110,9 @@ public class DCMIRecordType extends AbstractRecordType {
     @XmlElement(name = "modified", namespace = "http://purl.org/dc/terms/")
     private SimpleLiteral modified;
     
+    @XmlElement(name = "date", namespace = "http://purl.org/dc/elements/1.1/")
+    private SimpleLiteral date;
+    
     @XmlElement(name = "abstract", namespace = "http://purl.org/dc/terms/")
     private SimpleLiteral _abstract;
     
@@ -127,7 +131,7 @@ public class DCMIRecordType extends AbstractRecordType {
         
     
     public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
-            List<SimpleLiteral> subjects, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
+            List<SimpleLiteral> subjects, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral date, SimpleLiteral _abstract,
             SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language, SimpleLiteral spatial, 
             SimpleLiteral references) {
         
@@ -135,6 +139,7 @@ public class DCMIRecordType extends AbstractRecordType {
         this.title      = title;
         this.type       = type;
         this.format     = format;
+        this.date       = date;
         
         this.dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
         
@@ -218,6 +223,14 @@ public class DCMIRecordType extends AbstractRecordType {
         return modified;
     }
     
+    public void setDate(SimpleLiteral date) {
+        this.date = date;
+    }
+    
+    public SimpleLiteral getDate() {
+        return date;
+    }
+    
     public void setAbstract(SimpleLiteral _abstract) {
         this._abstract =_abstract;
     }
@@ -286,19 +299,6 @@ public class DCMIRecordType extends AbstractRecordType {
                 return jb.getValue();
             }
             
-        }
-        return null;
-    }
-    
-    public void setDate(SimpleLiteral date) {
-        this.dcElement.add(dublinFactory.createDate(date));
-    }
-    
-    public SimpleLiteral getDate() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("date")) {
-                return jb.getValue();
-            }
         }
         return null;
     }

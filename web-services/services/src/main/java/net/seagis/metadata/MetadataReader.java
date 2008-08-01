@@ -149,6 +149,7 @@ public class MetadataReader {
         Map<String, String> isoMap = new HashMap<String, String>();
         isoMap.put("identifier", "ISO 19115:MD_Metadata:fileIdentifier");
         isoMap.put("type",       "ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm");
+        isoMap.put("date",       "ISO 19115:MD_Metadata:dateStamp");
         isoMap.put("subject",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         isoMap.put("format",     "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
         isoMap.put("abstract",   "ISO 19115:MD_Metadata:identificationInfo:abstract");
@@ -275,7 +276,7 @@ public class MetadataReader {
         Standard  recordStandard    = top.getType().getStandard();
         
         if (recordStandard.equals(Standard.ISO_19115)) {
-            return getRecordFromMDForm(form, type);
+            return getRecordFromMDForm(form, type, elementName);
         
         } else {
             Object obj =  getObjectFromForm(form);
@@ -287,7 +288,6 @@ public class MetadataReader {
             
             // for an ElementSetName mode
             if (elementName == null || elementName.size() == 0) {
-                
                 // for a element set FULL we return the record directly
                 if (type == null || type.equals(ElementSetType.FULL)) {
                     return record;
@@ -311,29 +311,36 @@ public class MetadataReader {
                 Class recordClass = RecordType.class;
                 for (QName qn: elementName) {
 
-                    String getterName = "get" + firstToUpper(qn.getLocalPart());
-                    String setterName = "set" + firstToUpper(qn.getLocalPart());
+                    String getterName        = "get" + firstToUpper(qn.getLocalPart());
+                    String setterName        = "set" + firstToUpper(qn.getLocalPart());
+                    String currentMethodName = getterName + "()";
                     try {
                         Method getter = recordClass.getMethod(getterName);
                         Object param  = getter.invoke(record);
                         
                         Method setter = null;
-                        if (param != null) 
-                            setter = recordClass.getMethod(setterName, param.getClass());
+                        if (param != null) {
+                            currentMethodName = setterName + "(" + param.getClass() + ")";
+                            Class paramClass = param.getClass();
+                            if (paramClass.equals(ArrayList.class)) {
+                                paramClass = List.class;
+                            }
+                            setter = recordClass.getMethod(setterName, paramClass);
+                        }
                         
                         if (setter != null)
                             setter.invoke(result, param);
                         
                     } catch (IllegalAccessException ex) {
-                        logger.info("Illegal Access exception while invoking the method " + getterName + " in the classe RecordType");
+                        logger.info("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType");
                     } catch (IllegalArgumentException ex) {
-                       logger.info("illegal argument exception while invoking the method " + getterName + " in the classe RecordType");
+                       logger.info("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType");
                     } catch (InvocationTargetException ex) {
-                        logger.info("Invocation Target exception while invoking the method " + getterName + " in the classe RecordType");
+                        logger.info("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType");
                     } catch (NoSuchMethodException ex) {
-                        logger.info("The method " + getterName + " does not exists in the classe RecordType");
+                        logger.info("The method " + currentMethodName + " does not exists in the classe RecordType");
                     } catch (SecurityException ex) {
-                        logger.info("Security exception while getting the method " + getterName + " in the classe RecordType");
+                        logger.info("Security exception while getting the method " + currentMethodName + " in the classe RecordType");
                     }
                     
                 }
@@ -348,7 +355,7 @@ public class MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromMDForm(Form form, ElementSetType type) throws SQLException {
+    private AbstractRecordType getRecordFromMDForm(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
         
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
@@ -386,9 +393,6 @@ public class MetadataReader {
         }
         SimpleLiteral litType = new SimpleLiteral(null, dataType);
         
-        if (type.equals(ElementSetType.BRIEF)) {
-            return new BriefRecordType(identifier, title, litType , bboxes);
-        }
         
         // we get the keywords
         List<Value> keywordsValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("subject")));
@@ -408,6 +412,15 @@ public class MetadataReader {
         }
         SimpleLiteral format = new SimpleLiteral(null, formats);
         
+        List<Value> dateValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("date")));
+        List<String> dates = new ArrayList<String>();
+        for (Value v: dateValues) {
+            if (v instanceof TextValue) {
+                dates.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral date = new SimpleLiteral(null, dates);
+        
         // the last update date
         Date lastUp            = form.getUpdateDate();
         SimpleLiteral modified = new SimpleLiteral(null, lastUp.toString());
@@ -424,9 +437,7 @@ public class MetadataReader {
         
         // TODO add spatial
         
-        if (type.equals(ElementSetType.SUMMARY)) {
-            return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, description);
-        }
+        
         
         // the creator of the data
         List<Value>   creatorValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:credit"));
@@ -465,8 +476,59 @@ public class MetadataReader {
         if (keywords.size() != 0) {
             
         }
-        return new RecordType(identifier, title, litType , keywords, format, modified, description, bboxes,
-                creator, publisher, language, null, null);
+        
+        RecordType fullResult = new RecordType(identifier, title, litType , keywords, format, modified, date, description, bboxes,
+                        creator, publisher, language, null, null);
+        
+        // for an ElementSetName mode
+        if (elementName == null || elementName.size() == 0) {
+            if (type.equals(ElementSetType.BRIEF)) {
+                return new BriefRecordType(identifier, title, litType , bboxes);
+            }
+        
+            if (type.equals(ElementSetType.SUMMARY)) {
+                return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, description);
+            } else {
+            
+                return fullResult;
+            }
+        
+        // for an element name mode    
+        } else {
+            RecordType result = new RecordType();
+            Class recordClass = RecordType.class;
+            for (QName qn : elementName) {
+
+                String getterName = "get" + firstToUpper(qn.getLocalPart());
+                String setterName = "set" + firstToUpper(qn.getLocalPart());
+                try {
+                    Method getter = recordClass.getMethod(getterName);
+                    Object param = getter.invoke(fullResult);
+
+                    Method setter = null;
+                    if (param != null) {
+                        setter = recordClass.getMethod(setterName, param.getClass());
+                    }
+
+                    if (setter != null) {
+                        setter.invoke(result, param);
+                    }
+
+                } catch (IllegalAccessException ex) {
+                    logger.info("Illegal Access exception while invoking the method " + getterName + " in the classe RecordType");
+                } catch (IllegalArgumentException ex) {
+                    logger.info("illegal argument exception while invoking the method " + getterName + " in the classe RecordType");
+                } catch (InvocationTargetException ex) {
+                    logger.info("Invocation Target exception while invoking the method " + getterName + " in the classe RecordType");
+                } catch (NoSuchMethodException ex) {
+                    logger.info("The method " + getterName + " does not exists in the classe RecordType");
+                } catch (SecurityException ex) {
+                    logger.info("Security exception while getting the method " + getterName + " in the classe RecordType");
+                }
+
+            }
+            return result;
+        }
     }
     
     /**

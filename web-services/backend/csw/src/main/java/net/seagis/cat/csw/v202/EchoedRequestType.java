@@ -50,8 +50,22 @@ import javax.xml.bind.annotation.XmlType;
 public class EchoedRequestType {
 
     @XmlAnyElement(lax = true)
-    protected Object any;
+    private Object any;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    public EchoedRequestType() {
+        
+    }
+    
+    /**
+     * Build a new Echoed request
+     */
+    public EchoedRequestType(Object request) {
+        this.any = request;
+    }
+    
     /**
      * Gets the value of the any property.
      */

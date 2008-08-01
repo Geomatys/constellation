@@ -81,12 +81,22 @@ public class RecordType extends DCMIRecordType {
     /**
      * Build a new Record TODO add contributor, source , spatial, right, relation
      */
-    public RecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
-            List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
-            List<BoundingBoxType> bboxes, SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language, 
-            SimpleLiteral spatial,SimpleLiteral references) {
+    public RecordType(SimpleLiteral identifier, 
+                      SimpleLiteral title, 
+                      SimpleLiteral type, 
+                      List<SimpleLiteral> subject, 
+                      SimpleLiteral format, 
+                      SimpleLiteral modified,
+                      SimpleLiteral date,
+                      SimpleLiteral _abstract,
+                      List<BoundingBoxType> bboxes, 
+                      SimpleLiteral creator, 
+                      SimpleLiteral distributor, 
+                      SimpleLiteral language, 
+                      SimpleLiteral spatial,
+                      SimpleLiteral references) {
         
-        super(identifier, title,type, subject, format, modified, _abstract, creator, distributor, language, spatial, references);
+        super(identifier, title,type, subject, format, modified, date, _abstract, creator, distributor, language, spatial, references);
         
         this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         for (BoundingBoxType bbox: bboxes) {
@@ -111,13 +121,12 @@ public class RecordType extends DCMIRecordType {
 
     /**
      * Gets the value of the boundingBox property.
-     * (unmodifiable)
      */
     public List<JAXBElement<? extends BoundingBoxType>> getBoundingBox() {
         if (boundingBox == null) {
             boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         }
-        return Collections.unmodifiableList(boundingBox);
+        return boundingBox;
     }
     
     public void setBoundingBox(BoundingBoxType bbox) {

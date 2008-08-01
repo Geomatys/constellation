@@ -119,6 +119,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
+import net.seagis.cat.csw.v202.EchoedRequestType;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -845,6 +846,10 @@ public class CSWworker {
         //we get the maxRecords wanted and start position
         Integer maxRecord = request.getMaxRecords();
         Integer startPos  = request.getStartPosition();
+        if (startPos <= 0) {
+            throw new OWSWebServiceException("The start position must be > 0.",
+                                             NO_APPLICABLE_CODE, "startPosition", version);
+        }
         
         // build the lucene query from the specified filter
         SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
@@ -886,11 +891,12 @@ public class CSWworker {
                                              NO_APPLICABLE_CODE, null, version);
         }
         
-        //we update the maxRecords attribute.
-        if (results.size() < maxRecord) {
-            maxRecord = results.size();
-        }
         int nextRecord = startPos + maxRecord;
+        if (nextRecord > results.size())
+            nextRecord = 0;
+        int max = (startPos - 1) + maxRecord;
+        if (max > results.size())
+            max = results.size();
         
         try {
             if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
@@ -903,11 +909,12 @@ public class CSWworker {
                 } else if (resultType.equals(ResultType.RESULTS)) {
                 
                     List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-                    int max = maxRecord;
+                    
                     for (int i = startPos -1; i < max; i++) {
                         Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
-                        if (obj == null && (max + 1) < results.size())
+                        if (obj == null && (max + 1) < results.size()) {
                             max++;
+                        }
                         else
                             records.add((AbstractRecordType)obj);
                     }
@@ -915,13 +922,19 @@ public class CSWworker {
                                                           set, 
                                                           results.size(),
                                                           records,
-                                                          maxRecord,
+                                                          records.size(),
                                                           nextRecord);
                         
-                // TODO
+                //we return an Acknowledgement if the request is valid. 
                 } else if (resultType.equals(ResultType.VALIDATE)) {
-                    throw new OWSWebServiceException("The service does not yet handle the VALIDATE resultType.",
-                                                   NO_APPLICABLE_CODE, "resultType", version);
+                   try {
+                       EchoedRequestType echoRequest = new EchoedRequestType(request);
+                       return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
+                    
+                    } catch(DatatypeConfigurationException ex) {
+                        throw new OWSWebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                         NO_APPLICABLE_CODE, null, version);
+                    }
                 }
             } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
             
@@ -943,10 +956,12 @@ public class CSWworker {
                                                           results.size(),
                                                           maxRecord,
                                                           records);
-                //TODO
+                    
+                //we return an Acknowledgement if the request is valid.
                 } else if (resultType.equals(ResultType.VALIDATE)) {
                     try {
-                        return new AcknowledgementType(ID, null, System.currentTimeMillis());
+                        EchoedRequestType echoRequest = new EchoedRequestType(request);
+                        return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
                     
                     } catch(DatatypeConfigurationException ex) {
                         throw new OWSWebServiceException("DataTypeConfiguration exception while creating acknowledgment response",

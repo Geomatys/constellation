@@ -408,6 +408,12 @@ public class FilterParser {
                 brutValue = brutValue.replace(pil.getSingleChar(),  "?");
                 brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
                 
+                //for a date we remove the '-'
+                if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
+                        brutValue = brutValue.replaceAll("-", "");
+                        brutValue = brutValue.replace("Z", "");
+                }
+                
                 response.append(brutValue);
                 
             } else {
@@ -559,6 +565,9 @@ public class FilterParser {
             //we verify that all the parameters are specified
             if (propertyName == null) {
                 throw new OWSWebServiceException("An operator BBOX must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } else if (!propertyName.contains("BoundingBox")) {
+                throw new OWSWebServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
