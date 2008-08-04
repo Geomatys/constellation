@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -149,41 +150,67 @@ public class WCService extends WebService {
      * Instanciate the {@link WebServiceWorker} if not already defined, trying to get some
      * information already defined in the JNDI configuration of the application server.
      *
+     * @throws IOException if we try to connect to the database using information stored in the
+     *                     configuration file.
      * @throws NamingException if an error in getting properties from JNDI references occured.
+     *                         For the moment, it is not thrown, and it fall backs on the
+     *                         configuration defined in the config.xml file.
      * @throws SQLException if an error occured while configuring the connection.
      */
-    private static synchronized void ensureWorkerInitialized() throws SQLException, IOException {
+    private static synchronized void ensureWorkerInitialized() throws SQLException, IOException,
+                                                                      NamingException
+    {
         if (webServiceWorker == null) {
             Database database;
             try {
-                final InitialContext ctx = new InitialContext();
-                // Initialize the database connection
-                final DataSource ds = (DataSource) ctx.lookup("Coverages");
-                if (ds == null) {
-                    throw new NamingException("DataSource \"Coverages\" is not defined.");
-                }
-                final Connection connection = ds.getConnection();
-                // Gets properties defined in the JNDI reference "Coverages Properties"
-                final Reference props = (Reference) ctx.lookup("Coverages Properties");
-                if (props == null) {
-                    throw new NamingException("\"Coverages Properties\" JNDI reference is not defined.");
-                }
-                /* Put all properties found in the JNDI reference into the Properties HashMap
-                 */
+                final Connection connection;
                 final Properties properties = new Properties();
-                final RefAddr permission = (RefAddr) props.get("Permission");
+                String permission = null, readOnly = null, rootDir = null;
+                final InitialContext ctx = new InitialContext();
+                /* domain.name is a property only present when using the glassfish application
+                 * server.
+                 */
+                if (System.getProperty("domain.name") != null) {
+                    final DataSource ds = (DataSource) ctx.lookup("Coverages");
+                    if (ds == null) {
+                        throw new NamingException("DataSource \"Coverages\" is not defined.");
+                    }
+                    connection = ds.getConnection();
+                    final Reference props = (Reference) getContextProperty("Coverages Properties", ctx);
+                    final RefAddr permissionAddr = (RefAddr) props.get("Permission");
+                    if (permissionAddr != null) {
+                        permission = (String) permissionAddr.getContent();
+                    }
+                    final RefAddr rootDirAddr = (RefAddr) props.get("RootDirectory");
+                    if (rootDirAddr != null) {
+                        rootDir = (String) rootDirAddr.getContent();
+                    }
+                    final RefAddr readOnlyAddr = (RefAddr) props.get("ReadOnly");
+                    if (readOnlyAddr != null) {
+                        readOnly = (String) readOnlyAddr.getContent();
+                    }
+                } else {
+                    // Here we are not in glassfish, probably in a Tomcat application server.
+                    final Context envContext = (Context) ctx.lookup("java:/comp/env");
+                    final DataSource ds = (DataSource) envContext.lookup("Coverages");
+                    if (ds == null) {
+                        throw new NamingException("DataSource \"Coverages\" is not defined.");
+                    }
+                    connection = ds.getConnection();
+                    permission = (String) getContextProperty("Permission", envContext);
+                    readOnly = (String) getContextProperty("ReadOnly", envContext);
+                    rootDir = (String) getContextProperty("RootDirectory", envContext);
+                }
+                // Put all properties found in the JNDI reference into the Properties HashMap
                 if (permission != null) {
-                    properties.setProperty(ConfigurationKey.PERMISSION.getKey(), (String) permission.getContent());
+                    properties.setProperty(ConfigurationKey.PERMISSION.getKey(), permission);
                 }
-                final RefAddr rootDir = (RefAddr) props.get("RootDirectory");
-                if (rootDir != null) {
-                    properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), (String) rootDir.getContent());
-                }
-                final RefAddr readOnly = (RefAddr) props.get("ReadOnly");
                 if (readOnly != null) {
-                    properties.setProperty(ConfigurationKey.READONLY.getKey(), (String) readOnly.getContent());
+                    properties.setProperty(ConfigurationKey.READONLY.getKey(), readOnly);
                 }
-
+                if (rootDir != null) {
+                    properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), rootDir);
+                }
                 try {
                     database = new Database(connection, properties);
                 } catch (IOException io) {
@@ -205,6 +232,7 @@ public class WCService extends WebService {
                  * configuration file is put under the WEB-INF directory of constellation.
                  * todo: get the webservice name (here ifremerWS) from the servlet context.
                  */
+                logger.warning("Connecting to the database using config.xml file !");
                 File configFile = null;
                 File dirCatalina = null;
                 final String catalinaPath = System.getenv().get("CATALINA_HOME");
@@ -221,7 +249,6 @@ public class WCService extends WebService {
             }
             final WebServiceWorker initialValue = new WebServiceWorker(database, true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
-
                 @Override
                 protected WebServiceWorker initialValue() {
                     return new WebServiceWorker(initialValue);
@@ -233,7 +260,9 @@ public class WCService extends WebService {
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
-    public WCService() throws JAXBException, WebServiceException, IOException, SQLException {
+    public WCService() throws JAXBException, WebServiceException, IOException,
+                               SQLException, NamingException
+    {
         super("WCS", new ServiceVersion(Service.WCS, "1.1.1"), new ServiceVersion(Service.WCS, "1.0.0"));
         ensureWorkerInitialized();
 
@@ -1366,6 +1395,24 @@ public class WCService extends WebService {
             throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
             //never reach
             return null;
+        }
+    }
+
+    /**
+     * Returns the context value for the key specified, or {@code null} if not found
+     * in this context.
+     *
+     * @param key The key to search in the context.
+     * @param context The context which to consider.
+     */
+    private static Object getContextProperty(final String key, final Context context) {
+        Object value = null;
+        try {
+            value = context.lookup(key);
+        } catch (NamingException n) {
+            // Do nothing, the key is not found in the context and the value is still null.
+        } finally {
+            return value;
         }
     }
 
