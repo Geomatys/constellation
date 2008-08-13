@@ -166,8 +166,7 @@ public class CSWService extends WebService {
         }
     }
 
-    @Override
-    public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
             
             if (worker != null) {

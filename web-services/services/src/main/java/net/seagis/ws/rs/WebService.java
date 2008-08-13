@@ -387,7 +387,7 @@ public abstract class WebService {
      */
     @GET
     public Response doGET() throws JAXBException  {
-        return treatIncommingRequest(null);
+        return treatIncomingRequest(null);
     }
     
     /**
@@ -411,7 +411,7 @@ public abstract class WebService {
         }
         logger.info("request POST kvp: " + request + '\n' + log);
         
-        return treatIncommingRequest(null);
+        return treatIncomingRequest(null);
     }
     
     /**
@@ -452,7 +452,7 @@ public abstract class WebService {
                 AbstractRequest ar = (AbstractRequest) request;
                 context.getQueryParameters().add("VERSION", ar.getVersion());
             }
-            return treatIncommingRequest(request);
+            return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", "text/plain").build();
         }
@@ -495,7 +495,7 @@ public abstract class WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    public abstract Response treatIncommingRequest(Object objectRequest) throws JAXBException;
+    public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
 
    
     /**

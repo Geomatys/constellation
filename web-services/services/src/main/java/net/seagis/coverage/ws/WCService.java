@@ -277,12 +277,12 @@ public class WCService extends WebService {
     }
 
     /**
-     * Treat the incomming request and call the right function.
+     * Treat the incoming request and call the right function.
      *
      * @return an image or xml response.
      * @throw JAXBException
      */
-    public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             writeParameters();
