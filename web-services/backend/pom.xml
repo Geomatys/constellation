@@ -68,6 +68,7 @@
     <module>sld</module>
     <module>wcs</module>
     <module>wms</module>
+    <module>xacml</module>
   </modules>
 
 </project>
