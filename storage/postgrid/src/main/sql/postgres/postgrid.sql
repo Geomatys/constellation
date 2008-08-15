@@ -3,12 +3,6 @@
 --------------------------------------------------------------------------------------------------
 
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = off;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET escape_string_warning = off;
-SET default_tablespace = '';
-SET default_with_oids = false;
 
 CREATE SCHEMA postgrid;
 ALTER SCHEMA postgrid OWNER TO geoadmin;
@@ -17,7 +11,7 @@ GRANT USAGE ON SCHEMA postgrid TO PUBLIC;
 
 COMMENT ON SCHEMA postgrid IS 'Metadata for grid coverages';
 
-SET search_path = postgrid, postgis, pg_catalog;
+SET search_path = postgrid, postgis;
 
 
 

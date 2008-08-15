@@ -9,8 +9,6 @@
 --
 
 SET client_encoding = 'UTF8';
-SET check_function_bodies = false;
-SET client_min_messages = warning;
 
 --
 -- Name: topsweb; Type: SCHEMA; Schema: -; Owner: geoadmin
@@ -38,7 +36,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: CoverageMetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: CoverageMetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "CoverageMetadata" (
@@ -54,7 +52,7 @@ ALTER TABLE topsweb."CoverageMetadata" OWNER TO geoadmin;
 GRANT SELECT ON TABLE topsweb."CoverageMetadata" TO public;
 
 --
--- Name: layermetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: layermetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE layermetadata (
@@ -79,7 +77,7 @@ ALTER TABLE topsweb.layermetadata OWNER TO geoadmin;
 GRANT SELECT ON TABLE layermetadata TO public;
 
 --
--- Name: poc; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: poc; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE poc (
@@ -109,7 +107,7 @@ ALTER TABLE topsweb.poc OWNER TO geoadmin;
 GRANT SELECT ON TABLE topsweb.poc TO public;
 
 --
--- Name: seriesmetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: seriesmetadata; Type: TABLE; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE seriesmetadata (
@@ -135,7 +133,7 @@ ALTER TABLE topsweb.seriesmetadata OWNER TO geoadmin;
 GRANT SELECT ON TABLE topsweb.seriesmetadata TO public;
 
 --
--- Name: CoverageMetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: CoverageMetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "CoverageMetadata"
@@ -143,7 +141,7 @@ ALTER TABLE ONLY "CoverageMetadata"
 
 
 --
--- Name: layermetadata_layer_meta_name_key; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: layermetadata_layer_meta_name_key; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY layermetadata
@@ -151,7 +149,7 @@ ALTER TABLE ONLY layermetadata
 
 
 --
--- Name: layermetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: layermetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY layermetadata
@@ -159,7 +157,7 @@ ALTER TABLE ONLY layermetadata
 
 
 --
--- Name: poc_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: poc_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY poc
@@ -167,7 +165,7 @@ ALTER TABLE ONLY poc
 
 
 --
--- Name: seriesmetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: seriesmetadata_pkey; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY seriesmetadata
@@ -175,7 +173,7 @@ ALTER TABLE ONLY seriesmetadata
 
 
 --
--- Name: seriesmetadata_series_meta_name_key; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: seriesmetadata_series_meta_name_key; Type: CONSTRAINT; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY seriesmetadata
@@ -183,7 +181,7 @@ ALTER TABLE ONLY seriesmetadata
 
 
 --
--- Name: poc_index; Type: INDEX; Schema: topsweb; Owner: geoadmin; Tablespace: 
+-- Name: poc_index; Type: INDEX; Schema: topsweb; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX poc_index ON poc USING btree (last_name, first_name);
