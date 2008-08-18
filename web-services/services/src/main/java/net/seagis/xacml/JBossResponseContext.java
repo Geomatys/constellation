@@ -44,7 +44,6 @@ import net.seagis.xacml.context.StatusType;
 import net.seagis.xacml.policy.EffectType;
 import net.seagis.xacml.policy.ObligationType;
 import net.seagis.xacml.policy.ObligationsType;
-import net.seagis.xacml.api.ContextMapOp;
 import net.seagis.xacml.api.ResponseContext;
 
 import org.w3c.dom.Document;

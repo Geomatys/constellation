@@ -38,7 +38,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.xacml.context.ObjectFactory;
 import net.seagis.xacml.context.RequestType;
-import net.seagis.xacml.api.ContextMapOp;
 import net.seagis.xacml.api.RequestContext;
 
 import org.w3c.dom.Document;

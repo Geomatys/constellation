@@ -109,7 +109,7 @@ public class RecordMarshallingTest {
         List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
         bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
         
-        RecordType record = new RecordType(id, title, type, subject, null, modified, Abstract, bbox, null, null, null, spatial, references);
+        RecordType record = new RecordType(id, title, type, subject, null, modified, null, Abstract, bbox, null, null, null, spatial, references);
         
         StringWriter sw = new StringWriter();
         recordMarshaller202.marshal(record, sw);
@@ -191,7 +191,7 @@ public class RecordMarshallingTest {
         List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
         bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
         
-        RecordType expResult = new RecordType(id, title, type, subject, null, modified, Abstract, bbox, null, null, null, spatial, references);
+        RecordType expResult = new RecordType(id, title, type, subject, null, modified, null, Abstract, bbox, null, null, null, spatial, references);
         
         logger.finer("RESULT: " + result.toString());
         logger.finer("");
