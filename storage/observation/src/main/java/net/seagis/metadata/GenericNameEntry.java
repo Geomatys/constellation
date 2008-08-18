@@ -78,4 +78,12 @@ public class GenericNameEntry extends Entry implements GenericName {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    public LocalName head() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public LocalName tip() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
