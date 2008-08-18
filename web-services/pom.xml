@@ -60,6 +60,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>services</module>
+    <module>sos</module>
     <module>backend</module>
   </modules>
 

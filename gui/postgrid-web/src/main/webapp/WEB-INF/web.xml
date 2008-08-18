@@ -12,7 +12,7 @@
           <param-name>com.sun.jersey.config.property.packages</param-name>
 	  <!-- To disable CSW     service remove packageName: net.seagis.metadata.ws.rs-->
           <!-- To disable WMS/WCS service remove packageName: net.seagis.coverage.ws-->
-          <param-value>net.seagis.metadata.ws.rs</param-value>
+          <param-value>net.seagis.coverage.ws;net.seagis.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

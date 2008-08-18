@@ -74,7 +74,7 @@ public class SOService extends WebService {
     }
 
     @Override
-    public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
          try {
              worker.setServiceURL(getServiceURL());
              writeParameters();
