@@ -312,7 +312,7 @@ public enum XACMLConstants {
     RULE_COMBINING_PERMIT_OVERRIDES("urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides"),
     RULE_COMBINING_ORDERED_PERMIT_OVERRIDES("urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:ordered-permit-overrides");
 
-    private final String key;
+    public final String key;
 
     private XACMLConstants(final String key) {
         this.key = key;

@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.seagis.xacml.bridge.JBossPolicyFinder;
-import net.seagis.xacml.api.ContextMapOp;
 import net.seagis.xacml.api.XACMLPolicy;
 import org.xml.sax.SAXException;
 
@@ -41,7 +40,7 @@ import org.xml.sax.SAXException;
  *  @since  Jul 6, 2007 
  *  @version $Revision$
  */
-public class JBossXACMLPolicy implements ContextMapOp {
+public class JBossXACMLPolicy implements XACMLPolicy {
 
     private final JBossPolicyFinder finder = new JBossPolicyFinder();
     private final List<XACMLPolicy> enclosingPolicies = new ArrayList<XACMLPolicy>();
@@ -55,9 +54,7 @@ public class JBossXACMLPolicy implements ContextMapOp {
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final URL url, final int type) throws IOException,
-                                                                  SAXException
-    {
+    public JBossXACMLPolicy(final URL url, final int type) throws IOException, SAXException {
         this(url.openStream(), type);
     }
 
@@ -68,9 +65,7 @@ public class JBossXACMLPolicy implements ContextMapOp {
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final InputStream is, final int type)
-            throws IOException, SAXException
-    {
+    public JBossXACMLPolicy(final InputStream is, final int type) throws IOException, SAXException {
         this(is, type, null);
     }
 
@@ -86,13 +81,13 @@ public class JBossXACMLPolicy implements ContextMapOp {
             final JBossPolicyFinder theFinder) throws IOException, SAXException
     {
         final AbstractPolicy policy;
-        XACMLPolicyUtil xpu = new XACMLPolicyUtil();
+        XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
         policyType = type;
         if (type == XACMLPolicy.POLICYSET) {
-            policy = xpu.createPolicySet(is, (theFinder != null) ? theFinder : finder);
+            policy = policyUtil.createPolicySet(is, (theFinder != null) ? theFinder : finder);
             map.put(XACMLConstants.POLICY_FINDER, theFinder);
         } else if (type == XACMLPolicy.POLICY) {
-            policy = xpu.createPolicy(is);
+            policy = policyUtil.createPolicy(is);
         } else {
             throw new IllegalArgumentException("Unknown type");
         }

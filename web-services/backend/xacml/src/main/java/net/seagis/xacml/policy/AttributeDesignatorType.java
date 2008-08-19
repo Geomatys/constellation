@@ -60,6 +60,23 @@ public class AttributeDesignatorType extends ExpressionType {
    private Boolean mustBePresent;
 
    /**
+    * An epty constructor used by JAXB.
+    */
+   public AttributeDesignatorType() {
+       
+   }
+   
+   /**
+    * Build a new AttributeDesignator from another AttributeDesignator. 
+    */
+   public AttributeDesignatorType(AttributeDesignatorType attribute) {
+       this.attributeId   = attribute.attributeId;
+       this.dataType      = attribute.dataType;
+       this.issuer        = attribute.issuer;
+       this.mustBePresent = attribute.mustBePresent;
+   }
+   
+   /**
     * Gets the value of the attributeId property.
     * 
     */

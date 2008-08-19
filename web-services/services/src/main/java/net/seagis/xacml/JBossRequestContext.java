@@ -154,7 +154,7 @@ public class JBossRequestContext implements RequestContext {
         } catch (SAXException sax) {
             throw new IOException(sax);
         }
-        final NodeList nodes = doc.getElementsByTagNameNS(XACMLConstants.CONTEXT_SCHEMA.name(), "Request");
+        final NodeList nodes = doc.getElementsByTagNameNS(XACMLConstants.CONTEXT_SCHEMA.key, "Request");
         return nodes.item(0);
     }
 }

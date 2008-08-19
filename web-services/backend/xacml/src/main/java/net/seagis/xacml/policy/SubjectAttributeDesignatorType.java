@@ -41,11 +41,27 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SubjectAttributeDesignatorType")
 public class SubjectAttributeDesignatorType extends AttributeDesignatorType {
+    
 
    @XmlAttribute(name = "SubjectCategory")
    @XmlSchemaType(name = "anyURI")
    private String subjectCategory;
 
+   /**
+    * An epty constructor used by JAXB.
+    */
+   public SubjectAttributeDesignatorType() {
+       
+   }
+   
+   /**
+    * Build a new SubjectAttributeDesignator from an AttributeDesignator. 
+    */
+   public SubjectAttributeDesignatorType(AttributeDesignatorType attribute, String subjectCategory) {
+       super(attribute);
+       this.subjectCategory = subjectCategory;
+   }
+   
    /**
     * Gets the value of the subjectCategory property.
     */

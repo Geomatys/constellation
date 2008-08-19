@@ -140,19 +140,17 @@ public class PolicyAttributeFactory {
             final String id, final String dataType, final String issuer,
             final boolean mustBePresent, final String subjectCategory)
     {
-        final SubjectAttributeDesignatorType adt = (SubjectAttributeDesignatorType)
-                createAttributeDesignatorType(id, dataType, issuer, mustBePresent);
-        if (subjectCategory != null) {
-            adt.setSubjectCategory(subjectCategory);
-        }
-        return adt;
+        AttributeDesignatorType adt = createAttributeDesignatorType(id, dataType, issuer, mustBePresent);
+        final SubjectAttributeDesignatorType sadt = new SubjectAttributeDesignatorType(adt, subjectCategory);
+                
+        return sadt;
     }
 
     private static AttributeValueType getBareAttributeValueType(final Object value, 
             final XMLSchemaConstants dataType)
     {
         final AttributeValueType avt = new AttributeValueType();
-        avt.setDataType(dataType.name());
+        avt.setDataType(dataType.key);
         avt.getContent().add(value);
         return avt;
     }

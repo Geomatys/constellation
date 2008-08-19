@@ -1,0 +1,35 @@
+<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides"
+        Version="2.0" PolicyId="ExamplePolicy">
+    <Target>
+        <Resources>
+             <Resource>
+                 <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://test/developer-guide.html</AttributeValue>
+                      <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#anyURI" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
+                 </ResourceMatch>
+             </Resource>
+        </Resources>
+    </Target>
+    <Rule Effect="Permit" RuleId="ReadRule">
+        <Target>
+             <Actions>
+                 <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
+                      </ActionMatch>
+                 </Action>
+             </Actions>
+        </Target>
+        <Condition>
+             <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">developer</AttributeValue>
+               <SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role" />
+             </Apply>
+      </Condition>
+    </Rule>
+    <!-- If none of the rules apply, deny the request -->
+    <Rule Effect="Deny" RuleId="DenyRule"/>
+</Policy>
+

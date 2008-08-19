@@ -48,7 +48,7 @@ public enum XMLSchemaConstants {
     DATATYPE_X500NAME("urn:oasis:names:tc:xacml:1.0:data-type:x500Name");
     
     
-    private final String key;
+    public final String key;
 
     private XMLSchemaConstants(final String key) {
         this.key = key;

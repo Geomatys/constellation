@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+   xmlns:ns="urn:jboss:xacml:2.0" 
+   targetNamespace="urn:jboss:xacml:2.0" 
+   elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xs:element name="jbosspdp" type="ns:PDP">
+      <xs:annotation>
+         <xs:documentation>Root Element for JBoss XACML</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="PDP">
+      <xs:sequence>
+         <xs:element ref="ns:Policies" minOccurs="1"/>
+         <xs:element ref="ns:Locators" minOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="Policies" type="ns:PoliciesType"/>
+   <xs:complexType name="PoliciesType">
+      <xs:sequence>
+         <xs:element name="PolicySet" type="ns:PolicySetType" minOccurs="0"  maxOccurs="unbounded"/>
+         <xs:element name="Policy" type="ns:PolicyType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="PolicySetType">
+      <xs:sequence>
+         <xs:element name="Location" type="xs:anyURI" minOccurs="0"/>
+         <xs:element name="Policy" type="ns:PolicyType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="PolicySet" type="ns:PolicySetType" minOccurs="0"  maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="PolicyType">
+      <xs:sequence>
+         <xs:element name="Location" type="xs:anyURI"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="Locators" type="ns:LocatorsType"/>
+   <xs:complexType name="LocatorsType">
+      <xs:sequence>
+         <xs:element name="Locator" type="ns:LocatorType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType> 
+   
+   <xs:element name="Option">
+     <xs:complexType mixed="true">
+      <xs:sequence>
+         <xs:any namespace="##other" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="Name" type="xs:string"/>
+     </xs:complexType>
+   </xs:element>
+   
+   <xs:complexType name="LocatorType">
+      <xs:sequence>
+         <xs:element ref="ns:Option" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="Name" type="xs:string"/>
+   </xs:complexType> 
+</xs:schema>

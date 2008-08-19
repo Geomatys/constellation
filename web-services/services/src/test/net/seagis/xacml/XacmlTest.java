@@ -1,14 +1,312 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2008, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package net.seagis.xacml;
 
+// J2SE dependencies
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.security.Principal;
+import java.security.acl.Group;
+
+// JAXB dependencies
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+
+// seagis dependencies
+import javax.xml.bind.Marshaller;
+import net.seagis.xacml.api.PolicyDecisionPoint;
+import net.seagis.xacml.api.PolicyLocator;
+import net.seagis.xacml.api.RequestContext;
+import net.seagis.xacml.api.XACMLPolicy;
+import net.seagis.xacml.factory.PolicyAttributeFactory;
+import net.seagis.xacml.factory.PolicyFactory;
+import net.seagis.xacml.locators.JBossPolicyLocator;
+import net.seagis.xacml.policy.ActionMatchType;
+import net.seagis.xacml.policy.ActionType;
+import net.seagis.xacml.policy.ActionsType;
+import net.seagis.xacml.policy.ApplyType;
+import net.seagis.xacml.policy.AttributeValueType;
+import net.seagis.xacml.policy.ConditionType;
+import net.seagis.xacml.policy.EffectType;
+import net.seagis.xacml.policy.ExpressionType;
+import net.seagis.xacml.policy.FunctionType;
+import net.seagis.xacml.policy.ObjectFactory;
+import net.seagis.xacml.policy.ResourceMatchType;
+import net.seagis.xacml.policy.ResourceType;
+import net.seagis.xacml.policy.ResourcesType;
+import net.seagis.xacml.policy.RuleType;
+import net.seagis.xacml.policy.SubjectAttributeDesignatorType;
+import net.seagis.xacml.policy.TargetType;
+
+// Junit dependencies
+import org.junit.*;
+import static org.junit.Assert.*;
+
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal
  */
 public class XacmlTest {
+    
+    private Logger logger = Logger.getLogger("net.seagis.metadata");
+   
+    private JBossPDP PDP;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
+    
+    /**
+     * Test the build of a PDP with a configuration file. 
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void configFilePDPTest() throws Exception {
+        
+        File configFile = new File("PDPConfig.xml");
+        InputStream is = new FileInputStream(configFile);
+        PDP = new JBossPDP(is);
+        
+        assertNotNull(PDP);
+    }
+    
+     /**
+     * Test the build of a PDP with a object model. 
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void ObjectModelPDPTest() throws Exception {
+        PDP = new JBossPDP();
+        
+        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
+        PolicyDecisionPoint pdp = new JBossPDP();
+        
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
+        Marshaller marshaller    = jbcontext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(policyType, System.out);
+        
+        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
+        Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+        policies.add(policy);
+       
+        //Pass a set of policies (and/or policy sets) to the PDP
+        pdp.setPolicies(policies);
+
+        assertNotNull(PDP);
+    }
+    
+    @Test
+    public void testPositiveWebBinding() throws Exception {
+        
+        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
+        PolicyDecisionPoint pdp = new JBossPDP();
+        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
+
+        Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+        policies.add(policy);
+        pdp.setPolicies(policies);
+        
+        //Add the basic locators also
+        PolicyLocator policyLocator = new JBossPolicyLocator();
+        policyLocator.setPolicies(policies);
+        
+        //Locators need to be given the policies
+        Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+        locators.add(policyLocator);
+        pdp.setLocators(locators);
+        assertNotNull("JBossPDP is != null", pdp);
+        Principal p = new Principal() {
+
+            public String getName() {
+                return "tesuser";
+            }
+        };
+        //Create Role Group
+        Group grp = XACMLTestUtil.getRoleGroup("developer");
+        String requestURI      = "http://test/developer-guide.html";
+        HttpRequestUtil util   = new HttpRequestUtil();
+        HttpServletRequest req = util.createRequest(p, requestURI);
+        
+        //Check PERMIT condition
+        WebPEP pep = new WebPEP();
+        RequestContext request = pep.createXACMLRequest(req, p, grp);
+        if (true) {
+            System.out.println("Positive Web Binding request");
+            request.marshall(System.out);
+            System.out.println("");
+        }
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(pdp, request));
+    }
+    
+    @Test
+    public void testNegativeAccessWebBinding() throws Exception {
+        
+        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
+        PolicyDecisionPoint pdp = new JBossPDP();
+        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
+        Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+        policies.add(policy);
+        pdp.setPolicies(policies);
+        
+        //Add the basic locators also
+        PolicyLocator policyLocator = new JBossPolicyLocator();
+        
+        //Locators need to be given the policies
+        policyLocator.setPolicies(policies);
+        Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+        locators.add(policyLocator);
+        pdp.setLocators(locators);
+        assertNotNull("JBossPDP is != null", pdp);
+        Principal p = new Principal() {
+
+            public String getName() {
+                return "testuser";
+            }
+        };
+        //Create Role Group
+        Group grp = XACMLTestUtil.getRoleGroup("imposter");
+        String requestURI = "http://test/developer-guide.html";
+        HttpRequestUtil util = new HttpRequestUtil();
+        HttpServletRequest req = util.createRequest(p, requestURI);
+        //Check DENY condition
+        WebPEP pep = new WebPEP();
+        RequestContext request = pep.createXACMLRequest(req, p, grp);
+        
+        if (true) {
+            System.out.println("Negative Web Binding request");
+            request.marshall(System.out);
+            System.out.println("");
+        }
+        assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY,
+                      XACMLTestUtil.getDecision(pdp, request));
+    }
+
+
+    
+    /**
+     * Build an example Policy.
+     * 
+     * This policy file basically provides access to the url when the subject has a role of "developer".
+     * All other requests are denied because of the explicit rule at the bottom of the policy file,
+     * without which the PDP would have returned a decision of NotAPPLICABLE.
+     *
+     * 
+     * @return
+     * @throws java.lang.Exception
+     */
+    private net.seagis.xacml.policy.PolicyType constructExamplePolicy() throws Exception {
+        
+        ObjectFactory objectFactory = new ObjectFactory();
+        String PERMIT_OVERRIDES = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
+        net.seagis.xacml.policy.PolicyType policyType = new net.seagis.xacml.policy.PolicyType();
+        policyType.setPolicyId("ExamplePolicy");
+        policyType.setVersion("2.0");
+        policyType.setRuleCombiningAlgId(PERMIT_OVERRIDES);
+        
+        //we Create the target resource
+        TargetType targetType = new TargetType();
+        ResourcesType resourcesType = new ResourcesType();
+        ResourceType resourceType = new ResourceType();
+        ResourceMatchType rmt = new ResourceMatchType();
+        rmt.setMatchId(XACMLConstants.FUNCTION_ANYURI_EQUAL.key);
+        rmt.setResourceAttributeDesignator(PolicyAttributeFactory.createAttributeDesignatorType(
+                XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key,
+                XMLSchemaConstants.DATATYPE_ANYURI.key,
+                null,
+                true));
+        
+        rmt.setAttributeValue(PolicyAttributeFactory.createAnyURIAttributeType(new URI("http://test/developer-guide.html")));
+        resourceType.getResourceMatch().add(rmt);
+        resourcesType.getResource().add(resourceType);
+        targetType.setResources(resourcesType);
+        policyType.setTarget(targetType);
+
+        //Create a Rule allowing the access of the ressource when the subject has a role of "developper"
+        RuleType permitRule = new RuleType();
+        permitRule.setRuleId("ReadRule");
+        permitRule.setEffect(EffectType.PERMIT);
+        ActionsType permitRuleActionsType = new ActionsType();
+        ActionType permitRuleActionType = new ActionType();
+        ActionMatchType amct = new ActionMatchType();
+
+        amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
+        amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("read"));
+        amct.setActionAttributeDesignator(
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                                                                     XMLSchemaConstants.DATATYPE_STRING.key,
+                                                                     null, true));
+        
+        permitRuleActionType.getActionMatch().add(amct);
+        TargetType permitRuleTargetType = new TargetType();
+        permitRuleActionsType.getAction().add(permitRuleActionType);
+        permitRuleTargetType.setActions(permitRuleActionsType);
+        permitRule.setTarget(permitRuleTargetType);
+        ConditionType permitRuleConditionType = new ConditionType();
+        FunctionType functionType = new FunctionType();
+        functionType.setFunctionId(XACMLConstants.FUNCTION_STRING_EQUAL.key);
+        JAXBElement<ExpressionType> jaxbElementFunctionType = objectFactory.createExpression(functionType);
+        permitRuleConditionType.setExpression(jaxbElementFunctionType);
+        ApplyType permitRuleApplyType = new ApplyType();
+        permitRuleApplyType.setFunctionId(XACMLConstants.FUNCTION_STRING_IS_IN.key);
+        SubjectAttributeDesignatorType sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ROLE.key,
+                                                                                                          XMLSchemaConstants.DATATYPE_STRING.key,
+                                                                                                          null, true, null);
+        
+        JAXBElement<SubjectAttributeDesignatorType> sadtElement = objectFactory.createSubjectAttributeDesignator(sadt);
+        AttributeValueType avt = PolicyAttributeFactory.createStringAttributeType("developer");
+        
+        JAXBElement<AttributeValueType> jaxbAVT = objectFactory.createAttributeValue(avt);
+        permitRuleApplyType.getExpression().add(jaxbAVT);
+        permitRuleApplyType.getExpression().add(sadtElement);
+        permitRuleConditionType.setExpression(objectFactory.createApply(permitRuleApplyType));
+        permitRule.setCondition(permitRuleConditionType);
+        policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().
+                add(permitRule);
+        
+        //Create a Deny Rule
+        RuleType denyRule = new RuleType();
+        denyRule.setRuleId("DenyRule");
+        denyRule.setEffect(EffectType.DENY);
+        policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().add(denyRule);
+        
+        //we return the result
+        return policyType;
+   }
+
 
 }

@@ -160,7 +160,7 @@ public class RequestAttributeFactory {
     {
         final AttributeType attributeType = new AttributeType();
         attributeType.setAttributeId(attrID);
-        attributeType.setDataType(dataType.name());
+        attributeType.setDataType(dataType.key);
         if (issuer != null) {
             attributeType.setIssuer(issuer);
         }

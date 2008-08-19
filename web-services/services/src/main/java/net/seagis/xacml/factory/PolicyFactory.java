@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.logging.Logger;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 
@@ -46,6 +47,8 @@ import net.seagis.xacml.JBossXACMLPolicy;
  */
 public class PolicyFactory {
 
+    private static Logger logger = Logger.getLogger("net.seagis.xacml");
+    
     public static Class<?> constructingClass = JBossXACMLPolicy.class;
 
     public static void setConstructingClass(final Class<?> clazz) {
@@ -55,32 +58,31 @@ public class PolicyFactory {
         constructingClass = clazz;
     }
 
-    public static XACMLPolicy createPolicySet(final InputStream policySetFile)
-            throws FactoryException
-    {
-        return newInstance(getCtr(), new Object[]{policySetFile, XACMLPolicy.POLICYSET});
+    public static XACMLPolicy createPolicySet(final InputStream policySetFile) throws FactoryException {
+        
+        return newInstance(getConstructor(), new Object[]{policySetFile, XACMLPolicy.POLICYSET});
     }
 
-    public static XACMLPolicy createPolicySet(final InputStream policySetFile,
-            final JBossPolicyFinder theFinder) throws FactoryException
-    {
-        return newInstance(getCtrWithFinder(),
-                new Object[] {policySetFile, XACMLPolicy.POLICYSET, theFinder});
+    public static XACMLPolicy createPolicySet(final InputStream policySetFile, final JBossPolicyFinder theFinder) throws FactoryException {
+        
+        return newInstance(getCtrWithFinder(), new Object[] {policySetFile, XACMLPolicy.POLICYSET, theFinder});
     }
 
     public static XACMLPolicy createPolicy(final InputStream policyFile) throws FactoryException {
-        return newInstance(getCtr(), new Object[]{policyFile, XACMLPolicy.POLICY});
+        
+        return newInstance(getConstructor(), new Object[]{policyFile, XACMLPolicy.POLICY});
     }
 
     public static XACMLPolicy createPolicy(final PolicyType policyFile) throws FactoryException {
+        
         final JAXBElement<PolicyType> jaxbPolicy = new ObjectFactory().createPolicy(policyFile);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JAXB.marshal(jaxbPolicy, baos);
         final ByteArrayInputStream bis = new ByteArrayInputStream(baos.toByteArray());
-        return newInstance(getCtr(), new Object[]{bis, XACMLPolicy.POLICY});
+        return newInstance(getConstructor(), new Object[]{bis, XACMLPolicy.POLICY});
     }
 
-    private static Constructor<XACMLPolicy> getCtr() throws FactoryException {
+    private static Constructor<XACMLPolicy> getConstructor() throws FactoryException {
         try {
             return (Constructor<XACMLPolicy>) constructingClass.getConstructor(
                     new Class[]{InputStream.class, Integer.TYPE});
@@ -100,11 +102,11 @@ public class PolicyFactory {
         }
     }
 
-    private static <T> T newInstance(final Constructor<T> constructor, final Object[] args)
-            throws FactoryException
-    {
+    private static <T> T newInstance(final Constructor<T> constructor, final Object[] args) throws FactoryException {
         try {
+        
             return constructor.newInstance(args);
+        
         } catch (InstantiationException ex) {
             throw new FactoryException(ex);
         } catch (IllegalAccessException ex) {
@@ -112,6 +114,8 @@ public class PolicyFactory {
         } catch (IllegalArgumentException ex) {
             throw new FactoryException(ex);
         } catch (InvocationTargetException ex) {
+            logger.severe("invocation target exception: " + ex.toString());
+            ex.printStackTrace();
             throw new FactoryException(ex);
         }
     }
