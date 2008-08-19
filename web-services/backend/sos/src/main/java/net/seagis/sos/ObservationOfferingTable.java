@@ -33,7 +33,6 @@ import net.seagis.gml.v311.BoundingShapeEntry;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.EnvelopeTable;
 import net.seagis.swe.PhenomenonEntry;
-import net.seagis.ws.rs.NamespacePrefixMapperImpl;
 import net.seagis.gml.v311.ReferenceEntry;
 import net.seagis.gml.v311.TimeIndeterminateValueType;
 import net.seagis.gml.v311.TimeInstantType;

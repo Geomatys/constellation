@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Configuration of "wms" module from SeaGIS project.
-  Version: $Id$
+  Version: $Id: pom.xml 737 2008-08-05 14:05:50Z cedricbr $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>net.seagis</groupId>
-    <artifactId>web-services</artifactId>
+    <artifactId>backend</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>net.seagis</groupId>
-  <artifactId>backend</artifactId>
-  <packaging>pom</packaging>
-  <name>Backend for Constellation Web Services</name>
+  <artifactId>sos</artifactId>
+  <packaging>jar</packaging>
+  <name>Sensor Observation Service</name>
   <description>
-    A group of bindings implementation used in the different Web Services of constellation.
+    A Sensor Observation Service to collect, store and distribute sensor observations.
   </description>
 
 
@@ -55,21 +55,36 @@
     </developer>
   </developers>
 
-  <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
-  <modules>
-    <module>csw</module>
-    <module>gml</module>
-    <module>kml</module>
-    <module>ogc</module>
-    <module>ows</module>
-    <module>se</module>
-    <module>sld</module>
-    <module>wcs</module>
-    <module>wms</module>
-    <module>xacml</module>
-    <module>sos</module>
-  </modules>
+
+
+  <!--
+    Dépendances requises pour la compilation. Ces dépendances seront incluses
+    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>ogc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>ows</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>observation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>

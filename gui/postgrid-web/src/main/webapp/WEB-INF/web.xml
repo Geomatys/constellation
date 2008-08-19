@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <!-- Servlet for seagis web service -->
+    <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
         <servlet-class>com.sun.jersey.impl.container.servlet.ServletAdaptor</servlet-class>
@@ -11,7 +11,8 @@
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
 	  <!-- To disable CSW     service remove packageName: net.seagis.metadata.ws.rs-->
-          <!-- To disable WMS/WCS service remove packageName: net.seagis.coverage.ws-->
+          <!-- To disable WMS/WCS service remove packageName: net.seagis.coverage.ws   -->
+          <!-- To enable  SOS     service add    packageName: net.seagis.sos.ws.rs     -->
           <param-value>net.seagis.coverage.ws;net.seagis.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -20,7 +21,25 @@
         <servlet-name>ServletAdaptor</servlet-name>
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
+    
+    <!-- SOAP servlet for constellation web service  (not needed in glassfish) 
+    
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>SOService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        </servlet>
+    <servlet>
+    
+    <servlet-mapping>
+        <servlet-name>SOService</servlet-name>
+        <url-pattern>/SOService</url-pattern>
+    </servlet-mapping>
 
+     -->
 
     <!-- Servlet for seagis JSF interface -->
     <!-- filters for tomahawk and sandbox -->

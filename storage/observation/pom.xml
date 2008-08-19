@@ -109,7 +109,12 @@
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
-      <artifactId>services</artifactId>
+      <artifactId>postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>gml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -127,6 +127,11 @@
       <artifactId>spatialLucene</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>sos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- web service-->
     <dependency>
       <groupId>javax.persistence</groupId>
