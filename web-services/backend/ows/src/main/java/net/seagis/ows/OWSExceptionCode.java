@@ -125,7 +125,7 @@ public class OWSExceptionCode extends CodeList<OWSExceptionCode> {
      *
      * @param name The enum name. This name must not be in use by an other enum of this type.
      */
-    private OWSExceptionCode(final String name) {
+    public OWSExceptionCode(final String name) {
         super(name, VALUES);
     }
 

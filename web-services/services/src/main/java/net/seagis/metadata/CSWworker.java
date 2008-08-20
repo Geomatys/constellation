@@ -1576,7 +1576,7 @@ public class CSWworker {
                         resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
                         resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
 
-                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                        Object harvested = getUnmarshaller().unmarshal(fileToHarvest);
                         if (harvested == null) {
                             throw new OWSWebServiceException("The resource can not be parsed.",
                                                               INVALID_PARAMETER_VALUE, "Source", version);
@@ -1758,6 +1758,14 @@ public class CSWworker {
             s = s.substring(i + 1, s.length());
         }
         return s;
+    }
+
+    public Marshaller getMarshaller() {
+        return marshaller;
+    }
+
+    public Unmarshaller getUnmarshaller() {
+        return unmarshaller;
     }
     
 }

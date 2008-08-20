@@ -622,7 +622,7 @@ public class CatalogueHarvester {
                 OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
                 StringWriter sw = new StringWriter();
                 try {
-                    worker.marshaller.marshal(request, sw);
+                    worker.getMarshaller().marshal(request, sw);
                 } catch (JAXBException ex) {
                     throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                      NO_APPLICABLE_CODE, null, worker.getVersion());
@@ -679,7 +679,7 @@ public class CatalogueHarvester {
             }
         
             try {
-                harvested = worker.unmarshaller.unmarshal(new StringReader(decodedString));
+                harvested = worker.getUnmarshaller().unmarshal(new StringReader(decodedString));
                 if (harvested != null && harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
