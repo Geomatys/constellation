@@ -34,7 +34,6 @@ import javax.xml.bind.JAXBElement;
 
 // seagis dependencies
 import javax.xml.bind.Marshaller;
-import net.seagis.xacml.api.PolicyDecisionPoint;
 import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.api.RequestContext;
 import net.seagis.xacml.api.XACMLPolicy;
@@ -70,7 +69,16 @@ public class XacmlTest {
     
     private Logger logger = Logger.getLogger("net.seagis.metadata");
    
+    /**
+     * A Policy Decision Point which received xacml request and decide to give or not the acces to the resource.
+     */
     private JBossPDP PDP;
+    
+    /**
+     * A example Policy.
+     */
+    private net.seagis.xacml.policy.PolicyType policyType;
+    
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -82,6 +90,8 @@ public class XacmlTest {
 
     @Before
     public void setUp() throws Exception {
+        
+         policyType = constructExamplePolicy();
     }
 
     @After
@@ -110,10 +120,8 @@ public class XacmlTest {
      */
     @Test
     public void ObjectModelPDPTest() throws Exception {
+
         PDP = new JBossPDP();
-        
-        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
-        PolicyDecisionPoint pdp = new JBossPDP();
         
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
         Marshaller marshaller    = jbcontext.createMarshaller();
@@ -125,21 +133,27 @@ public class XacmlTest {
         policies.add(policy);
        
         //Pass a set of policies (and/or policy sets) to the PDP
-        pdp.setPolicies(policies);
+        PDP.setPolicies(policies);
 
         assertNotNull(PDP);
     }
     
+    /**
+     * Test sending a request to the PDP with an user of the group developer.
+     * The response must be positive
+     * 
+     * @throws java.lang.Exception
+     */
     @Test
     public void testPositiveWebBinding() throws Exception {
         
-        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
-        PolicyDecisionPoint pdp = new JBossPDP();
+        PDP = new JBossPDP();
+        
         XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
 
         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
         policies.add(policy);
-        pdp.setPolicies(policies);
+        PDP.setPolicies(policies);
         
         //Add the basic locators also
         PolicyLocator policyLocator = new JBossPolicyLocator();
@@ -148,15 +162,18 @@ public class XacmlTest {
         //Locators need to be given the policies
         Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
         locators.add(policyLocator);
-        pdp.setLocators(locators);
-        assertNotNull("JBossPDP is != null", pdp);
+        PDP.setLocators(locators);
+        assertNotNull("JBossPDP is != null", PDP);
+        
+        //we create an user
         Principal p = new Principal() {
 
             public String getName() {
                 return "tesuser";
             }
         };
-        //Create Role Group
+        
+        //we create Role Group
         Group grp = XACMLTestUtil.getRoleGroup("developer");
         String requestURI      = "http://test/developer-guide.html";
         HttpRequestUtil util   = new HttpRequestUtil();
@@ -170,18 +187,23 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(pdp, request));
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
     }
     
+    /**
+     * Test sending a request to the PDP with an user of the group imposter.
+     * The response must be negative.
+     * 
+     * @throws java.lang.Exception
+     */
     @Test
     public void testNegativeAccessWebBinding() throws Exception {
         
-        net.seagis.xacml.policy.PolicyType policyType = constructExamplePolicy();
-        PolicyDecisionPoint pdp = new JBossPDP();
+        PDP = new JBossPDP();
         XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
         policies.add(policy);
-        pdp.setPolicies(policies);
+        PDP.setPolicies(policies);
         
         //Add the basic locators also
         PolicyLocator policyLocator = new JBossPolicyLocator();
@@ -190,19 +212,23 @@ public class XacmlTest {
         policyLocator.setPolicies(policies);
         Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
         locators.add(policyLocator);
-        pdp.setLocators(locators);
-        assertNotNull("JBossPDP is != null", pdp);
+        PDP.setLocators(locators);
+        assertNotNull("JBossPDP is != null", PDP);
+        
+        //we create an user
         Principal p = new Principal() {
 
             public String getName() {
                 return "testuser";
             }
         };
-        //Create Role Group
+        
+        //we create Role Group
         Group grp = XACMLTestUtil.getRoleGroup("imposter");
         String requestURI = "http://test/developer-guide.html";
         HttpRequestUtil util = new HttpRequestUtil();
         HttpServletRequest req = util.createRequest(p, requestURI);
+        
         //Check DENY condition
         WebPEP pep = new WebPEP();
         RequestContext request = pep.createXACMLRequest(req, p, grp);
@@ -213,7 +239,7 @@ public class XacmlTest {
             System.out.println("");
         }
         assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY,
-                      XACMLTestUtil.getDecision(pdp, request));
+                      XACMLTestUtil.getDecision(PDP, request));
     }
 
 
@@ -224,7 +250,6 @@ public class XacmlTest {
      * This policy file basically provides access to the url when the subject has a role of "developer".
      * All other requests are denied because of the explicit rule at the bottom of the policy file,
      * without which the PDP would have returned a decision of NotAPPLICABLE.
-     *
      * 
      * @return
      * @throws java.lang.Exception
@@ -238,32 +263,45 @@ public class XacmlTest {
         policyType.setVersion("2.0");
         policyType.setRuleCombiningAlgId(PERMIT_OVERRIDES);
         
-        //we Create the target resource
+        /**
+         * we Create the target resource here its : http://test/developer-guide.html
+         */ 
         TargetType targetType = new TargetType();
         ResourcesType resourcesType = new ResourcesType();
         ResourceType resourceType = new ResourceType();
         ResourceMatchType rmt = new ResourceMatchType();
+        
+        //this policy is applicable when the URI of the requested ressource equals the specified URI
         rmt.setMatchId(XACMLConstants.FUNCTION_ANYURI_EQUAL.key);
+        
+        // description of the attribute here the resource ID of type anyURI
         rmt.setResourceAttributeDesignator(PolicyAttributeFactory.createAttributeDesignatorType(
                 XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key,
                 XMLSchemaConstants.DATATYPE_ANYURI.key,
                 null,
                 true));
         
+        // the value of  the attribute
         rmt.setAttributeValue(PolicyAttributeFactory.createAnyURIAttributeType(new URI("http://test/developer-guide.html")));
         resourceType.getResourceMatch().add(rmt);
         resourcesType.getResource().add(resourceType);
         targetType.setResources(resourcesType);
         policyType.setTarget(targetType);
 
-        //Create a Rule allowing the access of the ressource when the subject has a role of "developper"
+        /**
+         * Create a Rule allowing the access of the ressource when the subject has a role of "developper"
+         */ 
         RuleType permitRule = new RuleType();
         permitRule.setRuleId("ReadRule");
+        
+        // if this rule is applicable the effect is to "PERMIT" the access
         permitRule.setEffect(EffectType.PERMIT);
+        
         ActionsType permitRuleActionsType = new ActionsType();
         ActionType permitRuleActionType = new ActionType();
         ActionMatchType amct = new ActionMatchType();
 
+        //here the rule is apply when the action on ressource is equal to "read"
         amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
         amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("read"));
         amct.setActionAttributeDesignator(
@@ -276,12 +314,16 @@ public class XacmlTest {
         permitRuleActionsType.getAction().add(permitRuleActionType);
         permitRuleTargetType.setActions(permitRuleActionsType);
         permitRule.setTarget(permitRuleTargetType);
+        
+        // now we create the condition to fill to permit the access
         ConditionType permitRuleConditionType = new ConditionType();
         FunctionType functionType = new FunctionType();
         functionType.setFunctionId(XACMLConstants.FUNCTION_STRING_EQUAL.key);
         JAXBElement<ExpressionType> jaxbElementFunctionType = objectFactory.createExpression(functionType);
         permitRuleConditionType.setExpression(jaxbElementFunctionType);
         ApplyType permitRuleApplyType = new ApplyType();
+        
+        // the condition is: "developer" is in role id 
         permitRuleApplyType.setFunctionId(XACMLConstants.FUNCTION_STRING_IS_IN.key);
         SubjectAttributeDesignatorType sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ROLE.key,
                                                                                                           XMLSchemaConstants.DATATYPE_STRING.key,
@@ -298,7 +340,7 @@ public class XacmlTest {
         policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().
                 add(permitRule);
         
-        //Create a Deny Rule
+        //Create a Deny Rule wich is applied if the precedent rule doens't match. it refuse always the access.
         RuleType denyRule = new RuleType();
         denyRule.setRuleId("DenyRule");
         denyRule.setEffect(EffectType.DENY);
