@@ -85,9 +85,7 @@ public class XACMLTestUtil {
     * @return
     * @throws Exception
     */
-   public static ResponseContext getResponse(PolicyDecisionPoint pdp
-         , RequestContext request) throws Exception
-   {
+   public static ResponseContext getResponse(PolicyDecisionPoint pdp, RequestContext request) throws Exception {
       return pdp.evaluate(request);
    }
 
@@ -125,11 +123,9 @@ public class XACMLTestUtil {
          }
 
          public Enumeration<? extends Principal> members() {
-            vect.add(new Principal()
-            {
+            vect.add(new Principal() {
 
-               public String getName()
-               {
+               public String getName() {
                   return roleName;
                }
             });
@@ -144,28 +140,5 @@ public class XACMLTestUtil {
             return "ROLES";
          }
       };
-   }
-
-   /**
-    * Validate the 7 Oasis XACML Interoperability Use Cases
-    * @param pdp
-    * @throws Exception
-    */
-   public static void validateInteropCases(PolicyDecisionPoint pdp) throws Exception {
-      TestCase.assertNotNull("JBossPDP is != null", pdp);
-      TestCase.assertEquals("Case 1 should be deny", XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase1-request.xml"));
-      TestCase.assertEquals("Case 2 should be deny", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase2-request.xml"));
-      TestCase.assertEquals("Case 3 should be deny", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase3-request.xml"));
-      TestCase.assertEquals("Case 4 should be deny", XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase4-request.xml"));
-      TestCase.assertEquals("Case 5 should be deny", XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase5-request.xml"));
-      TestCase.assertEquals("Case 6 should be deny", XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase6-request.xml"));
-      TestCase.assertEquals("Case 7 should be deny", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(pdp,
-            "test/requests/interop/scenario2-testcase7-request.xml"));
    }
 }

@@ -70,6 +70,11 @@ public class XacmlTest {
     private Logger logger = Logger.getLogger("net.seagis.metadata");
    
     /**
+     * enable the debug logging system 
+     */
+    private boolean debug = true;
+    
+    /**
      * A Policy Decision Point which received xacml request and decide to give or not the acces to the resource.
      */
     private JBossPDP PDP;
@@ -77,7 +82,7 @@ public class XacmlTest {
     /**
      * A example Policy.
      */
-    private net.seagis.xacml.policy.PolicyType policyType;
+    private net.seagis.xacml.policy.PolicyType policyType1;
     
     
     @BeforeClass
@@ -91,7 +96,23 @@ public class XacmlTest {
     @Before
     public void setUp() throws Exception {
         
-         policyType = constructExamplePolicy();
+         policyType1 = constructExamplePolicy();
+         PDP = new JBossPDP();
+        
+         XACMLPolicy policy = PolicyFactory.createPolicy(policyType1);
+
+         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+         policies.add(policy);
+         PDP.setPolicies(policies);
+        
+         //Add the basic locators also
+         PolicyLocator policyLocator = new JBossPolicyLocator();
+         policyLocator.setPolicies(policies);
+        
+         //Locators need to be given the policies
+         Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+         locators.add(policyLocator);
+         PDP.setLocators(locators);
     }
 
     @After
@@ -126,9 +147,9 @@ public class XacmlTest {
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
         Marshaller marshaller    = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(policyType, System.out);
+        marshaller.marshal(policyType1, System.out);
         
-        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
+        XACMLPolicy policy = PolicyFactory.createPolicy(policyType1);
         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
         policies.add(policy);
        
@@ -147,23 +168,8 @@ public class XacmlTest {
     @Test
     public void testPositiveWebBinding() throws Exception {
         
-        PDP = new JBossPDP();
-        
-        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
-
-        Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
-        policies.add(policy);
-        PDP.setPolicies(policies);
-        
-        //Add the basic locators also
-        PolicyLocator policyLocator = new JBossPolicyLocator();
-        policyLocator.setPolicies(policies);
-        
-        //Locators need to be given the policies
-        Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
-        locators.add(policyLocator);
-        PDP.setLocators(locators);
         assertNotNull("JBossPDP is != null", PDP);
+        PEP pep = new PEP();
         
         //we create an user
         Principal p = new Principal() {
@@ -174,16 +180,32 @@ public class XacmlTest {
         };
         
         //we create Role Group
-        Group grp = XACMLTestUtil.getRoleGroup("developer");
-        String requestURI      = "http://test/developer-guide.html";
-        HttpRequestUtil util   = new HttpRequestUtil();
-        HttpServletRequest req = util.createRequest(p, requestURI);
+        Group grp_developer = XACMLTestUtil.getRoleGroup("developer");
+        Group grp_admin     = XACMLTestUtil.getRoleGroup("admin");
+        String requestURI   = "http://test/developer-guide.html";
         
         //Check PERMIT condition
-        WebPEP pep = new WebPEP();
-        RequestContext request = pep.createXACMLRequest(req, p, grp);
-        if (true) {
-            System.out.println("Positive Web Binding request");
+        RequestContext request = pep.createXACMLRequest(requestURI, p, grp_developer, "read");
+        if (debug) {
+            System.out.println("Positive Web Binding request: role='developer' action='read'");
+            request.marshall(System.out);
+            System.out.println("");
+        }
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "read");
+        if (debug) {
+            System.out.println("Positive Web Binding request: role='adminr' action='write'");
+            request.marshall(System.out);
+            System.out.println("");
+        }
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "write");
+        if (debug) {
+            System.out.println("Positive Web Binding request: role='adminr' action='write'");
             request.marshall(System.out);
             System.out.println("");
         }
@@ -199,21 +221,8 @@ public class XacmlTest {
     @Test
     public void testNegativeAccessWebBinding() throws Exception {
         
-        PDP = new JBossPDP();
-        XACMLPolicy policy = PolicyFactory.createPolicy(policyType);
-        Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
-        policies.add(policy);
-        PDP.setPolicies(policies);
-        
-        //Add the basic locators also
-        PolicyLocator policyLocator = new JBossPolicyLocator();
-        
-        //Locators need to be given the policies
-        policyLocator.setPolicies(policies);
-        Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
-        locators.add(policyLocator);
-        PDP.setLocators(locators);
         assertNotNull("JBossPDP is != null", PDP);
+        PEP pep = new PEP();
         
         //we create an user
         Principal p = new Principal() {
@@ -224,17 +233,27 @@ public class XacmlTest {
         };
         
         //we create Role Group
-        Group grp = XACMLTestUtil.getRoleGroup("imposter");
+        Group grp_imposter  = XACMLTestUtil.getRoleGroup("imposter");
+        Group grp_developer = XACMLTestUtil.getRoleGroup("developer");
+        
         String requestURI = "http://test/developer-guide.html";
-        HttpRequestUtil util = new HttpRequestUtil();
-        HttpServletRequest req = util.createRequest(p, requestURI);
         
         //Check DENY condition
-        WebPEP pep = new WebPEP();
-        RequestContext request = pep.createXACMLRequest(req, p, grp);
+        RequestContext request = pep.createXACMLRequest(requestURI, p, grp_imposter, "read");
         
-        if (true) {
-            System.out.println("Negative Web Binding request");
+        if (debug) {
+            System.out.println("Negative Web Binding request: role= 'imposter' action='read' ");
+            request.marshall(System.out);
+            System.out.println("");
+        }
+        assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY,
+                      XACMLTestUtil.getDecision(PDP, request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_developer, "write");
+        
+        if (debug) {
+            System.out.println("Negative Web Binding request: role= 'developer' action='write' ");
             request.marshall(System.out);
             System.out.println("");
         }
@@ -266,10 +285,10 @@ public class XacmlTest {
         /**
          * we Create the target resource here its : http://test/developer-guide.html
          */ 
-        TargetType targetType = new TargetType();
+        TargetType targetType       = new TargetType();
         ResourcesType resourcesType = new ResourcesType();
-        ResourceType resourceType = new ResourceType();
-        ResourceMatchType rmt = new ResourceMatchType();
+        ResourceType resourceType   = new ResourceType();
+        ResourceMatchType rmt       = new ResourceMatchType();
         
         //this policy is applicable when the URI of the requested ressource equals the specified URI
         rmt.setMatchId(XACMLConstants.FUNCTION_ANYURI_EQUAL.key);
@@ -289,7 +308,7 @@ public class XacmlTest {
         policyType.setTarget(targetType);
 
         /**
-         * Create a Rule allowing the access of the ressource when the subject has a role of "developper"
+         * Create a Rule allowing the access of the ressource when the subject has a role of "developper" for a READ action
          */ 
         RuleType permitRule = new RuleType();
         permitRule.setRuleId("ReadRule");
@@ -337,8 +356,74 @@ public class XacmlTest {
         permitRuleApplyType.getExpression().add(sadtElement);
         permitRuleConditionType.setExpression(objectFactory.createApply(permitRuleApplyType));
         permitRule.setCondition(permitRuleConditionType);
-        policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().
-                add(permitRule);
+        policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().add(permitRule);
+        
+        /**
+         * Create a Rule allowing the access of the ressource when the subject has a role of "admin" for a READ or WRITE action
+         */ 
+        RuleType permitRule2 = new RuleType();
+        permitRule2.setRuleId("ReadWriteRule");
+        
+        // if this rule is applicable the effect is to "PERMIT" the access
+        permitRule2.setEffect(EffectType.PERMIT);
+        
+        permitRuleActionsType            = new ActionsType();
+        ActionType permitRuleActionType1 = new ActionType();
+        amct                             = new ActionMatchType();
+
+        //here the rule is apply when the action on ressource is equal to "read"
+        amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
+        amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("read"));
+        amct.setActionAttributeDesignator(
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                                                                     XMLSchemaConstants.DATATYPE_STRING.key,
+                                                                     null, true));
+        
+        permitRuleActionType1.getActionMatch().add(amct);
+        
+        ActionType permitRuleActionType2 = new ActionType();
+        amct                             = new ActionMatchType();
+
+        //here the rule is apply when the action on ressource is equal to "read"
+        amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
+        amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("write"));
+        amct.setActionAttributeDesignator(
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                                                                     XMLSchemaConstants.DATATYPE_STRING.key,
+                                                                     null, true));
+        
+        permitRuleActionType2.getActionMatch().add(amct);
+        
+        permitRuleTargetType = new TargetType();
+        permitRuleActionsType.getAction().add(permitRuleActionType1);
+        permitRuleActionsType.getAction().add(permitRuleActionType2);
+        permitRuleTargetType.setActions(permitRuleActionsType);
+        permitRule2.setTarget(permitRuleTargetType);
+        
+        // now we create the condition to fill to permit the access
+        permitRuleConditionType = new ConditionType();
+        functionType            = new FunctionType();
+        functionType.setFunctionId(XACMLConstants.FUNCTION_STRING_EQUAL.key);
+        jaxbElementFunctionType = objectFactory.createExpression(functionType);
+        permitRuleConditionType.setExpression(jaxbElementFunctionType);
+        permitRuleApplyType     = new ApplyType();
+        
+        // the condition is: "admin" is in role id 
+        permitRuleApplyType.setFunctionId(XACMLConstants.FUNCTION_STRING_IS_IN.key);
+        sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ROLE.key,
+                                                                           XMLSchemaConstants.DATATYPE_STRING.key,
+                                                                           null, true, null);
+        
+        sadtElement = objectFactory.createSubjectAttributeDesignator(sadt);
+        avt = PolicyAttributeFactory.createStringAttributeType("admin");
+        
+        jaxbAVT = objectFactory.createAttributeValue(avt);
+        permitRuleApplyType.getExpression().add(jaxbAVT);
+        permitRuleApplyType.getExpression().add(sadtElement);
+        permitRuleConditionType.setExpression(objectFactory.createApply(permitRuleApplyType));
+        permitRule2.setCondition(permitRuleConditionType);
+        policyType.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().add(permitRule2);
+        
         
         //Create a Deny Rule wich is applied if the precedent rule doens't match. it refuse always the access.
         RuleType denyRule = new RuleType();

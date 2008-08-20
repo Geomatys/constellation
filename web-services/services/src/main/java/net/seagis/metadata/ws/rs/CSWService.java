@@ -481,7 +481,10 @@ public class CSWService extends WebService {
         // we get the namespaces.
         String namespace               = getParameter("NAMESPACE", false);
         Map<String, String> namespaces = new HashMap<String, String>();
-        StringTokenizer tokens = new StringTokenizer(namespace, ",;");
+        StringTokenizer tokens;
+                
+        if (namespace != null) {
+            tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf('=') != -1) {
@@ -492,29 +495,29 @@ public class CSWService extends WebService {
                      throw new OWSWebServiceException("The namespace " + token + " is malformed",
                                                       INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
                 }
-                
+            }
         }
         
         //if there is not namespace specified, using the default namespace
-        // TODO add gmd...
         if (namespaces.size() == 0) {
             namespaces.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
+            namespaces.put("gmd", "http://www.isotc211.org/2005/gmd");
         }
         
         String names   = getParameter("TYPENAMES", true);
         List<QName> typeNames = new ArrayList<QName>();
         tokens = new StringTokenizer(names, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                
-                if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
-                    typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
-                } else {
-                     throw new OWSWebServiceException("The QName " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
-                }
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+
+            if (token.indexOf(':') != -1) {
+                String prefix = token.substring(0, token.indexOf(':'));
+                String localPart = token.substring(token.indexOf(':') + 1);
+                typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
+            } else {
+                throw new OWSWebServiceException("The QName " + token + " is malformed",
+                        INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+            }
         }
         
         String eSetName           = getParameter("ELEMENTSETNAME", false);
@@ -532,7 +535,9 @@ public class CSWService extends WebService {
         //we get the list of sort by object
         String sort = getParameter("SORTBY", false);
         List<SortPropertyType> sorts = new ArrayList<SortPropertyType>();
-        tokens = new StringTokenizer(sort, ",;");
+        SortByType sortBy = null;
+        if (sort != null) {
+            tokens = new StringTokenizer(sort, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 
@@ -551,8 +556,9 @@ public class CSWService extends WebService {
                      throw new OWSWebServiceException("The expression " + token + " is malformed",
                                                       INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion());
                 }
+            }
+            sortBy = new SortByType(sorts);
         }
-        SortByType sortBy = new SortByType(sorts);
         
         /*
          * here we build the constraint object

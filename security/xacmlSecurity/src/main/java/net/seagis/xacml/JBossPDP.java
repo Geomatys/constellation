@@ -223,8 +223,7 @@ public class JBossPDP implements PolicyDecisionPoint {
     }
 
     private List<XACMLPolicy> addPolicySets(final List<PolicySetType> policySets,
-            final boolean topLevel) throws FactoryException
-    {
+            final boolean topLevel) throws FactoryException  {
         final List<XACMLPolicy> list = new ArrayList<XACMLPolicy>();
 
         for (PolicySetType pst : policySets) {

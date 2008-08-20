@@ -103,7 +103,7 @@ public class JBossRequestContext implements RequestContext {
         try {
            request = RequestCtx.getInstance(root);
         } catch (ParsingException p) {
-            throw new IOException(p);
+            throw new IOException(p.getMessage());
         }
         set(XACMLConstants.REQUEST_CTX, request);
     }
@@ -120,7 +120,7 @@ public class JBossRequestContext implements RequestContext {
         try {
             request = RequestCtx.getInstance(node);
         } catch (ParsingException p) {
-            throw new IOException(p);
+            throw new IOException(p.getMessage());
         }
         set(XACMLConstants.REQUEST_CTX, request);
     }
@@ -150,9 +150,9 @@ public class JBossRequestContext implements RequestContext {
         try {
             doc = factory.newDocumentBuilder().parse(is);
         } catch (ParserConfigurationException p) {
-            throw new IOException(p);
+            throw new IOException(p.getMessage());
         } catch (SAXException sax) {
-            throw new IOException(sax);
+            throw new IOException(sax.getMessage());
         }
         final NodeList nodes = doc.getElementsByTagNameNS(XACMLConstants.CONTEXT_SCHEMA.key, "Request");
         return nodes.item(0);

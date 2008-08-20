@@ -75,27 +75,26 @@ import org.w3c.dom.Node;
 public class ExtendedAttributeFactory extends BaseAttributeFactory {
 
     private static ExtendedAttributeFactory instance = null;
-    private static final Map<String, AttributeProxy> supportedDatatypes =
-            new HashMap<String, AttributeProxy>();
+    private static final Map<String, AttributeProxy> supportedDatatypes = new HashMap<String, AttributeProxy>();
 
     private ExtendedAttributeFactory() {
         super(supportedDatatypes);
 
         // the 1.x datatypes
-        supportedDatatypes.put(BooleanAttribute.identifier, new BooleanAttributeProxy());
-        supportedDatatypes.put(StringAttribute.identifier, new StringAttributeProxy());
-        supportedDatatypes.put(DateAttribute.identifier, new DateAttributeProxy());
-        supportedDatatypes.put(TimeAttribute.identifier, new TimeAttributeProxy());
-        supportedDatatypes.put(DateTimeAttribute.identifier, new DateTimeAttributeProxy());
-        supportedDatatypes.put(DayTimeDurationAttribute.identifier, new DayTimeDurationAttributeProxy());
+        supportedDatatypes.put(BooleanAttribute.identifier,           new BooleanAttributeProxy());
+        supportedDatatypes.put(StringAttribute.identifier,            new StringAttributeProxy());
+        supportedDatatypes.put(DateAttribute.identifier,              new DateAttributeProxy());
+        supportedDatatypes.put(TimeAttribute.identifier,              new TimeAttributeProxy());
+        supportedDatatypes.put(DateTimeAttribute.identifier,          new DateTimeAttributeProxy());
+        supportedDatatypes.put(DayTimeDurationAttribute.identifier,   new DayTimeDurationAttributeProxy());
         supportedDatatypes.put(YearMonthDurationAttribute.identifier, new YearMonthDurationAttributeProxy());
-        supportedDatatypes.put(DoubleAttribute.identifier, new DoubleAttributeProxy());
-        supportedDatatypes.put(IntegerAttribute.identifier, new IntegerAttributeProxy());
-        supportedDatatypes.put(AnyURIAttribute.identifier, new AnyURIAttributeProxy());
-        supportedDatatypes.put(HexBinaryAttribute.identifier, new HexBinaryAttributeProxy());
-        supportedDatatypes.put(Base64BinaryAttribute.identifier, new Base64BinaryAttributeProxy());
-        supportedDatatypes.put(X500NameAttribute.identifier, new X500NameAttributeProxy());
-        supportedDatatypes.put(RFC822NameAttribute.identifier, new RFC822NameAttributeProxy());
+        supportedDatatypes.put(DoubleAttribute.identifier,            new DoubleAttributeProxy());
+        supportedDatatypes.put(IntegerAttribute.identifier,           new IntegerAttributeProxy());
+        supportedDatatypes.put(AnyURIAttribute.identifier,            new AnyURIAttributeProxy());
+        supportedDatatypes.put(HexBinaryAttribute.identifier,         new HexBinaryAttributeProxy());
+        supportedDatatypes.put(Base64BinaryAttribute.identifier,      new Base64BinaryAttributeProxy());
+        supportedDatatypes.put(X500NameAttribute.identifier,          new X500NameAttributeProxy());
+        supportedDatatypes.put(RFC822NameAttribute.identifier,        new RFC822NameAttributeProxy());
 
         // the 2.0 datatypes
         supportedDatatypes.put(DNSNameAttribute.identifier, new DNSNameAttributeProxy());

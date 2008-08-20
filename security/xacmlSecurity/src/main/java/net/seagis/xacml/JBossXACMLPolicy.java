@@ -78,8 +78,7 @@ public class JBossXACMLPolicy implements XACMLPolicy {
      * @see XACMLConstants
      */
     public JBossXACMLPolicy(final InputStream is, final int type,
-            final JBossPolicyFinder theFinder) throws IOException, SAXException
-    {
+            final JBossPolicyFinder theFinder) throws IOException, SAXException {
         final AbstractPolicy policy;
         XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
         policyType = type;

@@ -183,7 +183,7 @@ public class JBossResponseContext implements ResponseContext {
             responseCtx = ResponseCtx.getInstance(node);
             set(XACMLConstants.RESPONSE_CTX, responseCtx);
         } catch (ParsingException e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -202,9 +202,9 @@ public class JBossResponseContext implements ResponseContext {
         try {
             doc = factory.newDocumentBuilder().parse(is);
         } catch (ParserConfigurationException ex) {
-            throw new IOException(ex);
+            throw new IOException(ex.getMessage());
         } catch (SAXException ex) {
-            throw new IOException(ex);
+            throw new IOException(ex.getMessage());
         }
         NodeList nodes = doc.getElementsByTagNameNS(XACMLConstants.CONTEXT_SCHEMA.name(), "Response");
         if (nodes.getLength() == 0) {
