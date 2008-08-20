@@ -586,7 +586,7 @@
     <module>web-services</module>
     <module>gui</module>
     <module>spatialLucene</module>
-    <!--module>observations</module-->
+    <module>security</module>
     <!--module>widgets</module-->
     <!--module>openoffice</module -->
   </modules>
