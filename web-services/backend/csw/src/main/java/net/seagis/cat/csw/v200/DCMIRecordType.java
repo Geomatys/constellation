@@ -67,11 +67,11 @@ import org.geotools.util.Utilities;
     "language"    ,
     "distributor" ,
     "creator"     ,
-    "dcElement"   ,
     "modified"    ,
     "_abstract"   ,
     "references"  ,
-    "spatial"
+    "spatial"     ,
+    "dcElement"   
 })
 @XmlSeeAlso({
     RecordType.class

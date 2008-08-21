@@ -67,12 +67,12 @@ import org.geotools.util.Utilities;
     "language"    ,
     "distributor" ,
     "creator"     ,
-    "dcElement"   ,
     "modified"    ,
     "date"        ,    
     "_abstract"   ,
     "references"  ,
-    "spatial"
+    "spatial"     ,
+    "dcElement"   
 })
 @XmlSeeAlso({
     RecordType.class
@@ -268,12 +268,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getRelation() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("relation")) {
-                return jb.getValue();
-            }
-        }
-        return null;
+        return getAttributeFromDCelement("relation"); 
     }
     
     public void setSource(SimpleLiteral source) {
@@ -281,12 +276,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getSource() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("source")) {
-                return jb.getValue();
-            }
-        }
-        return null;
+       return getAttributeFromDCelement("source"); 
     }
     
     public void setCoverage(SimpleLiteral coverage) {
@@ -294,13 +284,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getCoverage() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("coverage")) {
-                return jb.getValue();
-            }
-            
-        }
-        return null;
+        return getAttributeFromDCelement("coverage"); 
     }
     
     public void setRights(SimpleLiteral rights) {
@@ -308,12 +292,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getRights() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("rights")) {
-                return jb.getValue();
-            }
-        }
-        return null;
+        return getAttributeFromDCelement("rights"); 
     }
     
     public void setSpatial(SimpleLiteral spatial) {
@@ -337,12 +316,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getPublisher() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("publisher")) {
-                return jb.getValue();
-            }
-        }
-        return null;
+        return getAttributeFromDCelement("publisher"); 
     }
     
     public void setContributor(SimpleLiteral contributor) {
@@ -350,12 +324,7 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getContributor() {
-        for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("contributor")) {
-                return jb.getValue();
-            }
-        }
-        return null;
+        return getAttributeFromDCelement("contributor"); 
     }
     
     public void setDescription(SimpleLiteral description) {
@@ -363,8 +332,15 @@ public class DCMIRecordType extends AbstractRecordType {
     }
     
     public SimpleLiteral getDescription() {
+        return getAttributeFromDCelement("description"); 
+    }
+    
+    /**
+     * if the attribute have not been fill by JAXB we search in DCelement
+     */
+    public SimpleLiteral getAttributeFromDCelement(String name) {
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
-            if (jb.getName().getLocalPart().equals("description")) {
+            if (jb.getName().getLocalPart().equals(name)) {
                 return jb.getValue();
             }
         }

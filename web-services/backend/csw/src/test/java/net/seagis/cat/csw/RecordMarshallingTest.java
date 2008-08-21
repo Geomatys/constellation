@@ -160,6 +160,7 @@ public class RecordMarshallingTest {
         "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
         "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
         "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "    <dc:date>2007-12-01</dc:date>"                                         + '\n' +        
         "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
         "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
         "    <dct:spatial>northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;</dct:spatial>" + '\n' +
@@ -184,6 +185,7 @@ public class RecordMarshallingTest {
         subject.add(new SimpleLiteral("oceans elevation 2"));
         
         SimpleLiteral modified   = new SimpleLiteral("2007-11-15 21:26:49");
+        SimpleLiteral date       = new SimpleLiteral("2007-12-01");
         SimpleLiteral Abstract   = new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.");
         SimpleLiteral references = new SimpleLiteral("http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml");
         SimpleLiteral spatial    = new SimpleLiteral("northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;");
@@ -191,13 +193,22 @@ public class RecordMarshallingTest {
         List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
         bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
         
-        RecordType expResult = new RecordType(id, title, type, subject, null, modified, null, Abstract, bbox, null, null, null, spatial, references);
+        RecordType expResult = new RecordType(id, title, type, subject, null, modified, date, Abstract, bbox, null, null, null, spatial, references);
+        
+        logger.info("DATE " +expResult.getDate() + " - " + result.getDate());
+        assertEquals(expResult.getDate(), result.getDate());
         
         logger.finer("RESULT: " + result.toString());
         logger.finer("");
         logger.finer("EXPRESULT: " + expResult.toString());
         logger.finer("-----------------------------------------------------------");
         assertEquals(expResult, result);
+        
+        logger.info("ABSTRACT " +expResult.getAbstract() + " - " + result.getAbstract());
+        assertEquals(expResult.getAbstract(), result.getAbstract());
+        
+        logger.info("SPATIAL " +expResult.getSpatial() + " - " + result.getSpatial());
+        assertEquals(expResult.getSpatial(), result.getSpatial());
         
         /*
          * Test Unmarshalling csw Record v2.0.0 with http://purl... DC namespace
