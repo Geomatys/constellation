@@ -28,7 +28,6 @@ import java.security.Principal;
 import java.security.acl.Group;
 
 // JAXB dependencies
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 

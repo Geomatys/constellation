@@ -157,7 +157,9 @@ public class RecordType extends DCMIRecordType {
         if (boundingBox != null && boundingBox.size() != 0) {
             s.append("bounding boxes:");
             for (JAXBElement<? extends BoundingBoxType> bb: boundingBox) {
-                s.append(bb.getValue().toString()).append('\n');
+                BoundingBoxType bbox = bb.getValue();
+                if (bbox != null)
+                    s.append(bbox.toString()).append('\n');
             }
         }
         

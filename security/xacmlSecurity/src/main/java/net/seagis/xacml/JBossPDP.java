@@ -100,6 +100,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             final Unmarshaller unmarshaller = createValidatingUnMarshaller();
             jxb = (JAXBElement<?>) unmarshaller.unmarshal(configFile);
         } catch (JAXBException j) {
+            logger.severe("JAXBException while umarshalling InputStream config file");
             throw new RuntimeException(j);
         } catch (FileNotFoundException j) {
             throw new RuntimeException(j);
@@ -117,6 +118,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             final Unmarshaller unmarshaller = createValidatingUnMarshaller();
             jxb = (JAXBElement<?>) unmarshaller.unmarshal(configFile);
         } catch (JAXBException j) {
+            logger.severe("JAXBException while umarshalling InputSource config file");
             throw new RuntimeException(j);
         } catch (FileNotFoundException j) {
             throw new RuntimeException(j);
@@ -134,6 +136,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             final Unmarshaller unmarshaller = createValidatingUnMarshaller();
             jxb = (JAXBElement<?>) unmarshaller.unmarshal(configFile);
         } catch (JAXBException j) {
+            logger.severe("JAXBException while umarshalling node config file");
             throw new RuntimeException(j);
         } catch (FileNotFoundException j) {
             throw new RuntimeException(j);
@@ -151,6 +154,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             final Unmarshaller unmarshaller = createValidatingUnMarshaller();
             jxb = (JAXBElement<?>) unmarshaller.unmarshal(configFile);
         } catch (JAXBException j) {
+            logger.severe("JAXBException while umarshalling XMLStreamReader config file");
             throw new RuntimeException(j);
         } catch (FileNotFoundException j) {
             throw new RuntimeException(j);
@@ -279,7 +283,7 @@ public class JBossPDP implements PolicyDecisionPoint {
         for (LocatorType lt : locs) {
             final Class<?> candidate;
             try {
-                candidate = loadClass(lt.getName());
+                candidate = SecurityActions.loadClass(lt.getName());
             } catch (ClassNotFoundException cnfe) {
                 logger.severe("class not found:" + lt.getName());
                 throw new PDPException(cnfe);
@@ -306,8 +310,7 @@ public class JBossPDP implements PolicyDecisionPoint {
         final JAXBContext context = JAXBContext.newInstance("net.seagis.xacml.jaxb");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         //Validate against schema
-        final ClassLoader tcl = SecurityActions.getContextClassLoader();
-        final URL schemaURL = tcl.getResource("net/seagis/xacml/jbossxacml-2.0.xsd");
+        final URL schemaURL = SecurityActions.getResource("net/seagis/xacml/jbossxacml-2.0.xsd");
         final SchemaFactory scFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         if (schemaURL == null) {
             throw new FileNotFoundException("Unable to find the resource file jbossxacml-2.0.xsd.");
@@ -325,20 +328,14 @@ public class JBossPDP implements PolicyDecisionPoint {
     private InputStream getInputStream(final String loc) throws IOException {
         InputStream is;
         try {
-             final URL url = new URL(loc);
+            final URL url = new URL(loc);
             is = url.openStream();
         } catch (IOException io) {
-            final ClassLoader tcl = SecurityActions.getContextClassLoader();
-            is = tcl.getResourceAsStream(loc);
+            is = SecurityActions.getResourceAsStream(loc);
         }
         if (is == null) {
             throw new IOException("Null Inputstream for " + loc);
         }
         return is;
-    }
-
-    private Class<?> loadClass(String name) throws ClassNotFoundException {
-        final ClassLoader tcl = SecurityActions.getContextClassLoader();
-        return tcl.loadClass(name);
     }
 }

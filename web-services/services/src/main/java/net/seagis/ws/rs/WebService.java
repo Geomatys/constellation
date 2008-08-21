@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +52,7 @@ import javax.ws.rs.POST;
 // JAXB xml binding dependencies
 import javax.ws.rs.core.Context;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
@@ -69,13 +72,22 @@ import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;
 import net.seagis.ows.AbstractRequest;
 import net.seagis.ows.OWSExceptionCode;
+import net.seagis.xacml.JBossPDP;
+import net.seagis.xacml.SecurityActions;
+import net.seagis.xacml.api.PolicyDecisionPoint;
+import net.seagis.xacml.api.PolicyLocator;
+import net.seagis.xacml.api.XACMLPolicy;
+import net.seagis.xacml.factory.FactoryException;
+import net.seagis.xacml.factory.PolicyFactory;
+import net.seagis.xacml.locators.JBossPolicyLocator;
+import net.seagis.xacml.policy.PolicyType;
 /**
  *
  * @author legal
  */
 public abstract class WebService {
     
-    protected static final Logger logger = Logger.getLogger("net.seagis.wms");
+    protected static final Logger logger = Logger.getLogger("net.seagis.ws");
     
     /**
      * The user directory where to store the configuration file on Unix platforms.
@@ -144,6 +156,11 @@ public abstract class WebService {
      */
     private long lastUpdateSequence;
     
+    /**
+     * A Policy Decision Point allowing to secure the access to the resources.
+     */
+    private PolicyDecisionPoint PDP;
+    
     
     /**
      * Initialize the basic attribute of a web service.
@@ -164,6 +181,64 @@ public abstract class WebService {
         unmarshaller = null;
         serviceURL   = null;
         ImageIO.scanForPlugins();
+        initializePolicyDecisionPoint();
+    }
+    
+    /**
+     * Initialize the policy Decision Point and load all the correspounding policy file.
+     */
+    private void initializePolicyDecisionPoint() {
+        
+        //we create a new PDP
+        PDP = new JBossPDP();
+
+        //load the correspounding policy file
+        String url = "net/seagis/xacml/" + service.toLowerCase() + "Policy.xml";
+        InputStream is = SecurityActions.getResourceAsStream(url);
+        if (is == null) {
+            logger.severe("unable to find the resource: " + url);
+            return;
+        }
+        Object p = null;
+        try {
+            JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
+            Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
+            p = policyUnmarshaller.unmarshal(is);
+        } catch (JAXBException e) {
+            logger.severe("JAXB exception while unmarshalling policyFile " + service.toLowerCase() + "Policy.xml");
+        }
+        
+        if (p instanceof JAXBElement) {
+            p = ((JAXBElement)p).getValue();
+        } 
+        
+        if (p == null) {
+            logger.severe("the unmarshalled service policy is null.");
+            return;
+        } else if (!(p instanceof PolicyType)) {
+            logger.severe("unknow unmarshalled type for service policy file:" + p.getClass());
+            return;
+        }
+        PolicyType servicePolicy  = (PolicyType) p;
+        
+        try {
+            XACMLPolicy policy = PolicyFactory.createPolicy(servicePolicy);
+            Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+            policies.add(policy);
+            PDP.setPolicies(policies);
+        
+            //Add the basic locators also
+            PolicyLocator policyLocator = new JBossPolicyLocator();
+            policyLocator.setPolicies(policies);
+        
+            //Locators need to be given the policies
+            Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+            locators.add(policyLocator);
+            PDP.setLocators(locators);
+        } catch (FactoryException e) {
+            logger.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
+        }
+        logger.info("PDP succesfully initialized");
     }
     
     /**

@@ -21,6 +21,8 @@
   */
 package net.seagis.xacml;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
  
@@ -32,9 +34,9 @@ import java.security.PrivilegedAction;
  *  @version $Revision$
  */
 public class SecurityActions {
+    
     /**
-     * Obtain the Thread Context ClassLoader
-     * @return
+     * Obtain the Thread Context ClassLoader.
      */
     public static ClassLoader getContextClassLoader() {
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
@@ -42,5 +44,30 @@ public class SecurityActions {
                 return Thread.currentThread().getContextClassLoader();
             }
         });
+    }
+    
+    
+    /**
+     * Return the URL of the specified resource 
+     */
+    public static URL getResource(String url) {
+        ClassLoader cl = getContextClassLoader();
+        return cl.getResource(url);
+    }
+    
+    /**
+     * Return an input stream of the specified resource. 
+     */
+    public static InputStream getResourceAsStream(String url) {
+        ClassLoader cl = getContextClassLoader();
+        return cl.getResourceAsStream(url);
+    }
+    
+    /**
+     * Return an input stream of the specified resource. 
+     */
+    public static Class<?> loadClass(String name) throws ClassNotFoundException {
+        ClassLoader cl = getContextClassLoader();
+        return cl.loadClass(name);
     }
 }

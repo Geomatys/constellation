@@ -597,7 +597,8 @@ public class CSWworker {
         cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         File f            = null;
-        File env          = new File("/opt/tomcat/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
+        String home       = System.getProperty("user.home");
+        File env          = new File(home, ".sicade/csw_configuration/");
         logger.info("Path to config file=" + env);
         isStarted = true;
         try {
