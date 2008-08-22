@@ -15,6 +15,8 @@
 
 package net.seagis.ws.rs;
 
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +83,7 @@ import net.seagis.xacml.factory.FactoryException;
 import net.seagis.xacml.factory.PolicyFactory;
 import net.seagis.xacml.locators.JBossPolicyLocator;
 import net.seagis.xacml.policy.PolicyType;
+
 /**
  *
  * @author legal
@@ -149,7 +152,13 @@ public abstract class WebService {
      * A servlet context used for access deployed file
      */
     @Context 
-    protected ServletContext servletcontext;
+    protected ServletContext servletContext;
+    
+    /**
+     * The HTTP context used for get informations on the client which send the request.
+     */
+    @Context 
+    protected HttpContext httpContext;
     
     /**
      * The last update sequence
@@ -574,6 +583,33 @@ public abstract class WebService {
 
    
     /**
+     * Temporary test method until we put in place an authentification process.
+     * @return
+     */
+    protected Principal getAuthentifiedUser() {
+        
+        Principal anonymous  = new PrincipalImpl("anonymous");
+        if (httpContext != null && httpContext.getRequest() != null) {
+            HttpRequestContext httpRequest = httpContext.getRequest();
+            String authent = httpRequest.getHeaderValue(httpRequest.AUTHORIZATION);
+
+            String userPassword = "admin:pass";
+            String encoding = "Basic " + new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+
+            Principal user = httpRequest.getUserPrincipal();
+            if (encoding.equals(authent)) {
+                user = new PrincipalImpl("admin");
+            } else {
+                user = anonymous;
+            }
+            logger.info("identified user: " + user.getName());
+            return user;
+        }
+        return anonymous;
+    }
+    
+    
+    /**
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
      *
@@ -635,7 +671,7 @@ public abstract class WebService {
          File path;
          
          //we try to get the deployed "WEB-INF" directory
-         String home = servletcontext.getRealPath("WEB-INF");
+         String home = servletContext.getRealPath("WEB-INF");
          
          if (home == null || !(path = new File(home)).isDirectory()) {
             path = getSicadeDirectory();
@@ -806,5 +842,18 @@ public abstract class WebService {
      */
     public void setLastUpdateSequence(long lastUpdateSequence) {
         this.lastUpdateSequence = lastUpdateSequence;
+    }
+    
+    private class PrincipalImpl implements Principal {
+        
+        String name;
+        
+        public PrincipalImpl(String name) {
+            this.name = name;
+        }
+        
+        public String getName() {
+            return name;
+        }
     }
 }

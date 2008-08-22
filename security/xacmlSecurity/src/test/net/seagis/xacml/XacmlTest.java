@@ -119,21 +119,6 @@ public class XacmlTest {
     }
     
     /**
-     * Test the build of a PDP with a configuration file. 
-     * 
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void configFilePDPTest() throws Exception {
-        
-        File configFile = new File("PDPConfig.xml");
-        InputStream is = new FileInputStream(configFile);
-        PDP = new JBossPDP(is);
-        
-        assertNotNull(PDP);
-    }
-    
-     /**
      * Test the build of a PDP with a object model. 
      * 
      * @throws java.lang.Exception
@@ -245,8 +230,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY,
-                      XACMLTestUtil.getDecision(PDP, request));
+        assertEquals(XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(PDP, request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, p, grp_developer, "write");
@@ -265,7 +249,9 @@ public class XacmlTest {
     /**
      * Build an example Policy.
      * 
-     * This policy file basically provides access to the url when the subject has a role of "developer".
+     * This policy file basically provides "read" access to the url when the subject has a role of "developer".
+     * It also provides "read/write" access to the url when the subject has a role of "admin".
+     * 
      * All other requests are denied because of the explicit rule at the bottom of the policy file,
      * without which the PDP would have returned a decision of NotAPPLICABLE.
      * 

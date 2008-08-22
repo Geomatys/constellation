@@ -16,20 +16,28 @@
 
 package net.seagis.metadata.ws.soap;
 
+// J2SE dependencies 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+// JAX-WS dependencies
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+
+// constellation dependencies
 import net.seagis.cat.csw.v202.Capabilities;
 import net.seagis.cat.csw.v202.DescribeRecordResponseType;
 import net.seagis.cat.csw.v202.DescribeRecordType;
@@ -56,6 +64,8 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.metadata.CSWworker;
 import net.seagis.ows.v100.ExceptionReport;
 import net.seagis.ows.v100.OWSWebServiceException;
+
+//geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
 
 /**

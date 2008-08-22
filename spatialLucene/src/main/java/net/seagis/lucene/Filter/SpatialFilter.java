@@ -331,7 +331,7 @@ public class SpatialFilter extends Filter {
                 
                 case BBOX :
                     
-                    if (boundingBox != null && boundingBox.contains(tempBox, false)) {
+                    if (boundingBox != null && boundingBox.intersects(tempBox, false)) {
                         bits.set(docNum);
                     }
                     break;
@@ -438,7 +438,7 @@ public class SpatialFilter extends Filter {
                 
                 case BBOX :
                     
-                    if (boundingBox != null && boundingBox.contains(tempPoint1) && boundingBox.contains(tempPoint2)) {
+                    if (boundingBox != null && GeometricUtilities.intersect(boundingBox, tempLine)) {
                         bits.set(docNum);
                     }
                     break;
@@ -568,7 +568,7 @@ public class SpatialFilter extends Filter {
             result = new GeneralEnvelope(min, max);
         
         } catch (IllegalArgumentException e) {
-            String s = doc.getField("Title").stringValue();
+            String s = doc.getField("name").stringValue();
         
             logger.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
                           "cause: " + e.getMessage());

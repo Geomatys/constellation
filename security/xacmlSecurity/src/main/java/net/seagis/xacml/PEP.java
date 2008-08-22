@@ -27,6 +27,8 @@ import net.seagis.xacml.factory.RequestResponseContextFactory;
  */
 public class PEP {
     
+    private String issuer = "constellation.org";
+    
     /**
      * Create A XACML request for the request resource containing the userName (principal), the role group and the action.
      * 
@@ -41,35 +43,16 @@ public class PEP {
         RequestContext requestCtx = RequestResponseContextFactory.createRequestCtx();
 
         //Create a subject type
-        SubjectType subject = new SubjectType();
-        subject.getAttribute().add(
-                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_ID.key, 
-                                                                  "constellation.org", 
-                                                                  principal.getName()));
-        
-        Enumeration<Principal> roles = (Enumeration<Principal>) roleGroup.members();
-        while (roles.hasMoreElements()) {
-            Principal rolePrincipal = roles.nextElement();
-            AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
-                    XACMLConstants.ATTRIBUTEID_ROLE.key, "constellation.org", rolePrincipal.getName());
-            subject.getAttribute().add(attSubjectID);
-        }
+        SubjectType subject = createSubject(principal, roleGroup);
 
         //Create a resource type
-        ResourceType resourceType = new ResourceType();
-        resourceType.getAttribute().add(
-                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key, null, 
-                                                                  new URI(resourceURI)));
+        ResourceType resourceType = createResource(resourceURI);
 
         //Create an action type
-        ActionType actionType = new ActionType();
-        actionType.getAttribute().add(
-                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key, "constellation.org", action));
+        ActionType actionType = createAction(action);
 
         //Create an Environment Type (Optional)
-        EnvironmentType environmentType = new EnvironmentType();
-        environmentType.getAttribute().add(
-                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_CURRENT_TIME.key, null));
+        EnvironmentType environmentType = createTimeEnvironement();
 
         //Create a Request Type
         RequestType requestType = new RequestType();
@@ -82,5 +65,78 @@ public class PEP {
 
         return requestCtx;
     }
+    
+    /**
+     * Create a part of XACML request about the user and group.
+     * 
+     * @param user      The authentified user.
+     * @param roleGroup The user group.
+     * 
+     * @return a subject Type whitch is a part of XACML request.
+     */
+    protected SubjectType createSubject(Principal user, Group roleGroup) {
+    
+        //Create a subject type
+        SubjectType subject = new SubjectType();
+        subject.getAttribute().add(
+                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_ID.key, 
+                                                                  issuer, 
+                                                                  user.getName()));
+        
+        Enumeration<Principal> roles = (Enumeration<Principal>) roleGroup.members();
+        while (roles.hasMoreElements()) {
+            Principal rolePrincipal = roles.nextElement();
+            AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
+                    XACMLConstants.ATTRIBUTEID_ROLE.key, issuer, rolePrincipal.getName());
+            subject.getAttribute().add(attSubjectID);
+        }
+        return subject;
+    }
 
+    /**
+     * Create a  part of XACML request about the requested resource.
+     * 
+     * @param URI the requested resource URI.
+     * 
+     * @return a resource Type whitch is a part of XACML request.
+     */
+    protected ResourceType createResource(String URI) throws URISyntaxException {
+    
+        //Create a resource type
+        ResourceType resourceType = new ResourceType();
+        resourceType.getAttribute().add(
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key, null, new URI(URI)));
+        return resourceType;
+    }
+    
+    /**
+     * Create a  part of XACML request about the action to execute.
+     * 
+     * @param URI the requested resource URI.
+     * 
+     * @return a action Type whitch is a part of XACML request.
+     */
+    protected ActionType createAction(String action)  {
+        
+        //Create an action type
+        ActionType actionType = new ActionType();
+        actionType.getAttribute().add(
+                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key, issuer, action));
+        
+        return actionType;
+    
+    }
+    
+    /**
+     * Create a part of XACML request about the time.
+     */
+    protected EnvironmentType createTimeEnvironement() {
+            
+        //Create an Environment Type
+        EnvironmentType environmentType = new EnvironmentType();
+        environmentType.getAttribute().add(
+                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_CURRENT_TIME.key, issuer));
+        return environmentType;
+        
+    }
 }

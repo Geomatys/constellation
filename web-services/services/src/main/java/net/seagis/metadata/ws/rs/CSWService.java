@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.security.Principal;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -166,6 +167,16 @@ public class CSWService extends WebService {
         }
     }
 
+     /**
+     * Treat the incomming request and call the right function.
+     * 
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this param is {@code null}
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
             
@@ -175,13 +186,19 @@ public class CSWService extends WebService {
                 writeParameters();
                 String request = "";
                 
+                //we look for an authentified user
+                Principal user = getAuthentifiedUser();
+                
+                
                 if (objectRequest instanceof JAXBElement) {
                     objectRequest = ((JAXBElement)objectRequest).getValue();
                 }
                 
+                // if the request is not an xml request we fill the request parameter.
                 if (objectRequest == null)
                     request = (String) getParameter("REQUEST", true);
             
+                
                 if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
                     GetCapabilities gc = (GetCapabilities)objectRequest;
@@ -242,7 +259,6 @@ public class CSWService extends WebService {
                 
                 } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
                 
-                    worker.setResourceDirectory(getFile(null));
                     DescribeRecordType dr = (DescribeRecordType)objectRequest;
                 
                     if (dr == null) {

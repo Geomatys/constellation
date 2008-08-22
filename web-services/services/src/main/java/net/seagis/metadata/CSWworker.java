@@ -28,6 +28,8 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -230,11 +232,6 @@ public class CSWworker {
      */
     private final CatalogueHarvester catalogueHarvester;
     
-    /**
-     * A File directory where we find the resource file (xsd files)
-     */
-    private File resourceDirectory;
-            
     /**
      * The queryable element from ISO 19115 and their path id.
      */
@@ -1170,7 +1167,7 @@ public class CSWworker {
 
             if (typeNames.contains(_Record_QNAME)) {
 
-                InputStream in = new FileInputStream(new File(resourceDirectory, "record.xsd"));
+                InputStream in = getResourceAsStream("net/seagis/metadata/record.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1178,7 +1175,7 @@ public class CSWworker {
             
             if (typeNames.contains(_Metadata_QNAME)) {
 
-                InputStream in = new FileInputStream(new File(resourceDirectory, "metadata.xsd"));
+                InputStream in = getResourceAsStream("net/seagis/metadata/metadata.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1577,7 +1574,7 @@ public class CSWworker {
                         resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
                         resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
 
-                        Object harvested = getUnmarshaller().unmarshal(fileToHarvest);
+                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
                         if (harvested == null) {
                             throw new OWSWebServiceException("The resource can not be parsed.",
                                                               INVALID_PARAMETER_VALUE, "Source", version);
@@ -1697,13 +1694,6 @@ public class CSWworker {
     }
     
     /**
-     * 
-     */
-    public void setResourceDirectory(File directory) {
-        this.resourceDirectory = directory;
-    }
-    
-    /**
      * Verify that the bases request attributes are correct.
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
@@ -1761,12 +1751,23 @@ public class CSWworker {
         return s;
     }
 
-    public Marshaller getMarshaller() {
-        return marshaller;
+    /**
+     * Obtain the Thread Context ClassLoader.
+     */
+    public static ClassLoader getContextClassLoader() {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
+        });
     }
-
-    public Unmarshaller getUnmarshaller() {
-        return unmarshaller;
+    
+    /**
+     * Return an input stream of the specified resource. 
+     */
+    public static InputStream getResourceAsStream(String url) {
+        ClassLoader cl = getContextClassLoader();
+        return cl.getResourceAsStream(url);
     }
     
 }
