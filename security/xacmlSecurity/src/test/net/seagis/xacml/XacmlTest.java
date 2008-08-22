@@ -17,9 +17,6 @@
 package net.seagis.xacml;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +25,8 @@ import java.security.Principal;
 import java.security.acl.Group;
 
 // JAXB dependencies
+import java.util.Enumeration;
+import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
@@ -153,7 +152,7 @@ public class XacmlTest {
     public void testPositiveWebBinding() throws Exception {
         
         assertNotNull("JBossPDP is != null", PDP);
-        PEP pep = new PEP();
+        PEP pep = new PEP(PDP);
         
         //we create an user
         Principal p = new Principal() {
@@ -164,8 +163,8 @@ public class XacmlTest {
         };
         
         //we create Role Group
-        Group grp_developer = XACMLTestUtil.getRoleGroup("developer");
-        Group grp_admin     = XACMLTestUtil.getRoleGroup("admin");
+        Group grp_developer = new GroupImpl("developer");
+        Group grp_admin     = new GroupImpl("admin");
         String requestURI   = "http://test/developer-guide.html";
         
         //Check PERMIT condition
@@ -175,7 +174,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_admin, "read");
@@ -184,7 +183,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_admin, "write");
@@ -193,7 +192,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, XACMLTestUtil.getDecision(PDP, request));
+        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
     }
     
     /**
@@ -206,7 +205,7 @@ public class XacmlTest {
     public void testNegativeAccessWebBinding() throws Exception {
         
         assertNotNull("JBossPDP is != null", PDP);
-        PEP pep = new PEP();
+        PEP pep = new PEP(PDP);
         
         //we create an user
         Principal p = new Principal() {
@@ -217,8 +216,8 @@ public class XacmlTest {
         };
         
         //we create Role Group
-        Group grp_imposter  = XACMLTestUtil.getRoleGroup("imposter");
-        Group grp_developer = XACMLTestUtil.getRoleGroup("developer");
+        Group grp_imposter  = new GroupImpl("imposter");
+        Group grp_developer = new GroupImpl("developer");
         
         String requestURI = "http://test/developer-guide.html";
         
@@ -230,7 +229,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals(XACMLConstants.DECISION_DENY, XACMLTestUtil.getDecision(PDP, request));
+        assertEquals(XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, p, grp_developer, "write");
@@ -240,8 +239,7 @@ public class XacmlTest {
             request.marshall(System.out);
             System.out.println("");
         }
-        assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY,
-                      XACMLTestUtil.getDecision(PDP, request));
+        assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY, pep.getDecision(request));
     }
 
 
@@ -419,6 +417,40 @@ public class XacmlTest {
         //we return the result
         return policyType;
    }
+    
+    /**
+     * An temporary implementations of java.security.acl.group
+     */
+    private class GroupImpl implements Group {
+        
+        String name;
+        private Vector<Principal> members;
+        
+        public GroupImpl(String name) {
+            this.name    = name;
+            this.members = new Vector<Principal>();
+        }
+        
+        public String getName() {
+            return name;
+        }
+
+        public boolean addMember(Principal user) {
+            return members.add(user);
+        }
+
+        public boolean removeMember(Principal user) {
+            return members.remove(user);
+        }
+
+        public boolean isMember(Principal member) {
+            return members.contains(member);
+        }
+
+        public Enumeration<? extends Principal> members() {
+            return members.elements();
+        }
+    }
 
 
 }

@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
 import java.security.Principal;
+import java.security.acl.Group;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -79,12 +80,15 @@ import net.seagis.coverage.web.Service;
 import net.seagis.metadata.CSWworker;
 import net.seagis.ows.v100.ExceptionReport;
 import net.seagis.ws.rs.WebService;
-import org.geotools.metadata.iso.MetaDataImpl;
 import static net.seagis.ows.OWSExceptionCode.*;
 
+// geotools dependencies
+import org.geotools.metadata.iso.MetaDataImpl;
+
 /**
- *
- * @author legal
+ * RestFul CSW service.
+ * 
+ * @author Guilhem Legal
  */
 @Path("csw")
 @Singleton
@@ -186,18 +190,26 @@ public class CSWService extends WebService {
                 writeParameters();
                 String request = "";
                 
-                //we look for an authentified user
-                Principal user = getAuthentifiedUser();
-                
-                
                 if (objectRequest instanceof JAXBElement) {
                     objectRequest = ((JAXBElement)objectRequest).getValue();
                 }
                 
                 // if the request is not an xml request we fill the request parameter.
-                if (objectRequest == null)
+                if (objectRequest == null) {
                     request = (String) getParameter("REQUEST", true);
-            
+                } 
+
+                //we look for an authentified user
+                Group userGrp  = getAuthentifiedUser();
+                Principal user = userGrp.members().nextElement();
+                
+                //we define the action
+                String action  = request;
+                if (action.equals("") && objectRequest != null) {
+                    action = objectRequest.getClass().getSimpleName();
+                    action = action.replace("Type", "");
+                }
+                
                 
                 if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 

@@ -11,7 +11,9 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Enumeration;
+import net.seagis.xacml.api.PolicyDecisionPoint;
 import net.seagis.xacml.api.RequestContext;
+import net.seagis.xacml.api.ResponseContext;
 import net.seagis.xacml.context.ActionType;
 import net.seagis.xacml.context.AttributeType;
 import net.seagis.xacml.context.EnvironmentType;
@@ -28,6 +30,17 @@ import net.seagis.xacml.factory.RequestResponseContextFactory;
 public class PEP {
     
     private String issuer = "constellation.org";
+    
+    private PolicyDecisionPoint PDP;
+    
+    /**
+     * Build a new Policy Enforcement Point.
+     * 
+     * @param PDP
+     */
+    public PEP(PolicyDecisionPoint PDP) {
+        this.PDP = PDP;
+    }
     
     /**
      * Create A XACML request for the request resource containing the userName (principal), the role group and the action.
@@ -139,4 +152,27 @@ public class PEP {
         return environmentType;
         
     }
+    
+   /**
+    * Get the response for a request from the PDP
+    * @param pdp
+    * @param request
+    * @return
+    * @throws Exception
+    */
+   public ResponseContext getResponse(RequestContext request) throws Exception {
+      return PDP.evaluate(request);
+   }
+
+   /**
+    * Get the decision from the PDP
+    * @param pdp
+    * @param request RequestContext containing the request
+    * @return
+    * @throws Exception
+    */
+   public int getDecision(RequestContext request) throws Exception {
+      ResponseContext response = PDP.evaluate(request);
+      return response.getDecision();
+   }
 }

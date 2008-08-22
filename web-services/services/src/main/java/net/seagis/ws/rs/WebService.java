@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.Principal;
+import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
@@ -586,9 +589,13 @@ public abstract class WebService {
      * Temporary test method until we put in place an authentification process.
      * @return
      */
-    protected Principal getAuthentifiedUser() {
+    protected Group getAuthentifiedUser() {
         
-        Principal anonymous  = new PrincipalImpl("anonymous");
+        //for now we consider an user and is group as the same.
+        Principal anonymous    = new PrincipalImpl("anonymous");
+        Group     anonymousGrp = new GroupImpl("anonymous");
+        anonymousGrp.addMember(anonymous);
+        
         if (httpContext != null && httpContext.getRequest() != null) {
             HttpRequestContext httpRequest = httpContext.getRequest();
             String authent = httpRequest.getHeaderValue(httpRequest.AUTHORIZATION);
@@ -596,16 +603,19 @@ public abstract class WebService {
             String userPassword = "admin:pass";
             String encoding = "Basic " + new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
 
-            Principal user = httpRequest.getUserPrincipal();
+            //Principal user = httpRequest.getUserPrincipal();
+            Group identifiedGrp;
             if (encoding.equals(authent)) {
-                user = new PrincipalImpl("admin");
+                Principal user = new PrincipalImpl("admin");
+                identifiedGrp  = new GroupImpl("admin");
+                identifiedGrp.addMember(user);
             } else {
-                user = anonymous;
+                identifiedGrp = anonymousGrp;
             }
-            logger.info("identified user: " + user.getName());
-            return user;
+            logger.info("identified user: " + identifiedGrp.getName());
+            return identifiedGrp;
         }
-        return anonymous;
+        return anonymousGrp;
     }
     
     
@@ -844,6 +854,9 @@ public abstract class WebService {
         this.lastUpdateSequence = lastUpdateSequence;
     }
     
+    /**
+     * An temporary implementations of java.security.principal
+     */
     private class PrincipalImpl implements Principal {
         
         String name;
@@ -854,6 +867,40 @@ public abstract class WebService {
         
         public String getName() {
             return name;
+        }
+    }
+    
+     /**
+     * An temporary implementations of java.security.acl.group
+     */
+    private class GroupImpl implements Group {
+        
+        String name;
+        private Vector<Principal> members;
+        
+        public GroupImpl(String name) {
+            this.name    = name;
+            this.members = new Vector<Principal>();
+        }
+        
+        public String getName() {
+            return name;
+        }
+
+        public boolean addMember(Principal user) {
+            return members.add(user);
+        }
+
+        public boolean removeMember(Principal user) {
+            return members.remove(user);
+        }
+
+        public boolean isMember(Principal member) {
+            return members.contains(member);
+        }
+
+        public Enumeration<? extends Principal> members() {
+            return members.elements();
         }
     }
 }
