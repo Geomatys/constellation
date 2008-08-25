@@ -49,7 +49,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -485,7 +485,7 @@ public abstract class WebService {
      * @throw JAXBException
      */
     @POST
-    @ConsumeMime("application/x-www-form-urlencoded")
+    @Consumes("application/x-www-form-urlencoded")
     public Response doPOSTKvp(String request) throws JAXBException  {
         final StringTokenizer tokens = new StringTokenizer(request, "&");
         String log = "";
@@ -508,7 +508,7 @@ public abstract class WebService {
      * @throw JAXBException
      */
     @POST
-    @ConsumeMime("*/xml")
+    @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
         logger.info("request POST xml: ");
         if (unmarshaller != null) {
@@ -552,7 +552,7 @@ public abstract class WebService {
      * @throw JAXBException
      */
     @POST
-    @ConsumeMime("text/plain")
+    @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         logger.severe("request POST plain sending Exception");
         StringWriter sw = new StringWriter(); 

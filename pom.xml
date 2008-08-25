@@ -169,8 +169,8 @@
       </dependency>
       <dependency>
         <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey</artifactId>
-        <version>0.8-ea</version>
+        <artifactId>jersey-server</artifactId>
+        <version>0.9-ea</version>
       </dependency>
       <dependency>
         <groupId>javax.faces</groupId>
