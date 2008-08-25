@@ -21,6 +21,7 @@
  */
 package net.seagis.xacml.factory;
 
+import com.sun.xacml.finder.PolicyFinder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,8 +35,8 @@ import javax.xml.bind.JAXBElement;
 import net.seagis.xacml.api.XACMLPolicy;
 import net.seagis.xacml.policy.ObjectFactory;
 import net.seagis.xacml.policy.PolicyType;
-import net.seagis.xacml.bridge.JBossPolicyFinder;
 import net.seagis.xacml.JBossXACMLPolicy;
+import net.seagis.xacml.policy.PolicySetType;
 
 
 /**
@@ -63,7 +64,7 @@ public class PolicyFactory {
         return newInstance(getConstructor(), new Object[]{policySetFile, XACMLPolicy.POLICYSET});
     }
 
-    public static XACMLPolicy createPolicySet(final InputStream policySetFile, final JBossPolicyFinder theFinder) throws FactoryException {
+    public static XACMLPolicy createPolicySet(final InputStream policySetFile, final PolicyFinder theFinder) throws FactoryException {
         
         return newInstance(getCtrWithFinder(), new Object[] {policySetFile, XACMLPolicy.POLICYSET, theFinder});
     }
@@ -81,6 +82,15 @@ public class PolicyFactory {
         final ByteArrayInputStream bis = new ByteArrayInputStream(baos.toByteArray());
         return newInstance(getConstructor(), new Object[]{bis, XACMLPolicy.POLICY});
     }
+    
+    public static XACMLPolicy createPolicySet(final PolicySetType policySetFile) throws FactoryException {
+        
+        final JAXBElement<PolicySetType> jaxbPolicy = new ObjectFactory().createPolicySet(policySetFile);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JAXB.marshal(jaxbPolicy, baos);
+        final ByteArrayInputStream bis = new ByteArrayInputStream(baos.toByteArray());
+        return newInstance(getConstructor(), new Object[]{bis, XACMLPolicy.POLICYSET});
+    }
 
     private static Constructor<XACMLPolicy> getConstructor() throws FactoryException {
         try {
@@ -94,7 +104,7 @@ public class PolicyFactory {
     private static Constructor<XACMLPolicy> getCtrWithFinder() throws FactoryException {
         try {
             return (Constructor<XACMLPolicy>) constructingClass.getConstructor(
-                    new Class[]{InputStream.class, Integer.TYPE, JBossPolicyFinder.class});
+                    new Class[]{InputStream.class, Integer.TYPE, PolicyFinder.class});
         } catch (NoSuchMethodException ex) {
             throw new FactoryException(ex);
         } catch (SecurityException ex) {

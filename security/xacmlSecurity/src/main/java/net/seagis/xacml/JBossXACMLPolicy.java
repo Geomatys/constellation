@@ -22,6 +22,7 @@
 package net.seagis.xacml;
 
 import com.sun.xacml.AbstractPolicy;
+import com.sun.xacml.finder.PolicyFinder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.seagis.xacml.bridge.JBossPolicyFinder;
 import net.seagis.xacml.api.XACMLPolicy;
 import org.xml.sax.SAXException;
 
@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
  */
 public class JBossXACMLPolicy implements XACMLPolicy {
 
-    private final JBossPolicyFinder finder = new JBossPolicyFinder();
+    private final PolicyFinder finder = new PolicyFinder();
     private final List<XACMLPolicy> enclosingPolicies = new ArrayList<XACMLPolicy>();
     private int policyType = XACMLPolicy.POLICY;
     private final Map<XACMLConstants, Object> map = new HashMap<XACMLConstants, Object>();
@@ -77,8 +77,7 @@ public class JBossXACMLPolicy implements XACMLPolicy {
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final InputStream is, final int type,
-            final JBossPolicyFinder theFinder) throws IOException, SAXException {
+    public JBossXACMLPolicy(final InputStream is, final int type, final PolicyFinder theFinder) throws IOException, SAXException {
         final AbstractPolicy policy;
         XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
         policyType = type;

@@ -35,6 +35,7 @@ import com.sun.xacml.finder.PolicyFinderResult;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -48,6 +49,8 @@ public class PolicySetFinderModule extends PolicyFinderModule {
     private final PolicySet policySet;
     private final List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
     protected PolicyFinder policyFinder = null;
+    
+    private Logger logger = Logger.getLogger("net.seagis.xacml.bridge");
 
     public PolicySetFinderModule() {
         this(null);
@@ -77,31 +80,46 @@ public class PolicySetFinderModule extends PolicyFinderModule {
      */
     @Override
     public PolicyFinderResult findPolicy(final EvaluationCtx context) {
+        logger.info(context.getResourceId().encode());
+        
         AbstractPolicy selectedPolicy = null;
         final MatchResult match = policySet.match(context);
-        final int result = match.getResult();
+        int result = match.getResult();
+        if (result == MatchResult.MATCH) {
+            selectedPolicy = policySet;
+        }
+        
+        int i = 0;
+        while (result == MatchResult.NO_MATCH && i < policies.size()) {
+            result = policies.get(i).match(context).getResult();
+            if (result == MatchResult.MATCH) {
+                selectedPolicy = policies.get(i);
+            }
+            i++;
+        }
+        
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
+            logger.info("undterminate matching");
             return new PolicyFinderResult(match.getStatus());        // see if the target matched
         }
         if (result == MatchResult.MATCH) {
-            // see if we previously found another match
-            if (selectedPolicy != null) {
-                // we found a match before, so this is an error
-                final List<String> code = new ArrayList<String>();
-                code.add(Status.STATUS_PROCESSING_ERROR);
-                return new PolicyFinderResult(new Status(code, "too many applicable " + "top-level policies"));
-            }
-            // this is the first match we've found, so remember it
-            selectedPolicy = policySet;
+            logger.info("succefull matching");
+            return new PolicyFinderResult(selectedPolicy);
         }
-        // return the single applicable policy (if there was one)
+        if (result == MatchResult.NO_MATCH) {
+            logger.info("no match: ");
+            return new PolicyFinderResult(match.getStatus());  
+        }
+
+        logger.info("returning null");
         return new PolicyFinderResult(selectedPolicy);
     }
 
     @Override
     public PolicyFinderResult findPolicy(final URI idReference, final int type,
             final VersionConstraints constraints, final PolicyMetaData parentMetaData) {
+        logger.info("par ici");
         for (AbstractPolicy p : policies) {
             if (p.getId().compareTo(idReference) == 0) {
                 return new PolicyFinderResult(p);

@@ -26,6 +26,7 @@ import com.sun.xacml.ctx.RequestCtx;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.finder.AttributeFinder;
 import com.sun.xacml.finder.AttributeFinderModule;
+import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.impl.CurrentEnvModule;
 import com.sun.xacml.finder.impl.SelectorModule;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.seagis.xacml.bridge.JBossPolicyFinder;
 import net.seagis.xacml.factory.FactoryException;
 import net.seagis.xacml.factory.PolicyFactory;
 import net.seagis.xacml.factory.RequestResponseContextFactory;
@@ -65,7 +65,7 @@ public class JBossPDP implements PolicyDecisionPoint {
     
     private Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
     
-    private final JBossPolicyFinder policyFinder = new JBossPolicyFinder();
+    private final PolicyFinder policyFinder = new PolicyFinder();
 
     private Logger logger = Logger.getLogger("net.seagis.xacml");
     
@@ -97,12 +97,12 @@ public class JBossPDP implements PolicyDecisionPoint {
         attributeModules.add(new SelectorModule());
         attributeFinder.setModules(attributeModules);
 
-        final com.sun.xacml.PDP pdp = new com.sun.xacml.PDP(new PDPConfig(
-                attributeFinder, policyFinder, null));
+        final com.sun.xacml.PDP pdp = new com.sun.xacml.PDP(new PDPConfig(attributeFinder, policyFinder, null));
         final RequestCtx req = (RequestCtx) request.get(XACMLConstants.REQUEST_CTX);
         if (req == null) {
             throw new IllegalStateException("Request Context does not contain a request");
         }
+        logger.info("evaluating");
         final ResponseCtx resp = pdp.evaluate(req);
         final ResponseContext response = RequestResponseContextFactory.createResponseContext();
         response.set(XACMLConstants.RESPONSE_CTX, resp);

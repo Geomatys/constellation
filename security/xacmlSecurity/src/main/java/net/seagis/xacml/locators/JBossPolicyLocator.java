@@ -21,6 +21,7 @@
   */
 package net.seagis.xacml.locators;
 
+import com.sun.xacml.AbstractPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,10 @@ import net.seagis.xacml.bridge.WrapperPolicyFinderModule;
 import net.seagis.xacml.XACMLConstants;
 import net.seagis.xacml.api.XACMLPolicy;
 import com.sun.xacml.Policy;
+import com.sun.xacml.PolicySet;
 import com.sun.xacml.finder.PolicyFinderModule;
+import java.util.logging.Logger;
+import net.seagis.xacml.bridge.PolicySetFinderModule;
 
 /**
  *  Policy Locator for plain XACML Policy instances
@@ -39,8 +43,10 @@ import com.sun.xacml.finder.PolicyFinderModule;
  */
 public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
    
-    private List<PolicyFinderModule> pfml = new ArrayList<PolicyFinderModule>();
+    private List<PolicyFinderModule> policyFinderModules = new ArrayList<PolicyFinderModule>();
 
+    private Logger logger = Logger.getLogger("net.seagis.xacml.locators"); 
+    
     public JBossPolicyLocator() {
     }
 
@@ -52,12 +58,31 @@ public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
     public void setPolicies(Set<XACMLPolicy> policies) {
         for (XACMLPolicy xp : policies) {
             if (xp.getType() == XACMLPolicy.POLICY) {
+                logger.info("policy type");
                 Policy p = (Policy) xp.get(XACMLConstants.UNDERLYING_POLICY);
                 WrapperPolicyFinderModule wpfm = new WrapperPolicyFinderModule(p);
-                pfml.add(wpfm);
+                policyFinderModules.add(wpfm);
+                
+            } else if (xp.getType() == XACMLPolicy.POLICYSET){
+                logger.info("policySet type");
+                PolicySet ps = (PolicySet) xp.get(XACMLConstants.UNDERLYING_POLICY);
+                
+                List<AbstractPolicy> poli = new ArrayList<AbstractPolicy>();
+                for (XACMLPolicy xp2 : xp.getEnclosingPolicies()) {
+                    Policy p = (Policy) xp2.get(XACMLConstants.UNDERLYING_POLICY);
+                    poli.add(p);
+                    logger.info("policy added");
+                }
+                
+                PolicySetFinderModule psfm = new PolicySetFinderModule(ps, poli);
+                policyFinderModules.add(psfm);
+                
+                
+            } else {
+                logger.info("unexpected Policy type:" + xp.getType());
             }
         }
-        this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, pfml);
+        this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, policyFinderModules);
     }
 
     public Object get(XACMLConstants key) {

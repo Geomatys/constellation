@@ -53,8 +53,7 @@ public class XACMLPolicyUtil {
      * @throws Exception
      */
     public PolicySet createPolicySet(final URL location, final PolicyFinder finder) 
-            throws IOException, SAXException
-    {
+            throws IOException, SAXException {
         return createPolicySet(location.openStream(), finder);
     }
 
@@ -66,8 +65,7 @@ public class XACMLPolicyUtil {
      * @throws Exception
      */
     public PolicySet createPolicySet(final InputStream is, final PolicyFinder finder)
-            throws IOException, SAXException
-    {
+            throws IOException, SAXException {
         if (finder == null) {
             throw new IllegalArgumentException("Policy Finder is null");
         }
