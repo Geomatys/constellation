@@ -577,11 +577,8 @@ public class WMService extends WebService {
         }
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         String format = getParameter("FORMAT", false);
-        if (format == null ) {
-            format = "application/vnd.ogc.wms_xml";
-        } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
-            throw new WMSWebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
-                      INVALID_PARAMETER_VALUE, getCurrentVersion());
+        if (format == null || !(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
+            format = "text/xml";
         }
 
         AbstractWMSCapabilities response;
@@ -698,7 +695,7 @@ public class WMService extends WebService {
                      */
                     net.seagis.wms.v111.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new net.seagis.wms.v111.BoundingBox(code.toString(),
+                        outputBBox = new net.seagis.wms.v111.BoundingBox("EPSG:" + code.toString(),
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -736,7 +733,7 @@ public class WMService extends WebService {
                      */
                     net.seagis.wms.v130.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new net.seagis.wms.v130.BoundingBox(code.toString(),
+                        outputBBox = new net.seagis.wms.v130.BoundingBox("EPSG:" + code.toString(),
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -809,7 +806,10 @@ public class WMService extends WebService {
         if (getCurrentVersion().toString().equals("1.1.1")) {
             marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
               "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
+        } else {
+            marshaller.setProperty("com.sun.xml.bind.xmlHeaders", "");
         }
+        
         marshaller.marshal(response, sw);
 
         return Response.ok(sw.toString(), format).build();

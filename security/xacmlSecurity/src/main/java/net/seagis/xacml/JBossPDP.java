@@ -48,8 +48,9 @@ import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.api.RequestContext;
 import net.seagis.xacml.api.ResponseContext;
 import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.jaxb.PolicySetType;
-import net.seagis.xacml.jaxb.PolicyType;
+import net.seagis.xacml.locators.JBossPolicyLocator;
+import net.seagis.xacml.policy.PolicySetType;
+import net.seagis.xacml.policy.PolicyType;
 
 
 
@@ -73,6 +74,26 @@ public class JBossPDP implements PolicyDecisionPoint {
      * Build a new empty PDP.
      */
     public JBossPDP() {}
+    
+    /**
+     * Build a PDP with the following policySet.
+     */
+    public JBossPDP(PolicySetType policySet) throws FactoryException {
+        
+        XACMLPolicy policySet1 = PolicyFactory.createPolicySet(policySet);
+        
+        List<XACMLPolicy> enclosing = new ArrayList<XACMLPolicy>();
+        for (PolicyType p: policySet.getPoliciesChild()) {
+            XACMLPolicy policy = PolicyFactory.createPolicy(p);
+            enclosing.add(policy);
+        }
+        policySet1.setEnclosingPolicies(enclosing);
+        
+        // we add the policies to the PDP
+        policies.add(policySet1);
+        
+        locators.add(new JBossPolicyLocator(policies));
+    }
 
     
     /**
@@ -102,7 +123,6 @@ public class JBossPDP implements PolicyDecisionPoint {
         if (req == null) {
             throw new IllegalStateException("Request Context does not contain a request");
         }
-        logger.info("evaluating");
         final ResponseCtx resp = pdp.evaluate(req);
         final ResponseContext response = RequestResponseContextFactory.createResponseContext();
         response.set(XACMLConstants.RESPONSE_CTX, resp);
@@ -123,7 +143,7 @@ public class JBossPDP implements PolicyDecisionPoint {
         this.policies = policies;
     }
 
-    private List<XACMLPolicy> addPolicySets(final List<PolicySetType> policySets, final boolean topLevel) throws FactoryException  {
+    /**private List<XACMLPolicy> addPolicySets(final List<PolicySetType> policySets, final boolean topLevel) throws FactoryException  {
         final List<XACMLPolicy> list = new ArrayList<XACMLPolicy>();
 
         for (PolicySetType pst : policySets) {
@@ -175,5 +195,5 @@ public class JBossPDP implements PolicyDecisionPoint {
             throw new IOException("Null Inputstream for " + loc);
         }
         return is;
-    }
+    }*/
 }

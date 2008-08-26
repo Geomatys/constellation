@@ -80,7 +80,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
      */
     @Override
     public PolicyFinderResult findPolicy(final EvaluationCtx context) {
-        logger.info(context.getResourceId().encode());
+        logger.finer(context.getResourceId().encode());
         
         AbstractPolicy selectedPolicy = null;
         final MatchResult match = policySet.match(context);
@@ -100,26 +100,25 @@ public class PolicySetFinderModule extends PolicyFinderModule {
         
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
-            logger.info("undterminate matching");
+            logger.finer("undterminate matching");
             return new PolicyFinderResult(match.getStatus());        // see if the target matched
         }
         if (result == MatchResult.MATCH) {
-            logger.info("succefull matching");
+            logger.finer("succefull matching");
             return new PolicyFinderResult(selectedPolicy);
         }
         if (result == MatchResult.NO_MATCH) {
-            logger.info("no match: ");
+            logger.finer("no match: ");
             return new PolicyFinderResult(match.getStatus());  
         }
 
-        logger.info("returning null");
+        logger.finer("returning null");
         return new PolicyFinderResult(selectedPolicy);
     }
 
     @Override
     public PolicyFinderResult findPolicy(final URI idReference, final int type,
             final VersionConstraints constraints, final PolicyMetaData parentMetaData) {
-        logger.info("par ici");
         for (AbstractPolicy p : policies) {
             if (p.getId().compareTo(idReference) == 0) {
                 return new PolicyFinderResult(p);

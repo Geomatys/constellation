@@ -192,10 +192,14 @@ public class MetadataReader {
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
         Object result;
         int id;
+        String catalog = "";
         
         //if the identifier is an int we assme that is directly the Form ID
         try  {
-            id = Integer.parseInt(identifier);
+            catalog    = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
+            identifier = identifier.substring(0, identifier.indexOf(":"));
+            id         = Integer.parseInt(identifier);
+            
         
         //else we search for an Identifier or a title
         } catch (NumberFormatException e) {
@@ -213,11 +217,8 @@ public class MetadataReader {
         if (mode == ISO_19115) {
             result = metadatas.get(identifier);
             if (result == null) {
-                //TODO gere plusieur catalogue proprement
-                Form f = MDReader.getForm(MDCatalogs.get(0), id);
-                if (f == null) {
-                    f = MDReader.getForm(MDCatalogs.get(1), id);
-                }
+                
+                Form f = MDReader.getForm(MDReader.getCatalog(catalog), id);
                 result = getObjectFromForm(f);
                 if (result != null) {
                     metadatas.put(identifier, result);
@@ -225,9 +226,9 @@ public class MetadataReader {
             }
             
         } else {
-            Form f = MDReader.getForm(MDCatalogs.get(0), id);
+            Form f = MDReader.getForm(MDReader.getCatalog(catalog), id);
             if (f == null) {
-                f = MDReader.getForm(MDCatalogs.get(1), id);
+                f = MDReader.getForm(MDReader.getCatalog(catalog), id);
             }
             result = getRecordFromForm(f, type, elementName);
         }

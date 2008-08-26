@@ -65,6 +65,9 @@ public class WMSCapabilities extends AbstractWMSCapabilities {
     private String version;
     @XmlAttribute
     private String updateSequence;
+    
+    @XmlAttribute(namespace = "http://www.w3.org/2001/XMLSchema-instance")
+    private String schemaLocation = "http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd";
 
     /**
      * An empty constructor used by JAXB.

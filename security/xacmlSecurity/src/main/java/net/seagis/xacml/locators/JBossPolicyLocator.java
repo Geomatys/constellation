@@ -58,20 +58,17 @@ public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
     public void setPolicies(Set<XACMLPolicy> policies) {
         for (XACMLPolicy xp : policies) {
             if (xp.getType() == XACMLPolicy.POLICY) {
-                logger.info("policy type");
                 Policy p = (Policy) xp.get(XACMLConstants.UNDERLYING_POLICY);
                 WrapperPolicyFinderModule wpfm = new WrapperPolicyFinderModule(p);
                 policyFinderModules.add(wpfm);
                 
             } else if (xp.getType() == XACMLPolicy.POLICYSET){
-                logger.info("policySet type");
                 PolicySet ps = (PolicySet) xp.get(XACMLConstants.UNDERLYING_POLICY);
                 
                 List<AbstractPolicy> poli = new ArrayList<AbstractPolicy>();
                 for (XACMLPolicy xp2 : xp.getEnclosingPolicies()) {
                     Policy p = (Policy) xp2.get(XACMLConstants.UNDERLYING_POLICY);
                     poli.add(p);
-                    logger.info("policy added");
                 }
                 
                 PolicySetFinderModule psfm = new PolicySetFinderModule(ps, poli);

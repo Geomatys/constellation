@@ -165,27 +165,27 @@ public class CSWworker {
     /**
      * A connection to the Database
      */
-    private final Connection MDConnection;
+    private Connection MDConnection;
     
     /**
      * A Reader to the Metadata database.
      */
-    private final Reader20 databaseReader;
+    private Reader20 databaseReader;
     
     /**
      * A Writer to the Metadata database.
      */
-    private final Writer20 databaseWriter;
+    private Writer20 databaseWriter;
     
     /**
      * An object creator from the MDWeb database.
      */
-    private final MetadataReader MDReader;
+    private MetadataReader MDReader;
     
     /**
      * An Form creator from the MDWeb database.
      */
-    private final MetadataWriter MDWriter;
+    private MetadataWriter MDWriter;
     
     /**
      * A JAXB factory to csw object version 2.0.2
@@ -215,7 +215,7 @@ public class CSWworker {
     /**
      * A lucene index to make quick search on the metadatas.
      */
-    private final IndexLucene index;
+    private  IndexLucene index;
     
     /**
      * A filter parser whitch create lucene query from OGC filter
@@ -230,7 +230,7 @@ public class CSWworker {
     /**
      * A catalogue Harvester comunicating with other CSW 
      */
-    private final CatalogueHarvester catalogueHarvester;
+    private CatalogueHarvester catalogueHarvester;
     
     /**
      * The queryable element from ISO 19115 and their path id.
@@ -586,7 +586,7 @@ public class CSWworker {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
-    public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) throws IOException, SQLException {
+    public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) throws IOException {
         
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller; 
@@ -637,37 +637,34 @@ public class CSWworker {
             dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
             dataSourceMD.setUser(prop.getProperty("MDDBUser"));
             dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-            MDConnection    = dataSourceMD.getConnection();
-            
+            try {
+                MDConnection    = dataSourceMD.getConnection();
+            } catch (SQLException e) {
+                MDConnection = null;
+                logger.severe(e.getMessage());
+            }
             if (MDConnection == null) {
                 logger.severe("The CSW service is not working!" + '\n' + 
                               "cause: The web service can't connect to the metadata database!");
-                databaseReader      = null;
-                databaseWriter      = null;
-                index               = null;
-                MDReader            = null;
-                MDWriter            = null;
                 isStarted           = false;
-                catalogueHarvester  = null;
             } else {
-                 databaseReader     = new Reader20(Standard.ISO_19115,  MDConnection);
-                 databaseWriter     = new Writer20(MDConnection);
-                 index              = new IndexLucene(databaseReader, env);
-                 MDReader           = new MetadataReader(databaseReader, dataSourceMD.getConnection());
-                 MDWriter           = new MetadataWriter(databaseReader, databaseWriter);
-                 catalogueHarvester = new CatalogueHarvester(this);
                  
-                 logger.info("CSW service running");
+                 try {
+                    databaseReader     = new Reader20(Standard.ISO_19115,  MDConnection);
+                    databaseWriter     = new Writer20(MDConnection);
+                    index              = new IndexLucene(databaseReader, env);
+                    MDReader           = new MetadataReader(databaseReader, dataSourceMD.getConnection());
+                    MDWriter           = new MetadataWriter(databaseReader, databaseWriter);
+                    catalogueHarvester = new CatalogueHarvester(this);
+                 
+                    logger.info("CSW service running");
+                 } catch (SQLException e) {
+                    logger.severe(e.getMessage());
+                    logger.severe("The CSW service is not working!" + '\n' + 
+                                  "cause: The web service can't connect to the metadata database!");
+                }
             }
             
-        } else {
-            databaseReader     = null;
-            databaseWriter     = null;
-            index              = null;
-            MDReader           = null;
-            MDWriter           = null;
-            MDConnection       = null;
-            catalogueHarvester = null;
         }
     }
     

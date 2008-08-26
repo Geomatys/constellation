@@ -127,6 +127,9 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.isotc211.org/2005/gfc".equals(namespaceUri) )
             prefix = "gfc";
         
+        else if( "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceUri) )
+            prefix = "xsi";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

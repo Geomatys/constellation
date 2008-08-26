@@ -284,8 +284,9 @@ public class IndexLucene extends AbstractIndex {
         // make a new, empty document
         Document doc = new Document();
         
-        doc.add(new Field("id",    form.getId() + "", Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field("Title", form.getTitle(),   Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("id",      form.getId() + "",            Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("catalog", form.getCatalog().getCode() , Field.Store.YES, Field.Index.TOKENIZED));        
+        doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.TOKENIZED));
         
         // For an ISO 19115 form
         if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
@@ -417,7 +418,7 @@ public class IndexLucene extends AbstractIndex {
         
             for (int i = 0; i < hits.length(); i ++) {
             
-                results.add( hits.doc(i).get("id"));
+                results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
             }
         
         // for a OR we need to perform many request 
@@ -426,11 +427,11 @@ public class IndexLucene extends AbstractIndex {
             Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), sort);
             
             for (int i = 0; i < hits1.length(); i++) {
-                results.add(hits1.doc(i).get("id"));
+                results.add(hits1.doc(i).get("id") + ':' + hits1.doc(i).get("catalog"));
             }
             
             for (int i = 0; i < hits2.length(); i++) {
-                String id = hits2.doc(i).get("id");
+                String id = hits2.doc(i).get("id") + ':' + hits2.doc(i).get("catalog");
                 if (!results.contains(id)) {
                     results.add(id);
                 }
@@ -442,12 +443,12 @@ public class IndexLucene extends AbstractIndex {
             
             List<String> unWanteds = new ArrayList<String>();
             for (int i = 0; i < hits1.length(); i++) {
-                unWanteds.add(hits1.doc(i).get("id"));
+                unWanteds.add(hits1.doc(i).get("id") + ':' + hits1.doc(i).get("catalog"));
             }
             
             Hits hits2 = searcher.search(simpleQuery, sort);
             for (int i = 0; i < hits2.length(); i++) {
-                String id = hits2.doc(i).get("id");
+                String id = hits2.doc(i).get("id") + ':' + hits2.doc(i).get("catalog");
                 if (!unWanteds.contains(id)) {
                     results.add(id);
                 }

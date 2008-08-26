@@ -68,8 +68,7 @@ public class WrapperPolicyFinderModule extends PolicyFinderModule {
      */
     @Override
     public PolicyFinderResult findPolicy(final URI arg0, final int arg1,
-            final VersionConstraints arg2, final PolicyMetaData arg3)
-    {
+            final VersionConstraints arg2, final PolicyMetaData arg3) {
         return new PolicyFinderResult(policy);
     }
 

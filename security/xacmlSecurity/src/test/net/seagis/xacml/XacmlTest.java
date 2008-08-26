@@ -85,14 +85,9 @@ public class XacmlTest {
     private JBossPDP PDP;
     
     /**
-     * A example Policy.
+     * A Policy Enforcement Point whitch send xacml request to the PDP and retrieve the decision of the it.
      */
-    private net.seagis.xacml.policy.PolicyType policyType1;
-    
-    /**
-     * The CSW Policy.
-     */
-    private net.seagis.xacml.policy.PolicyType CSWpolicy;
+    private PEP pep;
     
     /**
      * A policy unmarshaller
@@ -120,77 +115,22 @@ public class XacmlTest {
          unmarshaller           = jbcontext.createUnmarshaller();
          marshaller             = jbcontext.createMarshaller();
          marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-         PDP = new JBossPDP();
-
-         net.seagis.xacml.policy.ObjectFactory factory = new net.seagis.xacml.policy.ObjectFactory(); 
-                 
+         
          //we construct an example policy
-         policyType1                 = getExamplePolicy();
-         XACMLPolicy policy1         = PolicyFactory.createPolicy(policyType1);
-         JAXBElement<PolicyType> jb1 = factory.createPolicy(policyType1);
+         PolicyType policyType1 = getExamplePolicy();
          
-         //we build the csw policy
-         CSWpolicy                   = getCSWPolicy();
-         XACMLPolicy policy2         = PolicyFactory.createPolicy(CSWpolicy);
-         JAXBElement<PolicyType> jb2 = factory.createPolicy(CSWpolicy);
-
+         //we build the service policy
+         List<PolicyType> WservicePolicies = getWebServicePolicies();
+         WservicePolicies.add(policyType1);
+                
          //we build a policySet 
-         PolicySetType policySet = new PolicySetType();
-         policySet.setDescription("a container of service policies");
-         policySet.setPolicySetId("constellation-policyset");
-         policySet.setPolicyCombiningAlgId("urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides");
-         policySet.setVersion("2.0");
-         
-         //we build the target of the policySet
-         TargetType targetType       = new TargetType();
-         ResourcesType resourcesType = new ResourcesType();
-         ResourceType resourceType   = new ResourceType();
-         ResourceMatchType rmt       = new ResourceMatchType();
-        
-         //this policy is applicable when the URI of the requested ressource equals the specified URI
-         rmt.setMatchId(XACMLConstants.FUNCTION_ANYURI_EQUAL.key);
-        
-         // description of the attribute here the resource ID of type anyURI
-         rmt.setResourceAttributeDesignator(PolicyAttributeFactory.createAttributeDesignatorType(
-                 XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key,
-                 XMLSchemaConstants.DATATYPE_ANYURI.key,
-                 null,
-                 true));
-        
-         // the value of  the attribute
-         rmt.setAttributeValue(PolicyAttributeFactory.createAnyURIAttributeType(new URI("http://someurl")));
-         resourceType.getResourceMatch().add(rmt);
-         resourcesType.getResource().add(resourceType);
-         targetType.setResources(resourcesType);
-         policySet.setTarget(targetType);
-         
-         //we add the policies to the policy set
-         policySet.getPolicySetOrPolicyOrPolicySetIdReference().add(jb1);
-         policySet.getPolicySetOrPolicyOrPolicySetIdReference().add(jb2);
-         
-         if (debug)
+         PolicySetType policySet     = buildPolicySet(WservicePolicies);
+         if (true)
              marshaller.marshal(policySet, System.out);
          
+         PDP = new JBossPDP(policySet);
          
-         XACMLPolicy policySet1 = PolicyFactory.createPolicySet(policySet);
-         List<XACMLPolicy> poli = new ArrayList<XACMLPolicy>();
-         poli.add(policy1);
-         poli.add(policy2);
-         policySet1.setEnclosingPolicies(poli);
-         
-         // we add the policies to the PDP
-         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
-         policies.add(policySet1);
-         PDP.setPolicies(policies);
-         
-        
-         //Add the basic locators also
-         PolicyLocator policyLocator = new JBossPolicyLocator(policies);
-        
-         //Locators need to be given the policies
-         Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
-         locators.add(policyLocator);
-         PDP.setLocators(locators);
+         pep = new PEP(PDP);
     }
 
     @After
@@ -208,14 +148,12 @@ public class XacmlTest {
         logger.info('\n' + "-------- Object Model PDP Test --------" + '\n');
         
         PDP = new JBossPDP();
+        PolicyType examplePolicy = getExamplePolicy();
         
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
-        Marshaller marshaller    = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         if (debug)
-            marshaller.marshal(policyType1, System.out);
+            marshaller.marshal(examplePolicy, System.out);
         
-        XACMLPolicy policy = PolicyFactory.createPolicy(policyType1);
+        XACMLPolicy policy = PolicyFactory.createPolicy(examplePolicy);
         Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
         policies.add(policy);
        
@@ -238,7 +176,7 @@ public class XacmlTest {
         
         logger.info('\n' + "-------- Positive Web Binding Test --------" + '\n');
         assertNotNull(PDP);
-        PEP pep = new PEP(PDP);
+        
         
         //we create an user
         Principal p = new PrincipalImpl("testuser");
@@ -255,7 +193,7 @@ public class XacmlTest {
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_admin, "read");
@@ -264,7 +202,7 @@ public class XacmlTest {
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_admin, "write");
@@ -273,7 +211,7 @@ public class XacmlTest {
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         logger.info('\n' + "-------- Fin Positive Web Binding Test --------" + '\n');
     }
@@ -289,7 +227,6 @@ public class XacmlTest {
         
         logger.info('\n' + "-------- Negative Web Binding Test --------" + '\n');
         assertNotNull(PDP);
-        PEP pep = new PEP(PDP);
         
         //we create an user
         Principal p = new PrincipalImpl("testuser");
@@ -325,8 +262,7 @@ public class XacmlTest {
 
 
     /**
-     * Test sending a request to the PDP with an user of the group imposter.
-     * The response must be negative.
+     * Test sending CSW request to the PDP.
      * 
      * @throws java.lang.Exception
      */
@@ -336,7 +272,6 @@ public class XacmlTest {
         logger.info('\n' + "-------- CSW Policy Test --------" + '\n');
         
         assertNotNull(PDP);
-        PEP pep = new PEP(PDP);
         
         //we create an user
         Principal p = new PrincipalImpl("testuser");
@@ -353,7 +288,7 @@ public class XacmlTest {
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "getrecords");
@@ -362,27 +297,159 @@ public class XacmlTest {
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "transaction");
         if (debug) {
-            logger.info("csw GetCapabilities request: role='anonymous' action='transaction'");
+            logger.info("csw request: role='anonymous' action='transaction'");
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, p, grp_admin, "transaction");
         if (debug) {
-            logger.info("csw GetCapabilities request: role='anonymous' action='transaction'");
+            logger.info("csw request: role='admin' action='transaction'");
             request.marshall(System.out);
             logger.info("");
         }
-        assertEquals("Access Allowed?", XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "harvest");
+        if (debug) {
+            logger.info("csw request: role='admin' action='harvest'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "whatever");
+        if (debug) {
+            logger.info("csw request: role='anonymous' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+         //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "whatever");
+        if (debug) {
+            logger.info("csw request: role='admin' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         logger.info('\n' + "-------- Fin CSW Policy Test --------" + '\n');
+    }
+    
+    /**
+     * Test sending SOS request to the PDP.
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testSOSPolicy() throws Exception {
+        
+        logger.info('\n' + "-------- SOS Policy Test --------" + '\n');
+        
+        assertNotNull(PDP);
+        
+        //we create an user
+        Principal p = new PrincipalImpl("testuser");
+        
+        //we create Role Group
+        Group grp_anomymous = new GroupImpl("anonymous");
+        Group grp_admin     = new GroupImpl("admin");
+        String requestURI   = "http://test.geomatys.fr/sos";
+        
+        //Check PERMIT condition
+        RequestContext request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "getcapabilities");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='getCapabilities'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "describesensor");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='describesensor'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "getobservation");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='getobservation'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "registersensor");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='registersensor'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "registersensor");
+        if (debug) {
+            logger.info("sos request: role='admin' action='registersensor'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "insertobservation");
+        if (debug) {
+            logger.info("sos request: role='admin' action='insertObservation'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "insertobservation");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='insertObservation'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_anomymous, "whatever");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+         //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, p, grp_admin, "whatever");
+        if (debug) {
+            logger.info("sos request: role='admin' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        logger.info('\n' + "-------- Fin SOS Policy Test --------" + '\n');
     }
     
     /**
@@ -559,11 +626,53 @@ public class XacmlTest {
         return policyType;
    }
     
-    private net.seagis.xacml.policy.PolicyType getCSWPolicy() throws JAXBException {
-        String url     = "net/seagis/xacml/cswPolicy.xml";
-        InputStream is = SecurityActions.getResourceAsStream(url);
-        JAXBElement<PolicyType> jb2 = (JAXBElement<PolicyType>) unmarshaller.unmarshal(is);  
-        return jb2.getValue(); 
+    /**
+     * Build The CSW Policy from a resource file.
+     * 
+     * @return
+     * @throws javax.xml.bind.JAXBException
+     */
+    private List<PolicyType> getWebServicePolicies() throws JAXBException {
+        List<PolicyType> policies = new ArrayList<PolicyType>();
+        
+        InputStream is             = SecurityActions.getResourceAsStream("net/seagis/xacml/cswPolicy.xml");
+        JAXBElement<PolicyType> jb = (JAXBElement<PolicyType>) unmarshaller.unmarshal(is);  
+        policies.add(jb.getValue());
+        
+        is  = SecurityActions.getResourceAsStream("net/seagis/xacml/sosPolicy.xml");
+        jb  = (JAXBElement<PolicyType>) unmarshaller.unmarshal(is);  
+        policies.add(jb.getValue());
+        
+        return policies;
+    }
+    
+    /**
+     * Build a policy Set with containing the following policies.
+     * 
+     * @param policies
+     * @return
+     * @throws java.lang.Exception
+     */
+    private PolicySetType buildPolicySet(List<PolicyType> policies) throws Exception {
+        
+        PolicySetType policySet = new PolicySetType();
+        policySet.setDescription("a container of service policies");
+        policySet.setPolicySetId("constellation-policyset");
+        policySet.setPolicyCombiningAlgId("urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides");
+        policySet.setVersion("2.0");
+         
+        //we build the target of the policySet (no target)
+        policySet.setTarget(new TargetType());
+         
+        //we add the policies to the policy set
+        net.seagis.xacml.policy.ObjectFactory factory = new net.seagis.xacml.policy.ObjectFactory();
+        
+        for (PolicyType p : policies) {
+            JAXBElement<PolicyType> jb = factory.createPolicy(p);
+            policySet.getPolicySetOrPolicyOrPolicySetIdReference().add(jb);
+        }
+            
+        return policySet;
     }
     
     /**

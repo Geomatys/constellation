@@ -154,6 +154,21 @@ public class PolicySetType {
       }
       return this.policySetOrPolicyOrPolicySetIdReference;
    }
+   
+   /**
+    * Gets the value of the policies child.
+    * 
+    */
+   public List<PolicyType> getPoliciesChild() {
+      List<PolicyType> policies = new ArrayList<PolicyType>();
+      if (policySetOrPolicyOrPolicySetIdReference != null) {
+         for (JAXBElement<?> jb: policySetOrPolicyOrPolicySetIdReference) {
+             jb.getName().getLocalPart().equals("Policy");
+             policies.add((PolicyType)jb.getValue());
+         }
+      }
+      return policies;
+   }
 
    /**
     * Gets the value of the obligations property.
