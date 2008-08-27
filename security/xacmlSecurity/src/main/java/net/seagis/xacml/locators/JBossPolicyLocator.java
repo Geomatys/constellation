@@ -43,24 +43,34 @@ import net.seagis.xacml.bridge.PolicySetFinderModule;
  */
 public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
    
-    private List<PolicyFinderModule> policyFinderModules = new ArrayList<PolicyFinderModule>();
+    private PolicyFinderModule policyFinderModule;
 
     private Logger logger = Logger.getLogger("net.seagis.xacml.locators"); 
     
+    /**
+     * Build a new Policy locator.
+     */
     public JBossPolicyLocator() {
     }
 
+    /**
+     * Build a new Policy locator with the specified set of policy.
+     */
     public JBossPolicyLocator(Set<XACMLPolicy> policies) {
         setPolicies(policies);
     }
 
+    /**
+     * Set the specified List of policies.
+     * 
+     * @param policies
+     */
     @Override
     public void setPolicies(Set<XACMLPolicy> policies) {
         for (XACMLPolicy xp : policies) {
             if (xp.getType() == XACMLPolicy.POLICY) {
                 Policy p = (Policy) xp.get(XACMLConstants.UNDERLYING_POLICY);
-                WrapperPolicyFinderModule wpfm = new WrapperPolicyFinderModule(p);
-                policyFinderModules.add(wpfm);
+                policyFinderModule =  new WrapperPolicyFinderModule(p);
                 
             } else if (xp.getType() == XACMLPolicy.POLICYSET){
                 PolicySet ps = (PolicySet) xp.get(XACMLConstants.UNDERLYING_POLICY);
@@ -70,18 +80,16 @@ public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
                     Policy p = (Policy) xp2.get(XACMLConstants.UNDERLYING_POLICY);
                     poli.add(p);
                 }
-                
-                PolicySetFinderModule psfm = new PolicySetFinderModule(ps, poli);
-                policyFinderModules.add(psfm);
+                policyFinderModule = new PolicySetFinderModule(ps, poli);
                 
                 
             } else {
                 logger.info("unexpected Policy type:" + xp.getType());
             }
         }
-        this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, policyFinderModules);
+        this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, policyFinderModule);
     }
-
+    
     public Object get(XACMLConstants key) {
         return map.get(key.key);
     }

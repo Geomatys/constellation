@@ -63,8 +63,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PolicySetType", propOrder =
-{"description", "policySetDefaults", "target", "policySetOrPolicyOrPolicySetIdReference", "obligations"})
+@XmlType(name      = "PolicySetType", 
+         propOrder ={ "description", 
+                      "policySetDefaults", 
+                      "target", 
+                      "policySetOrPolicyOrPolicySetIdReference", 
+                      "obligations"})
 @XmlRootElement(name="PolicySet")
 public class PolicySetType {
 
@@ -163,8 +167,12 @@ public class PolicySetType {
       List<PolicyType> policies = new ArrayList<PolicyType>();
       if (policySetOrPolicyOrPolicySetIdReference != null) {
          for (JAXBElement<?> jb: policySetOrPolicyOrPolicySetIdReference) {
-             jb.getName().getLocalPart().equals("Policy");
-             policies.add((PolicyType)jb.getValue());
+             if (jb.getName().getLocalPart().equals("Policy")) {
+                policies.add((PolicyType)jb.getValue());
+             } else if (jb.getName().getLocalPart().equals("PolicySet")) {
+                 PolicySetType policySetChild = (PolicySetType) jb.getValue();
+                 policies.addAll(policySetChild.getPoliciesChild());
+             }
          }
       }
       return policies;

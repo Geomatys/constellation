@@ -21,11 +21,10 @@ import net.seagis.xacml.context.RequestType;
 import net.seagis.xacml.context.ResourceType;
 import net.seagis.xacml.context.SubjectType;
 import net.seagis.xacml.factory.RequestAttributeFactory;
-import net.seagis.xacml.factory.RequestResponseContextFactory;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal
  */
 public class PEP {
     
@@ -53,7 +52,7 @@ public class PEP {
      * @throws java.lang.Exception
      */
     public RequestContext createXACMLRequest(String resourceURI, Principal principal, Group roleGroup, String action) throws URISyntaxException, IOException {
-        RequestContext requestCtx = RequestResponseContextFactory.createRequestCtx();
+        RequestContext requestCtx = new JBossRequestContext();
 
         //Create a subject type
         SubjectType subject = createSubject(principal, roleGroup);

@@ -27,7 +27,6 @@ import com.sun.xacml.MatchResult;
 import com.sun.xacml.PolicyMetaData;
 import com.sun.xacml.PolicySet;
 import com.sun.xacml.VersionConstraints;
-import com.sun.xacml.ctx.Status;
 import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.PolicyFinderResult;
@@ -48,7 +47,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
 
     private final PolicySet policySet;
     private final List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
-    protected PolicyFinder policyFinder = null;
+    protected PolicyFinder policyFinder         = null;
     
     private Logger logger = Logger.getLogger("net.seagis.xacml.bridge");
 
@@ -89,26 +88,17 @@ public class PolicySetFinderModule extends PolicyFinderModule {
             selectedPolicy = policySet;
         }
         
-        int i = 0;
-        while (result == MatchResult.NO_MATCH && i < policies.size()) {
-            result = policies.get(i).match(context).getResult();
-            if (result == MatchResult.MATCH) {
-                selectedPolicy = policies.get(i);
-            }
-            i++;
-        }
-        
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
-            logger.finer("undterminate matching");
+            logger.info("undeterminate matching");
             return new PolicyFinderResult(match.getStatus());        // see if the target matched
         }
         if (result == MatchResult.MATCH) {
-            logger.finer("succefull matching");
+            logger.info("succefull matching");
             return new PolicyFinderResult(selectedPolicy);
         }
         if (result == MatchResult.NO_MATCH) {
-            logger.finer("no match: ");
+            logger.info("no match: ");
             return new PolicyFinderResult(match.getStatus());  
         }
 

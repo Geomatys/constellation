@@ -187,13 +187,6 @@ public class JBossResponseContext implements ResponseContext {
         }
     }
 
-    /**
-     * @see ElementMappingType#asElement(Document)
-     */
-    public Element asElement(final Document root) {
-        throw new UnsupportedOperationException("SECURITY-177");
-    }
-
     private Node getResponse(final InputStream is) throws IOException {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);

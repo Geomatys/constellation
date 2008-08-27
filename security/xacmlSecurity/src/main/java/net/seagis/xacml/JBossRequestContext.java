@@ -135,13 +135,6 @@ public class JBossRequestContext implements RequestContext {
         }
     }
 
-    /**
-     * @see ElementMappingType#asElement(Document)
-     */
-    public Element asElement(final Document root) {
-        throw new UnsupportedOperationException("SECURITY-176");
-    }
-
     private Node getRequest(final InputStream is) throws IOException {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);

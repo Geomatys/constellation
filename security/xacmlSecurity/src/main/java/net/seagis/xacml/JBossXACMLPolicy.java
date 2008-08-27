@@ -42,10 +42,10 @@ import org.xml.sax.SAXException;
  */
 public class JBossXACMLPolicy implements XACMLPolicy {
 
-    private final PolicyFinder finder = new PolicyFinder();
+    private final PolicyFinder finder                 = new PolicyFinder();
     private final List<XACMLPolicy> enclosingPolicies = new ArrayList<XACMLPolicy>();
-    private int policyType = XACMLPolicy.POLICY;
-    private final Map<XACMLConstants, Object> map = new HashMap<XACMLConstants, Object>();
+    private int policyType                            = XACMLPolicy.POLICY;
+    private final Map<XACMLConstants, Object> map     = new HashMap<XACMLConstants, Object>();
 
     /**
      * Construct a JBossXACMLPolicy  

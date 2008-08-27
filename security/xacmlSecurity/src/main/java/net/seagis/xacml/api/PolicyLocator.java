@@ -21,10 +21,9 @@
   */
 package net.seagis.xacml.api;
 
-import java.util.List;
 import java.util.Set;
 
-import net.seagis.xacml.jaxb.Option;
+
 
 
 /**
@@ -34,12 +33,6 @@ import net.seagis.xacml.jaxb.Option;
  *  @version $Revision$
  */
 public interface PolicyLocator extends ContextMapOp {
-
-    /**
-     * Set a list of options on the locator
-     * @param options
-     */
-    void setOptions(List<Option> options);
 
     /**
      * Set of policies that this locator is able to return

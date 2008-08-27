@@ -31,9 +31,6 @@ import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.impl.CurrentEnvModule;
 import com.sun.xacml.finder.impl.SelectorModule;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +39,6 @@ import java.util.logging.Logger;
 
 import net.seagis.xacml.factory.FactoryException;
 import net.seagis.xacml.factory.PolicyFactory;
-import net.seagis.xacml.factory.RequestResponseContextFactory;
 import net.seagis.xacml.api.PolicyDecisionPoint;
 import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.api.RequestContext;
@@ -80,17 +76,17 @@ public class JBossPDP implements PolicyDecisionPoint {
      */
     public JBossPDP(PolicySetType policySet) throws FactoryException {
         
-        XACMLPolicy policySet1 = PolicyFactory.createPolicySet(policySet);
+        XACMLPolicy xpolicySet = PolicyFactory.createPolicySet(policySet);
         
         List<XACMLPolicy> enclosing = new ArrayList<XACMLPolicy>();
         for (PolicyType p: policySet.getPoliciesChild()) {
             XACMLPolicy policy = PolicyFactory.createPolicy(p);
             enclosing.add(policy);
         }
-        policySet1.setEnclosingPolicies(enclosing);
+        xpolicySet.setEnclosingPolicies(enclosing);
         
         // we add the policies to the PDP
-        policies.add(policySet1);
+        policies.add(xpolicySet);
         
         locators.add(new JBossPolicyLocator(policies));
     }
@@ -104,11 +100,11 @@ public class JBossPDP implements PolicyDecisionPoint {
         
         //Go through the Locators
         for (PolicyLocator locator : locators) {
-            final List finderModulesList = (List) locator.get(XACMLConstants.POLICY_FINDER_MODULE);
+            final PolicyFinderModule finderModulesList =  (PolicyFinderModule) locator.get(XACMLConstants.POLICY_FINDER_MODULE);
             if (finderModulesList == null) {
                 throw new IllegalStateException("Locator " + locator.getClass().getName() + " has no policy finder modules");
             }
-            policyModules.addAll(finderModulesList);
+            policyModules.add(finderModulesList);
         }
         policyFinder.setModules(policyModules);
 
@@ -124,7 +120,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             throw new IllegalStateException("Request Context does not contain a request");
         }
         final ResponseCtx resp = pdp.evaluate(req);
-        final ResponseContext response = RequestResponseContextFactory.createResponseContext();
+        final ResponseContext response = new JBossResponseContext();
         response.set(XACMLConstants.RESPONSE_CTX, resp);
         return response;
     }
@@ -141,59 +137,6 @@ public class JBossPDP implements PolicyDecisionPoint {
      */
     public void setPolicies(final Set<XACMLPolicy> policies) {
         this.policies = policies;
+        locators.add(new JBossPolicyLocator(policies));
     }
-
-    /**private List<XACMLPolicy> addPolicySets(final List<PolicySetType> policySets, final boolean topLevel) throws FactoryException  {
-        final List<XACMLPolicy> list = new ArrayList<XACMLPolicy>();
-
-        for (PolicySetType pst : policySets) {
-            final String loc = pst.getLocation();
-            final XACMLPolicy policySet;
-            try {
-                policySet = PolicyFactory.createPolicySet(getInputStream(loc), policyFinder);
-            } catch (IOException ex) {
-                throw new FactoryException(ex);
-            }
-            list.add(policySet);
-
-            final List<XACMLPolicy> policyList = addPolicies(pst.getPolicy());
-            policySet.setEnclosingPolicies(policyList);
-
-            final List<PolicySetType> pset = pst.getPolicySet();
-            if (pset != null) {
-                policySet.getEnclosingPolicies().addAll(addPolicySets(pset, false));
-            }
-            if (topLevel) {
-                policies.add(policySet);
-            }
-        }
-
-        return list;
-    }
-
-    private List<XACMLPolicy> addPolicies(final List<PolicyType> policies) throws FactoryException {
-        final List<XACMLPolicy> policyList = new ArrayList<XACMLPolicy>();
-        for (PolicyType pt : policies) {
-            try {
-                policyList.add(PolicyFactory.createPolicy(getInputStream(pt.getLocation())));
-            } catch (IOException ex) {
-                throw new FactoryException(ex);
-            }
-        }
-        return policyList;
-    }
-
-    private InputStream getInputStream(final String loc) throws IOException {
-        InputStream is;
-        try {
-            final URL url = new URL(loc);
-            is = url.openStream();
-        } catch (IOException io) {
-            is = SecurityActions.getResourceAsStream(loc);
-        }
-        if (is == null) {
-            throw new IOException("Null Inputstream for " + loc);
-        }
-        return is;
-    }*/
 }

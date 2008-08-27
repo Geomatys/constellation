@@ -11,6 +11,7 @@
              </Resource>
         </Resources>
     </Target>
+    <!-- The following rule allow the anonymous user to reach the following read operation -->
     <Rule Effect="Permit" RuleId="ReadRule">
         <Target>
              <Actions>
@@ -47,6 +48,7 @@
              </Apply>
       </Condition>
     </Rule>
+    <!-- The following rule allow the administrator user to reach the following write operation -->
     <Rule Effect="Permit" RuleId="WriteRule">
         <Target>
              <Actions>

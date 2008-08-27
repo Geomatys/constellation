@@ -35,7 +35,7 @@ import org.w3c.dom.Node;
  *  @since  Jul 6, 2007 
  *  @version $Revision$
  */
-public interface ResponseContext extends ContextMapOp, ElementMappingType {
+public interface ResponseContext extends ContextMapOp {
 
     /**
      * Decision based on the evaluation of policies

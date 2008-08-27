@@ -22,14 +22,12 @@
 package net.seagis.xacml.locators;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.seagis.xacml.api.ContextMapOp;
 import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.jaxb.Option;
 
 
 /**
@@ -39,18 +37,8 @@ import net.seagis.xacml.jaxb.Option;
  *  @version $Revision$
  */
 public abstract class AbstractJBossPolicyLocator implements PolicyLocator, ContextMapOp {
-   private List<Option> options = null;
 
    protected Map<String, Object> map = new HashMap<String, Object>();
-
-   private Set<XACMLPolicy> policies;
-
-   /**
-    * @see PolicyLocator#setOptions(List)
-    */
-   public void setOptions(List<Option> theoptions) {
-      this.options = theoptions;
-   }
 
    /**
     * @see ContextMapOp#get(String)
