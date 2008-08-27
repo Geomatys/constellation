@@ -32,7 +32,11 @@ import net.seagis.xacml.api.XACMLPolicy;
 import com.sun.xacml.Policy;
 import com.sun.xacml.PolicySet;
 import com.sun.xacml.finder.PolicyFinderModule;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
+import net.seagis.xacml.api.ContextMapOp;
+import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.bridge.PolicySetFinderModule;
 
 /**
@@ -41,8 +45,10 @@ import net.seagis.xacml.bridge.PolicySetFinderModule;
  *  @since  Jul 6, 2007 
  *  @version $Revision$
  */
-public class JBossPolicyLocator extends AbstractJBossPolicyLocator {
+public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
    
+    private Map<String, Object> map = new HashMap<String, Object>();
+    
     private PolicyFinderModule policyFinderModule;
 
     private Logger logger = Logger.getLogger("net.seagis.xacml.locators"); 

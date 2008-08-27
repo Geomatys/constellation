@@ -41,7 +41,6 @@ import net.seagis.xacml.context.RequestType;
 import net.seagis.xacml.api.RequestContext;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -53,7 +52,7 @@ import org.xml.sax.SAXException;
  *  @since  Jul 6, 2007 
  *  @version $Revision$
  */
-public class JBossRequestContext implements RequestContext {
+public class CstlRequestContext implements RequestContext {
 
     private final Map<XACMLConstants, Object> map = new HashMap<XACMLConstants, Object>();
     private Node documentElement = null;

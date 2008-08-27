@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
  *  @since  Jul 6, 2007 
  *  @version $Revision$
  */
-public class JBossXACMLPolicy implements XACMLPolicy {
+public class CstlXACMLPolicy implements XACMLPolicy {
 
     private final PolicyFinder finder                 = new PolicyFinder();
     private final List<XACMLPolicy> enclosingPolicies = new ArrayList<XACMLPolicy>();
@@ -48,36 +48,36 @@ public class JBossXACMLPolicy implements XACMLPolicy {
     private final Map<XACMLConstants, Object> map     = new HashMap<XACMLConstants, Object>();
 
     /**
-     * Construct a JBossXACMLPolicy  
+     * Construct a CstlXACMLPolicy  
      * @param url url to the policy file
      * @param type type (Policy or PolicySet) 
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final URL url, final int type) throws IOException, SAXException {
+    public CstlXACMLPolicy(final URL url, final int type) throws IOException, SAXException {
         this(url.openStream(), type);
     }
 
     /**
-     * Construct a JBossXACMLPolicy
+     * Construct a CstlXACMLPolicy
      * @param is Inputstream to the policy file
      * @param type type (Policy or PolicySet)
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final InputStream is, final int type) throws IOException, SAXException {
+    public CstlXACMLPolicy(final InputStream is, final int type) throws IOException, SAXException {
         this(is, type, null);
     }
 
     /**
-     * Construct a JBossXACMLPolicy instance
+     * Construct a CstlXACMLPolicy instance
      * @param is Inputstream to the policy/policyset file
      * @param type policy or policyset
      * @param theFinder PolicySet processing needs this
      * @throws Exception
      * @see XACMLConstants
      */
-    public JBossXACMLPolicy(final InputStream is, final int type, final PolicyFinder theFinder) throws IOException, SAXException {
+    public CstlXACMLPolicy(final InputStream is, final int type, final PolicyFinder theFinder) throws IOException, SAXException {
         final AbstractPolicy policy;
         XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
         policyType = type;

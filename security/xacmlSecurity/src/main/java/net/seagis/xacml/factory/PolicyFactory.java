@@ -35,7 +35,7 @@ import javax.xml.bind.JAXBElement;
 import net.seagis.xacml.api.XACMLPolicy;
 import net.seagis.xacml.policy.ObjectFactory;
 import net.seagis.xacml.policy.PolicyType;
-import net.seagis.xacml.JBossXACMLPolicy;
+import net.seagis.xacml.CstlXACMLPolicy;
 import net.seagis.xacml.policy.PolicySetType;
 
 
@@ -50,7 +50,7 @@ public class PolicyFactory {
 
     private static Logger logger = Logger.getLogger("net.seagis.xacml");
     
-    public static Class<?> constructingClass = JBossXACMLPolicy.class;
+    public static Class<?> constructingClass = CstlXACMLPolicy.class;
 
     public static void setConstructingClass(final Class<?> clazz) {
         if (XACMLPolicy.class.isAssignableFrom(clazz) == false) {

@@ -77,7 +77,7 @@ import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;
 import net.seagis.ows.AbstractRequest;
 import net.seagis.ows.OWSExceptionCode;
-import net.seagis.xacml.JBossPDP;
+import net.seagis.xacml.CstlPDP;
 import net.seagis.xacml.SecurityActions;
 import net.seagis.xacml.api.PolicyDecisionPoint;
 import net.seagis.xacml.api.PolicyLocator;
@@ -202,7 +202,7 @@ public abstract class WebService {
     private void initializePolicyDecisionPoint() {
         
         //we create a new PDP
-        PDP = new JBossPDP();
+        PDP = new CstlPDP();
 
         //load the correspounding policy file
         String url = "net/seagis/xacml/" + service.toLowerCase() + "Policy.xml";

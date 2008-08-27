@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
  *  @since  Jul 6, 2007
  *  @version $Revision$
  */
-public class JBossResponseContext implements ResponseContext {
+public class CstlResponseContext implements ResponseContext {
 
     private final Map<XACMLConstants, Object> map = new HashMap<XACMLConstants, Object>();
     private Node documentElement = null;

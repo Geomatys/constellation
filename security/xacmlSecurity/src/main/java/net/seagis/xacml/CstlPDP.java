@@ -56,7 +56,7 @@ import net.seagis.xacml.policy.PolicyType;
  *  @since  Jul 6, 2007
  *  @version $Revision$
  */
-public class JBossPDP implements PolicyDecisionPoint {
+public class CstlPDP implements PolicyDecisionPoint {
     
     private Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
     
@@ -69,12 +69,12 @@ public class JBossPDP implements PolicyDecisionPoint {
     /**
      * Build a new empty PDP.
      */
-    public JBossPDP() {}
+    public CstlPDP() {}
     
     /**
      * Build a PDP with the following policySet.
      */
-    public JBossPDP(PolicySetType policySet) throws FactoryException {
+    public CstlPDP(PolicySetType policySet) throws FactoryException {
         
         XACMLPolicy xpolicySet = PolicyFactory.createPolicySet(policySet);
         
@@ -120,7 +120,7 @@ public class JBossPDP implements PolicyDecisionPoint {
             throw new IllegalStateException("Request Context does not contain a request");
         }
         final ResponseCtx resp = pdp.evaluate(req);
-        final ResponseContext response = new JBossResponseContext();
+        final ResponseContext response = new CstlResponseContext();
         response.set(XACMLConstants.RESPONSE_CTX, resp);
         return response;
     }

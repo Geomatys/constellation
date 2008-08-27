@@ -52,7 +52,7 @@ public class PEP {
      * @throws java.lang.Exception
      */
     public RequestContext createXACMLRequest(String resourceURI, Principal principal, Group roleGroup, String action) throws URISyntaxException, IOException {
-        RequestContext requestCtx = new JBossRequestContext();
+        RequestContext requestCtx = new CstlRequestContext();
 
         //Create a subject type
         SubjectType subject = createSubject(principal, roleGroup);
