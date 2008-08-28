@@ -354,19 +354,14 @@
       <url>http://download.java.net/maven/2</url>
     </repository>
     <repository>
-      <id>geotools</id>
-      <name>Geotools et ses dépendances spécifiques</name>
-      <url>http://maven.geotools.fr/repository</url>
-    </repository>
-    <repository>
       <id>geomatys</id>
-      <name>Other projects</name>
+      <name>Builds from Geomatys</name>
       <url>http://maven.geomatys.fr/repository</url>
     </repository>
     <repository>
-      <id>refractions</id>
-      <name>Other projects</name>
-      <url>http://lists.refractions.net/m2</url>
+      <id>geotools</id>
+      <name>Geotools et ses dépendances spécifiques</name>
+      <url>http://maven.geotools.fr/repository</url>
     </repository>
     <repository>
       <id>apache</id>
@@ -375,6 +370,11 @@
     </repository>
   </repositories>
   <pluginRepositories>
+    <pluginRepository>
+      <id>geomatys</id>
+      <name>Builds from Geomatys</name>
+      <url>http://maven.geomatys.fr/repository</url>
+    </pluginRepository>
     <pluginRepository>
       <id>geotools</id>
       <name>Geotools et ses dépendances spécifiques</name>
