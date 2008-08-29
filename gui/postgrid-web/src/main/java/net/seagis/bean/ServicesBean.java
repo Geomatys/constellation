@@ -217,7 +217,7 @@ public class ServicesBean {
     private boolean existPrefrence = false;
     
     /**
-     * 
+     * Debugging purpose
      */
     private Logger logger = Logger.getLogger("net.seagis.bean");
 

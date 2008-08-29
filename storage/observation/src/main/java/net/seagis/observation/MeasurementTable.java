@@ -33,10 +33,10 @@ import net.seagis.sampling.SamplingFeatureEntry;
 import net.seagis.sampling.SamplingFeatureTable;
 import net.seagis.sampling.SamplingPointEntry;
 import net.seagis.sampling.SamplingPointTable;
-import net.seagis.swe.CompositePhenomenonEntry;
-import net.seagis.swe.CompositePhenomenonTable;
-import net.seagis.swe.PhenomenonEntry;
-import net.seagis.swe.PhenomenonTable;
+import net.seagis.swe.v100.CompositePhenomenonEntry;
+import net.seagis.swe.v100.CompositePhenomenonTable;
+import net.seagis.swe.v100.PhenomenonEntry;
+import net.seagis.swe.v100.PhenomenonTable;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measurement;
 

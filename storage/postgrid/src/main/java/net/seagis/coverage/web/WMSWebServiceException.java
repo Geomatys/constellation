@@ -45,7 +45,7 @@ public class WMSWebServiceException extends WebServiceException {
      */
     public WMSWebServiceException(final String message, final WMSExceptionCode code, final Version version) {
         super(message);
-        setServiceExceptionReport(message, code, version);
+        setExceptionReport(message, code, version);
     }
 
     /**
@@ -57,7 +57,7 @@ public class WMSWebServiceException extends WebServiceException {
      */
     public WMSWebServiceException(final Exception cause, final WMSExceptionCode code, final Version version) {
         super(cause);
-        setServiceExceptionReport(cause.getLocalizedMessage(), code, version);
+        setExceptionReport(cause.getLocalizedMessage(), code, version);
     }
 
     /**
@@ -72,7 +72,7 @@ public class WMSWebServiceException extends WebServiceException {
                                final WMSExceptionCode code, final Version version)
     {
         super(message, cause);
-        setServiceExceptionReport(message, code, version);
+        setExceptionReport(message, code, version);
     }
 
     /**
@@ -82,7 +82,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
+    private void setExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
         final ServiceExceptionType details = new ServiceExceptionType(message, code);
         exception = new ServiceExceptionReport(version, details);
     }
@@ -90,7 +90,7 @@ public class WMSWebServiceException extends WebServiceException {
     /**
      * Returns the OGC Web Service exception report.
      */
-    public ServiceExceptionReport getServiceExceptionReport() {
+    public ServiceExceptionReport getExceptionReport() {
         return exception;
     }
 

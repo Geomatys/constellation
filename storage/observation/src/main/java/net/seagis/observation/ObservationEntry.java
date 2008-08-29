@@ -37,12 +37,12 @@ import net.seagis.gml.v311.TimePeriodType;
 import net.seagis.gml.v311.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.swe.AnyResultEntry;
-import net.seagis.swe.DataArrayEntry;
-import net.seagis.swe.DataArrayPropertyType;
-import net.seagis.swe.PhenomenonEntry;
-import net.seagis.swe.PhenomenonPropertyType;
-import net.seagis.swe.TimeGeometricPrimitivePropertyType;
+import net.seagis.swe.v100.AnyResultEntry;
+import net.seagis.swe.v100.DataArrayEntry;
+import net.seagis.swe.v100.DataArrayPropertyType;
+import net.seagis.swe.v100.PhenomenonEntry;
+import net.seagis.swe.v100.PhenomenonPropertyType;
+import net.seagis.swe.v100.TimeGeometricPrimitivePropertyType;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -51,7 +51,7 @@ import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.MetaData;
 
 // geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 

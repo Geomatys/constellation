@@ -199,18 +199,6 @@ public class CSWService extends WebService {
                     request = (String) getParameter("REQUEST", true);
                 } 
 
-                //we look for an authentified user
-                Group userGrp  = getAuthentifiedUser();
-                Principal user = userGrp.members().nextElement();
-                
-                //we define the action
-                String action  = request;
-                if (action.equals("") && objectRequest != null) {
-                    action = objectRequest.getClass().getSimpleName();
-                    action = action.replace("Type", "");
-                }
-                
-                
                 if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
                     GetCapabilities gc = (GetCapabilities)objectRequest;

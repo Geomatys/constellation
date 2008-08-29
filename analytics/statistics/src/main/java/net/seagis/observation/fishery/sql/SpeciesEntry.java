@@ -24,7 +24,7 @@ import static java.util.Locale.*;
 
 // Sicade dependencies
 import net.seagis.observation.fishery.Species;
-import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.v100.PhenomenonEntry;
 
 
 /**

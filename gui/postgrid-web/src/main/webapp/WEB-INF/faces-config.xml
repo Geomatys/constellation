@@ -8,6 +8,11 @@
       <managed-bean-class>net.seagis.bean.ServicesBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
+   <managed-bean>
+      <managed-bean-name>authentificationBean</managed-bean-name>
+      <managed-bean-class>net.seagis.bean.AuthentificationBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
    <navigation-rule>
     <!-- Indique pour quelle vue courante la règle s'applique -->
     <from-view-id>/*</from-view-id>
@@ -17,6 +22,10 @@
     </navigation-case>
     <navigation-case>
       <from-outcome>goBack</from-outcome>
+      <to-view-id>/metadata.jsp</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>authentified</from-outcome>
       <to-view-id>/metadata.jsp</to-view-id>
     </navigation-case>
   </navigation-rule>

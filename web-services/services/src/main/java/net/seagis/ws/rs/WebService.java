@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import javax.ws.rs.POST;
 
 // JAXB xml binding dependencies
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.PropertyException;
@@ -78,9 +80,12 @@ import net.seagis.ows.AbstractOperation;
 import net.seagis.ows.AbstractRequest;
 import net.seagis.ows.OWSExceptionCode;
 import net.seagis.xacml.CstlPDP;
+import net.seagis.xacml.PEP;
 import net.seagis.xacml.SecurityActions;
+import net.seagis.xacml.XACMLConstants;
 import net.seagis.xacml.api.PolicyDecisionPoint;
 import net.seagis.xacml.api.PolicyLocator;
+import net.seagis.xacml.api.RequestContext;
 import net.seagis.xacml.api.XACMLPolicy;
 import net.seagis.xacml.factory.FactoryException;
 import net.seagis.xacml.factory.PolicyFactory;
@@ -173,6 +178,11 @@ public abstract class WebService {
      */
     private PolicyDecisionPoint PDP;
     
+    /**
+     * A Policy Enforcement Point allowing to secure the access to the resources.
+     */
+    private PEP pep;
+    
     
     /**
      * Initialize the basic attribute of a web service.
@@ -247,6 +257,9 @@ public abstract class WebService {
             Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
             locators.add(policyLocator);
             PDP.setLocators(locators);
+            
+            pep = new PEP(PDP);
+            
         } catch (FactoryException e) {
             logger.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
         }
@@ -474,7 +487,7 @@ public abstract class WebService {
      */
     @GET
     public Response doGET() throws JAXBException  {
-        return treatIncomingRequest(null);
+        return allowRequest(null);
     }
     
     /**
@@ -498,7 +511,7 @@ public abstract class WebService {
         }
         logger.info("request POST kvp: " + request + '\n' + log);
         
-        return treatIncomingRequest(null);
+        return allowRequest(null);
     }
     
     /**
@@ -518,20 +531,8 @@ public abstract class WebService {
         
             } catch (UnmarshalException e) {
                 logger.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-                StringWriter sw = new StringWriter(); 
-                if (getCurrentVersion().isOWS()) {
-                    OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
-                                                                            OWSExceptionCode.INVALID_REQUEST, 
-                                                                            null,
-                                                                            getCurrentVersion());
-                    marshaller.marshal(wse.getExceptionReport(), sw);
-                } else {
-                    WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
-                                                                            WMSExceptionCode.INVALID_PARAMETER_VALUE,
-                                                                            getCurrentVersion());
-                    marshaller.marshal(wse.getServiceExceptionReport(), sw);
-                }
-            
+                StringWriter sw = launchException("The XML request is not valid", "INVALID_REQUEST");
+                
                 return Response.ok(sw.toString(), "text/xml").build();
             }
         
@@ -539,7 +540,7 @@ public abstract class WebService {
                 AbstractRequest ar = (AbstractRequest) request;
                 context.getQueryParameters().add("VERSION", ar.getVersion());
             }
-            return treatIncomingRequest(request);
+            return allowRequest(request);
         } else {
             return Response.ok("This service is not running", "text/plain").build();
         }
@@ -555,23 +556,76 @@ public abstract class WebService {
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         logger.severe("request POST plain sending Exception");
-        StringWriter sw = new StringWriter(); 
-        if (getCurrentVersion().isOWS()) {
-            OWSWebServiceException wse = new OWSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                                                    OWSExceptionCode.INVALID_REQUEST, 
-                                                                    null,
-                                                                    getCurrentVersion());
-            marshaller.marshal(wse.getExceptionReport(), sw);
-        } else {
-            WMSWebServiceException wse = new WMSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                                                    WMSExceptionCode.INVALID_PARAMETER_VALUE,
-                                                                    getCurrentVersion());
-            marshaller.marshal(wse.getServiceExceptionReport(), sw);
-        }
-            
+        StringWriter sw = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded", 
+                                          "INVALID_REQUEST");
+                    
         return Response.ok(sw.toString(), "text/xml").build();
     }
     
+    /**
+     * Decide if the user who send the request has access to this resource.
+     */
+    private Response allowRequest(Object objectRequest) throws JAXBException {
+        
+        try {
+            
+        //we look for an authentified user
+        Group userGrp  = getAuthentifiedUser();
+        Principal user = userGrp.members().nextElement();
+        
+        if (objectRequest instanceof JAXBElement) {
+            objectRequest = ((JAXBElement)objectRequest).getValue();
+        }
+                
+        // if the request is not an xml request we fill the request parameter.
+        String request = "";
+        if (objectRequest == null) {
+            request = (String) getParameter("REQUEST", true);
+        }  
+        
+        //we define the action
+        String action  = request;
+        if (action.equals("") && objectRequest != null) {
+            action = objectRequest.getClass().getSimpleName();
+            action = action.replace("Type", "");
+        }
+        action = action.toLowerCase();
+        
+        //we define the selected URI
+        String requestedURI = context.getBaseUri().toString() + service.toLowerCase();
+        
+        
+        logger.finer("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
+        RequestContext decisionRequest = pep.createXACMLRequest(requestedURI, user, userGrp, action);
+        int decision = pep.getDecision(decisionRequest);
+        
+        if (decision == XACMLConstants.DECISION_PERMIT) {
+            logger.finer("request allowed");
+            return treatIncomingRequest(objectRequest);
+        } else if (decision == XACMLConstants.DECISION_DENY) {
+            StringWriter sw = launchException("Your are not authorized to execute this request. Identify yourself first",  "NO_APPLICABLE_CODE");
+            return Response.ok(sw.toString(), "text/xml").build();
+        } else {
+            logger.severe("unable to decide, we let pass");
+             return treatIncomingRequest(objectRequest);
+        }
+        
+        } catch (WebServiceException ex) {
+            StringWriter sw = new StringWriter(); 
+            marshaller.marshal(ex.getExceptionReport(), sw);
+            return Response.ok(sw.toString(), "text/xml").build();
+            
+        }  catch (IOException ex) {
+            StringWriter sw = launchException("The service has throw an IO exception",  "NO_APPLICABLE_CODE");
+            return Response.ok(sw.toString(), "text/xml").build();
+            
+        } catch (URISyntaxException ex) {
+            StringWriter sw = launchException("The service has throw an URI syntax exception",  "NO_APPLICABLE_CODE");
+            return Response.ok(sw.toString(), "text/xml").build();
+            
+        }
+    } 
+            
     /**
      * Treat the incomming request and call the right function.
      * 
@@ -584,12 +638,38 @@ public abstract class WebService {
      */
     public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
 
+    /**
+     * build an service Exception and marshall it into a StringWriter
+     * 
+     * @param message
+     * @param codeName
+     * @return
+     */
+    private StringWriter launchException(String message, String codeName) throws JAXBException {
+        StringWriter sw = new StringWriter();
+        
+        if (getCurrentVersion().isOWS()) {
+            OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+            OWSWebServiceException wse = new OWSWebServiceException(message,
+                                                                    code,
+                                                                    null,
+                                                                    getCurrentVersion());
+            marshaller.marshal(wse.getExceptionReport(), sw);
+        } else {
+            WMSExceptionCode code = WMSExceptionCode.valueOf(codeName);
+            WMSWebServiceException wse = new WMSWebServiceException(message,
+                                                                    code,
+                                                                    getCurrentVersion());
+            marshaller.marshal(wse.getExceptionReport(), sw);
+        }
+        return sw;
+    }
    
     /**
      * Temporary test method until we put in place an authentification process.
      * @return
      */
-    protected Group getAuthentifiedUser() {
+    private Group getAuthentifiedUser() {
         
         //for now we consider an user and is group as the same.
         Principal anonymous    = new PrincipalImpl("anonymous");
@@ -598,20 +678,20 @@ public abstract class WebService {
         
         if (httpContext != null && httpContext.getRequest() != null) {
             HttpRequestContext httpRequest = httpContext.getRequest();
-            String authent = httpRequest.getHeaderValue(httpRequest.AUTHORIZATION);
+            Cookie authent = httpRequest.getCookies().get("authent");
 
-            String userPassword = "admin:pass";
-            String encoding = "Basic " + new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-
-            //Principal user = httpRequest.getUserPrincipal();
-            Group identifiedGrp;
-            if (encoding.equals(authent)) {
-                Principal user = new PrincipalImpl("admin");
-                identifiedGrp  = new GroupImpl("admin");
-                identifiedGrp.addMember(user);
-            } else {
+            Group identifiedGrp = null;
+            if (authent != null) {
+                if (authent.getValue().equals("admin:admin")) {
+                    Principal user = new PrincipalImpl("admin");
+                    identifiedGrp  = new GroupImpl("admin");
+                    identifiedGrp.addMember(user);  
+                } 
+            } 
+            if (identifiedGrp == null) {
                 identifiedGrp = anonymousGrp;
             }
+            
             logger.info("identified user: " + identifiedGrp.getName());
             return identifiedGrp;
         }
@@ -857,9 +937,9 @@ public abstract class WebService {
     /**
      * An temporary implementations of java.security.principal
      */
-    private class PrincipalImpl implements Principal {
-        
-        String name;
+    public class PrincipalImpl implements Principal {
+
+        private String name;
         
         public PrincipalImpl(String name) {
             this.name = name;
@@ -868,39 +948,45 @@ public abstract class WebService {
         public String getName() {
             return name;
         }
+        
     }
     
      /**
      * An temporary implementations of java.security.acl.group
      */
-    private class GroupImpl implements Group {
-        
-        String name;
-        private Vector<Principal> members;
-        
-        public GroupImpl(String name) {
-            this.name    = name;
-            this.members = new Vector<Principal>();
-        }
-        
-        public String getName() {
-            return name;
+    public class GroupImpl implements Group {
+
+        private Vector<Principal> vect = new Vector<Principal>();
+        private String roleName;
+
+        public GroupImpl(String roleName) {
+            this.roleName = roleName;
         }
 
-        public boolean addMember(Principal user) {
-            return members.add(user);
+        public boolean addMember(final Principal principal) {
+            return vect.add(principal);
         }
 
-        public boolean removeMember(Principal user) {
-            return members.remove(user);
-        }
-
-        public boolean isMember(Principal member) {
-            return members.contains(member);
+        public boolean isMember(Principal principal) {
+            return vect.contains(principal);
         }
 
         public Enumeration<? extends Principal> members() {
-            return members.elements();
+            vect.add(new Principal() {
+
+                public String getName() {
+                    return roleName;
+                }
+            });
+            return vect.elements();
+        }
+
+        public boolean removeMember(Principal principal) {
+            return vect.remove(principal);
+        }
+
+        public String getName() {
+            return roleName;
         }
     }
 }

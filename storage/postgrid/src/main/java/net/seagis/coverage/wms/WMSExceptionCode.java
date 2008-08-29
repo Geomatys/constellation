@@ -37,12 +37,17 @@ public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
      * List of all enumerations of this type.
      * Must be declared before any enum declaration.
      */
-    private static final List<WMSExceptionCode> VALUES = new ArrayList<WMSExceptionCode>(15);
+    private static final List<WMSExceptionCode> VALUES = new ArrayList<WMSExceptionCode>(16);
 
     /**
      * Invalid format.
      */
     public static final WMSExceptionCode INVALID_FORMAT = new WMSExceptionCode("INVALID_FORMAT");
+    
+    /**
+     * Invalid request.
+     */
+    public static final WMSExceptionCode INVALID_REQUEST = new WMSExceptionCode("INVALID_REQUEST");
 
     /**
      * Current update sequence.

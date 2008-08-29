@@ -5,13 +5,13 @@
         <Resources>
              <Resource>
                  <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
-                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://test.geomatys.fr/wcs</AttributeValue>
+                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://test.geomatys.fr/constellation/WS/wcs</AttributeValue>
                       <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#anyURI" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
                  </ResourceMatch>
              </Resource>
         </Resources>
     </Target>
-    <Rule Effect="Permit" RuleId="PublicLayerRule">
+   <!-- <Rule Effect="Permit" RuleId="PublicLayerRule">
         <Target>
              <Actions>
                  <Action>
@@ -58,8 +58,8 @@
                <SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role" />
              </Apply>
       </Condition>
-    </Rule>
-    <!-- If none of the rules apply, deny the request -->
-    <Rule Effect="Deny" RuleId="DenyRule"/>
+    </Rule>-->
+    <!-- If none of the rules apply, permit the request -->
+    <Rule Effect="Permit" RuleId="PermitRule"/>
 </Policy>
 

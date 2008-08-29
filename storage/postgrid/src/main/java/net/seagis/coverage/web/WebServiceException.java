@@ -68,4 +68,6 @@ public abstract class WebServiceException extends CatalogException {
     public abstract CodeList getExceptionCode();
 
     public abstract String getVersion();
+    
+    public abstract Object getExceptionReport();
 }

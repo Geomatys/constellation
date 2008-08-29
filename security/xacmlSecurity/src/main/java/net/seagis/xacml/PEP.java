@@ -79,6 +79,43 @@ public class PEP {
     }
     
     /**
+     * Create A XACML request for the request resource containing the userName (principal), the role group and the action.
+     * 
+     * @param resourceURI The request resource URI.
+     * @param principal   The user.
+     * @param roleGroup   The user group.
+     * 
+     * @return An XACML request.
+     * @throws java.lang.Exception
+     */
+    public RequestContext createXACMLRequest(URI resourceURI, Principal principal, Group roleGroup, String action) throws IOException {
+        RequestContext requestCtx = new CstlRequestContext();
+
+        //Create a subject type
+        SubjectType subject = createSubject(principal, roleGroup);
+
+        //Create a resource type
+        ResourceType resourceType = createResource(resourceURI);
+
+        //Create an action type
+        ActionType actionType = createAction(action);
+
+        //Create an Environment Type (Optional)
+        EnvironmentType environmentType = createTimeEnvironement();
+
+        //Create a Request Type
+        RequestType requestType = new RequestType();
+        requestType.getSubject().add(subject);
+        requestType.getResource().add(resourceType);
+        requestType.setAction(actionType);
+        requestType.setEnvironment(environmentType);
+
+        requestCtx.setRequest(requestType);
+
+        return requestCtx;
+    }
+    
+    /**
      * Create a part of XACML request about the user and group.
      * 
      * @param user      The authentified user.
@@ -122,6 +159,22 @@ public class PEP {
     }
     
     /**
+     * Create a  part of XACML request about the requested resource.
+     * 
+     * @param URI the requested resource URI.
+     * 
+     * @return a resource Type whitch is a part of XACML request.
+     */
+    protected ResourceType createResource(URI URI) {
+    
+        //Create a resource type
+        ResourceType resourceType = new ResourceType();
+        resourceType.getAttribute().add(
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key, null, URI));
+        return resourceType;
+    }
+    
+    /**
      * Create a  part of XACML request about the action to execute.
      * 
      * @param URI the requested resource URI.
@@ -159,7 +212,7 @@ public class PEP {
     * @return
     * @throws Exception
     */
-   public ResponseContext getResponse(RequestContext request) throws Exception {
+   public ResponseContext getResponse(RequestContext request) {
       return PDP.evaluate(request);
    }
 
@@ -170,7 +223,7 @@ public class PEP {
     * @return
     * @throws Exception
     */
-   public int getDecision(RequestContext request) throws Exception {
+   public int getDecision(RequestContext request) {
       ResponseContext response = PDP.evaluate(request);
       return response.getDecision();
    }

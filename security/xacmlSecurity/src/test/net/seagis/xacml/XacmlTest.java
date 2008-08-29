@@ -37,10 +37,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import net.seagis.xacml.api.PolicyLocator;
 import net.seagis.xacml.api.RequestContext;
 import net.seagis.xacml.api.XACMLPolicy;
+import net.seagis.xacml.factory.FactoryException;
 import net.seagis.xacml.factory.PolicyAttributeFactory;
 import net.seagis.xacml.factory.PolicyFactory;
+import net.seagis.xacml.locators.JBossPolicyLocator;
 import net.seagis.xacml.policy.ActionMatchType;
 import net.seagis.xacml.policy.ActionType;
 import net.seagis.xacml.policy.ActionsType;
@@ -162,6 +165,15 @@ public class XacmlTest {
         //Pass a set of policies (and/or policy sets) to the PDP
         PDP.setPolicies(policies);
         
+        //Add the basic locators also
+        PolicyLocator policyLocator = new JBossPolicyLocator();
+        policyLocator.setPolicies(policies);
+        
+        //Locators need to be given the policies
+        Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+        locators.add(policyLocator);
+        PDP.setLocators(locators);
+            
         pep = new PEP(PDP);
 
         assertNotNull(PDP);
@@ -312,7 +324,98 @@ public class XacmlTest {
         
         assertNotNull(PDP);
 
-        String requestURI   = "http://test.geomatys.fr/csw";
+        String requestURI   = "http://test.geomatys.fr/constellation/WS/csw";
+        
+        //Check PERMIT condition
+        RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
+        if (debug) {
+            logger.info("csw request: role='anonymous' action='getCapabilities'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getrecords");
+        if (debug) {
+            logger.info("csw request: role='anonymous' action='getRecords'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "transaction");
+        if (debug) {
+            logger.info("csw request: role='anonymous' action='transaction'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "transaction");
+        if (debug) {
+            logger.info("csw request: role='admin' action='transaction'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "harvest");
+        if (debug) {
+            logger.info("csw request: role='admin' action='harvest'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+         //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "getcapabilities");
+        if (debug) {
+            logger.info("csw request: role='admin' action='harvest'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "whatever");
+        if (debug) {
+            logger.info("csw request: role='anonymous' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+         //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "whatever");
+        if (debug) {
+            logger.info("csw request: role='admin' action='whatever'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        logger.info('\n' + "-------- Fin CSW Policy Test --------" + '\n');
+    }
+    
+    /**
+     * Test sending CSW request to the PDP.
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testCSWPolicy2() throws Exception {
+        
+        logger.info('\n' + "-------- CSW Policy Test 2--------" + '\n');
+        
+        initializePolicyDecisionPoint();
+                
+        assertNotNull(PDP);
+
+        String requestURI   = "http://test.geomatys.fr/constellation/WS/csw";
         
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
@@ -381,6 +484,66 @@ public class XacmlTest {
     }
     
     /**
+     * Initialize the policy Decision Point and load all the correspounding policy file.
+     */
+    private void initializePolicyDecisionPoint() {
+        
+        //we create a new PDP
+        PDP = new CstlPDP();
+
+        //load the correspounding policy file
+        String url = "net/seagis/xacml/" + "csw" + "Policy.xml";
+        InputStream is = SecurityActions.getResourceAsStream(url);
+        if (is == null) {
+            logger.severe("unable to find the resource: " + url);
+            return;
+        }
+        Object p = null;
+        try {
+            JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
+            Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
+            p = policyUnmarshaller.unmarshal(is);
+        } catch (JAXBException e) {
+            logger.severe("JAXB exception while unmarshalling policyFile " + "csw" + "Policy.xml");
+        }
+        
+        if (p instanceof JAXBElement) {
+            p = ((JAXBElement)p).getValue();
+        } 
+        
+        if (p == null) {
+            logger.severe("the unmarshalled service policy is null.");
+            return;
+        } else if (!(p instanceof PolicyType)) {
+            logger.severe("unknow unmarshalled type for service policy file:" + p.getClass());
+            return;
+        }
+        PolicyType servicePolicy  = (PolicyType) p;
+        
+        try {
+            XACMLPolicy policy = PolicyFactory.createPolicy(servicePolicy);
+            Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+            policies.add(policy);
+            PDP.setPolicies(policies);
+        
+            //Add the basic locators also
+            PolicyLocator policyLocator = new JBossPolicyLocator();
+            policyLocator.setPolicies(policies);
+        
+            //Locators need to be given the policies
+            Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+            locators.add(policyLocator);
+            PDP.setLocators(locators);
+            
+            pep = new PEP(PDP);
+            
+        } catch (FactoryException e) {
+            logger.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
+        }
+        logger.info("PDP succesfully initialized");
+    }
+    
+    /**
      * Test sending SOS request to the PDP.
      * 
      * @throws java.lang.Exception
@@ -391,8 +554,8 @@ public class XacmlTest {
         logger.info('\n' + "-------- SOS Policy Test --------" + '\n');
         
         assertNotNull(PDP);
-        
-        String requestURI   = "http://test.geomatys.fr/sos";
+                               
+        String requestURI   = "http://test.geomatys.fr/constellation/WS/sos";
         
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
@@ -414,6 +577,15 @@ public class XacmlTest {
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getobservation");
+        if (debug) {
+            logger.info("sos request: role='anonymous' action='getobservation'");
+            request.marshall(System.out);
+            logger.info("");
+        }
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "getobservation");
         if (debug) {
             logger.info("sos request: role='anonymous' action='getobservation'");
             request.marshall(System.out);
@@ -510,7 +682,7 @@ public class XacmlTest {
         /**
          * wms TEST
          */
-        String requestURI   = "http://test.geomatys.fr/wms";
+        String requestURI   = "http://test.geomatys.fr/constellation/WS/wms";
         
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer3");
@@ -540,7 +712,7 @@ public class XacmlTest {
         /**
          * wcs TEST
          */
-        requestURI   = "http://test.geomatys.fr/wcs";
+        requestURI   = "http://test.geomatys.fr/constellation/WS/wcs";
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer1");

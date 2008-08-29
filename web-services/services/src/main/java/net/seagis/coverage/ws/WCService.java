@@ -177,17 +177,21 @@ public class WCService extends WebService {
                     }
                     connection = ds.getConnection();
                     final Reference props = (Reference) getContextProperty("Coverages Properties", ctx);
-                    final RefAddr permissionAddr = (RefAddr) props.get("Permission");
-                    if (permissionAddr != null) {
-                        permission = (String) permissionAddr.getContent();
-                    }
-                    final RefAddr rootDirAddr = (RefAddr) props.get("RootDirectory");
-                    if (rootDirAddr != null) {
-                        rootDir = (String) rootDirAddr.getContent();
-                    }
-                    final RefAddr readOnlyAddr = (RefAddr) props.get("ReadOnly");
-                    if (readOnlyAddr != null) {
-                        readOnly = (String) readOnlyAddr.getContent();
+                    if (props != null) {
+                        final RefAddr permissionAddr = (RefAddr) props.get("Permission");
+                        if (permissionAddr != null) {
+                            permission = (String) permissionAddr.getContent();
+                        }
+                        final RefAddr rootDirAddr = (RefAddr) props.get("RootDirectory");
+                        if (rootDirAddr != null) {
+                            rootDir = (String) rootDirAddr.getContent();
+                        }
+                        final RefAddr readOnlyAddr = (RefAddr) props.get("ReadOnly");
+                        if (readOnlyAddr != null) {
+                            readOnly = (String) readOnlyAddr.getContent();
+                        }
+                    } else {
+                        throw new NamingException("Coverages Properties is not defined.");
                     }
                 } else {
                     // Here we are not in glassfish, probably in a Tomcat application server.
@@ -366,7 +370,7 @@ public class WCService extends WebService {
                     wmsex.printStackTrace();
                 }
                 StringWriter sw = new StringWriter();
-                marshaller.marshal(wmsex.getServiceExceptionReport(), sw);
+                marshaller.marshal(wmsex.getExceptionReport(), sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
             } else if (ex instanceof OWSWebServiceException) {
 
