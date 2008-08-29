@@ -17,6 +17,8 @@
  */
 package net.seagis.console;
 
+import java.util.*;
+import java.util.logging.Level;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
@@ -25,12 +27,6 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.logging.Level;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
@@ -46,6 +42,7 @@ import org.geotools.image.io.mosaic.MosaicBuilder;
 import org.geotools.image.io.mosaic.TileWritingPolicy;
 import org.geotools.image.io.mosaic.TileManagerFactory;
 import org.geotools.util.FrequencySortedSet;
+import org.geotools.util.logging.Logging;
 import org.geotools.console.Option;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.console.ExternalyConfiguredCommandLine;
@@ -262,6 +259,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
          * Loads the file given by the "tiles" property. We read all lines before to
          * process them because we want to close the stream first in case of failure.
          */
+        int warnings = 0;
         final File tileFiles = getFile("Tiles");
         if (tileFiles != null) {
             final List<File> files = new ArrayList<File>();
@@ -279,6 +277,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                 err.println(e);
                 System.exit(IO_EXCEPTION_EXIT_CODE);
             }
+            final Map<AffineTransform,File> check = new HashMap<AffineTransform,File>();
             for (final File file : files) {
                 final AffineTransform tr;
                 try {
@@ -288,9 +287,19 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                     System.exit(IO_EXCEPTION_EXIT_CODE);
                     continue;
                 }
+                final File existing = check.put(tr, file);
+                if (existing != null) {
+                    Logging.getLogger(getClass()).warning("Affine transform declared for " + file
+                            + " is identical to the one for " + existing);
+                    warnings++;
+                }
                 final Tile tile = new Tile(null, file, 0, null, tr);
                 tiles.add(tile);
             }
+        }
+        if (warnings != 0) {
+            err.print(warnings);
+            err.println(" warnings");
         }
         return tiles;
     }
