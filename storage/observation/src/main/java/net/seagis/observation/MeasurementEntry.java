@@ -22,7 +22,7 @@ import net.seagis.coverage.model.Distribution;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.swe.v100.PhenomenonEntry;
+import net.seagis.swe.v101.PhenomenonEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
 

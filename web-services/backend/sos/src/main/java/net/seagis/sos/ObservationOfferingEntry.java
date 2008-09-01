@@ -31,9 +31,9 @@ import net.seagis.gml.v311.AbstractFeatureEntry;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.v311.BoundingShapeEntry;
 import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.swe.v100.PhenomenonEntry;
-import net.seagis.swe.v100.PhenomenonPropertyType;
-import net.seagis.swe.v100.TimeGeometricPrimitivePropertyType;
+import net.seagis.swe.v101.PhenomenonEntry;
+import net.seagis.swe.v101.PhenomenonPropertyType;
+import net.seagis.swe.v101.TimeGeometricPrimitivePropertyType;
 import org.geotools.util.Utilities;
 
 

@@ -761,7 +761,13 @@ public class MetadataReader {
             logger.severe("The date cannot be parsed ");
             return null;
         } catch (java.lang.reflect.InvocationTargetException e) {
-            logger.severe("Exception throw in the invokated constructor");
+            if (temp.equals("valueOf")) {
+                logger.severe("Exception throw in the invokated method: " + classe.getName() + ".valueOf(String code) " + '\n' + 
+                              "cause:" + e.getTargetException().getMessage());
+            } else {
+                logger.severe("Exception throw in the invokated constructor: " + classe.getName() + "(" + temp + ")" + '\n' + 
+                              "cause:" + e.getTargetException().getMessage());
+            }
 
             return null;
         }
@@ -895,7 +901,7 @@ public class MetadataReader {
      */
     private Class getPrimitiveTypeFromName(String className) {
 
-        if (className.equals("CharacterString")) {
+        if (className.equalsIgnoreCase("CharacterString")) {
             return String.class;
         } else if (className.equalsIgnoreCase("Date")) {
             return Date.class;
@@ -912,11 +918,11 @@ public class MetadataReader {
         } else if (className.equalsIgnoreCase("URL") || className.equalsIgnoreCase("URI")) {
             return URI.class;
         //special case for locale codeList.
-        } else if (className.equals("LanguageCode")) {
+        } else if (className.equalsIgnoreCase("LanguageCode")) {
             return Locale.class;
-        } else if (className.equals("CountryCode")) {
+        } else if (className.equalsIgnoreCase("CountryCode")) {
             return String.class;
-        } else if (className.equals("RO_SystRefCode")) {
+        } else if (className.equalsIgnoreCase("RO_SystRefCode")) {
             return String.class;
         } else {
             return null;
@@ -937,6 +943,8 @@ public class MetadataReader {
         } else {
             return result;
         }
+        
+        String classNameSave = standardName + ':' + className;
         
         //for the primitive type we return java primitive type
         result = getPrimitiveTypeFromName(className);
@@ -1036,7 +1044,7 @@ public class MetadataReader {
                 }
             }
         }
-        logger.severe("class no found: " + className);
+        logger.severe("class no found: " + classNameSave);
         return null;
     }
 

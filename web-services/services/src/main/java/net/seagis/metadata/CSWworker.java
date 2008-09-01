@@ -941,10 +941,15 @@ public class CSWworker {
                 
                     List<Object> records = new ArrayList<Object>();
                     
-                    for (int i = startPos -1; i < maxRecord; i++) {
+                    for (int i = startPos -1; i < max; i++) {
                         Object obj = MDReader.getMetadata(results.get(i), ISO_19115, set, elementName);
-                        if (obj instanceof MetaDataImpl)
-                            records.add((MetaDataImpl)obj);
+                        if (obj == null && (max + 1) < results.size()) {
+                            max++;
+                        }
+                        else {
+                            if (obj instanceof MetaDataImpl)
+                                records.add((MetaDataImpl)obj);
+                        }
                     }
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
