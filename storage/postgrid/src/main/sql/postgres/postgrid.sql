@@ -584,6 +584,61 @@ COMMENT ON VIEW "Tiling" IS
 
 
 
+--------------------------------------------------------------------------------------------------
+-- Creates the "DomainOfTiles" view.                                                            --
+-- Dependencies: "Tiles", "GridGeometries"                                                      --
+--------------------------------------------------------------------------------------------------
+
+CREATE VIEW "DomainOfTiles" AS
+    SELECT "series", "extent", "count", "tmin", "tmax",
+           xmin("horizontalExtent") AS "xmin",
+           xmax("horizontalExtent") AS "xmax",
+           ymin("horizontalExtent") AS "ymin",
+           ymax("horizontalExtent") AS "ymax",
+           xmin("geographic")       AS "west",
+           xmax("geographic")       AS "east",
+           ymin("geographic")       AS "south",
+           ymax("geographic")       AS "north"
+      FROM
+   (SELECT *, Transform("horizontalExtent", 4326) AS "geographic"
+      FROM
+   (SELECT "series", "extent", "count", "tmin", "tmax", Affine(GeometryFromText('POLYGON((' ||
+           "xmin" || ' ' || "ymin" || ',' ||
+           "xmax" || ' ' || "ymin" || ',' ||
+           "xmax" || ' ' || "ymax" || ',' ||
+           "xmin" || ' ' || "ymax" || ',' ||
+           "xmin" || ' ' || "ymin" || '))',
+           "horizontalSRID"), "scaleX", "shearX", "shearY", "scaleY", "translateX", "translateY")
+           AS "horizontalExtent"
+      FROM
+   (SELECT "series", "extent", "count", "tmin", "tmax",
+           "xmin", "xmax" + "width"  AS "xmax",
+           "ymin", "ymax" + "height" AS "ymax",
+           "horizontalSRID", "scaleX", "shearX", "shearY", "scaleY", "translateX", "translateY"
+      FROM
+   (SELECT "series", "extent",
+           count("extent")  AS "count",
+           min("startTime") AS "tmin",
+           max("endTime")   AS "tmax",
+           min("dx")        AS "xmin",
+           max("dx")        AS "xmax",
+           min("dy")        AS "ymin",
+           max("dy")        AS "ymax"
+           FROM "Tiles"
+  GROUP BY "series", "extent") AS "Boxes"
+      JOIN "GridGeometries" ON "Boxes"."extent" = "GridGeometries"."identifier")
+        AS "Extents") AS "Transformed") AS "Projected"
+  ORDER BY "series", "extent";
+
+ALTER TABLE "DomainOfTiles" OWNER TO geoadmin;
+GRANT ALL ON TABLE "DomainOfTiles" TO geoadmin;
+GRANT SELECT ON TABLE "DomainOfTiles" TO PUBLIC;
+
+COMMENT ON VIEW "DomainOfTiles" IS
+    'Geographic bounding boxes of tiles for each extent.';
+
+
+
 
 --------------------------------------------------------------------------------------------------
 -- Creates the "DomainOfSeries" view.                                                           --

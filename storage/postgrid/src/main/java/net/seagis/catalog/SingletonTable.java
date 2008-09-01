@@ -406,6 +406,8 @@ public abstract class SingletonTable<E> extends Table {
      * @return The set of entries. May be empty, but neven {@code null}.
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
+     *
+     * @todo Contains a unsafe cast.
      */
     protected Set<E> getEntries(final QueryType type) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
@@ -416,7 +418,7 @@ public abstract class SingletonTable<E> extends Table {
             while (results.next()) {
                 E entry = createEntry(results, null, indexByName);
                 if (accept(entry)) {
-                    final String name = ((Entry)entry).getName();//entry.getName();
+                    final String name = ((Entry)entry).getName();// TODO entry.getName();
                     /*
                      * Si une entrée existait déjà dans la cache, réutilise cette entrée en se
                      * souvenant que postCreateEntry(...) n'a pas besoin d'être appelée pour elle.
