@@ -18,6 +18,7 @@ package net.seagis.cat.csw;
 
 import java.util.List;
 import javax.xml.namespace.QName;
+import net.seagis.ogc.FilterType;
 
 
 /**
@@ -110,5 +111,10 @@ public interface GetRecordsRequest  {
      */
     public void setCQLConstraint(String CQLQuery);
     
+    /**
+     * This method set a query constraint by a filter.
+     * @param filter FilterType
+     */
+    public void setFilterConstraint(FilterType filter);
 
 }

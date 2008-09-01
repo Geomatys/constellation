@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import net.seagis.cat.csw.GetRecordsRequest;
+import net.seagis.ogc.FilterType;
 
 
 /**
@@ -299,6 +300,17 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         if (abstractQuery != null && abstractQuery.getValue() != null) {
                 AbstractQueryType query = abstractQuery.getValue();
                 query.setConstraint(new QueryConstraintType(CQLQuery, "1.1.0"));
+        } 
+    }
+    
+    /**
+     * This method set a query constraint by a filter.
+     * @param filter FilterType
+     */
+    public void setFilterConstraint(FilterType filter) {
+        if (abstractQuery != null && abstractQuery.getValue() != null) {
+                AbstractQueryType query = abstractQuery.getValue();
+                query.setConstraint(new QueryConstraintType(filter, "1.1.0"));
         } 
     }
 

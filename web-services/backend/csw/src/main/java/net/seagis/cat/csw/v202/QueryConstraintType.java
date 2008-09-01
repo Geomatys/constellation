@@ -107,4 +107,28 @@ public class QueryConstraintType {
     public String getVersion() {
         return version;
     }
+
+    /**
+     * Sets the value of the filter property.
+     * 
+     */
+    public void setFilter(FilterType value) {
+        this.filter = value;
+    }
+
+    /**
+     * Sets the value of the cqlText property.
+     * 
+     */
+    public void setCqlText(String value) {
+        this.cqlText = value;
+    }
+
+    /**
+     * Sets the value of the version property.
+     * 
+     */
+    public void setVersion(String value) {
+        this.version = value;
+    }
 }

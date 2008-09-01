@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import net.seagis.cat.csw.GetRecordsRequest;
+import net.seagis.ogc.FilterType;
 
 
 /**
@@ -69,10 +70,10 @@ import net.seagis.cat.csw.GetRecordsRequest;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "GetRecordsType", propOrder = {
-    "distributedSearch",
-    "responseHandler",
-    "abstractQuery",
-    "any"
+"distributedSearch",
+"responseHandler",
+"abstractQuery",
+"any"
 })
 @XmlRootElement(name = "GetRecords")
 public class GetRecordsType extends RequestBaseType implements GetRecordsRequest {
@@ -102,22 +103,22 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private Integer maxRecords;
-    
+
     /**
      * An empty constructor used by JAXB
      */
     GetRecordsType() {
-        
+
     }
-    
+
     /**
      * Build a new GetRecords request
      */
-    public GetRecordsType(String service, String version, ResultType resultType, 
+    public GetRecordsType(String service, String version, ResultType resultType,
             String requestId, String outputFormat, String outputSchema, Integer startPosition,
             Integer maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
             DistributedSearchType distributedSearch) {
-        
+
         super(service, version);
         this.resultType        = resultType;
         this.requestId         = requestId;
@@ -158,6 +159,14 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     }
 
     /**
+     * Sets the value of the abstractQuery property.
+     * 
+     */
+    public void setAbstractQuery(JAXBElement<? extends AbstractQueryType> value) {
+        this.abstractQuery = ((JAXBElement<? extends AbstractQueryType>) value);
+    }
+
+    /**
      * Gets the value of the any property.
      */
     public Object getAny() {
@@ -178,7 +187,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     public void setRequestId(String value) {
         this.requestId = value;
     }
-    
+
     /**
      * Gets the value of the resultType property.
      */
@@ -204,7 +213,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     public void setOutputFormat(String value) {
         this.outputFormat = value;
     }
-    
+
     /**
      * Gets the value of the outputSchema property.
      */
@@ -219,7 +228,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     public void setOutputSchema(String value) {
         this.outputSchema = value;
     }
-    
+
     /**
      * Initialize the start position.
      * 
@@ -228,7 +237,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     public void setStartPosition(Integer startPosition) {
         this.startPosition = startPosition;
     }
-    
+
     /**
      * Gets the value of the startPosition property.
      */
@@ -250,7 +259,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
             return maxRecords;
         }
     }
-    
+
     /**
      * Sets the value of the maxRecords property.
      * 
@@ -277,6 +286,17 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         if (abstractQuery != null && abstractQuery.getValue() != null) {
             AbstractQueryType query = abstractQuery.getValue();
             query.setConstraint(new QueryConstraintType(CQLQuery, "1.1.0"));
+        }
+    }
+    
+    /**
+     * This method set a query constraint by a filter.
+     * @param filter FilterType
+     */
+    public void setFilterConstraint(FilterType filter) {
+        if (abstractQuery != null && abstractQuery.getValue() != null) {
+                AbstractQueryType query = abstractQuery.getValue();
+                query.setConstraint(new QueryConstraintType(filter, "1.1.0"));
         } 
     }
 }
