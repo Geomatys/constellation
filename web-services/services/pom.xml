@@ -154,6 +154,21 @@
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-go2</artifactId>
+      <version>2.9-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile</artifactId>
+      <version>2.9-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sld</artifactId>
+      <version>2.9-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
 </project>

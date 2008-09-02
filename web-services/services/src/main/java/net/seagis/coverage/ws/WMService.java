@@ -15,38 +15,37 @@
 
 package net.seagis.coverage.ws;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.StringWriter;
+import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-// jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import com.sun.jersey.spi.resource.Singleton;
-
-// JAXB xml binding dependencies
-import java.io.IOException;
-import java.sql.Connection;
-
-import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+
+import com.sun.jersey.spi.resource.Singleton;
 
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
@@ -55,6 +54,7 @@ import net.seagis.catalog.Database;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.WMSWebServiceException;
+import net.seagis.sld.v110.TypeNameType;
 import net.seagis.sld.v110.DescribeLayerResponseType;
 import net.seagis.sld.v110.LayerDescriptionType;
 import net.seagis.sld.v110.StyledLayerDescriptor;
@@ -64,7 +64,6 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.gml.v311.DirectPositionType;
 import net.seagis.gml.v311.PointType;
 import net.seagis.se.OnlineResourceType;
-import net.seagis.sld.v110.TypeNameType;
 import net.seagis.util.PeriodUtilities;
 import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.AbstractDCP;
@@ -76,20 +75,30 @@ import net.seagis.wms.AbstractProtocol;
 import net.seagis.wms.v111.LatLonBoundingBox;
 import net.seagis.wms.v130.OperationType;
 import net.seagis.wms.v130.EXGeographicBoundingBox;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
-
 import net.seagis.coverage.metadata.LayerMetadata;
 import net.seagis.coverage.metadata.SeriesMetadata;
 import net.seagis.coverage.metadata.LayerMetadataTable;
 import net.seagis.coverage.metadata.PointOfContact;
 import net.seagis.coverage.metadata.PointOfContactTable;
 import net.seagis.coverage.metadata.SeriesMetadataTable;
+import net.seagis.provider.postgrid.PostGridNamedLayerDP;
+import net.seagis.query.StringParser;
+import net.seagis.query.WMSQuery111;
+import net.seagis.worker.WMSWorker;
+import net.seagis.ws.rs.WebService;
+import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 //geotools dependencies
-import net.seagis.ws.rs.WebService;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
+
+//geoapi dependencies
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -218,9 +227,7 @@ public class WMService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
     public WMService() throws JAXBException, WebServiceException, SQLException,
-                                IOException, NamingException
-
-    {
+                                IOException, NamingException {
         super("WMS", new ServiceVersion(Service.WMS, "1.3.0"), new ServiceVersion(Service.WMS, "1.1.1"));
         ensureWorkerInitialized();
 
@@ -313,12 +320,34 @@ public class WMService extends WebService {
     private File getMap() throws  WebServiceException {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
+        
+        final String strLayers = getParameter("LAYERS", true);
+        
+        // TODO Handle PostGrid layer within the renderer ----------------------
+        final StringParser parser = new StringParser();
+        final List<String> layers = parser.toLayers(strLayers);
+        final PostGridNamedLayerDP pgLayers = PostGridNamedLayerDP.getDefault();
+        boolean onlyPostGrid = true;
+        for(String key : layers){
+            if(!pgLayers.contains(key)){
+                onlyPostGrid = false;
+                break;
+            }
+        }
+        
+        //if no layer are postgrid then we use the vector renderer
+        if(!onlyPostGrid){
+            return getVectorMap();
+        }
+        
+        //----------------------------------------------------------------------
+        
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-
+    
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setFormat(getParameter("FORMAT", true));
-        webServiceWorker.setLayer(getParameter("LAYERS", true));
+        webServiceWorker.setLayer(strLayers);
         webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
 
         String crs;
@@ -347,6 +376,74 @@ public class WMService extends WebService {
         return webServiceWorker.getImageFile();
     }
 
+    /**
+     * Return a map for the specified parameters in the query: works with
+     * the new GO2 Renderer.
+     *
+     * @return
+     * @throws fr.geomatys.wms.WebServiceException
+     */
+    private File getVectorMap() throws  WebServiceException {
+        final WMSWorker worker = new WMSWorker();
+        final StringParser parser = new StringParser();
+
+        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ? "CRS" : "SRS", true);
+        final String strBBox            = getParameter("BBOX", true);
+        final String strMime            = getParameter("FORMAT", true);
+        final String strLayers          = getParameter("LAYERS", true);
+        final String strElevation       = getParameter("ELEVATION", false);
+        final String strTime            = getParameter("TIME", false);
+        final String strWidth           = getParameter("WIDTH", true);
+        final String strHeight          = getParameter("HEIGHT", true);
+        final String strBGColor         = getParameter("BGCOLOR", false);
+        final String strTransparent     = getParameter("TRANSPARENT", false);
+        final String strStyles          = getParameter("STYLES", true);
+        final String strSLD             = getParameter("SLD", false);
+        final String strRemoteOwsType   = getParameter("REMOTE_OWS_TYPE", false);
+        final String strRemoteOwsUrl    = getParameter("REMOTE_OWS_URL", false);
+
+        final GeneralEnvelope env = parser.toBBox(strBBox);
+        final Rectangle2D bbox = env.toRectangle2D();
+        CoordinateReferenceSystem crs = null;
+        
+        try {
+            crs = parser.toCRS(strCRS);
+        } catch (FactoryException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        final String format = strMime;
+        final List<String> layers = parser.toLayers(strLayers);
+        final List<String> styles = parser.toStyles(strStyles);
+        final MutableStyledLayerDescriptor sld = parser.toSLD(strSLD);
+        final Double elevation = 0d;
+        final Date date = new Date();
+        final Dimension size = new Dimension( parser.toInt(null, strWidth), parser.toInt(null, strHeight));
+        final Color background = parser.toColor(strBGColor);
+        final Boolean transparent = parser.toBoolean(strTransparent);
+
+        final WMSQuery111 query = new WMSQuery111(bbox, crs, format, layers, 
+                styles, sld, elevation, date, size, background, transparent);
+        worker.setQuery(query);
+
+        File f = null;
+        try {
+            f = File.createTempFile("temp", ".png");
+        } catch (IOException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            worker.getMap(f);
+        } catch (IOException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return f;
+    }
+    
     /**
      * Return the value of a point in a map.
      *
