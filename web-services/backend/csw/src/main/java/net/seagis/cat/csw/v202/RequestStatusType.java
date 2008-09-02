@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import net.seagis.cat.csw.RequestStatus;
 
 
 /**
@@ -57,7 +58,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RequestStatusType")
-public class RequestStatusType {
+public class RequestStatusType implements RequestStatus {
 
     @XmlAttribute
     @XmlSchemaType(name = "dateTime")
@@ -100,6 +101,15 @@ public class RequestStatusType {
      */
     public XMLGregorianCalendar getTimestamp() {
         return timestamp;
+    }
+
+    /**
+     * Sets the timestamp property with a XMLGregorianCalendar value.
+     * @param value
+     */
+    @Override
+    public void setTimestamp(XMLGregorianCalendar value) {
+        this.timestamp = value;
     }
     
     @Override

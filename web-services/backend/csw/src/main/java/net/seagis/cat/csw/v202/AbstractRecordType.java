@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.AbstractRecord;
 
 
 /**
@@ -47,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
     SummaryRecordType.class,
     BriefRecordType.class
 })
-public abstract class AbstractRecordType {
+public abstract class AbstractRecordType implements AbstractRecord {
     
     @XmlTransient
     protected static net.seagis.ows.v100.ObjectFactory owsFactory = new net.seagis.ows.v100.ObjectFactory();

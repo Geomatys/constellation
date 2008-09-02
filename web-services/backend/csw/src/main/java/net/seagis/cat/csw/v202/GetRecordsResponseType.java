@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.GetRecordsResponse;
 
 
 /**
@@ -60,7 +61,7 @@ import javax.xml.bind.annotation.XmlType;
     "searchResults"
 })
 @XmlRootElement(name = "GetRecordsResponse" )        
-public class GetRecordsResponseType {
+public class GetRecordsResponseType implements GetRecordsResponse {
 
     @XmlElement(name = "RequestId")
     @XmlSchemaType(name = "anyURI")
@@ -93,6 +94,7 @@ public class GetRecordsResponseType {
     /**
      * Gets the value of the requestId property.
      */
+    @Override
     public String getRequestId() {
         return requestId;
     }
@@ -116,6 +118,14 @@ public class GetRecordsResponseType {
      */
     public String getVersion() {
         return version;
+    }
+    
+    public void setRequestId(String value) {
+        this.requestId = value;
+    }
+
+    public void setVersion(String value) {
+        this.version = value;
     }
     
     @Override

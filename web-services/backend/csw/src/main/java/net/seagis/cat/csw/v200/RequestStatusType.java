@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
+import net.seagis.cat.csw.RequestStatus;
 
 
 /**
@@ -48,7 +49,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RequestStatusType")
-public class RequestStatusType {
+public class RequestStatusType implements RequestStatus {
 
     @XmlAttribute(required = true)
     private StatusType status;

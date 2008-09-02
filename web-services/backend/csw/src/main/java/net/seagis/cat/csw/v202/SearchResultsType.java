@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
+import net.seagis.cat.csw.SearchResults;
 
 
 /**
@@ -81,7 +82,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "abstractRecord",
     "any"
 })
-public class SearchResultsType {
+public class SearchResultsType implements SearchResults {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
@@ -277,6 +278,30 @@ public class SearchResultsType {
      */
     public XMLGregorianCalendar getExpires() {
         return expires;
+    }
+    
+    public void setResultSetId(String value) {
+        this.resultSetId = value;
+    }
+
+    public void setRecordSchema(String value) {
+        this.recordSchema = value;
+    }
+
+    public void setNumberOfRecordsMatched(int value) {
+        this.numberOfRecordsMatched = value;
+    }
+
+    public void setNumberOfRecordsReturned(int value) {
+        this.numberOfRecordsReturned = value;
+    }
+
+    public void setNextRecord(int value) {
+        this.nextRecord = value;
+    }
+
+    public void setExpires(XMLGregorianCalendar value) {
+        this.expires = value;
     }
     
     @Override

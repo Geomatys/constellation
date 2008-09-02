@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.GetRecordsResponse;
 
 
 /**
@@ -57,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
     "searchStatus",
     "searchResults"
 })
-public class GetRecordsResponseType {
+public class GetRecordsResponseType implements GetRecordsResponse {
 
     @XmlElement(name = "RequestId")
     @XmlSchemaType(name = "anyURI")

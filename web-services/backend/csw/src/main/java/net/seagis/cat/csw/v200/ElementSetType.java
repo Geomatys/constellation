@@ -19,6 +19,7 @@ package net.seagis.cat.csw.v200;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.ElementSet;
 
 
 /**
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "ElementSetType")
 @XmlEnum
-public enum ElementSetType {
+public enum ElementSetType implements ElementSet {
 
     @XmlEnumValue("brief")
     BRIEF("brief"),
