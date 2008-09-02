@@ -164,7 +164,7 @@ public class CSWService extends WebService {
             worker.setVersion(getCurrentVersion());
             
         } catch (JAXBException ex){
-            logger.severe("The CSW serving is not running."       + '\n' +
+            LOGGER.severe("The CSW serving is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' + 
                           " details: " + ex.toString());
@@ -356,7 +356,7 @@ public class CSWService extends WebService {
                     !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
+                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
                 }
                 StringWriter sw = new StringWriter();    
                 if (marshaller != null) {
@@ -375,7 +375,7 @@ public class CSWService extends WebService {
                     !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
+                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
                 }
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(owsex.getExceptionReport(), sw);
@@ -836,11 +836,11 @@ public class CSWService extends WebService {
         try {
             c = Class.forName("org.geotools.service.ServiceIdentificationImpl");
         } catch (ClassNotFoundException e) {
-            logger.info("ISO 19119 classes not found (optional)") ;
+            LOGGER.info("ISO 19119 classes not found (optional)") ;
         }
         if (c != null) {
             ExtClasses.add(c);
-            logger.info("extension ISO 19119 loaded");
+            LOGGER.info("extension ISO 19119 loaded");
         } 
 
         // if they are present in the classPath we add the ISO 19110 classes
@@ -921,9 +921,9 @@ public class CSWService extends WebService {
                 ExtClasses.add(c);
             }
             
-            logger.info("extension ISO 19110 loaded");
+            LOGGER.info("extension ISO 19110 loaded");
         } catch (ClassNotFoundException e) {
-            logger.info("ISO 19110 classes not found (optional).");
+            LOGGER.info("ISO 19110 classes not found (optional).");
         }
         return ExtClasses;
     }

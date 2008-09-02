@@ -44,8 +44,6 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -145,23 +143,10 @@ public class WMService extends WebService {
                         throw new NamingException("DataSource \"Coverages\" is not defined.");
                     }
                     connection = ds.getConnection();
-                    final Reference props = (Reference) getContextProperty("Coverages Properties", ctx);
-                    if (props != null) {
-                        final RefAddr permissionAddr = (RefAddr) props.get("Permission");
-                        if (permissionAddr != null) {
-                            permission = (String) permissionAddr.getContent();
-                        }
-                        final RefAddr rootDirAddr = (RefAddr) props.get("RootDirectory");
-                        if (rootDirAddr != null) {
-                            rootDir = (String) rootDirAddr.getContent();
-                        }
-                        final RefAddr readOnlyAddr = (RefAddr) props.get("ReadOnly");
-                        if (readOnlyAddr != null) {
-                            readOnly = (String) readOnlyAddr.getContent();
-                        }
-                    } else {
-                        throw new NamingException("Coverages Properties is not defined.");
-                    }
+                    final String coverageProps = "Coverages Properties";
+                    permission = getPropertyValue(coverageProps, "Permission");
+                    readOnly   = getPropertyValue(coverageProps, "ReadOnly");
+                    rootDir    = getPropertyValue(coverageProps, "RootDirectory");
                 } else {
                     // Here we are not in glassfish, probably in a Tomcat application server.
                     final Context envContext = (Context) ctx.lookup("java:/comp/env");
@@ -170,9 +155,9 @@ public class WMService extends WebService {
                         throw new NamingException("DataSource \"Coverages\" is not defined.");
                     }
                     connection = ds.getConnection();
-                    permission = (String) getContextProperty("Permission", envContext);
-                    readOnly = (String) getContextProperty("ReadOnly", envContext);
-                    rootDir = (String) getContextProperty("RootDirectory", envContext);
+                    permission = getPropertyValue(null, "Permission");
+                    readOnly   = getPropertyValue(null, "ReadOnly");
+                    rootDir    = getPropertyValue(null, "RootDirectory");
                 }
                 // Put all properties found in the JNDI reference into the Properties HashMap
                 if (permission != null) {
@@ -205,7 +190,6 @@ public class WMService extends WebService {
                  * configuration file is put under the WEB-INF directory of constellation.
                  * todo: get the webservice name (here ifremerWS) from the servlet context.
                  */
-                logger.warning("Connecting to the database using config.xml file !");
                 File configFile = null;
                 File dirCatalina = null;
                 final String catalinaPath = System.getenv().get("CATALINA_HOME");
@@ -246,9 +230,9 @@ public class WMService extends WebService {
 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        logger.info("Loading layers please wait...");
+        LOGGER.info("Loading layers please wait...");
         layerList = webServiceWorker.getLayers();
-        logger.info("WMS service running");
+        LOGGER.info("WMS service running");
     }
 
     /**
@@ -261,7 +245,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             String request = (String) getParameter("REQUEST", true);
-            logger.info("new request:" + request);
+            LOGGER.info("new request:" + request);
             writeParameters();
 
             if (request.equalsIgnoreCase("GetMap")) {
@@ -327,7 +311,7 @@ public class WMService extends WebService {
      * @throws fr.geomatys.wms.WebServiceException
      */
     private File getMap() throws  WebServiceException {
-        logger.info("getMap request received");
+        LOGGER.info("getMap request received");
         verifyBaseParameter(0);
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
@@ -371,7 +355,7 @@ public class WMService extends WebService {
      * @throws net.seagis.coverage.web.WebServiceException
      */
     private Response getFeatureInfo() throws WebServiceException, JAXBException {
-        logger.info("getFeatureInfo request received");
+        LOGGER.info("getFeatureInfo request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         verifyBaseParameter(0);
@@ -563,7 +547,7 @@ public class WMService extends WebService {
      * @throws javax.xml.bind.JAXBException
      */
     private Response getCapabilities() throws WebServiceException, JAXBException {
-        logger.info("getCapabilities request processing" + '\n');
+        LOGGER.info("getCapabilities request processing" + '\n');
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         //we begin by extract the mandatory attribute
@@ -612,7 +596,7 @@ public class WMService extends WebService {
         for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {
-                    logger.info("layer" + inputLayer.getName() + " not queryable by WMS");
+                    LOGGER.info("layer" + inputLayer.getName() + " not queryable by WMS");
                     continue;
                 }
 
@@ -829,7 +813,7 @@ public class WMService extends WebService {
      * @throws javax.xml.bind.JAXBException
      */
     private String describeLayer() throws WebServiceException, JAXBException {
-        logger.info("describeLayer request received");
+        LOGGER.info("describeLayer request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         verifyBaseParameter(2);
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
@@ -884,24 +868,6 @@ public class WMService extends WebService {
 
         return  webServiceWorker.getLegendFile();
 
-    }
-
-    /**
-     * Returns the context value for the key specified, or {@code null} if not found
-     * in this context.
-     *
-     * @param key The key to search in the context.
-     * @param context The context which to consider.
-     */
-    private static Object getContextProperty(final String key, final Context context) {
-        Object value = null;
-        try {
-            value = context.lookup(key);
-        } catch (NamingException n) {
-            // Do nothing, the key is not found in the context and the value is still null.
-        } finally {
-            return value;
-        }
     }
 
     /**

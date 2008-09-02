@@ -44,8 +44,6 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;
@@ -176,23 +174,10 @@ public class WCService extends WebService {
                         throw new NamingException("DataSource \"Coverages\" is not defined.");
                     }
                     connection = ds.getConnection();
-                    final Reference props = (Reference) getContextProperty("Coverages Properties", ctx);
-                    if (props != null) {
-                        final RefAddr permissionAddr = (RefAddr) props.get("Permission");
-                        if (permissionAddr != null) {
-                            permission = (String) permissionAddr.getContent();
-                        }
-                        final RefAddr rootDirAddr = (RefAddr) props.get("RootDirectory");
-                        if (rootDirAddr != null) {
-                            rootDir = (String) rootDirAddr.getContent();
-                        }
-                        final RefAddr readOnlyAddr = (RefAddr) props.get("ReadOnly");
-                        if (readOnlyAddr != null) {
-                            readOnly = (String) readOnlyAddr.getContent();
-                        }
-                    } else {
-                        throw new NamingException("Coverages Properties is not defined.");
-                    }
+                    final String coverageProps = "Coverages Properties";
+                    permission = getPropertyValue(coverageProps, "Permission");
+                    readOnly   = getPropertyValue(coverageProps, "ReadOnly");
+                    rootDir    = getPropertyValue(coverageProps, "RootDirectory");
                 } else {
                     // Here we are not in glassfish, probably in a Tomcat application server.
                     final Context envContext = (Context) ctx.lookup("java:/comp/env");
@@ -201,9 +186,9 @@ public class WCService extends WebService {
                         throw new NamingException("DataSource \"Coverages\" is not defined.");
                     }
                     connection = ds.getConnection();
-                    permission = (String) getContextProperty("Permission", envContext);
-                    readOnly = (String) getContextProperty("ReadOnly", envContext);
-                    rootDir = (String) getContextProperty("RootDirectory", envContext);
+                    permission = getPropertyValue(null, "Permission");
+                    readOnly   = getPropertyValue(null, "ReadOnly");
+                    rootDir    = getPropertyValue(null, "RootDirectory");
                 }
                 // Put all properties found in the JNDI reference into the Properties HashMap
                 if (permission != null) {
@@ -236,7 +221,6 @@ public class WCService extends WebService {
                  * configuration file is put under the WEB-INF directory of constellation.
                  * todo: get the webservice name (here ifremerWS) from the servlet context.
                  */
-                logger.warning("Connecting to the database using config.xml file !");
                 File configFile = null;
                 File dirCatalina = null;
                 final String catalinaPath = System.getenv().get("CATALINA_HOME");
@@ -275,9 +259,9 @@ public class WCService extends WebService {
 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        logger.info("Loading layers please wait...");
+        LOGGER.info("Loading layers please wait...");
         layerList = webServiceWorker.getLayers();
-        logger.info("WCS service running");
+        LOGGER.info("WCS service running");
     }
 
     /**
@@ -380,7 +364,7 @@ public class WCService extends WebService {
                     !owsex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info(owsex.getMessage());
+                    LOGGER.info(owsex.getMessage());
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(owsex.getExceptionReport(), sw);
@@ -680,7 +664,7 @@ public class WCService extends WebService {
      * TODO refaire tte la fonction en separant proprement les versions.
      */
     public Response getCapabilities(AbstractGetCapabilities abstractRequest) throws JAXBException, WebServiceException {
-        logger.info("getCapabilities request processing");
+        LOGGER.info("getCapabilities request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         //we begin by extract the base attribute
@@ -905,7 +889,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public File getCoverage(AbstractGetCoverage AbstractRequest) throws JAXBException, WebServiceException {
-        logger.info("getCoverage request processing");
+        LOGGER.info("getCoverage request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
@@ -1175,7 +1159,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public String describeCoverage(AbstractDescribeCoverage abstractRequest) throws JAXBException, WebServiceException {
-        logger.info("describeCoverage request processing");
+        LOGGER.info("describeCoverage request processing");
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
@@ -1399,24 +1383,6 @@ public class WCService extends WebService {
             throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
             //never reach
             return null;
-        }
-    }
-
-    /**
-     * Returns the context value for the key specified, or {@code null} if not found
-     * in this context.
-     *
-     * @param key The key to search in the context.
-     * @param context The context which to consider.
-     */
-    private static Object getContextProperty(final String key, final Context context) {
-        Object value = null;
-        try {
-            value = context.lookup(key);
-        } catch (NamingException n) {
-            // Do nothing, the key is not found in the context and the value is still null.
-        } finally {
-            return value;
         }
     }
 

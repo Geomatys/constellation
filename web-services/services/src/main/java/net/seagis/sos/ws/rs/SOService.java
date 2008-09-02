@@ -168,7 +168,7 @@ public class SOService extends WebService {
                     !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
+                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
                 }
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(owsex.getExceptionReport(), sw);
