@@ -26,6 +26,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 public interface SearchResults {
     
     /**
+     * Gets the value of the abstractRecord property.
+     * 
+     */
+    public List<? extends Object> getAbstractRecord();
+    
+    /**
      * Gets the value of the any property.
      * (unModifiable)
      */
