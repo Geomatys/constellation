@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.Record;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
@@ -64,7 +65,7 @@ import org.geotools.util.Utilities;
     "boundingBox"
 })
 @XmlRootElement(name = "Record")
-public class RecordType extends DCMIRecordType {
+public class RecordType extends DCMIRecordType implements Record{
 
     @XmlElement(name = "AnyText")
     private List<EmptyType> anyText;

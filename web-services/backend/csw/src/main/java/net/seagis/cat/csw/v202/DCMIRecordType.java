@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.DCMIRecord;
 import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import org.geotools.util.Utilities;
 
@@ -78,7 +79,7 @@ import org.geotools.util.Utilities;
     RecordType.class
 })
 @XmlRootElement(name="DCMIRecord") 
-public class DCMIRecordType extends AbstractRecordType {
+public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
 
     @XmlElement(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/")
     private SimpleLiteral identifier;

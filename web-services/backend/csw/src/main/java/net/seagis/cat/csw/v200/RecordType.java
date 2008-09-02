@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.Record;
 import net.seagis.dublincore.v1.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
@@ -57,7 +58,7 @@ import org.geotools.util.Utilities;
     "boundingBox"
 })
 @XmlRootElement(name= "Record")
-public class RecordType extends DCMIRecordType {
+public class RecordType extends DCMIRecordType implements Record {
 
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)
     private JAXBElement<? extends BoundingBoxType> boundingBox;
@@ -93,14 +94,6 @@ public class RecordType extends DCMIRecordType {
      */
     public JAXBElement<? extends BoundingBoxType> getBoundingBox() {
         return boundingBox;
-    }
-
-    /**
-     * Sets the value of the boundingBox property.
-     * 
-     */
-    public void setBoundingBox(JAXBElement<? extends BoundingBoxType> value) {
-        this.boundingBox = ((JAXBElement<? extends BoundingBoxType> ) value);
     }
     
     @Override
