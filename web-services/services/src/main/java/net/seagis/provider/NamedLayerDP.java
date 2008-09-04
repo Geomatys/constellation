@@ -13,9 +13,9 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
-import net.seagis.provider.postgrid.PostGridNamedLayerDP;
 import net.seagis.ws.rs.WebService;
 import org.geotools.map.MapLayer;
+import org.geotools.style.MutableStyle;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
@@ -23,13 +23,13 @@ import org.geotools.map.MapLayer;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class NamedLayerDP implements DataProvider<String,MapLayer>{
+public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
 
-    private static String KEY_SHAPEFILE_DP = "shapefile_folder";
+    private static final String KEY_SHAPEFILE_DP = "shapefile_folder";
     
     private static NamedLayerDP instance = null;
     
-    private final Collection<DataProvider<String,MapLayer>> dps = new ArrayList<DataProvider<String,MapLayer>>();
+    private final Collection<LayerDataProvider<String,MapLayer>> dps = new ArrayList<LayerDataProvider<String,MapLayer>>();
     
     
     private NamedLayerDP(){
@@ -84,13 +84,37 @@ public class NamedLayerDP implements DataProvider<String,MapLayer>{
      */
     public MapLayer get(String key) {
         MapLayer layer = null;
-        for(DataProvider<String,MapLayer> dp : dps){
+        for(LayerDataProvider<String,MapLayer> dp : dps){
             layer = dp.get(key);
             if(layer != null) return layer;
         }
         return null;
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    public MapLayer get(String layerName, MutableStyle style) {
+        MapLayer layer = null;
+        for(LayerDataProvider<String,MapLayer> dp : dps){
+            layer = dp.get(layerName,style);
+            if(layer != null) return layer;
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    public List<String> getFavoriteStyles(String layerName) {
+        List<String> styles = new ArrayList<String>();
+        for(LayerDataProvider<String,MapLayer> dp : dps){
+            List<String> sts = dp.getFavoriteStyles(layerName);
+            styles.addAll(sts);
+        }
+        return styles;
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -140,7 +164,6 @@ public class NamedLayerDP implements DataProvider<String,MapLayer>{
         return folders;
     }
     
-    
     public static NamedLayerDP getInstance(){
         if(instance == null){
             instance = new NamedLayerDP();
@@ -148,5 +171,8 @@ public class NamedLayerDP implements DataProvider<String,MapLayer>{
         
         return instance;
     }
+
+    
+
 
 }

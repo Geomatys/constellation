@@ -14,8 +14,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class WMSQuery111 implements Query{
-
+public class WMSQuery implements Query{
+    
+    
     public final Rectangle2D bbox;
     public final CoordinateReferenceSystem crs;
     public final String format;
@@ -28,7 +29,7 @@ public class WMSQuery111 implements Query{
     public final Boolean transparent;
     public final MutableStyledLayerDescriptor sld;
     
-    public WMSQuery111(Rectangle2D bbox, CoordinateReferenceSystem crs, String format,
+    public WMSQuery(Rectangle2D bbox, CoordinateReferenceSystem crs, String format,
             List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld, Double elevation, Date date,
             Dimension size, Color background, Boolean transparent){
         this.bbox = bbox;

@@ -147,6 +147,22 @@ public class Layer extends AbstractLayer {
      }
      
      /**
+      * Build a root layer with only few arguments
+      * 
+      * @param title                   The title of the layer.
+      * @param _abstract               A description of the layer.
+      * @param crs                     The list of supported CRS.
+      * @param exGeographicBoundingBox A general bounding box including all the child map.
+      */
+     public Layer(final String name, final String title, final String _abstract, final List<String> crs, 
+             final LatLonBoundingBox latLonBoundingBox, List<AbstractLayer> layers) {
+         this(title,_abstract,crs,latLonBoundingBox,layers);
+         this.name = name;
+            
+     }
+     
+     
+     /**
       * Build a child layer for the specified version
       * 
       * @param name      The title of the layer.

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import net.seagis.portrayal.CSTLPortrayalService;
-import net.seagis.query.WMSQuery111;
+import net.seagis.query.WMSQuery;
 
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -20,14 +20,14 @@ import org.opengis.referencing.operation.TransformException;
 public class WMSWorker {
 
     private CSTLPortrayalService service = new CSTLPortrayalService();
-    private WMSQuery111 query = null;
+    private WMSQuery query = null;
     
     
     public WMSWorker(){
         
     }
     
-    public void setQuery(WMSQuery111 query){
+    public void setQuery(WMSQuery query){
         if(query == null){
             throw new NullPointerException("Query can not be null");
         }

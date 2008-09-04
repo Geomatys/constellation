@@ -28,8 +28,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class StringParser {
 
-    
-    
     public CoordinateReferenceSystem toCRS(String epsg) throws FactoryException{
         if(epsg.trim().endsWith("4326")){
             //TODO fix this
@@ -101,7 +99,12 @@ public class StringParser {
     
     public List<String> toLayers(String strLayers){
         List<String> layers = new ArrayList<String>();
-        StringTokenizer token = new StringTokenizer(strLayers,",");
+        
+        if(strLayers == null || strLayers.isEmpty()){
+            return layers;
+        }
+        
+        StringTokenizer token = new StringTokenizer(strLayers,",",false);
         while(token.hasMoreTokens()){
             layers.add(token.nextToken());
         }

@@ -70,25 +70,26 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
 
         int index = 0;
         for(String layerName : layers){
-            MapLayer layer = layerDPS.get(layerName);
-
-            if(layer != null){
-
-                if(sld != null){
-                    //try to use the provided SLD
-                    MutableStyle style = extractStyle(layerName,sld);
-                    if(style != null){
-                        layer.setStyle(style);
-                    }
-                } else if (styles.size() > index){
-                    //try to grab the style if provided
-                    //a style has been given for this layer, try to use it
-                    MutableStyle style = styleDPS.get(styles.get(index));
-                    if(style != null){
-                        layer.setStyle(style);
-                    }
+            MutableStyle style = null;
+            
+            if(sld != null){
+                //try to use the provided SLD
+                style = extractStyle(layerName,sld);
+            } else if (styles.size() > index){
+                //try to grab the style if provided
+                //a style has been given for this layer, try to use it
+                style = styleDPS.get(styles.get(index));
+            } else {
+                //no defined styles, use the favorite one
+                List<String> favorites = layerDPS.getFavoriteStyles(layerName);
+                if(!favorites.isEmpty()){
+                    //take the first one
+                    style = styleDPS.get(favorites.get(0));
                 }
             }
+            
+            MapLayer layer = layerDPS.get(layerName,style);
+
             ctx.layers().add(layer);
 
             index++;

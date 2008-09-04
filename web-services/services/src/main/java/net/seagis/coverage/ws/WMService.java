@@ -19,8 +19,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.StringWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -48,6 +50,10 @@ import javax.xml.bind.JAXBException;
 import com.sun.jersey.spi.resource.Singleton;
 
 //seagis dependencies
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
@@ -81,16 +87,23 @@ import net.seagis.coverage.metadata.LayerMetadataTable;
 import net.seagis.coverage.metadata.PointOfContact;
 import net.seagis.coverage.metadata.PointOfContactTable;
 import net.seagis.coverage.metadata.SeriesMetadataTable;
+import net.seagis.provider.NamedLayerDP;
 import net.seagis.provider.postgrid.PostGridNamedLayerDP;
 import net.seagis.query.StringParser;
-import net.seagis.query.WMSQuery111;
+import net.seagis.query.WMSQuery;
 import net.seagis.worker.WMSWorker;
 import net.seagis.ws.rs.WebService;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 //geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.geotools.style.sld.Specification.SymbologyEncoding;
+import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //geoapi dependencies
@@ -98,6 +111,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -326,14 +340,28 @@ public class WMService extends WebService {
         // TODO Handle PostGrid layer within the renderer ----------------------
         final StringParser parser = new StringParser();
         final List<String> layers = parser.toLayers(strLayers);
-        final PostGridNamedLayerDP pgLayers = PostGridNamedLayerDP.getDefault();
+        final NamedLayerDP layerDP = NamedLayerDP.getInstance();
         boolean onlyPostGrid = true;
         for(String key : layers){
-            if(!pgLayers.contains(key)){
+            if(layerDP.contains(key)){
                 onlyPostGrid = false;
                 break;
             }
         }
+        String strSLD = getParameter("SLD", false);
+        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
+        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
+        System.out.println("SLD => " + strSLD);
+        System.out.println("remoteOWSType => " + remoteOwsType);
+        System.out.println("remoteOwsUrl => " + remoteOwsUrl);
+        MutableStyledLayerDescriptor sld = parser.toSLD(strSLD);
+        if(sld != null || remoteOwsType != null || remoteOwsUrl != null){
+            //if an SLD has been given we use the go renderer.
+            onlyPostGrid = false;
+        }
+        
+        
+        
         
         //if no layer are postgrid then we use the vector renderer
         if(!onlyPostGrid){
@@ -366,12 +394,12 @@ public class WMService extends WebService {
 
 
         //this parameters are not yet used
-        String styles        = getParameter("STYLES", true);
+//        String styles        = getParameter("STYLES", true);
 
         //extended parameter of the specification SLD
-        String sld           = getParameter("SLD", false);
-        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
-        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
+//        String sld           = getParameter("SLD", false);
+//        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
+//        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
 
         return webServiceWorker.getImageFile();
     }
@@ -415,14 +443,46 @@ public class WMService extends WebService {
         final String format = strMime;
         final List<String> layers = parser.toLayers(strLayers);
         final List<String> styles = parser.toStyles(strStyles);
-        final MutableStyledLayerDescriptor sld = parser.toSLD(strSLD);
+        MutableStyledLayerDescriptor sld = null;
         final Double elevation = 0d;
         final Date date = new Date();
         final Dimension size = new Dimension( parser.toInt(null, strWidth), parser.toInt(null, strHeight));
         final Color background = parser.toColor(strBGColor);
         final Boolean transparent = parser.toBoolean(strTransparent);
+        
+        if(strSLD != null){
+            sld = parser.toSLD(strSLD);
+        }else if(strRemoteOwsUrl != null){
+            
+//            URL url = null;
+//            try {
+//                url = new URL(strRemoteOwsUrl);
+//            } catch (MalformedURLException ex) {
+//                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+            try {
+                InputStream stream = new FileInputStream(new File(strRemoteOwsUrl));
+                XMLUtilities sldparser = new XMLUtilities();
+                try{
+                    sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
+                }catch(JAXBException ex){
+                    System.out.println("Not a SLD v1.0");
+                }
+                if(sld == null){
+                    try{
+                        sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
+                    }catch(JAXBException ex){
+                        System.out.println("Not a SLD v1.1");
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
 
-        final WMSQuery111 query = new WMSQuery111(bbox, crs, format, layers, 
+        final WMSQuery query = new WMSQuery(bbox, crs, format, layers, 
                 styles, sld, elevation, date, size, background, transparent);
         worker.setQuery(query);
 
@@ -690,6 +750,65 @@ public class WMService extends WebService {
 
         //we get the list of layers
         List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
+        
+        // layers from data providers ------------------------------------------
+        NamedLayerDP dp = NamedLayerDP.getInstance();
+        final Set<String> keys = dp.getKeys();
+        for(String key : keys){
+            MapLayer layer = dp.get(key);
+            if(layer != null){
+                //we build and add a layer
+                AbstractLayer outputLayer = null;
+                String name = key;
+                String title = key;
+                String desc = "";
+                List<String> crs = new ArrayList<String>();
+                crs.add("EPSG:4326");crs.add("EPSG:3395");crs.add("EPSG:27574");
+                crs.add("EPSG:27571");crs.add("EPSG:27572");crs.add("EPSG:27573");
+                crs.add("EPSG:27574");
+                
+                List<AbstractLayer> subLayers = Collections.emptyList();
+                
+                if (getCurrentVersion().toString().equals("1.1.1")) {
+                    //version 1.1.1
+                    ReferencedEnvelope env = layer.getBounds();
+                    CoordinateReferenceSystem sourceCRS = env.getCoordinateReferenceSystem();
+                    CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
+                    MathTransform transform = null;
+                    try {
+                        transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
+                    } catch (FactoryException ex) {
+                        Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    double minx = -180d;
+                    double maxx = +180d;
+                    double miny = -90d;
+                    double maxy = +90d;
+                    LatLonBoundingBox bbox = new LatLonBoundingBox(minx, miny, maxx, maxy);
+                    
+                    outputLayer = new net.seagis.wms.v111.Layer(name,title,desc,crs,bbox,subLayers);
+                }
+
+                else{
+                    //version 1.3.0
+                    double westBoundLongitude = -180d;
+                    double eastBoundLongitude = +180d;
+                    double southBoundLatitude = -90d;
+                    double northBoundLatitude = +90d;
+                    EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude);
+                    outputLayer = new net.seagis.wms.v130.Layer(name,title,desc,crs,bbox,subLayers);
+                }
+                
+                if(outputLayer != null){
+                    layers.add(outputLayer);
+                }
+                
+            }
+        }
+        
+        //----------------------------------------------------------------------
+        
+        
         for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {

@@ -35,7 +35,7 @@ public class SLDFileNamedLayerDP implements DataProvider<String,MutableStyle>{
     private final XMLUtilities sldParser = new XMLUtilities();
     private final File folder;
     private final Map<String,File> index = new HashMap<String,File>();
-    private final SoftHashMap<String,MutableStyle> cache = new SoftHashMap<String, MutableStyle>(5);
+    private final SoftHashMap<String,MutableStyle> cache = new SoftHashMap<String, MutableStyle>(20);
     
     
     public SLDFileNamedLayerDP(File folder){
@@ -81,15 +81,22 @@ public class SLDFileNamedLayerDP implements DataProvider<String,MutableStyle>{
     public MutableStyle get(String key) {
         MutableStyle style = null;
         
-        File f = index.get(key);
-        if(f != null){
-            try {
-                style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
-            } catch (JAXBException ex) {
-                Logger.getLogger(SLDFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+        style = cache.get(key);
+        
+        if(style == null){
+            File f = index.get(key);
+            if(f != null){
+                try {
+                    style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
+                } catch (JAXBException ex) {
+                    Logger.getLogger(SLDFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if(style != null){
+                    //cache the style
+                    cache.put(key, style);
+                }
             }
         }
-        
         
         return style;
     }
