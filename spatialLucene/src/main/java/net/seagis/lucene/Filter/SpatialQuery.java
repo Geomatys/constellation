@@ -109,6 +109,17 @@ public class SpatialQuery {
         subQueries           = new ArrayList<SpatialQuery>();
     }
     
+    /**
+     * Build a new Simple Text Query.
+     * 
+     * @param query  A well-formed Lucene query. 
+     */
+    public SpatialQuery(String query) {
+        this.query           = new StringBuilder(query);
+        spatialFilter        = null;
+        subQueries           = new ArrayList<SpatialQuery>();
+    }
+    
     
     
     /**

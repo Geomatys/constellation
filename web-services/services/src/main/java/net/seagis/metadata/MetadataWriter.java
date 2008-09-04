@@ -161,6 +161,14 @@ public class MetadataWriter {
     }
     
     /**
+     * Ask to the mdweb reader an available title for a form.
+     */
+    public String getAvailableTitle() throws SQLException {
+        
+        return MDReader.getAvailableTitle();
+    }
+    
+    /**
      * Add a MDWeb value (and his children)to the specified form.
      * 
      * @param form The created form.
@@ -595,6 +603,8 @@ public class MetadataWriter {
             return MDReader.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("Integer")) {
             return MDReader.getClasse(className, Standard.ISO_19103);
+        }  else if (className.equalsIgnoreCase("Long")) {
+            return MDReader.getClasse("Integer", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Boolean")) {
             return MDReader.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("URL")) {

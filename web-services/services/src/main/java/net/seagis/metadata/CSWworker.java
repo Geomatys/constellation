@@ -871,20 +871,7 @@ public class CSWworker {
         
         logger.info("Lucene query obtained:" + luceneQuery);
         // we try to execute the query
-        List<String> results;
-        try {
-            results = index.doSearch(luceneQuery);
-        
-        } catch (CorruptIndexException ex) {
-            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
-                                             NO_APPLICABLE_CODE, null, version);
-        } catch (IOException ex) {
-            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
-        } catch (ParseException ex) {
-            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
-        }
+        List<String> results = executeLuceneQuery(luceneQuery);
         
         int nextRecord = startPos + maxRecord;
         if (nextRecord > results.size())
@@ -954,7 +941,7 @@ public class CSWworker {
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
                                                           results.size(),
-                                                          maxRecord,
+                                                          records.size(),
                                                           records);
                     
                 //we return an Acknowledgement if the request is valid.
@@ -981,6 +968,29 @@ public class CSWworker {
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), version.toString(), searchResults);
         logger.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
+    }
+    
+    /**
+     * Execute a Lucene spatial query and return the result as a List of form identifier (form_ID:CatalogCode)
+     * 
+     * @param query
+     * @return
+     * @throws net.seagis.ows.v100.OWSWebServiceException
+     */
+    private List<String> executeLuceneQuery(SpatialQuery query) throws OWSWebServiceException {
+        try {
+            return index.doSearch(query);
+        
+        } catch (CorruptIndexException ex) {
+            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (IOException ex) {
+            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (ParseException ex) {
+            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
+        }
     }
     
     /**
@@ -1037,6 +1047,17 @@ public class CSWworker {
             List<String> unexistingID = new ArrayList<String>();
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
+                
+                //we get the form ID and catalog code
+                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                if (ids.size() > 0) {
+                    id = ids.get(0);
+                } else {
+                    unexistingID.add(id);
+                    logger.severe("unexisting id:" + id);
+                    continue;
+                }
+                //we get the metadata object
                 try {
                     Object o = MDReader.getMetadata(id, DUBLINCORE, set, null);
                     if (o instanceof BriefRecordType) {
@@ -1050,16 +1071,6 @@ public class CSWworker {
                 } catch (SQLException e) {
                     throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
                                                       NO_APPLICABLE_CODE, "id", version);
-                /* here we catch the exception reporting the non-existenz of identifier.
-                 * if at least one id match we return the record, else we throw the exception
-                 */ 
-                } catch (OWSWebServiceException e) {
-                   if (e.getLocator().equals("id")) {
-                       unexistingID.add(id);
-                       logger.severe("unexisting id:" + id);
-                   } else {
-                       throw e;
-                   }
                 }
             }
             if (records.size() == 0) {
@@ -1077,8 +1088,21 @@ public class CSWworker {
             response = new GetRecordByIdResponseType(records, null, null);
         //we build ISO 19139 object    
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+           List<String> unexistingID = new ArrayList<String>();
            List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
            for (String id:request.getId()) {
+               
+               //we get the form ID and catalog code
+                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                if (ids.size() > 0) {
+                    id = ids.get(0);
+                } else {
+                    unexistingID.add(id);
+                    logger.severe("unexisting id:" + id);
+                    continue;
+                }
+                
+                //we get the metadata object
                 try {
                     Object o = MDReader.getMetadata(id, ISO_19115, set, null);
                     if (o instanceof MetaDataImpl) {
@@ -1089,12 +1113,36 @@ public class CSWworker {
                                                       NO_APPLICABLE_CODE, "id", version);
                 }
            }
+           if (records.size() == 0) {
+                String identifiers = "";
+                for (String s: unexistingID) {
+                    identifiers = identifiers + s + ',';
+                }
+                if (identifiers.lastIndexOf(',') != -1)
+                    identifiers.substring(0, identifiers.length() - 1);
+                
+                throw new OWSWebServiceException("The identifiers " + identifiers + " does not exist",
+                                                  INVALID_PARAMETER_VALUE, "id", version);
+            }
         
            response = new GetRecordByIdResponseType(null, records, null);      
         
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+           List<String> unexistingID = new ArrayList<String>();
            List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
+               
+               //we get the form ID and catalog code
+                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                if (ids.size() > 0) {
+                    id = ids.get(0);
+                } else {
+                    unexistingID.add(id);
+                    logger.severe("unexisting id:" + id);
+                    continue;
+                }
+                
+                //we get the metadata object 
                 try {
                     Object o = MDReader.getMetadata(id, ISO_19115, set, null);
                     if (o != null) {
@@ -1105,6 +1153,17 @@ public class CSWworker {
                                                       NO_APPLICABLE_CODE, "id", version);
                 }
            }
+           if (records.size() == 0) {
+                String identifiers = "";
+                for (String s: unexistingID) {
+                    identifiers = identifiers + s + ',';
+                }
+                if (identifiers.lastIndexOf(',') != -1)
+                    identifiers.substring(0, identifiers.length() - 1);
+                
+                throw new OWSWebServiceException("The identifiers " + identifiers + " does not exist",
+                                                     INVALID_PARAMETER_VALUE, "id", version);
+            }
         
            response = new GetRecordByIdResponseType(null, null, records);      
         
@@ -1388,7 +1447,12 @@ public class CSWworker {
             obj = ((JAXBElement)obj).getValue();
         }
         
+        //we try to find a title for the from
         String title = findName(obj);
+        if (title.equals("unknow title")) {
+            title = MDWriter.getAvailableTitle();
+        }
+        
         // we create a MDWeb form form the object
         Form f = null;
         try {
@@ -1415,6 +1479,7 @@ public class CSWworker {
             
             long time = System.currentTimeMillis() - start; 
             logger.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
+            index.indexDocument(f);
             return true;
         }
         return false;

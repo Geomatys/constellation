@@ -110,7 +110,7 @@ public class CatalogueHarvester {
      * A global variable used during the harvest of a distant CSW.
      * it record the supported outputSchema in the GetRecords request of the distant web service.
      */
-    private List<String> currentDistantOuputSchema;
+    private String bestDistantOuputSchema;
     
     /**
      * a QName for csw:Record type
@@ -261,12 +261,13 @@ public class CatalogueHarvester {
         //we prepare to store the distant serviceException and send it later if this is necessary
         List<WebServiceException> distantException = new ArrayList<WebServiceException>();
         
-        //we request all the records for each outputSchema supported
-        for (String outputSchema: currentDistantOuputSchema) {
-            logger.info("harvesting with outputSchema: " + outputSchema);
+        //we request all the records for the best outputSchema supported
+        
+            logger.info("harvesting with outputSchema: " + bestDistantOuputSchema);
+            startPosition    = 1;
             
             if (!specialCase1)
-                getRecordRequest.setOutputSchema(outputSchema);
+                getRecordRequest.setOutputSchema(bestDistantOuputSchema);
             
             boolean moreResults = true;
             //we make multiple request by pack of 20 record 
@@ -406,7 +407,6 @@ public class CatalogueHarvester {
                     logger.info("trying with CQL constraint request");
                 }
             }
-        }
         
         
         if (!succeed && distantException.size() > 0) {
@@ -504,29 +504,30 @@ public class CatalogueHarvester {
             }
             
             if (outputDomain != null) {
-                currentDistantOuputSchema = outputDomain.getValue();
-                String defaultValue = outputDomain.getDefaultValue(); 
-                if (defaultValue != null && !defaultValue.equals(""))
-                    currentDistantOuputSchema.add(defaultValue);
+                List<String> availableOutputSchema = new ArrayList<String>();
+                availableOutputSchema              = outputDomain.getValue();
+                String defaultValue                = outputDomain.getDefaultValue(); 
+                
+                if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
+                    availableOutputSchema.add(defaultValue);
                 
                 
-                //ugly patch to be compatible with some CSW service who specify the wrong ouputSchema
-                currentDistantOuputSchema.add("csw:Record");
+                /* TODO place it elsewhere
+                  ugly patch to be compatible with some CSW service who specify the wrong ouputSchema
+                  currentDistantOuputSchema.add("csw:Record");*/
+                
                 
                 report.append("OutputSchema supported:").append('\n');
-                for (String osc: currentDistantOuputSchema) {
+                for (String osc: availableOutputSchema) {
                     report.append('\t').append("- ").append(osc).append('\n');
                 }
+                bestDistantOuputSchema = getBestOutputSchema(availableOutputSchema);
              
             } else {
-                report.append("No outputSchema specified using default:"    + '\n' +
-                              '\t' + "http://www.opengis.net/cat/csw/2.0.2" + '\n' + 
-                              '\t' + "csw:Record"                           + '\n');
+                report.append("No outputSchema specified using default: http://www.opengis.net/cat/csw/2.0.2");
                 
                 //we add the default outputSchema used
-                currentDistantOuputSchema = new ArrayList<String>();
-                currentDistantOuputSchema.add("http://www.opengis.net/cat/csw/2.0.2");
-                currentDistantOuputSchema.add("csw:Record");
+                bestDistantOuputSchema = "http://www.opengis.net/cat/csw/2.0.2";
             }
             
             // we look for the different Type names
@@ -591,6 +592,45 @@ public class CatalogueHarvester {
 
         logger.info(report.toString());
         return request;
+    }
+    
+    private String getBestOutputSchema(List<String> availableOutputSchema) {
+        if (availableOutputSchema.size() == 0) {
+            //default case
+            return "http://www.opengis.net/cat/csw/2.0.2";
+        
+        } else if (availableOutputSchema.size() == 1) {
+            return availableOutputSchema.get(0);
+        
+        // Priority to the ISO schema
+        } else if (availableOutputSchema.contains("http://www.isotc211.org/2005/gmd")) {
+            return "http://www.isotc211.org/2005/gmd";
+        
+        } else if (availableOutputSchema.contains("csw:profile")) {
+            return "csw:profile";
+            
+        // else to Dublincore schema    
+        } else if (availableOutputSchema.contains("http://www.opengis.net/cat/csw/2.0.2")) {
+            return "http://www.opengis.net/cat/csw/2.0.2";
+        
+        } else if (availableOutputSchema.contains("csw:record")) {
+            return "csw:record";
+        
+        } else if (availableOutputSchema.contains("csw:Record")) {
+            return "csw:Record";
+        
+        } else if (availableOutputSchema.contains("ISO19139")) {
+            return "ISO19139";
+        
+        } else if (availableOutputSchema.contains("OGCCORE")) {
+            return "OGCCORE";
+
+        } else if (availableOutputSchema.contains("DublinCore")) {
+            return "DublinCore";
+        } else {
+            logger.severe("unable to found a outputSchema!!!");
+            return "http://www.opengis.net/cat/csw/2.0.2";
+        }
     }
     
     /**

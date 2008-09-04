@@ -314,7 +314,7 @@ public class SearchResultsType implements SearchResults {
         if (recordSchema != null)
             s.append("recordShema: ").append(recordSchema).append('\n');
         
-        s.append("nbRec Matched = ").append(numberOfRecordsMatched).append(" ").append("nbRec Returned = ").append(numberOfRecordsReturned);
+        s.append("nbRec Matched = ").append(numberOfRecordsMatched).append(" nbRec Returned = ").append(numberOfRecordsReturned);
         s.append("next record = ").append(nextRecord).append('\n');
         
         if (expires != null) {

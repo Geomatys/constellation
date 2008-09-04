@@ -71,14 +71,6 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.ws</groupId>
-      <artifactId>jaxws-rt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.ws</groupId>
-      <artifactId>jaxws-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-cql</artifactId>
     </dependency>

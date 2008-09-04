@@ -184,7 +184,7 @@ public class MetadataReader {
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      * 
-     * @param identifier The form identifier
+     * @param identifier The form identifier with the pattern : Form_ID:
      * 
      * @return An metadata object.
      * @throws java.sql.SQLException
@@ -192,33 +192,29 @@ public class MetadataReader {
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
         Object result;
         int id;
-        String catalog = "";
+        String catalogCode = "";
         
-        //if the identifier is an int we assme that is directly the Form ID
+        //we parse the identifier (Form_ID:Catalog_Code)
         try  {
-            catalog    = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
-            identifier = identifier.substring(0, identifier.indexOf(":"));
-            id         = Integer.parseInt(identifier);
-            
-        
-        //else we search for an Identifier or a title
-        } catch (NumberFormatException e) {
-            id = getIDFromFileIdentifier(identifier);
-            if (id == -1) {
-                id = getIDFromTitle(identifier);
-                if (id == -1)
-                    throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
-                                                     INVALID_PARAMETER_VALUE, "id", version);
+            if (identifier.indexOf(":") != -1) {
+                catalogCode    = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
+                identifier = identifier.substring(0, identifier.indexOf(":"));
+                id         = Integer.parseInt(identifier);
+            } else {
+                throw new NumberFormatException();
             }
+            
+        } catch (NumberFormatException e) {
+             throw new OWSWebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id", version);
         }
         
-        
         alreadyRead.clear();
+        Catalog catalog = MDReader.getCatalog(catalogCode);
         if (mode == ISO_19115) {
             result = metadatas.get(identifier);
             if (result == null) {
                 
-                Form f = MDReader.getForm(MDReader.getCatalog(catalog), id);
+                Form f = MDReader.getForm(catalog, id);
                 result = getObjectFromForm(f);
                 if (result != null) {
                     metadatas.put(identifier, result);
@@ -226,10 +222,7 @@ public class MetadataReader {
             }
             
         } else {
-            Form f = MDReader.getForm(MDReader.getCatalog(catalog), id);
-            if (f == null) {
-                f = MDReader.getForm(MDReader.getCatalog(catalog), id);
-            }
+            Form f = MDReader.getForm(catalog, id);
             result = getRecordFromForm(f, type, elementName);
         }
         return result;

@@ -119,7 +119,7 @@ public class IndexLucene extends AbstractIndex {
                 List<Catalog> cats = reader.getCatalogs();
                 nbCatalogs = cats.size();
                 List<Form> results = reader.getAllForm(cats);
-                logger.info("end read form");
+                logger.info("end read all form");
                 nbForms    =  results.size();
                 for (Form form : results) {
                     indexDocument(writer, form);
@@ -220,6 +220,39 @@ public class IndexLucene extends AbstractIndex {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(r));
+            logger.finer("Form: " + r.getTitle() + " indexed");
+            
+        } catch (SQLException ex) {
+            logger.severe("SQLException " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * This method add to index of lucene a new document based on Form object.
+     * (implements AbstractIndex.indexDocument() )
+     * object must be a Form.
+     * 
+     * @param object A MDweb formular.
+     */
+    public void indexDocument(Object object) {
+        Form r;
+        if (object instanceof Form) {
+            r = (Form) object;
+        } else {
+            throw new IllegalArgumentException("Unexpected type, supported one is: org.mdweb.model.storage.Form");
+        }
+        try {
+            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            
+            //adding the document in a specific model. in this case we use a MDwebDocument.
+            writer.addDocument(createDocument(r));
             logger.info("Form: " + r.getTitle() + " indexed");
             
         } catch (SQLException ex) {
@@ -291,7 +324,7 @@ public class IndexLucene extends AbstractIndex {
         // For an ISO 19115 form
         if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
             
-            logger.info("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
+            logger.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
             for (String term :ISO_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
@@ -331,7 +364,7 @@ public class IndexLucene extends AbstractIndex {
                 
                 String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
                 if (!values.equals("null")) {
-                    logger.info("put " + term + " values: " + values);
+                    logger.finer("put " + term + " values: " + values);
                     anyText.append(values).append(" ");
                 }
                 if (term.equals("date") || term.equals("modified")) {
@@ -494,7 +527,7 @@ public class IndexLucene extends AbstractIndex {
         doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        logger.info("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
+        logger.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
     }
     
     /**

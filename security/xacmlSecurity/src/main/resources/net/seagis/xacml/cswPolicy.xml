@@ -54,6 +54,30 @@
              </Apply>
       </Condition>
     </Rule>
+    <Rule Effect="Deny" RuleId="WriteRule">
+        <Target>
+             <Actions>
+                 <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">transaction</AttributeValue>
+                          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
+                      </ActionMatch>
+                 </Action>
+                 <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">harvest</AttributeValue>
+                          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
+                      </ActionMatch>
+                 </Action>
+             </Actions>
+        </Target>
+        <Condition>
+             <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">anonymous</AttributeValue>
+               <SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role" />
+             </Apply>
+      </Condition>
+    </Rule>
      <!-- The following rule allow the administrator user to reach the following write operation -->
     <Rule Effect="Permit" RuleId="WriteRule">
         <Target>
@@ -110,6 +134,5 @@
       </Condition>
     </Rule>
     <!-- If none of the rules apply, deny the request -->
-    <Rule Effect="Deny" RuleId="DenyRule"/>
 </Policy>
 

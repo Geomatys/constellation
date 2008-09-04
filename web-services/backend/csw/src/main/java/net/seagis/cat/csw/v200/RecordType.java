@@ -96,6 +96,14 @@ public class RecordType extends DCMIRecordType implements Record {
         return boundingBox;
     }
     
+    /**
+     * Sets the value of the boundingBox property.
+     * 
+     */
+    public void setBoundingBox(JAXBElement<? extends BoundingBoxType> value) {
+        this.boundingBox = ((JAXBElement<? extends BoundingBoxType> ) value);
+    }
+    
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
