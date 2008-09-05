@@ -351,9 +351,6 @@ public class WMService extends WebService {
         String strSLD = getParameter("SLD", false);
         String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
         String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
-        System.out.println("SLD => " + strSLD);
-        System.out.println("remoteOWSType => " + remoteOwsType);
-        System.out.println("remoteOwsUrl => " + remoteOwsUrl);
         MutableStyledLayerDescriptor sld = parser.toSLD(strSLD);
         if(sld != null || remoteOwsType != null || remoteOwsUrl != null){
             //if an SLD has been given we use the go renderer.
