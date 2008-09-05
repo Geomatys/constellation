@@ -82,4 +82,9 @@ public class ReferenceSystemImpl implements ReferenceSystem {
     public String toWKT() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    @Override
+    public String toString() {
+        return "[ReferenceSystemImpl] referenceSystemIdentifier:" + referenceSystemIdentifier;
+    }
 }

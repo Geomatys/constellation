@@ -122,6 +122,8 @@ import javax.xml.namespace.QName;
 
 //mdweb model dependencies
 import net.seagis.cat.csw.v202.EchoedRequestType;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -994,6 +996,29 @@ public class CSWworker {
     }
     
     /**
+     * Execute a Lucene spatial query and return the result as a List of form identifier (form_ID:CatalogCode)
+     * 
+     * @param query
+     * @return
+     * @throws net.seagis.ows.v100.OWSWebServiceException
+     */
+    private List<String> executeLuceneQuery(TermQuery query) throws OWSWebServiceException {
+        try {
+            return index.doSearch(query);
+        
+        } catch (CorruptIndexException ex) {
+            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (IOException ex) {
+            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (ParseException ex) {
+            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
+        }
+    }
+    
+    /**
      * web service operation return one or more records specified by there identifier.
      * 
      * @param request
@@ -1049,7 +1074,7 @@ public class CSWworker {
             for (String id:request.getId()) {
                 
                 //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1093,7 +1118,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1133,7 +1158,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new SpatialQuery("identifier:" + id));
+                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1387,7 +1412,6 @@ public class CSWworker {
                 for(Object record: insertRequest.getAny()) {
                     
                         try {
-
                             storeMetadata(record);
                             totalInserted++;
                         

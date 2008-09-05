@@ -627,8 +627,15 @@ public class MetadataReader {
      */
     private Object getObjectFromValue(Form form, Value value) {
 
-        String className    = value.getType().getName();
-        String standardName = value.getType().getStandard().getName();
+        String className;
+        String standardName;
+        if (value.getType() != null) {
+            className    = value.getType().getName();
+            standardName = value.getType().getStandard().getName();
+        } else {
+            logger.severe("Error the type of the value is null");
+            return null;
+        }
         Class classe = null;
         Object result;
         //debug purpose

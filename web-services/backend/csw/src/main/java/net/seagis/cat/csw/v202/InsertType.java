@@ -31,10 +31,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * 
- *             Submits one or more records to the catalogue. The representation
- *             is defined by the application profile. The handle attribute
- *             may be included to specify a local identifier for the action 
- *             (it must be unique within the context of the transaction).
+ * Submits one or more records to the catalogue. 
+ * The representation is defined by the application profile. 
+ * The handle attribute may be included to specify a local identifier for the action 
+ * (it must be unique within the context of the transaction).
  *          
  * 
  * <p>Java class for InsertType complex type.
@@ -74,6 +74,21 @@ public class InsertType {
     @XmlSchemaType(name = "ID")
     private String handle;
 
+    /**
+     * An empty constructor used by JAXB.
+     */
+    public InsertType() {}
+    
+    /**
+     * Build a new Insert request with the specified objects to insert.
+     */
+    public InsertType(Object... objects) {
+        any = new ArrayList<Object>();
+        for (Object obj: objects) {
+            any.add(obj);
+        }
+    }
+    
     /**
      * Gets the value of the any property.
      * (unmodifiable)

@@ -254,6 +254,8 @@ public class IndexLucene extends AbstractIndex {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(r));
             logger.info("Form: " + r.getTitle() + " indexed");
+            writer.optimize();
+            writer.close();
             
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
@@ -429,7 +431,7 @@ public class IndexLucene extends AbstractIndex {
         Searcher searcher   = new IndexSearcher(ireader);
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
-        if (spatialQuery.getQuery().indexOf(":*") != -1)
+        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 )
             parser.setAllowLeadingWildcard(true);
         
         Query query   = parser.parse(spatialQuery.getQuery());
@@ -506,7 +508,30 @@ public class IndexLucene extends AbstractIndex {
         
         ireader.close();
         return results;
-    }  
+    } 
+    
+    /**
+     * This method proceed a lucene search and returns a list of ID.
+     *
+     * @param query The lucene query string with spatials filters.
+     * 
+     * @return      A List of id.
+     */
+    public List<String> doSearch(TermQuery query) throws CorruptIndexException, IOException, ParseException {
+        
+        List<String> results = new ArrayList<String>();
+        
+        IndexReader ireader = IndexReader.open(getFileDirectory());
+        Searcher searcher   = new IndexSearcher(ireader);
+       
+        Hits hits = searcher.search(query);
+        
+        for (int i = 0; i < hits.length(); i ++) {
+            results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
+        }
+        ireader.close();
+        return results;
+    }
     
     /**
      * Add a boundingBox geometry to the specified Document.

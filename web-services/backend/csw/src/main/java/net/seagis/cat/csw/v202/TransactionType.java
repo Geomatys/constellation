@@ -31,9 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- *             Users may insert, update, or delete catalogue entries. If the 
- *             verboseResponse attribute has the value "true", then one or more 
- *             csw:InsertResult elements must be included in the response.
+ *  Users may insert, update, or delete catalogue entries. If the verboseResponse attribute has the value "true", 
+ *  then one or more csw:InsertResult elements must be included in the response.
  *          
  * 
  * <p>Java class for TransactionType complex type.
@@ -79,6 +78,23 @@ public class TransactionType extends RequestBaseType {
     @XmlSchemaType(name = "anyURI")
     private String requestId;
 
+    /**
+     * An empty constructor used by JAXB. 
+     */
+    public TransactionType() {}
+    
+    /**
+     * Build a new transaction request to insert a list of object
+     */
+    public TransactionType(String service, String version, InsertType... inserts) {
+        super(service, version);
+        insertOrUpdateOrDelete = new ArrayList<Object>();
+        for (InsertType insert: inserts) {
+            insertOrUpdateOrDelete.add(insert);
+        }
+        verboseResponse = false;
+    }
+    
     /**
      * Gets the value of the insertOrUpdateOrDelete property.
      * (unmodifiable)

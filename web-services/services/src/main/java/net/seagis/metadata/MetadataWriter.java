@@ -226,7 +226,15 @@ public class MetadataWriter {
                 if (classe.getName().equals("LanguageCode")) {
                     codelistElement =  ((Locale) object).getISO3Language();
                 } else {
-                    codelistElement =  ((org.opengis.util.CodeList) object).identifier();
+                    if (object instanceof org.opengis.util.CodeList) {
+                        codelistElement =  ((org.opengis.util.CodeList) object).identifier();
+                        if (codelistElement == null) {
+                            codelistElement = ((org.opengis.util.CodeList) object).name();
+                        }
+                    } else {
+                        logger.severe (object.getClass().getName() + " is not a codelist!");
+                        codelistElement = null;
+                    }
                 }
                 CodeListElement cle = (CodeListElement) cl.getPropertyByName(codelistElement);
                 if (cle != null && cle instanceof org.mdweb.model.schemas.Locale) {
@@ -323,6 +331,8 @@ public class MetadataWriter {
             propertyName = "onLineResource";
         } else if (propertyName.equals("dataSetURI")) {
             propertyName = "dataSetUri";
+        } else if (propertyName.equals("extentTypeCode")) {
+            propertyName = "inclusion";    
         // TODO remove when this issue will be fix in MDWeb    
         } else if (propertyName.indexOf("geographicElement") != -1) {
             propertyName = "geographicElement";
@@ -465,6 +475,8 @@ public class MetadataWriter {
             className = "CI_Date";
         } else if (className.equals("FRA_DirectReferenceSystem")) {
             className = "MD_ReferenceSystem";
+        } else if (className.equals("ScopeImpl")) {
+            className = "DQ_Scope";
         } 
         
         //we remove the Impl suffix
@@ -508,7 +520,7 @@ public class MetadataWriter {
             }       
             String name = className;
             int nameType = 0;
-            while (nameType < 9) {
+            while (nameType < 11) {
                 
                 logger.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
@@ -562,23 +574,35 @@ public class MetadataWriter {
                             name = "FC_" + className;    
                             break;
                         }
-                        //for the code list we add the "code" suffix
+                        //we add the prefix DQ_
                         case 7: {
+                            nameType = 8;
+                            name = "DQ_" + className;    
+                            break;
+                        }
+                        //we add the prefix LI_
+                        case 8: {
+                            nameType = 9;
+                            name = "LI_" + className;    
+                            break;
+                        }
+                        //for the code list we add the "code" suffix
+                        case 9: {
                             if (name.indexOf("Code") != -1) {
                                 name += "Code";
                             }
-                            nameType = 8;
+                            nameType = 10;
                             break;
                         }
                          //for the code list we add the "code" suffix
                         //for the temporal element we remove add prefix
-                        case 8: {
+                        case 10: {
                             name = "Time" + name;
-                            nameType = 9;
+                            nameType = 11;
                             break;
                         }
                         default:
-                            nameType = 9;
+                            nameType = 11;
                             break;
                     }
 
