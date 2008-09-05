@@ -9,7 +9,7 @@
 
 # Version des bibliothèques à utiliser par défaut
 export GEOTOOLS_VERSION=2.5-SNAPSHOT
-export SEAGIS_VERSION=1.0-SNAPSHOT
+export CONSTELLATION_VERSION=1.0-SNAPSHOT
 
 # Répertoire contenant l'ensemble des fichiers JARS.
 export JARS="$BASE_DIR/jar"
