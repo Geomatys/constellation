@@ -68,6 +68,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-go</artifactId>
+      <version>${geotools.version}</version>
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
