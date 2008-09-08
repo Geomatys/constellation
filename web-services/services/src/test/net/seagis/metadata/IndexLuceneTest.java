@@ -28,9 +28,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 // seagis dependencies
-import net.seagis.lucene.Filter.SerialChainFilter;
-import net.seagis.lucene.Filter.SpatialFilter;
-import net.seagis.lucene.Filter.SpatialQuery;
+import net.seagis.lucene.filter.SerialChainFilter;
+import net.seagis.lucene.filter.SpatialFilter;
+import net.seagis.lucene.filter.SpatialQuery;
 
 // lucene dependencies
 import org.apache.lucene.search.Filter;

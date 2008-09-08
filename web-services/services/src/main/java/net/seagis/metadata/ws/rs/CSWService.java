@@ -30,8 +30,6 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import java.security.Principal;
-import java.security.acl.Group;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -611,10 +609,10 @@ public class CSWService extends WebService {
         DistributedSearchType distribSearch = null;
         if (distrib != null && distrib.equalsIgnoreCase("true")) {
             String count = getParameter("HOPCOUNT", false);
-            BigInteger hopCount = new BigInteger("2");
+            Integer hopCount = 2;
             if (count != null) {
                 try {
-                    hopCount = new BigInteger(count);
+                    hopCount = Integer.parseInt(count);
                 } catch (NumberFormatException e){
                     throw new OWSWebServiceException("The positif integer " + count + " is malformed",
                                                 INVALID_PARAMETER_VALUE, "HopCount", getCurrentVersion());        

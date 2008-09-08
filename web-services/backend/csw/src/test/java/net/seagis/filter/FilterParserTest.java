@@ -29,9 +29,9 @@ import javax.xml.bind.Unmarshaller;
 // Seagis dependencies
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.lucene.Filter.SerialChainFilter;
-import net.seagis.lucene.Filter.SpatialFilter;
-import net.seagis.lucene.Filter.SpatialQuery;
+import net.seagis.lucene.filter.SerialChainFilter;
+import net.seagis.lucene.filter.SpatialFilter;
+import net.seagis.lucene.filter.SpatialQuery;
 import net.seagis.ogc.FilterType;
 
 // geotools dependencies

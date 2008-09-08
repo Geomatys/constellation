@@ -817,4 +817,91 @@ public class CatalogueHarvester {
                 throw new IllegalArgumentException("2.0.0 prefix unsupported: " + prefix + ".");
         }
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public DistributedResults transferGetRecordsRequest(GetRecordsType request, List<String> distributedServers,
+            int startPosition, int maxRecords) {
+        List<Object> additionalResults = new ArrayList<Object>();
+        int matched = 0;
+        for (String serverURL : distributedServers) {
+            request.setStartPosition(startPosition);
+            request.setMaxRecords(maxRecords);
+        
+            try {
+
+                Object response = sendRequest(serverURL, request);
+
+                if (response instanceof GetRecordsResponseType) {
+                    
+                    logger.info("Response of distant service:" + '\n' + response.toString());
+                    GetRecordsResponseType serviceResponse = (GetRecordsResponseType) response;
+                    SearchResultsType results = serviceResponse.getSearchResults();
+
+                    //we looking for CSW record
+                    for (JAXBElement<? extends AbstractRecordType> JBrecord : results.getAbstractRecord()) {
+                        AbstractRecordType record = JBrecord.getValue();
+                        additionalResults.add(record);
+                    }
+
+                    //we looking for any other Record type
+                    for (Object otherRecord : results.getAny()) {
+                        if (otherRecord instanceof JAXBElement) {
+                            otherRecord = ((JAXBElement) otherRecord).getValue();
+                        }
+                        additionalResults.add(otherRecord);
+                    }
+                    matched = matched + results.getNumberOfRecordsMatched();
+                    //if we have enought results a this point we stop requesting other CSW
+                    if (additionalResults.size() == maxRecords) {
+                        break;
+                    } else {
+                        startPosition = 1;
+                        maxRecords    = maxRecords - additionalResults.size();
+                        
+                    }
+                    
+                    
+                }
+
+            } catch (MalformedURLException ex) {
+                logger.severe(serverURL + " is a malformed URL. unable to request that service");
+            } catch (WebServiceException ex) {
+                logger.severe(ex.getMessage());
+            } catch (IOException ex) {
+                logger.info("IO exeception while distibuting the request: " + ex.getMessage());
+            }
+        }
+        
+        return new DistributedResults(matched, additionalResults);
+        
+    }
+    
+    public class DistributedResults {
+        
+        /**
+         * The number of records matched on all distributed servers.
+         */
+        public int nbMatched;
+        
+        /**
+         * The merged list of records.
+         */
+        public List<Object> additionalResults;
+        
+        public DistributedResults() {
+            this.nbMatched         = 0;
+            this.additionalResults = new ArrayList<Object>(); 
+        }
+        
+        public DistributedResults(int nbMatched, List<Object> additionalResults) {
+            this.nbMatched         = nbMatched;
+            this.additionalResults = additionalResults; 
+        }
+        
+        
+        
+    }
 }

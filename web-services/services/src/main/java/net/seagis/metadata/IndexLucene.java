@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 // Lucene dependencies
-import net.seagis.lucene.Filter.SerialChainFilter;
-import net.seagis.lucene.Filter.SpatialQuery;
+import net.seagis.lucene.filter.SerialChainFilter;
+import net.seagis.lucene.filter.SpatialQuery;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;

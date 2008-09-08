@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -94,6 +94,8 @@ public class OperationsMetadata {
      * 
      */
     public List<Operation> getOperation() {
+        if (operation == null)
+            operation = new ArrayList<Operation>();
         return operation;
     }
     
@@ -113,6 +115,8 @@ public class OperationsMetadata {
      * Gets the value of the parameter property.
      */
     public List<DomainType> getParameter() {
+        if (parameter == null)
+            parameter = new ArrayList<DomainType>();
         return Collections.unmodifiableList(parameter);
     }
 
@@ -120,7 +124,9 @@ public class OperationsMetadata {
      * Gets the value of the constraint property.
      */
     public List<DomainType> getConstraint() {
-        return Collections.unmodifiableList(constraint);
+        if (constraint == null)
+            constraint = new ArrayList<DomainType>();
+        return constraint;
     }
 
     /**

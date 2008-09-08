@@ -87,7 +87,7 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.dublincore.AbstractSimpleLiteral;
 import net.seagis.filter.FilterParser;
-import net.seagis.lucene.Filter.SpatialQuery;
+import net.seagis.lucene.filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ogc.SortByType;
 import net.seagis.ogc.SortPropertyType;
@@ -579,6 +579,10 @@ public class CSWworker {
         ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
     }
     
+    /**
+     * A list of known CSW server used in distributed search.
+     */
+    private List<String> cascadedCSWservers;
     
     /**
      * Build a new CSW worker
@@ -595,6 +599,7 @@ public class CSWworker {
         cswFactory202     = new ObjectFactory();
         cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
+        Properties cascad = new Properties();
         File f            = null;
         String home       = System.getProperty("user.home");
         File env          = new File(home, ".sicade/csw_configuration/");
@@ -602,7 +607,6 @@ public class CSWworker {
         isStarted = true;
         try {
             // we get the configuration file
-            
             f = new File(env, "config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
@@ -616,6 +620,25 @@ public class CSWworker {
                           "cause: The service can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
             isStarted = false;
+        }
+        
+        cascadedCSWservers = new ArrayList<String>();
+        try {
+            // we get the cascading configuration file
+            f = new File(env, "CSWCascading.properties");
+            FileInputStream in = new FileInputStream(f);
+            cascad.load(in);
+            in.close();
+            String s = "Cascaded Services:" + '\n';
+            for (String serverName: cascad.stringPropertyNames()) {
+                String servURL = (String)cascad.getProperty(serverName);
+                s = s + servURL + '\n';
+                cascadedCSWservers.add(servURL);
+            }
+            logger.info(s);
+            
+        } catch (FileNotFoundException e) {
+            logger.info("no cascaded CSW server found (optionnal)");
         }
         
         // we initialize the filterParser
@@ -741,8 +764,12 @@ public class CSWworker {
                 
             om = staticCapabilities.getOperationsMetadata();
             //we update the URL
-            if (om != null)
+            if (om != null) {
                 WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
+                DomainType cascadedCSW = new DomainType("FederatedCatalogues", cascadedCSWservers);
+                om.getConstraint().add(cascadedCSW);
+            }
+            
                
         }
             
@@ -875,12 +902,36 @@ public class CSWworker {
         // we try to execute the query
         List<String> results = executeLuceneQuery(luceneQuery);
         
-        int nextRecord = startPos + maxRecord;
-        if (nextRecord > results.size())
+        //we look for distributed queries
+        CatalogueHarvester.DistributedResults distributedResults = catalogueHarvester.new DistributedResults();
+        if (request.getDistributedSearch() != null) {
+            int distributedStartPosition;
+            int distributedMaxRecord;
+            if (startPos > results.size()) {
+                distributedStartPosition = startPos - results.size();
+                distributedMaxRecord     = maxRecord;
+            } else {
+                distributedStartPosition = 1;
+                distributedMaxRecord     = maxRecord - results.size();
+            }
+            
+            distributedResults = catalogueHarvester.transferGetRecordsRequest(request, cascadedCSWservers, distributedStartPosition, distributedMaxRecord);
+        }
+        
+        int nextRecord   = startPos + maxRecord;
+        int totalMatched = results.size() + distributedResults.nbMatched;
+        
+        if (nextRecord > totalMatched)
             nextRecord = 0;
+        
+        int maxDistributed = distributedResults.additionalResults.size();
         int max = (startPos - 1) + maxRecord;
-        if (max > results.size())
+        
+        if (max > results.size()) {
             max = results.size();
+        }
+        logger.info("local max = " + max + " distributed max = " + maxDistributed);
+        
         
         try {
             if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
@@ -898,13 +949,24 @@ public class CSWworker {
                         Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
                         if (obj == null && (max + 1) < results.size()) {
                             max++;
-                        }
-                        else
+                        
+                        } else {
                             records.add((AbstractRecordType)obj);
+                        }
                     }
+                    
+                    //we add additional distributed result
+                    for (int i = 0; i < maxDistributed; i++) {
+                        
+                        Object additionalResult = distributedResults.additionalResults.get(i);
+                        if (additionalResult instanceof AbstractRecordType) {
+                            records.add((AbstractRecordType) additionalResult);
+                        }
+                    }
+                    
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
-                                                          results.size(),
+                                                          totalMatched,
                                                           records,
                                                           records.size(),
                                                           nextRecord);
@@ -940,9 +1002,19 @@ public class CSWworker {
                                 records.add((MetaDataImpl)obj);
                         }
                     }
+                    
+                     //we add additional distributed result
+                    for (int i = 0; i < maxDistributed; i++) {
+                        
+                        Object additionalResult = distributedResults.additionalResults.get(i);
+                        if (additionalResult instanceof MetaDataImpl) {
+                            records.add((MetaDataImpl) additionalResult);
+                        }
+                    }
+                    
                     searchResults = new SearchResultsType(ID, 
                                                           set, 
-                                                          results.size(),
+                                                          totalMatched,
                                                           records.size(),
                                                           records);
                     

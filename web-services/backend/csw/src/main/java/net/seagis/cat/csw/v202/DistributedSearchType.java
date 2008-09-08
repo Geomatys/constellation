@@ -25,10 +25,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * Governs the behaviour of a distributed search.
- * hopCount     - the maximum number of message hops before
- *                the search is terminated. Each catalogue node 
- *                decrements this value when the request is received, 
- *                and must not forward the request if hopCount=0.
+ * hopCount     - the maximum number of message hops before the search is terminated. 
+ * 
+ * Each catalogue node decrements this value when the request is received, and must not forward the request if hopCount=0.
  * 
  * <p>Java class for DistributedSearchType complex type.
  * 
@@ -52,7 +51,7 @@ public class DistributedSearchType {
 
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger hopCount;
+    private Integer hopCount;
 
     /**
      * An empty constructor used by JAXB
@@ -64,15 +63,15 @@ public class DistributedSearchType {
     /**
      * Build a new DIstributed search
      */
-    public DistributedSearchType(BigInteger hopCount){
+    public DistributedSearchType(Integer hopCount){
         this.hopCount = hopCount;
     }
     
     /**
      */
-    public BigInteger getHopCount() {
+    public Integer getHopCount() {
         if (hopCount == null) {
-            return new BigInteger("2");
+            return 2;
         } else {
             return hopCount;
         }

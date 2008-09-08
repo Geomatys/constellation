@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.lucene.Filter;
+package net.seagis.lucene.filter;
 
 import java.awt.geom.Line2D;
 import java.io.IOException;

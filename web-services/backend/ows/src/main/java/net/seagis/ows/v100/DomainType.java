@@ -73,6 +73,21 @@ public class DomainType {
     private String name;
 
     /**
+     * An empty constructor used by JAXB.
+     */
+    public DomainType() {
+        
+    }
+    
+    /**
+     * Build a new Domain with the specified list of values.
+     */
+    public DomainType(String name, List<String> value) {
+        this.name  = name;
+        this.value = value;
+    }
+    
+    /**
      * return the default value for this domain
      */
     public String getDefaultValue() {
