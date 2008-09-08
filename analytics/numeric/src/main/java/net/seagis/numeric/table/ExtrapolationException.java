@@ -1,6 +1,6 @@
 /*
  *    Constellation - An open source and standard compliant SDI
- *    http://constellation.codehaus.org
+ *    http://www.constellation-sdi.org
  *
  *    (C) 1997, Pêches et Océans Canada
  *    (C) 2006, Institut de Recherche pour le Développement

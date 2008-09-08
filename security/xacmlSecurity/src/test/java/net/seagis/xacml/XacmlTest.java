@@ -1,6 +1,6 @@
 /*
  *    Constellation - An open source and standard compliant SDI
- *    http://constellation.codehaus.org
+ *    http://www.constellation-sdi.org
  *
  *    (C) 2007 - 2008, Geomatys
  *
