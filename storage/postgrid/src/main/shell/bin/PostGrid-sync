@@ -20,4 +20,4 @@ export BASE_DIR
 
 # Runs Java commands
 export CLASSPATH=$JARS/postgrid-$CONSTELLATION_VERSION.jar
-java $OPTS -showversion net.seagis.console.Synchronizer -config "$BASE_DIR/etc/postgrid-sync.properties" "$@"
+java $OPTS -showversion org.constellation.console.Synchronizer -config "$BASE_DIR/etc/postgrid-sync.properties" "$@"

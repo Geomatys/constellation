@@ -13,7 +13,7 @@ export BASE_DIR
 
 # Runs Java commands
 export CLASSPATH=.
-export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-hsql-$GEOTOOLS_VERSION.jar
-export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-extension-$GEOTOOLS_VERSION.jar
+export CLASSPATH=$CLASSPATH:$JARS/gt-epsg-hsql-$GEOTOOLS_VERSION.jar
+export CLASSPATH=$CLASSPATH:$JARS/gt-epsg-extension-$GEOTOOLS_VERSION.jar
 
 java $OPTS org.geotools.referencing.CRS "$@"

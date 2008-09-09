@@ -12,4 +12,4 @@ export BASE_DIR
 
 # Runs Java commands
 export CLASSPATH=$JARS/postgrid-$CONSTELLATION_VERSION.jar
-java $OPTS -showversion net.seagis.catalog.Database "$@"
+java $OPTS -showversion org.constellation.catalog.Database "$@"
