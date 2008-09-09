@@ -5,12 +5,12 @@
    
   <managed-bean>
       <managed-bean-name>servicesBean</managed-bean-name>
-      <managed-bean-class>net.seagis.bean.ServicesBean</managed-bean-class>
+      <managed-bean-class>org.constellation.bean.ServicesBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    <managed-bean>
       <managed-bean-name>authentificationBean</managed-bean-name>
-      <managed-bean-class>net.seagis.bean.AuthentificationBean</managed-bean-class>
+      <managed-bean-class>org.constellation.bean.AuthentificationBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    <navigation-rule>

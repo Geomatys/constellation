@@ -10,10 +10,10 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-	  <!-- To disable CSW     service remove packageName: net.seagis.metadata.ws.rs-->
-          <!-- To disable WMS/WCS service remove packageName: net.seagis.coverage.ws   -->
-          <!-- To enable  SOS     service add    packageName: net.seagis.sos.ws.rs     -->
-          <param-value>net.seagis.coverage.ws;net.seagis.metadata.ws.rs</param-value>
+	  <!-- To disable CSW     service remove packageName: org.constellation.metadata.ws.rs-->
+          <!-- To disable WMS/WCS service remove packageName: org.constellation.coverage.ws   -->
+          <!-- To enable  SOS     service add    packageName: org.constellation.sos.ws.rs     -->
+          <param-value>org.constellation.coverage.ws;org.constellation.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
