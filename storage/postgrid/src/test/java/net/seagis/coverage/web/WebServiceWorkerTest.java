@@ -28,6 +28,7 @@ import javax.imageio.IIOException;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.OperationNotFoundException;
+
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
@@ -36,9 +37,10 @@ import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.util.logging.Logging;
 
+import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.ConfigurationKey;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTableTest;
-import net.seagis.catalog.DatabaseTest;
 
 import org.junit.*;
 
@@ -53,7 +55,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      * {@code true} for disabling tests. Useful for disabling every tests except one
      * during debugging.
      */
-    private static final boolean DISABLED = false;
+    private static final boolean DISABLED = true;
 
     /**
      * Tests with the default test layer.
@@ -371,13 +373,65 @@ public class WebServiceWorkerTest extends DatabaseTest {
     }
 
     /**
+     * Tests with the Ortho2000 layer.
+     *
+     * @throws WebServiceException If a WMS parameter is illegal.
+     * @throws IOException If an error occured while reading an image.
+     */
+    @Test
+    public void testOrtho2000() throws WebServiceException, IOException {
+        //if (DISABLED) return;
+        final WebServiceWorker worker = new WebServiceWorker(database, false);
+        worker.setService("WMS", "1.1.1");
+        worker.setLayer("Ortho2000");
+        worker.setCoordinateReferenceSystem("EPSG:27572");
+        worker.setDimension("604", "424", null);
+        /*
+         * Global view.
+         * BBOX demandée: 51°48'45,6"N, 09°21'36,7"W - 41°14'56,2"N, 13°37'45,3"E
+         * BBOX utilisée: 51°07'16,2"N, 05°34'11,9"W - 43°09'50,8"N, 02°36'25,5"E
+         * BBOX obtenue:  51°06'33,1"N, 05°32'53,1"W - 43°09'39,0"N, 02°35'38,6"E
+         */
+        worker.setBoundingBox("-215869.691647, 1632837.614174, 1387192.992499, 2758166.385826");
+        RenderedImage image = ImageIO.read(worker.getImageFile());
+        assertEquals(604, image.getWidth());
+        assertEquals(424, image.getHeight());
+        /*
+         * Following was used to throw a NullPointerException.
+         * BBOX demandée: 47°08'27,9"N, 02°53'05,4"W - 46°27'26,6"N, 01°31'16,6"W
+         * BBOX utilisée: 47°08'28,1"N, 02°53'09,9"W - 46°27'26,6"N, 01°31'10,6"W
+         * BBOX obtenue:  47°11'38,8"N, 02°57'01,1"W - 46°24'11,3"N, 01°28'12,9"W
+         */
+        worker.setBoundingBox("203806.280092, 2174932.90099, 303997.697852, 2245265.949218");
+        image = ImageIO.read(worker.getImageFile());
+        assertEquals(604, image.getWidth());
+        assertEquals(424, image.getHeight());
+        /*
+         * Following was used to miss a tile (need visual check - look for black area).
+         * BBOX demandée: 49°18'28,0"N, 01°02'43,1"W - 49°18'09,2"N, 01°02'03,3"W
+         * BBOX utilisée: 49°18'29,7"N, 01°02'43,2"W - 49°18'08,4"N, 01°01'57,4"W
+         * BBOX obtenue:  49°18'31,3"N, 01°02'41,5"W - 49°18'07,5"N, 01°01'52,9"W
+         * 
+         * java.awt.geom.Rectangle2D$Float[x=353912.8,y=2483559.0,w=953.25,h=697.25]
+         */
+        worker.setBoundingBox("353875.689453, 2483613.235058, 354658.434904, 2484162.711997");
+        image = ImageIO.read(worker.getImageFile());
+        assertEquals(604, image.getWidth());
+        assertEquals(424, image.getHeight());
+    }
+
+    /**
      * Tests the permission.
      *
      * @throws WebServiceException If a WMS parameter is illegal.
      * @throws IOException If an error occured while reading an image.
-
+     *
+     * @todo Disabled for now.
+     */
     @Test
     public void testPermissions() throws WebServiceException, IOException {
+        if (true) return;
+
         if (DISABLED) return;
 
         // First Case we test with an "Anonymous" user.
@@ -464,5 +518,5 @@ public class WebServiceWorkerTest extends DatabaseTest {
         image = ImageIO.read(file);
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
-    }*/
+    }
 }

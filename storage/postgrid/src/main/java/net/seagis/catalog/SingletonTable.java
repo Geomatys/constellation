@@ -271,6 +271,8 @@ public abstract class SingletonTable<E> extends Table {
      * @throws NoSuchRecordException if no record was found for the specified key.
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if a SQL error occured while reading the database.
+     *
+     * @todo Contains an unsafe cast.
      */
     private E executeQuery(final PreparedStatement statement, Object key, final int index)
             throws CatalogException, SQLException
@@ -297,7 +299,7 @@ public abstract class SingletonTable<E> extends Table {
          * name, uses the entry's String instance in order to reduce the number of objects
          * to be managed by the garbage collector.
          */
-        final String name = ((Entry)entry).getName();
+        final String name = ((Entry)entry).getName(); // TODO: unsafe cast.
         if (key.equals(name)) {
             key = name; // Use the same instance (slight memory saver).
         } else {

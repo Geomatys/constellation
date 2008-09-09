@@ -452,8 +452,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             throws TransformException
     {
         final GridRange gridRange = geometry.geometry.getGridRange();
-        final int width  = gridRange.getLength(0);
-        final int height = gridRange.getLength(1);
+        final int width  = gridRange.getSpan(0);
+        final int height = gridRange.getSpan(1);
         final AffineTransform gridToCRS = geometry.gridToCRS; // DO NOT MODIFY.
         final AffineTransform crsToGrid;
         try {

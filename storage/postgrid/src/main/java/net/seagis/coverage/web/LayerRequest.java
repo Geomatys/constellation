@@ -136,8 +136,8 @@ final class LayerRequest {
              * We allows zero, which means best resolution available.
              */
             if (size != null) {
-                xResolution *= Math.max(0, Math.floor(xRange / (size.getLength(0) * xResolution) + EPS));
-                yResolution *= Math.max(0, Math.floor(yRange / (size.getLength(1) * yResolution) + EPS));
+                xResolution *= Math.max(0, Math.floor(xRange / (size.getSpan(0) * xResolution) + EPS));
+                yResolution *= Math.max(0, Math.floor(yRange / (size.getSpan(1) * yResolution) + EPS));
                 resolution = (xResolution != 0 || yResolution != 0) ?
                         new XDimension2D.Double(xResolution, yResolution) : null;
             } else {
@@ -161,8 +161,8 @@ final class LayerRequest {
             return false;
         }
         for (int i=envelope.getDimension(); --i>=0;) {
-            final double length = envelope.getLength(i);
-            if (Double.isInfinite(length) || !(length > 0)) {
+            final double span = envelope.getSpan(i);
+            if (Double.isInfinite(span) || !(span > 0)) {
                 return false;
             }
         }
