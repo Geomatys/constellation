@@ -29,7 +29,7 @@ import org.openide.nodes.Sheet;
 import org.openide.nodes.PropertySupport;
 import org.openide.util.NbBundle;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.util.DateRange;
 
 

@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-// Sicade dependencies 
+// Constellation dependencies 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Entry;
 import org.constellation.coverage.model.Distribution;

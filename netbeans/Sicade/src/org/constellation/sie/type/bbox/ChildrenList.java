@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 // OpenIDE dependencies
 import org.openide.nodes.Children;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.Element;
 import org.constellation.observation.coverage.Series;
 import org.constellation.observation.coverage.Thematic;

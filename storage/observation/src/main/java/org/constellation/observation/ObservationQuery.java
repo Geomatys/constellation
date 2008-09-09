@@ -17,7 +17,7 @@
  */
 package org.constellation.observation;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.Column;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.Parameter;

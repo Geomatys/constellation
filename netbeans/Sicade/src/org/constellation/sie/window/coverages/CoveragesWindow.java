@@ -31,7 +31,7 @@ import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.coverage.CoverageReference;
 import org.constellation.observation.coverage.CoverageTableModel;
 

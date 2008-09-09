@@ -41,7 +41,7 @@ import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.CatalogException;
 import org.constellation.observation.coverage.DynamicCoverage;
 

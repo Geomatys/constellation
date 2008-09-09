@@ -38,7 +38,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.coverage.model.DescriptorTable;
 import org.constellation.resources.i18n.Resources;
 //import org.constellation.resources.XArray;

@@ -24,7 +24,7 @@ import java.util.LinkedList;
 // OpenIDE dependencies
 import org.openide.ErrorManager;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.Observations;
 import org.constellation.observation.coverage.Series;
 

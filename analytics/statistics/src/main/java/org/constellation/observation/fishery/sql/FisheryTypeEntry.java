@@ -17,7 +17,7 @@
  */
 package org.constellation.observation.fishery.sql;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.ProcessEntry;
 import org.constellation.observation.fishery.FisheryType;
 

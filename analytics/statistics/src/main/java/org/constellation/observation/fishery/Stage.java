@@ -17,7 +17,7 @@
  */
 package org.constellation.observation.fishery;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.Element;
 
 

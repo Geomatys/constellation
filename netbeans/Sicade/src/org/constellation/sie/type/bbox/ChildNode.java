@@ -30,7 +30,7 @@ import org.openide.nodes.NodeOperation;
 import org.openide.util.NbBundle;
 import org.openide.ErrorManager;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.Element;
 import org.constellation.observation.CatalogException;
 import org.constellation.observation.coverage.Series;

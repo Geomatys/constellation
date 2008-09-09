@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-// Sicade dependencies
+// Constellation dependencies
 import java.sql.Timestamp;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;

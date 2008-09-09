@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.GeneralEnvelope;
 //import org.geotools.gui.headless.ProgressPrinter;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.coverage.catalog.Catalog;
 import org.constellation.catalog.CatalogException;
 import org.geotools.resources.image.ImageUtilities;

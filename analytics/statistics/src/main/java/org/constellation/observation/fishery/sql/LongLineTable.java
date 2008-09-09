@@ -27,7 +27,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingFeatureCollection;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.sampling.SamplingFeatureTable;

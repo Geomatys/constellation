@@ -32,7 +32,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.util.DateRange;
 import org.constellation.observation.coverage.Series;
 import org.constellation.observation.coverage.sql.TreeDepth;

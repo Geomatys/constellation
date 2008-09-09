@@ -33,7 +33,7 @@ import org.openide.filesystems.Repository;
 import org.openide.util.Utilities;
 import org.openide.util.NbBundle;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.sie.type.bbox.AddAction;
 
 

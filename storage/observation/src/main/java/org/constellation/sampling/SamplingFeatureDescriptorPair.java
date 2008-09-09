@@ -21,7 +21,7 @@ package org.constellation.sampling;
 import java.util.Date;
 import java.lang.reflect.UndeclaredThrowableException;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Descriptor;
 import org.opengis.observation.sampling.SamplingFeature;

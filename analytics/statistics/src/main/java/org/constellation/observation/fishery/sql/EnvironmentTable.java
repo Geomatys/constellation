@@ -17,7 +17,7 @@
  */
 package org.constellation.observation.fishery.sql;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;

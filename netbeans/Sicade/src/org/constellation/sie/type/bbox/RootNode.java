@@ -24,7 +24,7 @@ import javax.swing.Action;
 import org.openide.nodes.Sheet;
 import org.openide.loaders.DataNode;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.resources.XArray;
 
 

@@ -36,7 +36,7 @@ import org.openide.windows.TopComponent;
 import org.geotools.gui.swing.ImagePane;
 import org.geotools.gui.swing.ExceptionMonitor;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.Observations;
 import org.constellation.observation.CatalogException;
 import org.constellation.observation.coverage.Series;

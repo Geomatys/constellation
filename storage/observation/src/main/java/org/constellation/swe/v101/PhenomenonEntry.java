@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-// Sicade dependencies
+// Constellation dependencies
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.DefinitionType;
 import org.opengis.observation.Phenomenon;

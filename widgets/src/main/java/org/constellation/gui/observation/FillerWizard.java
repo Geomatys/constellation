@@ -23,7 +23,7 @@ import java.util.Set;
 // Geotools dependencies
 import org.geotools.resources.Arguments;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.coverage.catalog.Catalog;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Descriptor;

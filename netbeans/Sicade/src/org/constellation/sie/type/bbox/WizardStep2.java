@@ -28,7 +28,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.gui.swing.referencing.CoordinateChooser;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.util.DateRange;
 
 

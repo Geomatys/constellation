@@ -31,7 +31,7 @@ import javax.swing.event.ChangeListener;
 import org.openide.util.NbBundle;
 import org.openide.WizardDescriptor;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.resources.XArray;
 
 

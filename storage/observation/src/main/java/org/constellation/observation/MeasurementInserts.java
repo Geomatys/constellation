@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ServerException;
 import org.constellation.coverage.catalog.*;

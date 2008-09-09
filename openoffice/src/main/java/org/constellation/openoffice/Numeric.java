@@ -31,7 +31,7 @@ import com.sun.star.registry.XRegistryKey;
 import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.numeric.table.Table;
 import org.constellation.numeric.table.TableFactory;
 import org.constellation.numeric.table.Interpolation;

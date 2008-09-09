@@ -23,7 +23,7 @@ import javax.swing.JRadioButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.coverage.sql.TreeDepth;
 
 

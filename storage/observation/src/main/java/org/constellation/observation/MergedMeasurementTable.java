@@ -41,7 +41,7 @@ import org.constellation.catalog.Table;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.coverage.model.Descriptor;
 import org.constellation.coverage.model.RegionOfInterest;
 

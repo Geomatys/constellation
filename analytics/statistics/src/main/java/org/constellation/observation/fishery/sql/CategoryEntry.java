@@ -20,7 +20,7 @@ package org.constellation.observation.fishery.sql;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.coverage.model.Distribution;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.observation.ElementEntry;

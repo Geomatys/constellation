@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.coverage.Series;
 
 

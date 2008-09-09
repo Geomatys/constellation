@@ -21,7 +21,7 @@ package org.constellation.observation.fishery.sql;
 import java.util.Locale;
 import static java.util.Locale.*;
 
-// Sicade dependencies
+// Constellation dependencies
 import org.constellation.observation.fishery.Species;
 import org.constellation.swe.v101.PhenomenonEntry;
 
