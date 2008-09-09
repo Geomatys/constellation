@@ -2,22 +2,22 @@
 
 <HTML>
   <HEAD>
-    <TITLE>package net.seagis.catalog</TITLE>
+    <TITLE>package org.constellation.catalog</TITLE>
   </HEAD>
   <BODY>
-  Base classes for the {@linkplain net.seagis.coverage.catalog coverage catalog}
-  and the {@linkplain net.seagis.observation.catalog observation catalog}. Those
+  Base classes for the {@linkplain org.constellation.coverage.catalog coverage catalog}
+  and the {@linkplain org.constellation.observation.catalog observation catalog}. Those
   base classes provide helper methods for a catalog backed by a SQL database.
 
-  <P>{@link net.seagis.catalog.Element} is the parent of all interfaces providing an
+  <P>{@link org.constellation.catalog.Element} is the parent of all interfaces providing an
   access to the catalog. Implementations may delegate their work to a remote server,
   using a JDBC query in most cases, or using RMI (<cite>Remote Method Invocation</cite>)
   in a few other cases (for example when a single pixel is evaluated in a grid coverage;
   we don't want to transfer the full image through the network. Note that <cite>Web
   Coverage Service</cite> is an other way to provide the same functionality).</P>
 
-  <P>{@link net.seagis.catalog.Entry} is the root class of most {@link net.seagis.catalog.Element}
-  implementations. It is often (but not always) a record from a {@link net.seagis.catalog.Table},
+  <P>{@link org.constellation.catalog.Entry} is the root class of most {@link org.constellation.catalog.Element}
+  implementations. It is often (but not always) a record from a {@link org.constellation.catalog.Table},
   which is why it is named {@code Entry}.</P>
   </BODY>
 </HTML>
