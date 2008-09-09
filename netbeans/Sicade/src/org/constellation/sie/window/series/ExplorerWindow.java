@@ -60,7 +60,7 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
      * Chemin vers l'icône utilisée pour cette fenêtre ainsi que pour l'action
      * {@link ViewAction} qui l'ouvrira.
      */
-    static final String ICON_PATH = "net/seagis/sie/window/series/Icon.gif";
+    static final String ICON_PATH = "org/constellation/sie/window/series/Icon.gif";
 
     /**
      * Une chaîne de caractères qui représentera cette fenêtre au sein du {@linkplain WindowManager

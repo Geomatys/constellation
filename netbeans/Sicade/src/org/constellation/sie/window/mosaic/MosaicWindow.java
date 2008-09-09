@@ -62,7 +62,7 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
      * Chemin vers l'icône utilisée pour cette fenêtre ainsi que pour l'action
      * {@link ViewAction} qui l'ouvrira.
      */
-    static final String ICON_PATH = "net/seagis/sie/window/mosaic/Icon.gif";
+    static final String ICON_PATH = "org/constellation/sie/window/mosaic/Icon.gif";
 
     /**
      * L'icone pour cette fenêtre. Ne sera lue que la première fois où elle sera nécessaire.

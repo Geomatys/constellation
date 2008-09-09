@@ -1326,7 +1326,7 @@ public class CSWworker {
 
             if (typeNames.contains(_Record_QNAME)) {
 
-                InputStream in = getResourceAsStream("net/seagis/metadata/record.xsd");
+                InputStream in = getResourceAsStream("org/constellation/metadata/record.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1334,7 +1334,7 @@ public class CSWworker {
             
             if (typeNames.contains(_Metadata_QNAME)) {
 
-                InputStream in = getResourceAsStream("net/seagis/metadata/metadata.xsd");
+                InputStream in = getResourceAsStream("org/constellation/metadata/metadata.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
                 components.add(component);

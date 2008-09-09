@@ -226,7 +226,7 @@ public abstract class WebService {
         PDP = new CstlPDP();
 
         //load the correspounding policy file
-        final String url = "net/seagis/xacml/" + service.toLowerCase() + "Policy.xml";
+        final String url = "org/constellation/xacml/" + service.toLowerCase() + "Policy.xml";
         final InputStream is = SecurityActions.getResourceAsStream(url);
         if (is == null) {
             LOGGER.severe("unable to find the resource: " + url);

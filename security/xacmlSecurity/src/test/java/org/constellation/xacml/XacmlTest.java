@@ -492,7 +492,7 @@ public class XacmlTest {
         PDP = new CstlPDP();
 
         //load the correspounding policy file
-        String url = "net/seagis/xacml/" + "csw" + "Policy.xml";
+        String url = "org/constellation/xacml/" + "csw" + "Policy.xml";
         InputStream is = SecurityActions.getResourceAsStream(url);
         if (is == null) {
             logger.severe("unable to find the resource: " + url);
@@ -925,7 +925,7 @@ public class XacmlTest {
         List<PolicyType> policies = new ArrayList<PolicyType>();
         
         for (String policyName: policyNames) {
-            InputStream is             = SecurityActions.getResourceAsStream("net/seagis/xacml/" + policyName);
+            InputStream is             = SecurityActions.getResourceAsStream("org/constellation/xacml/" + policyName);
             JAXBElement<PolicyType> jb = (JAXBElement<PolicyType>) unmarshaller.unmarshal(is);  
             policies.add(jb.getValue());
         }
