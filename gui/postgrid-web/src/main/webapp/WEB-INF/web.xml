@@ -41,7 +41,7 @@
 
      -->
 
-    <!-- Servlet for seagis JSF interface -->
+    <!-- Servlet for constellation JSF interface -->
     <!-- filters for tomahawk and sandbox -->
     <filter>
         <filter-name>MyFacesExtensionsFilter</filter-name>

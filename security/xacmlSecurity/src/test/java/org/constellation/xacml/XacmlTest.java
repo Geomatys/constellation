@@ -33,7 +33,7 @@ import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
-// seagis dependencies
+// Constellation dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;

@@ -45,7 +45,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
-// Seagis Dependencies
+// Constellation Dependencies
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
@@ -130,7 +130,7 @@ public class MetadataReader {
     /**
      * A list of package containing the CSW and dublinCore implementation
      */
-    private List<String> seagisPackage;
+    private List<String> ConstellationPackage;
     
     /**
      * A List of the already see object for the current metadata readed
@@ -176,7 +176,7 @@ public class MetadataReader {
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.seagisPackage   = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
+        this.ConstellationPackage   = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();
@@ -971,7 +971,7 @@ public class MetadataReader {
         List<String> packagesName = new ArrayList<String>();
         if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore") || 
             standardName.equals("OGC Web Service")) {
-            packagesName = seagisPackage;
+            packagesName = ConstellationPackage;
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType")) {
                 packagesName = geotoolsPackage;

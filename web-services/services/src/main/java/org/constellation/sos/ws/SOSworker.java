@@ -53,7 +53,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.catalog.NoSuchTableException;
 import org.xml.sax.SAXException;
 
-// SeaGis dependencies
+// Constellation dependencies
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.Contents;
 import org.constellation.sos.Contents.ObservationOfferingList;

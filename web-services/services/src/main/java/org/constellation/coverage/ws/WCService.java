@@ -50,7 +50,7 @@ import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;
 
-// seagis dependencies
+// Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;

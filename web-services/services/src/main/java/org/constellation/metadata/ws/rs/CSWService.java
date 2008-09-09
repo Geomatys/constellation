@@ -42,7 +42,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 
-// seagis dependencies
+// Constellation dependencies
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;

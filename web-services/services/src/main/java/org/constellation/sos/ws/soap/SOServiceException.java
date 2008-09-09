@@ -29,7 +29,7 @@ import org.constellation.coverage.web.Service;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "SOServiceException", namespace="http://soap.webservice.sos.seagis.net/")
+@XmlRootElement(name = "SOServiceException", namespace="http://soap.webservice.sos.constellation.org/")
 public class SOServiceException extends Exception {
     
     /**

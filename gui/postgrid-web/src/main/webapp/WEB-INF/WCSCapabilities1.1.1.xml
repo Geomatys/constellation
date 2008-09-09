@@ -10,7 +10,7 @@ version="1.1.1" updateSequence="">
   <!-- ************************************************************ -->
   <ows:ServiceIdentification>
 		<ows:Title>Web Coverage Server</ows:Title>
-		<ows:Abstract>SeaGis Web Coverage Server maintained by geomatys.</ows:Abstract>
+		<ows:Abstract>Constellation Web Coverage Server maintained by geomatys.</ows:Abstract>
 		<ows:Keywords>
 			<ows:Keyword>WCS</ows:Keyword>
 			<ows:Keyword>geomatys</ows:Keyword>
@@ -51,7 +51,7 @@ version="1.1.1" updateSequence="">
 		<ows:Operation name="GetCapabilities">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
+					<ows:Get xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="service">
@@ -81,19 +81,19 @@ version="1.1.1" updateSequence="">
          </ows:Parameter>
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
+					<ows:Post xlink:href="s"/>
 				</ows:HTTP>
 			</ows:DCP>
 		</ows:Operation>
 		<ows:Operation name="GetCoverage">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCoverage"/>
+					<ows:Get xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCoverage"/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="Format">
@@ -113,12 +113,12 @@ version="1.1.1" updateSequence="">
 		<ows:Operation name="DescribeCoverage">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=DescribeCoverage"/>
+					<ows:Get xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=DescribeCoverage"/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="Format">

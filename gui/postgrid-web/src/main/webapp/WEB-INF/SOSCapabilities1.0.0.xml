@@ -37,8 +37,8 @@
 		<ows:Operation name="GetCapabilities">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Get xlink:href=""/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="service">
@@ -70,7 +70,7 @@
 		<ows:Operation name="RegisterSensor">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">
@@ -87,7 +87,7 @@
 		<ows:Operation name="GetResult">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">
@@ -104,7 +104,7 @@
 		<ows:Operation name="GetObservation">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">
@@ -169,7 +169,7 @@
 		<ows:Operation name="InsertObservation">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">
@@ -186,7 +186,7 @@
 		<ows:Operation name="DescribeSensor">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">

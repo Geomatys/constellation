@@ -2,14 +2,14 @@
 	<Service version="1.0.0">
     <metadataLink about="http://seagis.sourceforge.net/html/index.php" metadataType="other"/>
     <description>
-      SeaGis Web Coverage Server maintained by geomatys.
+      Constellation Web Coverage Server maintained by geomatys.
     </description>
-    <name>SeaGis WCS</name>
-    <label>SeaGis WCS</label>
+    <name>Constellation WCS</name>
+    <label>Constellation WCS</label>
     <keywords>
       <keyword>WCS</keyword>
       <keyword>WMS</keyword>
-      <keyword>SeaGis</keyword>
+      <keyword>Constellation</keyword>
     </keywords>
     <fees>NONE</fees>
     <accessConstraints>NONE</accessConstraints>
@@ -20,14 +20,14 @@
         <DCPType>
           <HTTP>
             <Get>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+              <OnlineResource xlink:href=""/>
             </Get>
           </HTTP>
         </DCPType>
         <DCPType>
           <HTTP>
             <Post>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+              <OnlineResource xlink:href=""/>
             </Post>
           </HTTP>
         </DCPType>
@@ -36,14 +36,14 @@
         <DCPType>
           <HTTP>
             <Get>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+              <OnlineResource xlink:href=""/>
             </Get>
           </HTTP>
         </DCPType>
         <DCPType>
           <HTTP>
             <Post>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+              <OnlineResource xlink:href=""/>
             </Post>
           </HTTP>
         </DCPType>
@@ -52,14 +52,14 @@
         <DCPType>
           <HTTP>
             <Get>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+              <OnlineResource xlink:href=""/>
             </Get>
           </HTTP>
         </DCPType>
         <DCPType>
           <HTTP>
             <Post>
-              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+              <OnlineResource xlink:href=""/>
             </Post>
           </HTTP>
         </DCPType>

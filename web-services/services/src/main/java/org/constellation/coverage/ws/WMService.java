@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -51,10 +50,9 @@ import javax.xml.bind.JAXBException;
 
 import com.sun.jersey.spi.resource.Singleton;
 
-//seagis dependencies
+//Constellation dependencies
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
@@ -90,7 +88,6 @@ import org.constellation.coverage.metadata.PointOfContact;
 import org.constellation.coverage.metadata.PointOfContactTable;
 import org.constellation.coverage.metadata.SeriesMetadataTable;
 import org.constellation.provider.NamedLayerDP;
-import org.constellation.provider.postgrid.PostGridNamedLayerDP;
 import org.constellation.query.StringParser;
 import org.constellation.query.WMSQuery;
 import org.constellation.worker.WMSWorker;
@@ -104,7 +101,6 @@ import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.style.sld.Specification.SymbologyEncoding;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
@@ -988,14 +984,14 @@ public class WMService extends WebService {
         //we build the general layer and add it to the document
         AbstractLayer mainLayer;
         if (getCurrentVersion().toString().equals("1.1.1")) {
-            mainLayer = new org.constellation.wms.v111.Layer("Seagis Web Map Layer",
+            mainLayer = new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
                                                       "description of the service(need to be fill)",
                                                        crs,
                                                        null,
                                                        layers);
         // version 1.3.0
         } else {
-            mainLayer = new org.constellation.wms.v130.Layer("Seagis Web Map Layer",
+            mainLayer = new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
                                                       "description of the service(need to be fill)",
                                                        crs,
                                                        null,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <csw:Capabilities version="2.0.2" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:gml="http://www.opengis.net/gml" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ows="http://www.opengis.net/ows" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ows:ServiceIdentification>
-		<ows:Title>seaGIS CSW Server</ows:Title>
+		<ows:Title>Constellation CSW Server</ows:Title>
 		<ows:Abstract>
         CS-W 2.0.2/AP ISO19115/19139 for service, datasets and applications      
     </ows:Abstract>

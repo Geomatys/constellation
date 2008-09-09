@@ -69,7 +69,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 
-// seagis dependencies
+// Constellation dependencies
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.ows.v110.OWSWebServiceException;

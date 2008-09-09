@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 
 // geotools dependencies
 
-// seaGIS dependencies
+// Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.Service;

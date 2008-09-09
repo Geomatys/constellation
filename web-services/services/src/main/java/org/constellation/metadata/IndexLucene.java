@@ -58,7 +58,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
 
-// SeaGIS dependencies
+// Constellation dependencies
 import static org.constellation.metadata.CSWworker.*;
 
 /**

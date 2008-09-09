@@ -446,6 +446,18 @@
         </executions>
       </plugin>
     </plugins>
+     <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-2</version>
+      </extension>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-alpha-5</version>
+      </extension>
+    </extensions>
   </build>
 
 
@@ -578,6 +590,12 @@
       <name>Site SourceForge</name>
       <url>scp://seagis.sourceforge.net/home/groups/s/se/seagis/htdocs</url>
     </site>
+    <repository>
+    	<id>geomatys</id>
+    	<name>Repository maven geomatys</name>
+    	<url>dav:https://maven.geomatys.fr/repository</url>
+  </repository>
+
   </distributionManagement>
 
 

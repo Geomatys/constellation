@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
-// SeaGIS dependencies
+// Constellation dependencies
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.GetRecordsRequest;
 import org.constellation.cat.csw.v200.GetCapabilitiesType;

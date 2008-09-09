@@ -37,7 +37,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-// seagis dependencies
+// Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;

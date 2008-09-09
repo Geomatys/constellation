@@ -460,7 +460,7 @@ public abstract class ImageProducer {
             final DOMSource source = new DOMSource(doc);
             final String directory = System.getProperty("java.io.tmpdir");
             if (directory != null) {
-                temporaryDirectory = new File(directory, "seagis");
+                temporaryDirectory = new File(directory, "constellation");
                 if (!temporaryDirectory.isDirectory() && !temporaryDirectory.mkdir()) {
                     temporaryDirectory = null; // Fallback on system default.
                 }
@@ -1215,7 +1215,7 @@ public abstract class ImageProducer {
             files = new ImageRequestMap();
             final String directory = System.getProperty("java.io.tmpdir");
             if (directory != null) {
-                temporaryDirectory = new File(directory, "seagis");
+                temporaryDirectory = new File(directory, "constellation");
                 if (!temporaryDirectory.isDirectory() && !temporaryDirectory.mkdir()) {
                     temporaryDirectory = null; // Fallback on system default.
                 }

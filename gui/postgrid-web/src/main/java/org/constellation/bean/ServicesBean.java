@@ -47,7 +47,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-// SeaGIS dependencies
+// Constellation dependencies
 import org.constellation.gml.v311.CodeListType;
 import org.constellation.ows.v110.AddressType;
 import org.constellation.ows.v110.CapabilitiesBaseType;

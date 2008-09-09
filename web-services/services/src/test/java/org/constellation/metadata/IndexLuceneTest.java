@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-// seagis dependencies
+// Constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;

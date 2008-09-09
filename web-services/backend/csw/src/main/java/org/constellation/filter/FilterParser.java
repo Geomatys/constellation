@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-// Seagis dependencies
+// Constellation dependencies
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
@@ -176,7 +176,7 @@ public class FilterParser {
         /*
          * here we put a temporary patch consisting in using the geotools filterFactory implementation
          * instead of our own implementation.
-         * Then we unmarshaller the xml to get a seagis Filter object.
+         * Then we unmarshaller the xml to get a constellation Filter object.
          *
          *
          * File f = File.createTempFile("CQL", "query");

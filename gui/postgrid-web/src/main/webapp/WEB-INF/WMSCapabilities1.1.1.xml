@@ -6,7 +6,7 @@
   <!-- The WMT-defined name for this type of service -->
   <Name>WMS</Name>
   <!-- Human-readable title for pick lists -->
-  <Title>SeaGis Map Server</Title>
+  <Title>Constellation Map Server</Title>
   <!-- Narrative description providing additional information -->
   <Abstract>Map Server.  Contact: someone@geomatys.fr.  High-quality maps.</Abstract>
   <KeywordList>
@@ -45,10 +45,10 @@
       <DCPType>
         <HTTP>
           <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetCapabilities"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Get>
           <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetCapabilities"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Post>
         </HTTP>
       </DCPType>
@@ -64,10 +64,10 @@
       <DCPType>
         <HTTP>
           <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetMap"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Get>
           <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetMap"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Post>
         </HTTP>
       </DCPType>
@@ -79,10 +79,10 @@
       <DCPType>
         <HTTP>
           <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetFeatureInfo"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Get>
           <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetFeatureInfo"/>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
           </Post>
         </HTTP>
       </DCPType>
@@ -92,10 +92,10 @@
 	<DCPType>
 	   <HTTP>
 	     <Get>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=DescribeLayer"/>
+	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
 	     </Get>
 	     <Post>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=DescribeLayer"/>
+	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
 	     </Post>
 	   </HTTP>
 	</DCPType>
@@ -107,10 +107,10 @@
 	<DCPType>
 	   <HTTP>
 	     <Get>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetLegendGraphic"/>
+	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
 	     </Get>
 	     <Post>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetLegendGraphic"/>
+	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
 	     </Post>
 	   </HTTP>
 	</DCPType>

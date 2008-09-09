@@ -30,7 +30,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-//seagis dependencies
+// Constellation dependencies
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.BoundingBoxType;
