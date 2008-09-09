@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
-OpenIDE-Module: net.seagis.sie
-OpenIDE-Module-Layer: net/seagis/sie/layer.xml
-OpenIDE-Module-Localizing-Bundle: net/seagis/sie/Bundle.properties
+OpenIDE-Module: org.constellation.sie
+OpenIDE-Module-Layer: org/constellation/sie/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/constellation/sie/Bundle.properties
 OpenIDE-Module-Specification-Version: 0.1
 
-Name: net/seagis/sie/type/bbox/Loader.class
+Name: org/constellation/sie/type/bbox/Loader.class
 OpenIDE-Module-Class: Loader
 

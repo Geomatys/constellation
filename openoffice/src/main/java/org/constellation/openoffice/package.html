@@ -12,11 +12,11 @@
 
     <OL>
       <LI><CODE>
-      idlc -C -cid -w -I $OO_SDK_HOME/idl net/seagis/openoffice/XObservations.idl
+      idlc -C -cid -w -I $OO_SDK_HOME/idl org/constellation/openoffice/XObservations.idl
       </CODE></LI>
 
       <LI><CODE>
-      regmerge sicade.rdb /UCR net/seagis/openoffice/XObservations.urd
+      regmerge sicade.rdb /UCR org/constellation/openoffice/XObservations.urd
       </CODE></LI>
 
       <LI><CODE>
@@ -30,11 +30,11 @@
       <HR>
 
       <LI><CODE>
-      javac net/seagis/openoffice/*.java
+      javac org/constellation/openoffice/*.java
       </CODE></LI>
 
       <LI><CODE>
-      jar -cfm0 sicade-SNAPSHOT.jar META-INF/MANIFEST.MF net/seagis/openoffice/*.class
+      jar -cfm0 sicade-SNAPSHOT.jar META-INF/MANIFEST.MF org/constellation/openoffice/*.class
       </CODE></LI>
 
       <LI><CODE>
