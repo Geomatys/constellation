@@ -388,9 +388,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         worker.setDimension("604", "424", null);
         /*
          * Global view.
-         * BBOX demandée: 51°48'45,6"N, 09°21'36,7"W - 41°14'56,2"N, 13°37'45,3"E
-         * BBOX utilisée: 51°07'16,2"N, 05°34'11,9"W - 43°09'50,8"N, 02°36'25,5"E
-         * BBOX obtenue:  51°06'33,1"N, 05°32'53,1"W - 43°09'39,0"N, 02°35'38,6"E
          */
         worker.setBoundingBox("-215869.691647, 1632837.614174, 1387192.992499, 2758166.385826");
         RenderedImage image = ImageIO.read(worker.getImageFile());
@@ -398,9 +395,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(424, image.getHeight());
         /*
          * Following was used to throw a NullPointerException.
-         * BBOX demandée: 47°08'27,9"N, 02°53'05,4"W - 46°27'26,6"N, 01°31'16,6"W
-         * BBOX utilisée: 47°08'28,1"N, 02°53'09,9"W - 46°27'26,6"N, 01°31'10,6"W
-         * BBOX obtenue:  47°11'38,8"N, 02°57'01,1"W - 46°24'11,3"N, 01°28'12,9"W
          */
         worker.setBoundingBox("203806.280092, 2174932.90099, 303997.697852, 2245265.949218");
         image = ImageIO.read(worker.getImageFile());
@@ -411,8 +405,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
          * BBOX demandée: 49°18'28,0"N, 01°02'43,1"W - 49°18'09,2"N, 01°02'03,3"W
          * BBOX utilisée: 49°18'29,7"N, 01°02'43,2"W - 49°18'08,4"N, 01°01'57,4"W
          * BBOX obtenue:  49°18'31,3"N, 01°02'41,5"W - 49°18'07,5"N, 01°01'52,9"W
-         * 
-         * java.awt.geom.Rectangle2D$Float[x=353912.8,y=2483559.0,w=953.25,h=697.25]
          */
         worker.setBoundingBox("353875.689453, 2483613.235058, 354658.434904, 2484162.711997");
         image = ImageIO.read(worker.getImageFile());

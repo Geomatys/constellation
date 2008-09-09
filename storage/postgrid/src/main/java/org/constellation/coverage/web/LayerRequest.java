@@ -18,12 +18,14 @@ package org.constellation.coverage.web;
 
 import java.awt.geom.Dimension2D;
 import org.opengis.geometry.Envelope;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.util.Utilities;
 import org.geotools.util.logging.Logging;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -72,7 +74,8 @@ final class LayerRequest {
     /**
      * Creates a {@code LayerRequest} for the given layer name, source envelope and target size.
      */
-    public LayerRequest(final Layer layer, final Envelope envelope, final GridRange size)
+    public LayerRequest(final Layer layer, final CoordinateReferenceSystem layerCRS,
+                        final Envelope envelope, final GridEnvelope size)
             throws CatalogException
     {
         this.layer = layer;
@@ -83,7 +86,9 @@ final class LayerRequest {
          */
         GeographicBoundingBoxImpl bbox = null;
         if (isValid(envelope)) try {
-            bbox = new GeographicBoundingBoxImpl(envelope);
+            // Do not rely on the transformation performed by GeographicBoundingBoxImpl constructor,
+            // since it is approximative by design while we want an accurate transformation.
+            bbox = new GeographicBoundingBoxImpl(CRS.transform(envelope, CRS.getHorizontalCRS(layerCRS)));
         } catch (TransformException exception) {
             Logging.recoverableException(WebServiceWorker.LOGGER, WebServiceWorker.class, "getLayer", exception);
         }

@@ -56,7 +56,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.PixelInCell;
@@ -71,7 +71,7 @@ import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.DirectPosition2D;
@@ -208,7 +208,7 @@ public abstract class ImageProducer {
     /**
      * The dimension of target image.
      */
-    protected GridRange gridRange;
+    protected GridEnvelope gridRange;
 
     /**
      * The <cite>grid to CRS</cite> transform specified by the user.
@@ -632,16 +632,18 @@ public abstract class ImageProducer {
         Layer candidate;
         boolean change = false;
         try {
-            final Layer entry = getLayerTable(true).getEntry(layer);
+            LayerTable table = getLayerTable(true);
+            final Layer entry = table.getEntry(layer);
             if (entry.getSeries().isEmpty() || !entry.isQueryable(version.getService())) {
                 throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
                         LAYER_NOT_DEFINED, version);
             }
-            final LayerRequest request = new LayerRequest(entry, envelope, gridRange);
+            final LayerRequest request = new LayerRequest(entry,
+                    table.getCoordinateReferenceSystem(), envelope, gridRange);
             synchronized (layers) {
                 candidate = layers.get(request);
                 if (candidate == null) {
-                    final LayerTable table = getLayerTable(false);
+                    table = getLayerTable(false);
                     change |= table.setGeographicBoundingBox(request.bbox);
                     change |= table.setPreferredResolution(request.resolution);
                     if (!times.isEmpty()) {
@@ -733,14 +735,14 @@ public abstract class ImageProducer {
                 }
             } else {
                 GeneralEnvelope envelope = this.envelope;
-                GridRange gridRange = this.gridRange;
+                GridEnvelope gridRange = this.gridRange;
                 if (envelope == null || gridRange == null) {
                     final Layer layer = getLayer();
                     try {
                         if (gridRange == null) {
                             final Rectangle bounds = layer.getTypicalBounds();
                             if (bounds != null) {
-                                gridRange = new GeneralGridRange(bounds);
+                                gridRange = new GeneralGridEnvelope(bounds, 2);
                             }
                         }
                         if (envelope == null) {
@@ -984,7 +986,7 @@ public abstract class ImageProducer {
         }
         final Dimension dimension;
         if (gridRange != null) {
-            dimension = new Dimension(gridRange.getUpper(0), gridRange.getUpper(1));
+            dimension = new Dimension(gridRange.getHigh(0), gridRange.getHigh(1));
         } else {
             dimension = new Dimension(200, 40);
         }

@@ -26,7 +26,7 @@ import java.awt.geom.RectangularShape;
 import java.awt.geom.AffineTransform;
 import static java.lang.Math.abs;
 
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -217,17 +217,17 @@ final class GridGeometryEntry extends Entry {
      * Convenience method returning the two first dimension of the grid range.
      */
     public Dimension getSize() {
-        final GridRange gridRange = geometry.getGridRange();
-        return new Dimension(gridRange.getLength(0), gridRange.getLength(1));
+        final GridEnvelope gridRange = geometry.getGridRange();
+        return new Dimension(gridRange.getSpan(0), gridRange.getSpan(1));
     }
 
     /**
      * Convenience method returning the two first dimension of the grid range.
      */
     public Rectangle getBounds() {
-        final GridRange gridRange = geometry.getGridRange();
-        return new Rectangle(gridRange.getLower (0), gridRange.getLower (1),
-                             gridRange.getLength(0), gridRange.getLength(1));
+        final GridEnvelope gridRange = geometry.getGridRange();
+        return new Rectangle(gridRange.getLow (0), gridRange.getLow (1),
+                             gridRange.getSpan(0), gridRange.getSpan(1));
     }
 
     /**
@@ -235,10 +235,10 @@ final class GridGeometryEntry extends Entry {
      * (but not garanteed) to be an instance of {@link Rectangle2D}. It can be freely modified.
      */
     public Shape getShape() {
-        final GridRange gridRange = geometry.getGridRange();
+        final GridEnvelope gridRange = geometry.getGridRange();
         Shape shape = new Rectangle2D.Double(
-                gridRange.getLower (0), gridRange.getLower (1),
-                gridRange.getLength(0), gridRange.getLength(1));
+                gridRange.getLow (0), gridRange.getLow (1),
+                gridRange.getSpan(0), gridRange.getSpan(1));
         shape = AffineTransform2D.transform(gridToCRS, shape, true);
         return shape;
     }
@@ -249,7 +249,7 @@ final class GridGeometryEntry extends Entry {
      */
     public double[] getVerticalOrdinates() {
         if (verticalOrdinates != null) {
-            assert geometry.getGridRange().getLength(2) == verticalOrdinates.length : geometry;
+            assert geometry.getGridRange().getSpan(2) == verticalOrdinates.length : geometry;
             return verticalOrdinates.clone();
         }
         return null;
