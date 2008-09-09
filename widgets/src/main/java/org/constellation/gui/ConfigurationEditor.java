@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 
-// Sicade
+// Constellation
 import org.constellation.catalog.Database;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.resources.i18n.ResourceKeys;

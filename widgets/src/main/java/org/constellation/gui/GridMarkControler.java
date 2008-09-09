@@ -49,7 +49,7 @@ import javax.swing.event.ChangeListener;
 // Geotools dependencies
 import org.geotools.resources.SwingUtilities;
 
-// Seagis
+// Constellation
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 

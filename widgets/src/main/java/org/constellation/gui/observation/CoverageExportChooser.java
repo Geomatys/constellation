@@ -75,7 +75,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.CRSUtilities;
 
-// Sicade
+// Constellation
 import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
