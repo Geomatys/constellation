@@ -23,9 +23,9 @@ import java.util.logging.Logger;
 import java.awt.geom.Line2D;
 
 // seagis dependencies
-import net.seagis.lucene.Filter.SerialChainFilter;
-import net.seagis.lucene.Filter.SpatialFilter;
-import net.seagis.lucene.Filter.SpatialQuery;
+import net.seagis.lucene.filter.SerialChainFilter;
+import net.seagis.lucene.filter.SpatialFilter;
+import net.seagis.lucene.filter.SpatialQuery;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
