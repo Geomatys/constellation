@@ -34,7 +34,7 @@
                                            value="#{servicesBean.uploadedFile}"
                                            immediate="true"
                                            required="true">
-                            <f:valueChangeListener type="net.seagis.bean.UploadListener" />
+                            <f:valueChangeListener type="org.constellation.bean.UploadListener" />
                         </t:inputFileUpload>
                         
                         <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.doUpload}">
