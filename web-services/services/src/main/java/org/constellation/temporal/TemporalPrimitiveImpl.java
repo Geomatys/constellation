@@ -17,7 +17,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package net.seagis.temporal;
+package org.constellation.temporal;
 
 import org.opengis.temporal.RelativePosition;
 import org.opengis.temporal.TemporalPrimitive;

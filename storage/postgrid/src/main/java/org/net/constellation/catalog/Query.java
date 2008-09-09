@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -33,8 +33,8 @@ import java.util.logging.LogRecord;
 import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

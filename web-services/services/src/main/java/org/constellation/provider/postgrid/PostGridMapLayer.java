@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider.postgrid;
+package org.constellation.provider.postgrid;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -28,10 +28,10 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.Interpolation;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Layer;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.Layer;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;

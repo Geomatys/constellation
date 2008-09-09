@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Set;
 import java.util.Map;
@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.catalog.ServerException;
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.coverage.model.Model;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.catalog.ServerException;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.Model;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -35,8 +35,8 @@ import org.geotools.resources.Utilities;
 import org.geotools.util.WeakValueHashMap;
 import org.geotools.util.DateRange;
 
-import net.seagis.catalog.Database;
-import net.seagis.coverage.model.DescriptorTable;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.model.DescriptorTable;
 
 
 /**

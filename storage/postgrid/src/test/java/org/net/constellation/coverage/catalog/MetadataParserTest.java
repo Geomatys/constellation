@@ -14,20 +14,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.CatalogException;
 import org.junit.Test;
 
 import org.geotools.util.DateRange;
 
-import net.seagis.catalog.Element;
-import net.seagis.catalog.DatabaseTest;
+import org.constellation.catalog.Element;
+import org.constellation.catalog.DatabaseTest;
 
 
 /**

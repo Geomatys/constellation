@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
@@ -51,59 +51,59 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 
 //seaGIS dependencies
-import net.seagis.cat.csw.v202.AbstractRecordType;
-import net.seagis.cat.csw.v202.AcknowledgementType;
-import net.seagis.cat.csw.v202.BriefRecordType;
-import net.seagis.cat.csw.v202.Capabilities;
-import net.seagis.cat.csw.v202.DeleteType;
-import net.seagis.cat.csw.v202.DescribeRecordResponseType;
-import net.seagis.cat.csw.v202.DescribeRecordType;
-import net.seagis.cat.csw.v202.DomainValuesType;
-import net.seagis.cat.csw.v202.ElementSetNameType;
-import net.seagis.cat.csw.v202.ElementSetType;
-import net.seagis.cat.csw.v202.GetCapabilities;
-import net.seagis.cat.csw.v202.GetDomainResponseType;
-import net.seagis.cat.csw.v202.GetDomainType;
-import net.seagis.cat.csw.v202.GetRecordByIdResponseType;
-import net.seagis.cat.csw.v202.GetRecordByIdType;
-import net.seagis.cat.csw.v202.GetRecordsResponseType;
-import net.seagis.cat.csw.v202.GetRecordsType;
-import net.seagis.cat.csw.v202.HarvestResponseType;
-import net.seagis.cat.csw.v202.HarvestType;
-import net.seagis.cat.csw.v202.InsertType;
-import net.seagis.cat.csw.v202.ListOfValuesType;
-import net.seagis.cat.csw.v202.ObjectFactory;
-import net.seagis.cat.csw.v202.QueryType;
-import net.seagis.cat.csw.v202.RecordType;
-import net.seagis.cat.csw.v202.RequestBaseType;
-import net.seagis.cat.csw.v202.ResultType;
-import net.seagis.cat.csw.v202.SearchResultsType;
-import net.seagis.cat.csw.v202.SummaryRecordType;
-import net.seagis.cat.csw.v202.TransactionResponseType;
-import net.seagis.cat.csw.v202.TransactionSummaryType;
-import net.seagis.cat.csw.v202.TransactionType;
-import net.seagis.cat.csw.v202.UpdateType;
-import net.seagis.cat.csw.v202.SchemaComponentType;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.dublincore.AbstractSimpleLiteral;
-import net.seagis.filter.FilterParser;
-import net.seagis.lucene.filter.SpatialQuery;
-import net.seagis.ogc.FilterCapabilities;
-import net.seagis.ogc.SortByType;
-import net.seagis.ogc.SortPropertyType;
-import net.seagis.ows.v100.AcceptFormatsType;
-import net.seagis.ows.v100.AcceptVersionsType;
-import net.seagis.ows.v100.DomainType;
-import net.seagis.ows.v100.OWSWebServiceException;
-import net.seagis.ows.v100.Operation;
-import net.seagis.ows.v100.OperationsMetadata;
-import net.seagis.ows.v100.SectionsType;
-import net.seagis.ows.v100.ServiceIdentification;
-import net.seagis.ows.v100.ServiceProvider;
-import net.seagis.ws.rs.WebService;
-import static net.seagis.ows.OWSExceptionCode.*;
-import static net.seagis.metadata.MetadataReader.*;
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.AcknowledgementType;
+import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.DeleteType;
+import org.constellation.cat.csw.v202.DescribeRecordResponseType;
+import org.constellation.cat.csw.v202.DescribeRecordType;
+import org.constellation.cat.csw.v202.DomainValuesType;
+import org.constellation.cat.csw.v202.ElementSetNameType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetDomainResponseType;
+import org.constellation.cat.csw.v202.GetDomainType;
+import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
+import org.constellation.cat.csw.v202.GetRecordByIdType;
+import org.constellation.cat.csw.v202.GetRecordsResponseType;
+import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.HarvestResponseType;
+import org.constellation.cat.csw.v202.HarvestType;
+import org.constellation.cat.csw.v202.InsertType;
+import org.constellation.cat.csw.v202.ListOfValuesType;
+import org.constellation.cat.csw.v202.ObjectFactory;
+import org.constellation.cat.csw.v202.QueryType;
+import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.v202.RequestBaseType;
+import org.constellation.cat.csw.v202.ResultType;
+import org.constellation.cat.csw.v202.SearchResultsType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
+import org.constellation.cat.csw.v202.TransactionResponseType;
+import org.constellation.cat.csw.v202.TransactionSummaryType;
+import org.constellation.cat.csw.v202.TransactionType;
+import org.constellation.cat.csw.v202.UpdateType;
+import org.constellation.cat.csw.v202.SchemaComponentType;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.dublincore.AbstractSimpleLiteral;
+import org.constellation.filter.FilterParser;
+import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.ogc.FilterCapabilities;
+import org.constellation.ogc.SortByType;
+import org.constellation.ogc.SortPropertyType;
+import org.constellation.ows.v100.AcceptFormatsType;
+import org.constellation.ows.v100.AcceptVersionsType;
+import org.constellation.ows.v100.DomainType;
+import org.constellation.ows.v100.OWSWebServiceException;
+import org.constellation.ows.v100.Operation;
+import org.constellation.ows.v100.OperationsMetadata;
+import org.constellation.ows.v100.SectionsType;
+import org.constellation.ows.v100.ServiceIdentification;
+import org.constellation.ows.v100.ServiceProvider;
+import org.constellation.ws.rs.WebService;
+import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.metadata.MetadataReader.*;
 
 // Apache Lucene dependencies
 import org.apache.lucene.index.CorruptIndexException;
@@ -122,7 +122,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
-import net.seagis.cat.csw.v202.EchoedRequestType;
+import org.constellation.cat.csw.v202.EchoedRequestType;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.mdweb.model.schemas.Standard; 
@@ -148,7 +148,7 @@ public class CSWworker {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.metadata");
+    Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * The version of the service
@@ -198,7 +198,7 @@ public class CSWworker {
     /**
      * A JAXB factory to csw object version 2.0.0 
      */
-    protected final net.seagis.cat.csw.v200.ObjectFactory cswFactory200;
+    protected final org.constellation.cat.csw.v200.ObjectFactory cswFactory200;
     
     /**
      * The current MIME type of return
@@ -598,7 +598,7 @@ public class CSWworker {
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller; 
         cswFactory202     = new ObjectFactory();
-        cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
+        cswFactory200     = new org.constellation.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         Properties cascad = new Properties();
         File f            = null;
@@ -1050,7 +1050,7 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws net.seagis.ows.v100.OWSWebServiceException
+     * @throws org.constellation.ows.v100.OWSWebServiceException
      */
     private List<String> executeLuceneQuery(SpatialQuery query) throws OWSWebServiceException {
         try {
@@ -1073,7 +1073,7 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws net.seagis.ows.v100.OWSWebServiceException
+     * @throws org.constellation.ows.v100.OWSWebServiceException
      */
     private List<String> executeLuceneQuery(TermQuery query) throws OWSWebServiceException {
         try {

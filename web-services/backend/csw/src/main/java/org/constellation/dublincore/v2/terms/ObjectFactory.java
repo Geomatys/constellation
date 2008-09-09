@@ -14,13 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.dublincore.v2.terms;
+package org.constellation.dublincore.v2.terms;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
 
 
 /**

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.bridge;
+package org.constellation.xacml.bridge;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.EvaluationCtx;
@@ -45,7 +45,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
     private final List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
     protected PolicyFinder policyFinder         = null;
     
-    private Logger logger = Logger.getLogger("net.seagis.xacml.bridge");
+    private Logger logger = Logger.getLogger("org.constellation.xacml.bridge");
 
     public PolicySetFinderModule() {
         this(null);

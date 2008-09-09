@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 // jaxb import
 import java.util.logging.Logger;
@@ -28,24 +28,24 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 // Sicade dependencies 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Entry;
-import net.seagis.coverage.model.Distribution;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Entry;
+import org.constellation.coverage.model.Distribution;
 
 // openGis dependencies
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.v311.FeaturePropertyType;
-import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.gml.v311.TimePeriodType;
-import net.seagis.gml.v311.TimePositionType;
-import net.seagis.metadata.MetaDataEntry;
-import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.swe.v101.AnyResultEntry;
-import net.seagis.swe.v101.DataArrayEntry;
-import net.seagis.swe.v101.DataArrayPropertyType;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonPropertyType;
-import net.seagis.swe.v101.TimeGeometricPrimitivePropertyType;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.FeaturePropertyType;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.metadata.MetaDataEntry;
+import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.swe.v101.AnyResultEntry;
+import org.constellation.swe.v101.DataArrayEntry;
+import org.constellation.swe.v101.DataArrayPropertyType;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonPropertyType;
+import org.constellation.swe.v101.TimeGeometricPrimitivePropertyType;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;

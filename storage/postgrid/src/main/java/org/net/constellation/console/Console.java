@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.util.Date;
 import java.io.File;
@@ -41,21 +41,21 @@ import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.util.logging.Logging;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Format;
-import net.seagis.coverage.catalog.FormatTable;
-import net.seagis.coverage.catalog.GridCoverageTable;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.coverage.catalog.LayerTree;
-import net.seagis.coverage.catalog.TreeDepth;
-import net.seagis.coverage.model.Model;
-import net.seagis.coverage.model.LinearModel;
-import net.seagis.widget.CoverageTableModel;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.Format;
+import org.constellation.coverage.catalog.FormatTable;
+import org.constellation.coverage.catalog.GridCoverageTable;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.coverage.catalog.LayerTree;
+import org.constellation.coverage.catalog.TreeDepth;
+import org.constellation.coverage.model.Model;
+import org.constellation.coverage.model.LinearModel;
+import org.constellation.widget.CoverageTableModel;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**
@@ -63,7 +63,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  * Cette classe peut être exécutée à partir de la ligne de commande:
  * <p>
  * <blockquote><pre>
- * java net.seagis.observation.coverage.Console <var>options</var>
+ * java org.constellation.observation.coverage.Console <var>options</var>
  * </pre></blockquote>
  * <p>
  * Lorsque cette classe est exécutée avec l'argument {@code -config}, elle fait apparaître une boite

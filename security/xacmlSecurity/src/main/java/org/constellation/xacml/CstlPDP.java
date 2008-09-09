@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import com.sun.xacml.PDPConfig;
 import com.sun.xacml.ctx.RequestCtx;
@@ -33,16 +33,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.seagis.xacml.factory.FactoryException;
-import net.seagis.xacml.factory.PolicyFactory;
-import net.seagis.xacml.api.PolicyDecisionPoint;
-import net.seagis.xacml.api.PolicyLocator;
-import net.seagis.xacml.api.RequestContext;
-import net.seagis.xacml.api.ResponseContext;
-import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.locators.JBossPolicyLocator;
-import net.seagis.xacml.policy.PolicySetType;
-import net.seagis.xacml.policy.PolicyType;
+import org.constellation.xacml.factory.FactoryException;
+import org.constellation.xacml.factory.PolicyFactory;
+import org.constellation.xacml.api.PolicyDecisionPoint;
+import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.api.RequestContext;
+import org.constellation.xacml.api.ResponseContext;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.locators.JBossPolicyLocator;
+import org.constellation.xacml.policy.PolicySetType;
+import org.constellation.xacml.policy.PolicyType;
 
 
 
@@ -60,7 +60,7 @@ public class CstlPDP implements PolicyDecisionPoint {
     
     private final PolicyFinder policyFinder = new PolicyFinder();
 
-    private Logger logger = Logger.getLogger("net.seagis.xacml");
+    private Logger logger = Logger.getLogger("org.constellation.xacml");
     
     /**
      * Build a new empty PDP.

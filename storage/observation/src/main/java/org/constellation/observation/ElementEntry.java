@@ -15,18 +15,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 import java.util.Collection;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
-import net.seagis.metadata.CitationEntry;
-import net.seagis.metadata.IdentifierEntry;
-import net.seagis.metadata.InternationalStringEntry;
-import net.seagis.metadata.ResultEntry;
+import org.constellation.catalog.Entry;
+import org.constellation.metadata.CitationEntry;
+import org.constellation.metadata.IdentifierEntry;
+import org.constellation.metadata.InternationalStringEntry;
+import org.constellation.metadata.ResultEntry;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.Element;

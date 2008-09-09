@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.resources;
+package org.constellation.resources;
 
 import java.io.IOException;
 import java.io.Serializable;

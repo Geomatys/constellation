@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gml.v311;
+package org.constellation.gml.v311;
 
 import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;

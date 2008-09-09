@@ -15,13 +15,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.wrs;
+package org.constellation.cat.wrs;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.Capabilities;
 
 
 /**

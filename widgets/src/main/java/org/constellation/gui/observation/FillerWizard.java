@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui.observation;
+package org.constellation.gui.observation;
 
 // J2SE dependencies
 import java.util.Set;
@@ -24,13 +24,13 @@ import java.util.Set;
 import org.geotools.resources.Arguments;
 
 // Sicade dependencies
-import net.seagis.coverage.catalog.Catalog;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.observation.MeasurementTableFiller;
-import net.seagis.observation.fishery.sql.EnvironmentTable;
-import net.seagis.observation.sql.MeasurementTable;
-import net.seagis.observation.sql.StationTable;
+import org.constellation.coverage.catalog.Catalog;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.observation.MeasurementTableFiller;
+import org.constellation.observation.fishery.sql.EnvironmentTable;
+import org.constellation.observation.sql.MeasurementTable;
+import org.constellation.observation.sql.StationTable;
 
 
 /**

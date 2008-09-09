@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wcs.v100;
+package org.constellation.wcs.v100;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.PolygonType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.GridType;
-import net.seagis.gml.v311.ObjectFactory;
+import org.constellation.gml.v311.PolygonType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.GridType;
+import org.constellation.gml.v311.ObjectFactory;
 
 /**
  * Definition of the spatial domain of a coverage. 

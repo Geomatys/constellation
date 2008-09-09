@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.portrayal;
+package org.constellation.portrayal;
 
 //import java.awt.Color;
 //import java.awt.Dimension;
@@ -30,12 +30,12 @@ package net.seagis.portrayal;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 //
-//import net.seagis.catalog.CatalogException;
-//import net.seagis.catalog.Database;
-//import net.seagis.coverage.catalog.CoverageReference;
-//import net.seagis.coverage.catalog.Layer;
-//import net.seagis.coverage.catalog.LayerTable;
-//import net.seagis.coverage.web.TimeParser;
+//import org.constellation.catalog.CatalogException;
+//import org.constellation.catalog.Database;
+//import org.constellation.coverage.catalog.CoverageReference;
+//import org.constellation.coverage.catalog.Layer;
+//import org.constellation.coverage.catalog.LayerTable;
+//import org.constellation.coverage.web.TimeParser;
 //
 //import org.geotools.coverage.grid.GeneralGridGeometry;
 //import org.geotools.coverage.grid.GridCoverage2D;

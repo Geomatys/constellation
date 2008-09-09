@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.cat.wrs;
+package org.constellation.cat.wrs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ValueListType", propOrder = {
     "anyValue"
 })
-public class ValueListType extends net.seagis.ebrim.v300.ValueListType {
+public class ValueListType extends org.constellation.ebrim.v300.ValueListType {
 
     @XmlElement(name = "AnyValue")
     private List<AnyValueType> anyValue;

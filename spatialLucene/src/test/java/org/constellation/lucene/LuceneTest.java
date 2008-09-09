@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.lucene;
+package org.constellation.lucene;
 
 // J2SE dependencies
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ import java.util.logging.Logger;
 import java.awt.geom.Line2D;
 
 // seagis dependencies
-import net.seagis.lucene.filter.SerialChainFilter;
-import net.seagis.lucene.filter.SpatialFilter;
-import net.seagis.lucene.filter.SpatialQuery;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.lucene.filter.SpatialQuery;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
@@ -64,7 +64,7 @@ public class LuceneTest {
     private RAMDirectory  directory;
     private IndexSearcher searcher;
     private Query         simpleQuery;
-    private Logger logger = Logger.getLogger("net.seagis.lucene");
+    private Logger logger = Logger.getLogger("org.constellation.lucene");
 
    
     @BeforeClass

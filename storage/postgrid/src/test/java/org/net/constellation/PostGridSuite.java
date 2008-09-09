@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis;
+package org.constellation;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -32,33 +32,33 @@ public class PostGridSuite extends TestSuite {
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
     public PostGridSuite() {
-        addTestSuite(net.seagis.catalog.DatabaseTest.Open.class); // Must be first
+        addTestSuite(org.constellation.catalog.DatabaseTest.Open.class); // Must be first
 
         addTestSuite(org.geotools.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
 
-        addTestSuite(net.seagis.catalog.         SpatialFunctionsTest         .class);
-        addTestSuite(net.seagis.catalog.         TimeStampTest                .class);
-        addTestSuite(net.seagis.catalog.         QueryTest                    .class);
-        addTestSuite(net.seagis.coverage.catalog.MetadataParserTest           .class);
-        addTestSuite(net.seagis.coverage.catalog.CategoryTableTest            .class);
-        addTestSuite(net.seagis.coverage.catalog.SampleDimensionTableTest     .class);
-        addTestSuite(net.seagis.coverage.catalog.FormatTableTest              .class);
-        addTestSuite(net.seagis.coverage.catalog.SeriesEntryTest              .class);
-        addTestSuite(net.seagis.coverage.catalog.SeriesTableTest              .class);
-        addTestSuite(net.seagis.coverage.catalog.LayerTableTest               .class);
-        addTestSuite(net.seagis.coverage.catalog.GridGeometryTableTest        .class);
-        addTestSuite(net.seagis.coverage.catalog.GridCoverageTableTest        .class);
-        addTestSuite(net.seagis.coverage.catalog.WritableGridCoverageTableTest.class);
-        addTestSuite(net.seagis.coverage.catalog.MosaicTest                   .class);
-        addTestSuite(net.seagis.coverage.model  .RegionOfInterestTableTest    .class);
-        addTestSuite(net.seagis.coverage.model  .OperationTableTest           .class);
-        addTestSuite(net.seagis.coverage.model  .DistributionTableTest        .class);
-        addTestSuite(net.seagis.coverage.model  .DescriptorTableTest          .class);
-        addTestSuite(net.seagis.coverage.model  .IntegrationTest              .class);
-        addTestSuite(net.seagis.coverage.web    .TimeParserTest               .class);
-        addTestSuite(net.seagis.coverage.web    .WebServiceWorkerTest         .class);
+        addTestSuite(org.constellation.catalog.         SpatialFunctionsTest         .class);
+        addTestSuite(org.constellation.catalog.         TimeStampTest                .class);
+        addTestSuite(org.constellation.catalog.         QueryTest                    .class);
+        addTestSuite(org.constellation.coverage.catalog.MetadataParserTest           .class);
+        addTestSuite(org.constellation.coverage.catalog.CategoryTableTest            .class);
+        addTestSuite(org.constellation.coverage.catalog.SampleDimensionTableTest     .class);
+        addTestSuite(org.constellation.coverage.catalog.FormatTableTest              .class);
+        addTestSuite(org.constellation.coverage.catalog.SeriesEntryTest              .class);
+        addTestSuite(org.constellation.coverage.catalog.SeriesTableTest              .class);
+        addTestSuite(org.constellation.coverage.catalog.LayerTableTest               .class);
+        addTestSuite(org.constellation.coverage.catalog.GridGeometryTableTest        .class);
+        addTestSuite(org.constellation.coverage.catalog.GridCoverageTableTest        .class);
+        addTestSuite(org.constellation.coverage.catalog.WritableGridCoverageTableTest.class);
+        addTestSuite(org.constellation.coverage.catalog.MosaicTest                   .class);
+        addTestSuite(org.constellation.coverage.model  .RegionOfInterestTableTest    .class);
+        addTestSuite(org.constellation.coverage.model  .OperationTableTest           .class);
+        addTestSuite(org.constellation.coverage.model  .DistributionTableTest        .class);
+        addTestSuite(org.constellation.coverage.model  .DescriptorTableTest          .class);
+        addTestSuite(org.constellation.coverage.model  .IntegrationTest              .class);
+        addTestSuite(org.constellation.coverage.web    .TimeParserTest               .class);
+        addTestSuite(org.constellation.coverage.web    .WebServiceWorkerTest         .class);
 
-        addTestSuite(net.seagis.catalog.DatabaseTest.Close.class); // Must be last
+        addTestSuite(org.constellation.catalog.DatabaseTest.Close.class); // Must be last
     }
 
     /**

@@ -15,12 +15,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.observation.fishery.Catch;
-import net.seagis.observation.MeasurementTable;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.observation.fishery.Catch;
+import org.constellation.observation.MeasurementTable;
 
 
 /**

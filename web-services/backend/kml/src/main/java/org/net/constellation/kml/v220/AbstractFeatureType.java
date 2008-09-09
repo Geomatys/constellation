@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.kml.v220;
+package org.constellation.kml.v220;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.oasis.xal.v20.AddressDetails;
-import net.seagis.atom.AtomPersonConstruct;
-import net.seagis.atom.Link;
+import org.constellation.atom.AtomPersonConstruct;
+import org.constellation.atom.Link;
 
 
 /**

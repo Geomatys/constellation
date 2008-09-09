@@ -14,17 +14,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gml.v311;
+package org.constellation.gml.v311;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.SingletonTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.SingletonTable;
 
 /**
  *
@@ -56,7 +56,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      * @param results un resultSet contenant une ligne de la table des envelopes.
      * 
      * @return
-     * @throws net.seagis.catalog.CatalogException
+     * @throws org.constellation.catalog.CatalogException
      * @throws java.sql.SQLException
      */
     @Override

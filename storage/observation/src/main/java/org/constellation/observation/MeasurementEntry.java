@@ -15,17 +15,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.coverage.model.Distribution;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.metadata.MetaDataEntry;
-import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.swe.v101.PhenomenonEntry;
+import org.constellation.coverage.model.Distribution;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.metadata.MetaDataEntry;
+import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.swe.v101.PhenomenonEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
 

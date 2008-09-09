@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.temporal;
+package org.constellation.temporal;
 
 import org.opengis.temporal.Duration;
 import org.opengis.temporal.TemporalGeometricPrimitive;

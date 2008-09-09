@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.timeseries;
+package org.constellation.coverage.timeseries;
 
 // J2SE dependencies
 import java.io.EOFException;

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.util;
+package org.constellation.util;
 
 import java.text.DateFormat;
 import java.text.FieldPosition;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  */
 public class PeriodUtilities {
     
-    Logger logger = Logger.getLogger("net.seagis.util");
+    Logger logger = Logger.getLogger("org.constellation.util");
     /**
      * The number of millisecond in one year.
      */

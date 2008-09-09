@@ -17,7 +17,7 @@
  */
 
 
-package net.seagis.ebrim.v300;
+package org.constellation.ebrim.v300;
 
 import java.util.ArrayList;
 import java.util.List;

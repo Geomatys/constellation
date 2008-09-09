@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +28,10 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import org.junit.Test;
 
-import net.seagis.catalog.Element;
-import net.seagis.catalog.TableTest;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Element;
+import org.constellation.catalog.TableTest;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.CatalogException;
 
 
 /**

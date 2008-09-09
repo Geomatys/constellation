@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.util.Set;
@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import org.openide.ErrorManager;
 
 // Sicade dependencies
-import net.seagis.observation.Observations;
-import net.seagis.observation.coverage.Series;
+import org.constellation.observation.Observations;
+import org.constellation.observation.coverage.Series;
 
 
 /**

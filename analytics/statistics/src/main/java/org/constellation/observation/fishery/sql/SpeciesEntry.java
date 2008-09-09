@@ -15,15 +15,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
 // J2SE dependencies
 import java.util.Locale;
 import static java.util.Locale.*;
 
 // Sicade dependencies
-import net.seagis.observation.fishery.Species;
-import net.seagis.swe.v101.PhenomenonEntry;
+import org.constellation.observation.fishery.Species;
+import org.constellation.swe.v101.PhenomenonEntry;
 
 
 /**

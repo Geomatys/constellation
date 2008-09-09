@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -33,7 +33,7 @@ import junit.framework.TestCase;
  * The base class for tests that require a {@link Database}.
  * <p>
  * Note: While not strictly required, we extends the {@link TestCase} from the old JUnit 3
- * framework in order to create a suite in {@link net.seagis.PostgridSuite}.
+ * framework in order to create a suite in {@link org.constellation.PostgridSuite}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

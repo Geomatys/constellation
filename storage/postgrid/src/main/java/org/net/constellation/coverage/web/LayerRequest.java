@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.web;
+package org.constellation.coverage.web;
 
 import java.awt.geom.Dimension2D;
 import org.opengis.geometry.Envelope;
@@ -27,8 +27,8 @@ import org.geotools.util.logging.Logging;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.catalog.CatalogException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.catalog.CatalogException;
 
 
 /**

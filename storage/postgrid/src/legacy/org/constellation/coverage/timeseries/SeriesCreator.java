@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.timeseries;
+package org.constellation.coverage.timeseries;
 
 // J2SE dependencies
 import java.io.Writer;
@@ -32,8 +32,8 @@ import org.geotools.geometry.GeneralEnvelope;
 //import org.geotools.gui.headless.ProgressPrinter;
 
 // Sicade dependencies
-import net.seagis.coverage.catalog.Catalog;
-import net.seagis.catalog.CatalogException;
+import org.constellation.coverage.catalog.Catalog;
+import org.constellation.catalog.CatalogException;
 import org.geotools.resources.image.ImageUtilities;
 
 

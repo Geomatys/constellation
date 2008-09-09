@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.widget;
+package org.constellation.widget;
 
 import java.util.Map;
 import java.util.Set;
@@ -60,11 +60,11 @@ import org.geotools.resources.XArray;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.grid.GridCoverage2D;
 
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.CoverageReference;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.CoverageReference;
 
 
 /**

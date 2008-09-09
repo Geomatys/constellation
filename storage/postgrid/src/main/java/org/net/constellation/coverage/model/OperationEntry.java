@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.processing.AbstractProcessor;
 
-import net.seagis.catalog.Entry;
+import org.constellation.catalog.Entry;
 
 
 /**

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wcs.v111;
+package org.constellation.wcs.v111;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.v110.BoundingBoxType;
-import net.seagis.ows.v110.WGS84BoundingBoxType;
+import org.constellation.ows.v110.BoundingBoxType;
+import org.constellation.ows.v110.WGS84BoundingBoxType;
 
 
 /**
@@ -72,7 +72,7 @@ public class DomainSubsetType {
       */
      public DomainSubsetType(TimeSequenceType temporal, BoundingBoxType boundingBox){
          this.temporalSubset = temporal;
-         net.seagis.ows.v110.ObjectFactory facto = new net.seagis.ows.v110.ObjectFactory();
+         org.constellation.ows.v110.ObjectFactory facto = new org.constellation.ows.v110.ObjectFactory();
          this.boundingBox = facto.createBoundingBox(boundingBox);
      }
     

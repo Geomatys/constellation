@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.kml.v220;
+package org.constellation.kml.v220;
 
 import java.util.List;
 import javax.xml.bind.JAXBElement;

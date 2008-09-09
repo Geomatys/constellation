@@ -15,13 +15,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.List;
 import java.util.Locale;
 import java.io.Writer;
 import java.io.IOException;
-import net.seagis.catalog.Element;
+import org.constellation.catalog.Element;
 
 
 /**
@@ -41,7 +41,7 @@ public interface LinearModel extends Model {
      * <var>C</var><sub>3</sub>&times;{@code SST}&times;{@code SLA} + ...</p>
      *
      * Each term on the right side of {@code =} is represented by a
-     * {@link net.seagis.observation.coverage.LinearModel.Term} instance.
+     * {@link org.constellation.observation.coverage.LinearModel.Term} instance.
      * The term contains a <var>C</var><sub>n</sub> coefficient, often
      * computed from a multiple linear regression.
      *

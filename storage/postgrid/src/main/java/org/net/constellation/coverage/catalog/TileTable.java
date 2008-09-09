@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Map;
 import java.util.List;
@@ -43,10 +43,10 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.CatalogException;
 
 
 /**

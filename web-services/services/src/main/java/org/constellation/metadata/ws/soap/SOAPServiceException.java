@@ -15,14 +15,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata.ws.soap;
+package org.constellation.metadata.ws.soap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import net.seagis.ows.v110.ExceptionReport;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.Service;
+import org.constellation.ows.v110.ExceptionReport;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.Service;
 
 /**
  *

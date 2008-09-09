@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 // J2SE dependencies
 import java.util.*;
@@ -24,10 +24,10 @@ import java.util.logging.LogRecord;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.awt.Component;
 import java.sql.SQLException;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ServerException;
-import net.seagis.coverage.catalog.*;
-import net.seagis.coverage.model.Descriptor;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ServerException;
+import org.constellation.coverage.catalog.*;
+import org.constellation.coverage.model.Descriptor;
 
 // OpenGIS dependencies
 import org.opengis.coverage.PointOutsideCoverageException;
@@ -39,9 +39,9 @@ import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
 // Sicade dependencies
-import net.seagis.coverage.model.DescriptorTable;
-import net.seagis.resources.i18n.Resources;
-//import net.seagis.resources.XArray;
+import org.constellation.coverage.model.DescriptorTable;
+import org.constellation.resources.i18n.Resources;
+//import org.constellation.resources.XArray;
 
 
 

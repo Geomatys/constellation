@@ -15,15 +15,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.List;
 import org.opengis.coverage.Coverage;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import net.seagis.catalog.Entry;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.Layer;
+import org.constellation.catalog.Entry;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Layer;
 
 
 /**

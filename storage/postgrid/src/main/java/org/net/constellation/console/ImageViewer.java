@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -44,9 +44,9 @@ import javax.imageio.stream.ImageOutputStream;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.resources.Arguments;
 
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.GridCoverageTable;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.GridCoverageTable;
 import org.geotools.image.io.metadata.GeographicMetadata;
 
 

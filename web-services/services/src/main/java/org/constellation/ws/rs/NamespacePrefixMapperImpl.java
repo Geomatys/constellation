@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ws.rs;
+package org.constellation.ws.rs;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 

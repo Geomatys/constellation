@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.Set;
 import java.util.List;
@@ -53,13 +53,13 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.IIOException;
 import javax.imageio.stream.ImageOutputStream;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.catalog.ServerException;
-import net.seagis.coverage.catalog.Catalog;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.GridCoverage;
-import net.seagis.coverage.catalog.Layer;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.catalog.ServerException;
+import org.constellation.coverage.catalog.Catalog;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.GridCoverage;
+import org.constellation.coverage.catalog.Layer;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
@@ -85,8 +85,8 @@ import org.geotools.resources.Classes;
 import org.geotools.math.Statistics;
 import org.geotools.util.DateRange;
 
-import net.seagis.image.operation.Equalizer;
-import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.constellation.image.operation.Equalizer;
+import org.constellation.coverage.catalog.WritableGridCoverageTable;
 
 
 /**
@@ -456,7 +456,7 @@ public class CoverageBuilder {
                     // ATTENTION: On suppose ici que DEFAULT_SUFFIX correspond aussi au nom du format.
                 }
             } else {
-                Logger.getLogger("net.seagis.observation.coverage").warning("Modèle de couleurs incompatible.");
+                Logger.getLogger("org.constellation.observation.coverage").warning("Modèle de couleurs incompatible.");
             }
         }
     }

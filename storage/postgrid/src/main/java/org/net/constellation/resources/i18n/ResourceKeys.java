@@ -16,7 +16,7 @@
  *    THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!
  *    Generated with: org.geotools.resources.IndexedResourceCompiler
  */
-package net.seagis.resources.i18n;
+package org.constellation.resources.i18n;
 
 
 /**

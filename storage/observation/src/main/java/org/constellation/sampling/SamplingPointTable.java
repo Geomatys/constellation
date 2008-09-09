@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sampling;
+package org.constellation.sampling;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,12 +23,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.v311.DirectPositionType;
-import net.seagis.gml.v311.PointType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.PointType;
 
 /**
  *SamplingPointTable.java

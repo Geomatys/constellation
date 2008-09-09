@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import java.io.File;
 import javax.xml.bind.JAXBContext;
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 public class XacmlAnnotationsTest {
     @Test
     public void testPolicyAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("net.seagis.xacml.policy");
+        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         final Object policy = unmarshaller.unmarshal(new File("/home/cedr/Bureau/GeoXACML/example/policy.xml"));
         assertNotNull(policy);
@@ -41,7 +41,7 @@ public class XacmlAnnotationsTest {
 
     @Test
     public void testRequestAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("net.seagis.xacml.policy:net.seagis.xacml.context");
+        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy:org.constellation.xacml.context");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         final Object request = unmarshaller.unmarshal(new File("/home/cedr/Bureau/GeoXACML/example/request.xml"));
         assertNotNull(request);
@@ -49,7 +49,7 @@ public class XacmlAnnotationsTest {
 
     @Test
     public void testResponseAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("net.seagis.xacml.policy:net.seagis.xacml.context");
+        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy:org.constellation.xacml.context");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         final Object response = unmarshaller.unmarshal(new File("/home/cedr/Bureau/GeoXACML/example/response.xml"));
         assertNotNull(response);

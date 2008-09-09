@@ -14,18 +14,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.dublincore.v1.terms;
+package org.constellation.dublincore.v1.terms;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.dublincore.v1.elements.SimpleLiteral;
+import org.constellation.dublincore.v1.elements.SimpleLiteral;
 
 
 /**
  * This object contains factory methods for each Java content interface and Java element interface 
- * generated in the net.seagis.dublincore.v1.terms package. 
+ * generated in the org.constellation.dublincore.v1.terms package. 
  * An ObjectFactory allows you to programatically construct new instances of the Java representation for XML content. 
  * The Java representation of XML content can consist of schema derived interfaces and classes representing the binding of schema 
  * type definitions, element declarations and model groups.  
@@ -70,7 +70,7 @@ public class ObjectFactory {
     private final static QName _TableOfContents_QNAME       = new QName("http://www.purl.org/dc/terms/", "tableOfContents");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.seagis.dublincore.v1.terms
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.constellation.dublincore.v1.terms
      * 
      */
     public ObjectFactory() {

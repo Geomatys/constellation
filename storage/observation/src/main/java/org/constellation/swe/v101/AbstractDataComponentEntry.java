@@ -15,14 +15,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.util.Utilities;
-import net.seagis.catalog.Entry;
+import org.constellation.catalog.Entry;
 /**
  *
  * @version $Id:

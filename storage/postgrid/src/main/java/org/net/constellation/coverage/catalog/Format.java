@@ -15,12 +15,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Locale;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import net.seagis.catalog.Element;
+import org.constellation.catalog.Element;
 import org.geotools.util.MeasurementRange;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;

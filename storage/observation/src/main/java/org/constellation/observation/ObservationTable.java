@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,31 +24,31 @@ import java.sql.SQLException;
 
 // Sicade dependencies
 import java.sql.Timestamp;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.coverage.model.Distribution;
-import net.seagis.coverage.model.DistributionTable;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.gml.v311.TimeInstantType;
-import net.seagis.gml.v311.TimePeriodType;
-import net.seagis.gml.v311.TimePositionType;
-import net.seagis.metadata.MetadataTable;
-import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.sampling.SamplingFeatureTable;
-import net.seagis.sampling.SamplingPointEntry;
-import net.seagis.sampling.SamplingPointTable;
-import net.seagis.swe.v101.AnyResultEntry;
-import net.seagis.swe.v101.AnyResultTable;
-import net.seagis.swe.v101.CompositePhenomenonEntry;
-import net.seagis.swe.v101.CompositePhenomenonTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.coverage.model.Distribution;
+import org.constellation.coverage.model.DistributionTable;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.metadata.MetadataTable;
+import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.sampling.SamplingFeatureTable;
+import org.constellation.sampling.SamplingPointEntry;
+import org.constellation.sampling.SamplingPointTable;
+import org.constellation.swe.v101.AnyResultEntry;
+import org.constellation.swe.v101.AnyResultTable;
+import org.constellation.swe.v101.CompositePhenomenonEntry;
+import org.constellation.swe.v101.CompositePhenomenonTable;
 
 // OpenGis dependencies
-import net.seagis.swe.v101.DataArrayPropertyType;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonTable;
+import org.constellation.swe.v101.DataArrayPropertyType;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonTable;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 

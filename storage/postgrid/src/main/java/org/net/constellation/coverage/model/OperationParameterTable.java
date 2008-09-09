@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.Arrays;
 import java.sql.ResultSet;
@@ -32,11 +32,11 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.geotools.resources.XMath;
 
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.IllegalRecordException;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.IllegalRecordException;
 
 
 /**

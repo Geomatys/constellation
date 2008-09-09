@@ -20,4 +20,4 @@ xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http:/
           @javax.xml.bind.annotation.XmlNs(prefix = "om", namespaceURI= "http://www.opengis.net/om/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "xlink", namespaceURI= "http://www.w3.org/1999/xlink")})
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;

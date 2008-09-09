@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 
 /**
@@ -28,7 +28,7 @@ package net.seagis.catalog;
  * @author Martin Desruisseaux
  *
  * @see Database#getProperty
- * @see net.seagis.gui.swing.ConfigurationEditor
+ * @see org.constellation.gui.swing.ConfigurationEditor
  */
 public enum ConfigurationKey {
     /**

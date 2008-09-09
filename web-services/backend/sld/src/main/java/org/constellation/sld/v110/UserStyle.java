@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sld.v110;
+package org.constellation.sld.v110;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.se.CoverageStyleType;
-import net.seagis.se.DescriptionType;
-import net.seagis.se.OnlineResourceType;
+import org.constellation.se.CoverageStyleType;
+import org.constellation.se.DescriptionType;
+import org.constellation.se.OnlineResourceType;
 
 
 /**

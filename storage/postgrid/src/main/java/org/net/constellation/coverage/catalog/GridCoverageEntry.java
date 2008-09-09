@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.Shape;
 import java.awt.Dimension;
@@ -75,10 +75,10 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 
-import net.seagis.catalog.Entry;
-import net.seagis.coverage.model.Operation;
-import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Entry;
+import org.constellation.coverage.model.Operation;
+import org.constellation.catalog.IllegalRecordException;
+import org.constellation.catalog.CatalogException;
 
 import ucar.nc2.dataset.AxisType;
 
@@ -325,7 +325,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * {@inheritDoc}
      *
      * Note: Cette bibliothèque utilise une instance spéciale de {@link DefaultTemporalCRS}
-     *       (définie dans {@link net.seagis.observation.sql.CRS}) qui sait représenter les
+     *       (définie dans {@link org.constellation.observation.sql.CRS}) qui sait représenter les
      *       plages de temps illimitées par {@link Double#POSITIVE_INFINITY} ou
      *       {@link Double#NEGATIVE_INFINITY}.
      *

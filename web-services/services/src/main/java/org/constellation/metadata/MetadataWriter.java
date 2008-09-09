@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 import java.lang.reflect.Method;
 import java.sql.Date;
@@ -54,7 +54,7 @@ public class MetadataWriter {
     /**
      * A debugging logger.
      */
-    private Logger logger = Logger.getLogger("net.seagis.metadata");
+    private Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A MDWeb catalogs where write the form.

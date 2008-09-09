@@ -14,20 +14,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.swe.v101.CompositePhenomenonEntry;
-import net.seagis.swe.v101.CompositePhenomenonTable;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.swe.v101.CompositePhenomenonEntry;
+import org.constellation.swe.v101.CompositePhenomenonTable;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonTable;
 import org.geotools.util.Utilities;
 
 /**

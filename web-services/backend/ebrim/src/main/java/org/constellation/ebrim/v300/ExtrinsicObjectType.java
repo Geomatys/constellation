@@ -17,7 +17,7 @@
  */
 
 
-package net.seagis.ebrim.v300;
+package org.constellation.ebrim.v300;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -57,7 +57,7 @@ import javax.xml.bind.annotation.XmlType;
     "contentVersionInfo"
 })
 @XmlSeeAlso({
-    net.seagis.cat.wrs.ExtrinsicObjectType.class
+    org.constellation.cat.wrs.ExtrinsicObjectType.class
 })
 public class ExtrinsicObjectType extends RegistryObjectType {
 

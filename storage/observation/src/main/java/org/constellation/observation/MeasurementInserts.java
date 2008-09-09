@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 // J2SE dependencies
 import java.sql.SQLException;
@@ -23,10 +23,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // Sicade dependencies
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ServerException;
-import net.seagis.coverage.catalog.*;
-import net.seagis.observation.MeasurementTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ServerException;
+import org.constellation.coverage.catalog.*;
+import org.constellation.observation.MeasurementTable;
 
 
 /**

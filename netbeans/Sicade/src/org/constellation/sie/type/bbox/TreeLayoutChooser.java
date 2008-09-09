@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import javax.swing.JPanel;
@@ -24,7 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Sicade dependencies
-import net.seagis.observation.coverage.sql.TreeDepth;
+import org.constellation.observation.coverage.sql.TreeDepth;
 
 
 /**

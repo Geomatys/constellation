@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.window.series;
+package org.constellation.sie.window.series;
 
 // J2SE dependencies
 import java.awt.Image;
@@ -34,7 +34,7 @@ import org.openide.util.Utilities;
 import org.openide.util.NbBundle;
 
 // Sicade dependencies
-import net.seagis.sie.type.bbox.AddAction;
+import org.constellation.sie.type.bbox.AddAction;
 
 
 /**

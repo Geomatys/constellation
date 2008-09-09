@@ -15,9 +15,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;
 
-import net.seagis.catalog.Entry;
+import org.constellation.catalog.Entry;
 import org.geotools.util.Utilities;
 
 /**

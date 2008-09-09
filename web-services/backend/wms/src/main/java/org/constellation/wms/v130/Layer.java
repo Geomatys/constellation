@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wms.v130;
+package org.constellation.wms.v130;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wms.AbstractDimension;
-import net.seagis.wms.AbstractGeographicBoundingBox;
-import net.seagis.wms.AbstractLayer;
+import org.constellation.wms.AbstractDimension;
+import org.constellation.wms.AbstractGeographicBoundingBox;
+import org.constellation.wms.AbstractLayer;
 
 
 /**

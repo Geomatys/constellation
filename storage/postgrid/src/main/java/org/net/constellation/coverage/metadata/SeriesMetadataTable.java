@@ -12,15 +12,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.metadata;
+package org.constellation.coverage.metadata;
 
-import net.seagis.coverage.catalog.*;
+import org.constellation.coverage.catalog.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.BoundedSingletonTable;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.BoundedSingletonTable;
+import org.constellation.catalog.CatalogException;
 
 
 /**

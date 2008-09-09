@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Set;
 import java.util.List;
@@ -38,11 +38,11 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.util.UnsupportedImplementationException;
 
-import net.seagis.coverage.model.Operation;
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.coverage.model.RegionOfInterest;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ServerException;
+import org.constellation.coverage.model.Operation;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.RegionOfInterest;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ServerException;
 
 
 /**
@@ -139,7 +139,7 @@ public class DataCoverage extends AbstractCoverage {
         } else {
             sampleDimension = null;
         }
-        if (super.getCoordinateReferenceSystem().equals(net.seagis.catalog.CRS.XYT)) {
+        if (super.getCoordinateReferenceSystem().equals(org.constellation.catalog.CRS.XYT)) {
             throw new UnsupportedOperationException("Transformation de coordonnées pas encore implémentée.");
         }
         if (offset.getEasting()!=0 || offset.getNorthing()!=0) {

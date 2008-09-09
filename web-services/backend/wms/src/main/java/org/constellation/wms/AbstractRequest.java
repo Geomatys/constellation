@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wms;
+package org.constellation.wms;
 
 import javax.xml.bind.annotation.XmlTransient;
 

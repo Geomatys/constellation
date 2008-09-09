@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui;
+package org.constellation.gui;
 
 // Interface utilisateur
 import java.awt.BorderLayout;
@@ -48,10 +48,10 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 
 // Sicade
-import net.seagis.catalog.Database;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.resources.i18n.ResourceKeys;
-import net.seagis.resources.i18n.Resources;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 
 
 /**

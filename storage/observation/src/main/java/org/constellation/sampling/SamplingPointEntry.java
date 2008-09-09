@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sampling;
+package org.constellation.sampling;
 
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,9 +23,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.PointType;
-import net.seagis.observation.ObservationEntry;
-import net.seagis.observation.SurveyProcedureEntry;
+import org.constellation.gml.v311.PointType;
+import org.constellation.observation.ObservationEntry;
+import org.constellation.observation.SurveyProcedureEntry;
 import org.geotools.resources.Utilities;
 import org.opengis.observation.sampling.SamplingPoint;
 

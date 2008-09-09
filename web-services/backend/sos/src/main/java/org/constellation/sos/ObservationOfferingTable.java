@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,20 +25,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.v311.BoundingShapeEntry;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.EnvelopeTable;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.gml.v311.TimeIndeterminateValueType;
-import net.seagis.gml.v311.TimeInstantType;
-import net.seagis.gml.v311.TimePeriodType;
-import net.seagis.gml.v311.TimePositionType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.gml.v311.BoundingShapeEntry;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.EnvelopeTable;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.gml.v311.TimeIndeterminateValueType;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.gml.v311.TimePositionType;
 
 /**
  *
@@ -142,7 +142,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * 
      * @return A observationOffering object.
      * 
-     * @throws net.seagis.catalog.CatalogException
+     * @throws org.constellation.catalog.CatalogException
      * @throws java.sql.SQLException
      */
     @Override

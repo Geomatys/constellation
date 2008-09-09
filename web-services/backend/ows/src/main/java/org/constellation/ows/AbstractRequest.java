@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ows;
+package org.constellation.ows;
 
 /**
  * A class who permit to get the version parameter on each request.

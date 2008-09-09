@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
@@ -47,16 +47,16 @@ import java.util.logging.Logger;
 
 // Seagis Dependencies
 import javax.xml.namespace.QName;
-import net.seagis.cat.csw.v202.AbstractRecordType;
-import net.seagis.cat.csw.v202.BriefRecordType;
-import net.seagis.cat.csw.v202.ElementSetType;
-import net.seagis.cat.csw.v202.SummaryRecordType;
-import net.seagis.cat.csw.v202.RecordType;
-import net.seagis.dublincore.v2.elements.SimpleLiteral;
-import net.seagis.ows.v100.BoundingBoxType;
-import net.seagis.ows.v100.OWSWebServiceException;
-import net.seagis.coverage.web.ServiceVersion;
-import static net.seagis.ows.OWSExceptionCode.*;
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
+import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.ows.v100.BoundingBoxType;
+import org.constellation.ows.v100.OWSWebServiceException;
+import org.constellation.coverage.web.ServiceVersion;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
@@ -85,7 +85,7 @@ public class MetadataReader {
     /**
      * A debugging logger
      */
-    private Logger logger = Logger.getLogger("net.seagis.coverage.wms");
+    private Logger logger = Logger.getLogger("org.constellation.coverage.wms");
     
     /**
      * A reader to the MDWeb database.
@@ -172,11 +172,11 @@ public class MetadataReader {
         this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));
         this.MDCatalogs.add(MDReader.getCatalog("CSWCat"));
         
-        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing"  , "net.seagis.temporal", 
+        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw.v202"   , "net.seagis.dublincore.v2.elements", "net.seagis.ows.v100");
+        this.seagisPackage   = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();
@@ -985,7 +985,7 @@ public class MetadataReader {
             
             //TODO remove this special case
             if (className.equals("RS_Identifier"))
-                packageName = "net.seagis.referencing";
+                packageName = "org.constellation.referencing";
             else if (className.equals("MD_ScopeCode"))
                 packageName = "org.opengis.metadata.maintenance";
             else if (className.equals("SV_ServiceIdentification")) 

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.factory;
+package org.constellation.xacml.factory;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -28,9 +28,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import net.seagis.xacml.context.AttributeType;
-import net.seagis.xacml.context.AttributeValueType;
-import net.seagis.xacml.XMLSchemaConstants;
+import org.constellation.xacml.context.AttributeType;
+import org.constellation.xacml.context.AttributeValueType;
+import org.constellation.xacml.XMLSchemaConstants;
  
 
 /**

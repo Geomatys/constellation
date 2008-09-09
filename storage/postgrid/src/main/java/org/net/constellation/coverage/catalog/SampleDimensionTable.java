@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ import javax.measure.unit.UnitFormat;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.IllegalRecordException;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 

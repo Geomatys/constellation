@@ -15,13 +15,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.seagis.catalog.Element;
-import net.seagis.coverage.web.Service;
+import org.constellation.catalog.Element;
+import org.constellation.coverage.web.Service;
 
 
 /**
@@ -70,7 +70,7 @@ public interface Series extends Element {
      * Returns the given filename as a {@link File} augmented with series-dependent
      * {@linkplain File#getParent parent} and extension. The returned file should be
      * {@linkplain File#isAbsolute absolute}. If it is not, then there is probably no
-     * {@linkplain net.seagis.catalog.ConfigurationKey#ROOT_DIRECTORY root directory}
+     * {@linkplain org.constellation.catalog.ConfigurationKey#ROOT_DIRECTORY root directory}
      * set and consequently the file is probably not accessible locally. In such case,
      * consider using {@link #uri} instead.
      *

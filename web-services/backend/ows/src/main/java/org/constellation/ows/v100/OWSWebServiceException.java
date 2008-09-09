@@ -14,11 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ows.v100;
+package org.constellation.ows.v100;
 
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ows.OWSExceptionCode;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ows.OWSExceptionCode;
 
 /**
  *
@@ -54,7 +54,7 @@ public class OWSWebServiceException extends WebServiceException {
     /**
      * Build an OWS v1.0.0 web service exception from an OWS v 1.1.0 exception
      */
-    public OWSWebServiceException(net.seagis.ows.v110.OWSWebServiceException exc, ServiceVersion v) {
+    public OWSWebServiceException(org.constellation.ows.v110.OWSWebServiceException exc, ServiceVersion v) {
         super("");
         this.exception = new ExceptionReport(exc.getMessage(), exc.getExceptionCode().name(), exc.getExceptionReport().getFirstLocator(), v);
     }

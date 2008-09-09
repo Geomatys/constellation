@@ -14,13 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.geom.Dimension2D;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.util.DateRange;
 import org.geotools.resources.Utilities;
-import net.seagis.catalog.Entry;
+import org.constellation.catalog.Entry;
 
 
 /**

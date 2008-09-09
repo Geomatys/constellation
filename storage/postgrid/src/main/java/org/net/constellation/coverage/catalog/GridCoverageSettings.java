@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Date;
 import java.text.DateFormat;
@@ -32,7 +32,7 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
-import net.seagis.coverage.model.Operation;
+import org.constellation.coverage.model.Operation;
 
 
 /**

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ogc.SpatialOpsType;
+import org.constellation.ogc.SpatialOpsType;
 import org.geotools.resources.Utilities;
 
 

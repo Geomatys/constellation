@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,16 +26,16 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import java.util.logging.Logger;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.UpdatePolicy;
-import net.seagis.catalog.ServerException;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.UpdatePolicy;
+import org.constellation.catalog.ServerException;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.WritableGridCoverageTable;
 import org.geotools.console.CommandLine;
 import org.geotools.console.Option;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.jdom.Element;
-import static net.seagis.catalog.UpdatePolicy.*;
+import static org.constellation.catalog.UpdatePolicy.*;
 
 
 /**
@@ -49,7 +49,7 @@ public class Collector extends CommandLine {
     /**
      * The default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("net.seagis.console");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.console");
     
     /**
      * Database connection.

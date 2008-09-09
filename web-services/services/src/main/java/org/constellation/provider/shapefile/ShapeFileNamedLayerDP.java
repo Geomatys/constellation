@@ -15,14 +15,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider.shapefile;
+package org.constellation.provider.shapefile;
 
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
-import net.seagis.provider.*;
+import org.constellation.provider.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

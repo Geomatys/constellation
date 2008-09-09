@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Set;
 import java.util.List;
@@ -34,8 +34,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.Operation;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.model.Operation;
 
 
 /**

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -37,39 +37,39 @@ import javax.xml.bind.JAXBException;
 
 // SeaGIS dependencies
 import javax.xml.namespace.QName;
-import net.seagis.cat.csw.GetRecordsRequest;
-import net.seagis.cat.csw.v200.GetCapabilitiesType;
-import net.seagis.cat.csw.v202.AbstractQueryType;
-import net.seagis.cat.csw.v202.AbstractRecordType;
-import net.seagis.cat.csw.v202.Capabilities;
-import net.seagis.cat.csw.v202.ElementSetNameType;
-import net.seagis.cat.csw.v202.ElementSetType;
-import net.seagis.cat.csw.v202.GetCapabilities;
-import net.seagis.cat.csw.v202.GetRecordsResponseType;
-import net.seagis.cat.csw.v202.GetRecordsType;
-import net.seagis.cat.csw.v202.QueryConstraintType;
-import net.seagis.cat.csw.v202.QueryType;
-import net.seagis.cat.csw.v202.ResultType;
-import net.seagis.cat.csw.v202.SearchResultsType;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ogc.FilterType;
-import net.seagis.ogc.NotType;
-import net.seagis.ogc.PropertyIsLikeType;
-import net.seagis.ogc.PropertyNameType;
-import net.seagis.ows.v100.AcceptFormatsType;
-import net.seagis.ows.v100.AcceptVersionsType;
-import net.seagis.ows.v100.CapabilitiesBaseType;
-import net.seagis.ows.v100.DCP;
-import net.seagis.ows.v100.DomainType;
-import net.seagis.ows.v100.ExceptionReport;
-import net.seagis.ows.v100.ExceptionType;
-import net.seagis.ows.v100.OWSWebServiceException;
-import net.seagis.ows.v100.Operation;
-import net.seagis.ows.v100.OperationsMetadata;
-import net.seagis.ows.v100.RequestMethodType;
-import net.seagis.ows.v100.SectionsType;
-import net.seagis.ws.rs.NamespacePrefixMapperImpl;
-import static net.seagis.ows.OWSExceptionCode.*;
+import org.constellation.cat.csw.GetRecordsRequest;
+import org.constellation.cat.csw.v200.GetCapabilitiesType;
+import org.constellation.cat.csw.v202.AbstractQueryType;
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.ElementSetNameType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetRecordsResponseType;
+import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.cat.csw.v202.QueryType;
+import org.constellation.cat.csw.v202.ResultType;
+import org.constellation.cat.csw.v202.SearchResultsType;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ogc.FilterType;
+import org.constellation.ogc.NotType;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyNameType;
+import org.constellation.ows.v100.AcceptFormatsType;
+import org.constellation.ows.v100.AcceptVersionsType;
+import org.constellation.ows.v100.CapabilitiesBaseType;
+import org.constellation.ows.v100.DCP;
+import org.constellation.ows.v100.DomainType;
+import org.constellation.ows.v100.ExceptionReport;
+import org.constellation.ows.v100.ExceptionType;
+import org.constellation.ows.v100.OWSWebServiceException;
+import org.constellation.ows.v100.Operation;
+import org.constellation.ows.v100.OperationsMetadata;
+import org.constellation.ows.v100.RequestMethodType;
+import org.constellation.ows.v100.SectionsType;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -80,7 +80,7 @@ public class CatalogueHarvester {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.metadata");
+    Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A getRecords request used to request another csw (2.0.2).
@@ -90,12 +90,12 @@ public class CatalogueHarvester {
     /**
      * A getRecords request used to request another csw(2.0.0).
      */
-    private net.seagis.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200;
+    private org.constellation.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200;
     
     /**
      * A special getRecords request used to request another unstandardized csw (2.0.0).
      */
-    private net.seagis.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
+    private org.constellation.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
     
     /**
      * A getCapabilities request used request another csw(2.0.2)
@@ -183,25 +183,25 @@ public class CatalogueHarvester {
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
-        net.seagis.cat.csw.v200.QueryConstraintType constraint2 = new net.seagis.cat.csw.v200.QueryConstraintType(filter1, "1.1.0");
+        org.constellation.cat.csw.v200.QueryConstraintType constraint2 = new org.constellation.cat.csw.v200.QueryConstraintType(filter1, "1.1.0");
         List<String> typeNames2 = new ArrayList<String>();
         typeNames2.add("csw:dataset");
-        net.seagis.cat.csw.v200.QueryType query2 = new net.seagis.cat.csw.v200.QueryType(typeNames2, 
-                                                                                         new net.seagis.cat.csw.v200.ElementSetNameType(net.seagis.cat.csw.v200.ElementSetType.FULL), 
+        org.constellation.cat.csw.v200.QueryType query2 = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
+                                                                                         new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                                          constraint2); 
-        JAXBElement<? extends net.seagis.cat.csw.v200.AbstractQueryType> jbQuery2 =  worker.cswFactory200.createQuery(query2);
-        fullGetRecordsRequestv200 = new net.seagis.cat.csw.v200.GetRecordsType("CSW", "2.0.0", net.seagis.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery2, null);
+        JAXBElement<? extends org.constellation.cat.csw.v200.AbstractQueryType> jbQuery2 =  worker.cswFactory200.createQuery(query2);
+        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
-        constraint2        = new net.seagis.cat.csw.v200.QueryConstraintType(filter2, "1.0.20");
+        constraint2        = new org.constellation.cat.csw.v200.QueryConstraintType(filter2, "1.0.20");
         typeNames2         = new ArrayList<String>();
         typeNames2.add("Dataset");
-        query2             = new net.seagis.cat.csw.v200.QueryType(typeNames2, 
-                                                                   new net.seagis.cat.csw.v200.ElementSetNameType(net.seagis.cat.csw.v200.ElementSetType.FULL), 
+        query2             = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
+                                                                   new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                    constraint2); 
         jbQuery2 =  worker.cswFactory200.createQuery(query2);
-        fullGetRecordsRequestv200_Special1 = new net.seagis.cat.csw.v200.GetRecordsType("CSW", "2.0.0", net.seagis.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, jbQuery2, null);
+        fullGetRecordsRequestv200_Special1 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, jbQuery2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
@@ -240,7 +240,7 @@ public class CatalogueHarvester {
         if (distantCapabilities instanceof Capabilities) {
             getRecordRequest = fullGetRecordsRequestv202;
             
-        } else if (distantCapabilities instanceof net.seagis.cat.csw.v200.CapabilitiesType) {
+        } else if (distantCapabilities instanceof org.constellation.cat.csw.v200.CapabilitiesType) {
             getRecordRequest = fullGetRecordsRequestv200;
             
         } else {
@@ -329,15 +329,15 @@ public class CatalogueHarvester {
                     } 
                     
                 // a correct response v2.0.0
-                } else if (harvested instanceof net.seagis.cat.csw.v200.GetRecordsResponseType) {
+                } else if (harvested instanceof org.constellation.cat.csw.v200.GetRecordsResponseType) {
                     succeed = true;
                     logger.info("Response of distant service:" + '\n' + harvested.toString());
-                    net.seagis.cat.csw.v200.GetRecordsResponseType serviceResponse = (net.seagis.cat.csw.v200.GetRecordsResponseType) harvested;
-                    net.seagis.cat.csw.v200.SearchResultsType results = serviceResponse.getSearchResults();
+                    org.constellation.cat.csw.v200.GetRecordsResponseType serviceResponse = (org.constellation.cat.csw.v200.GetRecordsResponseType) harvested;
+                    org.constellation.cat.csw.v200.SearchResultsType results = serviceResponse.getSearchResults();
             
                     //we looking for CSW record
-                    for (JAXBElement<? extends net.seagis.cat.csw.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
-                        net.seagis.cat.csw.v200.AbstractRecordType record = JBrecord.getValue();
+                    for (JAXBElement<? extends org.constellation.cat.csw.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
+                        org.constellation.cat.csw.v200.AbstractRecordType record = JBrecord.getValue();
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -644,7 +644,7 @@ public class CatalogueHarvester {
      * 
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, WebServiceException, IOException {
         

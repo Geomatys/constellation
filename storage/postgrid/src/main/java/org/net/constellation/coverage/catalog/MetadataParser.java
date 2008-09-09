@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.geom.AffineTransform;
 import java.util.Date;
@@ -48,8 +48,8 @@ import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
 import org.geotools.util.Ranks;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
 import org.geotools.image.io.metadata.Identification;
 
 

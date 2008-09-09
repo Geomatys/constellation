@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.xml;
+package org.constellation.observation.xml;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
-import net.seagis.catalog.CatalogException;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonTable;
-import net.seagis.gml.v311.UnitOfMeasureEntry;
-import net.seagis.gml.v311.UnitOfMeasureTable;
-import net.seagis.sampling.SamplingPointEntry;
-import net.seagis.sampling.SamplingPointTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonTable;
+import org.constellation.gml.v311.UnitOfMeasureEntry;
+import org.constellation.gml.v311.UnitOfMeasureTable;
+import org.constellation.sampling.SamplingPointEntry;
+import org.constellation.sampling.SamplingPointTable;
 
 /**
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.

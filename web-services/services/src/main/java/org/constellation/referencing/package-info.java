@@ -35,7 +35,7 @@ xmlns = {
     @XmlJavaTypeAdapter(BooleanAdapter.class),
     @XmlJavaTypeAdapter(type=boolean.class, value=BooleanAdapter.class)
 })
-package net.seagis.referencing;
+package org.constellation.referencing;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

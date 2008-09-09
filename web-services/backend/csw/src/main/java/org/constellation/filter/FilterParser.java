@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.filter;
+package org.constellation.filter;
 
 // J2SE dependencies
 import java.awt.geom.Line2D;
@@ -33,36 +33,36 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 // Seagis dependencies
-import net.seagis.cat.csw.v202.QueryConstraintType;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.gml.v311.CoordinatesType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.LineStringType;
-import net.seagis.gml.v311.PointType;
-import net.seagis.lucene.filter.SerialChainFilter;
-import net.seagis.lucene.filter.SpatialFilter;
-import net.seagis.lucene.filter.SpatialQuery;
-import net.seagis.ogc.AbstractIdType;
-import net.seagis.ogc.BBOXType;
-import net.seagis.ogc.BinaryComparisonOpType;
-import net.seagis.ogc.BinaryLogicOpType;
-import net.seagis.ogc.BinarySpatialOpType;
-import net.seagis.ogc.ComparisonOpsType;
-import net.seagis.ogc.DistanceBufferType;
-import net.seagis.ogc.FilterType;
-import net.seagis.ogc.LiteralType;
-import net.seagis.ogc.LogicOpsType;
-import net.seagis.ogc.PropertyIsBetweenType;
-import net.seagis.ogc.PropertyIsLikeType;
-import net.seagis.ogc.PropertyIsNullType;
-import net.seagis.ogc.PropertyNameType;
-import net.seagis.ogc.SpatialOpsType;
-import net.seagis.ogc.UnaryLogicOpType;
-import net.seagis.ows.v100.OWSWebServiceException;
-import static net.seagis.ows.OWSExceptionCode.*;
+import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.gml.v311.CoordinatesType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.LineStringType;
+import org.constellation.gml.v311.PointType;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.ogc.AbstractIdType;
+import org.constellation.ogc.BBOXType;
+import org.constellation.ogc.BinaryComparisonOpType;
+import org.constellation.ogc.BinaryLogicOpType;
+import org.constellation.ogc.BinarySpatialOpType;
+import org.constellation.ogc.ComparisonOpsType;
+import org.constellation.ogc.DistanceBufferType;
+import org.constellation.ogc.FilterType;
+import org.constellation.ogc.LiteralType;
+import org.constellation.ogc.LogicOpsType;
+import org.constellation.ogc.PropertyIsBetweenType;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyIsNullType;
+import org.constellation.ogc.PropertyNameType;
+import org.constellation.ogc.SpatialOpsType;
+import org.constellation.ogc.UnaryLogicOpType;
+import org.constellation.ows.v100.OWSWebServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
@@ -89,7 +89,7 @@ public class FilterParser {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.filter");
+    Logger logger = Logger.getLogger("org.constellation.filter");
     
      /**
      * The version of the service
@@ -112,7 +112,7 @@ public class FilterParser {
             this.version = version;
         }
             
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml.v311");
+        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterMarshaller = jbcontext.createMarshaller();
         filterMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
     }
@@ -233,7 +233,7 @@ public class FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     private SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
         List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
@@ -380,7 +380,7 @@ public class FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     private String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
         StringBuilder response = new StringBuilder();
@@ -550,7 +550,7 @@ public class FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     private Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
         SpatialFilter spatialfilter = null;
@@ -937,7 +937,7 @@ public class FilterParser {
      * 
      * @return A GeneralDirectPosition.
      * 
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */

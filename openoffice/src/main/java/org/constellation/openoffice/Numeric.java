@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.openoffice;
+package org.constellation.openoffice;
 
 // J2SE dependencies
 import java.util.logging.Logger;
@@ -32,9 +32,9 @@ import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
 
 // Sicade dependencies
-import net.seagis.numeric.table.Table;
-import net.seagis.numeric.table.TableFactory;
-import net.seagis.numeric.table.Interpolation;
+import org.constellation.numeric.table.Table;
+import org.constellation.numeric.table.TableFactory;
+import org.constellation.numeric.table.Interpolation;
 
 
 /**
@@ -48,7 +48,7 @@ public class Numeric extends Formulas implements XNumeric {
     /**
      * The logger to use for all message to log in this package.
      */
-    private static final Logger LOGGER = Logger.getLogger("net.seagis.openoffice");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.openoffice");
 
     /**
      * Le nom sous lequel sera enregistré cette composante.
@@ -56,7 +56,7 @@ public class Numeric extends Formulas implements XNumeric {
      * <strong>Note:</strong> Bien que ce nom de correspondent pas aux conventions
      * du Java, on ne peut le changer car il correspond au nom attendu par OpenOffice.
      */
-    private static final String __serviceName = "net.seagis.openoffice.Numeric";
+    private static final String __serviceName = "org.constellation.openoffice.Numeric";
 
     /**
      * Le service que l'on étend.

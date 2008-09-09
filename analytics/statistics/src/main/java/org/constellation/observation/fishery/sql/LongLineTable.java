@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
 // J2SE dependencies
 import java.sql.ResultSet;
@@ -28,9 +28,9 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingFeatureCollection;
 
 // Sicade dependencies
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.sampling.SamplingFeatureTable;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.sampling.SamplingFeatureTable;
 import org.geotools.util.DateRange;
 
 

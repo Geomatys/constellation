@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.util.Date;
@@ -30,7 +30,7 @@ import org.openide.nodes.PropertySupport;
 import org.openide.util.NbBundle;
 
 // Sicade dependencies
-import net.seagis.util.DateRange;
+import org.constellation.util.DateRange;
 
 
 /**

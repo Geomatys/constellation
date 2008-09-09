@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
@@ -29,9 +29,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 // seagis dependencies
-import net.seagis.lucene.filter.SerialChainFilter;
-import net.seagis.lucene.filter.SpatialFilter;
-import net.seagis.lucene.filter.SpatialQuery;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.lucene.filter.SpatialQuery;
 
 // lucene dependencies
 import org.apache.lucene.search.Filter;
@@ -65,7 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class IndexLuceneTest {
     
     
-    private Logger logger = Logger.getLogger("net.seagis.metadata");
+    private Logger logger = Logger.getLogger("org.constellation.metadata");
    
     private IndexLucene indexLucene;
     

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.bean;
+package org.constellation.bean;
 
 import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
@@ -31,7 +31,7 @@ public class AuthentificationBean {
     /**
      * Debugging purpose
      */
-    private Logger logger = Logger.getLogger("net.seagis.bean");
+    private Logger logger = Logger.getLogger("org.constellation.bean");
     
     private String login;
     

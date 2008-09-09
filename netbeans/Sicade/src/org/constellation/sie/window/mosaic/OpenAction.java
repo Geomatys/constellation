@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.window.mosaic;
+package org.constellation.sie.window.mosaic;
 
 // J2SE dependencies
 import javax.swing.Icon;
@@ -29,7 +29,7 @@ import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 
 // Sicade dependencies
-import net.seagis.observation.coverage.Series;
+import org.constellation.observation.coverage.Series;
 
 
 /**

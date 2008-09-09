@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.finder.PolicyFinder;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.seagis.xacml.api.XACMLPolicy;
+import org.constellation.xacml.api.XACMLPolicy;
 import org.xml.sax.SAXException;
 
 

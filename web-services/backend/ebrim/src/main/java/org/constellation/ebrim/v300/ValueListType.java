@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ebrim.v300;
+package org.constellation.ebrim.v300;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
     "value"
 })
 @XmlSeeAlso({
-    net.seagis.cat.wrs.ValueListType.class
+    org.constellation.cat.wrs.ValueListType.class
 })
 public class ValueListType {
 

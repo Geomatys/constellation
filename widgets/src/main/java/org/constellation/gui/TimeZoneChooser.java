@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui;
+package org.constellation.gui;
 
 // Temps et utilitaires
 import java.util.TimeZone;
@@ -43,8 +43,8 @@ import javax.swing.event.ListSelectionListener;
 import org.geotools.resources.SwingUtilities;
 
 // Divers
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

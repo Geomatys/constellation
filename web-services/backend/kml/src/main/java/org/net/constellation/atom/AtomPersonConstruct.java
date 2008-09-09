@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.atom;
+package org.constellation.atom;
 
 import java.util.ArrayList;
 import java.util.List;

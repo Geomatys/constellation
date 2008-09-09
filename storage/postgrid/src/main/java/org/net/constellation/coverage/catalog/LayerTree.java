@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Locale;
 import java.sql.ResultSet;
@@ -27,14 +27,14 @@ import javax.swing.tree.DefaultTreeModel;
 import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Element;
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Element;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**
@@ -99,7 +99,7 @@ public class LayerTree extends Table {
      * @param database  Connexion vers la base de données d'observations.
      */
     public LayerTree(final Database database) {
-        super(new net.seagis.catalog.Query(database, null)); // TODO
+        super(new org.constellation.catalog.Query(database, null)); // TODO
     }
 
     /**

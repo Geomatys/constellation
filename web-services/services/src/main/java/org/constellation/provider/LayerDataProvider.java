@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider;
+package org.constellation.provider;
 
 import java.util.List;
 import org.geotools.map.MapLayer;

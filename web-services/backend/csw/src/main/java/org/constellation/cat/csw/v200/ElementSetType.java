@@ -14,12 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v200;
+package org.constellation.cat.csw.v200;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.cat.csw.ElementSet;
+import org.constellation.cat.csw.ElementSet;
 
 
 /**

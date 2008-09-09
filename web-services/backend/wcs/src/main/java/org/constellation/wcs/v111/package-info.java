@@ -15,4 +15,4 @@
  *    Lesser General Public License for more details.
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/wcs/1.1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package net.seagis.wcs.v111;
+package org.constellation.wcs.v111;

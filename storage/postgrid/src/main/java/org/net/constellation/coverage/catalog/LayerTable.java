@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,16 +26,16 @@ import org.geotools.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import net.seagis.catalog.Database;
-import net.seagis.coverage.web.Service;
-import net.seagis.catalog.BoundedSingletonTable;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.QueryType;
-import net.seagis.coverage.model.DescriptorTable;
-import net.seagis.coverage.model.LinearModelTable;
-import net.seagis.resources.i18n.ResourceKeys;
-import net.seagis.resources.i18n.Resources;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.web.Service;
+import org.constellation.catalog.BoundedSingletonTable;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.QueryType;
+import org.constellation.coverage.model.DescriptorTable;
+import org.constellation.coverage.model.LinearModelTable;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 
 
 /**

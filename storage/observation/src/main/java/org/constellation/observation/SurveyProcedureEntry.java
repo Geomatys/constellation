@@ -15,15 +15,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.metadata.ResponsiblePartyEntry;
+import org.constellation.catalog.Entry;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.metadata.ResponsiblePartyEntry;
 import org.geotools.util.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;

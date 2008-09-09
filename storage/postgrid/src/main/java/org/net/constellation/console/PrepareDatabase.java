@@ -14,15 +14,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
 import org.geotools.console.CommandLine;
 import org.geotools.console.Option;
 

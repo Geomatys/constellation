@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.*;
 import java.sql.Types;
@@ -39,14 +39,14 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.catalog.Column;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.IllegalRecordException;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.catalog.Column;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

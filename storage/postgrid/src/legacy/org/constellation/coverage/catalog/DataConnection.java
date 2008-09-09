@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Set;
 import java.util.List;
@@ -34,8 +34,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.Operation;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.model.Operation;
 
 
 /**
@@ -206,7 +206,7 @@ interface DataConnection extends Remote {
      * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
      * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
      * entrées), alors le choix de l'image se fera en utilisant un objet
-     * {@link net.seagis.observation.coverage.CoverageComparator} par défaut.
+     * {@link org.constellation.observation.coverage.CoverageComparator} par défaut.
      *
      * @return Une image choisie arbitrairement dans la région et la plage de date
      *         sélectionnées, ou {@code null} s'il n'y a pas d'image dans ces plages.

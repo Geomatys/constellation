@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.window.mosaic;
+package org.constellation.sie.window.mosaic;
 
 // J2SE dependencies
 import java.util.Map;
@@ -37,12 +37,12 @@ import org.geotools.gui.swing.ImagePane;
 import org.geotools.gui.swing.ExceptionMonitor;
 
 // Sicade dependencies
-import net.seagis.observation.Observations;
-import net.seagis.observation.CatalogException;
-import net.seagis.observation.coverage.Series;
-import net.seagis.observation.coverage.CoverageReference;
-import net.seagis.observation.coverage.CoverageTableModel;
-import net.seagis.sie.window.coverages.CoveragesWindow;
+import org.constellation.observation.Observations;
+import org.constellation.observation.CatalogException;
+import org.constellation.observation.coverage.Series;
+import org.constellation.observation.coverage.CoverageReference;
+import org.constellation.observation.coverage.CoverageTableModel;
+import org.constellation.sie.window.coverages.CoveragesWindow;
 
 
 /**

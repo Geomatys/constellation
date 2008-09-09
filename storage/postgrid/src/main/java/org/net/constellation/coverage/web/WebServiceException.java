@@ -14,12 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.web;
+package org.constellation.coverage.web;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.CatalogException;
 import org.opengis.util.CodeList;
 
 

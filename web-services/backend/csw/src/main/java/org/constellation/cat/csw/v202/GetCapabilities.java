@@ -14,16 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v202;
+package org.constellation.cat.csw.v202;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import net.seagis.ows.v100.AcceptFormatsType;
-import net.seagis.ows.v100.AcceptVersionsType;
-import net.seagis.ows.v100.GetCapabilitiesType;
-import net.seagis.ows.v100.SectionsType;
+import org.constellation.ows.v100.AcceptFormatsType;
+import org.constellation.ows.v100.AcceptVersionsType;
+import org.constellation.ows.v100.GetCapabilitiesType;
+import org.constellation.ows.v100.SectionsType;
 
 
 /**

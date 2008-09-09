@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.filter;
+package org.constellation.filter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -27,53 +27,53 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import net.seagis.coverage.web.ExpressionType;
-import net.seagis.gml.v311.AbstractGeometryType;
-import net.seagis.gml.v311.CoordinatesType;
-import net.seagis.gml.v311.DirectPositionType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.LineStringType;
-import net.seagis.gml.v311.PointType;
-import net.seagis.ogc.AndType;
-import net.seagis.ogc.ArithmeticOperatorsType;
-import net.seagis.ogc.BBOXType;
-import net.seagis.ogc.BeyondType;
-import net.seagis.ogc.ComparisonOperatorsType;
-import net.seagis.ogc.ContainsType;
-import net.seagis.ogc.CrossesType;
-import net.seagis.ogc.DWithinType;
-import net.seagis.ogc.DisjointType;
-import net.seagis.ogc.EqualsType;
-import net.seagis.ogc.FeatureIdType;
-import net.seagis.ogc.FunctionNameType;
-import net.seagis.ogc.FunctionNamesType;
-import net.seagis.ogc.FunctionType;
-import net.seagis.ogc.GmlObjectIdType;
-import net.seagis.ogc.IdCapabilitiesType;
-import net.seagis.ogc.IntersectsType;
-import net.seagis.ogc.LiteralType;
-import net.seagis.ogc.LowerBoundaryType;
-import net.seagis.ogc.NotType;
-import net.seagis.ogc.OrType;
-import net.seagis.ogc.OverlapsType;
-import net.seagis.ogc.PropertyIsBetweenType;
-import net.seagis.ogc.PropertyIsEqualToType;
-import net.seagis.ogc.PropertyIsGreaterThanOrEqualToType;
-import net.seagis.ogc.PropertyIsGreaterThanType;
-import net.seagis.ogc.PropertyIsLessThanOrEqualToType;
-import net.seagis.ogc.PropertyIsLessThanType;
-import net.seagis.ogc.PropertyIsLikeType;
-import net.seagis.ogc.PropertyIsNotEqualToType;
-import net.seagis.ogc.PropertyIsNullType;
-import net.seagis.ogc.PropertyNameType;
-import net.seagis.ogc.ScalarCapabilitiesType;
-import net.seagis.ogc.SortPropertyType;
-import net.seagis.ogc.SpatialCapabilitiesType;
-import net.seagis.ogc.SpatialOperatorType;
-import net.seagis.ogc.SpatialOperatorsType;
-import net.seagis.ogc.TouchesType;
-import net.seagis.ogc.UpperBoundaryType;
-import net.seagis.ogc.WithinType;
+import org.constellation.coverage.web.ExpressionType;
+import org.constellation.gml.v311.AbstractGeometryType;
+import org.constellation.gml.v311.CoordinatesType;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.LineStringType;
+import org.constellation.gml.v311.PointType;
+import org.constellation.ogc.AndType;
+import org.constellation.ogc.ArithmeticOperatorsType;
+import org.constellation.ogc.BBOXType;
+import org.constellation.ogc.BeyondType;
+import org.constellation.ogc.ComparisonOperatorsType;
+import org.constellation.ogc.ContainsType;
+import org.constellation.ogc.CrossesType;
+import org.constellation.ogc.DWithinType;
+import org.constellation.ogc.DisjointType;
+import org.constellation.ogc.EqualsType;
+import org.constellation.ogc.FeatureIdType;
+import org.constellation.ogc.FunctionNameType;
+import org.constellation.ogc.FunctionNamesType;
+import org.constellation.ogc.FunctionType;
+import org.constellation.ogc.GmlObjectIdType;
+import org.constellation.ogc.IdCapabilitiesType;
+import org.constellation.ogc.IntersectsType;
+import org.constellation.ogc.LiteralType;
+import org.constellation.ogc.LowerBoundaryType;
+import org.constellation.ogc.NotType;
+import org.constellation.ogc.OrType;
+import org.constellation.ogc.OverlapsType;
+import org.constellation.ogc.PropertyIsBetweenType;
+import org.constellation.ogc.PropertyIsEqualToType;
+import org.constellation.ogc.PropertyIsGreaterThanOrEqualToType;
+import org.constellation.ogc.PropertyIsGreaterThanType;
+import org.constellation.ogc.PropertyIsLessThanOrEqualToType;
+import org.constellation.ogc.PropertyIsLessThanType;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyIsNotEqualToType;
+import org.constellation.ogc.PropertyIsNullType;
+import org.constellation.ogc.PropertyNameType;
+import org.constellation.ogc.ScalarCapabilitiesType;
+import org.constellation.ogc.SortPropertyType;
+import org.constellation.ogc.SpatialCapabilitiesType;
+import org.constellation.ogc.SpatialOperatorType;
+import org.constellation.ogc.SpatialOperatorsType;
+import org.constellation.ogc.TouchesType;
+import org.constellation.ogc.UpperBoundaryType;
+import org.constellation.ogc.WithinType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
@@ -138,7 +138,7 @@ import org.opengis.geometry.Geometry;
  */
 public class FilterFactoryImpl implements FilterFactory2 {
 
-    private final Logger logger = Logger.getLogger("net.seagis.filter");
+    private final Logger logger = Logger.getLogger("org.constellation.filter");
     
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
@@ -611,7 +611,7 @@ public class FilterFactoryImpl implements FilterFactory2 {
     }
 
     public FilterCapabilities capabilities(String version, ScalarCapabilities scalar, SpatialCapabilities spatial, IdCapabilities id) {
-        return new net.seagis.ogc.FilterCapabilities(scalar, spatial, id);
+        return new org.constellation.ogc.FilterCapabilities(scalar, spatial, id);
     }
 
     public PropertyName property(Name name) {

@@ -14,15 +14,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ogc;
+package org.constellation.ogc;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.DirectPositionType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.EnvelopeWithTimePeriodType;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.EnvelopeWithTimePeriodType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.BBOX;

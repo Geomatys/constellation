@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,16 +22,16 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Enumeration;
-import net.seagis.xacml.api.PolicyDecisionPoint;
-import net.seagis.xacml.api.RequestContext;
-import net.seagis.xacml.api.ResponseContext;
-import net.seagis.xacml.context.ActionType;
-import net.seagis.xacml.context.AttributeType;
-import net.seagis.xacml.context.EnvironmentType;
-import net.seagis.xacml.context.RequestType;
-import net.seagis.xacml.context.ResourceType;
-import net.seagis.xacml.context.SubjectType;
-import net.seagis.xacml.factory.RequestAttributeFactory;
+import org.constellation.xacml.api.PolicyDecisionPoint;
+import org.constellation.xacml.api.RequestContext;
+import org.constellation.xacml.api.ResponseContext;
+import org.constellation.xacml.context.ActionType;
+import org.constellation.xacml.context.AttributeType;
+import org.constellation.xacml.context.EnvironmentType;
+import org.constellation.xacml.context.RequestType;
+import org.constellation.xacml.context.ResourceType;
+import org.constellation.xacml.context.SubjectType;
+import org.constellation.xacml.factory.RequestAttributeFactory;
 
 /**
  *

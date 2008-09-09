@@ -14,11 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ows.v110;
+package org.constellation.ows.v110;
 
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ows.OWSExceptionCode;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ows.OWSExceptionCode;
 
 /**
  *

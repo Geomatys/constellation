@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ogc.v100;
+package org.constellation.ogc.v100;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v212.AbstractGeometryType;
-import net.seagis.gml.v212.BoxType;
+import org.constellation.gml.v212.AbstractGeometryType;
+import org.constellation.gml.v212.BoxType;
 
 
 /**

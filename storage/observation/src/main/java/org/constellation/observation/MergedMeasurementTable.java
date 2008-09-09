@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 // J2SE dependencies
 import java.util.Map;
@@ -33,17 +33,17 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.LoggingLevel;
-import net.seagis.catalog.Query;
-import net.seagis.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.LoggingLevel;
+import org.constellation.catalog.Query;
+import org.constellation.catalog.Table;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.coverage.model.RegionOfInterest;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.RegionOfInterest;
 
 // GeoAPI dependencies
 import org.opengis.observation.Phenomenon;
@@ -52,8 +52,8 @@ import org.opengis.observation.Observation;
 
 /**
  * Juxtapose des observations de différents types sur une même ligne. La première colonne pourrait
- * contenir par exemple des données de {@linkplain net.seagis.observation.fishery pêches}, et les
- * colonnes suivantes les valeurs de différents {@linkplain net.seagis.observation.coverage.Descriptor
+ * contenir par exemple des données de {@linkplain org.constellation.observation.fishery pêches}, et les
+ * colonnes suivantes les valeurs de différents {@linkplain org.constellation.observation.coverage.Descriptor
  * descripteur du paysage océanique} aux positions de ces données de pêche. Cette classe interroge la
  * table {@code "Environments"} (ou une table équivalente) en la réarangeant d'une façon plus
  * appropriée pour l'analyse avec des logiciels statistiques. Les valeurs du paysage océanique

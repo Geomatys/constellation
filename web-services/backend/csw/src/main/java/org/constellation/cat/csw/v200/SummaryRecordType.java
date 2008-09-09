@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v200;
+package org.constellation.cat.csw.v200;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.v1.elements.SimpleLiteral;
+import org.constellation.dublincore.v1.elements.SimpleLiteral;
 
 
 /**

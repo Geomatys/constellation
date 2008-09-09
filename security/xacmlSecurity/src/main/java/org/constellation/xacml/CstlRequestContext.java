@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import com.sun.xacml.ParsingException;
 import com.sun.xacml.ctx.RequestCtx;
@@ -32,9 +32,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
-import net.seagis.xacml.context.ObjectFactory;
-import net.seagis.xacml.context.RequestType;
-import net.seagis.xacml.api.RequestContext;
+import org.constellation.xacml.context.ObjectFactory;
+import org.constellation.xacml.context.RequestType;
+import org.constellation.xacml.api.RequestContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

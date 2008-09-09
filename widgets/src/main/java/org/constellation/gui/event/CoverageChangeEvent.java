@@ -15,11 +15,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui.event;
+package org.constellation.gui.event;
 
 import java.util.EventObject;
 import org.opengis.coverage.grid.GridCoverage;
-import net.seagis.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.CoverageReference;
 
 
 /**

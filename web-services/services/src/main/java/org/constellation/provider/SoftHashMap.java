@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider;
+package org.constellation.provider;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;

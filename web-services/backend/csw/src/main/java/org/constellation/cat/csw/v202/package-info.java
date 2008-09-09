@@ -15,4 +15,4 @@
  *    Lesser General Public License for more details.
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/cat/csw/2.0.2", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package net.seagis.cat.csw.v202;
+package org.constellation.cat.csw.v202;

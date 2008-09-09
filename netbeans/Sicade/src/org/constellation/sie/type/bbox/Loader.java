@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -63,7 +63,7 @@ public final class Loader extends UniFileLoader {
      * Construit un lecteur par défaut.
      */
     public Loader() {
-        super("net.seagis.sie.type.bbox.DataFile");
+        super("org.constellation.sie.type.bbox.DataFile");
     }
 
     /**

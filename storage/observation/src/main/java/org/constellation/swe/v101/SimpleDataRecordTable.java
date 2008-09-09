@@ -15,18 +15,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.SingletonTable;
-import static net.seagis.catalog.QueryType.*;
-import net.seagis.catalog.QueryType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.SingletonTable;
+import static org.constellation.catalog.QueryType.*;
+import org.constellation.catalog.QueryType;
 import org.geotools.util.Utilities;
 
 /**

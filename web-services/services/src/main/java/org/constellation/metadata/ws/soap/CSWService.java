@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata.ws.soap;
+package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies 
 import java.io.File;
@@ -39,32 +39,32 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
-import net.seagis.cat.csw.v202.Capabilities;
-import net.seagis.cat.csw.v202.DescribeRecordResponseType;
-import net.seagis.cat.csw.v202.DescribeRecordType;
-import net.seagis.cat.csw.v202.DistributedSearchType;
-import net.seagis.cat.csw.v202.ElementSetNameType;
-import net.seagis.cat.csw.v202.ElementSetType;
-import net.seagis.cat.csw.v202.GetCapabilities;
-import net.seagis.cat.csw.v202.GetDomainResponseType;
-import net.seagis.cat.csw.v202.GetDomainType;
-import net.seagis.cat.csw.v202.GetRecordByIdResponseType;
-import net.seagis.cat.csw.v202.GetRecordByIdType;
-import net.seagis.cat.csw.v202.GetRecordsResponseType;
-import net.seagis.cat.csw.v202.GetRecordsType;
-import net.seagis.cat.csw.v202.HarvestResponseType;
-import net.seagis.cat.csw.v202.HarvestType;
-import net.seagis.cat.csw.v202.QueryConstraintType;
-import net.seagis.cat.csw.v202.QueryType;
-import net.seagis.cat.csw.v202.ResultType;
-import net.seagis.cat.csw.v202.TransactionResponseType;
-import net.seagis.cat.csw.v202.TransactionType;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.metadata.CSWworker;
-import net.seagis.ows.v100.ExceptionReport;
-import net.seagis.ows.v100.OWSWebServiceException;
+import org.constellation.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.DescribeRecordResponseType;
+import org.constellation.cat.csw.v202.DescribeRecordType;
+import org.constellation.cat.csw.v202.DistributedSearchType;
+import org.constellation.cat.csw.v202.ElementSetNameType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetDomainResponseType;
+import org.constellation.cat.csw.v202.GetDomainType;
+import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
+import org.constellation.cat.csw.v202.GetRecordByIdType;
+import org.constellation.cat.csw.v202.GetRecordsResponseType;
+import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.HarvestResponseType;
+import org.constellation.cat.csw.v202.HarvestType;
+import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.cat.csw.v202.QueryType;
+import org.constellation.cat.csw.v202.ResultType;
+import org.constellation.cat.csw.v202.TransactionResponseType;
+import org.constellation.cat.csw.v202.TransactionType;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.metadata.CSWworker;
+import org.constellation.ows.v100.ExceptionReport;
+import org.constellation.ows.v100.OWSWebServiceException;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -121,8 +121,8 @@ public class CSWService {
                         ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
-                        ,net.seagis.dublincore.v2.terms.ObjectFactory.class);
+                        ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
+                        ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
        
        unmarshaller = jbcontext.createUnmarshaller();
        worker = new CSWworker(unmarshaller, jbcontext.createMarshaller());

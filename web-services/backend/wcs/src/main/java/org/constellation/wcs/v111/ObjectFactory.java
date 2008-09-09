@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wcs.v111;
+package org.constellation.wcs.v111;
 
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.ows.v110.ReferenceGroupType;
+import org.constellation.ows.v110.ReferenceGroupType;
 
 /**
  * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wcs.v111

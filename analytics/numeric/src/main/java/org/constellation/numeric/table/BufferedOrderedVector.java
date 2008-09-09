@@ -16,7 +16,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.numeric.table;
+package org.constellation.numeric.table;
 
 // J2SE dependencies
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import static java.lang.Math.abs;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.System.arraycopy;
-import static net.seagis.numeric.table.DataOrder.*;
+import static org.constellation.numeric.table.DataOrder.*;
 import static org.geotools.resources.XArray.isSorted;
 
 

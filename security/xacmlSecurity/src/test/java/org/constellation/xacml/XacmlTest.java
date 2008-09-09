@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 // J2SE dependencies
 import java.io.InputStream;
@@ -37,31 +37,31 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import net.seagis.xacml.api.PolicyLocator;
-import net.seagis.xacml.api.RequestContext;
-import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.factory.FactoryException;
-import net.seagis.xacml.factory.PolicyAttributeFactory;
-import net.seagis.xacml.factory.PolicyFactory;
-import net.seagis.xacml.locators.JBossPolicyLocator;
-import net.seagis.xacml.policy.ActionMatchType;
-import net.seagis.xacml.policy.ActionType;
-import net.seagis.xacml.policy.ActionsType;
-import net.seagis.xacml.policy.ApplyType;
-import net.seagis.xacml.policy.AttributeValueType;
-import net.seagis.xacml.policy.ConditionType;
-import net.seagis.xacml.policy.EffectType;
-import net.seagis.xacml.policy.ExpressionType;
-import net.seagis.xacml.policy.FunctionType;
-import net.seagis.xacml.policy.ObjectFactory;
-import net.seagis.xacml.policy.PolicySetType;
-import net.seagis.xacml.policy.PolicyType;
-import net.seagis.xacml.policy.ResourceMatchType;
-import net.seagis.xacml.policy.ResourceType;
-import net.seagis.xacml.policy.ResourcesType;
-import net.seagis.xacml.policy.RuleType;
-import net.seagis.xacml.policy.SubjectAttributeDesignatorType;
-import net.seagis.xacml.policy.TargetType;
+import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.api.RequestContext;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.factory.FactoryException;
+import org.constellation.xacml.factory.PolicyAttributeFactory;
+import org.constellation.xacml.factory.PolicyFactory;
+import org.constellation.xacml.locators.JBossPolicyLocator;
+import org.constellation.xacml.policy.ActionMatchType;
+import org.constellation.xacml.policy.ActionType;
+import org.constellation.xacml.policy.ActionsType;
+import org.constellation.xacml.policy.ApplyType;
+import org.constellation.xacml.policy.AttributeValueType;
+import org.constellation.xacml.policy.ConditionType;
+import org.constellation.xacml.policy.EffectType;
+import org.constellation.xacml.policy.ExpressionType;
+import org.constellation.xacml.policy.FunctionType;
+import org.constellation.xacml.policy.ObjectFactory;
+import org.constellation.xacml.policy.PolicySetType;
+import org.constellation.xacml.policy.PolicyType;
+import org.constellation.xacml.policy.ResourceMatchType;
+import org.constellation.xacml.policy.ResourceType;
+import org.constellation.xacml.policy.ResourcesType;
+import org.constellation.xacml.policy.RuleType;
+import org.constellation.xacml.policy.SubjectAttributeDesignatorType;
+import org.constellation.xacml.policy.TargetType;
 
 // Junit dependencies
 import org.junit.*;
@@ -73,7 +73,7 @@ import static org.junit.Assert.*;
  */
 public class XacmlTest {
     
-    private Logger logger = Logger.getLogger("net.seagis.metadata");
+    private Logger logger = Logger.getLogger("org.constellation.metadata");
    
     /**
      * enable the debug logging system 
@@ -117,7 +117,7 @@ public class XacmlTest {
     @Before
     public void setUp() throws Exception {
         
-         JAXBContext jbcontext  = JAXBContext.newInstance("net.seagis.xacml.policy");
+         JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.xacml.policy");
          unmarshaller           = jbcontext.createUnmarshaller();
          marshaller             = jbcontext.createMarshaller();
          marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -500,7 +500,7 @@ public class XacmlTest {
         }
         Object p = null;
         try {
-            JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
+            JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.xacml.policy");
             Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
             p = policyUnmarshaller.unmarshal(is);
         } catch (JAXBException e) {
@@ -753,11 +753,11 @@ public class XacmlTest {
      * @return
      * @throws java.lang.Exception
      */
-    private net.seagis.xacml.policy.PolicyType getExamplePolicy() throws Exception {
+    private org.constellation.xacml.policy.PolicyType getExamplePolicy() throws Exception {
         
         ObjectFactory objectFactory = new ObjectFactory();
         String PERMIT_OVERRIDES = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
-        net.seagis.xacml.policy.PolicyType policyType = new net.seagis.xacml.policy.PolicyType();
+        org.constellation.xacml.policy.PolicyType policyType = new org.constellation.xacml.policy.PolicyType();
         policyType.setPolicyId("ExamplePolicy");
         policyType.setVersion("2.0");
         policyType.setRuleCombiningAlgId(PERMIT_OVERRIDES);
@@ -953,7 +953,7 @@ public class XacmlTest {
         policySet.setTarget(new TargetType());
          
         //we add the policies to the policy set
-        net.seagis.xacml.policy.ObjectFactory factory = new net.seagis.xacml.policy.ObjectFactory();
+        org.constellation.xacml.policy.ObjectFactory factory = new org.constellation.xacml.policy.ObjectFactory();
         
         for (PolicyType p : policies) {
             JAXBElement<PolicyType> jb = factory.createPolicy(p);
@@ -982,7 +982,7 @@ public class XacmlTest {
         policySet.setTarget(new TargetType());
          
         //we add the policies to the policy set
-        net.seagis.xacml.policy.ObjectFactory factory = new net.seagis.xacml.policy.ObjectFactory();
+        org.constellation.xacml.policy.ObjectFactory factory = new org.constellation.xacml.policy.ObjectFactory();
         
         for (PolicyType p : policies) {
             JAXBElement<PolicyType> jb = factory.createPolicy(p);

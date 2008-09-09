@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.sql.SQLException;
 import java.sql.PreparedStatement;

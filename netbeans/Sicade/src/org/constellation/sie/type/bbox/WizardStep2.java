@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.util.Date;
@@ -29,7 +29,7 @@ import org.geotools.gui.swing.referencing.CoordinateChooser;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Sicade dependencies
-import net.seagis.util.DateRange;
+import org.constellation.util.DateRange;
 
 
 /**

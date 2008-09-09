@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +27,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-import net.seagis.ogc.BBOXType;
-import net.seagis.ogc.BinaryComparisonOpType;
-import net.seagis.ogc.BinarySpatialOpType;
-import net.seagis.ogc.ComparisonOpsType;
-import net.seagis.ogc.DistanceBufferType;
-import net.seagis.ogc.PropertyIsBetweenType;
-import net.seagis.ogc.PropertyIsLikeType;
-import net.seagis.ogc.PropertyIsNullType;
-import net.seagis.ogc.SpatialOpsType;
+import org.constellation.ogc.BBOXType;
+import org.constellation.ogc.BinaryComparisonOpType;
+import org.constellation.ogc.BinarySpatialOpType;
+import org.constellation.ogc.ComparisonOpsType;
+import org.constellation.ogc.DistanceBufferType;
+import org.constellation.ogc.PropertyIsBetweenType;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyIsNullType;
+import org.constellation.ogc.SpatialOpsType;
 import org.geotools.resources.Utilities;
 
 

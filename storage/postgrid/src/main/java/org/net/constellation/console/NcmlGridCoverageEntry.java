@@ -14,13 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.io.IOException;
 import java.util.Date;
 import javax.imageio.ImageReader;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.WritableGridCoverageEntry;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.WritableGridCoverageEntry;
 import org.geotools.util.DateRange;
 
 
@@ -28,7 +28,7 @@ import org.geotools.util.DateRange;
  * Adds to the {@link WritableGridCoverageEntry} some specifics parameters designed
  * for handling time specified in an NcML file.
  *
- * @see net.seagis.coverage.catalog.WritableGridCoverageEntry
+ * @see org.constellation.coverage.catalog.WritableGridCoverageEntry
  * @source $URL$
  * @author Cédric Briançon
  */

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -28,7 +28,7 @@ import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import net.seagis.catalog.DatabaseTest;
+import org.constellation.catalog.DatabaseTest;
 
 
 /**

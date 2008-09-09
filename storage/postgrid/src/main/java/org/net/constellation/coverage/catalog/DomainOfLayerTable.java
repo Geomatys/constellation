@@ -15,16 +15,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Date;
 import java.util.Calendar;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.SingletonTable;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.catalog.CatalogException;
 
 import org.geotools.util.DateRange;
 import org.geotools.resources.geometry.XDimension2D;

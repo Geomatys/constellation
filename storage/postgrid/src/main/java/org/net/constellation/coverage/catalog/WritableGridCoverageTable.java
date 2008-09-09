@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.Point;
 import java.sql.Types;
@@ -44,13 +44,13 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.geotools.util.DateRange;
 import org.geotools.image.io.mosaic.Tile;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.UpdatePolicy;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.UpdatePolicy;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 

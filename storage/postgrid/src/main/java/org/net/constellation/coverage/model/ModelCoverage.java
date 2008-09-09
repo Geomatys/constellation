@@ -15,12 +15,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.CatalogException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.GeneralEnvelope;
 
-import net.seagis.catalog.CRS;
+import org.constellation.catalog.CRS;
 
 
 /**

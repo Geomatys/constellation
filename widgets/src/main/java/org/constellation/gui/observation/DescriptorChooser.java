@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui.observation;
+package org.constellation.gui.observation;
 
 // J2SE dependencies
 import java.util.Set;
@@ -56,14 +56,14 @@ import org.geotools.gui.swing.DisjointLists;
 import org.geotools.resources.SwingUtilities;
 
 // J2SE dependencies
-import net.seagis.resources.XArray;
-import net.seagis.catalog.Element;
-import net.seagis.coverage.catalog.Catalog;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.model.Operation;
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.coverage.model.RegionOfInterest;
+import org.constellation.resources.XArray;
+import org.constellation.catalog.Element;
+import org.constellation.coverage.catalog.Catalog;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.model.Operation;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.RegionOfInterest;
 
 
 /**

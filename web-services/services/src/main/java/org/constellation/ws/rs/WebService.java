@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ws.rs;
+package org.constellation.ws.rs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,29 +70,29 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 
 // seagis dependencies
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.ows.v110.OWSWebServiceException;
-import net.seagis.coverage.web.WMSWebServiceException;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.WMSExceptionCode;
-import net.seagis.ows.AbstractDCP;
-import net.seagis.ows.AbstractOnlineResourceType;
-import net.seagis.ows.AbstractOperation;
-import net.seagis.ows.AbstractRequest;
-import net.seagis.ows.OWSExceptionCode;
-import net.seagis.xacml.CstlPDP;
-import net.seagis.xacml.PEP;
-import net.seagis.xacml.SecurityActions;
-import net.seagis.xacml.XACMLConstants;
-import net.seagis.xacml.api.PolicyDecisionPoint;
-import net.seagis.xacml.api.PolicyLocator;
-import net.seagis.xacml.api.RequestContext;
-import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.factory.FactoryException;
-import net.seagis.xacml.factory.PolicyFactory;
-import net.seagis.xacml.locators.JBossPolicyLocator;
-import net.seagis.xacml.policy.PolicyType;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.coverage.web.WMSWebServiceException;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.coverage.wms.WMSExceptionCode;
+import org.constellation.ows.AbstractDCP;
+import org.constellation.ows.AbstractOnlineResourceType;
+import org.constellation.ows.AbstractOperation;
+import org.constellation.ows.AbstractRequest;
+import org.constellation.ows.OWSExceptionCode;
+import org.constellation.xacml.CstlPDP;
+import org.constellation.xacml.PEP;
+import org.constellation.xacml.SecurityActions;
+import org.constellation.xacml.XACMLConstants;
+import org.constellation.xacml.api.PolicyDecisionPoint;
+import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.api.RequestContext;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.factory.FactoryException;
+import org.constellation.xacml.factory.PolicyFactory;
+import org.constellation.xacml.locators.JBossPolicyLocator;
+import org.constellation.xacml.policy.PolicyType;
 
 
 /**
@@ -106,7 +106,7 @@ public abstract class WebService {
     /**
      * Default logger for all web services.
      */
-    protected static final Logger LOGGER = Logger.getLogger("net.seagis.ws");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws");
 
     /**
      * The user directory where to store the configuration file on Unix platforms.
@@ -234,7 +234,7 @@ public abstract class WebService {
         }
         Object p = null;
         try {
-            JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.xacml.policy");
+            JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.xacml.policy");
             Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
             p = policyUnmarshaller.unmarshal(is);
         } catch (JAXBException e) {
@@ -375,7 +375,7 @@ public abstract class WebService {
      *            case 1: VERSION parameter for WMS version and SLD_VERSION for sld version.
      *            case 2: VERSION parameter for sld version.
      *
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     protected void verifyBaseParameter(int sld) throws WebServiceException {
         if (sld == 2) {

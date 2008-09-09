@@ -15,11 +15,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
 // Sicade dependencies
-import net.seagis.observation.ProcessEntry;
-import net.seagis.observation.fishery.FisheryType;
+import org.constellation.observation.ProcessEntry;
+import org.constellation.observation.fishery.FisheryType;
 
 
 /**

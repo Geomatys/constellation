@@ -14,10 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw;
+package org.constellation.cat.csw;
 
 import javax.xml.bind.JAXBElement;
-import net.seagis.ows.v100.BoundingBoxType;
+import org.constellation.ows.v100.BoundingBoxType;
 
 /**
  *

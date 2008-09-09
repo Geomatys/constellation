@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 // Lucene dependencies
-import net.seagis.lucene.filter.SerialChainFilter;
-import net.seagis.lucene.filter.SpatialQuery;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialQuery;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -59,7 +59,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
 
 // SeaGIS dependencies
-import static net.seagis.metadata.CSWworker.*;
+import static org.constellation.metadata.CSWworker.*;
 
 /**
  *
@@ -67,7 +67,7 @@ import static net.seagis.metadata.CSWworker.*;
  */
 public class IndexLucene extends AbstractIndex {
 
-    private final Logger logger = Logger.getLogger("net.seagis.metadata");
+    private final Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * The Reader of this lucene index.

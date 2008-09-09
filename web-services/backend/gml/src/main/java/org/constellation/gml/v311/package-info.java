@@ -15,4 +15,4 @@
  *    Lesser General Public License for more details.
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/gml", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package net.seagis.gml.v311;
+package org.constellation.gml.v311;

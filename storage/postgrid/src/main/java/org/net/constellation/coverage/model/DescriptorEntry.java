@@ -15,16 +15,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
 import org.geotools.resources.Utilities;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.GridCoverage;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Entry;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.GridCoverage;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Entry;
 
 
 /**
@@ -86,8 +86,8 @@ final class DescriptorEntry extends Entry implements Descriptor {
      *
      * @param identifier   L'identifiant du descripteur.
      * @param symbol       Le symbole du descripteur.
-     * @param layer        La couche de données ({@linkplain net.seagis.observation.Phenomenon phénomène}).
-     * @param operation    L'opération associée ({@linkplain net.seagis.observation.Procedure  procédure}).
+     * @param layer        La couche de données ({@linkplain org.constellation.observation.Phenomenon phénomène}).
+     * @param operation    L'opération associée ({@linkplain org.constellation.observation.Procedure  procédure}).
      * @param band         Le numéro de bande dans laquelle évaluer les valeurs de pixels, à partir de 0.
      * @param offset       La position relative.
      * @param distribution La distribution des données.

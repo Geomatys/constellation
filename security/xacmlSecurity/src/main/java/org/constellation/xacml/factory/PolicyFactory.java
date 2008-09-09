@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.factory;
+package org.constellation.xacml.factory;
 
 import com.sun.xacml.finder.PolicyFinder;
 import java.io.ByteArrayInputStream;
@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 
-import net.seagis.xacml.api.XACMLPolicy;
-import net.seagis.xacml.policy.ObjectFactory;
-import net.seagis.xacml.policy.PolicyType;
-import net.seagis.xacml.CstlXACMLPolicy;
-import net.seagis.xacml.policy.PolicySetType;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.policy.ObjectFactory;
+import org.constellation.xacml.policy.PolicyType;
+import org.constellation.xacml.CstlXACMLPolicy;
+import org.constellation.xacml.policy.PolicySetType;
 
 
 /**
@@ -44,7 +44,7 @@ import net.seagis.xacml.policy.PolicySetType;
  */
 public class PolicyFactory {
 
-    private static Logger logger = Logger.getLogger("net.seagis.xacml");
+    private static Logger logger = Logger.getLogger("org.constellation.xacml");
     
     public static Class<?> constructingClass = CstlXACMLPolicy.class;
 

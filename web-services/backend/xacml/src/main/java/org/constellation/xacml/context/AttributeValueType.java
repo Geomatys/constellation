@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.context;
+package org.constellation.xacml.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;

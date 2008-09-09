@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v202;
+package org.constellation.cat.csw.v202;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import net.seagis.cat.csw.RequestStatus;
+import org.constellation.cat.csw.RequestStatus;
 
 
 /**
@@ -65,7 +65,7 @@ public class RequestStatusType implements RequestStatus {
     private XMLGregorianCalendar timestamp;
     
     @XmlTransient
-    private Logger logger = Logger.getLogger("net.seagis.cat.csw");
+    private Logger logger = Logger.getLogger("org.constellation.cat.csw");
 
     /**
      * An empty constructor used by JAXB

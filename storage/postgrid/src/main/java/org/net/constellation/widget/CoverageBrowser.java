@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.widget;
+package org.constellation.widget;
 
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
@@ -42,11 +42,11 @@ import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.gui.swing.image.OperationTreeBrowser;
 import org.geotools.resources.Arguments;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.LayerTable;
 
 
 /**

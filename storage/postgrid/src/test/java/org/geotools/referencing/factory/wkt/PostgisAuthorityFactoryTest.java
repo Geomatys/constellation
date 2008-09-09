@@ -27,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.Citations;
-import net.seagis.catalog.DatabaseTest;
+import org.constellation.catalog.DatabaseTest;
 
 import org.junit.*;
 

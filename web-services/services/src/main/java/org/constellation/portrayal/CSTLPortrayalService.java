@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.portrayal;
+package org.constellation.portrayal;
 
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.List;
 
-import net.seagis.provider.NamedLayerDP;
-import net.seagis.provider.NamedStyleDP;
+import org.constellation.provider.NamedLayerDP;
+import org.constellation.provider.NamedStyleDP;
 
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.factory.Hints;

@@ -14,12 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.ListIterator;
-import static net.seagis.catalog.QueryType.*;
+import static org.constellation.catalog.QueryType.*;
 
 import org.junit.*;
 

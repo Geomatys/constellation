@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v202;
+package org.constellation.cat.csw.v202;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,8 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-import net.seagis.cat.csw.GetRecordsRequest;
-import net.seagis.ogc.FilterType;
+import org.constellation.cat.csw.GetRecordsRequest;
+import org.constellation.ogc.FilterType;
 
 
 /**

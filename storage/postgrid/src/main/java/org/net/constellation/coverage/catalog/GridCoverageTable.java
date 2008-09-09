@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
@@ -43,14 +43,14 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.image.io.mosaic.TileManager;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.Operation;
-import net.seagis.catalog.BoundedSingletonTable;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
-import static net.seagis.catalog.QueryType.*;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.model.Operation;
+import org.constellation.catalog.BoundedSingletonTable;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
+import static org.constellation.catalog.QueryType.*;
 
 
 /**

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw;
+package org.constellation.cat.csw;
 
 // J2SE dependencies
 import java.io.StringReader;
@@ -31,11 +31,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //seagis dependencies
-import net.seagis.cat.csw.v202.RecordType;
-import net.seagis.dublincore.v2.elements.SimpleLiteral;
-import net.seagis.ows.v100.BoundingBoxType;
-import net.seagis.ows.v100.WGS84BoundingBoxType;
-import net.seagis.ws.rs.NamespacePrefixMapperImpl;
+import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.ows.v100.BoundingBoxType;
+import org.constellation.ows.v100.WGS84BoundingBoxType;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 
 //Junit dependencies
 import org.junit.*;
@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
  */
 public class RecordMarshallingTest {
     
-    private Logger       logger = Logger.getLogger("net.seagis.filter");
+    private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller recordUnmarshaller202;
     private Marshaller   recordMarshaller202;
     
@@ -65,13 +65,13 @@ public class RecordMarshallingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext202 = JAXBContext.newInstance("net.seagis.cat.csw.v202");
+        JAXBContext jbcontext202 = JAXBContext.newInstance("org.constellation.cat.csw.v202");
         recordUnmarshaller202    = jbcontext202.createUnmarshaller();
         recordMarshaller202      = jbcontext202.createMarshaller();
         recordMarshaller202.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         recordMarshaller202.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
         
-        JAXBContext jbcontext200 = JAXBContext.newInstance("net.seagis.cat.csw.v200:net.seagis.dublincore.v1.terms:net.seagis.dublincore.v2.terms");
+        JAXBContext jbcontext200 = JAXBContext.newInstance("org.constellation.cat.csw.v200:org.constellation.dublincore.v1.terms:org.constellation.dublincore.v2.terms");
         recordUnmarshaller200    = jbcontext200.createUnmarshaller();
         recordMarshaller200      = jbcontext200.createMarshaller();
         recordMarshaller200.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -245,7 +245,7 @@ public class RecordMarshallingTest {
         sr = new StringReader(xml);
         
         jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
-        net.seagis.cat.csw.v200.RecordType result2 = (net.seagis.cat.csw.v200.RecordType) jb.getValue();
+        org.constellation.cat.csw.v200.RecordType result2 = (org.constellation.cat.csw.v200.RecordType) jb.getValue();
         
         logger.info("result:" + result2.toString());
         
@@ -283,7 +283,7 @@ public class RecordMarshallingTest {
         sr = new StringReader(xml);
         
         jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
-        result2 = (net.seagis.cat.csw.v200.RecordType) jb.getValue();
+        result2 = (org.constellation.cat.csw.v200.RecordType) jb.getValue();
         
         logger.info("result:" + result2.toString());
     }

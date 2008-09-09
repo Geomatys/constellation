@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml;
+package org.constellation.xacml;
 
 import com.sun.xacml.Indenter;
 import com.sun.xacml.Obligation;
@@ -33,14 +33,14 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
-import net.seagis.xacml.context.ObjectFactory;
-import net.seagis.xacml.context.ResultType;
-import net.seagis.xacml.context.StatusCodeType;
-import net.seagis.xacml.context.StatusType;
-import net.seagis.xacml.policy.EffectType;
-import net.seagis.xacml.policy.ObligationType;
-import net.seagis.xacml.policy.ObligationsType;
-import net.seagis.xacml.api.ResponseContext;
+import org.constellation.xacml.context.ObjectFactory;
+import org.constellation.xacml.context.ResultType;
+import org.constellation.xacml.context.StatusCodeType;
+import org.constellation.xacml.context.StatusType;
+import org.constellation.xacml.policy.EffectType;
+import org.constellation.xacml.policy.ObligationType;
+import org.constellation.xacml.policy.ObligationsType;
+import org.constellation.xacml.api.ResponseContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

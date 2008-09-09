@@ -15,17 +15,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
 // SQL dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.Query;
-import net.seagis.catalog.SingletonTable;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.Query;
+import org.constellation.catalog.SingletonTable;
 
 
 /**

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos.ws;
+package org.constellation.sos.ws;
 
 // JDK dependencies
 import org.apache.xerces.dom.ElementNSImpl;
@@ -50,79 +50,79 @@ import java.util.logging.Logger;
 // JAXB dependencies
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-import net.seagis.catalog.NoSuchTableException;
+import org.constellation.catalog.NoSuchTableException;
 import org.xml.sax.SAXException;
 
 // SeaGis dependencies
-import net.seagis.sos.Capabilities;
-import net.seagis.sos.Contents;
-import net.seagis.sos.Contents.ObservationOfferingList;
-import net.seagis.sos.DescribeSensor;
-import net.seagis.sos.EventTime;
-import net.seagis.sos.GetCapabilities;
-import net.seagis.sos.GetObservation;
-import net.seagis.sos.GetResult;
-import net.seagis.sos.GetResultResponse;
-import net.seagis.sos.InsertObservation;
-import net.seagis.sos.InsertObservationResponse;
-import net.seagis.sos.RegisterSensor;
-import net.seagis.sos.RegisterSensorResponse;
-import net.seagis.sos.RequestBaseType;
-import net.seagis.gml.v311.TimeInstantType;
-import net.seagis.gml.v311.TimePeriodType;
-import net.seagis.ogc.LiteralType;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.ows.v110.OWSWebServiceException;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ws.rs.WebService;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.FeaturePropertyType;
-import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.gml.v311.ReferenceTable;
-import net.seagis.gml.v311.TimePositionType;
-import net.seagis.swe.v101.CompositePhenomenonEntry;
-import net.seagis.swe.v101.CompositePhenomenonTable;
-import net.seagis.observation.MeasurementEntry;
-import net.seagis.observation.MeasurementTable;
-import net.seagis.observation.ObservationCollectionEntry;
-import net.seagis.observation.ObservationEntry;
-import net.seagis.observation.ObservationTable;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonTable;
-import net.seagis.observation.ProcessEntry;
-import net.seagis.observation.ProcessTable;
-import net.seagis.sampling.SamplingFeatureEntry;
-import net.seagis.sampling.SamplingFeatureTable;
-import net.seagis.sampling.SamplingPointEntry;
-import net.seagis.sampling.SamplingPointTable;
-import net.seagis.ows.v110.AcceptFormatsType;
-import net.seagis.ows.v110.AcceptVersionsType;
-import net.seagis.ows.v110.Operation;
-import net.seagis.ows.v110.OperationsMetadata;
-import net.seagis.ows.v110.RangeType;
-import net.seagis.ows.v110.SectionsType;
-import net.seagis.ows.v110.ServiceIdentification;
-import net.seagis.ows.v110.ServiceProvider;
-import net.seagis.sos.FilterCapabilities;
-import net.seagis.sos.ObservationOfferingEntry;
-import net.seagis.sos.ObservationOfferingTable;
-import net.seagis.sos.ObservationTemplate;
-import net.seagis.sos.OfferingPhenomenonEntry;
-import net.seagis.sos.OfferingProcedureEntry;
-import net.seagis.sos.OfferingSamplingFeatureEntry;
-import net.seagis.sos.ResponseModeType;
-import net.seagis.swe.v101.AbstractEncodingPropertyType;
-import net.seagis.swe.v101.AnyResultEntry;
-import net.seagis.swe.v101.AnyResultTable;
-import net.seagis.swe.v101.DataArrayEntry;
-import net.seagis.swe.v101.DataArrayPropertyType;
-import net.seagis.swe.v101.DataComponentPropertyType;
-import net.seagis.swe.v101.PhenomenonPropertyType;
-import static net.seagis.ows.OWSExceptionCode.*;
+import org.constellation.sos.Capabilities;
+import org.constellation.sos.Contents;
+import org.constellation.sos.Contents.ObservationOfferingList;
+import org.constellation.sos.DescribeSensor;
+import org.constellation.sos.EventTime;
+import org.constellation.sos.GetCapabilities;
+import org.constellation.sos.GetObservation;
+import org.constellation.sos.GetResult;
+import org.constellation.sos.GetResultResponse;
+import org.constellation.sos.InsertObservation;
+import org.constellation.sos.InsertObservationResponse;
+import org.constellation.sos.RegisterSensor;
+import org.constellation.sos.RegisterSensorResponse;
+import org.constellation.sos.RequestBaseType;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.ogc.LiteralType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.rs.WebService;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.FeaturePropertyType;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.gml.v311.ReferenceTable;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.swe.v101.CompositePhenomenonEntry;
+import org.constellation.swe.v101.CompositePhenomenonTable;
+import org.constellation.observation.MeasurementEntry;
+import org.constellation.observation.MeasurementTable;
+import org.constellation.observation.ObservationCollectionEntry;
+import org.constellation.observation.ObservationEntry;
+import org.constellation.observation.ObservationTable;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonTable;
+import org.constellation.observation.ProcessEntry;
+import org.constellation.observation.ProcessTable;
+import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.sampling.SamplingFeatureTable;
+import org.constellation.sampling.SamplingPointEntry;
+import org.constellation.sampling.SamplingPointTable;
+import org.constellation.ows.v110.AcceptFormatsType;
+import org.constellation.ows.v110.AcceptVersionsType;
+import org.constellation.ows.v110.Operation;
+import org.constellation.ows.v110.OperationsMetadata;
+import org.constellation.ows.v110.RangeType;
+import org.constellation.ows.v110.SectionsType;
+import org.constellation.ows.v110.ServiceIdentification;
+import org.constellation.ows.v110.ServiceProvider;
+import org.constellation.sos.FilterCapabilities;
+import org.constellation.sos.ObservationOfferingEntry;
+import org.constellation.sos.ObservationOfferingTable;
+import org.constellation.sos.ObservationTemplate;
+import org.constellation.sos.OfferingPhenomenonEntry;
+import org.constellation.sos.OfferingProcedureEntry;
+import org.constellation.sos.OfferingSamplingFeatureEntry;
+import org.constellation.sos.ResponseModeType;
+import org.constellation.swe.v101.AbstractEncodingPropertyType;
+import org.constellation.swe.v101.AnyResultEntry;
+import org.constellation.swe.v101.AnyResultTable;
+import org.constellation.swe.v101.DataArrayEntry;
+import org.constellation.swe.v101.DataArrayPropertyType;
+import org.constellation.swe.v101.DataComponentPropertyType;
+import org.constellation.swe.v101.PhenomenonPropertyType;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
@@ -153,7 +153,7 @@ public class SOSworker {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.sos.webservice");
+    Logger logger = Logger.getLogger("org.constellation.sos.webservice");
     
     /**
      * A simple Connection to the SensorML database.

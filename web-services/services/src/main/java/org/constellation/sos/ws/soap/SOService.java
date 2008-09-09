@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos.ws.soap;
+package org.constellation.sos.ws.soap;
 
 // JDK dependencies
 import java.io.File;
@@ -38,22 +38,22 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // seagis dependencies
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.observation.ObservationCollectionEntry;
-import net.seagis.sos.Capabilities;
-import net.seagis.sos.DescribeSensor;
-import net.seagis.sos.GetCapabilities;
-import net.seagis.sos.GetObservation;
-import net.seagis.sos.GetResult;
-import net.seagis.sos.GetResultResponse;
-import net.seagis.sos.InsertObservation;
-import net.seagis.sos.InsertObservationResponse;
-import net.seagis.sos.RegisterSensor;
-import net.seagis.sos.RegisterSensorResponse;
-import net.seagis.sos.ws.SOSworker;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.observation.ObservationCollectionEntry;
+import org.constellation.sos.Capabilities;
+import org.constellation.sos.DescribeSensor;
+import org.constellation.sos.GetCapabilities;
+import org.constellation.sos.GetObservation;
+import org.constellation.sos.GetResult;
+import org.constellation.sos.GetResultResponse;
+import org.constellation.sos.InsertObservation;
+import org.constellation.sos.InsertObservationResponse;
+import org.constellation.sos.RegisterSensor;
+import org.constellation.sos.RegisterSensorResponse;
+import org.constellation.sos.ws.SOSworker;
 
 
 
@@ -102,7 +102,7 @@ public class SOService {
      */
     public SOService() throws SQLException, IOException, NoSuchTableException, JAXBException {
        worker = new SOSworker();
-       JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.sos:net.seagis.observation");
+       JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");

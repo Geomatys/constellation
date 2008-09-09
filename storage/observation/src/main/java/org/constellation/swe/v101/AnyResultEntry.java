@@ -15,14 +15,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
-import net.seagis.gml.v311.ReferenceEntry;
+import org.constellation.catalog.Entry;
+import org.constellation.gml.v311.ReferenceEntry;
 
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.

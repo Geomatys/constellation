@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import org.geotools.util.WeakValueHashMap;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

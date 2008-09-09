@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.openoffice;
+package org.constellation.openoffice;
 
 // J2SE dependencies
 import java.util.Map;
@@ -42,8 +42,8 @@ import org.geotools.openoffice.MethodInfo;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
 // Sicade dependencies
-import net.seagis.observation.CatalogException;
-import net.seagis.observation.coverage.DynamicCoverage;
+import org.constellation.observation.CatalogException;
+import org.constellation.observation.coverage.DynamicCoverage;
 
 
 /**
@@ -57,7 +57,7 @@ public class Observations extends Formulas implements XObservations {
     /**
      * The logger to use for all message to log in this package.
      */
-    private static final Logger LOGGER = Logger.getLogger("net.seagis.openoffice");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.openoffice");
 
     /**
      * Le nom sous lequel sera enregistré cette composante.
@@ -65,7 +65,7 @@ public class Observations extends Formulas implements XObservations {
      * <strong>Note:</strong> Bien que ce nom de correspondent pas aux conventions
      * du Java, on ne peut le changer car il correspond au nom attendu par OpenOffice.
      */
-    private static final String __serviceName = "net.seagis.openoffice.Observations";
+    private static final String __serviceName = "org.constellation.openoffice.Observations";
 
     /**
      * Le service que l'on étend.
@@ -182,7 +182,7 @@ public class Observations extends Formulas implements XObservations {
     private SpatioTemporalCoverage3D getDescriptorCoverage(final String descriptor)
             throws CatalogException
     {
-        final net.seagis.observation.Observations obs = net.seagis.observation.Observations.getDefault();
+        final org.constellation.observation.Observations obs = org.constellation.observation.Observations.getDefault();
         // Pour la synchronisation, utilise le même verrou que 'Observations.getDescriptorCoverage'.
         synchronized (obs) {
             Reference<SpatioTemporalCoverage3D> ref = descriptors.get(descriptor);

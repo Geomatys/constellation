@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.net.URI;
 import java.io.File;
@@ -36,7 +36,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
 
-import net.seagis.catalog.Element;
+import org.constellation.catalog.Element;
 
 
 /**
@@ -62,7 +62,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * assert source == reference;
      * </pre></blockquote>
      */
-    String REFERENCE_KEY = "net.seagis.observation.CoverageReference";
+    String REFERENCE_KEY = "org.constellation.observation.CoverageReference";
 
     /**
      * Returns the series of this coverage reference.
@@ -163,7 +163,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Proxy extends net.seagis.catalog.Proxy implements CoverageReference {
+    public static class Proxy extends org.constellation.catalog.Proxy implements CoverageReference {
         /**
          * For cross-version compatibility.
          */

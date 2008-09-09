@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ogc;
+package org.constellation.ogc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,11 +27,11 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.AbstractGeometryType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.LineStringType;
-import net.seagis.gml.v311.PointType;
-import net.seagis.gml.v311.PolygonType;
+import org.constellation.gml.v311.AbstractGeometryType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.LineStringType;
+import org.constellation.gml.v311.PointType;
+import org.constellation.gml.v311.PolygonType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 
@@ -81,7 +81,7 @@ public class BinarySpatialOpType extends SpatialOpsType {
     private ObjectFactory ogcFactory = new ObjectFactory();
     
     @XmlTransient
-    private net.seagis.gml.v311.ObjectFactory gmlFactory = new net.seagis.gml.v311.ObjectFactory();
+    private org.constellation.gml.v311.ObjectFactory gmlFactory = new org.constellation.gml.v311.ObjectFactory();
     
     /**
      * An empty constructor used by JAXB

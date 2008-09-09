@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ogc;
+package org.constellation.ogc;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,12 +23,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.AbstractGeometryType;
+import org.constellation.gml.v311.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
-import net.seagis.gml.v311.ObjectFactory;
-import net.seagis.gml.v311.PointType;
-import net.seagis.gml.v311.PolygonType;
+import org.constellation.gml.v311.ObjectFactory;
+import org.constellation.gml.v311.PointType;
+import org.constellation.gml.v311.PolygonType;
 
 
 /**

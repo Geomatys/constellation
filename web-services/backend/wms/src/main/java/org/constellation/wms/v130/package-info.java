@@ -18,4 +18,4 @@
 xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "wms", namespaceURI= "http://www.opengis.net/wms"),
           @javax.xml.bind.annotation.XmlNs(prefix = "sld", namespaceURI= "http://www.opengis.net/sld"),
           @javax.xml.bind.annotation.XmlNs(prefix = "se", namespaceURI= "http://www.opengis.net/se")})
-package net.seagis.wms.v130;
+package org.constellation.wms.v130;

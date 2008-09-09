@@ -15,25 +15,25 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.locators;
+package org.constellation.xacml.locators;
 
 import com.sun.xacml.AbstractPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.seagis.xacml.bridge.WrapperPolicyFinderModule;
-import net.seagis.xacml.XACMLConstants;
-import net.seagis.xacml.api.XACMLPolicy;
+import org.constellation.xacml.bridge.WrapperPolicyFinderModule;
+import org.constellation.xacml.XACMLConstants;
+import org.constellation.xacml.api.XACMLPolicy;
 import com.sun.xacml.Policy;
 import com.sun.xacml.PolicySet;
 import com.sun.xacml.finder.PolicyFinderModule;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import net.seagis.xacml.api.ContextMapOp;
-import net.seagis.xacml.api.PolicyLocator;
-import net.seagis.xacml.bridge.PolicySetFinderModule;
+import org.constellation.xacml.api.ContextMapOp;
+import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.bridge.PolicySetFinderModule;
 
 /**
  *  Policy Locator for plain XACML Policy instances
@@ -47,7 +47,7 @@ public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
     
     private PolicyFinderModule policyFinderModule;
 
-    private Logger logger = Logger.getLogger("net.seagis.xacml.locators"); 
+    private Logger logger = Logger.getLogger("org.constellation.xacml.locators"); 
     
     /**
      * Build a new Policy locator.

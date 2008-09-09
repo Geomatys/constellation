@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v200;
+package org.constellation.cat.csw.v200;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.cat.csw.AbstractRecord;
+import org.constellation.cat.csw.AbstractRecord;
 
 
 /**
@@ -50,13 +50,13 @@ import net.seagis.cat.csw.AbstractRecord;
 public abstract class AbstractRecordType implements AbstractRecord {
     
     @XmlTransient
-    protected static net.seagis.ows.v100.ObjectFactory owsFactory = new net.seagis.ows.v100.ObjectFactory();
+    protected static org.constellation.ows.v100.ObjectFactory owsFactory = new org.constellation.ows.v100.ObjectFactory();
     
     @XmlTransient
-    protected static net.seagis.dublincore.v1.elements.ObjectFactory dublinFactory = new net.seagis.dublincore.v1.elements.ObjectFactory();
+    protected static org.constellation.dublincore.v1.elements.ObjectFactory dublinFactory = new org.constellation.dublincore.v1.elements.ObjectFactory();
     
     @XmlTransient
-    protected static net.seagis.dublincore.v1.terms.ObjectFactory dublinTermFactory = new net.seagis.dublincore.v1.terms.ObjectFactory();
+    protected static org.constellation.dublincore.v1.terms.ObjectFactory dublinTermFactory = new org.constellation.dublincore.v1.terms.ObjectFactory();
 
 
 }

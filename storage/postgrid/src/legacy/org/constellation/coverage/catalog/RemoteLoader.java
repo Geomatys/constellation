@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -24,7 +24,7 @@ import java.awt.image.RenderedImage;
 import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import static net.seagis.coverage.model.CoverageBuilder.FACTORY;
+import static org.constellation.coverage.model.CoverageBuilder.FACTORY;
 
 
 /**

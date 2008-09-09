@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.timeseries;
+package org.constellation.coverage.timeseries;
 
 import junit.framework.*;
 import org.geotools.geometry.GeneralEnvelope;
@@ -37,7 +37,7 @@ public class TimeSeriesTileTest extends TestCase {
     }
     
     /**
-     * Test of writeSeries method, of class net.seagis.observation.coverage.TimeSeriesTile.
+     * Test of writeSeries method, of class org.constellation.observation.coverage.TimeSeriesTile.
      */
     public void testWriteSeries() throws Exception {
         

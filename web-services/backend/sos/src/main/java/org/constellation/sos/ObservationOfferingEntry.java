@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +27,13 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
-import net.seagis.gml.v311.AbstractFeatureEntry;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.v311.BoundingShapeEntry;
-import net.seagis.gml.v311.ReferenceEntry;
-import net.seagis.swe.v101.PhenomenonEntry;
-import net.seagis.swe.v101.PhenomenonPropertyType;
-import net.seagis.swe.v101.TimeGeometricPrimitivePropertyType;
+import org.constellation.gml.v311.AbstractFeatureEntry;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.BoundingShapeEntry;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonPropertyType;
+import org.constellation.swe.v101.TimeGeometricPrimitivePropertyType;
 import org.geotools.util.Utilities;
 
 

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.resources.i18n;
+package org.constellation.resources.i18n;
 
 import java.io.File;
 import org.geotools.resources.IndexedResourceCompiler;

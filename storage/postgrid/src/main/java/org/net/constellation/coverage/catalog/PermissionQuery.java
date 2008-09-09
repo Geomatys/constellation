@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
-import net.seagis.catalog.Column;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.Parameter;
-import net.seagis.catalog.Query;
-import net.seagis.catalog.QueryType;
-import static net.seagis.catalog.QueryType.*;
+import org.constellation.catalog.Column;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.Parameter;
+import org.constellation.catalog.Query;
+import org.constellation.catalog.QueryType;
+import static org.constellation.catalog.QueryType.*;
 
 
 /**
@@ -35,7 +35,7 @@ import static net.seagis.catalog.QueryType.*;
 final class PermissionQuery extends Query {
     /**
      * Default user. The value should match the default provided in
-     * {@link net.seagis.catalog.ConfigurationKey#PERMISSION}.
+     * {@link org.constellation.catalog.ConfigurationKey#PERMISSION}.
      */
     static final String DEFAULT = "Anonymous";
 

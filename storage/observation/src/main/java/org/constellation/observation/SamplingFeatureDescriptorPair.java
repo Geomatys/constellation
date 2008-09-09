@@ -15,15 +15,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package org.constellation.observation;
 
 // J2SE dependencies
 import java.util.Date;
 import java.lang.reflect.UndeclaredThrowableException;
 
 // Sicade dependencies
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.Descriptor;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.model.Descriptor;
 import org.opengis.observation.sampling.SamplingFeature;
 
 

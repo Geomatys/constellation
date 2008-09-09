@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.Color;
 import java.util.List;
@@ -35,19 +35,19 @@ import org.geotools.coverage.Category;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.image.io.PaletteFactory;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ServerException;
-import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.Table;
-import net.seagis.catalog.QueryType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ServerException;
+import org.constellation.catalog.IllegalRecordException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.QueryType;
 
 
 /**
  * Connection to a table of {@linkplain Category categories}. This table creates a list of
  * {@link Category} objects for a given sample dimension. Categories are one of the components
  * required for creating a {@link org.geotools.coverage.grid.GridCoverage2D}; they are not an
- * {@link net.seagis.catalog.Element} subinterface.
+ * {@link org.constellation.catalog.Element} subinterface.
  *
  * @author Martin Desruisseaux
  * @version $Id$

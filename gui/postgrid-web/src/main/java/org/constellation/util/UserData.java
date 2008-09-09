@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.util;
+package org.constellation.util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,10 +22,10 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.v100.WCSCapabilitiesType;
-import net.seagis.wcs.v111.Capabilities;
-import net.seagis.wms.v111.WMT_MS_Capabilities;
-import net.seagis.wms.v130.WMSCapabilities;
+import org.constellation.wcs.v100.WCSCapabilitiesType;
+import org.constellation.wcs.v111.Capabilities;
+import org.constellation.wms.v111.WMT_MS_Capabilities;
+import org.constellation.wms.v130.WMSCapabilities;
 
 
 /**
@@ -50,7 +50,7 @@ public class UserData {
     })
     private Object[] WCSCapabilities;
     
-    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = net.seagis.cat.csw.v202.Capabilities.class)
+    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = org.constellation.cat.csw.v202.Capabilities.class)
     private Object[] CSWCapabilities;
     
     private Object[] SOSCapabilities;

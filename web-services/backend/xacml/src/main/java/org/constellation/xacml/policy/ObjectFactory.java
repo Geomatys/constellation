@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.policy;
+package org.constellation.xacml.policy;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
 /**
- * This object contains factory methods for each Java content interface and Java element interface generated in the net.seagis.xacml.policy.package. 
+ * This object contains factory methods for each Java content interface and Java element interface generated in the org.constellation.xacml.policy.package. 
  * An ObjectFactory allows you to programatically construct new instances of the Java representation for XML content. 
  * The Java representation of XML content can consist of schema derived interfaces and classes representing the binding of schema type definitions, 
  * element declarations and model groups. 
@@ -77,7 +77,7 @@ public class ObjectFactory
    private final static QName _CombinerParameter_QNAME         = new QName("urn:oasis:names:tc:xacml:2.0:policy:schema:os", "CombinerParameter");
 
    /**
-    * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.seagis.xacml.policy.
+    * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.constellation.xacml.policy.
     * 
     */
    public ObjectFactory() {

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos.ws.rs;
+package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
 import java.io.IOException;
@@ -34,24 +34,24 @@ import javax.xml.bind.JAXBException;
 // geotools dependencies
 
 // seaGIS dependencies
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.ows.v110.OWSWebServiceException;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ws.rs.WebService;
-import net.seagis.ows.v110.AcceptFormatsType;
-import net.seagis.ows.v110.AcceptVersionsType;
-import net.seagis.ows.v110.SectionsType;
-import net.seagis.sos.Capabilities;
-import net.seagis.sos.DescribeSensor;
-import net.seagis.sos.GetCapabilities;
-import net.seagis.sos.GetObservation;
-import net.seagis.sos.GetResult;
-import net.seagis.sos.InsertObservation;
-import net.seagis.sos.RegisterSensor;
-import net.seagis.sos.ws.SOSworker;
-import static net.seagis.ows.OWSExceptionCode.*;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.rs.WebService;
+import org.constellation.ows.v110.AcceptFormatsType;
+import org.constellation.ows.v110.AcceptVersionsType;
+import org.constellation.ows.v110.SectionsType;
+import org.constellation.sos.Capabilities;
+import org.constellation.sos.DescribeSensor;
+import org.constellation.sos.GetCapabilities;
+import org.constellation.sos.GetObservation;
+import org.constellation.sos.GetResult;
+import org.constellation.sos.InsertObservation;
+import org.constellation.sos.RegisterSensor;
+import org.constellation.sos.ws.SOSworker;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -70,7 +70,7 @@ public class SOService extends WebService {
         super("SOS", new ServiceVersion(Service.OWS, "1.0.0"));
         worker = new SOSworker();
         worker.setVersion(getCurrentVersion());
-        setXMLContext("net.seagis.sos:net.seagis.gml.v311:net.seagis.swe:net.seagis.observation",
+        setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe:org.constellation.observation",
                       "");
     }
 

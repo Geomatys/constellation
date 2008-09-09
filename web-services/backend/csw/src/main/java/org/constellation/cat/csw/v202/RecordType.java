@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.cat.csw.v202;
+package org.constellation.cat.csw.v202;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,10 +26,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.cat.csw.Record;
-import net.seagis.ows.v100.BoundingBoxType;
-import net.seagis.dublincore.v2.elements.SimpleLiteral;
-import net.seagis.ows.v100.WGS84BoundingBoxType;
+import org.constellation.cat.csw.Record;
+import org.constellation.ows.v100.BoundingBoxType;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.ows.v100.WGS84BoundingBoxType;
 import org.geotools.util.Utilities;
 
 

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -41,9 +41,9 @@ import org.openide.util.NbBundle;
  * {@code .bbox}. Aucune autre action n'est effectuée; l'ajout de ce fichier sera détecté par
  * l'explorateur de Netbeans, ce qui permettra à l'utilisateur de l'ouvrir pour le modifier.
  * <p>
- * L'{@linkplain net.seagis.sie.window.series.ExplorerWindow explorateur des séries de données}
+ * L'{@linkplain org.constellation.sie.window.series.ExplorerWindow explorateur des séries de données}
  * proposera cette action dans son menu contextuel, via sa
- * {@linkplain net.seagis.sie.window.series.RootNode racine}.
+ * {@linkplain org.constellation.sie.window.series.RootNode racine}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

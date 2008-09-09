@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.numeric.table;
+package org.constellation.numeric.table;
 
 // J2SE dependencies and extensions
 import java.nio.DoubleBuffer;

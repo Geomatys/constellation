@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.ws;
+package org.constellation.coverage.ws;
 
 //jdk dependencies
 import java.io.File;
@@ -51,74 +51,74 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;
 
 // seagis dependencies
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.Series;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.coverage.web.WMSWebServiceException;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.web.WebServiceWorker;
-import net.seagis.coverage.wms.WMSExceptionCode;
-import net.seagis.gml.v311.CodeListType;
-import net.seagis.gml.v311.CodeType;
-import net.seagis.gml.v311.DirectPositionType;
-import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.v311.GridEnvelopeType;
-import net.seagis.gml.v311.GridLimitsType;
-import net.seagis.gml.v311.GridType;
-import net.seagis.gml.v311.RectifiedGridType;
-import net.seagis.gml.v311.TimePositionType;
-import net.seagis.ows.v110.AcceptFormatsType;
-import net.seagis.ows.v110.AcceptVersionsType;
-import net.seagis.ows.v110.BoundingBoxType;
-import net.seagis.ows.v110.KeywordsType;
-import net.seagis.ows.v110.LanguageStringType;
-import net.seagis.ows.OWSExceptionCode;
-import net.seagis.ows.v110.OWSWebServiceException;
-import net.seagis.ows.v110.WGS84BoundingBoxType;
-import net.seagis.ows.v110.OperationsMetadata;
-import net.seagis.ows.v110.SectionsType;
-import net.seagis.ows.v110.ServiceIdentification;
-import net.seagis.ows.v110.ServiceProvider;
-import net.seagis.wcs.AbstractDescribeCoverage;
-import net.seagis.ows.AbstractGetCapabilities;
-import net.seagis.wcs.AbstractGetCoverage;
-import net.seagis.wcs.v111.RangeType;
-import net.seagis.wcs.v111.Capabilities;
-import net.seagis.wcs.v100.ContentMetadata;
-import net.seagis.wcs.v111.Contents;
-import net.seagis.wcs.v111.CoverageDescriptionType;
-import net.seagis.wcs.v111.CoverageDescriptions;
-import net.seagis.wcs.v100.CoverageDescription;
-import net.seagis.wcs.v111.CoverageDomainType;
-import net.seagis.wcs.v100.CoverageOfferingBriefType;
-import net.seagis.wcs.v100.CoverageOfferingType;
-import net.seagis.wcs.v111.CoverageSummaryType;
-import net.seagis.wcs.v100.WCSCapabilityType.Request;
-import net.seagis.wcs.v100.DCPTypeType;
-import net.seagis.wcs.v100.DCPTypeType.HTTP.Get;
-import net.seagis.wcs.v100.DCPTypeType.HTTP.Post;
-import net.seagis.wcs.v100.DomainSetType;
-import net.seagis.wcs.v111.FieldType;
-import net.seagis.wcs.v111.InterpolationMethodType;
-import net.seagis.wcs.v111.InterpolationMethods;
-import net.seagis.wcs.v100.Keywords;
-import net.seagis.wcs.v100.LonLatEnvelopeType;
-import net.seagis.wcs.v100.RangeSet;
-import net.seagis.wcs.v100.RangeSetType;
-import net.seagis.wcs.v100.SpatialSubsetType;
-import net.seagis.wcs.v100.SupportedCRSsType;
-import net.seagis.wcs.v100.SupportedFormatsType;
-import net.seagis.wcs.v100.SupportedInterpolationsType;
-import net.seagis.wcs.v100.WCSCapabilitiesType;
-import net.seagis.wcs.v111.GridCrsType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.Series;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WMSWebServiceException;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.coverage.web.WebServiceWorker;
+import org.constellation.coverage.wms.WMSExceptionCode;
+import org.constellation.gml.v311.CodeListType;
+import org.constellation.gml.v311.CodeType;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.GridEnvelopeType;
+import org.constellation.gml.v311.GridLimitsType;
+import org.constellation.gml.v311.GridType;
+import org.constellation.gml.v311.RectifiedGridType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.ows.v110.AcceptFormatsType;
+import org.constellation.ows.v110.AcceptVersionsType;
+import org.constellation.ows.v110.BoundingBoxType;
+import org.constellation.ows.v110.KeywordsType;
+import org.constellation.ows.v110.LanguageStringType;
+import org.constellation.ows.OWSExceptionCode;
+import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.ows.v110.WGS84BoundingBoxType;
+import org.constellation.ows.v110.OperationsMetadata;
+import org.constellation.ows.v110.SectionsType;
+import org.constellation.ows.v110.ServiceIdentification;
+import org.constellation.ows.v110.ServiceProvider;
+import org.constellation.wcs.AbstractDescribeCoverage;
+import org.constellation.ows.AbstractGetCapabilities;
+import org.constellation.wcs.AbstractGetCoverage;
+import org.constellation.wcs.v111.RangeType;
+import org.constellation.wcs.v111.Capabilities;
+import org.constellation.wcs.v100.ContentMetadata;
+import org.constellation.wcs.v111.Contents;
+import org.constellation.wcs.v111.CoverageDescriptionType;
+import org.constellation.wcs.v111.CoverageDescriptions;
+import org.constellation.wcs.v100.CoverageDescription;
+import org.constellation.wcs.v111.CoverageDomainType;
+import org.constellation.wcs.v100.CoverageOfferingBriefType;
+import org.constellation.wcs.v100.CoverageOfferingType;
+import org.constellation.wcs.v111.CoverageSummaryType;
+import org.constellation.wcs.v100.WCSCapabilityType.Request;
+import org.constellation.wcs.v100.DCPTypeType;
+import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
+import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
+import org.constellation.wcs.v100.DomainSetType;
+import org.constellation.wcs.v111.FieldType;
+import org.constellation.wcs.v111.InterpolationMethodType;
+import org.constellation.wcs.v111.InterpolationMethods;
+import org.constellation.wcs.v100.Keywords;
+import org.constellation.wcs.v100.LonLatEnvelopeType;
+import org.constellation.wcs.v100.RangeSet;
+import org.constellation.wcs.v100.RangeSetType;
+import org.constellation.wcs.v100.SpatialSubsetType;
+import org.constellation.wcs.v100.SupportedCRSsType;
+import org.constellation.wcs.v100.SupportedFormatsType;
+import org.constellation.wcs.v100.SupportedInterpolationsType;
+import org.constellation.wcs.v100.WCSCapabilitiesType;
+import org.constellation.wcs.v111.GridCrsType;
 
 // geoAPI dependencies
-import net.seagis.wcs.v111.RangeSubsetType.FieldSubset;
-import net.seagis.ws.rs.WebService;
+import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
+import org.constellation.ws.rs.WebService;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // geoTools dependencies
@@ -139,7 +139,7 @@ public class WCService extends WebService {
     /**
      * A list of layer initialized a begining;
      */
-    private Set<net.seagis.coverage.catalog.Layer> layerList;
+    private Set<org.constellation.coverage.catalog.Layer> layerList;
 
     /**
      * The object whitch made all the operation on the postgrid database
@@ -256,7 +256,7 @@ public class WCService extends WebService {
         super("WCS", new ServiceVersion(Service.WCS, "1.1.1"), new ServiceVersion(Service.WCS, "1.0.0"));
         ensureWorkerInitialized();
 
-        setXMLContext("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111",
+        setXMLContext("org.constellation.coverage.web:org.constellation.wcs.v100:org.constellation.wcs.v111",
                       "http://www.opengis.net/wcs");
 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
@@ -400,7 +400,7 @@ public class WCService extends WebService {
         this.setCurrentVersion(getBestVersion(inputVersion).toString());
 
         if (getCurrentVersion().toString().equals("1.0.0")) {
-            return new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
+            return new org.constellation.wcs.v100.GetCapabilities(getParameter("SECTION", false),
                                                            null);
         } else {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
@@ -426,7 +426,7 @@ public class WCService extends WebService {
             }
             SectionsType sections = new SectionsType(requestedSections);
             AcceptVersionsType versions = new AcceptVersionsType("1.1.1");
-            return new net.seagis.wcs.v111.GetCapabilities(versions,
+            return new org.constellation.wcs.v111.GetCapabilities(versions,
                                                            sections,
                                                            formats,
                                                            null);
@@ -438,9 +438,9 @@ public class WCService extends WebService {
      */
     private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws WebServiceException {
         if (getCurrentVersion().toString().equals("1.0.0")) {
-            return new net.seagis.wcs.v100.DescribeCoverage(getParameter("COVERAGE", true));
+            return new org.constellation.wcs.v100.DescribeCoverage(getParameter("COVERAGE", true));
         } else {
-            return new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
+            return new org.constellation.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
         }
     }
 
@@ -451,11 +451,11 @@ public class WCService extends WebService {
 
         if (getCurrentVersion().toString().equals("1.0.0")) {
             // temporal subset
-            net.seagis.wcs.v100.TimeSequenceType temporal = null;
+            org.constellation.wcs.v100.TimeSequenceType temporal = null;
             String timeParameter = getParameter("time", false);
             if (timeParameter != null) {
                 TimePositionType time     = new TimePositionType(timeParameter);
-                temporal = new net.seagis.wcs.v100.TimeSequenceType(time);
+                temporal = new org.constellation.wcs.v100.TimeSequenceType(time);
             }
 
             /*
@@ -514,22 +514,22 @@ public class WCService extends WebService {
                 GridLimitsType limits     = new GridLimitsType(low, high);
                 grid        = new GridType(limits, axis);
             }
-            net.seagis.wcs.v100.SpatialSubsetType spatial = new net.seagis.wcs.v100.SpatialSubsetType(envelope, grid);
+            org.constellation.wcs.v100.SpatialSubsetType spatial = new org.constellation.wcs.v100.SpatialSubsetType(envelope, grid);
 
             //domain subset
-            net.seagis.wcs.v100.DomainSubsetType domain   = new net.seagis.wcs.v100.DomainSubsetType(temporal, spatial);
+            org.constellation.wcs.v100.DomainSubsetType domain   = new org.constellation.wcs.v100.DomainSubsetType(temporal, spatial);
 
             //range subset (not yet used)
-            net.seagis.wcs.v100.RangeSubsetType  range    = null;
+            org.constellation.wcs.v100.RangeSubsetType  range    = null;
 
             //interpolation method
-            net.seagis.wcs.v100.InterpolationMethod interpolation = net.seagis.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
+            org.constellation.wcs.v100.InterpolationMethod interpolation = org.constellation.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
 
             //output
-            net.seagis.wcs.v100.OutputType output         = new net.seagis.wcs.v100.OutputType(getParameter("format", true),
+            org.constellation.wcs.v100.OutputType output         = new org.constellation.wcs.v100.OutputType(getParameter("format", true),
                                                                                                            getParameter("response_crs", false));
 
-            return new net.seagis.wcs.v100.GetCoverage(getParameter("coverage", true),
+            return new org.constellation.wcs.v100.GetCoverage(getParameter("coverage", true),
                                                        domain,
                                                        range,
                                                        interpolation,
@@ -537,11 +537,11 @@ public class WCService extends WebService {
          } else {
 
             // temporal subset
-            net.seagis.wcs.v111.TimeSequenceType temporal = null;
+            org.constellation.wcs.v111.TimeSequenceType temporal = null;
             String timeParameter = getParameter("timeSequence", false);
             if (timeParameter != null) {
                 if (timeParameter.indexOf('/') == -1) {
-                    temporal = new net.seagis.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
+                    temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
                 } else {
                     throwException("The service does not handle TimePeriod" ,
                                    "INVALID_PARAMETER_VALUE", "temporalSubset");
@@ -581,10 +581,10 @@ public class WCService extends WebService {
              }
 
              //domain subset
-             net.seagis.wcs.v111.DomainSubsetType domain   = new net.seagis.wcs.v111.DomainSubsetType(temporal, envelope);
+             org.constellation.wcs.v111.DomainSubsetType domain   = new org.constellation.wcs.v111.DomainSubsetType(temporal, envelope);
 
              //range subset.
-             net.seagis.wcs.v111.RangeSubsetType  range = null;
+             org.constellation.wcs.v111.RangeSubsetType  range = null;
              String rangeSubset = getParameter("RangeSubset", false);
              if (rangeSubset != null) {
 
@@ -609,7 +609,7 @@ public class WCService extends WebService {
                     fields.add(new FieldSubset(rangeIdentifier, interpolation));
                 }
 
-                    range = new net.seagis.wcs.v111.RangeSubsetType(fields);
+                    range = new org.constellation.wcs.v111.RangeSubsetType(fields);
                 }
 
 
@@ -651,9 +651,9 @@ public class WCService extends WebService {
                                                    offset,
                                                    gridCS,
                                                    "");
-                net.seagis.wcs.v111.OutputType output = new net.seagis.wcs.v111.OutputType(grid, getParameter("format", true));
+                org.constellation.wcs.v111.OutputType output = new org.constellation.wcs.v111.OutputType(grid, getParameter("format", true));
 
-                return new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.v110.CodeType(getParameter("identifier", true)),
+                return new org.constellation.wcs.v111.GetCoverage(new org.constellation.ows.v110.CodeType(getParameter("identifier", true)),
                                                            domain,
                                                            range,
                                                            output);
@@ -686,7 +686,7 @@ public class WCService extends WebService {
 
         if (getCurrentVersion().toString().equals("1.1.1")) {
 
-            net.seagis.wcs.v111.GetCapabilities request = (net.seagis.wcs.v111.GetCapabilities) abstractRequest;
+            org.constellation.wcs.v111.GetCapabilities request = (org.constellation.wcs.v111.GetCapabilities) abstractRequest;
 
             // if the user have specified one format accepted (only one for now != spec)
             AcceptFormatsType formats = request.getAcceptFormats();
@@ -747,7 +747,7 @@ public class WCService extends WebService {
 
         } else {
 
-            net.seagis.wcs.v100.GetCapabilities request = (net.seagis.wcs.v100.GetCapabilities) abstractRequest;
+            org.constellation.wcs.v100.GetCapabilities request = (org.constellation.wcs.v100.GetCapabilities) abstractRequest;
 
             /*
              * In WCS 1.0.0 the user can request only one section
@@ -801,9 +801,9 @@ public class WCService extends WebService {
         List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
         List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
 
-        net.seagis.wcs.v111.ObjectFactory wcs111Factory = new net.seagis.wcs.v111.ObjectFactory();
-        net.seagis.wcs.v100.ObjectFactory wcs100Factory = new net.seagis.wcs.v100.ObjectFactory();
-        net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
+        org.constellation.wcs.v111.ObjectFactory wcs111Factory = new org.constellation.wcs.v111.ObjectFactory();
+        org.constellation.wcs.v100.ObjectFactory wcs100Factory = new org.constellation.wcs.v100.ObjectFactory();
+        org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
         try {
             for (Layer inputLayer:layerList) {
                 if (!inputLayer.isQueryable(Service.WCS))
@@ -902,7 +902,7 @@ public class WCService extends WebService {
         String responseCRS = null;
 
        if (getCurrentVersion().toString().equals("1.1.1")) {
-            net.seagis.wcs.v111.GetCoverage request = (net.seagis.wcs.v111.GetCoverage)AbstractRequest;
+            org.constellation.wcs.v111.GetCoverage request = (org.constellation.wcs.v111.GetCoverage)AbstractRequest;
 
             if (request.getIdentifier() != null) {
                 coverage = request.getIdentifier().getValue();
@@ -922,7 +922,7 @@ public class WCService extends WebService {
              * temporal subSet: - timeSequence
              *
              */
-            net.seagis.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
+            org.constellation.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
             if (domain == null) {
                 throwException("The DomainSubset must be specify" ,
                                "MISSING_PARAMETER_VALUE", "DomainSubset");
@@ -952,7 +952,7 @@ public class WCService extends WebService {
                 for (Object obj:timeSeq) {
                     if (obj instanceof TimePositionType)
                         time = ((TimePositionType)obj).getValue();
-                    else if (obj instanceof net.seagis.wcs.v111.TimePeriodType) {
+                    else if (obj instanceof org.constellation.wcs.v111.TimePeriodType) {
                         throwException("The service does not handle time Period type" ,
                                        "INVALID_PARAMETER_VALUE", "temporalSubset");
                     }
@@ -970,10 +970,10 @@ public class WCService extends WebService {
              * AxisSubset:  - identifier
              *              - key
              */
-            net.seagis.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
+            org.constellation.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
             if (rangeSubset != null) {
                 List<String> requestedField = new ArrayList<String>();
-                for(net.seagis.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
+                for(org.constellation.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
                     Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
                     if (currentLayer.getSeries().size() == 0) {
                         throwException("The layer " + coverage + " is not available" ,
@@ -1017,7 +1017,7 @@ public class WCService extends WebService {
              *
              */
 
-            net.seagis.wcs.v111.OutputType output = request.getOutput();
+            org.constellation.wcs.v111.OutputType output = request.getOutput();
             if (output == null) {
                 throwException("The Output must be specify" ,
                                "MISSING_PARAMETER_VALUE", "output");
@@ -1059,7 +1059,7 @@ public class WCService extends WebService {
         } else {
 
             // parameter for 1.0.0 version
-            net.seagis.wcs.v100.GetCoverage request = (net.seagis.wcs.v100.GetCoverage)AbstractRequest;
+            org.constellation.wcs.v100.GetCoverage request = (org.constellation.wcs.v100.GetCoverage)AbstractRequest;
             if (request.getOutput().getFormat()!= null) {
                 format    = request.getOutput().getFormat().getValue();
             } else {
@@ -1081,7 +1081,7 @@ public class WCService extends WebService {
             }
 
             //for now we only handle one time parameter with timePosition type
-            net.seagis.wcs.v100.TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet();
+            org.constellation.wcs.v100.TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet();
             if (temporalSubset != null) {
                 for (Object timeObj:temporalSubset.getTimePositionOrTimePeriod()){
                     if (timeObj instanceof TimePositionType) {
@@ -1180,7 +1180,7 @@ public class WCService extends WebService {
         Object response;
 
         if (getCurrentVersion().toString().equals("1.0.0")) {
-            net.seagis.wcs.v100.DescribeCoverage request = (net.seagis.wcs.v100.DescribeCoverage) abstractRequest;
+            org.constellation.wcs.v100.DescribeCoverage request = (org.constellation.wcs.v100.DescribeCoverage) abstractRequest;
             if (request.getCoverage().size() == 0) {
                 throwException("the parameter COVERAGE must be specified", "MISSING_PARAMETER_VALUE", "coverage");
             }
@@ -1212,7 +1212,7 @@ public class WCService extends WebService {
                 Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
 
                 //Spatial metadata
-                net.seagis.wcs.v100.SpatialDomainType spatialDomain = new net.seagis.wcs.v100.SpatialDomainType(llenvelope);
+                org.constellation.wcs.v100.SpatialDomainType spatialDomain = new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
 
                 // temporal metadata
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -1222,7 +1222,7 @@ public class WCService extends WebService {
                 for (Date d:dates){
                         times.add(new TimePositionType(df.format(d)));
                 }
-                net.seagis.wcs.v100.TimeSequenceType temporalDomain = new net.seagis.wcs.v100.TimeSequenceType(times);
+                org.constellation.wcs.v100.TimeSequenceType temporalDomain = new org.constellation.wcs.v100.TimeSequenceType(times);
 
                 DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
 
@@ -1254,11 +1254,11 @@ public class WCService extends WebService {
                 SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
 
                 //supported interpolations
-                List<net.seagis.wcs.v100.InterpolationMethod> interpolations = new ArrayList<net.seagis.wcs.v100.InterpolationMethod>();
-                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BILINEAR);
-                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BICUBIC);
-                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
-                SupportedInterpolationsType supInt = new SupportedInterpolationsType(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+                List<org.constellation.wcs.v100.InterpolationMethod> interpolations = new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
+                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
+                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
+                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+                SupportedInterpolationsType supInt = new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
                 //we build the coverage offering for this layer/coverage
                 CoverageOfferingType coverage = new CoverageOfferingType(null,
@@ -1279,7 +1279,7 @@ public class WCService extends WebService {
 
         // describeCoverage version 1.1.1
         } else {
-            net.seagis.wcs.v111.DescribeCoverage request = (net.seagis.wcs.v111.DescribeCoverage) abstractRequest;
+            org.constellation.wcs.v111.DescribeCoverage request = (org.constellation.wcs.v111.DescribeCoverage) abstractRequest;
             if (request.getIdentifier().size() == 0) {
                 throwException("the parameter IDENTIFIER must be specified", "MISSING_PARAMETER_VALUE", "identifier");
             }
@@ -1289,7 +1289,7 @@ public class WCService extends WebService {
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
 
-            net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
+            org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             for (Layer layer: layers) {
                 if (layer.getSeries().size() == 0) {
@@ -1326,7 +1326,7 @@ public class WCService extends WebService {
                                               ));
 
                 // spatial metadata
-                net.seagis.wcs.v111.SpatialDomainType spatial = new net.seagis.wcs.v111.SpatialDomainType(bboxs);
+                org.constellation.wcs.v111.SpatialDomainType spatial = new org.constellation.wcs.v111.SpatialDomainType(bboxs);
 
                 // temporal metadata
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -1336,19 +1336,19 @@ public class WCService extends WebService {
                 for (Date d:dates){
                         times.add(new TimePositionType(df.format(d)));
                 }
-                net.seagis.wcs.v111.TimeSequenceType temporalDomain = new net.seagis.wcs.v111.TimeSequenceType(times);
+                org.constellation.wcs.v111.TimeSequenceType temporalDomain = new org.constellation.wcs.v111.TimeSequenceType(times);
 
                 CoverageDomainType domain       = new CoverageDomainType(spatial, temporalDomain);
 
                 //supported interpolations
                 List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
-                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
-                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-                InterpolationMethods interpolations = new InterpolationMethods(intList, net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
+                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
+                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+                InterpolationMethods interpolations = new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
                 RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()),
                                                               null,
-                                                              new net.seagis.ows.v110.CodeType("0.0"),
+                                                              new org.constellation.ows.v110.CodeType("0.0"),
                                                               interpolations));
 
                 //supported CRS

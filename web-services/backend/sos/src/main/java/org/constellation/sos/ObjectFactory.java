@@ -14,19 +14,19 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.gml.v311.CodeType;
+import org.constellation.gml.v311.CodeType;
 
 /**
  *
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the net.seagis.sos package. 
+ * generated in the org.constellation.sos package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 

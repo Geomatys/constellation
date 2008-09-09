@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,10 +36,10 @@ import javax.media.jai.TileCache;
 
 import org.geotools.resources.Arguments;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.coverage.model.DescriptorTable;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.coverage.model.DescriptorTable;
+import org.constellation.catalog.CatalogException;
 
 
 /**

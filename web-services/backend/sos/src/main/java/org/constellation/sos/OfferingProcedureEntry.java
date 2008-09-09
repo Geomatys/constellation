@@ -14,10 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sos;
+package org.constellation.sos;
 
-import net.seagis.catalog.Entry;
-import net.seagis.gml.v311.ReferenceEntry;
+import org.constellation.catalog.Entry;
+import org.constellation.gml.v311.ReferenceEntry;
 
 /**
  *

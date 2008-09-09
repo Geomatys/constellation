@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.List;
 import java.util.Map;
@@ -38,8 +38,8 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import static org.geotools.referencing.CRS.getTemporalCRS;
 
-import net.seagis.catalog.CRS;
-import net.seagis.coverage.catalog.GridCoverage;
+import org.constellation.catalog.CRS;
+import org.constellation.coverage.catalog.GridCoverage;
 
 
 /**

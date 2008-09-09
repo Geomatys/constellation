@@ -18,7 +18,7 @@
  *    OpenGIS consortium's work is fully acknowledged here.
  */
 
-package net.seagis.referencing;
+package org.constellation.referencing;
 
 import java.util.Collection;
 import java.util.Set;

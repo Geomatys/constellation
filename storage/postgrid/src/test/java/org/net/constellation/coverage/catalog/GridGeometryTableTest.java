@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.util.Set;
 import java.sql.SQLException;
@@ -24,8 +24,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.TableTest;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.TableTest;
 
 import org.junit.*;
 

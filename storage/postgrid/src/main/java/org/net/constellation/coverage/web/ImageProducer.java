@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.web;
+package org.constellation.coverage.web;
 
 import java.awt.Color;
 import java.io.*;
@@ -87,20 +87,20 @@ import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.coverage.CoverageUtilities;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.resources.i18n.ResourceKeys;
-import net.seagis.resources.i18n.Resources;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
+import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 
 /**
@@ -138,7 +138,7 @@ public abstract class ImageProducer {
     /**
      * A logger for every {@link ImageProducer} instances.
      */
-    static final Logger LOGGER = Logger.getLogger("net.seagis.coverage.web");
+    static final Logger LOGGER = Logger.getLogger("org.constellation.coverage.web");
 
     /**
      * The default format, or {@code null} if we should not provides any default.

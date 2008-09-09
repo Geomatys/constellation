@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gml.v311;
+package org.constellation.gml.v311;
 
-import net.seagis.catalog.Column;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.Parameter;
-import net.seagis.catalog.Query;
-import static net.seagis.catalog.QueryType.*;
-import net.seagis.catalog.QueryType;
+import org.constellation.catalog.Column;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.Parameter;
+import org.constellation.catalog.Query;
+import static org.constellation.catalog.QueryType.*;
+import org.constellation.catalog.QueryType;
 
 /**
  *

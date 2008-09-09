@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider;
+package org.constellation.provider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
-import net.seagis.provider.sld.SLDFileNamedLayerDP;
+import org.constellation.provider.sld.SLDFileNamedLayerDP;
 
-import net.seagis.ws.rs.WebService;
+import org.constellation.ws.rs.WebService;
 import org.geotools.style.MutableStyle;
 
 /**

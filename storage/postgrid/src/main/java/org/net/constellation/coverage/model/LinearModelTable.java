@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.util.List;
 import java.util.Arrays;
@@ -26,14 +26,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.Column;
-import net.seagis.catalog.Parameter;
-import net.seagis.catalog.QueryType;
-import static net.seagis.catalog.QueryType.*;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.Column;
+import org.constellation.catalog.Parameter;
+import org.constellation.catalog.QueryType;
+import static org.constellation.catalog.QueryType.*;
 
 
 /**
@@ -79,7 +79,7 @@ public class LinearModelTable extends Table {
     }
 
     /**
-     * Sets the descriptor table to use. This method is invoked by {@link net.seagis.coverage.catalog.LayerTable}
+     * Sets the descriptor table to use. This method is invoked by {@link org.constellation.coverage.catalog.LayerTable}
      * immediately after the creation of this {@code LinearModelTable}. Note that
      * the instance given to this method should not be cached by {@link Database#getTable}.
      *

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui;
+package org.constellation.gui;
 
 // User interface
 import javax.swing.JFrame;
@@ -88,8 +88,8 @@ import org.geotools.axis.NumberGraduation;
 import org.geotools.axis.AbstractGraduation;
 
 // Resources
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

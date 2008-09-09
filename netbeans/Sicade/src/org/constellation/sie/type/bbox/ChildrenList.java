@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import java.util.Map;
@@ -25,10 +25,10 @@ import java.util.LinkedHashMap;
 import org.openide.nodes.Children;
 
 // Sicade dependencies
-import net.seagis.observation.Element;
-import net.seagis.observation.coverage.Series;
-import net.seagis.observation.coverage.Thematic;
-import net.seagis.observation.coverage.sql.TreeDepth;
+import org.constellation.observation.Element;
+import org.constellation.observation.coverage.Series;
+import org.constellation.observation.coverage.Thematic;
+import org.constellation.observation.coverage.sql.TreeDepth;
 
 
 /**

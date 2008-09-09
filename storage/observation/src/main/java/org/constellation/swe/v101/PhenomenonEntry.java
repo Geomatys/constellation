@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.swe.v101;
+package org.constellation.swe.v101;
 
 //jaxB import
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 // Sicade dependencies
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.v311.DefinitionType;
+import org.constellation.gml.v311.DefinitionType;
 import org.opengis.observation.Phenomenon;
 
 

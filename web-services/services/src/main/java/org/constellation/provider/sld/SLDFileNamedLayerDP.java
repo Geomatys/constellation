@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider.sld;
+package org.constellation.provider.sld;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.seagis.provider.DataProvider;
-import net.seagis.provider.SoftHashMap;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.SoftHashMap;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.style.MutableStyle;

@@ -18,7 +18,7 @@
  *    OpenGIS consortium's work is fully acknowledged here.
  */
 
-package net.seagis.temporal;
+package org.constellation.temporal;
 
 import org.opengis.temporal.TemporalObject;
 

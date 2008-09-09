@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -558,7 +558,7 @@ public class Database {
 
     /**
      * Returns an remote object for the specified name. The name should be registered on the remote server.
-     * A typical value is {@value net.seagis.coverage.catalog.rmi.DataConnectionFactory#REGISTRY_NAME}.
+     * A typical value is {@value org.constellation.coverage.catalog.rmi.DataConnectionFactory#REGISTRY_NAME}.
      * <p>
      * If this method has already been invoked previously with the specified name, the same object
      * is returned. Otherwise, a new connection is etablished and the object returned. If the object
@@ -597,7 +597,7 @@ public class Database {
                         /*
                          * Ne devrait pas se produire, puisque l'on a construit notre URL nous-même
                          * et que l'argument 'name' est habituellement une constante d'une des
-                         * interfaces du paquet net.seagis.observation.coverage.rmi.
+                         * interfaces du paquet org.constellation.observation.coverage.rmi.
                          */
                         throw new IllegalArgumentException(name, exception);
                     } catch (ConnectException exception) {

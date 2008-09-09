@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.type.bbox;
+package org.constellation.sie.type.bbox;
 
 // J2SE dependencies
 import javax.swing.Action;
@@ -31,11 +31,11 @@ import org.openide.util.NbBundle;
 import org.openide.ErrorManager;
 
 // Sicade dependencies
-import net.seagis.observation.Element;
-import net.seagis.observation.CatalogException;
-import net.seagis.observation.coverage.Series;
-import net.seagis.observation.coverage.sql.TreeDepth;
-import net.seagis.sie.window.mosaic.OpenAction;
+import org.constellation.observation.Element;
+import org.constellation.observation.CatalogException;
+import org.constellation.observation.coverage.Series;
+import org.constellation.observation.coverage.sql.TreeDepth;
+import org.constellation.sie.window.mosaic.OpenAction;
 
 
 /**

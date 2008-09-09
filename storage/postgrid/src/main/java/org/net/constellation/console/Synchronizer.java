@@ -15,9 +15,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
-import net.seagis.catalog.*;
+import org.constellation.catalog.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;

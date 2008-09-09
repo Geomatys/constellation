@@ -15,18 +15,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import net.seagis.catalog.Table;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.DuplicatedRecordException;
+import org.constellation.catalog.Table;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.QueryType;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.IllegalRecordException;
+import org.constellation.catalog.DuplicatedRecordException;
 
 
 /**

@@ -15,10 +15,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.model;
+package org.constellation.coverage.model;
 
-import net.seagis.catalog.*;
-import net.seagis.coverage.catalog.*;
+import org.constellation.catalog.*;
+import org.constellation.coverage.catalog.*;
 import java.util.Set;
 import java.util.Date;
 import java.util.Arrays;
@@ -40,8 +40,8 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.seagis.catalog.DatabaseTest;
-import net.seagis.catalog.CatalogException;
+import org.constellation.catalog.DatabaseTest;
+import org.constellation.catalog.CatalogException;
 
 
 /**

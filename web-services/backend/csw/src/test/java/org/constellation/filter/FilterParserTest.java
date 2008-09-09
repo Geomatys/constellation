@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.filter;
+package org.constellation.filter;
 
 // J2SE dependencies
 import java.awt.geom.Line2D;
@@ -28,12 +28,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
 // Seagis dependencies
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.lucene.filter.SerialChainFilter;
-import net.seagis.lucene.filter.SpatialFilter;
-import net.seagis.lucene.filter.SpatialQuery;
-import net.seagis.ogc.FilterType;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.ogc.FilterType;
 
 // geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
 public class FilterParserTest {
     
     private FilterParser filterParser;
-    private Logger       logger = Logger.getLogger("net.seagis.filter");
+    private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller filterUnmarshaller;
    
     @BeforeClass
@@ -65,7 +65,7 @@ public class FilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new FilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml.v311");
+        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterUnmarshaller = jbcontext.createUnmarshaller();
     }
 

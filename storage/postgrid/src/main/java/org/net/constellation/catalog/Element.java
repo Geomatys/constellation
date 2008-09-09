@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package org.constellation.catalog;
 
 import java.util.logging.Logger;
 
@@ -32,7 +32,7 @@ public interface Element {
      *
      * @see LoggingLevel
      */
-    Logger LOGGER = Logger.getLogger("net.seagis.catalog");
+    Logger LOGGER = Logger.getLogger("org.constellation.catalog");
 
     /**
      * Returns the name for this element. It is often (but not always) the primary key value

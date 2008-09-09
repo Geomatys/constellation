@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gui.map;
+package org.constellation.gui.map;
 
 // Geometry
 import java.awt.Shape;

@@ -15,22 +15,22 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation.fishery.sql;
+package org.constellation.observation.fishery.sql;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.seagis.coverage.model.Distribution;
-import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.observation.ElementEntry;
-import net.seagis.metadata.MetaDataEntry;
-import net.seagis.observation.fishery.Stage;
-import net.seagis.observation.fishery.Species;
-import net.seagis.observation.fishery.Category;
-import net.seagis.observation.fishery.FisheryType;
-import net.seagis.observation.ObservationEntry;
-import net.seagis.sampling.SamplingFeatureEntry;
+import org.constellation.coverage.model.Distribution;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.observation.ElementEntry;
+import org.constellation.metadata.MetaDataEntry;
+import org.constellation.observation.fishery.Stage;
+import org.constellation.observation.fishery.Species;
+import org.constellation.observation.fishery.Category;
+import org.constellation.observation.fishery.FisheryType;
+import org.constellation.observation.ObservationEntry;
+import org.constellation.sampling.SamplingFeatureEntry;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.

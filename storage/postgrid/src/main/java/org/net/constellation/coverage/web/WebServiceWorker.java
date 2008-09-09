@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.web;
+package org.constellation.coverage.web;
 
 import java.awt.Color;
 import java.io.*;
@@ -36,8 +36,8 @@ import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
-import net.seagis.catalog.Database;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
+import org.constellation.catalog.Database;
+import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 
 /**

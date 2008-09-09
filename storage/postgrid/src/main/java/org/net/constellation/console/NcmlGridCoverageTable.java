@@ -14,20 +14,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.io.IOException;
 import javax.imageio.ImageReader;
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.WritableGridCoverageEntry;
-import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.WritableGridCoverageEntry;
+import org.constellation.coverage.catalog.WritableGridCoverageTable;
 
 
 /**
  * Adds to the {@link WritableGridCoverageTable} some specifics parameters designed
  * for handling time specified in an NcML file.
  *
- * @see net.seagis.coverage.catalog.WritableGridCoverageTable
+ * @see org.constellation.coverage.catalog.WritableGridCoverageTable
  * @source $URL$
  * @author Cédric Briançon
  */
@@ -62,7 +62,7 @@ final class NcmlGridCoverageTable extends WritableGridCoverageTable {
      *
      * @param database The database.
      * @param format The format to use for the serie.
-     * @see net.seagis.coverage.catalog.WritableGridCoverageTable
+     * @see org.constellation.coverage.catalog.WritableGridCoverageTable
      */
     public NcmlGridCoverageTable(final Database database, final String format) {
         super(database);

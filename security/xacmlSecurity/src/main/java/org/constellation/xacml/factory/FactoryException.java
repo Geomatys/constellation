@@ -14,9 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.factory;
+package org.constellation.xacml.factory;
 
-import net.seagis.xacml.XACMLException;
+import org.constellation.xacml.XACMLException;
 
 
 /**

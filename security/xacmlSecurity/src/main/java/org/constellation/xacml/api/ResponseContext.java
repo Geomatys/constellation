@@ -15,13 +15,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.api;
+package org.constellation.xacml.api;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.seagis.xacml.context.ResultType;
+import org.constellation.xacml.context.ResultType;
 import org.w3c.dom.Node;
  
 

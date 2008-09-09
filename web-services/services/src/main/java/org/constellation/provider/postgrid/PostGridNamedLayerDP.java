@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.provider.postgrid;
+package org.constellation.provider.postgrid;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,13 +32,13 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.provider.DataProvider;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.provider.DataProvider;
 import org.geotools.map.MapLayer;
 
 /**
@@ -49,7 +49,7 @@ public class PostGridNamedLayerDP implements DataProvider<String,MapLayer>{
 
     private static PostGridNamedLayerDP instance = null;
     
-    protected static final Logger logger = Logger.getLogger("net.seagis.provider.postgrid");
+    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
     
     protected static Database database;
     static {

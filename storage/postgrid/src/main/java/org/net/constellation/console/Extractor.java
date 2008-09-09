@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -39,13 +39,13 @@ import org.geotools.resources.Utilities;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.coverage.model.Descriptor;
-import net.seagis.coverage.model.DescriptorTable;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.DescriptorTable;
 
 
 /**

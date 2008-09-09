@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package org.constellation.coverage.catalog;
 
 import java.awt.Dimension;
 import java.awt.image.ColorModel;
@@ -68,9 +68,9 @@ import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 
-import net.seagis.catalog.Entry;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
+import org.constellation.catalog.Entry;
+import org.constellation.resources.i18n.Resources;
+import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**
@@ -89,7 +89,7 @@ final class FormatEntry extends Entry implements Format {
      * {@code true} for using JAI {@code "ImageRead"} operation,
      * or {@code false} for using {@link ImageReader} directly.
      */
-    private static final boolean USE_IMAGE_READ_OPERATION = Boolean.getBoolean("net.seagis.usejai");
+    private static final boolean USE_IMAGE_READ_OPERATION = Boolean.getBoolean("org.constellation.usejai");
 
     /**
      * The input types for mosaic image reader.

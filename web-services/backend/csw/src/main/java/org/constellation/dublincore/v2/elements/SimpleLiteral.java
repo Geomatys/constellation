@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.dublincore.v2.elements;
+package org.constellation.dublincore.v2.elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.AbstractSimpleLiteral;
+import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.geotools.util.Utilities;
 
 

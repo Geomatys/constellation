@@ -17,7 +17,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package net.seagis.referencing;
+package org.constellation.referencing;
 
 import java.util.Map;
 

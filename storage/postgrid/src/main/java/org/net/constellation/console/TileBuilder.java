@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package org.constellation.console;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -46,11 +46,11 @@ import org.geotools.console.Option;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.console.ExternalyConfiguredCommandLine;
 
-import net.seagis.catalog.Database;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.coverage.catalog.WritableGridCoverageEntry;
-import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.NoSuchRecordException;
+import org.constellation.coverage.catalog.WritableGridCoverageEntry;
+import org.constellation.coverage.catalog.WritableGridCoverageTable;
 
 
 /**

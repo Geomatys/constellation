@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.xacml.bridge;
+package org.constellation.xacml.bridge;
 
 import com.sun.xacml.EvaluationCtx;
 import com.sun.xacml.Policy;

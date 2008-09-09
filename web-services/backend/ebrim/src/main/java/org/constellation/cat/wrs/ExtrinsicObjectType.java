@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.cat.wrs;
+package org.constellation.cat.wrs;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -57,7 +57,7 @@ import javax.xml.bind.annotation.XmlType;
     "repositoryItemRef",
     "repositoryItem"
 })
-public class ExtrinsicObjectType extends net.seagis.ebrim.v300.ExtrinsicObjectType {
+public class ExtrinsicObjectType extends org.constellation.ebrim.v300.ExtrinsicObjectType {
 
     private SimpleLinkType repositoryItemRef;
     @XmlMimeType("*/*")

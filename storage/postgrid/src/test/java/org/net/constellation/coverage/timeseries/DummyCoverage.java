@@ -14,9 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.timeseries;
+package org.constellation.coverage.timeseries;
 
-import net.seagis.catalog.CRS;
+import org.constellation.catalog.CRS;
 import org.geotools.coverage.AbstractCoverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;

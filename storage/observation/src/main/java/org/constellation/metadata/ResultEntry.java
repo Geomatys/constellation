@@ -15,9 +15,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.metadata;
+package org.constellation.metadata;
 
-import net.seagis.catalog.Entry;
+import org.constellation.catalog.Entry;
 import org.opengis.metadata.quality.Result;
 
 /**

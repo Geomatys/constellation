@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.sie.window.coverages;
+package org.constellation.sie.window.coverages;
 
 // J2SE dependencies
 import java.util.Date;
@@ -32,8 +32,8 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 // Sicade dependencies
-import net.seagis.observation.coverage.CoverageReference;
-import net.seagis.observation.coverage.CoverageTableModel;
+import org.constellation.observation.coverage.CoverageReference;
+import org.constellation.observation.coverage.CoverageTableModel;
 
 
 /**
@@ -81,7 +81,7 @@ public final class CoveragesWindow extends TopComponent {
 
     /**
      * Objet à informer des changements de la sélection des images. Ces listeners correspondent
-     * à des instances de {@link net.seagis.sie.window.mosaic.MosaicWindow}, et il ne devrait y
+     * à des instances de {@link org.constellation.sie.window.mosaic.MosaicWindow}, et il ne devrait y
      * avoir qu'un seul listener actif à chaque instant.
      */
     private ListSelectionListener listener;

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wcs.v100;
+package org.constellation.wcs.v100;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
     "intervalOrSingleValue"
 })
 @XmlSeeAlso({
-    net.seagis.wcs.v100.RangeSubsetType.AxisSubset.class
+    org.constellation.wcs.v100.RangeSubsetType.AxisSubset.class
     //ValueEnumType.class
 })
 public class ValueEnumBaseType {

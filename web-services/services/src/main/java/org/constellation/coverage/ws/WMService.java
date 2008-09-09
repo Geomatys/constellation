@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.ws;
+package org.constellation.coverage.ws;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -56,46 +56,46 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.ConfigurationKey;
-import net.seagis.catalog.Database;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.WMSWebServiceException;
-import net.seagis.sld.v110.TypeNameType;
-import net.seagis.sld.v110.DescribeLayerResponseType;
-import net.seagis.sld.v110.LayerDescriptionType;
-import net.seagis.sld.v110.StyledLayerDescriptor;
-import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.web.WebServiceWorker;
-import net.seagis.coverage.web.ServiceVersion;
-import net.seagis.gml.v311.DirectPositionType;
-import net.seagis.gml.v311.PointType;
-import net.seagis.se.OnlineResourceType;
-import net.seagis.util.PeriodUtilities;
-import net.seagis.wms.AbstractWMSCapabilities;
-import net.seagis.wms.AbstractDCP;
-import net.seagis.wms.AbstractDimension;
-import net.seagis.wms.AbstractLayer;
-import net.seagis.wms.AbstractRequest;
-import net.seagis.wms.AbstractOperation;
-import net.seagis.wms.AbstractProtocol;
-import net.seagis.wms.v111.LatLonBoundingBox;
-import net.seagis.wms.v130.OperationType;
-import net.seagis.wms.v130.EXGeographicBoundingBox;
-import net.seagis.coverage.metadata.LayerMetadata;
-import net.seagis.coverage.metadata.SeriesMetadata;
-import net.seagis.coverage.metadata.LayerMetadataTable;
-import net.seagis.coverage.metadata.PointOfContact;
-import net.seagis.coverage.metadata.PointOfContactTable;
-import net.seagis.coverage.metadata.SeriesMetadataTable;
-import net.seagis.provider.NamedLayerDP;
-import net.seagis.provider.postgrid.PostGridNamedLayerDP;
-import net.seagis.query.StringParser;
-import net.seagis.query.WMSQuery;
-import net.seagis.worker.WMSWorker;
-import net.seagis.ws.rs.WebService;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.WMSWebServiceException;
+import org.constellation.sld.v110.TypeNameType;
+import org.constellation.sld.v110.DescribeLayerResponseType;
+import org.constellation.sld.v110.LayerDescriptionType;
+import org.constellation.sld.v110.StyledLayerDescriptor;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.coverage.web.WebServiceWorker;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.PointType;
+import org.constellation.se.OnlineResourceType;
+import org.constellation.util.PeriodUtilities;
+import org.constellation.wms.AbstractWMSCapabilities;
+import org.constellation.wms.AbstractDCP;
+import org.constellation.wms.AbstractDimension;
+import org.constellation.wms.AbstractLayer;
+import org.constellation.wms.AbstractRequest;
+import org.constellation.wms.AbstractOperation;
+import org.constellation.wms.AbstractProtocol;
+import org.constellation.wms.v111.LatLonBoundingBox;
+import org.constellation.wms.v130.OperationType;
+import org.constellation.wms.v130.EXGeographicBoundingBox;
+import org.constellation.coverage.metadata.LayerMetadata;
+import org.constellation.coverage.metadata.SeriesMetadata;
+import org.constellation.coverage.metadata.LayerMetadataTable;
+import org.constellation.coverage.metadata.PointOfContact;
+import org.constellation.coverage.metadata.PointOfContactTable;
+import org.constellation.coverage.metadata.SeriesMetadataTable;
+import org.constellation.provider.NamedLayerDP;
+import org.constellation.provider.postgrid.PostGridNamedLayerDP;
+import org.constellation.query.StringParser;
+import org.constellation.query.WMSQuery;
+import org.constellation.worker.WMSWorker;
+import org.constellation.ws.rs.WebService;
+import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 //geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
@@ -131,7 +131,7 @@ public class WMService extends WebService {
     /**
      * A list of layer initialized a begining;
      */
-    private Set<net.seagis.coverage.catalog.Layer> layerList;
+    private Set<org.constellation.coverage.catalog.Layer> layerList;
 
     /**
      * The object whitch made all the operation on the postgrid database
@@ -248,7 +248,7 @@ public class WMService extends WebService {
         ensureWorkerInitialized();
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("net.seagis.coverage.web:net.seagis.wms.v111:net.seagis.wms.v130:net.seagis.sld.v110:net.seagis.gml.v311",
+        setXMLContext("org.constellation.coverage.web:org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.sld.v110:org.constellation.gml.v311",
                       "http://www.opengis.net/wms");
 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
@@ -508,7 +508,7 @@ public class WMService extends WebService {
      *
      * @return text, HTML , XML or GML code.
      *
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      */
     private Response getFeatureInfo() throws WebServiceException, JAXBException {
         LOGGER.info("getFeatureInfo request received");
@@ -699,7 +699,7 @@ public class WMService extends WebService {
      *
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
     private Response getCapabilities() throws WebServiceException, JAXBException {
@@ -785,7 +785,7 @@ public class WMService extends WebService {
                     double maxy = +90d;
                     LatLonBoundingBox bbox = new LatLonBoundingBox(minx, miny, maxx, maxy);
                     
-                    outputLayer = new net.seagis.wms.v111.Layer(name,title,desc,crs,bbox,subLayers);
+                    outputLayer = new org.constellation.wms.v111.Layer(name,title,desc,crs,bbox,subLayers);
                 }
 
                 else{
@@ -795,7 +795,7 @@ public class WMService extends WebService {
                     double southBoundLatitude = -90d;
                     double northBoundLatitude = +90d;
                     EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude);
-                    outputLayer = new net.seagis.wms.v130.Layer(name,title,desc,crs,bbox,subLayers);
+                    outputLayer = new org.constellation.wms.v130.Layer(name,title,desc,crs,bbox,subLayers);
                 }
                 
                 if(outputLayer != null){
@@ -808,7 +808,7 @@ public class WMService extends WebService {
         //----------------------------------------------------------------------
         
         
-        for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
+        for (org.constellation.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {
                     LOGGER.info("layer" + inputLayer.getName() + " not queryable by WMS");
@@ -843,9 +843,9 @@ public class WMService extends WebService {
                     defaut = df.format(dates.last());
 
                     if (getCurrentVersion().toString().endsWith("1.1.1"))
-                        dim = new net.seagis.wms.v111.Dimension("time", "ISO8601", defaut, null);
+                        dim = new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null);
                     else
-                        dim = new net.seagis.wms.v130.Dimension("time", "ISO8601", defaut, null);
+                        dim = new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
 
                     value = periodFormatter.getDatesRespresentation(dates);
                     dim.setValue(value);
@@ -859,9 +859,9 @@ public class WMService extends WebService {
                     defaut = elevations.first().toString();
 
                     if (getCurrentVersion().toString().endsWith("1.1.1"))
-                        dim = new net.seagis.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null);
+                        dim = new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null);
                     else
-                        dim = new net.seagis.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
+                        dim = new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                     value = "";
                     for (Number n:elevations){
                         value += n.toString() + ',';
@@ -881,9 +881,9 @@ public class WMService extends WebService {
                         unit = u.toString();
 
                     if (getCurrentVersion().toString().endsWith("1.1.1"))
-                        dim = new net.seagis.wms.v111.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
+                        dim = new org.constellation.wms.v111.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     else
-                        dim = new net.seagis.wms.v130.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
+                        dim = new org.constellation.wms.v130.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     dimensions.add(dim);
                 }
 
@@ -896,9 +896,9 @@ public class WMService extends WebService {
                      * TODO
                      * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
                      */
-                    net.seagis.wms.v111.BoundingBox outputBBox = null;
+                    org.constellation.wms.v111.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new net.seagis.wms.v111.BoundingBox("EPSG:" + code.toString(),
+                        outputBBox = new org.constellation.wms.v111.BoundingBox("EPSG:" + code.toString(),
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -908,14 +908,14 @@ public class WMService extends WebService {
                     }
 
                     // we build a Style Object
-                    net.seagis.wms.v111.OnlineResource or    = new net.seagis.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
-                    net.seagis.wms.v111.LegendURL legendURL1 = new net.seagis.wms.v111.LegendURL("image/png", or);
+                    org.constellation.wms.v111.OnlineResource or    = new org.constellation.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                    org.constellation.wms.v111.LegendURL legendURL1 = new org.constellation.wms.v111.LegendURL("image/png", or);
 
-                    or = new net.seagis.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
-                    net.seagis.wms.v111.LegendURL legendURL2 = new net.seagis.wms.v111.LegendURL("image/gif", or);
-                    net.seagis.wms.v111.Style style          = new net.seagis.wms.v111.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
+                    or = new org.constellation.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                    org.constellation.wms.v111.LegendURL legendURL2 = new org.constellation.wms.v111.LegendURL("image/gif", or);
+                    org.constellation.wms.v111.Style style          = new org.constellation.wms.v111.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
 
-                    outputLayer = new net.seagis.wms.v111.Layer(inputLayer.getName(),
+                    outputLayer = new org.constellation.wms.v111.Layer(inputLayer.getName(),
                                                                 cleanSpecialCharacter(inputLayer.getRemarks()),
                                                                 cleanSpecialCharacter(inputLayer.getThematic()),
                                                                 crs,
@@ -934,9 +934,9 @@ public class WMService extends WebService {
                      * TODO
                      * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
                      */
-                    net.seagis.wms.v130.BoundingBox outputBBox = null;
+                    org.constellation.wms.v130.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new net.seagis.wms.v130.BoundingBox("EPSG:" + code.toString(),
+                        outputBBox = new org.constellation.wms.v130.BoundingBox("EPSG:" + code.toString(),
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -946,15 +946,15 @@ public class WMService extends WebService {
                     }
 
                     // we build a Style Object
-                    net.seagis.wms.v130.OnlineResource or    = new net.seagis.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
-                    net.seagis.wms.v130.LegendURL legendURL1 = new net.seagis.wms.v130.LegendURL("image/png", or);
+                    org.constellation.wms.v130.OnlineResource or    = new org.constellation.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                    org.constellation.wms.v130.LegendURL legendURL1 = new org.constellation.wms.v130.LegendURL("image/png", or);
 
-                    or = new net.seagis.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
-                    net.seagis.wms.v130.LegendURL legendURL2 = new net.seagis.wms.v130.LegendURL("image/gif", or);
-                    net.seagis.wms.v130.Style style          = new net.seagis.wms.v130.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
+                    or = new org.constellation.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                    org.constellation.wms.v130.LegendURL legendURL2 = new org.constellation.wms.v130.LegendURL("image/gif", or);
+                    org.constellation.wms.v130.Style style          = new org.constellation.wms.v130.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
 
 
-                    outputLayer = new net.seagis.wms.v130.Layer(inputLayer.getName(),
+                    outputLayer = new org.constellation.wms.v130.Layer(inputLayer.getName(),
                                                                 cleanSpecialCharacter(inputLayer.getRemarks()),
                                                                 cleanSpecialCharacter(inputLayer.getThematic()),
                                                                 crs,
@@ -988,14 +988,14 @@ public class WMService extends WebService {
         //we build the general layer and add it to the document
         AbstractLayer mainLayer;
         if (getCurrentVersion().toString().equals("1.1.1")) {
-            mainLayer = new net.seagis.wms.v111.Layer("Seagis Web Map Layer",
+            mainLayer = new org.constellation.wms.v111.Layer("Seagis Web Map Layer",
                                                       "description of the service(need to be fill)",
                                                        crs,
                                                        null,
                                                        layers);
         // version 1.3.0
         } else {
-            mainLayer = new net.seagis.wms.v130.Layer("Seagis Web Map Layer",
+            mainLayer = new org.constellation.wms.v130.Layer("Seagis Web Map Layer",
                                                       "description of the service(need to be fill)",
                                                        crs,
                                                        null,
@@ -1024,7 +1024,7 @@ public class WMService extends WebService {
     /**
      *
      * @return
-     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
     private String describeLayer() throws WebServiceException, JAXBException {
@@ -1107,7 +1107,7 @@ public class WMService extends WebService {
     private void updateExtendedOperationURL(AbstractRequest request) {
 
         if (getCurrentVersion().toString().equals("1.3.0")) {
-            net.seagis.wms.v130.Request r = (net.seagis.wms.v130.Request) request;
+            org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
             List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
             for(JAXBElement<OperationType> extOp: extendedOperations) {
                 updateURL(extOp.getValue().getDCPType());
@@ -1115,7 +1115,7 @@ public class WMService extends WebService {
 
         // version 1.1.1
         } else {
-           net.seagis.wms.v111.Request r = (net.seagis.wms.v111.Request) request;
+           org.constellation.wms.v111.Request r = (org.constellation.wms.v111.Request) request;
            AbstractOperation op = r.getDescribeLayer();
            if (op != null)
                 updateURL(op.getDCPType());

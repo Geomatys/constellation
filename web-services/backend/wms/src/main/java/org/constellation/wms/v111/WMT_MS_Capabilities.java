@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.wms.v111;
+package org.constellation.wms.v111;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,9 +22,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wms.AbstractLayer;
-import net.seagis.wms.AbstractService;
-import net.seagis.wms.AbstractWMSCapabilities;
+import org.constellation.wms.AbstractLayer;
+import org.constellation.wms.AbstractService;
+import org.constellation.wms.AbstractWMSCapabilities;
 
 
 /**
