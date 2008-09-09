@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.constellation.sie
-OpenIDE-Module-Layer: org/constellation/sie/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/constellation/sie/Bundle.properties
-OpenIDE-Module-Specification-Version: 0.1
-
-Name: org/constellation/sie/type/bbox/Loader.class
-OpenIDE-Module-Class: Loader
-

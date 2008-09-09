@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Global configuration of SeaGIS project. Every files in this project shoud
+  Global configuration of Constellation project. Every files in this project shoud
   comply to the following rules:
 
   - Directory structures must comply to Maven 2 conventions.
@@ -619,7 +619,7 @@
 
 
   <!--
-    All SeaGIS modules.
+    All Constellation modules.
   -->
   <modules>
     <module>analytics</module>
