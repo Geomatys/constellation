@@ -17,7 +17,6 @@
 package org.constellation.provider;
 
 import java.io.File;
-import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +27,8 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
+import org.constellation.provider.postgrid.PostGridNamedLayerDP;
+import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
 import org.constellation.ws.rs.WebService;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
@@ -55,8 +56,8 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
             dps.add(shapeDP);
         }
                 
-//        PostGridNamedLayerDP postGridDP = PostGridNamedLayerDP.getDefault();
-//        dps.add(postGridDP);
+        PostGridNamedLayerDP postGridDP = PostGridNamedLayerDP.getDefault();
+        dps.add(postGridDP);
     }
     
     /**
@@ -162,9 +163,7 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
         }catch(NamingException ex){
             Logger.getLogger(NamedStyleDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SHAPEFILE_DP);
         }
-        
-//        strFolders = "/home/sorel/GIS_DATA/GIS/DCW_Europe_North-Asia_shp;/home/sorel/GIS_DATA/data-wms-1.3.0/shapefile";
-        
+                
         StringTokenizer token = new StringTokenizer(strFolders, ";", false);
         while(token.hasMoreElements()){
             String path = token.nextToken();

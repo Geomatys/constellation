@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -32,24 +34,27 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
-import org.constellation.provider.DataProvider;
+import org.constellation.provider.LayerDataProvider;
+
 import org.geotools.map.MapLayer;
+import org.geotools.style.MutableStyle;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridNamedLayerDP implements DataProvider<String,MapLayer>{
+public class PostGridNamedLayerDP implements LayerDataProvider<String,MapLayer>{
 
     private static PostGridNamedLayerDP instance = null;
     
-    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
+    protected static final Logger logger = Logger.getLogger("net.seagis.provider.postgrid");
     
     protected static Database database;
     static {
@@ -175,11 +180,9 @@ public class PostGridNamedLayerDP implements DataProvider<String,MapLayer>{
         }
     }
 
-    
     //--------------------------------------------------------------------------
     
     private final Map<String,Layer> index = new HashMap<String,Layer>();
-    
     
     private PostGridNamedLayerDP(){
         visit();
@@ -282,13 +285,20 @@ public class PostGridNamedLayerDP implements DataProvider<String,MapLayer>{
         
         return layer;
     }
-        
- 
+    
     public static PostGridNamedLayerDP getDefault(){
         if(instance == null){
             instance = new PostGridNamedLayerDP();
         }
         return instance;
+    }
+
+    public MapLayer get(String layerName, MutableStyle style) {
+        return get(layerName);
+    }
+
+    public List<String> getFavoriteStyles(String layerName) {
+        return Collections.emptyList();
     }
     
     

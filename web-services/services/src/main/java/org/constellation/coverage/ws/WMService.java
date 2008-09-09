@@ -333,44 +333,19 @@ public class WMService extends WebService {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
         
-        final String strLayers = getParameter("LAYERS", true);
-        
-        // TODO Handle PostGrid layer within the renderer ----------------------
-        final StringParser parser = new StringParser();
-        final List<String> layers = parser.toLayers(strLayers);
-        final NamedLayerDP layerDP = NamedLayerDP.getInstance();
-        boolean onlyPostGrid = true;
-        for(String key : layers){
-            if(layerDP.contains(key)){
-                onlyPostGrid = false;
-                break;
-            }
-        }
-        String strSLD = getParameter("SLD", false);
-        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
-        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
-        MutableStyledLayerDescriptor sld = parser.toSLD(strSLD);
-        if(sld != null || remoteOwsType != null || remoteOwsUrl != null){
-            //if an SLD has been given we use the go renderer.
-            onlyPostGrid = false;
+        //Set to true if you want to use the new GO2 renderer-------------------
+        if(false){
+            return getGo2RendererMap();
         }
         
-        
-        
-        
-        //if no layer are postgrid then we use the vector renderer
-        if(!onlyPostGrid){
-            return getVectorMap();
-        }
-        
-        //----------------------------------------------------------------------
+        // Previous SEAGIS renderer, only PostGrid support----------------------
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
     
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setFormat(getParameter("FORMAT", true));
-        webServiceWorker.setLayer(strLayers);
+        webServiceWorker.setLayer(getParameter("LAYERS", true));
         webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
 
         String crs;
@@ -406,7 +381,7 @@ public class WMService extends WebService {
      * @return
      * @throws fr.geomatys.wms.WebServiceException
      */
-    private File getVectorMap() throws  WebServiceException {
+    private File getGo2RendererMap() throws  WebServiceException {
         final WMSWorker worker = new WMSWorker();
         final StringParser parser = new StringParser();
 
