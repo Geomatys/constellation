@@ -55,7 +55,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      * {@code true} for disabling tests. Useful for disabling every tests except one
      * during debugging.
      */
-    private static final boolean DISABLED = true;
+    private static final boolean DISABLED = false;
 
     /**
      * Tests with the default test layer.
@@ -380,7 +380,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testOrtho2000() throws WebServiceException, IOException {
-        //if (DISABLED) return;
+        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1.1");
         worker.setLayer("Ortho2000");
@@ -402,9 +402,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(424, image.getHeight());
         /*
          * Following was used to miss a tile (need visual check - look for black area).
-         * BBOX demandée: 49°18'28,0"N, 01°02'43,1"W - 49°18'09,2"N, 01°02'03,3"W
-         * BBOX utilisée: 49°18'29,7"N, 01°02'43,2"W - 49°18'08,4"N, 01°01'57,4"W
-         * BBOX obtenue:  49°18'31,3"N, 01°02'41,5"W - 49°18'07,5"N, 01°01'52,9"W
          */
         worker.setBoundingBox("353875.689453, 2483613.235058, 354658.434904, 2484162.711997");
         image = ImageIO.read(worker.getImageFile());
@@ -421,15 +418,15 @@ public class WebServiceWorkerTest extends DatabaseTest {
      * @todo Disabled for now.
      */
     @Test
+    @Ignore
     public void testPermissions() throws WebServiceException, IOException {
-        if (true) return;
-
+        if (true) return; // @Ignore above is not enough.
         if (DISABLED) return;
 
         // First Case we test with an "Anonymous" user.
         database.setProperty(ConfigurationKey.PERMISSION, "Anonymous");
 
-        //Blue Marble is Public so we can see it in WCS and WMS
+        // Blue Marble is Public so we can see it in WCS and WMS
 
         // for a request WS/wms?bbox=-33.52649,25.033113,-25.927152,31.142384&format=image/png&service=wms&version=1.1.1&request=GetMap&layers=AO_Coriolis_(Sal)&time=2007-06-20T12:00:00Z&srs=EPSG:4326&width=608&height=428&styles=dd
         final WebServiceWorker worker = new WebServiceWorker(database, false);
@@ -455,7 +452,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
 
-        //we test with the WCS
+        // Test with the WCS
         // corresponding to the following request
         ///WS/wcs?bbox=-33.52649,25.033113,-25.927152,31.142384,5.0,5.0&format=image/png&service=wcs&version=1.0.0&request=GetCoverage&coverage=AO_Coriolis_(Sal)&time=2007-06-20T12:00:00Z&crs=EPSG:4326&width=608&height=428
 
@@ -472,8 +469,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
 
-
-       // Mars3D Ligure (XE) is Download so only WCS for anonymous user.
+        // Mars3D Ligure (XE) is Download so only WCS for anonymous user.
 
         worker.setService("WCS", "1.0.0");
         worker.setBoundingBox("-33.52649,25.033113,-25.927152,31.142384");
@@ -488,7 +484,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
 
-        //WMS must not work
+        // WMS is not expected to be allowed.
         worker.setService("WMS", "1.1");
         worker.setLayer("AO_Coriolis_(Temp)");
         worker.setCoordinateReferenceSystem("EPSG:4326");

@@ -55,16 +55,21 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.opengis.geometry.DirectPosition;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.opengis.coverage.Coverage;
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.geometry.DirectPosition;
 
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
@@ -73,6 +78,8 @@ import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridGeometry;
+import org.geotools.coverage.SpatioTemporalCoverage3D;
+import org.geotools.referencing.CRS;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.util.NumberRange;
@@ -95,11 +102,6 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
-import org.geotools.coverage.SpatioTemporalCoverage3D;
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.Coverage;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 
@@ -199,6 +201,19 @@ public abstract class ImageProducer {
      * The envelope of current layer, including its CRS.
      */
     protected GeneralEnvelope envelope;
+
+    /**
+     * The CRS of the query, or {@code null} if not specified. In theory it should be the same one
+     * than the {@linkplain #envelope} CRS. In practice they sometime have different axis order and
+     * {@code TOWGS84} element because of difference between the EPSG database and the PostGIS
+     * {@code "spatial_ref_sys"} table. The envelope CRS should be the one specified in the EPSG
+     * database, while {@code queryCRS} is the same CRS as specified in the PostGIS table.
+     * <p>
+     * Be aware that {@code queryCRS} may have wrong axis order. The envelope CRS is the
+     * authoritative one. This {@code queryCRS} may be understood as the CRS to use for
+     * submitting the query to the PostGrid database.
+     */
+    protected CoordinateReferenceSystem queryCRS;
 
     /**
      * The CRS of the response, or {@code null} if not specified.
@@ -638,8 +653,18 @@ public abstract class ImageProducer {
                 throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
                         LAYER_NOT_DEFINED, version);
             }
+            GeneralEnvelope queryEnvelope = envelope;
+            if (queryCRS != null) try {
+                // Make sure we are using the same CRS than the one declared in the PostGIS database.
+                // It may be slightly different in TOWGS84 elements and axis order.
+                queryEnvelope = (GeneralEnvelope) CRS.transform(queryEnvelope, queryCRS);
+                queryEnvelope.setCoordinateReferenceSystem(queryCRS);
+            } catch (TransformException e) {
+                // Keep the previous queryEnvelope. It will work, maybe with reduced accuracy.
+                Logging.recoverableException(ImageProducer.class, "getLayer", e);
+            }
             final LayerRequest request = new LayerRequest(entry,
-                    table.getCoordinateReferenceSystem(), envelope, gridRange);
+                    table.getCoordinateReferenceSystem(), queryEnvelope, gridRange);
             synchronized (layers) {
                 candidate = layers.get(request);
                 if (candidate == null) {
@@ -1304,7 +1329,7 @@ public abstract class ImageProducer {
 
     /**
      * Return the geographic coordinate of a point.
-     * This method must be call after evaluatePixel(...) in a getFeatureInfo request.
+     * This method can be invoked after evaluatePixel(...) in a getFeatureInfo request.
      */
     @Deprecated
     public DirectPosition getCoordinates() {

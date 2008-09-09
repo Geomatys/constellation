@@ -17,8 +17,8 @@
 package org.constellation.coverage.web;
 
 import java.awt.Color;
-import java.io.*;
 import java.util.*;
+import java.sql.SQLException;
 import java.text.ParseException;
 import javax.imageio.ImageIO;
 import javax.media.jai.Interpolation;
@@ -29,14 +29,17 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.util.Utilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import org.constellation.catalog.Database;
+import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.wms.WMSExceptionCode;
 import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 
@@ -79,6 +82,11 @@ public class WebServiceWorker extends ImageProducer {
      * {@code "nosd"} is for <cite>no scale down</cite> from 16 to 8 bits.
      */
     private static final String NO_SCALE_DOWN = "-nosd";
+
+    /**
+     * Last CRS code. Used in order to detect changes.
+     */
+    private transient String srid;
 
     /**
      * List of valid formats. Will be created only when first needed.
@@ -232,6 +240,12 @@ public class WebServiceWorker extends ImageProducer {
      * @throws WebServiceException if no CRS object can be built from the given code.
      */
     public void setCoordinateReferenceSystem(final String code) throws WebServiceException {
+        if (Utilities.equals(code, srid)) {
+            // No change. Avoid querying the database again.
+            return;
+        }
+        srid = null;
+        queryCRS = null;
         clearGridGeometry();
         if (code == null) {
             envelope = null;
@@ -240,6 +254,16 @@ public class WebServiceWorker extends ImageProducer {
         final CoordinateReferenceSystem crs = decodeCRS(code);
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
+        try {
+            queryCRS = getLayerTable(true).getSpatialReferenceSystem(code);
+        } catch (SQLException e) {
+            throw new WMSWebServiceException(e, WMSExceptionCode.NO_APPLICABLE_CODE, version);
+        } catch (CatalogException e) {
+            throw new WMSWebServiceException(e, WMSExceptionCode.NO_APPLICABLE_CODE, version);
+        } catch (FactoryException e) {
+            queryCRS = crs;
+        }
+        srid = code; // Retain only on success.
     }
 
     /**
@@ -340,10 +364,10 @@ public class WebServiceWorker extends ImageProducer {
         double resolutionX = parseDouble(resx);
         double resolutionY = parseDouble(resy);
         final int[] upper = new int[] {
-            (int) Math.round(envelope.getLength(0) / resolutionX),
-            (int) Math.round(envelope.getLength(1) / resolutionY)
+            (int) Math.round(envelope.getSpan(0) / resolutionX),
+            (int) Math.round(envelope.getSpan(1) / resolutionY)
         };
-        gridRange = new GeneralGridRange(new int[upper.length], upper);
+        gridRange = new GeneralGridEnvelope(new int[upper.length], upper, false);
     }
 
     /**
@@ -366,7 +390,7 @@ public class WebServiceWorker extends ImageProducer {
             parseInt("width",  width),
             parseInt("height", height)
         };
-        gridRange = new GeneralGridRange(new int[upper.length], upper);
+        gridRange = new GeneralGridEnvelope(new int[upper.length], upper, false);
     }
 
     /**
