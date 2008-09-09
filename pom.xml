@@ -24,7 +24,7 @@
     liens brisés dans les pages qui seront générées et pour permettre à
     Continuum de fonctionner.
   -->
-  <groupId>net.seagis</groupId>
+  <groupId>org.constellation</groupId>
   <artifactId>seagis</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
@@ -487,28 +487,28 @@
             <link>http://javadoc.geotools.fr/snapshot</link>
             <link>http://jscience.org/api/</link>
           </links>
-          <excludePackageNames>net.seagis.resources</excludePackageNames>
+          <excludePackageNames>org.constellation.resources</excludePackageNames>
           <!-- Separates packages on the overview page into whatever groups is specified. -->
           <groups>
             <group>
               <title>PostGrid</title>
-              <packages>net.seagis.catalog*:net.seagis.coverage*:net.seagis.image*</packages>
+              <packages>org.constellation.catalog*:org.constellation.coverage*:org.constellation.image*</packages>
             </group>
             <group>
               <title>Web Services</title>
-              <packages>net.seagis.wms*</packages>
+              <packages>org.constellation.wms*</packages>
             </group>
             <group>
               <title>Graphical interfaces</title>
-              <packages>net.seagis.gui*</packages>
+              <packages>org.constellation.gui*</packages>
             </group>
             <group>
               <title>Numerical</title>
-              <packages>net.seagis.numeric*</packages>
+              <packages>org.constellation.numeric*</packages>
             </group>
             <group>
               <title>Observations</title>
-              <packages>net.seagis.observation*</packages>
+              <packages>org.constellation.observation*</packages>
             </group>
           </groups>
           <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in

@@ -8,7 +8,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>net.seagis</groupId>
+    <groupId>org.constellation</groupId>
     <artifactId>analytics</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
@@ -18,7 +18,7 @@
   <!--
     Description du module.
   -->
-  <groupId>net.seagis</groupId>
+  <groupId>org.constellation</groupId>
   <artifactId>statistics</artifactId>
   <packaging>jar</packaging>
   <name>Statistics</name>
@@ -53,7 +53,7 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>net.seagis</groupId>
+      <groupId>org.constellation</groupId>
       <artifactId>observation</artifactId>
       <version>${project.version}</version>
     </dependency>
