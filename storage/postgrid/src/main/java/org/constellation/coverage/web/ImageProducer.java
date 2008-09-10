@@ -655,9 +655,20 @@ public abstract class ImageProducer {
             }
             GeneralEnvelope queryEnvelope = envelope;
             if (queryCRS != null) try {
-                // Make sure we are using the same CRS than the one declared in the PostGIS database.
-                // It may be slightly different in TOWGS84 elements and axis order.
-                queryEnvelope = (GeneralEnvelope) CRS.transform(queryEnvelope, queryCRS);
+                /*
+                 * Make sure we are using the same CRS than the one declared in the PostGIS database.
+                 * It may have slightly different TOWGS84 element and axis order. We perform this step
+                 * inconditionnaly, even if the transform is the identity transform (which is usually
+                 * the case - so we create inconditionnaly a new GeneralEnvelope for making sure we
+                 * don't modify the original envelope), because we need to set the queryEnvelope CRS
+                 * to queryCRS. PostGrid will transform this envelope using CRS read from the PostGIS
+                 * table, so the CRS must match. If we don't do so, the coverage returned by PostGrid
+                 * may be slightly translated (~100 meters) compared to the image requested.
+                 *
+                 * TODO: We should computes this queryEnvelope only once when the original envelope
+                 *       is defined.
+                 */
+                queryEnvelope = new GeneralEnvelope(CRS.transform(queryEnvelope, queryCRS));
                 queryEnvelope.setCoordinateReferenceSystem(queryCRS);
             } catch (TransformException e) {
                 // Keep the previous queryEnvelope. It will work, maybe with reduced accuracy.
