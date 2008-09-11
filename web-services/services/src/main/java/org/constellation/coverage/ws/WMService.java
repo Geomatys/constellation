@@ -17,18 +17,25 @@
  */
 package org.constellation.coverage.ws;
 
+import com.sun.jersey.spi.resource.Singleton;
+
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.StringWriter;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -38,25 +45,18 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.measure.unit.Unit;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
-import com.sun.jersey.spi.resource.Singleton;
-
 //Constellation dependencies
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Collections;
-import javax.imageio.ImageIO;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -95,7 +95,6 @@ import org.constellation.query.WMSQueryAdapter;
 import org.constellation.query.WMSQuery;
 import org.constellation.worker.WMSWorker;
 import org.constellation.ws.rs.WebService;
-import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 //geotools dependencies
 import org.geotools.display.service.PortrayalException;
@@ -115,6 +114,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import static org.constellation.coverage.wms.WMSExceptionCode.*;
 import static org.constellation.query.WMSQuery.*;
 
 /**

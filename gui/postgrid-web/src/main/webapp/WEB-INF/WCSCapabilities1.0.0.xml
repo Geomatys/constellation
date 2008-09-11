@@ -1,6 +1,6 @@
 <WCS_Capabilities version="1.0.0" xmlns="http://www.opengis.net/wcs" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://demo6.geomatys.fr:80/geoserver/schemas/wcs/1.0.0/wcsCapabilities.xsd">
 	<Service version="1.0.0">
-    <metadataLink about="http://seagis.sourceforge.net/html/index.php" metadataType="other"/>
+    <metadataLink about="http://www.constellation-sdi.org" metadataType="other"/>
     <description>
       Constellation Web Coverage Server maintained by geomatys.
     </description>
