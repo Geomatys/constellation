@@ -379,7 +379,7 @@ public class WMService extends WebService {
             if(errorInImage){
                 errorFile = createTempFile(query.format);
                 CSTLPortrayalService.writeInImage(ex, query.size.width, query.size.height, errorFile, query.format);
-            }else{
+            } else {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
                 throw new WMSWebServiceException("The requested map could not be renderered correctly :" + ex.getMessage(),
                                               NO_APPLICABLE_CODE, getCurrentVersion());
@@ -387,7 +387,6 @@ public class WMService extends WebService {
         }
 
         if(errorFile != null){
-            System.out.println("Error image not null");
             return errorFile;
         }else{
             return image;

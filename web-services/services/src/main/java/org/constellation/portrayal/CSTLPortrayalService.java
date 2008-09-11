@@ -24,15 +24,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
 
@@ -159,6 +154,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         final int fontHeight = metrics.getHeight();
         final int maxCharPerLine = width / metrics.charWidth('A');
         final String message = e.getMessage();
+        
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, width, height);
         
         g.setColor(Color.RED);
         if(maxCharPerLine < 1){
