@@ -21,13 +21,9 @@ import com.sun.jersey.spi.resource.Singleton;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -35,7 +31,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -45,7 +40,6 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.measure.unit.Unit;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -57,6 +51,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Collections;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -90,6 +87,7 @@ import org.constellation.coverage.metadata.LayerMetadataTable;
 import org.constellation.coverage.metadata.PointOfContact;
 import org.constellation.coverage.metadata.PointOfContactTable;
 import org.constellation.coverage.metadata.SeriesMetadataTable;
+import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.WMSQueryAdapter;
 import org.constellation.query.WMSQuery;
@@ -374,19 +372,27 @@ public class WMService extends WebService {
         final WMSWorker worker = new WMSWorker(query,tempFile);
         
         File image = null;
+        File errorFile = null;
         try {
             image = worker.getMap();
         } catch (PortrayalException ex) {
             if(errorInImage){
-                image = writeInImage(ex, query.size.width, query.size.height, tempFile, query.format);
+                errorFile = createTempFile(query.format);
+                CSTLPortrayalService.writeInImage(ex, query.size.width, query.size.height, errorFile, query.format);
             }else{
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException("The requested map could not be renderered correctly, ",
+                throw new WMSWebServiceException("The requested map could not be renderered correctly :" + ex.getMessage(),
                                               NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
 
-        return image;
+        if(errorFile != null){
+            System.out.println("Error image not null");
+            return errorFile;
+        }else{
+            return image;
+        }
+        
     }
     
     /**
@@ -1115,7 +1121,8 @@ public class WMService extends WebService {
                 ending = ".png";
             }
             
-            f = File.createTempFile("temp", ending);
+            f = File.createTempFile("map", ending);
+            f.deleteOnExit();
         } catch (IOException ex) {
             Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1123,20 +1130,6 @@ public class WMService extends WebService {
         return f;
     }
     
-    private File writeInImage(Exception e, int width, int height, File output, String type){
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        
-        Graphics2D g = img.createGraphics();
-        g.setColor(Color.RED);
-        g.drawString(e.getMessage(), 10, height/2);
-        g.dispose();
-        
-        try {
-            ImageIO.write(img, type, output);
-        } catch (IOException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return output;
-    }
+    
     
 }

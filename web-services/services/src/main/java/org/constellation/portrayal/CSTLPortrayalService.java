@@ -18,8 +18,21 @@ package org.constellation.portrayal;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
 
@@ -136,5 +149,48 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         return null;
     }
 
+    public static synchronized File writeInImage(Exception e, int width, int height, File output, String mime){
+        Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.WARNING, "Error image created : " + output,e);
+        
+        final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);        
+        final Graphics2D g = img.createGraphics();
+        final Font f = new Font("Dialog",Font.BOLD,12);
+        final FontMetrics metrics = g.getFontMetrics(f);
+        final int fontHeight = metrics.getHeight();
+        final int maxCharPerLine = width / metrics.charWidth('A');
+        final String message = e.getMessage();
+        
+        g.setColor(Color.RED);
+        if(maxCharPerLine < 1){
+            //not enough space to draw error, simply use a red background
+            g.setColor(Color.RED);
+            g.fillRect(0, 0, width, height);
+        }else{
+            int y = fontHeight;
+            String remain = message;
+
+            while(!remain.isEmpty()){
+                int lastChar = (maxCharPerLine > remain.length()) ? remain.length() : maxCharPerLine;
+                String oneLine = remain.substring(0, lastChar);
+                remain = remain.substring(lastChar);
+                g.drawString(oneLine, 2, y);
+                y += fontHeight ;
+                if(y > height){
+                    //we are out of the painting area, no need to draw more text.
+                    break;
+                }
+            }
+        }
+        g.dispose();
+        
+        
+        try {
+            writeImage(img, mime, output);
+        } catch (IOException ex) {
+            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return output;
+    }
+    
 
 }
