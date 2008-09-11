@@ -54,16 +54,18 @@ import org.opengis.filter.Or;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryLogicOpType", propOrder = {
-    "operators"
+    "comparisonOps",
+    "logicOps",
+    "spatialOps"
 })
 public class BinaryLogicOpType extends LogicOpsType {
 
-    @XmlElementRefs({
-        @XmlElementRef(name = "comparisonOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
-        @XmlElementRef(name = "spatialOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
-        @XmlElementRef(name = "logicOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
-    })
-    private List<JAXBElement<?>> operators;
+    @XmlElementRef(name = "comparisonOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+    private List<JAXBElement<? extends ComparisonOpsType>> comparisonOps;
+    @XmlElementRef(name = "spatialOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+    private List<JAXBElement<? extends SpatialOpsType>> spatialOps;
+    @XmlElementRef(name = "logicOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+    private List<JAXBElement<? extends LogicOpsType>> logicOps;
 
     /**
      * an transient ogc factory to build JAXBelement
@@ -82,66 +84,69 @@ public class BinaryLogicOpType extends LogicOpsType {
       * Build a new Binary logic operator 
       */
      public BinaryLogicOpType(Object... operators) {
-         this.operators = new ArrayList<JAXBElement<?>>();
+         this.comparisonOps = new ArrayList<JAXBElement<? extends ComparisonOpsType>>();
+         this.logicOps      = new ArrayList<JAXBElement<? extends LogicOpsType>>();
+         this.spatialOps    = new ArrayList<JAXBElement<? extends SpatialOpsType>>();
+         
          for (Object obj: operators) {
              
              // comparison operator
              if (obj instanceof PropertyIsLessThanOrEqualToType) {
-                 this.operators.add(factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType)obj));
              } else if (obj instanceof PropertyIsLessThanType) {
-                 this.operators.add(factory.createPropertyIsLessThan((PropertyIsLessThanType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsLessThan((PropertyIsLessThanType)obj));
              } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
-                 this.operators.add(factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType)obj));
              } else if (obj instanceof PropertyIsNotEqualToType) {
-                 this.operators.add(factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType)obj));
              } else if (obj instanceof PropertyIsGreaterThanType) {
-                 this.operators.add(factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType)obj));
              } else if (obj instanceof PropertyIsEqualToType) {
-                 this.operators.add(factory.createPropertyIsEqualTo((PropertyIsEqualToType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsEqualTo((PropertyIsEqualToType)obj));
              } else if (obj instanceof PropertyIsNullType) {
-                 this.operators.add(factory.createPropertyIsNull((PropertyIsNullType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsNull((PropertyIsNullType)obj));
              } else if (obj instanceof PropertyIsBetweenType) {
-                 this.operators.add(factory.createPropertyIsBetween((PropertyIsBetweenType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsBetween((PropertyIsBetweenType)obj));
              } else if (obj instanceof PropertyIsLikeType) {
-                 this.operators.add(factory.createPropertyIsLike((PropertyIsLikeType)obj));
+                 this.comparisonOps.add(factory.createPropertyIsLike((PropertyIsLikeType)obj));
              } else if (obj instanceof ComparisonOpsType) {
-                 this.operators.add(factory.createComparisonOps((ComparisonOpsType)obj));
+                 this.comparisonOps.add(factory.createComparisonOps((ComparisonOpsType)obj));
                  
              // logical operator    
              } else if (obj instanceof OrType) {
-                 this.operators.add(factory.createOr((OrType)obj));
+                 this.logicOps.add(factory.createOr((OrType)obj));
              } else if (obj instanceof NotType) {
-                 this.operators.add(factory.createNot((NotType)obj));
+                 this.logicOps.add(factory.createNot((NotType)obj));
              } else if (obj instanceof AndType) {
-                 this.operators.add(factory.createAnd((AndType)obj));
+                 this.logicOps.add(factory.createAnd((AndType)obj));
              } else if (obj instanceof LogicOpsType) {
-                 this.operators.add(factory.createLogicOps((LogicOpsType)obj));
+                 this.logicOps.add(factory.createLogicOps((LogicOpsType)obj));
              
              // spatial operator    
              } else if (obj instanceof BeyondType) {
-                 this.operators.add(factory.createBeyond((DistanceBufferType) obj));
+                 this.spatialOps.add(factory.createBeyond((DistanceBufferType) obj));
              } else if (obj instanceof DWithinType) {
-                 this.operators.add(factory.createDWithin((DistanceBufferType) obj));
+                 this.spatialOps.add(factory.createDWithin((DistanceBufferType) obj));
              } else if (obj instanceof BBOXType) {
-                 this.operators.add(factory.createBBOX((BBOXType) obj));
+                 this.spatialOps.add(factory.createBBOX((BBOXType) obj));
              } else if (obj instanceof ContainsType) {
-                 this.operators.add(factory.createContains((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createContains((BinarySpatialOpType) obj));
              } else if (obj instanceof CrossesType) {
-                 this.operators.add(factory.createCrosses((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createCrosses((BinarySpatialOpType) obj));
              } else if (obj instanceof DisjointType) {
-                 this.operators.add(factory.createDisjoint((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createDisjoint((BinarySpatialOpType) obj));
              } else if (obj instanceof EqualsType) {
-                 this.operators.add(factory.createEquals((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createEquals((BinarySpatialOpType) obj));
              } else if (obj instanceof IntersectsType) {
-                 this.operators.add(factory.createIntersects((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createIntersects((BinarySpatialOpType) obj));
              } else if (obj instanceof OverlapsType) {
-                 this.operators.add(factory.createOverlaps((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createOverlaps((BinarySpatialOpType) obj));
              } else if (obj instanceof TouchesType) {
-                 this.operators.add(factory.createTouches((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createTouches((BinarySpatialOpType) obj));
              } else if (obj instanceof WithinType) {
-                 this.operators.add(factory.createWithin((BinarySpatialOpType) obj));
+                 this.spatialOps.add(factory.createWithin((BinarySpatialOpType) obj));
              } else if (obj instanceof SpatialOpsType) {
-                 this.operators.add(factory.createSpatialOps((SpatialOpsType) obj));
+                 this.spatialOps.add(factory.createSpatialOps((SpatialOpsType) obj));
              
              } else {
                  throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
@@ -150,23 +155,28 @@ public class BinaryLogicOpType extends LogicOpsType {
          
      }
      
-    /**
-     * Gets the value of the comparisonOpsOrSpatialOpsOrLogicOps property.
-     * (unmodifable)
-     */
-    public List<JAXBElement<?>> getOperators() {
-        if (operators == null) {
-            operators = new ArrayList<JAXBElement<?>>();
-        }
-        return Collections.unmodifiableList(operators);
-    }
     
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
-        if (operators != null) {
-            int i = 0; 
-            for (JAXBElement<?> jb: operators) {
+        int i = 0;
+        if (getComparisonOps() != null) {
+            s.append("comparisonOps: ").append('\n');
+            for (JAXBElement<?> jb: getComparisonOps()) {
+                s.append(i).append(": ").append(jb.getValue().toString()).append('\n');
+                i++;        
+            }
+        }
+        if (getLogicOps() != null) {
+            s.append("logicOps: ").append('\n');
+            for (JAXBElement<?> jb: getLogicOps()) {
+                s.append(i).append(": ").append(jb.getValue().toString()).append('\n');
+                i++;        
+            }
+        }
+        if (getSpatialOps() != null) {
+            s.append("spatialOps: ").append('\n');
+            for (JAXBElement<?> jb: getSpatialOps()) {
                 s.append(i).append(": ").append(jb.getValue().toString()).append('\n');
                 i++;        
             }
@@ -176,7 +186,13 @@ public class BinaryLogicOpType extends LogicOpsType {
 
     public List<Filter> getChildren() {
         List<Filter> result = new ArrayList<Filter>();
-        for (JAXBElement jb: operators) {
+        for (JAXBElement jb: getComparisonOps()) {
+            result.add((Filter)jb.getValue());
+        }
+        for (JAXBElement jb: getLogicOps()) {
+            result.add((Filter)jb.getValue());
+        }
+        for (JAXBElement jb: getSpatialOps()) {
             result.add((Filter)jb.getValue());
         }
         return result;
@@ -188,6 +204,30 @@ public class BinaryLogicOpType extends LogicOpsType {
 
     public Object accept(FilterVisitor visitor, Object extraData) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public List<JAXBElement<? extends ComparisonOpsType>> getComparisonOps() {
+        return comparisonOps;
+    }
+
+    public void setComparisonOps(List<JAXBElement<? extends ComparisonOpsType>> comparisonOps) {
+        this.comparisonOps = comparisonOps;
+    }
+
+    public List<JAXBElement<? extends SpatialOpsType>> getSpatialOps() {
+        return spatialOps;
+    }
+
+    public void setSpatialOps(List<JAXBElement<? extends SpatialOpsType>> spatialOps) {
+        this.spatialOps = spatialOps;
+    }
+
+    public List<JAXBElement<? extends LogicOpsType>> getLogicOps() {
+        return logicOps;
+    }
+
+    public void setLogicOps(List<JAXBElement<? extends LogicOpsType>> logicOps) {
+        this.logicOps = logicOps;
     }
 
 }

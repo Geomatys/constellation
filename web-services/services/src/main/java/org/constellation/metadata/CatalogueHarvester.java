@@ -119,6 +119,11 @@ public class CatalogueHarvester {
     private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
     
     /**
+     * a QName for gmd:Dataset type
+     */
+    private final static QName _Dataset_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
+    
+    /**
      * The CSW worker which owe this ctalogue harvester.
      */
     private final CSWworker worker;
@@ -184,8 +189,8 @@ public class CatalogueHarvester {
         
         //we build the base request to harvest another CSW service (2.0.0)
         org.constellation.cat.csw.v200.QueryConstraintType constraint2 = new org.constellation.cat.csw.v200.QueryConstraintType(filter1, "1.1.0");
-        List<String> typeNames2 = new ArrayList<String>();
-        typeNames2.add("csw:dataset");
+        List<QName> typeNames2 = new ArrayList<QName>();
+        typeNames2.add(_Dataset_QNAME);
         org.constellation.cat.csw.v200.QueryType query2 = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
                                                                                          new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                                          constraint2); 
@@ -195,8 +200,8 @@ public class CatalogueHarvester {
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
         constraint2        = new org.constellation.cat.csw.v200.QueryConstraintType(filter2, "1.0.20");
-        typeNames2         = new ArrayList<String>();
-        typeNames2.add("Dataset");
+        typeNames2         = new ArrayList<QName>();
+        typeNames2.add(_Dataset_QNAME);
         query2             = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
                                                                    new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                    constraint2); 

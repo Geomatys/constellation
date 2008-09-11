@@ -16,7 +16,6 @@
  */
 package org.constellation.gml.v311;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,9 +23,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.filter.expression.Expression;
-import org.opengis.geometry.Geometry;
 
 
 /**
@@ -56,7 +54,7 @@ import org.opengis.geometry.Geometry;
 public abstract class AbstractGeometryType extends AbstractGMLEntry implements Expression {
 
     @XmlAttribute
-    private BigInteger srsDimension;
+    private Integer srsDimension;
     @XmlAttribute
     private String srsName;
     @XmlAttribute
@@ -70,7 +68,7 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry implements E
     AbstractGeometryType(){
     }
     
-    public AbstractGeometryType(BigInteger srsDimension, String srsName, List<String> axisLabels, List<String> uomLabels){
+    public AbstractGeometryType(Integer srsDimension, String srsName, List<String> axisLabels, List<String> uomLabels){
         this.axisLabels   = axisLabels;
         this.srsDimension = srsDimension;
         this.srsName      = srsName;
@@ -79,7 +77,7 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry implements E
     /**
      * Gets the value of the srsDimension property.
      */
-    public BigInteger getSrsDimension() {
+    public Integer getSrsDimension() {
         return srsDimension;
     }
 

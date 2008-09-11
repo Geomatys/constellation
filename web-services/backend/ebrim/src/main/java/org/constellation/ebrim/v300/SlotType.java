@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -52,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "SlotType1", propOrder = {
     "valueList"
 })
-public class SlotType1 {
+public class SlotType {
 
     @XmlElementRef(name = "ValueList", namespace = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", type = JAXBElement.class)
     private JAXBElement<? extends ValueListType> valueList;
@@ -60,6 +61,9 @@ public class SlotType1 {
     private String name;
     @XmlAttribute
     private String slotType;
+    
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
 
     /**
      * Gets the value of the valueList property.
@@ -67,12 +71,19 @@ public class SlotType1 {
     public JAXBElement<? extends ValueListType> getValueList() {
         return valueList;
     }
+    
+    /**
+     * Gets the value of the valueList property.
+     */
+    public void setValueList(JAXBElement<? extends ValueListType> valueList) {
+        this.valueList = valueList;
+    }
 
     /**
      * Sets the value of the valueList property.
      */
-    public void setValueList(JAXBElement<? extends ValueListType> value) {
-        this.valueList = ((JAXBElement<? extends ValueListType> ) value);
+    public void setValueList(ValueListType value) {
+        this.valueList = factory.createValueList(value);
     }
 
     /**
@@ -101,6 +112,20 @@ public class SlotType1 {
      */
     public void setSlotType(String value) {
         this.slotType = value;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append('[').append(this.getClass().getSimpleName()).append(']').append('\n');
+        s.append("name: ").append(name).append('\n');
+        if (slotType != null) {
+            s.append("slotType: ").append(slotType).append('\n');
+        }
+        if (valueList != null && valueList.getValue() != null) {
+            s.append("Value list: ").append(valueList.getValue().toString()).append('\n');
+        }
+        return s.toString();
     }
 
 }

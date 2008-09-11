@@ -76,6 +76,7 @@ import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.OWSWebServiceException;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.coverage.web.Service;
+import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.WebService;
@@ -151,6 +152,10 @@ public class CSWService extends WebService {
                                            org.constellation.cat.csw.v200.DescribeRecordResponseType.class, 
                                            org.constellation.cat.csw.v200.GetDomainResponseType.class,
                                            org.constellation.dublincore.v1.terms.ObjectFactory.class));
+           
+           //Ebrim classes
+           classeList.add(IdentifiableType.class);
+           
            // we add the extensions classes
            classeList.addAll(loadExtensionsClasses());
             

@@ -58,7 +58,7 @@ public class ElementSetNameType {
     /**
      * An empty constructor used by JAXB
      */
-    ElementSetNameType(){
+    public ElementSetNameType(){
         
     }
     

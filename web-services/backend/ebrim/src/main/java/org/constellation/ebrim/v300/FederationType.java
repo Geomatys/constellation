@@ -20,6 +20,7 @@ package org.constellation.ebrim.v300;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 
@@ -45,6 +46,7 @@ import javax.xml.datatype.Duration;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FederationType")
+@XmlRootElement(name = "Federation")
 public class FederationType extends RegistryObjectType {
 
     @XmlAttribute

@@ -76,18 +76,14 @@ public class GetRecordByIdResponseType {
     
     /**
      * Build a new response to a getRecordById request.
-     * catalogue version/ISO version
-     * one of the three list mustn't be null
+     * one of the two list mustn't be null
      */
-    public GetRecordByIdResponseType(List<JAXBElement<? extends AbstractRecordType>> abstractRecords, List<MetaDataImpl> metadatas, List<Object> others) {
-        if (abstractRecords != null && metadatas != null || abstractRecords != null && others != null || metadatas != null && others !=null) {
-            throw new IllegalArgumentException("only one of abstractRecords, metadatas or others mustn't be null");
+    public GetRecordByIdResponseType(List<JAXBElement<? extends AbstractRecordType>> abstractRecords, List<? extends Object> others) {
+        if (abstractRecords != null && others != null) {
+            throw new IllegalArgumentException("only one of abstractRecords or others mustn't be null");
         }
         this.abstractRecord = abstractRecords;
-        if (metadatas != null)
-            this.any = metadatas;
-        else
-            this.any = others;
+        this.any            = others;
     }
     
        

@@ -22,6 +22,7 @@ package org.constellation.ebrim.v300;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -50,6 +51,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExternalIdentifierType")
+@XmlRootElement(name = "ExternalIdentifier")
 public class ExternalIdentifierType extends RegistryObjectType {
 
     @XmlAttribute(required = true)

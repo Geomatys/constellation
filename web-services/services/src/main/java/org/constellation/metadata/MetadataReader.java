@@ -113,11 +113,6 @@ public class MetadataReader {
     private DateFormat dateFormat; 
     
     /**
-     * A list of MDWeb catalogs
-     */
-    private List<Catalog> MDCatalogs;
-    
-    /**
      * A list of package containing the ISO 19115 interfaces (and the codelist classes)
      */
     private List<String> opengisPackage;
@@ -130,7 +125,12 @@ public class MetadataReader {
     /**
      * A list of package containing the CSW and dublinCore implementation
      */
-    private List<String> ConstellationPackage;
+    private List<String> CSWPackage;
+    
+    /**
+     * A list of package containing the Ebrim implementation
+     */
+    private List<String> ebrimPackage;
     
     /**
      * A List of the already see object for the current metadata readed
@@ -141,6 +141,7 @@ public class MetadataReader {
 
     public final static int DUBLINCORE = 0;
     public final static int ISO_19115  = 1;
+    public final static int EBRIM      = 2;
     
     private ServiceVersion version;
     
@@ -155,7 +156,27 @@ public class MetadataReader {
         isoMap.put("subject",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         isoMap.put("format",     "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
         isoMap.put("abstract",   "ISO 19115:MD_Metadata:identificationInfo:abstract");
+        isoMap.put("boudingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
+        isoMap.put("creator",    "ISO 19115:MD_Metadata:identificationInfo:credit");
+        isoMap.put("publisher",  "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        isoMap.put("language",   "ISO 19115:MD_Metadata:language");
         DublinCorePathMap.put(Standard.ISO_19115, isoMap);
+        
+        Map<String, String> ebrimMap = new HashMap<String, String>();
+        ebrimMap.put("identifier", "Ebrim v3.0:RegistryObject:id");
+        ebrimMap.put("type",       "Ebrim v3.0:RegistryObject:objectType");
+        ebrimMap.put("abstract",   "Ebrim v3.0:RegistryObject:description:localizedString:value");
+        ebrimMap.put("format",     "Ebrim v3.0:ExtrinsicObject:mimeType");
+        //TODO @name = “http://purl.org/dc/elements/1.1/subject”
+        ebrimMap.put("subject",    "Ebrim v3.0:RegistryObject:slot:valueList:value");
+        //TODO @slotType =“*:GM_Envelope”
+        ebrimMap.put("boudingBox", "Ebrim v3.0:RegistryObject:slot:valueList:value");
+        
+        //ebrimMap.put("creator",    "Ebrim v3:RegistryObject:identificationInfo:credit");
+        //ebrimMap.put("publisher",  "Ebrim v3:RegistryObject:distributionInfo:distributor:distributorContact:organisationName");
+        //ebrimMap.put("language",   "Ebrim v3:RegistryObject:language");
+        //TODO find ebrimMap.put("date",       "Ebrim V3:RegistryObject:dateStamp");
+        DublinCorePathMap.put(Standard.EBRIM_V3, ebrimMap);
     }
     
     /**
@@ -168,15 +189,13 @@ public class MetadataReader {
         this.connection      = c;
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
-        this.MDCatalogs       = new ArrayList<Catalog>();
-        this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));
-        this.MDCatalogs.add(MDReader.getCatalog("CSWCat"));
-        
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.ConstellationPackage   = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
+        this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
+        this.ebrimPackage    = searchSubPackage("org.constellation.ebrim.v300");
+        
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();
@@ -212,7 +231,7 @@ public class MetadataReader {
         
         alreadyRead.clear();
         Catalog catalog = MDReader.getCatalog(catalogCode);
-        if (mode == ISO_19115) {
+        if (mode == ISO_19115 || mode == EBRIM) {
             result = metadatas.get(identifier);
             if (result == null) {
                 
@@ -223,16 +242,22 @@ public class MetadataReader {
                 }
             }
             
-        } else {
+        } else if (mode == DUBLINCORE) {
             Form f = MDReader.getForm(catalog, id);
             result = getRecordFromForm(f, type, elementName);
+            
+        } else {
+            throw new IllegalArgumentException("unknow standard mode:" + mode);
         }
         return result;
     }
     
     /**
      * Return the MDWeb form ID from the fileIdentifier
+     * 
+     * @Deprectated use a lucene query instead to retrieve form identifier and Catalogue name.
      */
+    @Deprecated
     public int getIDFromFileIdentifier(String identifier) throws SQLException {
         
        PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
@@ -271,7 +296,7 @@ public class MetadataReader {
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
         
-        if (recordStandard.equals(Standard.ISO_19115)) {
+        if (recordStandard.equals(Standard.ISO_19115) || recordStandard.equals(Standard.EBRIM_V3)) {
             return getRecordFromMDForm(form, type, elementName);
         
         } else {
@@ -279,8 +304,13 @@ public class MetadataReader {
             RecordType record;
             if (obj instanceof RecordType)
                 record =  (RecordType) obj;
-            else
-                return null;
+            else {
+                String objType = "null";
+                if (obj != null)
+                    objType = obj.getClass().getName();
+                
+                throw new IllegalArgumentException("Unexpected type in getRecordFromForm. waiting for RecordType, got: " + objType);
+            }
             
             // for an ElementSetName mode
             if (elementName == null || elementName.size() == 0) {
@@ -328,15 +358,15 @@ public class MetadataReader {
                             setter.invoke(result, param);
                         
                     } catch (IllegalAccessException ex) {
-                        logger.info("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType");
+                        logger.severe("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType!");
                     } catch (IllegalArgumentException ex) {
-                       logger.info("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType");
+                       logger.severe("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType!");
                     } catch (InvocationTargetException ex) {
-                        logger.info("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType");
+                        logger.severe("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType!");
                     } catch (NoSuchMethodException ex) {
-                        logger.info("The method " + currentMethodName + " does not exists in the classe RecordType");
+                        logger.severe("The method " + currentMethodName + " does not exists in the classe RecordType!");
                     } catch (SecurityException ex) {
-                        logger.info("Security exception while getting the method " + currentMethodName + " in the classe RecordType");
+                        logger.severe("Security exception while getting the method " + currentMethodName + " in the classe RecordType!");
                     }
                     
                 }
@@ -345,6 +375,7 @@ public class MetadataReader {
         }
         
     }
+   
     /**
      * Return a dublinCore record from a ISO 19115 MDWeb formular
      * 
@@ -371,7 +402,7 @@ public class MetadataReader {
         SimpleLiteral identifier = new SimpleLiteral(null, identifiers);
         
         //we get The boundingBox(es)
-        List<Value>   bboxValues     = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2"));
+        List<Value>   bboxValues     = form.getValueFromPath(MDReader.getPath(pathMap.get("boundingBox")));
         List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
             bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form));
@@ -422,7 +453,7 @@ public class MetadataReader {
         SimpleLiteral modified = new SimpleLiteral(null, lastUp.toString());
         
         // the descriptions
-        List<Value>   descriptionValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:abstract"));
+        List<Value>   descriptionValues = form.getValueFromPath(MDReader.getPath(pathMap.get("abstract")));
         List<String>  descriptions      = new ArrayList<String>();
         for (Value v: descriptionValues) {
             if (v instanceof TextValue) {
@@ -436,7 +467,7 @@ public class MetadataReader {
         
         
         // the creator of the data
-        List<Value>   creatorValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:credit"));
+        List<Value>   creatorValues = form.getValueFromPath(MDReader.getPath(pathMap.get("creator")));
         List<String>  creators      = new ArrayList<String>();
         for (Value v: creatorValues) {
             if (v instanceof TextValue) {
@@ -446,7 +477,7 @@ public class MetadataReader {
         SimpleLiteral creator = new SimpleLiteral(null, creators);
         
         // the publisher of the data
-        List<Value>   publisherValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName"));
+        List<Value>   publisherValues = form.getValueFromPath(MDReader.getPath(pathMap.get("publisher")));
         List<String>  publishers      = new ArrayList<String>();
         for (Value v: publisherValues) {
             if (v instanceof TextValue) {
@@ -460,7 +491,7 @@ public class MetadataReader {
         // TODO The rights
         
         // the language
-        List<Value>   languageValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:language"));
+        List<Value>   languageValues = form.getValueFromPath(MDReader.getPath(pathMap.get("language")));
         List<String>  languages      = new ArrayList<String>();
         for (Value v: languageValues) {
             if (v instanceof TextValue) {
@@ -971,7 +1002,11 @@ public class MetadataReader {
         List<String> packagesName = new ArrayList<String>();
         if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore") || 
             standardName.equals("OGC Web Service")) {
-            packagesName = ConstellationPackage;
+            packagesName = CSWPackage;
+            
+        } else if (standardName.equals("Ebrim v3.0")) {
+            packagesName = ebrimPackage;
+            
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType")) {
                 packagesName = geotoolsPackage;
@@ -1079,19 +1114,15 @@ public class MetadataReader {
             interfacee = classe.getInterfaces()[0];
         }
         
-        //TODO make it recursivly
-        Class argumentSuperClass     = null;
+        Class argumentSuperClass     = classe;
         Class argumentSuperInterface = null;
-        if (classe.getSuperclass() != null) {
-            argumentSuperClass     = classe.getSuperclass();
-            if (argumentSuperClass.getInterfaces().length > 0) {
-                argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
-            }
+        if (argumentSuperClass.getInterfaces().length > 0) {
+            argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
         }
         
 
         while (occurenceType < 7) {
-
+            
             try {
                 Method setter = null;
                 switch (occurenceType) {
@@ -1172,8 +1203,12 @@ public class MetadataReader {
                     case 5: {
                         if (argumentSuperClass != null) {
                             logger.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
+                            argumentSuperClass     = argumentSuperClass.getSuperclass();
+                            occurenceType = 5;
+                            
+                        } else {
+                            occurenceType = 6;
                         }
-                        occurenceType = 6;
                         break;
                     }
                     case 6: {

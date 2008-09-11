@@ -147,6 +147,9 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceUri) )
             prefix = "xsi";
         
+        else if( "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0".equals(namespaceUri) )
+            prefix = "rim";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

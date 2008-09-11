@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -59,6 +60,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlType(name = "SubscriptionType", propOrder = {
     "action"
 })
+@XmlRootElement(name = "Subscription")
 public class SubscriptionType extends RegistryObjectType {
 
     @XmlElementRef(name = "Action", namespace = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", type = JAXBElement.class)

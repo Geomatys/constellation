@@ -89,6 +89,11 @@
     </dependency>
     <dependency>
      <groupId>org.constellation</groupId>
+      <artifactId>ebrim</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>org.constellation</groupId>
       <artifactId>csw</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -52,6 +52,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 // MDWeb dependencies
 import org.mdweb.lucene.AbstractIndex;
 import org.mdweb.model.schemas.Path;
+import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
@@ -59,11 +60,12 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
 
 // Constellation dependencies
-import static org.constellation.metadata.CSWworker.*;
+import static org.constellation.metadata.CSWQueryable.*;
+
 
 /**
  *
- * @author legal
+ * @author Guilehm Legal
  */
 public class IndexLucene extends AbstractIndex {
 
@@ -327,7 +329,7 @@ public class IndexLucene extends AbstractIndex {
         // For an ISO 19115 form
         if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
             
-            logger.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
+            logger.info("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
             for (String term :ISO_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
@@ -356,60 +358,68 @@ public class IndexLucene extends AbstractIndex {
                     logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
-        }
-        
-        // for a CSW Record  and ISO 19115 form  
-        if (form.getTopValue().getType().getName().equals("Record") || form.getTopValue().getType().getName().equals("MD_Metadata") || form.getTopValue().getType().getName().equals("FC_FeatureCatalogue")) {
             
+         // For an ebrim form    
+        } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("Identifiable", Standard.EBRIM_V3))) {
+            logger.info("indexing Ebrim 3.0 Record");
+        
+        // For a csw:Record (indexing is made in next generic indexing bloc)
+        } else if (form.getTopValue().getType().getName().equals("Record")){
             logger.info("indexing CSW Record");
-            StringBuilder anyText = new StringBuilder();
-            for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-                
-                String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
-                if (!values.equals("null")) {
-                    logger.finer("put " + term + " values: " + values);
-                    anyText.append(values).append(" ");
-                }
-                if (term.equals("date") || term.equals("modified")) {
-                    values = values.replaceAll("-","");
-                }
-                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
-            }
             
-            //we add the anyText values
-            doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
-            
-            //we add the geometry parts
-            String coord = "null";
-            try {
-                coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
-                double minx = Double.parseDouble(coord);
-                
-                coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
-                double maxx = Double.parseDouble(coord);
-            
-                coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-                double maxy = Double.parseDouble(coord);
-            
-                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-                double miny = Double.parseDouble(coord);
-                
-                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-            
-                String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
-                
-                addBoundingBox(doc, minx, maxx, miny, maxy, crs);
-            
-            } catch (NumberFormatException e) {
-                if (!coord.equals("null"))
-                    logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
-                                  "cause:  unable to parse double: " + coord);
-            }
-        
         } else {
             logger.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
         }
+        
+        
+        // All form types must be compatible with dublinCore.
+        
+        StringBuilder anyText = new StringBuilder();
+        for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+                
+            String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
+            if (!values.equals("null")) {
+                logger.info("put " + term + " values: " + values);
+                anyText.append(values).append(" ");
+            }
+            if (term.equals("date") || term.equals("modified")) {
+                values = values.replaceAll("-","");
+            }
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
+        }
+            
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
+            
+        //we add the geometry parts
+        String coord = "null";
+        try {
+            coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
+            double minx = Double.parseDouble(coord);
+                
+            coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
+            double maxx = Double.parseDouble(coord);
+            
+            coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
+            double maxy = Double.parseDouble(coord);
+            
+            coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
+            double miny = Double.parseDouble(coord);
+                
+            coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
+            
+            String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
+                
+            addBoundingBox(doc, minx, maxx, miny, maxy, crs);
+            
+        } catch (NumberFormatException e) {
+            if (!coord.equals("null"))
+                logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
+                              "cause:  unable to parse double: " + coord);
+        }
+        
+        
         
         // add a default meta field to make searching all documents easy 
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
@@ -514,7 +524,7 @@ public class IndexLucene extends AbstractIndex {
     /**
      * This method proceed a lucene search and returns a list of ID.
      *
-     * @param query The lucene query string with spatials filters.
+     * @param query A simple Term query.
      * 
      * @return      A List of id.
      */
@@ -524,13 +534,15 @@ public class IndexLucene extends AbstractIndex {
         
         IndexReader ireader = IndexReader.open(getFileDirectory());
         Searcher searcher   = new IndexSearcher(ireader);
-       
+        logger.info("TermQuery:" + query.toString());
         Hits hits = searcher.search(query);
         
         for (int i = 0; i < hits.length(); i ++) {
             results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
         }
         ireader.close();
+        logger.info(results.size() + " total matching documents");
+        
         return results;
     }
     

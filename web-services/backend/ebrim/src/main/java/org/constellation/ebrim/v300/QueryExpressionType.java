@@ -69,6 +69,23 @@ public class QueryExpressionType {
         }
         return this.content;
     }
+    
+     /**
+     * Sets the value of the content property.
+    */
+    public void setContent(Object content) {
+        if (this.content == null) {
+            this.content = new ArrayList<Object>();
+        }
+        this.content.add(content);
+    }
+    
+    /**
+     * Gets the value of the content property.
+    */
+    public void setContent(List<Object> content) {
+        this.content = content;
+    }
 
     /**
      * Gets the value of the queryLanguage property.

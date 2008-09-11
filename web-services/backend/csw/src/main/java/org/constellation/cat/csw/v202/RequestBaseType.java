@@ -87,6 +87,13 @@ public abstract class RequestBaseType {
     public String getService() {
         return service;
     }
+    
+    /**
+     * Sets the value of the service property.
+     */
+    public void setService(String service) {
+        this.service = service;
+    }
 
     /**
      * Gets the value of the version property.

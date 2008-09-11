@@ -20,6 +20,7 @@ package org.constellation.ebrim.v300;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -49,8 +50,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AssociationType1")
-public class AssociationType1 extends RegistryObjectType {
+@XmlType(name = "AssociationType")
+@XmlRootElement(name = "Association")
+public class AssociationType extends RegistryObjectType {
 
     @XmlAttribute(required = true)
     private String associationType;

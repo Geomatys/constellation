@@ -84,7 +84,7 @@ public class QueryType extends AbstractQueryType {
     /**
      * Empty constructor used by JAXB
      */
-    QueryType() {
+    public QueryType() {
         
     }
     

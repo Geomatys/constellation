@@ -102,6 +102,10 @@ public class DomainType {
         }
         return value;
     }
+    
+    public void setValue(List<String> value) {
+        this.value = value;
+    }
 
     /**
      * Optional unordered list of additional metadata about this parameter. A list of required and optional metadata elements for this domain should be specified in the Implementation Specification for this service. (Informative: This metadata might specify the meanings of the valid values.) Gets the value of the metadata property.

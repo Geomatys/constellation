@@ -16,6 +16,7 @@
  */
 package org.constellation.ogc;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.gml.v311.AbstractGeometryType;
 import org.opengis.filter.spatial.Overlaps;
 
@@ -23,6 +24,7 @@ import org.opengis.filter.spatial.Overlaps;
  *
  * @author Guilhem Legal
  */
+@XmlRootElement(name = "Overlaps")
 public class OverlapsType extends BinarySpatialOpType implements Overlaps {
 
     /**

@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
+import org.constellation.ogc.SortByType;
 
 
 /**
@@ -74,7 +76,7 @@ public class QueryType extends AbstractQueryType {
     @XmlElement(name = "Constraint")
     private QueryConstraintType constraint;
     @XmlAttribute(required = true)
-    private List<String> typeNames;
+    private List<QName> typeNames;
 
     /**
      * Empty constructor used by JAXB
@@ -86,7 +88,7 @@ public class QueryType extends AbstractQueryType {
     /**
      * Build a new Query
      */
-    public QueryType(List<String> typeNames, ElementSetNameType elementSetName, QueryConstraintType constraint) {
+    public QueryType(List<QName> typeNames, ElementSetNameType elementSetName, QueryConstraintType constraint) {
         
         this.typeNames      = typeNames;
         this.elementSetName = elementSetName; 
@@ -138,15 +140,24 @@ public class QueryType extends AbstractQueryType {
     /**
      * Gets the value of the typeNames property.
      */
-    public List<String> getTypeNames() {
+    public List<QName> getTypeNames() {
         if (typeNames == null) {
-            typeNames = new ArrayList<String>();
+            typeNames = new ArrayList<QName>();
         }
         return this.typeNames;
     }
     
-    public void setTypeNames(List<String> typeNames) {
+    public void setTypeNames(List<QName> typeNames) {
         this.typeNames = typeNames;
+    }
+    
+    /**
+     * Always null in that version of csw.
+     * 
+     * @return null.
+     */
+    public SortByType getSortBy() {
+        return null;
     }
 
 }

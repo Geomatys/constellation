@@ -66,5 +66,14 @@ public class ValueListType {
         }
         return this.value;
     }
+    
+    @Override
+    public String toString() {
+        String s = '[' + this.getClass().getSimpleName() + "] values:" + '\n';
+        for (String v : value) {
+            s = s + v + '\n';
+        }
+        return s;
+    }
 
 }

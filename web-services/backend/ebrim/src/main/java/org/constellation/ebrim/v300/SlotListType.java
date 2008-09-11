@@ -53,16 +53,33 @@ import javax.xml.bind.annotation.XmlType;
 public class SlotListType {
 
     @XmlElement(name = "Slot")
-    private List<SlotType1> slot;
+    private List<SlotType> slot;
 
     /**
      * Gets the value of the slot property.
      */
-    public List<SlotType1> getSlot() {
+    public List<SlotType> getSlot() {
         if (slot == null) {
-            slot = new ArrayList<SlotType1>();
+            slot = new ArrayList<SlotType>();
         }
         return this.slot;
+    }
+    
+    /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(SlotType slot) {
+        if (this.slot == null) {
+            this.slot = new ArrayList<SlotType>();
+        }
+        this.slot.add(slot);
+    }
+    
+    /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(List<SlotType> slot) {
+        this.slot = slot;
     }
 
 }

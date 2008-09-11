@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.GetRecordsRequest;
@@ -103,11 +104,14 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private Integer maxRecords;
+    
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
 
     /**
      * An empty constructor used by JAXB
      */
-    GetRecordsType() {
+    public GetRecordsType() {
 
     }
 
@@ -164,6 +168,15 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      */
     public void setAbstractQuery(JAXBElement<? extends AbstractQueryType> value) {
         this.abstractQuery = ((JAXBElement<? extends AbstractQueryType>) value);
+    }
+    
+    /**
+     * Sets the value of the abstractQuery property.
+     * 
+     */
+    public void setAbstractQuery(AbstractQueryType value) {
+        if (value instanceof QueryType)
+            this.abstractQuery = factory.createQuery((QueryType)value);
     }
 
     /**

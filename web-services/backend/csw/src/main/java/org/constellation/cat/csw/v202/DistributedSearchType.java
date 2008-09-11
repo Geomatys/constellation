@@ -57,7 +57,7 @@ public class DistributedSearchType {
     /**
      * An empty constructor used by JAXB
      */
-    DistributedSearchType(){
+    public DistributedSearchType(){
         
     }
     

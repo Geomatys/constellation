@@ -68,6 +68,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
 import org.apache.lucene.search.Filter;
 
 // geotools dependencies
+import org.constellation.gml.v311.AbstractGeometryType;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -247,50 +248,54 @@ public class FilterParser {
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
             queryBuilder.append('(');
-            for (JAXBElement<?> jb: binary.getOperators()) {
-                
+            
+            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
+            for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
+            
+                queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+            }
+            
+            // we treat logical Operators like AND, OR, ...
+            for (JAXBElement<? extends LogicOpsType> jb: binary.getLogicOps()) {
+            
                 boolean writeOperator = true;
                 
-                // we treat logical Operators like AND, OR, ...
-                if (jb.getValue() instanceof LogicOpsType) {
-                    SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
-                    String subQuery  = sq.getQuery();
-                    Filter subFilter = sq.getSpatialFilter();
+                SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                String subQuery  = sq.getQuery();
+                Filter subFilter = sq.getSpatialFilter();
                     
-                    //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                    if ((subFilter != null && !subQuery.equals("")) 
-                        || sq.getSubQueries().size() != 0 
-                        || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
+                //if the sub spatial query contains both term search and spatial search we create a subQuery 
+                if ((subFilter != null && !subQuery.equals("")) 
+                    || sq.getSubQueries().size() != 0 
+                    || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
                         
-                        subQueries.add(sq);
-                        writeOperator = false;
-                    } else {
-                        
-                        if (subQuery.equals("")) {
-                            writeOperator = false;
-                        } else  {
-                            queryBuilder.append(subQuery);
-                        }
-                        if (subFilter != null)
-                            filters.add(subFilter);
-                    }
-                
-                // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...        
-                } else if (jb.getValue() instanceof ComparisonOpsType) {
-                    
-                    queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
-                
-                // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
-                } else if (jb.getValue() instanceof SpatialOpsType) {
-                   
-                   //for the spatial filter we don't need to write into the lucene query 
-                   filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
-                   writeOperator = false;
-                    
+                    subQueries.add(sq);
+                    writeOperator = false;
                 } else {
-                    
-                    throw new IllegalArgumentException("unknow BinaryLogicalOp:" + jb.getValue().getClass().getSimpleName()); 
+                        
+                    if (subQuery.equals("")) {
+                        writeOperator = false;
+                    } else  {
+                        queryBuilder.append(subQuery);
+                    }
+                    if (subFilter != null)
+                        filters.add(subFilter);
                 }
+               
+                if (writeOperator) {
+                    queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
+                } else {
+                    writeOperator = true;
+                }
+            }
+            
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...   
+            for (JAXBElement<? extends SpatialOpsType> jb: binary.getSpatialOps()) {
+                
+                boolean writeOperator = true;
+                //for the spatial filter we don't need to write into the lucene query 
+                filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
+                writeOperator = false;
                 
                 if (writeOperator) {
                     queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
@@ -298,7 +303,7 @@ public class FilterParser {
                     writeOperator = true;
                 }
             }
-          
+                
           // we remove the last Operator and add a ') '
           int pos = queryBuilder.length()- (operator.length() + 2);
           if (pos > 0)
@@ -438,20 +443,10 @@ public class FilterParser {
         } else if (comparisonOps instanceof BinaryComparisonOpType) {
             
             BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
-            String propertyName       = null;
-            LiteralType literal       = null;
+            String propertyName       = bc.getPropertyName();
+            LiteralType literal       = bc.getLiteral();
             String operator           = JBComparisonOps.getName().getLocalPart(); 
-            for (Object obj: bc.getExpressionOrLiteralOrPropertyName()) {
-                if (obj instanceof LiteralType) {
-                    literal      = (LiteralType) obj;
-                } else if (obj instanceof String) {
-                    propertyName = (String) obj;
-                } else  if (obj instanceof PropertyNameType) {
-                    propertyName = ((PropertyNameType) obj).getPropertyName();
-                } else {
-                    throw new IllegalArgumentException("BinaryComparisonOpType parameter not known: " + obj.getClass().getSimpleName());
-                }
-            }
+            
             if (propertyName == null || literal == null) {
                 throw new OWSWebServiceException("A binary comparison operator must be constitued of a literal and a property name.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
@@ -666,35 +661,39 @@ public class FilterParser {
         } else if (spatialOps instanceof BinarySpatialOpType) {
             
             BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
-            List<JAXBElement<?>> objects   = binSpatial.getRest();
-            
+                        
             String propertyName = null;
             String operator     = JBSpatialOps.getName().getLocalPart();
             Object geometry     = null;
             
-            for (JAXBElement<?> jb: objects) {
+            // the propertyName
+            if (binSpatial.getPropertyName() != null && binSpatial.getPropertyName().getValue() != null) {
+                PropertyNameType p = binSpatial.getPropertyName().getValue();
+                propertyName = p.getContent();
+            }
                 
-                // the propertyName
-                if (jb.getValue() instanceof PropertyNameType) {
-                    PropertyNameType p = (PropertyNameType) jb.getValue();
-                    propertyName = p.getContent();
+            // geometric object: envelope    
+            if (binSpatial.getEnvelope() != null && binSpatial.getEnvelope().getValue() != null) {
+                geometry = binSpatial.getEnvelope().getValue();
+            }
                 
-                // geometric object: envelope    
-                } else if (jb.getValue() instanceof EnvelopeEntry) {
-                    geometry     = (EnvelopeEntry) jb.getValue();
+            
+            if (binSpatial.getAbstractGeometry() != null && binSpatial.getAbstractGeometry().getValue() != null) {
+                AbstractGeometryType ab =  binSpatial.getAbstractGeometry().getValue();
                 
                 // geometric object: point
-                } else if (jb.getValue() instanceof PointType) {
-                    geometry     = (PointType) jb.getValue();
+                if (ab instanceof PointType) {
+                    geometry     = (PointType) ab;
                  
                 // geometric object: Line    
-                } else if (jb.getValue() instanceof LineStringType) {
-                    geometry     = (LineStringType) jb.getValue();    
+                } else if (ab instanceof LineStringType) {
+                    geometry     = (LineStringType) ab;    
                 
-                } else if (jb.getValue() == null) {
+                } else if (ab == null) {
                    throw new IllegalArgumentException("null value in BinarySpatialOp type");
+                
                 } else {
-                    throw new IllegalArgumentException("unknow BinarySpatialOp type:" + jb.getValue().getClass().getSimpleName());
+                    throw new IllegalArgumentException("unknow BinarySpatialOp type:" + ab.getClass().getSimpleName());
                 }
             }
             

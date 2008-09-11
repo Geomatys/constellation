@@ -68,7 +68,7 @@ import javax.xml.bind.annotation.XmlType;
 public class IdentifiableType {
 
     @XmlElement(name = "Slot")
-    private List<SlotType1> slot;
+    private List<SlotType> slot;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "anyURI")
     private String id;
@@ -79,11 +79,28 @@ public class IdentifiableType {
     /**
      * Gets the value of the slot property.
      */
-    public List<SlotType1> getSlot() {
+    public List<SlotType> getSlot() {
         if (slot == null) {
-            slot = new ArrayList<SlotType1>();
+            slot = new ArrayList<SlotType>();
         }
         return this.slot;
+    }
+    
+    /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(SlotType slot) {
+        if (this.slot == null) {
+            this.slot = new ArrayList<SlotType>();
+        }
+        this.slot.add(slot);
+    }
+    
+    /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(List<SlotType> slot) {
+        this.slot = slot;
     }
 
     /**
@@ -112,6 +129,24 @@ public class IdentifiableType {
      */
     public void setHome(String value) {
         this.home = value;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append('[').append(this.getClass().getSimpleName()).append(']').append('\n');
+        s.append("id:").append(id).append('\n');
+        if (home != null) {
+            s.append("home:").append(home).append('\n');
+        }
+        if (slot != null) {
+            int i = 0;
+            for (SlotType sl: slot) {
+                s.append("Slot ").append(i).append(sl.toString()).append('\n');
+                i++;
+            }
+        }
+        return s.toString();
     }
 
 }

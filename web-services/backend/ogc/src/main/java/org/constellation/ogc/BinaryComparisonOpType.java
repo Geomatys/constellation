@@ -16,19 +16,13 @@
  */
 package org.constellation.ogc;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.coverage.web.ExpressionType;
 import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.expression.Expression;
 
 
@@ -58,16 +52,21 @@ import org.opengis.filter.expression.Expression;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryComparisonOpType", propOrder = {
-    "expressionOrLiteralOrPropertyName"
+    "expression",
+    "literal",
+    "propertyName"
 })
 public class BinaryComparisonOpType extends ComparisonOpsType {
 
-    @XmlElements({
-        @XmlElement(name = "expression", type = ExpressionType.class, nillable = true),
-        @XmlElement(name = "PropertyName", type = String.class, nillable = true),
-        @XmlElement(name = "Literal", type = LiteralType.class, nillable = true)
-    })
-    private List<Object> expressionOrLiteralOrPropertyName;
+    @XmlElement(name = "Literal", type = LiteralType.class, nillable = true)        
+    private LiteralType literal;
+    
+    @XmlElement(name = "expression", type = ExpressionType.class, nillable = true)
+    private ExpressionType expression;
+    
+    @XmlElement(name = "PropertyName", type = String.class, nillable = true)
+    private String propertyName;
+            
     @XmlAttribute
     private Boolean matchCase;
 
@@ -82,43 +81,48 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
      * Build a new Binary comparison operator
      */
     public BinaryComparisonOpType(LiteralType literal, PropertyNameType propertyName, Boolean matchCase) {
-        expressionOrLiteralOrPropertyName = new ArrayList<Object>();
-        expressionOrLiteralOrPropertyName.add(literal);
+        this.literal = literal;
         if (propertyName != null)
-        expressionOrLiteralOrPropertyName.add(propertyName.getPropertyName());
+            this.propertyName = propertyName.getPropertyName();
         this.matchCase = matchCase;
     }
     
-    /**
-     * Gets the value of the expressionOrLiteralOrPropertyName property.
-     * (unmodifiable)
-     */
-    public List<Object> getExpressionOrLiteralOrPropertyName() {
-        if (expressionOrLiteralOrPropertyName == null) {
-            expressionOrLiteralOrPropertyName = new ArrayList<Object>();
-        }
-        return Collections.unmodifiableList(expressionOrLiteralOrPropertyName);
-    }
+    
 
     /**
      * Gets the value of the matchCase property.
      */
-    public boolean isMatchingCase() {
+    public Boolean getMatchCase() {
         return matchCase;
+    }
+    
+    /**
+     * Gets the value of the matchCase property.
+     */
+    public boolean isMatchingCase() {
+        if (matchCase == null)
+            return false;
+        return matchCase;
+    }
+    
+    /**
+     * sets the value of the matchCase property.
+     */
+    public void setMatchCase(Boolean matchCase) {
+        this.matchCase = matchCase;
     }
     
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
         s.append("MatchCase ? ").append(matchCase).append('\n');
-        int i = 0;
-        if (expressionOrLiteralOrPropertyName != null) {
-            for (Object obj: expressionOrLiteralOrPropertyName) {
-                s.append(i).append(": ").append("class: ").append(obj.getClass().getSimpleName());
-                s.append('\n').append(obj.toString()).append('\n');
-            }
-        }
+        s.append("propertyName: ").append(propertyName).append('\n');
+        if (literal != null)
+            s.append("literal: ").append(literal.toString()).append('\n');
         
+        if (expression != null) 
+            s.append("expression: ").append(expression.toString()).append('\n');
+
         return s.toString();
     }
 
@@ -131,24 +135,34 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
     }
 
     public Expression getExpression1() {
-        String propertyName = null;
-        for (Object obj : getExpressionOrLiteralOrPropertyName()) {
-            if (obj instanceof String ) {
-                propertyName = (String) obj;
-            } else if (obj instanceof PropertyNameType) {
-                return (PropertyNameType)obj;
-            }
-        }
         return new PropertyNameType(propertyName);
     }
 
     public Expression getExpression2() {
-        LiteralType literal = null;
-        for (Object obj : getExpressionOrLiteralOrPropertyName()) {
-            if (obj instanceof LiteralType) {
-                literal = (LiteralType) obj;
-            } 
-        }
         return literal;
+    }
+
+    public LiteralType getLiteral() {
+        return literal;
+    }
+
+    public void setLiteral(LiteralType literal) {
+        this.literal = literal;
+    }
+
+    public ExpressionType getExpression() {
+        return expression;
+    }
+
+    public void setExpression(ExpressionType expression) {
+        this.expression = expression;
+    }
+
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 }

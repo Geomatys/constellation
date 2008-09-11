@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
@@ -66,7 +67,8 @@ import org.constellation.ogc.FilterType;
 @XmlType(name = "GetRecordsType", propOrder = {
     "distributedSearch",
     "responseHandler",
-    "abstractQuery"
+    "abstractQuery",
+    "any"
 })
 @XmlRootElement(name = "GetRecords")        
 public class GetRecordsType extends RequestBaseType implements GetRecordsRequest {
@@ -78,6 +80,8 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     private List<String> responseHandler;
     @XmlElementRef(name = "AbstractQuery", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private JAXBElement<? extends AbstractQueryType> abstractQuery;
+    @XmlAnyElement(lax = true)
+    private Object any;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String requestId;
@@ -98,7 +102,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     /**
      * An empty constructor used by JAXB
      */
-    GetRecordsType() {
+    public GetRecordsType() {
         
     }
     
@@ -156,6 +160,13 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      */
     public JAXBElement<? extends AbstractQueryType> getAbstractQuery() {
         return abstractQuery;
+    }
+    
+    /**
+     * Gets the value of the any property.
+     */
+    public Object getAny() {
+        return any;
     }
 
     /**
@@ -276,15 +287,10 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     }
 
     public void setTypeNames(List<QName> typeNames) {
-        List<String> tname = new ArrayList<String>();
-        
         if (typeNames != null) {
-            for (QName qn: typeNames) {
-                tname.add(qn.getPrefix() + ':' + qn.getLocalPart());
-            }
             if (abstractQuery != null && abstractQuery.getValue() != null) {
                 AbstractQueryType query = abstractQuery.getValue();
-                query.setTypeNames(tname);
+                query.setTypeNames(typeNames);
             }
         }
     }

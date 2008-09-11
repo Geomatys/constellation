@@ -850,83 +850,32 @@ public class SOSworker {
                 //we treat the different operation
                 if (result.getPropertyIsLessThan() != null) {
                     
-                    if (result.getPropertyIsLessThan().getExpressionOrLiteralOrPropertyName().size() != 2) {
+                    String propertyName  = result.getPropertyIsLessThan().getPropertyName();
+                    LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
+                    if (literal == null || propertyName == null || propertyName.equals("")) {
                         throw new OWSWebServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
                                                       MISSING_PARAMETER_VALUE, "lessThan", version);
                     } 
-                    String propertyName  = null;
-                    LiteralType literal  = null;
                     
-                    for (Object j:result.getPropertyIsLessThan().getExpressionOrLiteralOrPropertyName()){
-                        
-                        if (j instanceof String) {
-                            propertyName = (String)j;
-                        } else if (j instanceof LiteralType) {
-                            literal = (LiteralType)j;
-                        } else {
-                            throw new OWSWebServiceException("This type of parameter is not accepted by the SOS service: " + j.getClass().getSimpleName() + "!",
-                                                          INVALID_PARAMETER_VALUE, "lessThan", version);
-                        }
-                    }
-                    if (propertyName == null || propertyName.equals("") || literal == null) {
-                            throw new OWSWebServiceException("This property name and literal must be specify",
-                                                          INVALID_PARAMETER_VALUE, "result", version);
-                            
-                    }
-                
+                                    
                 } else if (result.getPropertyIsGreaterThan() != null) {
-                    logger.info("PROP IS GREATER");
-                    if (result.getPropertyIsGreaterThan().getExpressionOrLiteralOrPropertyName().size() != 2) {
+                    
+                    String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
+                    LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
+                    if (propertyName == null || propertyName.equals("") || literal == null) {
                         throw new OWSWebServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
                                                      MISSING_PARAMETER_VALUE, "greaterThan", version);
-                    } 
-                    String propertyName  = null;
-                    LiteralType literal  = null;
-                    
-                    for (Object j:result.getPropertyIsGreaterThan().getExpressionOrLiteralOrPropertyName()){
-                        
-                        if (j instanceof String) {
-                            propertyName = (String)j;
-                        } else if (j instanceof LiteralType) {
-                            literal = (LiteralType)j;
-                        } else {
-                            throw new OWSWebServiceException("This type of parameter is not accepted by the SOS service: " + j.getClass().getSimpleName() + "!",
-                                                          INVALID_PARAMETER_VALUE, "greaterThan", version);
-                        }
-                    }
-                    if (propertyName == null || propertyName.equals("") || literal == null) {
-                            throw new OWSWebServiceException("This property name and literal must be specify",
-                                                          INVALID_PARAMETER_VALUE, "result", version);
-                            
                     }
                 
                 } else if (result.getPropertyIsEqualTo() != null) {
                     
-                    logger.info("PROP IS EQUAL");
-                    if (result.getPropertyIsEqualTo().getExpressionOrLiteralOrPropertyName().size() != 2) {
+                    String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
+                    LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
+                    if (propertyName == null || propertyName.equals("") || literal == null) {
                          throw new OWSWebServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                        MISSING_PARAMETER_VALUE, "propertyIsEqualTo", version);
                     } 
-                    String propertyName  = null;
-                    LiteralType literal  = null;
                     
-                    for (Object j:result.getPropertyIsEqualTo().getExpressionOrLiteralOrPropertyName()){
-                        
-                        if (j instanceof String) {
-                            propertyName = (String)j;
-                            logger.info("j=|" + propertyName + "|" + propertyName.length());
-                        } else if (j instanceof LiteralType) {
-                            literal = (LiteralType)j;
-                        } else {
-                            throw new OWSWebServiceException("This type of parameter is not accepted by the SOS service: " + j.getClass().getSimpleName() + "!",
-                                                          INVALID_PARAMETER_VALUE, "propertyIsEqualTo", version);
-                        }
-                    }
-                    if (propertyName == null || propertyName.equals("") || literal == null) {
-                            throw new OWSWebServiceException("This property name and literal must be specify",
-                                                          INVALID_PARAMETER_VALUE, "result", version);
-                            
-                    }
                 
                 } else if (result.getPropertyIsLike() != null) {
                     throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
@@ -1178,6 +1127,7 @@ public class SOSworker {
             
             //we create a new Tempory File SensorML
             File tempFile = File.createTempFile("sml", "xml");
+            tempFile.deleteOnExit();
             FileOutputStream outstr = new FileOutputStream(tempFile);
             OutputStreamWriter outstrR = new OutputStreamWriter(outstr,"UTF-8");
             BufferedWriter output = new BufferedWriter(outstrR);

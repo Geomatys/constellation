@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -55,6 +56,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ClassificationSchemeType", propOrder = {
     "classificationNode"
 })
+@XmlRootElement(name = "ClassificationScheme")
 public class ClassificationSchemeType  extends RegistryObjectType {
 
     @XmlElement(name = "ClassificationNode")
@@ -73,12 +75,29 @@ public class ClassificationSchemeType  extends RegistryObjectType {
         }
         return this.classificationNode;
     }
+    
+    /**
+     * Gets the value of the classificationNode property.
+     */
+    public void setClassificationNode(ClassificationNodeType classificationNode) {
+        if (this.classificationNode == null) {
+            this.classificationNode = new ArrayList<ClassificationNodeType>();
+        }
+        this.classificationNode.add(classificationNode);
+    }
+    
+    /**
+     * Gets the value of the classificationNode property.
+     */
+    public void setClassificationNode(List<ClassificationNodeType> classificationNode) {
+        this.classificationNode = classificationNode;
+    }
 
     /**
      * Gets the value of the isInternal property.
      * 
      */
-    public boolean isIsInternal() {
+    public boolean getIsInternal() {
         return isInternal;
     }
 
@@ -86,7 +105,7 @@ public class ClassificationSchemeType  extends RegistryObjectType {
      * Sets the value of the isInternal property.
      * 
      */
-    public void setIsInternal(boolean value) {
+    public void setIsInternal(Boolean value) {
         this.isInternal = value;
     }
 

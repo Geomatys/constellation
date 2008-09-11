@@ -21,6 +21,7 @@ package org.constellation.ebrim.v300;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ClassificationType")
+@XmlRootElement(name = "Classification")
 public class ClassificationType extends RegistryObjectType {
 
     @XmlAttribute

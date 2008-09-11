@@ -62,5 +62,26 @@ public class InternationalStringType {
         }
         return this.localizedString;
     }
+    
+    /**
+     * Set the values of localizedString.
+     * 
+     * @param localizedString
+     */
+    public void setLocalizedString(List<LocalizedStringType> localizedString) {
+        this.localizedString = localizedString;
+    }
+    
+    /**
+     * Add a singleton value to the localizedString list.
+     * 
+     * @param localizedString
+     */
+    public void setLocalizedString(LocalizedStringType localizedString) {
+        if (this.localizedString == null) {
+            this.localizedString = new ArrayList<LocalizedStringType>();
+        }
+        this.localizedString.add(localizedString);
+    }
 
 }

@@ -66,7 +66,7 @@ public class QueryConstraintType {
     /**
      * Empty constructor used by JAXB
      */
-    QueryConstraintType(){
+    public QueryConstraintType(){
         
     }
     

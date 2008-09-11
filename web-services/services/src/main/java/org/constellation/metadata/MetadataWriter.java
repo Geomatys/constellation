@@ -17,6 +17,7 @@
  */
 package org.constellation.metadata;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -30,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+import org.constellation.ebrim.v300.IdentifiableType;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
@@ -137,9 +139,13 @@ public class MetadataWriter {
             ) {
                 mainStandard   = Standard.ISO_19115;
             
+            // Ebrim Types    
+            } else if (object instanceof IdentifiableType) {
+                mainStandard = Standard.EBRIM_V3;
+            
             // CSW Types    
             } else if (className.equals("RecordType")) {
-                mainStandard = MDReader.getStandard("Catalog Web Service");
+                mainStandard = Standard.CSW;
             
             // unkow types
             } else {
@@ -232,6 +238,11 @@ public class MetadataWriter {
                         if (codelistElement == null) {
                             codelistElement = ((org.opengis.util.CodeList) object).name();
                         }
+                        
+                    } else if (object.getClass().isEnum()) {
+                        
+                        codelistElement = getElementNameFromEnum(object);
+                        
                     } else {
                         logger.severe (object.getClass().getName() + " is not a codelist!");
                         codelistElement = null;
@@ -299,7 +310,8 @@ public class MetadataWriter {
                             logger.severe("The class is not accessible");
                             return;
                         } catch (java.lang.reflect.InvocationTargetException e) {
-                            logger.severe("Exception throw in the invokated constructor");
+                            logger.severe("Exception throw in the invokated getter: " + getter.toGenericString() + '\n' +
+                                          "Cause: " + e.getMessage());
                             return;
                         }   
                     }
@@ -312,6 +324,31 @@ public class MetadataWriter {
         }
     }
 
+    /**
+     * 
+     * @param enumeration
+     * @return
+     */
+    private String getElementNameFromEnum(Object enumeration) {
+        String value = "";
+        try {
+            Method getValue = enumeration.getClass().getDeclaredMethod("value");
+            value = (String) getValue.invoke(enumeration);
+        } catch (IllegalAccessException ex) {
+            logger.severe("The class is not accessible");
+        } catch (IllegalArgumentException ex) {
+            logger.severe("IllegalArguement exeption in value()");
+        } catch (InvocationTargetException ex) {
+            logger.severe("Exception throw in the invokated getter value() " + '\n' +
+                       "Cause: " + ex.getMessage());
+        } catch (NoSuchMethodException ex) {
+           logger.severe("no such method value() in " + enumeration.getClass().getSimpleName());
+        } catch (SecurityException ex) {
+           logger.severe("security Exception while getting the codelistElement in value() method");
+        }
+        return value;
+    }
+    
     /**
      * Return a getter Method for the specified attribute (propertyName) 
      * 
@@ -505,14 +542,26 @@ public class MetadataWriter {
             availableStandards.add(MDReader.getStandard("ISO 19110"));
         
         // CSW standard    
+        } else if (mainStandard.equals(Standard.CSW)) {
+            availableStandards.add(Standard.CSW);
+            availableStandards.add(Standard.DUBLINCORE);
+            availableStandards.add(Standard.DUBLINCORE_TERMS);
+            availableStandards.add(Standard.OWS);
+        
+        // Ebrim standard    
+        } else if (mainStandard.equals(Standard.EBRIM_V3)) {
+            availableStandards.add(Standard.EBRIM_V3);
+            availableStandards.add(Standard.CSW);
+            availableStandards.add(Standard.OGC_FILTER);
+        
         } else {
-            availableStandards.add(MDReader.getStandard("Catalog Web Service"));
-            availableStandards.add(MDReader.getStandard("DublinCore"));
-            availableStandards.add(MDReader.getStandard("DublinCore-terms"));
-            availableStandards.add(MDReader.getStandard("OGC Web Service"));
+            throw new IllegalArgumentException("Unexpected Main standard: " + mainStandard);
         }
+        
+        String availableStandardLabel = "";
         for (Standard standard : availableStandards) {
             
+            availableStandardLabel = availableStandardLabel + standard.getName() + ',';
             /* to avoid some confusion between to classes with the same name
              * we affect the standard in some special case
              */
@@ -610,7 +659,8 @@ public class MetadataWriter {
                 }
             }
         
-        logger.severe("class no found: " + className);
+        availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
+        logger.severe("class no found: " + className + " in the following standards: " + availableStandardLabel);
         return null;
     }
     
