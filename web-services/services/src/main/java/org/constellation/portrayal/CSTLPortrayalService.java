@@ -16,14 +16,15 @@
  */
 package org.constellation.portrayal;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.io.IOException;
 import java.util.List;
 
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
 
 import org.geotools.display.service.DefaultPortrayalService;
+import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
@@ -37,7 +38,6 @@ import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * Portrayal service, extends the GT portrayal service by adding support
@@ -51,36 +51,25 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
     private final NamedStyleDP styleDPS = NamedStyleDP.getInstance();
 
 
-    public CSTLPortrayalService(){
+    public CSTLPortrayalService(){}
 
-    }
-
-    public boolean portray(List<String> layers, List<String> styles,
+    public void portray(List<String> layers, List<String> styles, Color background,
             MutableStyledLayerDescriptor sld,ReferencedEnvelope contextEnv, Object output,
             String mime, Dimension canvasDimension,Hints hints)
-            throws IOException,TransformException{
+            throws PortrayalException{
 
         MapContext context = toMapContext(layers,styles,sld);
 
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("Layers => " + layers.toArray() + "\n");
-        builder.append("Styles => " + styles.toArray() + "\n");
-        builder.append("Context env => " + contextEnv.toString() + "\n");
-        builder.append("Mime => " + mime.toString() + "\n");
-        builder.append("Dimension => " + canvasDimension.toString() + "\n");
-        builder.append("File => " + output.toString() + "\n");
-
-        System.out.println(builder.toString());
-
-        return this.portray(context, contextEnv, output, mime, canvasDimension, hints);
+        this.portray(context, contextEnv, background, output, mime, canvasDimension, hints);
     }
 
-    private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld) {
+    private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld) 
+            throws PortrayalException {
         MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
         int index = 0;
         for(String layerName : layers){
+            
             MutableStyle style = null;
             
             if(sld != null){
@@ -100,9 +89,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             }
             
             MapLayer layer = layerDPS.get(layerName,style);
-
+            
+            if(layer == null){
+                throw new PortrayalException("Layer : "+layerName+" could not be created");
+            }
+            
             ctx.layers().add(layer);
-
             index++;
         }
 

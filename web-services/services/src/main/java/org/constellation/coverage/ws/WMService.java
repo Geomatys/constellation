@@ -51,9 +51,12 @@ import javax.xml.bind.JAXBException;
 import com.sun.jersey.spi.resource.Singleton;
 
 //Constellation dependencies
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
+import javax.imageio.ImageIO;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -88,13 +91,14 @@ import org.constellation.coverage.metadata.PointOfContact;
 import org.constellation.coverage.metadata.PointOfContactTable;
 import org.constellation.coverage.metadata.SeriesMetadataTable;
 import org.constellation.provider.NamedLayerDP;
-import org.constellation.query.StringParser;
+import org.constellation.query.WMSQueryAdapter;
 import org.constellation.query.WMSQuery;
 import org.constellation.worker.WMSWorker;
 import org.constellation.ws.rs.WebService;
 import static org.constellation.coverage.wms.WMSExceptionCode.*;
 
 //geotools dependencies
+import org.geotools.display.service.PortrayalException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
@@ -110,8 +114,8 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
+import static org.constellation.query.WMSQuery.*;
 
 /**
  * WMS 1.3.0 / 1.1.1
@@ -146,8 +150,8 @@ public class WMService extends WebService {
      * @throws SQLException if an error occured while configuring the connection.
      */
     private static synchronized void ensureWorkerInitialized() throws SQLException, IOException,
-                                                                      NamingException
-    {
+                                                                      NamingException {
+        
         if (webServiceWorker == null) {
             Database database;
             try {
@@ -263,33 +267,22 @@ public class WMService extends WebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
-            String request = (String) getParameter("REQUEST", true);
+            String request = (String) getParameter(KEY_REQUEST, true);
             LOGGER.info("new request:" + request);
             writeParameters();
 
-            if (request.equalsIgnoreCase("GetMap")) {
-
+            if (REQUEST_MAP.equalsIgnoreCase(request)) {
                 return Response.ok(getMap(), webServiceWorker.getMimeType()).build();
-
-            } else if (request.equals("GetFeatureInfo")) {
-
+            } else if (REQUEST_FEATUREINFO.equalsIgnoreCase(request)) {
                 return getFeatureInfo();
-
-            } else if (request.equalsIgnoreCase("GetCapabilities")) {
-
+            } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
                 return getCapabilities();
-
-            } else if (request.equalsIgnoreCase("DescribeLayer")) {
-
+            } else if (REQUEST_DESCRIBELAYER.equalsIgnoreCase(request)) {
                 return Response.ok(describeLayer(), "text/xml").build();
-
-            } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
-
+            } else if (REQUEST_LEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 return Response.ok(getLegendGraphic(), webServiceWorker.getMimeType()).build();
-            } else if (request.equalsIgnoreCase("GetOrigFile")) {
-
+            } else if (REQUEST_ORIGFILE.equalsIgnoreCase(request)) {
                 return Response.ok(getOrigFile()).build();
-
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
@@ -316,8 +309,8 @@ public class WMService extends WebService {
 
     private File getOrigFile() throws WebServiceException {
         final WebServiceWorker worker = this.webServiceWorker.get();
-        worker.setLayer(getParameter("LAYER", true));
-        worker.setTime(getParameter("TIME", true));
+        worker.setLayer(getParameter(KEY_LAYER, true));
+        worker.setTime(getParameter(KEY_TIME, true));
         worker.setService("WMS", "1.3.0");
         CoverageReference cr = worker.getCoverageReference();
         return cr.getFile();
@@ -333,9 +326,12 @@ public class WMService extends WebService {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
         
+        final String errorType = getParameter(KEY_EXCEPTIONS, false);
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
+        
         //Set to true if you want to use the new GO2 renderer-------------------
         if(false){
-            return getGo2RendererMap();
+            return getGo2RendererMap(errorInImage);
         }
         
         // Previous SEAGIS renderer, only PostGrid support----------------------
@@ -344,32 +340,23 @@ public class WMService extends WebService {
     
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        webServiceWorker.setFormat(getParameter("FORMAT", true));
-        webServiceWorker.setLayer(getParameter("LAYERS", true));
-        webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
+        webServiceWorker.setFormat(getParameter(KEY_FORMAT, true));
+        webServiceWorker.setLayer(getParameter(KEY_LAYERS, true));
+        webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
 
         String crs;
         if (getCurrentVersion().toString().equals("1.3.0")) {
-            crs = getParameter("CRS", true);
+            crs = getParameter(KEY_CRS_v130, true);
         } else {
-            crs = getParameter("SRS", true);
+            crs = getParameter(KEY_CRS_v110, true);
         }
         webServiceWorker.setCoordinateReferenceSystem(crs);
-        webServiceWorker.setBoundingBox(getParameter("BBOX", true));
-        webServiceWorker.setElevation(getParameter("ELEVATION", false));
-        webServiceWorker.setTime(getParameter("TIME", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true), null);
-        webServiceWorker.setBackgroundColor(getParameter("BGCOLOR", false));
-        webServiceWorker.setTransparency(getParameter("TRANSPARENT", false));
-
-
-        //this parameters are not yet used
-//        String styles        = getParameter("STYLES", true);
-
-        //extended parameter of the specification SLD
-//        String sld           = getParameter("SLD", false);
-//        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
-//        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
+        webServiceWorker.setBoundingBox(getParameter(KEY_BBOX, true));
+        webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setTime(getParameter(KEY_TIME, false));
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, true), getParameter(KEY_HEIGHT, true), null);
+        webServiceWorker.setBackgroundColor(getParameter(KEY_BGCOLOR, false));
+        webServiceWorker.setTransparency(getParameter(KEY_TRANSPARENT, false));
 
         return webServiceWorker.getImageFile();
     }
@@ -381,97 +368,25 @@ public class WMService extends WebService {
      * @return
      * @throws fr.geomatys.wms.WebServiceException
      */
-    private File getGo2RendererMap() throws  WebServiceException {
-        final WMSWorker worker = new WMSWorker();
-        final StringParser parser = new StringParser();
-
-        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ? "CRS" : "SRS", true);
-        final String strBBox            = getParameter("BBOX", true);
-        final String strMime            = getParameter("FORMAT", true);
-        final String strLayers          = getParameter("LAYERS", true);
-        final String strElevation       = getParameter("ELEVATION", false);
-        final String strTime            = getParameter("TIME", false);
-        final String strWidth           = getParameter("WIDTH", true);
-        final String strHeight          = getParameter("HEIGHT", true);
-        final String strBGColor         = getParameter("BGCOLOR", false);
-        final String strTransparent     = getParameter("TRANSPARENT", false);
-        final String strStyles          = getParameter("STYLES", true);
-        final String strSLD             = getParameter("SLD", false);
-        final String strRemoteOwsType   = getParameter("REMOTE_OWS_TYPE", false);
-        final String strRemoteOwsUrl    = getParameter("REMOTE_OWS_URL", false);
-
-        final GeneralEnvelope env = parser.toBBox(strBBox);
-        final Rectangle2D bbox = env.toRectangle2D();
-        CoordinateReferenceSystem crs = null;
+    private synchronized File getGo2RendererMap(boolean errorInImage) throws  WebServiceException {
+        final WMSQuery query = adaptQuery();
+        final File tempFile = createTempFile(query.format);
+        final WMSWorker worker = new WMSWorker(query,tempFile);
         
+        File image = null;
         try {
-            crs = parser.toCRS(strCRS);
-        } catch (FactoryException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        final String format = strMime;
-        final List<String> layers = parser.toLayers(strLayers);
-        final List<String> styles = parser.toStyles(strStyles);
-        MutableStyledLayerDescriptor sld = null;
-        final Double elevation = 0d;
-        final Date date = new Date();
-        final Dimension size = new Dimension( parser.toInt(null, strWidth), parser.toInt(null, strHeight));
-        final Color background = parser.toColor(strBGColor);
-        final Boolean transparent = parser.toBoolean(strTransparent);
-        
-        if(strSLD != null){
-            sld = parser.toSLD(strSLD);
-        }else if(strRemoteOwsUrl != null){
-            
-//            URL url = null;
-//            try {
-//                url = new URL(strRemoteOwsUrl);
-//            } catch (MalformedURLException ex) {
-//                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-            try {
-                InputStream stream = new FileInputStream(new File(strRemoteOwsUrl));
-                XMLUtilities sldparser = new XMLUtilities();
-                try{
-                    sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
-                }catch(JAXBException ex){
-                    System.out.println("Not a SLD v1.0");
-                }
-                if(sld == null){
-                    try{
-                        sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
-                    }catch(JAXBException ex){
-                        System.out.println("Not a SLD v1.1");
-                    }
-                }
-            } catch (FileNotFoundException ex) {
+            image = worker.getMap();
+        } catch (PortrayalException ex) {
+            if(errorInImage){
+                image = writeInImage(ex, query.size.width, query.size.height, tempFile, query.format);
+            }else{
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WMSWebServiceException("The requested map could not be renderered correctly, ",
+                                              NO_APPLICABLE_CODE, getCurrentVersion());
             }
-            
-            
         }
 
-        final WMSQuery query = new WMSQuery(bbox, crs, format, layers, 
-                styles, sld, elevation, date, size, background, transparent);
-        worker.setQuery(query);
-
-        File f = null;
-        try {
-            f = File.createTempFile("temp", ".png");
-        } catch (IOException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            worker.getMap(f);
-        } catch (IOException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TransformException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return f;
+        return image;
     }
     
     /**
@@ -487,32 +402,32 @@ public class WMService extends WebService {
 
         verifyBaseParameter(0);
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        String layer = getParameter("QUERY_LAYERS", true);
+        String layer = getParameter(KEY_QUERY_LAYERS, true);
         webServiceWorker.setLayer(layer);
 
         String crs;
         if (getCurrentVersion().toString().equals("1.3.0")){
-            crs = getParameter("CRS", true);
+            crs = getParameter(KEY_CRS_v130, true);
         } else {
-            crs = getParameter("SRS", true);
+            crs = getParameter(KEY_CRS_v110, true);
         }
         webServiceWorker.setCoordinateReferenceSystem(crs);
-        webServiceWorker.setBoundingBox(getParameter("BBOX", true));
-        webServiceWorker.setElevation(getParameter("ELEVATION", false));
-        webServiceWorker.setTime(getParameter("TIME", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true), null);
+        webServiceWorker.setBoundingBox(getParameter(KEY_BBOX, true));
+        webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setTime(getParameter(KEY_TIME, false));
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, true), getParameter(KEY_HEIGHT, true), null);
 
 
         final String i, j;
         if (getCurrentVersion().toString().equals("1.3.0")) {
-            i = getParameter("I", true);
-            j = getParameter("J", true);
+            i = getParameter(KEY_I_v130, true);
+            j = getParameter(KEY_J_v130, true);
         } else {
-            i = getParameter("X", true);
-            j = getParameter("Y", true);
+            i = getParameter(KEY_I_v110, true);
+            j = getParameter(KEY_J_v110, true);
         }
 
-        String infoFormat  = getParameter("INFO_FORMAT", false); // TODO true);
+        String infoFormat  = getParameter(KEY_INFO_FORMAT, false); // TODO true);
         if (infoFormat != null) {
             if(!(infoFormat.equals("text/plain")
               || infoFormat.equals("text/html")
@@ -525,9 +440,9 @@ public class WMService extends WebService {
         } else {
             infoFormat = "text/plain";
         }
-        String feature_count = getParameter("FEATURE_COUNT", false);
+        String feature_count = getParameter(KEY_FEATURE_COUNT, false);
 
-        webServiceWorker.setExceptionFormat(getParameter("EXCEPTIONS", false));
+        webServiceWorker.setExceptionFormat(getParameter(KEY_EXCEPTIONS, false));
 
         double result = webServiceWorker.evaluatePixel(i,j);
 
@@ -577,7 +492,7 @@ public class WMService extends WebService {
         // HTML Response with all metadata for the
         // TODO: This is only temporary! Get metadata via CSW request instead.
         Boolean getMetadata = false;
-        String getMetadataParam = getParameter("GetMetadata",false);
+        String getMetadataParam = getParameter(KEY_GETMETADATA,false);
         if (getMetadataParam != null && getMetadataParam.equalsIgnoreCase("TRUE")) {
                 getMetadata = true;
         }
@@ -691,7 +606,7 @@ public class WMService extends WebService {
             setCurrentVersion("1.1.1");
         }
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        String format = getParameter("FORMAT", false);
+        String format = getParameter(KEY_FORMAT, false);
         if (format == null || !(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
             format = "text/xml";
         }
@@ -990,8 +905,6 @@ public class WMService extends WebService {
 
     }
 
-
-
     /**
      *
      * @return
@@ -1006,7 +919,7 @@ public class WMService extends WebService {
 
         OnlineResourceType or = new OnlineResourceType(getServiceURL() + "wcs?");
         List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
-        String layers = getParameter("LAYERS", true);
+        String layers = getParameter(KEY_LAYERS, true);
         Set<String> registredLayers = webServiceWorker.getLayerNames();
         final StringTokenizer tokens = new StringTokenizer(layers, ",");
         while (tokens.hasMoreTokens()) {
@@ -1035,22 +948,22 @@ public class WMService extends WebService {
 
         verifyBaseParameter(2);
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        webServiceWorker.setLayer(getParameter("LAYER", true));
-        webServiceWorker.setFormat(getParameter("FORMAT", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false), null);
+        webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
+        webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
 
 
-        String style = getParameter("STYLE", false);
+        String style = getParameter(KEY_STYLE, false);
 
-        String featureType   = getParameter("FEATURETYPE", false);
-        String remoteSld     = getParameter("SLD", false);
-        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
-        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
-        String coverage      = getParameter("COVERAGE", false);
-        String rule          = getParameter("RULE", false);
-        String scale         = getParameter("SCALE", false);
+        String featureType   = getParameter(KEY_FEATURETYPE, false);
+        String remoteSld     = getParameter(KEY_SLD, false);
+        String remoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
+        String remoteOwsUrl  = getParameter(KEY_REMOTE_OWS_URL, false);
+        String coverage      = getParameter(KEY_COVERAGE, false);
+        String rule          = getParameter(KEY_RULE, false);
+        String scale         = getParameter(KEY_SCALE, false);
 
-        StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter("SLD_BODY", false);
+        StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter(KEY_SLD_BODY, false);
 
         return  webServiceWorker.getLegendFile();
 
@@ -1102,4 +1015,128 @@ public class WMService extends WebService {
         }
 
     }
+    
+    /**
+     * Transform the Query in a container of real java objects, not strings.
+     * 
+     * @return WMSQuery
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    private WMSQuery adaptQuery() throws WebServiceException{
+        final WMSQueryAdapter adapter = new WMSQueryAdapter();
+
+        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ? KEY_CRS_v130 : KEY_CRS_v110, true );
+        final String strBBox            = getParameter( KEY_BBOX, true );
+        final String strMime            = getParameter( KEY_FORMAT, true );
+        final String strLayers          = getParameter( KEY_LAYERS, true );
+        final String strElevation       = getParameter( KEY_ELEVATION, false );
+        final String strTime            = getParameter( KEY_TIME, false );
+        final String strWidth           = getParameter( KEY_WIDTH, true );
+        final String strHeight          = getParameter( KEY_HEIGHT, true );
+        final String strBGColor         = getParameter( KEY_BGCOLOR, false );
+        final String strTransparent     = getParameter( KEY_TRANSPARENT, false );
+        final String strStyles          = getParameter( KEY_STYLES, true );
+        final String strSLD             = getParameter( KEY_SLD, false );
+        final String strRemoteOwsType   = getParameter( KEY_REMOTE_OWS_TYPE, false );
+        final String strRemoteOwsUrl    = getParameter( KEY_REMOTE_OWS_URL, false );
+
+        final GeneralEnvelope env = adapter.toBBox(strBBox);
+        final Rectangle2D bbox = env.toRectangle2D();
+        CoordinateReferenceSystem crs = null;
+        
+        try {
+            crs = adapter.toCRS(strCRS);
+        } catch (FactoryException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        final String format = strMime;
+        final List<String> layers = adapter.toLayers(strLayers);
+        final List<String> styles = adapter.toStyles(strStyles);
+        MutableStyledLayerDescriptor sld = null;
+        final Double elevation = 0d;
+        final Date date = new Date();
+        final Dimension size = new Dimension( adapter.toInt(null, strWidth), adapter.toInt(null, strHeight));
+        final Color background = adapter.toColor(strBGColor);
+        final boolean transparent = adapter.toBoolean(strTransparent);
+        
+        if(strSLD != null){
+            sld = adapter.toSLD(strSLD);
+        }else if(strRemoteOwsUrl != null){
+            
+//            URL url = null;
+//            try {
+//                url = new URL(strRemoteOwsUrl);
+//            } catch (MalformedURLException ex) {
+//                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+            try {
+                InputStream stream = new FileInputStream(new File(strRemoteOwsUrl));
+                XMLUtilities sldparser = new XMLUtilities();
+                try{
+                    sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
+                }catch(JAXBException ex){
+                    System.out.println("Not a SLD v1.0");
+                }
+                if(sld == null){
+                    try{
+                        sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
+                    }catch(JAXBException ex){
+                        System.out.println("Not a SLD v1.1");
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+        //TODO check here if the query is valid
+
+        return new WMSQuery(bbox, crs, format, layers, 
+                styles, sld, elevation, date, size, background, transparent);
+    }
+    
+    /**
+     * Create a temporary file used for map images
+     */
+    private File createTempFile(String type){
+        //TODO, I dont know if using a temp file is correct or if it should be
+        //somewhere else.
+        
+        File f = null;
+        try {
+            String ending;
+            if("image/jpeg".equalsIgnoreCase(type)){
+                ending = ".jpeg";
+            }else if("image/gif".equalsIgnoreCase(type)){
+                ending = ".gif";
+            } else {
+                ending = ".png";
+            }
+            
+            f = File.createTempFile("temp", ending);
+        } catch (IOException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return f;
+    }
+    
+    private File writeInImage(Exception e, int width, int height, File output, String type){
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        
+        Graphics2D g = img.createGraphics();
+        g.setColor(Color.RED);
+        g.drawString(e.getMessage(), 10, height/2);
+        g.dispose();
+        
+        try {
+            ImageIO.write(img, type, output);
+        } catch (IOException ex) {
+            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return output;
+    }
+    
 }

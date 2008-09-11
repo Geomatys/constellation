@@ -16,43 +16,39 @@
  */
 package org.constellation.worker;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
 
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.WMSQuery;
 
+import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author Johann Sorel (Geomatys)
  */
-public class WMSWorker {
+public class WMSWorker{
 
-    private CSTLPortrayalService service = new CSTLPortrayalService();
-    private WMSQuery query = null;
+    private final CSTLPortrayalService service = new CSTLPortrayalService();
+    private final WMSQuery query;
+    private final File output;
     
     
-    public WMSWorker(){
-        
-    }
-    
-    public void setQuery(WMSQuery query){
-        if(query == null){
-            throw new NullPointerException("Query can not be null");
+    public WMSWorker(WMSQuery query, File output){
+        if(query == null || output == null){
+            throw new NullPointerException("Query and outpur file can not be null");
         }
         this.query = query;
+        this.output = output;
     }
-    
-    public Object getMap(Object outputFile) throws IOException, TransformException{
-        if(query == null){
-            throw new NullPointerException("Query must be set before calling for getMap()");
-        }
+        
+    public File getMap() throws PortrayalException{
         
         final List<String> layers = query.layers;
         final List<String> styles = query.styles;
@@ -62,10 +58,33 @@ public class WMSWorker {
         final Dimension canvasDimension = query.size;
         final Hints hints = null;
         
-        service.portray(layers, styles, sld, contextEnv, outputFile, mime, canvasDimension, hints);
+        StringBuilder builder = new StringBuilder();
+        builder.append("Layers => ");
+        for(String layer : layers){
+            builder.append(layer +",");
+        }
+        builder.append("\n");
+        builder.append("Styles => ");
+        for(String style : styles){
+            builder.append(style +",");
+        }
+        builder.append("\n");
+        builder.append("Context env => " + contextEnv.toString() + "\n");
+        builder.append("Mime => " + mime.toString() + "\n");
+        builder.append("Dimension => " + canvasDimension.toString() + "\n");
+        builder.append("File => " + output.toString() + "\n");
+        builder.append("BGColor => " + query.background + "\n");
+        builder.append("Transparant => " + query.transparent + "\n");
         
-        return outputFile;
+        Color bgcolor = (query.transparent) ? null : query.background ;
+        System.out.println("REAL COLOR => " + bgcolor);
+        
+        System.out.println(builder.toString());
+        
+        service.portray(layers, styles, bgcolor, sld, contextEnv, output, mime, canvasDimension, hints);
+        
+        return output;
     }
-    
+
     
 }

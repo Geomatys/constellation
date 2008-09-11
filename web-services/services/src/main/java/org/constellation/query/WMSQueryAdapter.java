@@ -41,7 +41,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class StringParser {
+public class WMSQueryAdapter {
 
     public CoordinateReferenceSystem toCRS(String epsg) throws FactoryException{
         if(epsg.trim().endsWith("4326")){
@@ -139,7 +139,7 @@ public class StringParser {
         try {
             sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_0_0);
         } catch (JAXBException ex) {
-            Logger.getLogger(StringParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         if(sld == null){
@@ -147,7 +147,7 @@ public class StringParser {
             try {
                 sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_1_0);
             } catch (JAXBException ex) {
-                Logger.getLogger(StringParser.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
@@ -181,13 +181,18 @@ public class StringParser {
         if (background != null) {
             background = background.trim();
             color = Color.decode(background);
+        }else{
+            //return the defautl specification color
+            color = Color.WHITE;
         }
         return color;
     }
     
-    public Boolean toBoolean(String strTransparent) {
+    public boolean toBoolean(String strTransparent) {
         if (strTransparent != null) {
             strTransparent = strTransparent.trim();
+        }else{
+            return false;
         }
         return Boolean.parseBoolean(strTransparent);
     }
