@@ -97,10 +97,7 @@ import org.constellation.ws.rs.WebService;
 //geotools dependencies
 import org.geotools.display.service.PortrayalException;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
@@ -110,7 +107,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 import static org.constellation.coverage.wms.WMSExceptionCode.*;
 import static org.constellation.query.WMSQuery.*;
@@ -306,12 +302,12 @@ public class WMService extends WebService {
     }
 
     private File getOrigFile() throws WebServiceException {
+        LOGGER.info("getOrigFile request received");
         final WebServiceWorker worker = this.webServiceWorker.get();
         worker.setLayer(getParameter(KEY_LAYER, true));
         worker.setTime(getParameter(KEY_TIME, true));
         worker.setService("WMS", "1.3.0");
-        CoverageReference cr = worker.getCoverageReference();
-        return cr.getFile();
+        return worker.getCoverageReference().getFile();
     }
 
     /**
@@ -342,12 +338,8 @@ public class WMService extends WebService {
         webServiceWorker.setLayer(getParameter(KEY_LAYERS, true));
         webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
 
-        String crs;
-        if (getCurrentVersion().toString().equals("1.3.0")) {
-            crs = getParameter(KEY_CRS_v130, true);
-        } else {
-            crs = getParameter(KEY_CRS_v110, true);
-        }
+        final String crs = (getCurrentVersion().toString().equals("1.3.0")) ? 
+            getParameter(KEY_CRS_v130, true) : getParameter(KEY_CRS_v110, true);
         webServiceWorker.setCoordinateReferenceSystem(crs);
         webServiceWorker.setBoundingBox(getParameter(KEY_BBOX, true));
         webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
@@ -366,9 +358,14 @@ public class WMService extends WebService {
      * @return
      * @throws fr.geomatys.wms.WebServiceException
      */
-    private synchronized File getGo2RendererMap(boolean errorInImage) throws  WebServiceException {
+    private synchronized File getGo2RendererMap(boolean errorInImage) throws WebServiceException {
         final WMSQuery query = adaptQuery();
-        final File tempFile = createTempFile(query.format);
+        final File tempFile;
+        try {
+            tempFile = createTempFile(query.format);
+        } catch (IOException io) {
+            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+        }
         final WMSWorker worker = new WMSWorker(query,tempFile);
         
         File image = null;
@@ -376,8 +373,12 @@ public class WMService extends WebService {
         try {
             image = worker.getMap();
         } catch (PortrayalException ex) {
-            if(errorInImage){
-                errorFile = createTempFile(query.format);
+            if(errorInImage) {
+                try {
+                    errorFile = createTempFile(query.format);
+                } catch (IOException io) {
+                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+                }
                 CSTLPortrayalService.writeInImage(ex, query.size.width, query.size.height, errorFile, query.format);
             } else {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
@@ -386,12 +387,7 @@ public class WMService extends WebService {
             }
         }
 
-        if(errorFile != null){
-            return errorFile;
-        }else{
-            return image;
-        }
-        
+        return (errorFile != null) ? errorFile : image;
     }
     
     /**
@@ -604,7 +600,7 @@ public class WMService extends WebService {
         }
 
         //and the the optional attribute
-        String inputVersion = getParameter("VERSION", false);
+        final String inputVersion = getParameter("VERSION", false);
         if(inputVersion != null && inputVersion.equals("1.3.0")) {
             setCurrentVersion("1.3.0");
         } else {
@@ -616,8 +612,8 @@ public class WMService extends WebService {
             format = "text/xml";
         }
 
-        AbstractWMSCapabilities response;
-        String updateSequence = getParameter("UPDATESEQUENCE", false);
+        final AbstractWMSCapabilities response;
+        // String updateSequence = getParameter("UPDATESEQUENCE", false);
 
         // the service shall return WMSCapabilities marshalled
         try {
@@ -627,9 +623,15 @@ public class WMService extends WebService {
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
 
         }
+        
+        //we build the list of accepted crs
+        final List<String> crs = new ArrayList<String>();
+        crs.add("EPSG:4326");  crs.add("EPSG:3395");  crs.add("EPSG:27574");
+        crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573");
+        crs.add("EPSG:27574");
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        AbstractRequest request = response.getCapability().getRequest();
+        final AbstractRequest request = response.getCapability().getRequest();
 
         updateURL(request.getGetCapabilities().getDCPType());
         updateURL(request.getGetFeatureInfo().getDCPType());
@@ -639,37 +641,24 @@ public class WMService extends WebService {
         //we build the layers object of the document
 
         //we get the list of layers
-        List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
+        final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
         
         // layers from data providers ------------------------------------------
-        NamedLayerDP dp = NamedLayerDP.getInstance();
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
         final Set<String> keys = dp.getKeys();
         for(String key : keys){
             MapLayer layer = dp.get(key);
             if(layer != null){
                 //we build and add a layer
                 AbstractLayer outputLayer = null;
-                String name = key;
-                String title = key;
-                String desc = "";
-                List<String> crs = new ArrayList<String>();
-                crs.add("EPSG:4326");crs.add("EPSG:3395");crs.add("EPSG:27574");
-                crs.add("EPSG:27571");crs.add("EPSG:27572");crs.add("EPSG:27573");
-                crs.add("EPSG:27574");
+                final String name = key;
+                final String title = key;
+                final String desc = "";
                 
                 List<AbstractLayer> subLayers = Collections.emptyList();
                 
                 if (getCurrentVersion().toString().equals("1.1.1")) {
                     //version 1.1.1
-                    ReferencedEnvelope env = layer.getBounds();
-                    CoordinateReferenceSystem sourceCRS = env.getCoordinateReferenceSystem();
-                    CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
-                    MathTransform transform = null;
-                    try {
-                        transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
-                    } catch (FactoryException ex) {
-                        Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                    }
                     double minx = -180d;
                     double maxx = +180d;
                     double miny = -90d;
@@ -705,17 +694,10 @@ public class WMService extends WebService {
                     LOGGER.info("layer" + inputLayer.getName() + " not queryable by WMS");
                     continue;
                 }
-
-                List<String> crs = new ArrayList<String>();
-
-                Integer code = 4326;
                 /*
                  *  TODO
                  * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
                  */
-
-                crs.add("EPSG:" + code.toString());
-
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
 
                 //we add the list od available date and elevation
@@ -789,7 +771,7 @@ public class WMService extends WebService {
                      */
                     org.constellation.wms.v111.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new org.constellation.wms.v111.BoundingBox("EPSG:" + code.toString(),
+                        outputBBox = new org.constellation.wms.v111.BoundingBox("EPSG:4326",
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -827,7 +809,7 @@ public class WMService extends WebService {
                      */
                     org.constellation.wms.v130.BoundingBox outputBBox = null;
                     if(inputGeoBox != null) {
-                        outputBBox = new org.constellation.wms.v130.BoundingBox("EPSG:" + code.toString(),
+                        outputBBox = new org.constellation.wms.v130.BoundingBox("EPSG:4326",
                                                                          inputGeoBox.getWestBoundLongitude(),
                                                                          inputGeoBox.getSouthBoundLatitude(),
                                                                          inputGeoBox.getEastBoundLongitude(),
@@ -865,16 +847,6 @@ public class WMService extends WebService {
                 throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
-
-
-        //we build the list of accepted crs
-        List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");crs.add("EPSG:3395");crs.add("EPSG:27574");
-        crs.add("EPSG:27571");crs.add("EPSG:27572");crs.add("EPSG:27573");
-        crs.add("EPSG:27574");
-
-        //we build a general boundingbox TODO
-        EXGeographicBoundingBox exGeographicBoundingBox = null;
 
         //we build the general layer and add it to the document
         AbstractLayer mainLayer;
@@ -1030,7 +1002,8 @@ public class WMService extends WebService {
     private WMSQuery adaptQuery() throws WebServiceException{
         final WMSQueryAdapter adapter = new WMSQueryAdapter();
 
-        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ? KEY_CRS_v130 : KEY_CRS_v110, true );
+        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ?
+                                                        KEY_CRS_v130 : KEY_CRS_v110, true );
         final String strBBox            = getParameter( KEY_BBOX, true );
         final String strMime            = getParameter( KEY_FORMAT, true );
         final String strLayers          = getParameter( KEY_LAYERS, true );
@@ -1105,27 +1078,23 @@ public class WMService extends WebService {
     /**
      * Create a temporary file used for map images
      */
-    private File createTempFile(String type){
+    private File createTempFile(String type) throws IOException {
         //TODO, I dont know if using a temp file is correct or if it should be
         //somewhere else.
-        
+
         File f = null;
-        try {
-            String ending;
-            if("image/jpeg".equalsIgnoreCase(type)){
-                ending = ".jpeg";
-            }else if("image/gif".equalsIgnoreCase(type)){
-                ending = ".gif";
-            } else {
-                ending = ".png";
-            }
-            
-            f = File.createTempFile("map", ending);
-            f.deleteOnExit();
-        } catch (IOException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+        String ending;
+        if ("image/jpeg".equalsIgnoreCase(type)) {
+            ending = ".jpeg";
+        } else if ("image/gif".equalsIgnoreCase(type)) {
+            ending = ".gif";
+        } else {
+            ending = ".png";
         }
-        
+
+        f = File.createTempFile("map", ending);
+        f.deleteOnExit();
+
         return f;
     }
     

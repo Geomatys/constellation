@@ -319,7 +319,7 @@ public abstract class WebService {
      * @param parameterName The name of the parameter.
      * @param mandatory true if this parameter is mandatory, false if its optional.
       *
-     * @return the parameter or null if not specified
+     * @return the parameter or null if not specified and not mandatory.
      * @throw WebServiceException
      */
     protected String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
@@ -347,7 +347,7 @@ public abstract class WebService {
                 throwException("The parameter " + parameterName + " must be specified",
                                "MISSING_PARAMETER_VALUE", parameterName);
                 //never reach;
-                return null;
+                throw new AssertionError();
             } else {
                 return null;
             }

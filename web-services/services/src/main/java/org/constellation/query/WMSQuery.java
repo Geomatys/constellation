@@ -26,11 +26,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * WMS Query in java objects
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class WMSQuery implements Query{
-    
+
     public static final String KEY_REQUEST = "REQUEST";
     public static final String REQUEST_MAP = "GetMap";
     public static final String REQUEST_FEATUREINFO = "GetFeatureInfo";
@@ -38,13 +38,13 @@ public class WMSQuery implements Query{
     public static final String REQUEST_DESCRIBELAYER = "DescribeLayer";
     public static final String REQUEST_LEGENDGRAPHIC = "GetLegendGraphic";
     public static final String REQUEST_ORIGFILE = "GetOrigFile";
-    
+
     /** Parameter used in getMap */
     public static final String KEY_EXCEPTIONS = "EXCEPTIONS";
     /** Parameter used in getMap */
     public static final String EXCEPTIONS_INIMAGE = "INIMAGE";
-    
-    
+
+
     /** Parameter used in getMap, getLegendGraphic, getCapabilities */
     public static final String KEY_FORMAT = "FORMAT";
     /** Parameter used in getMap, describeLayer */
@@ -107,10 +107,9 @@ public class WMSQuery implements Query{
     public static final String KEY_FEATURE_COUNT = "FEATURE_COUNT";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_GETMETADATA = "GetMetadata";
-    
-    
-    
-    
+
+    public static final String UNDEFINED_CRS = "UndefinedCRS";
+
     public final Rectangle2D bbox;
     public final CoordinateReferenceSystem crs;
     public final String format;
@@ -122,7 +121,7 @@ public class WMSQuery implements Query{
     public final Color background;
     public final boolean transparent;
     public final MutableStyledLayerDescriptor sld;
-    
+
     public WMSQuery(Rectangle2D bbox, CoordinateReferenceSystem crs, String format,
             List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld, Double elevation, Date date,
             Dimension size, Color background, boolean transparent){
@@ -138,5 +137,5 @@ public class WMSQuery implements Query{
         this.background = background;
         this.transparent = transparent;
     }
-    
+
 }

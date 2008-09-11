@@ -38,25 +38,30 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Convinient class to transform Strings to real Java objects.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class WMSQueryAdapter {
+    /**
+     * The default logger.
+     */
+    public static final Logger LOGGER = Logger.getLogger("org.constellation.query");
 
     public CoordinateReferenceSystem toCRS(String epsg) throws FactoryException{
-        if(epsg.trim().endsWith("4326")){
+        final String epsgTimmed = epsg.trim();
+        if(epsgTimmed.endsWith("4326") || epsgTimmed.endsWith(WMSQuery.UNDEFINED_CRS)){
             //TODO fix this
             //we should return the good EPSG 32662
-            System.out.println("WARNING : CRS 4326 used.");
+            LOGGER.info("WARNING : CRS 4326 used.");
             return DefaultGeographicCRS.WGS84;
         }
         return CRS.decode(epsg);
     }
-    
+
     public GeneralEnvelope toBBox(final String bbox) {
         GeneralEnvelope envelope = new GeneralEnvelope(2);
         envelope.setToInfinite();
-        
+
         if (bbox == null) {
             if (envelope != null) {
                 envelope.setToInfinite();
@@ -108,17 +113,17 @@ public class WMSQueryAdapter {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2));
             }
         }
-        
+
         return envelope;
     }
-    
+
     public List<String> toLayers(String strLayers){
         List<String> layers = new ArrayList<String>();
-        
+
         if(strLayers == null || strLayers.isEmpty()){
             return layers;
         }
-        
+
         StringTokenizer token = new StringTokenizer(strLayers,",",false);
         while(token.hasMoreTokens()){
             layers.add(token.nextToken());
@@ -130,18 +135,18 @@ public class WMSQueryAdapter {
         if(strSLD == null || strSLD.trim().length() == 0){
             return null;
         }
-        
+
         MutableStyledLayerDescriptor sld = null;
-        
+
         XMLUtilities sldUtilities = new XMLUtilities();
-        
+
         //try sld v1.0
         try {
             sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_0_0);
         } catch (JAXBException ex) {
             Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         if(sld == null){
             //try sld v1.1
             try {
@@ -150,10 +155,10 @@ public class WMSQueryAdapter {
                 Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         return sld;
     }
-    
+
     public List<String> toStyles(String strLayers){
         List<String> styles = new ArrayList<String>();
         StringTokenizer token = new StringTokenizer(strLayers,",");
@@ -162,7 +167,7 @@ public class WMSQueryAdapter {
         }
         return styles;
     }
-    
+
     public int toInt(final String name, String value) throws NumberFormatException {
         if (value == null) {
             throw new NullPointerException("value " + name+ " can not be null");
@@ -175,7 +180,7 @@ public class WMSQueryAdapter {
         value = value.trim();
         return Double.parseDouble(value);
     }
-    
+
     public Color toColor(String background) throws NumberFormatException{
         Color color = null;
         if (background != null) {
@@ -187,7 +192,7 @@ public class WMSQueryAdapter {
         }
         return color;
     }
-    
+
     public boolean toBoolean(String strTransparent) {
         if (strTransparent != null) {
             strTransparent = strTransparent.trim();
@@ -196,6 +201,6 @@ public class WMSQueryAdapter {
         }
         return Boolean.parseBoolean(strTransparent);
     }
-    
-    
+
+
 }
