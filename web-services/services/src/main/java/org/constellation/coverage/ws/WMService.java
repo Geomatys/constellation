@@ -91,6 +91,7 @@ import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.WMSQueryAdapter;
 import org.constellation.query.WMSQuery;
+import org.constellation.wms.AbstractHTTP;
 import org.constellation.worker.WMSWorker;
 import org.constellation.ws.rs.WebService;
 
@@ -100,9 +101,11 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
+import org.geotools.util.DateRange;
 import org.geotools.util.MeasurementRange;
 
 //geoapi dependencies
+import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -145,7 +148,7 @@ public class WMService extends WebService {
      */
     private static synchronized void ensureWorkerInitialized() throws SQLException, IOException,
                                                                       NamingException {
-        
+
         if (webServiceWorker == null) {
             Database database;
             try {
@@ -242,8 +245,8 @@ public class WMService extends WebService {
         ensureWorkerInitialized();
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.coverage.web:org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.sld.v110:org.constellation.gml.v311",
-                      "http://www.opengis.net/wms");
+        setXMLContext("org.constellation.coverage.web:org.constellation.wms.v111:org.constellation.wms.v130:" +
+                "org.constellation.sld.v110:org.constellation.gml.v311", "http://www.opengis.net/wms");
 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
@@ -294,7 +297,8 @@ public class WMService extends WebService {
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(wmsex.getExceptionReport(), sw);
-                return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
+                return Response.ok(cleanSpecialCharacter(sw.toString()),
+                                   webServiceWorker.getExceptionFormat()).build();
             } else {
                 throw new IllegalArgumentException("this service can't return OWS Exception");
             }
@@ -319,26 +323,26 @@ public class WMService extends WebService {
     private File getMap() throws  WebServiceException {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
-        
+
         final String errorType = getParameter(KEY_EXCEPTIONS, false);
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
-        
+
         //Set to true if you want to use the new GO2 renderer-------------------
         if(false){
             return getGo2RendererMap(errorInImage);
         }
-        
+
         // Previous SEAGIS renderer, only PostGrid support----------------------
-        
+
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-    
+
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setFormat(getParameter(KEY_FORMAT, true));
         webServiceWorker.setLayer(getParameter(KEY_LAYERS, true));
         webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
 
-        final String crs = (getCurrentVersion().toString().equals("1.3.0")) ? 
+        final String crs = (getCurrentVersion().toString().equals("1.3.0")) ?
             getParameter(KEY_CRS_v130, true) : getParameter(KEY_CRS_v110, true);
         webServiceWorker.setCoordinateReferenceSystem(crs);
         webServiceWorker.setBoundingBox(getParameter(KEY_BBOX, true));
@@ -367,7 +371,7 @@ public class WMService extends WebService {
             throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
         }
         final WMSWorker worker = new WMSWorker(query,tempFile);
-        
+
         File image = null;
         File errorFile = null;
         try {
@@ -382,14 +386,14 @@ public class WMService extends WebService {
                 CSTLPortrayalService.writeInImage(ex, query.size.width, query.size.height, errorFile, query.format);
             } else {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException("The requested map could not be renderered correctly :" + ex.getMessage(),
-                                              NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
+                        ex.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
 
         return (errorFile != null) ? errorFile : image;
     }
-    
+
     /**
      * Return the value of a point in a map.
      *
@@ -402,25 +406,21 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         verifyBaseParameter(0);
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        String layer = getParameter(KEY_QUERY_LAYERS, true);
+        final String currentVersion = getCurrentVersion().toString();
+        webServiceWorker.setService("WMS", currentVersion);
+        final String layer = getParameter(KEY_QUERY_LAYERS, true);
         webServiceWorker.setLayer(layer);
 
-        String crs;
-        if (getCurrentVersion().toString().equals("1.3.0")){
-            crs = getParameter(KEY_CRS_v130, true);
-        } else {
-            crs = getParameter(KEY_CRS_v110, true);
-        }
+        final String crs = (currentVersion.equals("1.3.0")) ?
+            getParameter(KEY_CRS_v130, true) : getParameter(KEY_CRS_v110, true);
         webServiceWorker.setCoordinateReferenceSystem(crs);
         webServiceWorker.setBoundingBox(getParameter(KEY_BBOX, true));
         webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
         webServiceWorker.setTime(getParameter(KEY_TIME, false));
         webServiceWorker.setDimension(getParameter(KEY_WIDTH, true), getParameter(KEY_HEIGHT, true), null);
 
-
         final String i, j;
-        if (getCurrentVersion().toString().equals("1.3.0")) {
+        if (currentVersion.equals("1.3.0")) {
             i = getParameter(KEY_I_v130, true);
             j = getParameter(KEY_J_v130, true);
         } else {
@@ -441,12 +441,11 @@ public class WMService extends WebService {
         } else {
             infoFormat = "text/plain";
         }
-        String feature_count = getParameter(KEY_FEATURE_COUNT, false);
+        //String feature_count = getParameter(KEY_FEATURE_COUNT, false);
 
         webServiceWorker.setExceptionFormat(getParameter(KEY_EXCEPTIONS, false));
 
-        double result = webServiceWorker.evaluatePixel(i,j);
-
+        final double result = webServiceWorker.evaluatePixel(i,j);
 
         // there is many return type possible
         String response;
@@ -471,109 +470,105 @@ public class WMService extends WebService {
         }
         //if we return xml or gml
         else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
-            DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
-            List<Double> coord = new ArrayList<Double>();
+            final DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
+            final List<Double> coord = new ArrayList<Double>();
             for (Double d:inputCoordinate.getCoordinate()) {
                 coord.add(d);
             }
             coord.add(result);
-            List<String> axisLabels = new ArrayList<String>();
+            final List<String> axisLabels = new ArrayList<String>();
             axisLabels.add("X");
             axisLabels.add("Y");
             axisLabels.add("RESULT");
-            DirectPositionType pos = new DirectPositionType(crs, 3, axisLabels, coord);
-            PointType pt = new PointType(layer, pos);
+            final DirectPositionType pos = new DirectPositionType(crs, 3, axisLabels, coord);
+            final PointType pt = new PointType(layer, pos);
 
             //we marshall the response and return the XML String
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(pt, sw);
             response = sw.toString();
         }
 
         // HTML Response with all metadata for the
         // TODO: This is only temporary! Get metadata via CSW request instead.
-        Boolean getMetadata = false;
-        String getMetadataParam = getParameter(KEY_GETMETADATA,false);
+        boolean getMetadata = false;
+        final String getMetadataParam = getParameter(KEY_GETMETADATA, false);
         if (getMetadataParam != null && getMetadataParam.equalsIgnoreCase("TRUE")) {
                 getMetadata = true;
         }
-        if (infoFormat.equals("text/html") && getMetadata == true )  {
+        if (infoFormat.equals("text/html") && getMetadata == true) {
+            final CoverageReference coverageRef = webServiceWorker.getCoverageReference();
+
+            // TODO:  move all of this to CoverageReference so we just need:
+            // return coverageRef.getMetadataAsHTML();
+            final Database database = webServiceWorker.getDatabase();
+            final LayerMetadata layerMetaEntry;
+            final PointOfContact pocEntry;
             try {
-                CoverageReference coverageRef = webServiceWorker.getCoverageReference();
-                String filename = coverageRef.getFile().getAbsolutePath();
+                final LayerMetadataTable layerMetaTable = new LayerMetadataTable(database);
+                layerMetaEntry = layerMetaTable.getEntry(layer);
 
-                // TODO:  move all of this to CoverageReference so we just need:
-                // return coverageRef.getMetadataAsHTML();
-
-                final LayerMetadataTable layerMetaTable = new LayerMetadataTable(webServiceWorker.getDatabase());
-                final LayerMetadata layerMetaEntry = layerMetaTable.getEntry(layer);
-
-                final SeriesMetadataTable seriesMetaTable = new SeriesMetadataTable(webServiceWorker.getDatabase());
+                final SeriesMetadataTable seriesMetaTable = new SeriesMetadataTable(database);
                 final SeriesMetadata seriesMetaEntry = seriesMetaTable.getEntry(coverageRef.getSeries().toString());
 
-                final PointOfContactTable pocTable = new PointOfContactTable(webServiceWorker.getDatabase());
-                final PointOfContact pocEntry;
-                if (seriesMetaEntry.getPointOfContactID() != null) pocEntry = pocTable.getEntry(seriesMetaEntry.getPointOfContactID());
-                else pocEntry = null;
-
-
-                final Date startDate = coverageRef.getTimeRange().getMinValue();
-                final Date endDate = coverageRef.getTimeRange().getMaxValue();
-                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-                df.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-                final String pocName, pocOrg, pocEmail;
-                if (pocEntry == null) {
-                    pocName = pocOrg = pocEmail = "---";
-                }
-                else {
-                    pocName = pocEntry.getName();
-                    pocEmail = pocEntry.getEmail();
-                    pocOrg = pocEntry.getOrg();
-                }
-
-                final String linkToOrig = "../postgrid-web/WS/wms?REQUEST=GetOrigFile&LAYER=" + layer + "&TIME=" + getParameter("TIME", true);
-
-                response =  "<table id=\"metadataTable\">\n" +
-                            "<tr><td width=200><b>Data Layer Title:</b></td><td>" + layerMetaEntry.getLongTitle() + "</td></tr>\n" +
-                            "<tr><td><b>Start Date:</b></td><td>" + df.format(startDate) + "</td></tr>\n" +
-                            "<tr><td><b>End Date:</b></td><td>" + df.format(endDate) + "</td></tr>\n" +
-                            "<tr><td><b>Data File:</b></td><td><a href=\"" + linkToOrig + "\">" + coverageRef.getFile().getName() + "</a></td></tr>\n" +
-                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                            "<tr><td><b>Parameter Name:</b></td><td>" + layerMetaEntry.getParameterName() + "</td></tr>\n" +
-                            "<tr><td><b>Parameter Type:</b></td><td>" + layerMetaEntry.getParameterType() + "</td></tr>\n" +
-                            "<tr><td><b>Minimum Value:</b></td><td>" + Math.round(coverageRef.getSampleDimensions()[0].getMinimumValue()) + "</td></tr>\n" +
-                            "<tr><td><b>Maximum Value:</b></td><td>" + Math.round(coverageRef.getSampleDimensions()[0].getMaximumValue()) + "</td></tr>\n" +
-                            "<tr><td><b>Units:</b></td><td>" + coverageRef.getSampleDimensions()[0].getUnits() + "</td></tr>\n" +
-                            "<tr><td><b>Update Frequency:</b></td><td>" + layerMetaEntry.getUpdateFrequency() + "</td></tr>\n" +
-                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                            "<tr><td><b>Description:</b></td><td>" + layerMetaEntry.getDescription() + "</td></tr>\n" +
-                            "<tr><td><b>Purpose:</b></td><td>" + layerMetaEntry.getPurpose() + "</td></tr>\n" +
-                            "<tr><td><b>Bounding Box:</b></td><td>&nbsp;</td></tr>\n" +
-                            "<tr><td><i>&nbsp;&nbsp;&nbsp;West</i></td><td>"+ coverageRef.getGeographicBoundingBox().getWestBoundLongitude() + "</td></tr>\n" +
-                            "<tr><td><i>&nbsp;&nbsp;&nbsp;East</i></td><td>"+ coverageRef.getGeographicBoundingBox().getEastBoundLongitude() + "</td></tr>\n" +
-                            "<tr><td><i>&nbsp;&nbsp;&nbsp;North</i></td><td>"+ coverageRef.getGeographicBoundingBox().getNorthBoundLatitude() + "</td></tr>\n" +
-                            "<tr><td><i>&nbsp;&nbsp;&nbsp;South</i></td><td>"+ coverageRef.getGeographicBoundingBox().getSouthBoundLatitude() + "</td></tr>\n" +
-                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                            //"<tr><td><b>Spatial Reference:</b></td><td>" + coverageRef.getCoordinateReferenceSystem().toString() + "</td></tr>\n" +
-                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                            "<tr><td><b>Publisher:</b></td><td>" + pocOrg + "</td></tr>\n" +
-                            "<tr><td><b>Contact:</b></td><td>" + pocName + "</td></tr>\n" +
-                            "<tr><td><b>Email:</b></td><td>" + pocEmail + "</td></tr>\n" +
-                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                            "<tr><td><b>Use Constraints:</b></td><td>" + layerMetaEntry.getUseConstraint() + "</td></tr>\n" +
-                            "<tr><td></b></td><td>&nbsp;</td></tr>\n" +
-                            "</table>" ;
-
+                final PointOfContactTable pocTable = new PointOfContactTable(database);
+                pocEntry = (seriesMetaEntry.getPointOfContactID() != null) ? pocTable.getEntry(seriesMetaEntry.getPointOfContactID()) : null;
             } catch (CatalogException ex) {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                response = "Could not find any matching records.";
+                throw new WMSWebServiceException("Could not find any matching records.",
+                                              NO_APPLICABLE_CODE, getCurrentVersion());
             } catch (SQLException ex) {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                response = "SQL error.";
+                throw new WMSWebServiceException("Could not find any matching records.",
+                                              NO_APPLICABLE_CODE, getCurrentVersion());
             }
-        }
+            final DateRange timeRange = coverageRef.getTimeRange();
+            final Date startDate = timeRange.getMinValue();
+            final Date endDate = timeRange.getMaxValue();
+            final DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+            df.setTimeZone(TimeZone.getTimeZone("GMT"));
 
+            final String pocName,  pocOrg,  pocEmail;
+            if (pocEntry == null) {
+                pocName = pocOrg = pocEmail = "---";
+            } else {
+                pocName = pocEntry.getName();
+                pocEmail = pocEntry.getEmail();
+                pocOrg = pocEntry.getOrg();
+            }
+
+            final String linkToOrig = "../postgrid-web/WS/wms?REQUEST=GetOrigFile&LAYER=" + layer + "&TIME=" + getParameter("TIME", true);
+            final GeographicBoundingBox bbox = coverageRef.getGeographicBoundingBox();
+            final SampleDimension firstSampleDim = coverageRef.getSampleDimensions()[0];
+            response = "<table id=\"metadataTable\">\n" +
+                    "<tr><td width=200><b>Data Layer Title:</b></td><td>" + layerMetaEntry.getLongTitle() + "</td></tr>\n" +
+                    "<tr><td><b>Start Date:</b></td><td>" + df.format(startDate) + "</td></tr>\n" +
+                    "<tr><td><b>End Date:</b></td><td>" + df.format(endDate) + "</td></tr>\n" +
+                    "<tr><td><b>Data File:</b></td><td><a href=\"" + linkToOrig + "\">" + coverageRef.getFile().getName() + "</a></td></tr>\n" +
+                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                    "<tr><td><b>Parameter Name:</b></td><td>" + layerMetaEntry.getParameterName() + "</td></tr>\n" +
+                    "<tr><td><b>Parameter Type:</b></td><td>" + layerMetaEntry.getParameterType() + "</td></tr>\n" +
+                    "<tr><td><b>Minimum Value:</b></td><td>" + Math.round(firstSampleDim.getMinimumValue()) + "</td></tr>\n" +
+                    "<tr><td><b>Maximum Value:</b></td><td>" + Math.round(firstSampleDim.getMaximumValue()) + "</td></tr>\n" +
+                    "<tr><td><b>Units:</b></td><td>" + firstSampleDim.getUnits() + "</td></tr>\n" +
+                    "<tr><td><b>Update Frequency:</b></td><td>" + layerMetaEntry.getUpdateFrequency() + "</td></tr>\n" +
+                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                    "<tr><td><b>Description:</b></td><td>" + layerMetaEntry.getDescription() + "</td></tr>\n" +
+                    "<tr><td><b>Purpose:</b></td><td>" + layerMetaEntry.getPurpose() + "</td></tr>\n" +
+                    "<tr><td><b>Bounding Box:</b></td><td>&nbsp;</td></tr>\n" +
+                    "<tr><td><i>&nbsp;&nbsp;&nbsp;West</i></td><td>"+ bbox.getWestBoundLongitude() + "</td></tr>\n" +
+                    "<tr><td><i>&nbsp;&nbsp;&nbsp;East</i></td><td>"+ bbox.getEastBoundLongitude() + "</td></tr>\n" +
+                    "<tr><td><i>&nbsp;&nbsp;&nbsp;North</i></td><td>"+ bbox.getNorthBoundLatitude() + "</td></tr>\n" +
+                    "<tr><td><i>&nbsp;&nbsp;&nbsp;South</i></td><td>"+ bbox.getSouthBoundLatitude() + "</td></tr>\n" +
+                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                    //"<tr><td><b>Spatial Reference:</b></td><td>" + coverageRef.getCoordinateReferenceSystem().toString() + "</td></tr>\n" +
+                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                    "<tr><td><b>Publisher:</b></td><td>" + pocOrg + "</td></tr>\n" +
+                    "<tr><td><b>Contact:</b></td><td>" + pocName + "</td></tr>\n" +
+                    "<tr><td><b>Email:</b></td><td>" + pocEmail + "</td></tr>\n" +
+                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                    "<tr><td><b>Use Constraints:</b></td><td>" + layerMetaEntry.getUseConstraint() + "</td></tr>\n" +
+                    "<tr><td></b></td><td>&nbsp;</td></tr>\n" +
+                    "</table>" ;
+        }
         //if we return text
         else {
             response = "result for " + layer + " is:" + result;
@@ -601,7 +596,7 @@ public class WMService extends WebService {
 
         //and the the optional attribute
         final String inputVersion = getParameter("VERSION", false);
-        if(inputVersion != null && inputVersion.equals("1.3.0")) {
+        if (inputVersion != null && inputVersion.equals("1.3.0")) {
             setCurrentVersion("1.3.0");
         } else {
             setCurrentVersion("1.1.1");
@@ -621,9 +616,8 @@ public class WMService extends WebService {
         } catch(IOException e)   {
             throw new WMSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
-
         }
-        
+
         //we build the list of accepted crs
         final List<String> crs = new ArrayList<String>();
         crs.add("EPSG:4326");  crs.add("EPSG:3395");  crs.add("EPSG:27574");
@@ -642,7 +636,7 @@ public class WMService extends WebService {
 
         //we get the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
-        
+
         // layers from data providers ------------------------------------------
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final Set<String> keys = dp.getKeys();
@@ -654,9 +648,9 @@ public class WMService extends WebService {
                 final String name = key;
                 final String title = key;
                 final String desc = "";
-                
+
                 List<AbstractLayer> subLayers = Collections.emptyList();
-                
+
                 if (getCurrentVersion().toString().equals("1.1.1")) {
                     //version 1.1.1
                     double minx = -180d;
@@ -664,7 +658,7 @@ public class WMService extends WebService {
                     double miny = -90d;
                     double maxy = +90d;
                     LatLonBoundingBox bbox = new LatLonBoundingBox(minx, miny, maxx, maxy);
-                    
+
                     outputLayer = new org.constellation.wms.v111.Layer(name,title,desc,crs,bbox,subLayers);
                 }
 
@@ -677,17 +671,17 @@ public class WMService extends WebService {
                     EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude);
                     outputLayer = new org.constellation.wms.v130.Layer(name,title,desc,crs,bbox,subLayers);
                 }
-                
+
                 if(outputLayer != null){
                     layers.add(outputLayer);
                 }
-                
+
             }
         }
-        
+
         //----------------------------------------------------------------------
-        
-        
+
+
         for (org.constellation.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {
@@ -875,7 +869,7 @@ public class WMService extends WebService {
         } else {
             marshaller.setProperty("com.sun.xml.bind.xmlHeaders", "");
         }
-        
+
         marshaller.marshal(response, sw);
 
         return Response.ok(sw.toString(), format).build();
@@ -894,16 +888,16 @@ public class WMService extends WebService {
         verifyBaseParameter(2);
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
 
-        OnlineResourceType or = new OnlineResourceType(getServiceURL() + "wcs?");
-        List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
-        String layers = getParameter(KEY_LAYERS, true);
-        Set<String> registredLayers = webServiceWorker.getLayerNames();
+        final OnlineResourceType or = new OnlineResourceType(getServiceURL() + "wcs?");
+        final List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
+        final String layers = getParameter(KEY_LAYERS, true);
+        final Set<String> registredLayers = webServiceWorker.getLayerNames();
         final StringTokenizer tokens = new StringTokenizer(layers, ",");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             if (registredLayers.contains(token)) {
-                TypeNameType t = new TypeNameType(token);
-                LayerDescriptionType outputLayer = new LayerDescriptionType(or,t);
+                final TypeNameType t = new TypeNameType(token);
+                final LayerDescriptionType outputLayer = new LayerDescriptionType(or,t);
                 layersDescriptions.add(outputLayer);
             } else {
                 throw new WMSWebServiceException("This layer is not registred: " + token,
@@ -911,15 +905,21 @@ public class WMService extends WebService {
             }
         }
 
-        DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescriptions);
+        final DescribeLayerResponseType response = new DescribeLayerResponseType(
+                getSldVersion().toString(), layersDescriptions);
 
         //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();
+        final StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
         return sw.toString();
     }
 
-
+    /**
+     * Return the legend graphic for the current layer.
+     * @return
+     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws javax.xml.bind.JAXBException
+     */
     private File getLegendGraphic() throws WebServiceException, JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
@@ -927,10 +927,10 @@ public class WMService extends WebService {
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
         webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
-        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false),
+                getParameter(KEY_ELEVATION, false));
 
-
-        String style = getParameter(KEY_STYLE, false);
+        /*String style = getParameter(KEY_STYLE, false);
 
         String featureType   = getParameter(KEY_FEATURETYPE, false);
         String remoteSld     = getParameter(KEY_SLD, false);
@@ -940,7 +940,7 @@ public class WMService extends WebService {
         String rule          = getParameter(KEY_RULE, false);
         String scale         = getParameter(KEY_SCALE, false);
 
-        StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter(KEY_SLD_BODY, false);
+        StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter(KEY_SLD_BODY, false);*/
 
         return  webServiceWorker.getLegendFile();
 
@@ -949,13 +949,14 @@ public class WMService extends WebService {
     /**
      * update The URL in capabilities document with the service actual URL.
      */
-    private void updateURL(List<? extends AbstractDCP> dcpList) {
+    private void updateURL(final List<? extends AbstractDCP> dcpList) {
         for(AbstractDCP dcp: dcpList) {
-            AbstractProtocol getMethod = dcp.getHTTP().getGet();
+            final AbstractHTTP http = dcp.getHTTP();
+            final AbstractProtocol getMethod = http.getGet();
             if (getMethod != null) {
                 getMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
             }
-            AbstractProtocol postMethod = dcp.getHTTP().getPost();
+            final AbstractProtocol postMethod = http.getPost();
             if (postMethod != null) {
                 postMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
             }
@@ -992,14 +993,14 @@ public class WMService extends WebService {
         }
 
     }
-    
+
     /**
      * Transform the Query in a container of real java objects, not strings.
-     * 
+     *
      * @return WMSQuery
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private WMSQuery adaptQuery() throws WebServiceException{
+    private WMSQuery adaptQuery() throws WebServiceException {
         final WMSQueryAdapter adapter = new WMSQueryAdapter();
 
         final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ?
@@ -1007,27 +1008,27 @@ public class WMService extends WebService {
         final String strBBox            = getParameter( KEY_BBOX, true );
         final String strMime            = getParameter( KEY_FORMAT, true );
         final String strLayers          = getParameter( KEY_LAYERS, true );
-        final String strElevation       = getParameter( KEY_ELEVATION, false );
-        final String strTime            = getParameter( KEY_TIME, false );
+        //final String strElevation       = getParameter( KEY_ELEVATION, false );
+        //final String strTime            = getParameter( KEY_TIME, false );
         final String strWidth           = getParameter( KEY_WIDTH, true );
         final String strHeight          = getParameter( KEY_HEIGHT, true );
         final String strBGColor         = getParameter( KEY_BGCOLOR, false );
         final String strTransparent     = getParameter( KEY_TRANSPARENT, false );
         final String strStyles          = getParameter( KEY_STYLES, true );
         final String strSLD             = getParameter( KEY_SLD, false );
-        final String strRemoteOwsType   = getParameter( KEY_REMOTE_OWS_TYPE, false );
+        //final String strRemoteOwsType   = getParameter( KEY_REMOTE_OWS_TYPE, false );
         final String strRemoteOwsUrl    = getParameter( KEY_REMOTE_OWS_URL, false );
 
         final GeneralEnvelope env = adapter.toBBox(strBBox);
         final Rectangle2D bbox = env.toRectangle2D();
         CoordinateReferenceSystem crs = null;
-        
+
         try {
             crs = adapter.toCRS(strCRS);
         } catch (FactoryException ex) {
             Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         final String format = strMime;
         final List<String> layers = adapter.toLayers(strLayers);
         final List<String> styles = adapter.toStyles(strStyles);
@@ -1037,11 +1038,11 @@ public class WMService extends WebService {
         final Dimension size = new Dimension( adapter.toInt(null, strWidth), adapter.toInt(null, strHeight));
         final Color background = adapter.toColor(strBGColor);
         final boolean transparent = adapter.toBoolean(strTransparent);
-        
+
         if(strSLD != null){
             sld = adapter.toSLD(strSLD);
         }else if(strRemoteOwsUrl != null){
-            
+
 //            URL url = null;
 //            try {
 //                url = new URL(strRemoteOwsUrl);
@@ -1066,15 +1067,15 @@ public class WMService extends WebService {
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
-        
+
         //TODO check here if the query is valid
 
-        return new WMSQuery(bbox, crs, format, layers, 
+        return new WMSQuery(bbox, crs, format, layers,
                 styles, sld, elevation, date, size, background, transparent);
     }
-    
+
     /**
      * Create a temporary file used for map images
      */
@@ -1082,8 +1083,7 @@ public class WMService extends WebService {
         //TODO, I dont know if using a temp file is correct or if it should be
         //somewhere else.
 
-        File f = null;
-        String ending;
+        final String ending;
         if ("image/jpeg".equalsIgnoreCase(type)) {
             ending = ".jpeg";
         } else if ("image/gif".equalsIgnoreCase(type)) {
@@ -1092,12 +1092,12 @@ public class WMService extends WebService {
             ending = ".png";
         }
 
-        f = File.createTempFile("map", ending);
+        final File f = File.createTempFile("map", ending);
         f.deleteOnExit();
 
         return f;
     }
-    
-    
-    
+
+
+
 }

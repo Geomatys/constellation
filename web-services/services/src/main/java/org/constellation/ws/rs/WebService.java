@@ -323,13 +323,13 @@ public abstract class WebService {
      * @throw WebServiceException
      */
     protected String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
+        final MultivaluedMap parameters = context.getQueryParameters();
+        final Set<String> keySet = parameters.keySet();
+        final Iterator<String> it = keySet.iterator();
 
-        MultivaluedMap parameters = context.getQueryParameters();
-
-        Set<String> keySet = parameters.keySet();
         boolean notFound = true;
-        Iterator<String> it = keySet.iterator();
         String s = null;
+
         while (notFound && it.hasNext()) {
             s = it.next();
             if (parameterName.equalsIgnoreCase(s)) {
@@ -338,12 +338,6 @@ public abstract class WebService {
         }
         if (notFound) {
             if (mandatory) {
-                ServiceVersion v;
-                if (parameterName.equalsIgnoreCase("version")) {
-                    v = null;
-                } else {
-                    v = currentVersion;
-                }
                 throwException("The parameter " + parameterName + " must be specified",
                                "MISSING_PARAMETER_VALUE", parameterName);
                 //never reach;
@@ -352,8 +346,7 @@ public abstract class WebService {
                 return null;
             }
         } else {
-             LinkedList<String> list = (LinkedList) parameters.get(s);
-             return list.get(0);
+             return (String) ((LinkedList) parameters.get(s)).get(0);
         }
     }
 
@@ -363,7 +356,7 @@ public abstract class WebService {
      *
      */
     protected void writeParameters() throws WebServiceException {
-        MultivaluedMap parameters = context.getQueryParameters();
+        final MultivaluedMap parameters = context.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
     }
