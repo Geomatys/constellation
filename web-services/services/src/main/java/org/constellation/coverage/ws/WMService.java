@@ -473,7 +473,7 @@ public class WMService extends WebService {
         else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
             DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
             List<Double> coord = new ArrayList<Double>();
-            for (Double d:inputCoordinate.getCoordinates()) {
+            for (Double d:inputCoordinate.getCoordinate()) {
                 coord.add(d);
             }
             coord.add(result);
