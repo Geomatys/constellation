@@ -927,8 +927,8 @@ public class WMService extends WebService {
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
         webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
-        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false),
-                getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
 
         /*String style = getParameter(KEY_STYLE, false);
 
