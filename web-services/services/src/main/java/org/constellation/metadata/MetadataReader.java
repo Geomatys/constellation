@@ -193,7 +193,8 @@ public class MetadataReader {
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100");
+        this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
+                                                "org.constellation.ogc");
         this.ebrimPackage    = searchSubPackage("org.constellation.ebrim.v300");
         
         this.metadatas       = new HashMap<String, Object>();
@@ -691,14 +692,24 @@ public class MetadataReader {
 
                 // if the value is a codeList element we call the static method valueOf 
                 // instead of a constructor
-                if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
+                if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) || classe.isEnum()) {
                     // the textValue of a codelist is the code and not the value
                     // so we must find the codeList element corrrespounding to this code.
                     org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
                     try {
                         CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
                     
-                        Method method = classe.getMethod("valueOf", String.class);
+                        Method method;
+                        if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class))) {
+                            temp = "valueOf";
+                            method = classe.getMethod("valueOf", String.class);
+                        } else if (classe.isEnum()) {
+                            temp = "fromValue";
+                            method = classe.getMethod("fromValue", String.class);
+                        } else {
+                            logger.severe("unknow codelist type");
+                            return null;
+                        }
                         result = method.invoke(null, element.getName());
                         return result;
                     } catch (NumberFormatException e) {
@@ -736,8 +747,7 @@ public class MetadataReader {
                 if (tempobj != null) {
                     return tempobj;
                 } else {
-                    logger.severe("the linked object is not already read: " + lv.getLinkedValue().getIdValue());
-                    return null;
+                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue()); 
                 }
                 
             // else if the value is a complex object    
@@ -750,9 +760,10 @@ public class MetadataReader {
                 if (classe.getSimpleName().equals("LocalName")) {
                     Constructor constructor = classe.getConstructor(CharSequence.class);
                     TextValue child = null;
+                    
                     //We search the child of the localName
                     for (Value childValue : form.getValues()) {
-                        if (childValue.getParent()!= null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                        if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
                             child = (TextValue) childValue;
                         }
                     }
@@ -764,6 +775,28 @@ public class MetadataReader {
                         logger.severe("The localName is mal-formed");
                         return null;
                     }
+                } else if (classe.getSimpleName().equals("QName")) {
+                    Constructor constructor = classe.getConstructor(String.class, String.class);
+                    TextValue localPart    = null;
+                    TextValue namespaceURI = null;
+                    
+                    //We search the children of the QName
+                    for (Value childValue : form.getValues()) {
+                        if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                            if (childValue.getPath().getName().equals("localPart"))
+                                localPart = (TextValue) childValue;
+                            else  if (childValue.getPath().getName().equals("namespaceURI"))
+                                namespaceURI = (TextValue) childValue;
+                        }
+                    }
+                    if (localPart != null && namespaceURI != null) {
+                        result = constructor.newInstance(namespaceURI.getValue(), localPart.getValue());
+                        return result;
+                    } else {
+                        logger.severe("The QName is mal-formed");
+                        return null;
+                    }
+                    
                 }
                 
                 /**
@@ -957,6 +990,8 @@ public class MetadataReader {
             return String.class;
         } else if (className.equalsIgnoreCase("RO_SystRefCode")) {
             return String.class;
+        } else if (className.equalsIgnoreCase("QName")) {
+            return QName.class;
         } else {
             return null;
         }
@@ -1000,8 +1035,8 @@ public class MetadataReader {
 
 
         List<String> packagesName = new ArrayList<String>();
-        if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore") || 
-            standardName.equals("OGC Web Service")) {
+        if (standardName.equals("Catalog Web Service") || standardName.equals("DublinCore") || 
+            standardName.equals("OGC Web Service")     || standardName.equals("OGC Filter")) {
             packagesName = CSWPackage;
             
         } else if (standardName.equals("Ebrim v3.0")) {

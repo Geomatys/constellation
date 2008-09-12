@@ -466,8 +466,17 @@ public class MetadataWriter {
      * @param classe an MDWeb classe Object
      */
     private boolean isPrimitive(Classe classe) {
-        if (classe != null)
-            return (classe.getProperties().size() == 0 || classe instanceof CodeList);
+        if (classe != null) {
+            int nbProperties = classe.getProperties().size();
+            Classe superClass = classe.getSuperClass();
+            while (superClass != null) {
+                nbProperties = nbProperties + superClass.getProperties().size();
+                superClass = superClass.getSuperClass();
+            }
+            
+            return (nbProperties == 0 || classe instanceof CodeList);
+        }
+            
         return false;
     }
     
@@ -553,6 +562,7 @@ public class MetadataWriter {
             availableStandards.add(Standard.EBRIM_V3);
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.OGC_FILTER);
+            availableStandards.add(Standard.MDWEB);
         
         } else {
             throw new IllegalArgumentException("Unexpected Main standard: " + mainStandard);
