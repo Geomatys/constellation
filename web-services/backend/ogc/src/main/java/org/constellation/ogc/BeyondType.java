@@ -28,7 +28,7 @@ public class BeyondType extends DistanceBufferType implements Beyond {
     /**
      * An empty constructor used by JAXB
      */
-    BeyondType() {
+    public BeyondType() {
         
     }
     

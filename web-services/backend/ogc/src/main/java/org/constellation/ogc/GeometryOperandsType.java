@@ -58,7 +58,7 @@ public class GeometryOperandsType {
     /**
      * Empty constructor used by JAXB
      */
-    GeometryOperandsType() {
+    public GeometryOperandsType() {
         
     }
     

@@ -28,7 +28,7 @@ public class NotType extends UnaryLogicOpType implements Not {
     /**
      * An empty constructor used by JAXB
      */
-     NotType() {
+     public NotType() {
          
      }
      

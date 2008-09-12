@@ -59,7 +59,7 @@ public class ArithmeticOperatorsType implements ArithmeticOperators {
     /**
      * An empty constructor used by JAXB
      */
-    ArithmeticOperatorsType() {
+    public ArithmeticOperatorsType() {
         
     }
     

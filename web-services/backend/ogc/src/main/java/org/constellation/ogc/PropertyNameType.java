@@ -52,7 +52,7 @@ public class PropertyNameType implements PropertyName {
     /**
      * An empty constructor used by JAXB
      */
-    PropertyNameType() {
+    public PropertyNameType() {
         
     }
     

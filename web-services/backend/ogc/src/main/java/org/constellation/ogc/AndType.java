@@ -32,7 +32,7 @@ public class AndType extends  BinaryLogicOpType implements And {
      /**
      * An empty constructor used by JAXB
      */
-     AndType() {
+     public AndType() {
          
      }
      

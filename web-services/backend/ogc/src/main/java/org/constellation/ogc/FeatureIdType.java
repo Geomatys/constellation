@@ -58,7 +58,7 @@ public class FeatureIdType extends AbstractIdType implements FeatureId {
     /**
      * An empty constructor used by JAXB
      */
-    FeatureIdType() {
+    public FeatureIdType() {
         
     }
     

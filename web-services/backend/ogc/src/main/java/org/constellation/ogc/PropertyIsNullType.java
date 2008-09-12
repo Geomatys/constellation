@@ -56,7 +56,7 @@ public class PropertyIsNullType extends ComparisonOpsType implements PropertyIsN
     /**
      * An empty constructor used by JAXB
      */
-     PropertyIsNullType() {
+     public PropertyIsNullType() {
          
      }
      

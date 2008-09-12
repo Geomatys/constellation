@@ -72,7 +72,7 @@ public class DistanceBufferType extends SpatialOpsType {
     /**
      * An empty constructor used by JAXB
      */
-    DistanceBufferType() {
+    public DistanceBufferType() {
         
     }
     

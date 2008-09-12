@@ -78,7 +78,7 @@ public class FilterCapabilities implements org.opengis.filter.capability.FilterC
     /**
      * An empty constructor used by JAXB
      */
-    FilterCapabilities() {
+    public FilterCapabilities() {
         
     }
     

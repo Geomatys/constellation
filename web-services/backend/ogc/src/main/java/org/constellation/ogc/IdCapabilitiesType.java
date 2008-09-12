@@ -59,7 +59,7 @@ public class IdCapabilitiesType implements IdCapabilities {
     /**
      * Empty constructor used By JAXB
      */
-     IdCapabilitiesType() {
+     public IdCapabilitiesType() {
         
      }
      

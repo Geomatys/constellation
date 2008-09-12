@@ -32,7 +32,7 @@ public class OrType extends  BinaryLogicOpType implements Or  {
      /**
      * An empty constructor used by JAXB
      */
-     OrType() {
+     public OrType() {
          
      }
      

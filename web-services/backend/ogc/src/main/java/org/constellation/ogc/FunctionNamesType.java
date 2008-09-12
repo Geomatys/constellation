@@ -59,7 +59,7 @@ public class FunctionNamesType implements Functions {
     /**
      * Empty construtor used by JAXB
      */
-    FunctionNamesType() {
+    public FunctionNamesType() {
         
     }
     

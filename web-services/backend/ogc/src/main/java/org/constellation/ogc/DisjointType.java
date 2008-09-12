@@ -28,7 +28,7 @@ public class DisjointType extends BinarySpatialOpType implements Disjoint {
     /**
      * An empty constructor used by JAXB
      */
-    DisjointType() {
+    public DisjointType() {
         
     }
     

@@ -30,7 +30,7 @@ public class OverlapsType extends BinarySpatialOpType implements Overlaps {
     /**
      * An empty constructor used by JAXB
      */
-    OverlapsType() {
+    public OverlapsType() {
         
     }
     

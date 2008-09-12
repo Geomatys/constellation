@@ -491,12 +491,156 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link AndType }
+     * 
+     */
+    public AndType createAndType() {
+        return new AndType();
+    }
+    
+    /**
+     * Create an instance of {@link ContainsType }
+     * 
+     */
+    public ContainsType createContainsType() {
+        return new ContainsType();
+    }
+    
+    /**
+     * Create an instance of {@link CrossesType }
+     * 
+     */
+    public CrossesType createCrossesType() {
+        return new CrossesType();
+    }
+    
+    /**
+     * Create an instance of {@link DWithinType }
+     * 
+     */
+    public DWithinType createDWithinType() {
+        return new DWithinType();
+    }
+    
+    /**
+     * Create an instance of {@link DisjointType }
+     * 
+     */
+    public DisjointType createDisjointType() {
+        return new DisjointType();
+    }
+    
+    /**
+     * Create an instance of {@link EqualsType }
+     * 
+     */
+    public EqualsType createEqualsType() {
+        return new EqualsType();
+    }
+    
+    /**
+     * Create an instance of {@link IntersectsType }
+     * 
+     */
+    public IntersectsType createIntersectsType() {
+        return new IntersectsType();
+    }
+    
+    /**
+     * Create an instance of {@link NotType }
+     * 
+     */
+    public NotType createNotType() {
+        return new NotType();
+    }
+    
+    /**
+     * Create an instance of {@link OrType }
+     * 
+     */
+    public OrType createOrType() {
+        return new OrType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsEqualToType }
+     * 
+     */
+    public PropertyIsEqualToType createPropertyIsEqualToType() {
+        return new PropertyIsEqualToType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsNotEqualToType }
+     * 
+     */
+    public PropertyIsNotEqualToType createPropertyIsNotEqualToType() {
+        return new PropertyIsNotEqualToType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsGreaterThanOrEqualToType }
+     * 
+     */
+    public PropertyIsGreaterThanOrEqualToType createPropertyIsGreaterThanOrEqualToType() {
+        return new PropertyIsGreaterThanOrEqualToType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsGreaterThanType }
+     * 
+     */
+    public PropertyIsGreaterThanType createPropertyIsGreaterThanType() {
+        return new PropertyIsGreaterThanType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsLessThanOrEqualToType }
+     * 
+     */
+    public PropertyIsLessThanOrEqualToType createPropertyIsLessThanOrEqualToType() {
+        return new PropertyIsLessThanOrEqualToType();
+    }
+    
+    /**
+     * Create an instance of {@link TouchesType }
+     * 
+     */
+    public TouchesType createTouchesType() {
+        return new TouchesType();
+    }
+    
+    /**
+     * Create an instance of {@link WithinType }
+     * 
+     */
+    public WithinType createWithinType() {
+        return new WithinType();
+    }
+    
+    /**
+     * Create an instance of {@link PropertyIsLessThanType }
+     * 
+     */
+    public PropertyIsLessThanType createPropertyIsLessThanType() {
+        return new PropertyIsLessThanType();
+    }
+    
+    /**
+     * Create an instance of {@link BeyondType }
+     * 
+     */
+    public BeyondType createBeyondType() {
+        return new BeyondType();
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link UnaryLogicOpType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Not", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
-    public JAXBElement<UnaryLogicOpType> createNot(UnaryLogicOpType value) {
-        return new JAXBElement<UnaryLogicOpType>(_Not_QNAME, UnaryLogicOpType.class, null, value);
+    public JAXBElement<NotType> createNot(NotType value) {
+        return new JAXBElement<NotType>(_Not_QNAME, NotType.class, null, value);
     }
     
     /**
@@ -594,8 +738,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Or", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
-    public JAXBElement<BinaryLogicOpType> createOr(BinaryLogicOpType value) {
-        return new JAXBElement<BinaryLogicOpType>(_Or_QNAME, BinaryLogicOpType.class, null, value);
+    public JAXBElement<OrType> createOr(OrType value) {
+        return new JAXBElement<OrType>(_Or_QNAME, OrType.class, null, value);
     }
     
     /**
@@ -603,8 +747,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "And", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
-    public JAXBElement<BinaryLogicOpType> createAnd(BinaryLogicOpType value) {
-        return new JAXBElement<BinaryLogicOpType>(_And_QNAME, BinaryLogicOpType.class, null, value);
+    public JAXBElement<AndType> createAnd(AndType value) {
+        return new JAXBElement<AndType>(_And_QNAME, AndType.class, null, value);
     }
   
     /**
@@ -621,8 +765,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsLessThan", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsLessThan(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsLessThan_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsLessThanType> createPropertyIsLessThan(PropertyIsLessThanType value) {
+        return new JAXBElement<PropertyIsLessThanType>(_PropertyIsLessThan_QNAME, PropertyIsLessThanType.class, null, value);
     }
 
     /**
@@ -630,8 +774,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsGreaterThanOrEqualTo", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsGreaterThanOrEqualTo(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsGreaterThanOrEqualTo_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsGreaterThanOrEqualToType> createPropertyIsGreaterThanOrEqualTo(PropertyIsGreaterThanOrEqualToType value) {
+        return new JAXBElement<PropertyIsGreaterThanOrEqualToType>(_PropertyIsGreaterThanOrEqualTo_QNAME, PropertyIsGreaterThanOrEqualToType.class, null, value);
     }
 
     /**
@@ -639,8 +783,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Intersects", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createIntersects(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Intersects_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<IntersectsType> createIntersects(IntersectsType value) {
+        return new JAXBElement<IntersectsType>(_Intersects_QNAME, IntersectsType.class, null, value);
     }
 
      
@@ -658,8 +802,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsEqualTo", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsEqualTo(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsEqualTo_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsEqualToType> createPropertyIsEqualTo(PropertyIsEqualToType value) {
+        return new JAXBElement<PropertyIsEqualToType>(_PropertyIsEqualTo_QNAME, PropertyIsEqualToType.class, null, value);
     }
 
     /**
@@ -685,8 +829,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Touches", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createTouches(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Touches_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<TouchesType> createTouches(TouchesType value) {
+        return new JAXBElement<TouchesType>(_Touches_QNAME, TouchesType.class, null, value);
     }
 
     /**
@@ -748,8 +892,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsNotEqualTo", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsNotEqualTo(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsNotEqualTo_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsNotEqualToType> createPropertyIsNotEqualTo(PropertyIsNotEqualToType value) {
+        return new JAXBElement<PropertyIsNotEqualToType>(_PropertyIsNotEqualTo_QNAME, PropertyIsNotEqualToType.class, null, value);
     }
 
     /**
@@ -757,8 +901,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsLessThanOrEqualTo", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsLessThanOrEqualTo(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsLessThanOrEqualTo_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsLessThanOrEqualToType> createPropertyIsLessThanOrEqualTo(PropertyIsLessThanOrEqualToType value) {
+        return new JAXBElement<PropertyIsLessThanOrEqualToType>(_PropertyIsLessThanOrEqualTo_QNAME, PropertyIsLessThanOrEqualToType.class, null, value);
     }
 
    
@@ -776,8 +920,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "DWithin", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<DistanceBufferType> createDWithin(DistanceBufferType value) {
-        return new JAXBElement<DistanceBufferType>(_DWithin_QNAME, DistanceBufferType.class, null, value);
+    public JAXBElement<DWithinType> createDWithin(DWithinType value) {
+        return new JAXBElement<DWithinType>(_DWithin_QNAME, DWithinType.class, null, value);
     }
 
   
@@ -804,8 +948,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Disjoint", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createDisjoint(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Disjoint_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<DisjointType> createDisjoint(DisjointType value) {
+        return new JAXBElement<DisjointType>(_Disjoint_QNAME, DisjointType.class, null, value);
     }
 
     /**
@@ -813,8 +957,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Crosses", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createCrosses(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Crosses_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<CrossesType> createCrosses(CrossesType value) {
+        return new JAXBElement<CrossesType>(_Crosses_QNAME, CrossesType.class, null, value);
     }
 
     /**
@@ -831,8 +975,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Contains", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createContains(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Contains_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<ContainsType> createContains(ContainsType value) {
+        return new JAXBElement<ContainsType>(_Contains_QNAME, ContainsType.class, null, value);
     }
 
     /**
@@ -840,8 +984,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Beyond", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<DistanceBufferType> createBeyond(DistanceBufferType value) {
-        return new JAXBElement<DistanceBufferType>(_Beyond_QNAME, DistanceBufferType.class, null, value);
+    public JAXBElement<BeyondType> createBeyond(BeyondType value) {
+        return new JAXBElement<BeyondType>(_Beyond_QNAME, BeyondType.class, null, value);
     }
 
     /**
@@ -867,8 +1011,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Equals", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createEquals(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Equals_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<EqualsType> createEquals(EqualsType value) {
+        return new JAXBElement<EqualsType>(_Equals_QNAME, EqualsType.class, null, value);
     }
 
     /**
@@ -876,8 +1020,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Overlaps", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createOverlaps(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Overlaps_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<OverlapsType> createOverlaps(OverlapsType value) {
+        return new JAXBElement<OverlapsType>(_Overlaps_QNAME, OverlapsType.class, null, value);
     }
 
     /**
@@ -912,8 +1056,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "PropertyIsGreaterThan", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "comparisonOps")
-    public JAXBElement<BinaryComparisonOpType> createPropertyIsGreaterThan(BinaryComparisonOpType value) {
-        return new JAXBElement<BinaryComparisonOpType>(_PropertyIsGreaterThan_QNAME, BinaryComparisonOpType.class, null, value);
+    public JAXBElement<PropertyIsGreaterThanType> createPropertyIsGreaterThan(PropertyIsGreaterThanType value) {
+        return new JAXBElement<PropertyIsGreaterThanType>(_PropertyIsGreaterThan_QNAME, PropertyIsGreaterThanType.class, null, value);
     }
 
       /**
@@ -958,8 +1102,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Within", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "spatialOps")
-    public JAXBElement<BinarySpatialOpType> createWithin(BinarySpatialOpType value) {
-        return new JAXBElement<BinarySpatialOpType>(_Within_QNAME, BinarySpatialOpType.class, null, value);
+    public JAXBElement<WithinType> createWithin(WithinType value) {
+        return new JAXBElement<WithinType>(_Within_QNAME, WithinType.class, null, value);
     }
 
     /**
@@ -970,4 +1114,6 @@ public class ObjectFactory {
     public JAXBElement<PropertyIsNullType> createPropertyIsNull(PropertyIsNullType value) {
         return new JAXBElement<PropertyIsNullType>(_PropertyIsNull_QNAME, PropertyIsNullType.class, null, value);
     }
+    
+    
 }

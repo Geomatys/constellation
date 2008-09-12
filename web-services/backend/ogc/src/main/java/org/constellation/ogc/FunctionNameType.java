@@ -64,7 +64,7 @@ public class FunctionNameType implements FunctionName {
     /**
      * An empty constructor used by JAXB
      */
-    FunctionNameType() {
+    public FunctionNameType() {
         
     }
     

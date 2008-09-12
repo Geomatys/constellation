@@ -59,7 +59,7 @@ public class ComparisonOperatorsType implements ComparisonOperators {
     /**
      * An empty constructor used by JAXB
      */
-    ComparisonOperatorsType() {
+    public ComparisonOperatorsType() {
         
     }
     

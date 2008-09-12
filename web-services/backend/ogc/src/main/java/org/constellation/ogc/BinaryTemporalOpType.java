@@ -77,7 +77,7 @@ public class BinaryTemporalOpType extends TemporalOpsType {
     /**
      * Empty contructor used by JAXB
      */
-    BinaryTemporalOpType(){
+    public BinaryTemporalOpType(){
         
     }
     

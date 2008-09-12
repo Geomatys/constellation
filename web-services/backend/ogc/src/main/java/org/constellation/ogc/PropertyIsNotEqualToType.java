@@ -32,7 +32,7 @@ public class PropertyIsNotEqualToType  extends BinaryComparisonOpType implements
     /**
      * Empty constructor used by JAXB
      */
-    PropertyIsNotEqualToType() {
+    public PropertyIsNotEqualToType() {
         
     }
     

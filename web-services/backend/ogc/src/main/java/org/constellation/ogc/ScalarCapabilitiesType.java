@@ -64,7 +64,7 @@ public class ScalarCapabilitiesType implements ScalarCapabilities {
     /**
      * An empty constructor used by JAXB
      */
-    ScalarCapabilitiesType() {
+    public ScalarCapabilitiesType() {
     }
     
      /**

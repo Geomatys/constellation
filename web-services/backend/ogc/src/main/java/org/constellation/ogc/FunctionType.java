@@ -84,7 +84,7 @@ public class FunctionType extends ExpressionType implements Function {
     /**
      * An empty constructor used by JAXB 
      */
-     FunctionType() {
+     public FunctionType() {
          
      }
      

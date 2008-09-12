@@ -211,6 +211,13 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
             return resultType;
         }
     }
+    
+    /**
+     * Sets the value of the resultType property.
+     */
+    public void setResultType(ResultType resultType) {
+        this.resultType = resultType;
+    }
 
     /**
      * Gets the value of the outputFormat property.

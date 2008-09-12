@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.expression.Add;
 
 
 /**
@@ -76,7 +75,7 @@ public class FilterType implements Filter {
      * a transient factory to build JAXBelement
      */
     @XmlTransient
-    private ObjectFactory factory = new ObjectFactory();
+    private static ObjectFactory FACTORY = new ObjectFactory();
     
     /**
      * An empty constructor used by JAXB
@@ -91,62 +90,16 @@ public class FilterType implements Filter {
     public FilterType(Object obj) {
         
         // comparison operator
-        if (obj instanceof PropertyIsLessThanOrEqualToType) {
-            this.comparisonOps = (factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType) obj));
-        } else if (obj instanceof PropertyIsLessThanType) {
-            this.comparisonOps = (factory.createPropertyIsLessThan((PropertyIsLessThanType) obj));
-        } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
-            this.comparisonOps = (factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType) obj));
-        } else if (obj instanceof PropertyIsNotEqualToType) {
-            this.comparisonOps = (factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType) obj));
-        } else if (obj instanceof PropertyIsGreaterThanType) {
-            this.comparisonOps = (factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType) obj));
-        } else if (obj instanceof PropertyIsEqualToType) {
-            this.comparisonOps = (factory.createPropertyIsEqualTo((PropertyIsEqualToType) obj));
-        } else if (obj instanceof PropertyIsNullType) {
-            this.comparisonOps =  (factory.createPropertyIsNull((PropertyIsNullType) obj));
-        } else if (obj instanceof PropertyIsBetweenType) {
-            this.comparisonOps = (factory.createPropertyIsBetween((PropertyIsBetweenType) obj));
-        } else if (obj instanceof PropertyIsLikeType) {
-            this.comparisonOps = (factory.createPropertyIsLike((PropertyIsLikeType) obj));
-        } else if (obj instanceof ComparisonOpsType) {
-            this.comparisonOps = (factory.createComparisonOps((ComparisonOpsType) obj));
+        if (obj instanceof ComparisonOpsType) {
+            this.comparisonOps = createComparisonOps((ComparisonOpsType) obj);
             
         // logical operator    
-        } else if (obj instanceof OrType) {
-            this.logicOps = (factory.createOr((OrType) obj));
-        } else if (obj instanceof NotType) {
-            this.logicOps = (factory.createNot((NotType) obj));
-        } else if (obj instanceof AndType) {
-            this.logicOps = (factory.createAnd((AndType) obj));
         } else if (obj instanceof LogicOpsType) {
-            this.logicOps = (factory.createLogicOps((LogicOpsType) obj));
+            this.logicOps = createLogicOps((LogicOpsType) obj);
             
         // spatial operator    
-        } else if (obj instanceof BeyondType) {
-            this.spatialOps = factory.createBeyond((DistanceBufferType)obj);
-        } else if (obj instanceof DWithinType) {
-            this.spatialOps = factory.createDWithin((DistanceBufferType)obj);
-        } else if (obj instanceof BBOXType) {
-            this.spatialOps = factory.createBBOX((BBOXType)obj);
-        } else if (obj instanceof ContainsType) {
-            this.spatialOps = factory.createContains((BinarySpatialOpType)obj);  
-        } else if (obj instanceof CrossesType) {
-            this.spatialOps = factory.createCrosses((BinarySpatialOpType)obj);
-        } else if (obj instanceof DisjointType) {
-            this.spatialOps = factory.createDisjoint((BinarySpatialOpType)obj);
-        } else if (obj instanceof EqualsType) {
-            this.spatialOps = factory.createEquals((BinarySpatialOpType)obj);
-        } else if (obj instanceof IntersectsType) {
-            this.spatialOps = factory.createIntersects((BinarySpatialOpType)obj);
-        } else if (obj instanceof OverlapsType) {
-            this.spatialOps = factory.createOverlaps((BinarySpatialOpType)obj);
-        } else if (obj instanceof TouchesType) {
-            this.spatialOps = factory.createTouches((BinarySpatialOpType)obj); 
-        } else if (obj instanceof WithinType) {
-            this.spatialOps = factory.createWithin((BinarySpatialOpType)obj);    
         } else if (obj instanceof SpatialOpsType) {
-            this.spatialOps = (factory.createSpatialOps((SpatialOpsType) obj));
+            this.spatialOps = createSpatialOps((SpatialOpsType) obj);
         
         } else {
             throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
@@ -159,6 +112,20 @@ public class FilterType implements Filter {
     public JAXBElement<? extends SpatialOpsType> getSpatialOps() {
         return spatialOps;
     }
+    
+    /**
+     * Sets the value of the spatialOps property.
+     */
+    public void setSpatialOps(JAXBElement<? extends SpatialOpsType> spatialOps) {
+        this.spatialOps = spatialOps;
+    }
+    
+    /**
+     * Sets the value of the spatialOps property.
+     */
+    public void setSpatialOps(SpatialOpsType spatialOps) {
+        this.spatialOps = createSpatialOps(spatialOps);
+    }
 
     /**
      * Gets the value of the comparisonOps property.
@@ -166,12 +133,40 @@ public class FilterType implements Filter {
     public JAXBElement<? extends ComparisonOpsType> getComparisonOps() {
         return comparisonOps;
     }
+    
+    /**
+     * Sets the value of the comparisonOps property.
+     */
+    public void setComparisonOps(JAXBElement<? extends ComparisonOpsType> comparisonOps) {
+        this.comparisonOps = comparisonOps;
+    }
+    
+    /**
+     * Sets the value of the comparisonOps property.
+     */
+    public void setComparisonOps(ComparisonOpsType comparisonOps) {
+        this.comparisonOps = createComparisonOps(comparisonOps);
+    }
 
     /**
      * Gets the value of the logicOps property.
      */
     public JAXBElement<? extends LogicOpsType> getLogicOps() {
         return logicOps;
+    }
+    
+    /**
+     * Sets the value of the logicOps property.
+     */
+    public void setLogicOps(JAXBElement<? extends LogicOpsType> logicOps) {
+        this.logicOps = logicOps;
+    }
+    
+    /**
+     * Sets the value of the logicOps property.
+     */
+    public void setLogicOps(LogicOpsType logicOps) {
+        this.logicOps = createLogicOps(logicOps);
     }
 
     /**
@@ -214,6 +209,75 @@ public class FilterType implements Filter {
 
     public Object accept(FilterVisitor visitor, Object extraData) {
         return extraData;
+    }
+    
+    public static JAXBElement<? extends ComparisonOpsType> createComparisonOps(ComparisonOpsType operator) {
+        
+        if (operator instanceof PropertyIsLessThanOrEqualToType) {
+            return FACTORY.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType) operator);
+        } else if (operator instanceof PropertyIsLessThanType) {
+            return FACTORY.createPropertyIsLessThan((PropertyIsLessThanType) operator);
+        } else if (operator instanceof PropertyIsGreaterThanOrEqualToType) {
+            return FACTORY.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType) operator);
+        } else if (operator instanceof PropertyIsNotEqualToType) {
+            return FACTORY.createPropertyIsNotEqualTo((PropertyIsNotEqualToType) operator);
+        } else if (operator instanceof PropertyIsGreaterThanType) {
+            return FACTORY.createPropertyIsGreaterThan((PropertyIsGreaterThanType) operator);
+        } else if (operator instanceof PropertyIsEqualToType) {
+            return FACTORY.createPropertyIsEqualTo((PropertyIsEqualToType) operator);
+        } else if (operator instanceof PropertyIsNullType) {
+            return FACTORY.createPropertyIsNull((PropertyIsNullType) operator);
+        } else if (operator instanceof PropertyIsBetweenType) {
+            return FACTORY.createPropertyIsBetween((PropertyIsBetweenType) operator);
+        } else if (operator instanceof PropertyIsLikeType) {
+            return FACTORY.createPropertyIsLike((PropertyIsLikeType) operator);
+        } else if (operator instanceof ComparisonOpsType) {
+            return FACTORY.createComparisonOps((ComparisonOpsType) operator);
+        } else return null;
+    }
+    
+    public static JAXBElement<? extends LogicOpsType> createLogicOps(LogicOpsType operator) {
+        
+        if (operator instanceof OrType) {
+            return FACTORY.createOr((OrType) operator);
+        } else if (operator instanceof NotType) {
+            return FACTORY.createNot((NotType) operator);
+        } else if (operator instanceof AndType) {
+            return FACTORY.createAnd((AndType) operator);
+        } else if (operator instanceof LogicOpsType) {
+            return FACTORY.createLogicOps((LogicOpsType) operator);
+        } else return null;
+    }
+    
+    public static JAXBElement<? extends SpatialOpsType> createSpatialOps(SpatialOpsType operator) {
+        
+        if (operator instanceof BeyondType) {
+            return FACTORY.createBeyond((BeyondType) operator);
+        } else if (operator instanceof DWithinType) {
+            return FACTORY.createDWithin((DWithinType) operator);
+        } else if (operator instanceof BBOXType) {
+            return FACTORY.createBBOX((BBOXType) operator);
+        } else if (operator instanceof ContainsType) {
+            return FACTORY.createContains((ContainsType) operator);
+        } else if (operator instanceof CrossesType) {
+            return FACTORY.createCrosses((CrossesType) operator);
+        } else if (operator instanceof DisjointType) {
+            return FACTORY.createDisjoint((DisjointType) operator);
+        } else if (operator instanceof EqualsType) {
+            return FACTORY.createEquals((EqualsType) operator);
+        } else if (operator instanceof IntersectsType) {
+            return FACTORY.createIntersects((IntersectsType) operator);
+        } else if (operator instanceof OverlapsType) {
+            return FACTORY.createOverlaps((OverlapsType) operator);
+        } else if (operator instanceof TouchesType) {
+            return FACTORY.createTouches((TouchesType) operator);
+        } else if (operator instanceof WithinType) {
+            return FACTORY.createWithin((WithinType) operator);
+        } else if (operator instanceof SpatialOpsType) {
+            return FACTORY.createSpatialOps((SpatialOpsType) operator);
+        } else {
+            return null;
+        }
     }
 
 }

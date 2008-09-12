@@ -78,6 +78,16 @@ public class ElementSetNameType {
     public ElementSetType getValue() {
         return value;
     }
+    
+    /**
+     * Named subsets of catalogue object properties; these
+     * views are mapped to a specific information model and
+     * are defined in an application profile.
+     * 
+     */
+    public void setValue(ElementSetType value) {
+        this.value = value;
+    }
 
     /**
      * Gets the value of the typeNames property.
@@ -88,6 +98,23 @@ public class ElementSetNameType {
             typeNames = new ArrayList<QName>();
         }
         return Collections.unmodifiableList(typeNames);
+    }
+    
+    /**
+     * sets the value of the typeNames property.
+     */
+    public void setTypeNames(QName typeName) {
+        if (this.typeNames == null) {
+            this.typeNames = new ArrayList<QName>();
+        }
+        this.typeNames.add(typeName);
+    }
+    
+    /**
+     * sets the value of the typeNames property.
+     */
+    public void setTypeNames(List<QName> typeNames) {
+        this.typeNames = typeNames;
     }
 
 }

@@ -60,7 +60,7 @@ public class LiteralType implements Literal {
     /**
      * an empty constructor used by JAXB
      */
-    LiteralType() {
+    public LiteralType() {
         
     }
     
@@ -96,6 +96,23 @@ public class LiteralType implements Literal {
             content = new ArrayList<Object>();
         }
         return Collections.unmodifiableList(content);
+    }
+    
+    /**
+     * Sets the value of the content property.
+     */
+    public void setContent(Object content) {
+        if (this.content == null) {
+            this.content = new ArrayList<Object>();
+        }
+        this.content.add(content);
+    }
+    
+    /**
+     * Sets the value of the content property.
+     */
+    public void setContent(List<Object> content) {
+        this.content = content;
     }
     
     /**

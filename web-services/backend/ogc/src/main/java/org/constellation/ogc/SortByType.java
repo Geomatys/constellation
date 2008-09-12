@@ -56,7 +56,7 @@ public class SortByType {
     /**
      * An empty constructor used by JAXB
      */
-    SortByType() {
+    public SortByType() {
         
     }
     

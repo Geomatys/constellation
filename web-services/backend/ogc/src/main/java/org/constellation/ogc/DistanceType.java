@@ -54,7 +54,7 @@ public class DistanceType {
     /**
      * An empty constructor used by JAXB
      */
-    DistanceType() {
+    public DistanceType() {
         
     }
     

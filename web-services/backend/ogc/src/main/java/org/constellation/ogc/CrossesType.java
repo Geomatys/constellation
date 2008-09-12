@@ -28,7 +28,7 @@ public class CrossesType extends BinarySpatialOpType implements Crosses {
     /**
      * An empty constructor used by JAXB
      */
-    CrossesType() {
+    public CrossesType() {
         
     }
     

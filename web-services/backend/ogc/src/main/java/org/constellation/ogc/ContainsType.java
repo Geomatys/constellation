@@ -28,7 +28,7 @@ public class ContainsType extends BinarySpatialOpType implements Contains {
     /**
      * An empty constructor used by JAXB
      */
-    ContainsType() {
+    public ContainsType() {
         
     }
     

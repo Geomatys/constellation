@@ -59,7 +59,7 @@ public class SortPropertyType implements SortBy {
     /**
      * Empty constructor used by JAXB
      */
-    SortPropertyType(){
+    public SortPropertyType(){
         
     }
     

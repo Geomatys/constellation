@@ -73,7 +73,7 @@ public class PropertyIsLikeType extends ComparisonOpsType implements PropertyIsL
     /**
      * An empty constructor used by JAXB.
      */
-    PropertyIsLikeType() {
+    public PropertyIsLikeType() {
         
     }
     

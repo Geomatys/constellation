@@ -57,7 +57,7 @@ public class GmlObjectIdType extends AbstractIdType implements GmlObjectId {
     /**
      * An empty constructor used by JAXB
      */
-    GmlObjectIdType() {
+    public GmlObjectIdType() {
         
     }
     

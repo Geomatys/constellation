@@ -28,7 +28,7 @@ public class EqualsType extends BinarySpatialOpType implements Equals {
     /**
      * An empty constructor used by JAXB
      */
-    EqualsType() {
+    public EqualsType() {
         
     }
     

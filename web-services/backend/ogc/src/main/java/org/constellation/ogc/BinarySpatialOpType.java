@@ -87,7 +87,7 @@ public class BinarySpatialOpType extends SpatialOpsType {
     /**
      * An empty constructor used by JAXB
      */
-    BinarySpatialOpType() {
+    public BinarySpatialOpType() {
         
     }
     

@@ -111,6 +111,13 @@ public class QueryType extends AbstractQueryType {
     public ElementSetNameType getElementSetName() {
         return elementSetName;
     }
+    
+    /**
+     * Sets the value of the elementSetName property.
+     */
+    public void setElementSetName(ElementSetNameType elementSetName) {
+        this.elementSetName = elementSetName;
+    }
 
     /**
      * Gets the value of the elementName property.
@@ -121,6 +128,23 @@ public class QueryType extends AbstractQueryType {
             elementName = new ArrayList<QName>();
         }
         return Collections.unmodifiableList(elementName);
+    }
+    
+    /**
+     * Sets the value of the elementName property.
+     */
+    public void setElementName(QName elementName) {
+        if (this.elementName == null) {
+            this.elementName = new ArrayList<QName>();
+        }
+        this.elementName.add(elementName);
+    }
+    
+    /**
+     * Sets the value of the elementName property.
+     */
+    public void setElementName(List<QName> elementName) {
+        this.elementName = elementName;
     }
 
     /**
@@ -141,6 +165,13 @@ public class QueryType extends AbstractQueryType {
     public SortByType getSortBy() {
         return sortBy;
     }
+    
+    /**
+     * Sets the value of the sortBy property.
+     */
+    public void setSortBy(SortByType sortBy) {
+        this.sortBy = sortBy;
+    }
 
     /**
      * Gets the value of the typeNames property.
@@ -155,6 +186,16 @@ public class QueryType extends AbstractQueryType {
     
     public void setTypeNames(List<QName> typeNames) {
         this.typeNames = typeNames;
+    }
+    
+    /**
+     * Sets the value of the typeNames property.
+     */
+    public void setTypeNames(QName typeName) {
+        if (typeNames == null) {
+            typeNames = new ArrayList<QName>();
+        }
+        typeNames.add(typeName);
     }
 
    

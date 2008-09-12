@@ -64,7 +64,7 @@ public class SpatialCapabilitiesType implements SpatialCapabilities {
     /**
      * empty constructor used by JAXB
      */
-    SpatialCapabilitiesType() {
+    public SpatialCapabilitiesType() {
         
     }
     

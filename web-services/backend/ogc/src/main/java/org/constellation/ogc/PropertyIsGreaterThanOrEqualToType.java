@@ -32,7 +32,7 @@ public class PropertyIsGreaterThanOrEqualToType extends BinaryComparisonOpType i
     /**
      * Empty constructor used by JAXB
      */
-    PropertyIsGreaterThanOrEqualToType() {
+    public PropertyIsGreaterThanOrEqualToType() {
         
     }
     

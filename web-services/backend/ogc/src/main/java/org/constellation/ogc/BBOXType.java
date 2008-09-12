@@ -69,7 +69,7 @@ public class BBOXType extends SpatialOpsType implements BBOX {
     /**
      * An empty constructor used by JAXB
      */
-    BBOXType() {
+    public BBOXType() {
         
     }
     

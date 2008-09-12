@@ -28,7 +28,7 @@ public class TouchesType extends BinarySpatialOpType implements Touches {
     /**
      * An empty constructor used by JAXB
      */
-    TouchesType() {
+    public TouchesType() {
         
     }
     

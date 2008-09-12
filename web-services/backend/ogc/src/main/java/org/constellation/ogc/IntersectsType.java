@@ -28,7 +28,7 @@ public class IntersectsType extends BinarySpatialOpType implements Intersects {
     /**
      * An empty constructor used by JAXB
      */
-    IntersectsType() {
+    public IntersectsType() {
         
     }
     

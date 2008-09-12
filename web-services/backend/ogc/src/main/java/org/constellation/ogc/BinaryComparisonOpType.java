@@ -73,7 +73,7 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
     /**
      * Empty constructor used by JAXB
      */
-    BinaryComparisonOpType() {
+    public BinaryComparisonOpType() {
         
     }
     

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -51,7 +52,7 @@ public class ElementSetNameType {
     @XmlValue
     private ElementSetType value;
     @XmlAttribute
-    private List<String> typeNames;
+    private List<QName> typeNames;
 
     /**
      * An empty constructor used by JAXB
@@ -87,9 +88,9 @@ public class ElementSetNameType {
      * Gets the value of the typeNames property.
      * 
      */
-    public List<String> getTypeNames() {
+    public List<QName> getTypeNames() {
         if (typeNames == null) {
-            typeNames = new ArrayList<String>();
+            typeNames = new ArrayList<QName>();
         }
         return this.typeNames;
     }

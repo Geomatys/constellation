@@ -28,7 +28,7 @@ public class WithinType extends BinarySpatialOpType implements Within {
     /**
      * An empty constructor used by JAXB
      */
-    WithinType() {
+    public WithinType() {
         
     }
     

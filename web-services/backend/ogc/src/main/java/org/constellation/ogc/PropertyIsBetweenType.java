@@ -71,7 +71,7 @@ public class PropertyIsBetweenType extends ComparisonOpsType implements Property
     /**
      * An empty constructor used by JAXB
      */
-    PropertyIsBetweenType() {
+    public PropertyIsBetweenType() {
         
     }
     

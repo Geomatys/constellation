@@ -27,7 +27,7 @@ public class DWithinType extends DistanceBufferType implements DWithin {
      /**
      * An empty constructor used by JAXB
      */
-    DWithinType() {
+    public DWithinType() {
         
     }
     

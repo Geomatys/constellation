@@ -62,7 +62,7 @@ public class SpatialOperatorType implements SpatialOperator {
     /**
      * An empty constructor used by JAXB 
      */
-    SpatialOperatorType() {
+    public SpatialOperatorType() {
         
     }
     
