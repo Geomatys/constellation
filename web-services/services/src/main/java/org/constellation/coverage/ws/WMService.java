@@ -305,6 +305,11 @@ public class WMService extends WebService {
         }
     }
 
+    /**
+     * Get the original image.
+     *
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private File getOrigFile() throws WebServiceException {
         LOGGER.info("getOrigFile request received");
         final WebServiceWorker worker = this.webServiceWorker.get();
@@ -317,10 +322,10 @@ public class WMService extends WebService {
     /**
      * Return a map for the specified parameters in the query.
      *
-     * @return
+     * @return a file containing the image requested.
      * @throws fr.geomatys.wms.WebServiceException
      */
-    private File getMap() throws  WebServiceException {
+    private File getMap() throws WebServiceException {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
 
@@ -452,21 +457,23 @@ public class WMService extends WebService {
 
         // if we return html
         if (infoFormat.equals("text/html")) {
-            response = "<html>"                                       +
-                       "    <head>"                                   +
-                       "        <title>GetFeatureInfo output</title>" +
-                       "    </head>"                                  +
-                       "    <body>"                                   +
-                       "    <table>"                                  +
-                       "        <tr>"                                 +
-                       "            <th>" + layer + "</th>"           +
-                       "        </tr>"                                +
-                       "        <tr>"                                 +
-                       "            <th>" + result + "</th>"          +
-                       "        </tr>"                                +
-                       "    </table>"                                 +
-                       "    </body>"                                  +
-                       "</html>";
+            final StringBuilder builder = new StringBuilder();
+            builder.append("<html>")
+                   .append("    <head>")
+                   .append("        <title>GetFeatureInfo output</title>")
+                   .append("    </head>")
+                   .append("    <body>")
+                   .append("    <table>")
+                   .append("        <tr>")
+                   .append("            <th>").append(layer).append("</th>")
+                   .append("        </tr>")
+                   .append("        <tr>")
+                   .append("            <th>").append(result).append("</th>")
+                   .append("       </tr>")
+                   .append("    </table>")
+                   .append("    </body>")
+                   .append("</html>");
+            response = builder.toString();
         }
         //if we return xml or gml
         else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
@@ -538,36 +545,39 @@ public class WMService extends WebService {
             final String linkToOrig = "../postgrid-web/WS/wms?REQUEST=GetOrigFile&LAYER=" + layer + "&TIME=" + getParameter("TIME", true);
             final GeographicBoundingBox bbox = coverageRef.getGeographicBoundingBox();
             final SampleDimension firstSampleDim = coverageRef.getSampleDimensions()[0];
-            response = "<table id=\"metadataTable\">\n" +
-                    "<tr><td width=200><b>Data Layer Title:</b></td><td>" + layerMetaEntry.getLongTitle() + "</td></tr>\n" +
-                    "<tr><td><b>Start Date:</b></td><td>" + df.format(startDate) + "</td></tr>\n" +
-                    "<tr><td><b>End Date:</b></td><td>" + df.format(endDate) + "</td></tr>\n" +
-                    "<tr><td><b>Data File:</b></td><td><a href=\"" + linkToOrig + "\">" + coverageRef.getFile().getName() + "</a></td></tr>\n" +
-                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                    "<tr><td><b>Parameter Name:</b></td><td>" + layerMetaEntry.getParameterName() + "</td></tr>\n" +
-                    "<tr><td><b>Parameter Type:</b></td><td>" + layerMetaEntry.getParameterType() + "</td></tr>\n" +
-                    "<tr><td><b>Minimum Value:</b></td><td>" + Math.round(firstSampleDim.getMinimumValue()) + "</td></tr>\n" +
-                    "<tr><td><b>Maximum Value:</b></td><td>" + Math.round(firstSampleDim.getMaximumValue()) + "</td></tr>\n" +
-                    "<tr><td><b>Units:</b></td><td>" + firstSampleDim.getUnits() + "</td></tr>\n" +
-                    "<tr><td><b>Update Frequency:</b></td><td>" + layerMetaEntry.getUpdateFrequency() + "</td></tr>\n" +
-                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                    "<tr><td><b>Description:</b></td><td>" + layerMetaEntry.getDescription() + "</td></tr>\n" +
-                    "<tr><td><b>Purpose:</b></td><td>" + layerMetaEntry.getPurpose() + "</td></tr>\n" +
-                    "<tr><td><b>Bounding Box:</b></td><td>&nbsp;</td></tr>\n" +
-                    "<tr><td><i>&nbsp;&nbsp;&nbsp;West</i></td><td>"+ bbox.getWestBoundLongitude() + "</td></tr>\n" +
-                    "<tr><td><i>&nbsp;&nbsp;&nbsp;East</i></td><td>"+ bbox.getEastBoundLongitude() + "</td></tr>\n" +
-                    "<tr><td><i>&nbsp;&nbsp;&nbsp;North</i></td><td>"+ bbox.getNorthBoundLatitude() + "</td></tr>\n" +
-                    "<tr><td><i>&nbsp;&nbsp;&nbsp;South</i></td><td>"+ bbox.getSouthBoundLatitude() + "</td></tr>\n" +
-                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                    //"<tr><td><b>Spatial Reference:</b></td><td>" + coverageRef.getCoordinateReferenceSystem().toString() + "</td></tr>\n" +
-                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                    "<tr><td><b>Publisher:</b></td><td>" + pocOrg + "</td></tr>\n" +
-                    "<tr><td><b>Contact:</b></td><td>" + pocName + "</td></tr>\n" +
-                    "<tr><td><b>Email:</b></td><td>" + pocEmail + "</td></tr>\n" +
-                    "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
-                    "<tr><td><b>Use Constraints:</b></td><td>" + layerMetaEntry.getUseConstraint() + "</td></tr>\n" +
-                    "<tr><td></b></td><td>&nbsp;</td></tr>\n" +
-                    "</table>" ;
+            final StringBuilder builder = new StringBuilder();
+            builder.append("<table id=\"metadataTable\">\n")
+                   .append("<tr><td width=200><b>Data Layer Title:</b></td><td>").append(layerMetaEntry.getLongTitle()).append("</td></tr>\n")
+                   .append("<tr><td><b>Start Date:</b></td><td>").append(df.format(startDate)).append("</td></tr>\n")
+                   .append("<tr><td><b>End Date:</b></td><td>").append(df.format(endDate)).append("</td></tr>\n")
+                   .append("<tr><td><b>Data File:</b></td><td><a href=\"").append(linkToOrig).append("\">")
+                   .append(coverageRef.getFile().getName()).append("</a></td></tr>\n")
+                   .append("<tr><td><b></b></td><td>&nbsp;</td></tr>\n")
+                   .append("<tr><td><b>Parameter Name:</b></td><td>").append(layerMetaEntry.getParameterName()).append("</td></tr>\n")
+                   .append("<tr><td><b>Parameter Type:</b></td><td>").append(layerMetaEntry.getParameterType()).append("</td></tr>\n")
+                   .append("<tr><td><b>Minimum Value:</b></td><td>").append(Math.round(firstSampleDim.getMinimumValue())).append("</td></tr>\n")
+                   .append("<tr><td><b>Maximum Value:</b></td><td>").append(Math.round(firstSampleDim.getMaximumValue())).append("</td></tr>\n")
+                   .append("<tr><td><b>Units:</b></td><td>").append(firstSampleDim.getUnits()).append("</td></tr>\n")
+                   .append("<tr><td><b>Update Frequency:</b></td><td>").append(layerMetaEntry.getUpdateFrequency()).append("</td></tr>\n")
+                   .append("<tr><td><b></b></td><td>&nbsp;</td></tr>\n")
+                   .append("<tr><td><b>Description:</b></td><td>").append(layerMetaEntry.getDescription()).append("</td></tr>\n")
+                   .append("<tr><td><b>Purpose:</b></td><td>").append(layerMetaEntry.getPurpose()).append("</td></tr>\n")
+                   .append("<tr><td><b>Bounding Box:</b></td><td>&nbsp;</td></tr>\n")
+                   .append("<tr><td><i>&nbsp;&nbsp;&nbsp;West</i></td><td>").append(bbox.getWestBoundLongitude()).append("</td></tr>\n")
+                   .append("<tr><td><i>&nbsp;&nbsp;&nbsp;East</i></td><td>").append(bbox.getEastBoundLongitude()).append("</td></tr>\n")
+                   .append("<tr><td><i>&nbsp;&nbsp;&nbsp;North</i></td><td>").append(bbox.getNorthBoundLatitude()).append("</td></tr>\n")
+                   .append("<tr><td><i>&nbsp;&nbsp;&nbsp;South</i></td><td>").append(bbox.getSouthBoundLatitude()).append("</td></tr>\n")
+                   .append("<tr><td><b></b></td><td>&nbsp;</td></tr>\n")
+                    //.append("<tr><td><b>Spatial Reference:</b></td><td>").append(coverageRef.getCoordinateReferenceSystem().toString()).append("</td></tr>\n")
+                   .append("<tr><td><b></b></td><td>&nbsp;</td></tr>\n")
+                   .append("<tr><td><b>Publisher:</b></td><td>").append(pocOrg).append("</td></tr>\n")
+                   .append("<tr><td><b>Contact:</b></td><td>").append(pocName).append("</td></tr>\n")
+                   .append("<tr><td><b>Email:</b></td><td>").append(pocEmail).append("</td></tr>\n")
+                   .append("<tr><td><b></b></td><td>&nbsp;</td></tr>\n")
+                   .append("<tr><td><b>Use Constraints:</b></td><td>").append(layerMetaEntry.getUseConstraint()).append("</td></tr>\n")
+                   .append("<tr><td></b></td><td>&nbsp;</td></tr>\n")
+                   .append("</table>");
+            response = builder.toString();
         }
         //if we return text
         else {
@@ -916,7 +926,8 @@ public class WMService extends WebService {
 
     /**
      * Return the legend graphic for the current layer.
-     * @return
+     * 
+     * @return a file containing the legend graphic image.
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
