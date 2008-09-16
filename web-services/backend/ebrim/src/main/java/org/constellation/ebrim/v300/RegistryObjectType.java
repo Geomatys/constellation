@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.Settable;
 
 
 /**
@@ -87,7 +88,7 @@ import javax.xml.bind.annotation.XmlType;
     PersonType.class
 })
 @XmlRootElement(name = "RegistryObject")
-public class RegistryObjectType extends IdentifiableType {
+public class RegistryObjectType extends IdentifiableType implements Settable {
 
     @XmlElement(name = "Name")
     private InternationalStringType name;
@@ -209,6 +210,32 @@ public class RegistryObjectType extends IdentifiableType {
      */
     public void setStatus(String value) {
         this.status = value;
+    }
+    
+    /**
+     * Return a BRIEF representation of the registryObject.
+     * @return
+     */
+    public RegistryObjectType toBrief() {
+        RegistryObjectType brief = new RegistryObjectType();
+        brief.setId(getId());
+        brief.setLid(lid);
+        brief.setObjectType(objectType);
+        brief.setStatus(status);
+        brief.setVersionInfo(versionInfo);
+        return brief;
+    }
+    
+    /**
+     * Return a SUMMARY representation of the registryObject.
+     * @return
+     */
+    public RegistryObjectType toSummary() {
+        RegistryObjectType summary = toBrief();
+        summary.setSlot(getSlot());
+        summary.setName(name);
+        summary.setDescription(description);
+        return summary;
     }
 
 }

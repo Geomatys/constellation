@@ -15,23 +15,31 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.cat.wrs;
 
+package org.constellation.cat.wrs.v100;
+
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for RecordIdType complex type.
+ * Allows complex slot values.
+ * 
+ * <p>Java class for ValueListType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="RecordIdType">
+ * &lt;complexType name="ValueListType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/ogc}AbstractIdType">
+ *     &lt;extension base="{urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0}ValueListType">
+ *       &lt;sequence maxOccurs="unbounded" minOccurs="0">
+ *         &lt;element ref="{http://www.opengis.net/cat/wrs/1.0}AnyValue"/>
+ *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,26 +48,22 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RecordIdType", propOrder = {
-    "content"
+@XmlType(name = "ValueListType", propOrder = {
+    "anyValue"
 })
-public class RecordIdType {
+public class ValueListType extends org.constellation.ebrim.v300.ValueListType {
 
-    @XmlValue
-    private String content;
-
-    /**
-     * Gets the value of the content property.
-     */
-    public String getContent() {
-        return content;
-    }
+    @XmlElement(name = "AnyValue")
+    private List<AnyValueType> anyValue;
 
     /**
-     * Sets the value of the content property.
+     * Gets the value of the anyValue property.
      */
-    public void setContent(String value) {
-        this.content = value;
+    public List<AnyValueType> getAnyValue() {
+        if (anyValue == null) {
+            anyValue = new ArrayList<AnyValueType>();
+        }
+        return this.anyValue;
     }
 
 }

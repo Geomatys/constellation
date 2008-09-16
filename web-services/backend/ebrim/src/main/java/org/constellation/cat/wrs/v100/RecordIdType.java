@@ -15,30 +15,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.cat.wrs;
+package org.constellation.cat.wrs.v100;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for AnyValueType complex type.
+ * <p>Java class for RecordIdType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="AnyValueType">
+ * &lt;complexType name="RecordIdType">
  *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;any/>
- *       &lt;/sequence>
- *     &lt;/restriction>
+ *     &lt;extension base="{http://www.opengis.net/ogc}AbstractIdType">
+ *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -46,23 +40,26 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AnyValueType", propOrder = {
+@XmlType(name = "RecordIdType", propOrder = {
     "content"
 })
-public class AnyValueType {
+public class RecordIdType {
 
-    @XmlMixed
-    @XmlAnyElement(lax = true)
-    private List<Object> content;
+    @XmlValue
+    private String content;
 
     /**
      * Gets the value of the content property.
      */
-    public List<Object> getContent() {
-        if (content == null) {
-            content = new ArrayList<Object>();
-        }
-        return this.content;
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * Sets the value of the content property.
+     */
+    public void setContent(String value) {
+        this.content = value;
     }
 
 }

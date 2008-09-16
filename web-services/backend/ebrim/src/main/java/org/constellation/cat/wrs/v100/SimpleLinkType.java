@@ -17,7 +17,7 @@
  */
 
 
-package org.constellation.cat.wrs;
+package org.constellation.cat.wrs.v100;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

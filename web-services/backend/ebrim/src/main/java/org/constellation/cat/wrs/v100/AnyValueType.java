@@ -15,32 +15,30 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-package org.constellation.cat.wrs;
+package org.constellation.cat.wrs.v100;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Allows complex slot values.
- * 
- * <p>Java class for ValueListType complex type.
+ * <p>Java class for AnyValueType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="ValueListType">
+ * &lt;complexType name="AnyValueType">
  *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0}ValueListType">
- *       &lt;sequence maxOccurs="unbounded" minOccurs="0">
- *         &lt;element ref="{http://www.opengis.net/cat/wrs/1.0}AnyValue"/>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;any/>
  *       &lt;/sequence>
- *     &lt;/extension>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -48,22 +46,23 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ValueListType", propOrder = {
-    "anyValue"
+@XmlType(name = "AnyValueType", propOrder = {
+    "content"
 })
-public class ValueListType extends org.constellation.ebrim.v300.ValueListType {
+public class AnyValueType {
 
-    @XmlElement(name = "AnyValue")
-    private List<AnyValueType> anyValue;
+    @XmlMixed
+    @XmlAnyElement(lax = true)
+    private List<Object> content;
 
     /**
-     * Gets the value of the anyValue property.
+     * Gets the value of the content property.
      */
-    public List<AnyValueType> getAnyValue() {
-        if (anyValue == null) {
-            anyValue = new ArrayList<AnyValueType>();
+    public List<Object> getContent() {
+        if (content == null) {
+            content = new ArrayList<Object>();
         }
-        return this.anyValue;
+        return this.content;
     }
 
 }

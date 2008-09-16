@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
     "value"
 })
 @XmlSeeAlso({
-    org.constellation.cat.wrs.ValueListType.class
+    org.constellation.cat.wrs.v100.ValueListType.class
 })
 public class ValueListType {
 

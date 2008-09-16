@@ -58,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
     "contentVersionInfo"
 })
 @XmlSeeAlso({
-    org.constellation.cat.wrs.ExtrinsicObjectType.class
+    org.constellation.cat.wrs.v100.ExtrinsicObjectType.class
 })
 @XmlRootElement(name = "ExtrinsicObject")
 public class ExtrinsicObjectType extends RegistryObjectType {

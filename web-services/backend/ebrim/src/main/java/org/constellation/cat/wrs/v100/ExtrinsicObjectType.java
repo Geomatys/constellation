@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.cat.wrs;
+package org.constellation.cat.wrs.v100;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
