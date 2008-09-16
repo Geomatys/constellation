@@ -63,7 +63,8 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
-import org.constellation.cat.wrs.ExtrinsicObjectType;
+import org.constellation.cat.wrs.v090.WRSExtrinsicObjectType;
+import org.constellation.cat.wrs.v100.ExtrinsicObjectType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
@@ -76,6 +77,7 @@ import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.OWSWebServiceException;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.coverage.web.Service;
+import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
@@ -156,6 +158,9 @@ public class CSWService extends WebService {
            //Ebrim classes
            classeList.add(IdentifiableType.class);
            classeList.add(ExtrinsicObjectType.class);
+           
+           classeList.add(IdentifiableType.class);
+           classeList.add(RegistryObjectType.class);
            
            // we add the extensions classes
            classeList.addAll(loadExtensionsClasses());
