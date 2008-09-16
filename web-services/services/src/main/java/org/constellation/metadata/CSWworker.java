@@ -37,9 +37,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -106,8 +104,10 @@ import org.constellation.ows.v100.SectionsType;
 import org.constellation.ows.v100.ServiceIdentification;
 import org.constellation.ows.v100.ServiceProvider;
 import org.constellation.ws.rs.WebService;
+import org.constellation.ebrim.v300.IdentifiableType;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.MetadataReader.*;
+import static org.constellation.metadata.CSWQueryable.*;
 
 // Apache Lucene dependencies
 import org.apache.lucene.index.Term;
@@ -128,7 +128,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
-import org.constellation.ebrim.v300.IdentifiableType;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -239,19 +239,9 @@ public class CSWworker {
     private CatalogueHarvester catalogueHarvester;
     
     /**
-     * a QName for csw:Record type
+     * Used to map a prefix with a namespace URI.
      */
-    private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
-    
-    /**
-     * a QName for gmd:MD_Metadata type
-     */
-    private final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
-    
-    /**
-     * a QName for csw:Capabilities type
-     */
-    private final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
+    private NamespacePrefixMapperImpl prefixMapper;
     
     /**
      * A list of the supported Type name 
@@ -261,6 +251,28 @@ public class CSWworker {
         SUPPORTED_TYPE_NAME = new ArrayList<QName>();
         SUPPORTED_TYPE_NAME.add(_Record_QNAME);
         SUPPORTED_TYPE_NAME.add(_Metadata_QNAME);
+        SUPPORTED_TYPE_NAME.add(_AdhocQuery_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Association_QNAME);
+        SUPPORTED_TYPE_NAME.add(_AuditableEvent_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ClassificationNode_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ClassificationScheme_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Classification_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ExternalIdentifier_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ExternalLink_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ExtrinsicObject_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Federation_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Notification_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ObjectRefList_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Person_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Organization_QNAME);
+        SUPPORTED_TYPE_NAME.add(_RegistryObject_QNAME);
+        SUPPORTED_TYPE_NAME.add(_RegistryPackage_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Registry_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ServiceBinding_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Service_QNAME);
+        SUPPORTED_TYPE_NAME.add(_SpecificationLink_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Subscription_QNAME);
+        SUPPORTED_TYPE_NAME.add(_User_QNAME);
     }
     
     /**
@@ -305,6 +317,7 @@ public class CSWworker {
         
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller; 
+        prefixMapper      = new NamespacePrefixMapperImpl("");
         cswFactory202     = new ObjectFactory();
         cswFactory200     = new org.constellation.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
@@ -475,8 +488,14 @@ public class CSWworker {
             //we update the URL
             if (om != null) {
                 WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
-                DomainType cascadedCSW = new DomainType("FederatedCatalogues", cascadedCSWservers);
-                om.getConstraint().add(cascadedCSW);
+                
+                DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
+                if (cascadedCSW == null) {
+                    DomainType Fcata = new DomainType("FederatedCatalogues", cascadedCSWservers);
+                    om.getConstraint().add(Fcata);
+                } else {
+                    cascadedCSW.setValue(cascadedCSWservers);
+                }
                 
                 //we update the operation parameters 
                 Operation gr = om.getOperation("GetRecords");
@@ -485,13 +504,51 @@ public class CSWworker {
                     if (os != null) {
                         os.setValue(ACCEPTED_RESOURCE_TYPE);
                     }
+                    DomainType tn = gr.getParameter("TypeNames");
+                    if (tn != null) {
+                        List<String> values = new ArrayList<String>();
+                        for (QName qn : SUPPORTED_TYPE_NAME) {
+                            values.add(prefixMapper.getPreferredPrefix(qn.getNamespaceURI(), "", true) + ':' + qn.getLocalPart());
+                        }
+                        tn.setValue(values);
+                    }
+                    
+                    //we update the queryable elements :
+                    DomainType isoQ = gr.getConstraint("SupportedISOQueryables");
+                    if (isoQ != null) {
+                        List<String> values = new ArrayList<String>();
+                        for (String name : ISO_QUERYABLE.keySet() ) {
+                            values.add("apiso:" + name);
+                        }
+                        isoQ.setValue(values);
+                    }
+                    //we update the queryable elements :
+                    DomainType dubQ = gr.getConstraint("SupportedDublinCoreQueryables");
+                    if (dubQ != null) {
+                        List<String> values = new ArrayList<String>();
+                        for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
+                            values.add("dc:" + name);
+                        }
+                        dubQ.setValue(values);
+                    }
                 }
+                
+                
+                
                 
                 Operation grbi = om.getOperation("GetRecordById");
                 if (grbi != null) {
                     DomainType os = grbi.getParameter("outputSchema");
                     if (os != null) {
                         os.setValue(ACCEPTED_RESOURCE_TYPE);
+                    }
+                    DomainType tn = grbi.getParameter("TypeNames");
+                    if (tn != null) {
+                        List<String> values = new ArrayList<String>();
+                        for (QName qn : SUPPORTED_TYPE_NAME) {
+                            values.add(qn.getPrefix() + ':' + qn.getLocalPart());
+                        }
+                        tn.setValue(values);
                     }
                 }
             }
@@ -575,7 +632,10 @@ public class CSWworker {
             } else {
                 for (QName type:typeNames) {
                     if (!SUPPORTED_TYPE_NAME.contains(type)) {
-                        throw new OWSWebServiceException("The typeName " + type.getLocalPart() + " is not supported by the service:" +'\n' +
+                        String typeName = "null";
+                        if (type != null)
+                            typeName = type.getLocalPart();
+                        throw new OWSWebServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
                                                          "supported one are:" + '\n' + supportedTypeNames(),
                                                          INVALID_PARAMETER_VALUE, "TypeNames", version);
                     }
@@ -733,8 +793,8 @@ public class CSWworker {
                     List<Object> records = new ArrayList<Object>();
                     
                     for (int i = startPos -1; i < max; i++) {
+
                         Object obj = MDReader.getMetadata(results.get(i), mode, set, elementName);
-                        
                         if (obj == null && (max + 1) < results.size()) {
                             max++;
                         } else {
@@ -943,6 +1003,7 @@ public class CSWworker {
         
            response = new GetRecordByIdResponseType(null, records);      
         
+        //we build a Feature catalogue object
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
            List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
@@ -1187,7 +1248,7 @@ public class CSWworker {
             final StringTokenizer tokens = new StringTokenizer(propertyName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
-                List<String> paths = CSWQueryable.ISO_QUERYABLE.get(token);
+                List<String> paths = ISO_QUERYABLE.get(token);
                 if (paths != null) {
                     StringBuilder SQLRequest = new StringBuilder("SELECT distinct(value) FROM \"TextValues\" WHERE ");
                     for (String path: paths) {

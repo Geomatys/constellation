@@ -134,6 +134,20 @@ public class Operation extends AbstractOperation {
         }
         return Collections.unmodifiableList(constraint);
     }
+    
+    public DomainType getConstraint(String name) {
+        if (constraint != null) {
+            for (DomainType d : constraint) {
+                if (d.getName().equals(name))
+                    return d;
+            }
+            DomainType d = new DomainType(name, new ArrayList<String>());
+            constraint.add(d);
+            return d;
+        } else {
+            return null; 
+        }
+    }
 
     /**
      * Optional unordered list of additional metadata about this operation and its' implementation.

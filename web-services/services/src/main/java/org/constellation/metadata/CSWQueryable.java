@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * A container for list of queryable elements in different schemas used in CSW.
@@ -309,7 +310,7 @@ public class CSWQueryable {
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
         paths.add("Catalog Web Service:Record:rights:content");
-        DUBLIN_CORE_QUERYABLE.put("rigths", paths);
+        DUBLIN_CORE_QUERYABLE.put("rights", paths);
         
         /*
          * Bounding box
@@ -338,5 +339,134 @@ public class CSWQueryable {
         paths.add("Catalog Web Service:Record:BoundingBox:crs");
         DUBLIN_CORE_QUERYABLE.put("CRS",     paths);
     }
-
+    
+    /**
+     * The queryable element from DublinCore and their path id.
+     */
+    protected static Map<String, List<String>> EBRIM_QUERYABLE;
+    static {
+        EBRIM_QUERYABLE = new HashMap<String, List<String>>();
+        List<String> paths;
+        
+        /*
+         * The core queryable of DublinCore
+         */
+        paths = new ArrayList<String>();
+        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
+        EBRIM_QUERYABLE.put("", paths);
+        
+        //TODO verify codelist=originator
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("creator", paths);
+        
+        paths = new ArrayList<String>();
+        //TODO @name = “http://purl.org/dc/elements/1.1/subject”
+        paths.add("Ebrim v3.0:RegistryObject:slot:valueList:value");
+        paths.add("Ebrim v3.0:RegistryPackage:slot:valueList:value");
+        EBRIM_QUERYABLE.put("description", paths);
+        EBRIM_QUERYABLE.put("subject", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Ebrim v3.0:RegistryObject:description:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryPackage:description:localizedString:value");
+        EBRIM_QUERYABLE.put("abstract", paths);
+        
+        //TODO verify codelist=publisher
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("publisher", paths);
+        
+        //TODO verify codelist=contributor
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("contributor", paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("date", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Ebrim v3.0:RegistryObject:objectType");
+        paths.add("Ebrim v3.0:RegistryPackage:objectType");
+        EBRIM_QUERYABLE.put("type", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Ebrim v3.0:ExtrinsicObject:mimeType");
+        EBRIM_QUERYABLE.put("format", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Ebrim v3.0:RegistryObject:id");
+        paths.add("Ebrim v3.0:RegistryPackage:id");
+        EBRIM_QUERYABLE.put("identifier", paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("source", paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("language", paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("relation", paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("rigths", paths);
+        
+        /*
+         * Bounding box
+         */
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("WestBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("EastBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("NorthBoundLatitude",     paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("SouthBoundLatitude",     paths);
+        
+        paths = new ArrayList<String>();
+        EBRIM_QUERYABLE.put("CRS",     paths);
+    }
+    
+    /**
+     * a QName for csw:Record type
+     */
+    protected final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    
+    /**
+     * a QName for gmd:MD_Metadata type
+     */
+    protected final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
+    
+    /**
+     * a QName for csw:Capabilities type
+     */
+    protected final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
+    
+    /**
+     * some QName for ebrim types
+     */
+    protected final static QName _ExtrinsicObject_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExtrinsicObject");
+    protected final static QName _RegistryPackage_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryPackage");
+    protected final static QName _SpecificationLink_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "SpecificationLink");
+    protected final static QName _RegistryObject_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryObject");
+    protected final static QName _Association_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Association");
+    protected final static QName _AdhocQuery_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AdhocQuery");
+    protected final static QName _User_QNAME                 = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "User");
+    protected final static QName _ClassificationNode_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationNode");
+    protected final static QName _AuditableEvent_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AuditableEvent");
+    protected final static QName _Federation_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Federation");
+    protected final static QName _Subscription_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Subscription");
+    protected final static QName _ObjectRefList_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ObjectRefList");
+    protected final static QName _Classification_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Classification");
+    protected final static QName _Person_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Person");
+    protected final static QName _ServiceBinding_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ServiceBinding");
+    protected final static QName _Notification_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Notification");
+    protected final static QName _ClassificationScheme_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationScheme");
+    protected final static QName _Service_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Service");
+    protected final static QName _ExternalIdentifier_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalIdentifier");
+    protected final static QName _Registry_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Registry");
+    protected final static QName _Organization_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Organization");
+    protected final static QName _ExternalLink_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalLink");
+    
 }

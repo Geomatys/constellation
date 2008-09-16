@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 
 // Constellation Dependencies
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.Settable;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
@@ -212,7 +213,6 @@ public class MetadataReader {
      * @throws java.sql.SQLException
      */
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
-        Object result;
         int id;
         String catalogCode = "";
         
@@ -232,20 +232,33 @@ public class MetadataReader {
         
         alreadyRead.clear();
         Catalog catalog = MDReader.getCatalog(catalogCode);
+        
+        //we look for cached object
+        Object result = metadatas.get(identifier);
         if (mode == ISO_19115 || mode == EBRIM) {
-            result = metadatas.get(identifier);
+            
             if (result == null) {
-                
                 Form f = MDReader.getForm(catalog, id);
-                result = getObjectFromForm(f);
-                if (result != null) {
-                    metadatas.put(identifier, result);
-                }
+                result = getObjectFromForm(identifier, f);
             }
             
+            result = applyElementSet(result, type, elementName);
+            
         } else if (mode == DUBLINCORE) {
-            Form f = MDReader.getForm(catalog, id);
-            result = getRecordFromForm(f, type, elementName);
+            
+            Form form                  = MDReader.getForm(catalog, id);
+            Value top                  = form.getTopValue();
+            Standard recordStandard    = top.getType().getStandard();
+            
+            /*
+             * if the standard of the record is CSW and the record is cached we return it.
+             * if the record is not yet cached we proccess.
+             * if the record have to be transform from the orginal standard to CSW we process.
+             */  
+            if (!recordStandard.equals(Standard.CSW) || result == null)
+                result = getRecordFromForm(identifier, form, type, elementName);
+            
+            result = applyElementSet(result, type, elementName);
             
         } else {
             throw new IllegalArgumentException("unknow standard mode:" + mode);
@@ -293,88 +306,27 @@ public class MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSetType type, List<QName> elementName) throws SQLException {
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
         
         if (recordStandard.equals(Standard.ISO_19115) || recordStandard.equals(Standard.EBRIM_V3)) {
-            return getRecordFromMDForm(form, type, elementName);
+            return transformMDFormInRecord(form, type, elementName);
         
         } else {
-            Object obj =  getObjectFromForm(form);
-            RecordType record;
-            if (obj instanceof RecordType)
-                record =  (RecordType) obj;
-            else {
+            Object obj =  getObjectFromForm(identifier, form);
+            
+            if (obj instanceof AbstractRecordType) {
+                return (AbstractRecordType) obj;
+            
+            } else {
                 String objType = "null";
                 if (obj != null)
                     objType = obj.getClass().getName();
                 
-                throw new IllegalArgumentException("Unexpected type in getRecordFromForm. waiting for RecordType, got: " + objType);
-            }
-            
-            // for an ElementSetName mode
-            if (elementName == null || elementName.size() == 0) {
-                // for a element set FULL we return the record directly
-                if (type == null || type.equals(ElementSetType.FULL)) {
-                    return record;
-            
-                // Summary view
-                } else if (type.equals(ElementSetType.SUMMARY)) {
-                    return record.toSummaryRecord();
-           
-                // Brief view
-                } else  if (type.equals(ElementSetType.BRIEF)) {
-                    return record.toBriefRecord();
-            
-                // this case must never happen
-                } else {
-                    return null;
-                }
-            
-            // for an element name mode    
-            } else {
-                RecordType result = new RecordType();
-                Class recordClass = RecordType.class;
-                for (QName qn: elementName) {
-
-                    String getterName        = "get" + firstToUpper(qn.getLocalPart());
-                    String setterName        = "set" + firstToUpper(qn.getLocalPart());
-                    String currentMethodName = getterName + "()";
-                    try {
-                        Method getter = recordClass.getMethod(getterName);
-                        Object param  = getter.invoke(record);
-                        
-                        Method setter = null;
-                        if (param != null) {
-                            currentMethodName = setterName + "(" + param.getClass() + ")";
-                            Class paramClass = param.getClass();
-                            if (paramClass.equals(ArrayList.class)) {
-                                paramClass = List.class;
-                            }
-                            setter = recordClass.getMethod(setterName, paramClass);
-                        }
-                        
-                        if (setter != null)
-                            setter.invoke(result, param);
-                        
-                    } catch (IllegalAccessException ex) {
-                        logger.severe("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType!");
-                    } catch (IllegalArgumentException ex) {
-                       logger.severe("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType!");
-                    } catch (InvocationTargetException ex) {
-                        logger.severe("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType!");
-                    } catch (NoSuchMethodException ex) {
-                        logger.severe("The method " + currentMethodName + " does not exists in the classe RecordType!");
-                    } catch (SecurityException ex) {
-                        logger.severe("Security exception while getting the method " + currentMethodName + " in the classe RecordType!");
-                    }
-                    
-                }
-                return result;
+                throw new IllegalArgumentException("Unexpected type in getRecordFromForm. waiting for AbstractRecordType, got: " + objType);
             }
         }
-        
     }
    
     /**
@@ -383,7 +335,7 @@ public class MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromMDForm(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType transformMDFormInRecord(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
         
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
@@ -516,6 +468,7 @@ public class MetadataReader {
         
             if (type.equals(ElementSetType.SUMMARY)) {
                 return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, description);
+                
             } else {
             
                 return fullResult;
@@ -630,14 +583,24 @@ public class MetadataReader {
      * Return an object from a MDWeb formular.
      * 
      * @param form the MDWeb formular.
-     * @return a geotools object representing the metadata.
+     * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
+     * @param elementName 
+     * 
+     * @return a geotools/constellation object representing the metadata.
      */
-    private Object getObjectFromForm(Form form) {
-
+    private Object getObjectFromForm(String identifier, Form form) {
+        
         if (form != null && form.getTopValue() != null && form.getTopValue().getType() != null) {
             Value topValue = form.getTopValue();
             Object result = getObjectFromValue(form, topValue);
+            
+            //we put the full object in the already read metadatas.
+            if (result != null) {
+                metadatas.put(identifier, result);
+            }
             return result;
+        
+        //debugging part to see why the form cannot be read.
         } else {
             if (form == null) {
                 logger.severe("form is null");
@@ -648,6 +611,115 @@ public class MetadataReader {
             }
             return null;
         }
+    }
+    
+    private Object applyElementSet(Object result, ElementSetType type, List<QName> elementName) {
+        //if the result can't be filtered by Set filter we return it.
+        if (!(result instanceof Settable)) {
+            return result;
+        }
+
+         if (type == null)
+            type = ElementSetType.FULL;
+        
+        // then we apply the elementSet/elementName filter
+        
+        // for an ElementSetName mode
+        if (elementName == null || elementName.size() == 0) {
+            // for a element set FULL we return the record directly
+            if (type == null || type.equals(ElementSetType.FULL)) {
+                return result;
+
+            // Summary view
+            } else if (type.equals(ElementSetType.SUMMARY)) {
+                return ((Settable) result).toSummary();
+
+            // Brief view
+            } else if (type.equals(ElementSetType.BRIEF)) {
+                return ((Settable) result).toBrief();
+
+            // this case must never happen
+            } else {
+                return null;
+            }
+
+        // for an element name mode    
+        } else {
+            Class recordClass = result.getClass();
+            Object filtredResult = newInstance(recordClass);
+
+            for (QName qn : elementName) {
+
+                String getterName = "get" + firstToUpper(qn.getLocalPart());
+                String setterName = "set" + firstToUpper(qn.getLocalPart());
+                String currentMethodName = getterName + "()";
+                try {
+                    Method getter = recordClass.getMethod(getterName);
+                    Object param = getter.invoke(result);
+
+                    Method setter = null;
+                    if (param != null) {
+                        currentMethodName = setterName + "(" + param.getClass() + ")";
+                        Class paramClass = param.getClass();
+                        if (paramClass.equals(ArrayList.class)) {
+                            paramClass = List.class;
+                        }
+                        setter = recordClass.getMethod(setterName, paramClass);
+                    }
+
+                    if (setter != null) {
+                        setter.invoke(filtredResult, param);
+                    }
+
+                } catch (IllegalAccessException ex) {
+                    logger.severe("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType!");
+                } catch (IllegalArgumentException ex) {
+                    logger.severe("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType!");
+                } catch (InvocationTargetException ex) {
+                    logger.severe("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType!");
+                } catch (NoSuchMethodException ex) {
+                    logger.severe("The method " + currentMethodName + " does not exists in the classe RecordType!");
+                } catch (SecurityException ex) {
+                    logger.severe("Security exception while getting the method " + currentMethodName + " in the classe RecordType!");
+                }
+
+            }
+            return filtredResult;
+        }
+    }
+    
+    /**
+     * Call the empty constructor on the specified class and return the result.
+     * 
+     * @param classe
+     * @return
+     */
+    private Object newInstance(Class classe) {
+        try {
+            if (classe == null)
+                return null;
+            
+            Constructor constructor = classe.getConstructor();
+            logger.finer("constructor:" + '\n' + constructor.toGenericString());
+            
+            //we execute the constructor
+            Object result = constructor.newInstance();
+            return result;
+            
+        } catch (InstantiationException ex) {
+            logger.severe("the service can't instanciate the class: " + classe.getName() + "()");
+        } catch (IllegalAccessException ex) {
+            logger.severe("The service can't access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {
+            logger.severe("Illegal Argument in empty constructor for class: " + classe.getName());
+        } catch (InvocationTargetException ex) {
+           logger.severe("invocation target exception in empty constructor for class: " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+           logger.severe("No such empty constructor in class: " + classe.getName());
+        } catch (SecurityException ex) {
+            logger.severe("Security exception while instanciating class: " + classe.getName());
+        }
+        return null;
     }
 
     /**
@@ -660,7 +732,6 @@ public class MetadataReader {
      * @return a geotools metadat object.
      */
     private Object getObjectFromValue(Form form, Value value) {
-
         String className;
         String standardName;
         if (value.getType() != null) {
@@ -775,6 +846,11 @@ public class MetadataReader {
                         logger.severe("The localName is mal-formed");
                         return null;
                     }
+                
+                /** 
+                 * Again another special case QNAME does not have a empty constructor. 
+                 * and no setters so we must call the normal constructor.
+                 */    
                 } else if (classe.getSimpleName().equals("QName")) {
                     Constructor constructor = classe.getConstructor(String.class, String.class);
                     TextValue localPart    = null;

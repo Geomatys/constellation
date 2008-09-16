@@ -362,6 +362,11 @@ public class IndexLucene extends AbstractIndex {
          // For an ebrim form    
         } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("Identifiable", Standard.EBRIM_V3))) {
             logger.info("indexing Ebrim 3.0 Record");
+            
+            for (String term :EBRIM_QUERYABLE.keySet()) {
+                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
+            }
         
         // For a csw:Record (indexing is made in next generic indexing bloc)
         } else if (form.getTopValue().getType().getName().equals("Record")){

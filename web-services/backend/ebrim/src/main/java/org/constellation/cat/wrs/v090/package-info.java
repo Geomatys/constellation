@@ -14,18 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.cat.csw;
 
-/**
- *
- * @author Mehdi Sidhoum
- */
-public interface Record extends DCMIRecord {
-    
-    /**
-     * Gets the value of the boundingBox property.
-     * 
-     */
-    public Object getBoundingBox();
-    
-}
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/cat/wrs", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package org.constellation.cat.wrs.v090;

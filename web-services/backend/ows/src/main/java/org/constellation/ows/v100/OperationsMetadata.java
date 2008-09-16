@@ -127,6 +127,17 @@ public class OperationsMetadata {
             constraint = new ArrayList<DomainType>();
         return constraint;
     }
+    
+    public DomainType getConstraint(String name) {
+        if (constraint == null)
+            constraint = new ArrayList<DomainType>();
+        
+        for (DomainType d : constraint) {
+            if (d.getName().equals(name))
+                return d;
+        }
+        return null; 
+    }
 
     /**
      * Gets the value of the extendedCapabilities property.

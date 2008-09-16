@@ -20,7 +20,6 @@ package org.constellation.metadata.ws.rs;
 // java se dependencies
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +63,7 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
+import org.constellation.cat.wrs.ExtrinsicObjectType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
@@ -155,6 +155,7 @@ public class CSWService extends WebService {
            
            //Ebrim classes
            classeList.add(IdentifiableType.class);
+           classeList.add(ExtrinsicObjectType.class);
            
            // we add the extensions classes
            classeList.addAll(loadExtensionsClasses());

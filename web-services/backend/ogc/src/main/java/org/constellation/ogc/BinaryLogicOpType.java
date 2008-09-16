@@ -182,6 +182,9 @@ public class BinaryLogicOpType extends LogicOpsType {
     }
     
     public List<JAXBElement<? extends LogicOpsType>> getLogicOps() {
+        if (this.logicOps == null) {
+            this.logicOps = new ArrayList<JAXBElement<? extends LogicOpsType>>();
+        }
         return logicOps;
     }
 

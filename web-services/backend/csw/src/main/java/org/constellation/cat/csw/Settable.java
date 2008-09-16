@@ -14,18 +14,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.cat.csw;
 
 /**
- *
- * @author Mehdi Sidhoum
+ * Allow to build a restricted record from a full Object.
+ * 
+ * @author Guilhem Legal
  */
-public interface Record extends DCMIRecord {
+public interface Settable {
     
-    /**
-     * Gets the value of the boundingBox property.
-     * 
-     */
-    public Object getBoundingBox();
+    public Object toBrief();
     
+    public Object toSummary();
+
 }

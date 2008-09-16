@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.Record;
+import org.constellation.cat.csw.Settable;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
@@ -65,7 +66,7 @@ import org.geotools.util.Utilities;
     "boundingBox"
 })
 @XmlRootElement(name = "Record")
-public class RecordType extends DCMIRecordType implements Record{
+public class RecordType extends DCMIRecordType implements Record, Settable {
 
     @XmlElement(name = "AnyText")
     private List<EmptyType> anyText;
@@ -168,10 +169,11 @@ public class RecordType extends DCMIRecordType implements Record{
     }
     
     /**
-     * Transform the recordType into a SUmmaryRecordType
+     * Transform the recordType into a SummaryRecordType.
+     * 
      * @return
      */
-    public SummaryRecordType toSummaryRecord() {
+    public SummaryRecordType toSummary() {
         List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (JAXBElement<? extends BoundingBoxType> bb: getBoundingBox()) {
                 bboxes.add(bb.getValue());
@@ -179,7 +181,12 @@ public class RecordType extends DCMIRecordType implements Record{
         return new SummaryRecordType(getIdentifier(), getTitle(), getType(), bboxes, getSubject(), getFormat(), getModified(), getAbstract());
     }
     
-    public BriefRecordType toBriefRecord() {
+    /**
+     * Transform the recordType into a BriefRecordType.
+     * 
+     * @return
+     */
+    public BriefRecordType toBrief() {
         List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (JAXBElement<? extends BoundingBoxType> bb: getBoundingBox()) {
                 bboxes.add(bb.getValue());
