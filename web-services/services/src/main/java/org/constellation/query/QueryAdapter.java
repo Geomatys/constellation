@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 
 import org.constellation.query.wms.WMSQuery;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -35,6 +36,7 @@ import org.geotools.style.sld.Specification.StyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 
 import org.geotools.util.MeasurementRange;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -82,14 +84,14 @@ public class QueryAdapter {
      *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
      *         if the bbox is {@code null}.
      */
-    public static GeneralEnvelope toBBox(final String bbox) {
+    public static Envelope toBBox(final String bbox) {
         GeneralEnvelope envelope = new GeneralEnvelope(2);
         envelope.setToInfinite();
         if (bbox == null) {
             if (envelope != null) {
                 envelope.setToInfinite();
             }
-            return envelope;
+            return new ImmutableEnvelope(envelope);
         }
         final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
         if (envelope == null) {
@@ -136,7 +138,7 @@ public class QueryAdapter {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2));
             }
         }
-        return envelope;
+        return new ImmutableEnvelope(envelope);
     }
 
     public static MeasurementRange toMeasurementRange(final String strDimRange) {

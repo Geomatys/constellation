@@ -82,7 +82,7 @@ import org.constellation.worker.WMSWorker;
 
 // Geotools dependencies
 import org.geotools.display.service.PortrayalException;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
@@ -613,7 +613,7 @@ public class WMService extends WebService {
         //final String strRemoteOwsType = getParameter( KEY_REMOTE_OWS_TYPE, false );
         final String strRemoteOwsUrl  = getParameter( KEY_REMOTE_OWS_URL, false );
 
-        final GeneralEnvelope env = QueryAdapter.toBBox(strBBox);
+        final ImmutableEnvelope env = (ImmutableEnvelope) QueryAdapter.toBBox(strBBox);
         //final Rectangle2D bbox = env.toRectangle2D();
         final CoordinateReferenceSystem crs;
         try {
