@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -63,6 +64,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ClassificationNodeType", propOrder = {
     "classificationNode"
 })
+@XmlRootElement(name = "ClassificationNode")        
 public class ClassificationNodeType extends RegistryObjectType {
 
     @XmlElement(name = "ClassificationNode")
@@ -83,6 +85,23 @@ public class ClassificationNodeType extends RegistryObjectType {
             classificationNode = new ArrayList<ClassificationNodeType>();
         }
         return this.classificationNode;
+    }
+    
+    /**
+     * Sets the value of the classificationNode property.
+     */
+    public void setClassificationNode(ClassificationNodeType classificationNode) {
+        if (this.classificationNode == null) {
+            this.classificationNode = new ArrayList<ClassificationNodeType>();
+        }
+        this.classificationNode.add(classificationNode);
+    }
+    
+    /**
+     * Sets the value of the classificationNode property.
+     */
+    public void setClassificationNode(List<ClassificationNodeType> classificationNode) {
+        this.classificationNode = classificationNode;
     }
 
     /**

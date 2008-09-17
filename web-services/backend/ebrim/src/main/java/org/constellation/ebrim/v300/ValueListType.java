@@ -67,6 +67,23 @@ public class ValueListType {
         return this.value;
     }
     
+     /**
+     * Sets the value of the value property. 
+     */
+    public void setValue(List<String> value) {
+        this.value = value;
+    }
+    
+    /**
+     * Gets the value of the value property. 
+     */
+    public void setValue(String value) {
+        if (this.value == null) {
+            this.value = new ArrayList<String>();
+        }
+        this.value.add(value);
+    }
+    
     @Override
     public String toString() {
         String s = '[' + this.getClass().getSimpleName() + "] values:" + '\n';

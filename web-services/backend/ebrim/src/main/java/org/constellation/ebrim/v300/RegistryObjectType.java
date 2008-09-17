@@ -159,6 +159,24 @@ public class RegistryObjectType extends IdentifiableType implements Settable {
         }
         return this.classification;
     }
+    
+    /**
+     * Sets the value of the classification property.
+     */
+    public void setClassification(ClassificationType classification) {
+        if (this.classification == null) {
+            this.classification = new ArrayList<ClassificationType>();
+        }
+        this.classification.add(classification);
+    }
+    
+    /**
+     * Sets the value of the classification property.
+     */
+    public void setClassification(List<ClassificationType> classification) {
+       this.classification = classification;
+    }
+    
 
     /**
      * Gets the value of the externalIdentifier property.
@@ -170,6 +188,26 @@ public class RegistryObjectType extends IdentifiableType implements Settable {
         return this.externalIdentifier;
     }
 
+        /**
+     * Sets the value of the externalIdentifier property.
+     */
+    public void setExternalIdentifier(ExternalIdentifierType externalIdentifier) {
+        if (this.externalIdentifier == null) {
+            this.externalIdentifier = new ArrayList<ExternalIdentifierType>();
+        }
+        this.externalIdentifier.add(externalIdentifier);
+    }
+    
+    /**
+     * Sets the value of the externalIdentifier property.
+     */
+    public void setExternalIdentifier(List<ExternalIdentifierType> externalIdentifier) {
+        if (externalIdentifier == null) {
+            externalIdentifier = new ArrayList<ExternalIdentifierType>();
+        }
+        this.externalIdentifier = externalIdentifier;
+    }
+    
     /**
      * Gets the value of the lid property.
      */

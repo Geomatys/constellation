@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ServiceBindingType", propOrder = {
     "specificationLink"
 })
+@XmlRootElement(name = "ServiceBinding")
 public class ServiceBindingType extends RegistryObjectType {
 
     @XmlElement(name = "SpecificationLink")
@@ -69,25 +71,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Gets the value of the specificationLink property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the specificationLink property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSpecificationLink().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SpecificationLinkType }
-     * 
-     * 
      */
     public List<SpecificationLinkType> getSpecificationLink() {
         if (specificationLink == null) {
@@ -95,14 +78,26 @@ public class ServiceBindingType extends RegistryObjectType {
         }
         return this.specificationLink;
     }
+    
+    /**
+     * Sets the value of the specificationLink property.
+     */
+    public void setSpecificationLink(SpecificationLinkType specification) {
+        if (this.specificationLink == null) {
+            this.specificationLink = new ArrayList<SpecificationLinkType>();
+        }
+        this.specificationLink.add(specification);
+    }
+    
+    /**
+     * Sets the value of the specificationLink property.
+     */
+    public void setSpecificationLink(List<SpecificationLinkType> specification) {
+        this.specificationLink = specification;
+    }
 
     /**
      * Gets the value of the service property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getService() {
         return service;
@@ -110,11 +105,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Sets the value of the service property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setService(String value) {
         this.service = value;
@@ -122,11 +112,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Gets the value of the accessURI property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAccessURI() {
         return accessURI;
@@ -134,11 +119,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Sets the value of the accessURI property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAccessURI(String value) {
         this.accessURI = value;
@@ -146,11 +126,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Gets the value of the targetBinding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTargetBinding() {
         return targetBinding;
@@ -158,11 +133,6 @@ public class ServiceBindingType extends RegistryObjectType {
 
     /**
      * Sets the value of the targetBinding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setTargetBinding(String value) {
         this.targetBinding = value;

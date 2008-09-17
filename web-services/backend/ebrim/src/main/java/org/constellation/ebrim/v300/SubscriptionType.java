@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -73,6 +74,9 @@ public class SubscriptionType extends RegistryObjectType {
     private XMLGregorianCalendar endTime;
     @XmlAttribute
     private Duration notificationInterval;
+    
+    @XmlTransient
+    private static ObjectFactory factory = new ObjectFactory();
 
     /**
      * Gets the value of the action property.
@@ -82,6 +86,26 @@ public class SubscriptionType extends RegistryObjectType {
             action = new ArrayList<JAXBElement<? extends ActionType>>();
         }
         return this.action;
+    }
+    
+        /**
+     * Sets the value of the action property.
+     */
+    public void setAction(ActionType action) {
+        if (this.action == null) {
+            this.action = new ArrayList<JAXBElement<? extends ActionType>>();
+        }
+        if (action instanceof NotifyActionType)
+            this.action.add(factory.createNotifyAction((NotifyActionType)action));
+        else
+            this.action.add(factory.createAction(action));
+    }
+    
+    /**
+     * Sets the value of the action property.
+     */
+    public void setAction(List<JAXBElement<? extends ActionType>>  action) {
+        this.action = action;
     }
 
     /**

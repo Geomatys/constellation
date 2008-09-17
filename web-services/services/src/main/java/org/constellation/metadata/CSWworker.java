@@ -298,6 +298,7 @@ public class CSWworker {
         ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gfc");
         ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
         ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
+        ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
     }
     
     /**
@@ -1038,7 +1039,7 @@ public class CSWworker {
         
            response = new GetRecordByIdResponseType(null, records);      
         
-        //we build a Ebrim object
+        //we build a Ebrim 3.0 object
         } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")) {
            List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
@@ -1059,7 +1060,7 @@ public class CSWworker {
                     if (o instanceof IdentifiableType) {
                         records.add(o);
                     } else {
-                        logger.severe("The form " + id + " is not a EBRIM object");
+                        logger.severe("The form " + id + " is not a EBRIM v3.0 object");
                     }
                 } catch (SQLException e) {
                     throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
@@ -1071,7 +1072,43 @@ public class CSWworker {
             }
         
            response = new GetRecordByIdResponseType(null, records);      
+      
+         //we build a Ebrim 2.5 object
+        } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+           List<Object> records = new ArrayList<Object>();
+           for (String id:request.getId()) {
+               
+               //we get the form ID and catalog code
+                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                if (ids.size() > 0) {
+                    id = ids.get(0);
+                } else {
+                    unexistingID.add(id);
+                    logger.severe("unexisting id:" + id);
+                    continue;
+                }
+                
+                //we get the metadata object 
+                try {
+                    Object o = MDReader.getMetadata(id, EBRIM, set, null);
+                    if (o instanceof org.constellation.ebrim.v250.RegistryObjectType) {
+                        records.add(o);
+                    } else {
+                        if (o == null)
+                            logger.severe("The form " + id + " has not be read is null.");
+                        else
+                            logger.severe("The form " + id + " is not a EBRIM v2.5 object.");
+                    }
+                } catch (SQLException e) {
+                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                      NO_APPLICABLE_CODE, "id", version);
+                }
+           }
+           if (records.size() == 0) {
+                throwUnexistingIdentifierException(unexistingID);
+            }
         
+           response = new GetRecordByIdResponseType(null, records);  
            
         // this case must never append
         } else {
@@ -1391,7 +1428,8 @@ public class CSWworker {
             transTime = System.currentTimeMillis() - start_trans;
             
         } catch (IllegalArgumentException e) {
-             throw new OWSWebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName(),
+             throw new OWSWebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
+                                              "cause: " + e.getMessage(),
                                                NO_APPLICABLE_CODE, null, version);
         }
         
@@ -1452,8 +1490,19 @@ public class CSWworker {
             }
         } else if (obj instanceof RegistryObjectType) {
             InternationalStringType ident = ((RegistryObjectType) obj).getName();
-            if (ident.getLocalizedString().size() > 0)
+            if (ident != null && ident.getLocalizedString().size() > 0) {
                 title = ident.getLocalizedString().get(0).getValue();
+            } else {
+                title = ((RegistryObjectType) obj).getId();
+            } 
+        
+        } else if (obj instanceof org.constellation.ebrim.v250.RegistryObjectType) {
+            org.constellation.ebrim.v250.InternationalStringType ident = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getName();
+            if (ident != null && ident.getLocalizedString().size() > 0) {
+                title = ident.getLocalizedString().get(0).getValue();
+            } else {
+                title = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getId();
+            } 
             
         } else {
             Method nameGetter = null;

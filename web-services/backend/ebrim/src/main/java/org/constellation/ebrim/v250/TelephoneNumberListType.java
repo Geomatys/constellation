@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 public class TelephoneNumberListType {
 
     @XmlElement(name = "TelephoneNumber")
-    protected List<TelephoneNumberType> telephoneNumber;
+    private List<TelephoneNumberType> telephoneNumber;
 
     /**
      * Gets the value of the telephoneNumber property.
@@ -61,6 +61,23 @@ public class TelephoneNumberListType {
             telephoneNumber = new ArrayList<TelephoneNumberType>();
         }
         return this.telephoneNumber;
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(TelephoneNumberType number) {
+        if (telephoneNumber == null) {
+            telephoneNumber = new ArrayList<TelephoneNumberType>();
+        }
+        this.telephoneNumber.add(number);
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(List<TelephoneNumberType> numbers) {
+        this.telephoneNumber = numbers;
     }
 
 }

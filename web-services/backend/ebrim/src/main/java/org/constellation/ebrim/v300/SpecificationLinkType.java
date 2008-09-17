@@ -93,6 +93,23 @@ public class SpecificationLinkType extends RegistryObjectType {
         }
         return this.usageParameter;
     }
+    
+    /**
+     * Sets the value of the usageParameter property.
+     */
+    public void setUsageParameter(String usageParameter) {
+        if (this.usageParameter == null) {
+            this.usageParameter = new ArrayList<String>();
+        }
+        this.usageParameter.add(usageParameter);
+    }
+    
+    /**
+     * Sets the value of the usageParameter property.
+     */
+    public void setUsageParameter(List<String> usageParameter) {
+        this.usageParameter = usageParameter;
+    }
 
     /**
      * Gets the value of the serviceBinding property.

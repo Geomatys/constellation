@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -48,6 +49,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "ServiceType", propOrder = {
     "serviceBinding"
 })
+@XmlRootElement(name = "Service")        
 public class ServiceType extends RegistryEntryType {
 
     @XmlElement(name = "ServiceBinding")
@@ -61,6 +63,23 @@ public class ServiceType extends RegistryEntryType {
             serviceBinding = new ArrayList<ServiceBindingType>();
         }
         return this.serviceBinding;
+    }
+    
+    /**
+     * Sets the value of the serviceBinding property.
+     */
+    public void setServiceBinding(ServiceBindingType serviceBinding) {
+        if (this.serviceBinding == null) {
+            this.serviceBinding = new ArrayList<ServiceBindingType>();
+        }
+        this.serviceBinding.add(serviceBinding);
+    }
+    
+    /**
+     * Sets the value of the serviceBinding property.
+     */
+    public void setServiceBinding(List<ServiceBindingType> serviceBinding) {
+        this.serviceBinding = serviceBinding;
     }
 
 }

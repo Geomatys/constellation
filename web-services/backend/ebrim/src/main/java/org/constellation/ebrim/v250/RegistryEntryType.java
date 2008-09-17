@@ -20,6 +20,7 @@ package org.constellation.ebrim.v250;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -66,6 +67,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     RegistryType.class,
     FederationType.class
 })
+@XmlRootElement(name = "RegistryEntry")        
 public class RegistryEntryType extends RegistryObjectType {
 
     @XmlAttribute

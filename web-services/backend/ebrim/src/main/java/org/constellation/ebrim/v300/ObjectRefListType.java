@@ -63,5 +63,23 @@ public class ObjectRefListType {
         }
         return this.objectRef;
     }
+    
+        
+    /**
+     * Sets the value of the objectRef property.
+     */
+    public void setObjectRef(ObjectRefType ref) {
+        if (objectRef == null) {
+            objectRef = new ArrayList<ObjectRefType>();
+        }
+        this.objectRef.add(ref);
+    }
+    
+    /**
+     * Sets the value of the objectRef property.
+     */
+    public void setObjectRef(List<ObjectRefType> ref) {
+        this.objectRef = ref;
+    }
 
 }

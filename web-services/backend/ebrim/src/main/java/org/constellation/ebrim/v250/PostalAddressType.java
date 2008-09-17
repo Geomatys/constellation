@@ -88,6 +88,24 @@ public class PostalAddressType {
     }
 
     /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(SlotType slot) {
+        if (this.slot == null) {
+            this.slot = new ArrayList<SlotType>();
+        }
+        this.slot.add(slot);
+    }
+    
+     /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(List<SlotType> slot) {
+        this.slot = slot;
+    }
+
+    
+    /**
      * Gets the value of the city property.
      */
     public String getCity() {

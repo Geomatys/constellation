@@ -20,6 +20,7 @@ package org.constellation.ebrim.v250;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.wrs.v090.WRSExtrinsicObjectType;
@@ -53,6 +54,7 @@ import org.constellation.cat.wrs.v090.WRSExtrinsicObjectType;
 @XmlSeeAlso({
     WRSExtrinsicObjectType.class
 })
+@XmlRootElement( name = "ExtrinsicObject")        
 public class ExtrinsicObjectType extends RegistryEntryType {
 
     @XmlAttribute
@@ -81,7 +83,7 @@ public class ExtrinsicObjectType extends RegistryEntryType {
     /**
      * Gets the value of the isOpaque property.
      */
-    public boolean isIsOpaque() {
+    public boolean getIsOpaque() {
         if (isOpaque == null) {
             return false;
         } else {

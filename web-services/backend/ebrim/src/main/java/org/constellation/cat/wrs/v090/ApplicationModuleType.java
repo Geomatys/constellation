@@ -23,8 +23,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.v200.AbstractQueryType;
+import org.constellation.cat.csw.v200.ObjectFactory;
+import org.constellation.cat.csw.v200.QueryType;
 import org.constellation.ebrim.v250.RegistryPackageType;
 
 
@@ -55,11 +59,14 @@ import org.constellation.ebrim.v250.RegistryPackageType;
 @XmlType(name = "ApplicationModuleType", propOrder = {
     "abstractQuery"
 })
+@XmlRootElement( name = "ApplicationModule")        
 public class ApplicationModuleType extends RegistryPackageType {
 
     @XmlElementRef(name = "AbstractQuery", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractQueryType>> abstractQuery;
 
+    @XmlTransient
+    private static ObjectFactory cswFactory = new ObjectFactory();
     /**
      * Gets the value of the abstractQuery property.
      */
@@ -68,6 +75,26 @@ public class ApplicationModuleType extends RegistryPackageType {
             abstractQuery = new ArrayList<JAXBElement<? extends AbstractQueryType>>();
         }
         return this.abstractQuery;
+    }
+    
+    /**
+     * Sets the value of the abstractQuery property.
+     */
+    public void setAbstractQuery(List<JAXBElement<? extends AbstractQueryType>> abstractQuery) {
+        this.abstractQuery = abstractQuery;
+    }
+    
+    /**
+     * Sets the value of the abstractQuery property.
+     */
+    public void setAbstractQuery(AbstractQueryType abstractQuery) {
+        if (this.abstractQuery == null) {
+            this.abstractQuery = new ArrayList<JAXBElement<? extends AbstractQueryType>>();
+        }
+        if (abstractQuery instanceof QueryType)
+            this.abstractQuery.add(cswFactory.createQuery((QueryType)abstractQuery));
+        else
+            this.abstractQuery.add(cswFactory.createAbstractQuery(abstractQuery));
     }
 
 }

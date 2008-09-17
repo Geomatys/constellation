@@ -77,6 +77,23 @@ public class ServiceBindingType extends RegistryObjectType {
         }
         return this.specificationLink;
     }
+    
+    /**
+     * Sets the value of the specificationLink property.
+     */
+    public void setSpecificationLink(SpecificationLinkType specification) {
+        if (this.specificationLink == null) {
+            this.specificationLink = new ArrayList<SpecificationLinkType>();
+        }
+        this.specificationLink.add(specification);
+    }
+    
+    /**
+     * Sets the value of the specificationLink property.
+     */
+    public void setSpecificationLink(List<SpecificationLinkType> specification) {
+        this.specificationLink = specification;
+    }
 
     /**
      * Gets the value of the service property.

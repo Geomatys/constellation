@@ -153,7 +153,9 @@ public class MetadataWriter {
             
             // unkow types
             } else {
-                throw new IllegalArgumentException("Can't register ths kind of object:" + className);
+                String msg = "Can't register ths kind of object:" + object.getClass().getName();
+                logger.severe(msg);
+                throw new IllegalArgumentException(msg);
             }
             Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
@@ -561,9 +563,16 @@ public class MetadataWriter {
             availableStandards.add(Standard.DUBLINCORE_TERMS);
             availableStandards.add(Standard.OWS);
         
-        // Ebrim standard    
+        // Ebrim v3 standard    
         } else if (mainStandard.equals(Standard.EBRIM_V3)) {
             availableStandards.add(Standard.EBRIM_V3);
+            availableStandards.add(Standard.CSW);
+            availableStandards.add(Standard.OGC_FILTER);
+            availableStandards.add(Standard.MDWEB);
+            
+        // Ebrim v2.5 tandard    
+        } else if (mainStandard.equals(Standard.EBRIM_V2_5)) {
+            availableStandards.add(Standard.EBRIM_V2_5);
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.OGC_FILTER);
             availableStandards.add(Standard.MDWEB);

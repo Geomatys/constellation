@@ -81,6 +81,23 @@ public class Subscription extends RegistryObjectType {
         }
         return this.action;
     }
+    
+    /**
+     * Sets the value of the action property.
+     */
+    public void setAction(ActionType action) {
+        if (this.action == null) {
+            this.action = new ArrayList<ActionType>();
+        }
+        this.action.add(action);
+    }
+    
+    /**
+     * Sets the value of the action property.
+     */
+    public void setAction(List<ActionType> action) {
+        this.action = action;
+    }
 
     /**
      * Gets the value of the selector property.

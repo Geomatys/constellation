@@ -20,6 +20,7 @@ package org.constellation.ebrim.v250;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
@@ -55,6 +56,7 @@ import javax.xml.datatype.Duration;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RegistryType")
+@XmlRootElement(name = "Registry")
 public class RegistryType extends RegistryEntryType {
 
     @XmlAttribute(required = true)

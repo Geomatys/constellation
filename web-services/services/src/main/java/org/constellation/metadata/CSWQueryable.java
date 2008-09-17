@@ -291,6 +291,7 @@ public class CSWQueryable {
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         paths.add("Ebrim v3.0:RegistryObject:id");
         paths.add("Ebrim v3.0:RegistryPackage:id");
+        paths.add("Ebrim v2.5:ExtrinsicObject:id");
         DUBLIN_CORE_QUERYABLE.put("identifier", paths);
         
         paths = new ArrayList<String>();
@@ -354,7 +355,7 @@ public class CSWQueryable {
         paths = new ArrayList<String>();
         paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
         paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
-        EBRIM_QUERYABLE.put("", paths);
+        EBRIM_QUERYABLE.put("name", paths);
         
         //TODO verify codelist=originator
         paths = new ArrayList<String>();

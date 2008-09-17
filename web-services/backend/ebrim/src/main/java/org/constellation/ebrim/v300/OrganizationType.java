@@ -83,6 +83,25 @@ public class OrganizationType extends RegistryObjectType {
         }
         return this.address;
     }
+    
+    /**
+     * Sets the value of the address property.
+     * 
+     */
+    public void setAddress(PostalAddressType address) {
+        if (this.address == null) {
+            this.address = new ArrayList<PostalAddressType>();
+        }
+        this.address.add(address);
+    }
+    
+    /**
+     * Sets the value of the address property.
+     * 
+     */
+    public void setAddress(List<PostalAddressType> address) {
+        this.address = address;
+    }
 
     /**
      * Gets the value of the telephoneNumber property.
@@ -92,6 +111,23 @@ public class OrganizationType extends RegistryObjectType {
             telephoneNumber = new ArrayList<TelephoneNumberType>();
         }
         return this.telephoneNumber;
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(TelephoneNumberType number) {
+        if (telephoneNumber == null) {
+            telephoneNumber = new ArrayList<TelephoneNumberType>();
+        }
+        this.telephoneNumber.add(number);
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(List<TelephoneNumberType> number) {
+        this.telephoneNumber = number;
     }
 
     /**
@@ -104,6 +140,23 @@ public class OrganizationType extends RegistryObjectType {
         return this.emailAddress;
     }
 
+    /**
+     * Sets the value of the emailAddress property.
+     */
+    public void setEmailAddress(EmailAddressType email) {
+        if (emailAddress == null) {
+            emailAddress = new ArrayList<EmailAddressType>();
+        }
+        this.emailAddress.add(email);
+    }
+    
+    /**
+     * Sets the value of the emailAddress property.
+     */
+    public void setEmailAddress(List<EmailAddressType> emails) {
+        this.emailAddress = emails;
+    }
+    
     /**
      * Gets the value of the parent property.
      */

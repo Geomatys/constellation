@@ -83,6 +83,23 @@ public class ClassificationNodeType extends RegistryObjectType {
         }
         return this.classificationNode;
     }
+    
+    /**
+     * Sets the value of the classificationNode property.
+     */
+    public void setClassificationNode(ClassificationNodeType classificationNode) {
+        if (this.classificationNode == null) {
+            this.classificationNode = new ArrayList<ClassificationNodeType>();
+        }
+        this.classificationNode.add(classificationNode);
+    }
+    
+    /**
+     * Sets the value of the classificationNode property.
+     */
+    public void setClassificationNode(List<ClassificationNodeType> classificationNode) {
+        this.classificationNode = classificationNode;
+    }
 
     /**
      * Gets the value of the parent property.

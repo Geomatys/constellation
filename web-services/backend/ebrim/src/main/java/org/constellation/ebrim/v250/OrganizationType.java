@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -60,6 +61,7 @@ import javax.xml.bind.annotation.XmlType;
     "telephoneNumber",
     "emailAddress"
 })
+@XmlRootElement(name = "Organization")        
 public class OrganizationType extends RegistryObjectType {
 
     @XmlElement(name = "Address", required = true)
@@ -98,6 +100,23 @@ public class OrganizationType extends RegistryObjectType {
         }
         return this.telephoneNumber;
     }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(TelephoneNumberType number) {
+        if (telephoneNumber == null) {
+            telephoneNumber = new ArrayList<TelephoneNumberType>();
+        }
+        this.telephoneNumber.add(number);
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(List<TelephoneNumberType> number) {
+        this.telephoneNumber = number;
+    }
 
     /**
      * Gets the value of the emailAddress property.
@@ -107,6 +126,23 @@ public class OrganizationType extends RegistryObjectType {
             emailAddress = new ArrayList<EmailAddressType>();
         }
         return this.emailAddress;
+    }
+    
+    /**
+     * Sets the value of the emailAddress property.
+     */
+    public void setEmailAddress(EmailAddressType email) {
+        if (emailAddress == null) {
+            emailAddress = new ArrayList<EmailAddressType>();
+        }
+        this.emailAddress.add(email);
+    }
+    
+    /**
+     * Sets the value of the emailAddress property.
+     */
+    public void setEmailAddress(List<EmailAddressType> emails) {
+        this.emailAddress = emails;
     }
 
     /**

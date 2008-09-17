@@ -63,5 +63,22 @@ public class TelephoneNumberListType {
         }
         return this.telephoneNumber;
     }
+    
+     /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(TelephoneNumberType number) {
+        if (telephoneNumber == null) {
+            telephoneNumber = new ArrayList<TelephoneNumberType>();
+        }
+        this.telephoneNumber.add(number);
+    }
+    
+    /**
+     * Sets the value of the telephoneNumber property.
+     */
+    public void setTelephoneNumber(List<TelephoneNumberType> numbers) {
+        this.telephoneNumber = numbers;
+    }
 
 }

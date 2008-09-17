@@ -25,62 +25,58 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the oasis.names.tc.ebxml_regrep.rim.xsd._2 package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
- * provided in this class.
+ * This object contains factory methods for each Java content interface and Java element interface 
+ * generated in the  org.constellation.ebrim.v250 package. 
+ * <p>An ObjectFactory allows you to programatically construct new instances of the Java representation 
+ * for XML content. 
+ * The Java representation of XML content can consist of schema derived interfaces and classes representing the binding of schema 
+ * type definitions, element declarations and model groups.
+ * Factory methods for each of these are provided in this class.
  * 
  */
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Value_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Value");
-    private final static QName _RegistryObjectList_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObjectList");
-    private final static QName _Description_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Description");
-    private final static QName _LocalizedString_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "LocalizedString");
-    private final static QName _Federation_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Federation");
-    private final static QName _ExternalLink_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalLink");
-    private final static QName _PersonName_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PersonName");
-    private final static QName _ClassificationNode_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationNode");
-    private final static QName _User_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "User");
-    private final static QName _ObjectRefList_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ObjectRefList");
-    private final static QName _Classification_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Classification");
-    private final static QName _EmailAddress_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "EmailAddress");
-    private final static QName _RegistryPackage_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryPackage");
-    private final static QName _RegistryObject_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObject");
-    private final static QName _Association_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
-    private final static QName _FaxNumber_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "FaxNumber");
-    private final static QName _SignatureList_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SignatureList");
-    private final static QName _RegistryEntry_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryEntry");
-    private final static QName _ObjectRef_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ObjectRef");
-    private final static QName _ExtrinsicObject_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
+    private final static QName _Value_QNAME                 = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Value");
+    private final static QName _RegistryObjectList_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObjectList");
+    private final static QName _Description_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Description");
+    private final static QName _LocalizedString_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "LocalizedString");
+    private final static QName _Federation_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Federation");
+    private final static QName _ExternalLink_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalLink");
+    private final static QName _PersonName_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PersonName");
+    private final static QName _ClassificationNode_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationNode");
+    private final static QName _User_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "User");
+    private final static QName _ObjectRefList_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ObjectRefList");
+    private final static QName _Classification_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Classification");
+    private final static QName _EmailAddress_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "EmailAddress");
+    private final static QName _RegistryPackage_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryPackage");
+    private final static QName _RegistryObject_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObject");
+    private final static QName _Association_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
+    private final static QName _FaxNumber_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "FaxNumber");
+    private final static QName _SignatureList_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SignatureList");
+    private final static QName _RegistryEntry_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryEntry");
+    private final static QName _ObjectRef_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ObjectRef");
+    private final static QName _ExtrinsicObject_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
     private final static QName _MobileTelephoneNumber_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "MobileTelephoneNumber");
-    private final static QName _ClassificationScheme_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationScheme");
-    private final static QName _Organization_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Organization");
-    private final static QName _TelephoneNumber_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "TelephoneNumber");
-    private final static QName _InternationalString_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "InternationalString");
-    private final static QName _ExternalIdentifier_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalIdentifier");
-    private final static QName _SpecificationLink_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SpecificationLink");
-    private final static QName _Name_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Name");
-    private final static QName _UsageParameter_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "UsageParameter");
-    private final static QName _SlotList_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SlotList");
-    private final static QName _Registry_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Registry");
-    private final static QName _ServiceBinding_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ServiceBinding");
-    private final static QName _ValueList_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ValueList");
-    private final static QName _Service_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
-    private final static QName _UsageDescription_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "UsageDescription");
-    private final static QName _Slot_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Slot");
-    private final static QName _PostalAddress_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PostalAddress");
-    private final static QName _Address_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Address");
-    private final static QName _AuditableEvent_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
-    private final static QName _PagerNumber_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PagerNumber");
+    private final static QName _ClassificationScheme_QNAME  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationScheme");
+    private final static QName _Organization_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Organization");
+    private final static QName _TelephoneNumber_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "TelephoneNumber");
+    private final static QName _InternationalString_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "InternationalString");
+    private final static QName _ExternalIdentifier_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalIdentifier");
+    private final static QName _SpecificationLink_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SpecificationLink");
+    private final static QName _Name_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Name");
+    private final static QName _UsageParameter_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "UsageParameter");
+    private final static QName _SlotList_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SlotList");
+    private final static QName _Registry_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Registry");
+    private final static QName _ServiceBinding_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ServiceBinding");
+    private final static QName _ValueList_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ValueList");
+    private final static QName _Service_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
+    private final static QName _UsageDescription_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "UsageDescription");
+    private final static QName _Slot_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Slot");
+    private final static QName _PostalAddress_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PostalAddress");
+    private final static QName _Address_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Address");
+    private final static QName _AuditableEvent_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
+    private final static QName _PagerNumber_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "PagerNumber");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: oasis.names.tc.ebxml_regrep.rim.xsd._2

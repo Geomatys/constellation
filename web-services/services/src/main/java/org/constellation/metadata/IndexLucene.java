@@ -285,21 +285,22 @@ public class IndexLucene extends AbstractIndex {
         StringBuilder response  = new StringBuilder("");
         List<String> paths = queryable.get(term);
         
-        for (String pathID: paths) {
-            Path path;
-            if (reader != null) {
-                path   = reader.getPath(pathID);
-            } else {
-                path = pathMap.get(pathID);
-            }
-            List<Value> values = form.getValueFromPath(path);
-            for (Value v: values) {
-                if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
+        if (paths != null) {
+            for (String pathID: paths) {
+                Path path;
+                if (reader != null) {
+                    path   = reader.getPath(pathID);
+                } else {
+                    path = pathMap.get(pathID);
+                }
+                List<Value> values = form.getValueFromPath(path);
+                for (Value v: values) {
+                    if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
                 
-                    TextValue tv = (TextValue) v;
-                    response.append(tv.getValue()).append(','); 
-                
-                } 
+                        TextValue tv = (TextValue) v;
+                        response.append(tv.getValue()).append(','); 
+                    } 
+                }
             }
         }
         if (response.toString().equals("")) {
@@ -359,7 +360,7 @@ public class IndexLucene extends AbstractIndex {
                                   "cause:  unable to parse double: " + coord);
             }
             
-         // For an ebrim form    
+         // For an ebrim v 3.0 form    
         } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("Identifiable", Standard.EBRIM_V3))) {
             logger.info("indexing Ebrim 3.0 Record");
             
@@ -368,6 +369,16 @@ public class IndexLucene extends AbstractIndex {
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }
         
+             // For an ebrim v 2.5 form    
+        } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("RegistryObject", Standard.EBRIM_V2_5))) {
+            logger.info("indexing Ebrim 2.5 Record");
+            
+            for (String term :EBRIM_QUERYABLE.keySet()) {
+                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
+            }
+            
+            
         // For a csw:Record (indexing is made in next generic indexing bloc)
         } else if (form.getTopValue().getType().getName().equals("Record")){
             logger.info("indexing CSW Record");

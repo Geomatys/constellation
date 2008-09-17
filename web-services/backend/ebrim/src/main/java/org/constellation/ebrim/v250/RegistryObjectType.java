@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
@@ -104,6 +105,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     AdhocQueryType.class,
     Subscription.class
 })
+@XmlRootElement(name = "RegistryObject")
 public class RegistryObjectType {
 
     @XmlElement(name = "Name")
@@ -171,6 +173,24 @@ public class RegistryObjectType {
     }
 
     /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(SlotType slot) {
+        if (this.slot == null) {
+            this.slot = new ArrayList<SlotType>();
+        }
+        this.slot.add(slot);
+    }
+    
+     /**
+     * Sets the value of the slot property.
+     */
+    public void setSlot(List<SlotType> slot) {
+        this.slot = slot;
+    }
+
+    
+    /**
      * Gets the value of the classification property.
      */
     public List<ClassificationType> getClassification() {
@@ -178,6 +198,23 @@ public class RegistryObjectType {
             classification = new ArrayList<ClassificationType>();
         }
         return this.classification;
+    }
+    
+    /**
+     * Sets the value of the classification property.
+     */
+    public void setClassification(ClassificationType classification) {
+        if (this.classification == null) {
+            this.classification = new ArrayList<ClassificationType>();
+        }
+        this.classification.add(classification);
+    }
+    
+    /**
+     * Sets the value of the classification property.
+     */
+    public void setClassification(List<ClassificationType> classification) {
+       this.classification = classification;
     }
 
     /**
@@ -188,6 +225,26 @@ public class RegistryObjectType {
             externalIdentifier = new ArrayList<ExternalIdentifierType>();
         }
         return this.externalIdentifier;
+    }
+    
+    /**
+     * Sets the value of the externalIdentifier property.
+     */
+    public void setExternalIdentifier(ExternalIdentifierType externalIdentifier) {
+        if (this.externalIdentifier == null) {
+            this.externalIdentifier = new ArrayList<ExternalIdentifierType>();
+        }
+        this.externalIdentifier.add(externalIdentifier);
+    }
+    
+    /**
+     * Sets the value of the externalIdentifier property.
+     */
+    public void setExternalIdentifier(List<ExternalIdentifierType> externalIdentifier) {
+        if (externalIdentifier == null) {
+            externalIdentifier = new ArrayList<ExternalIdentifierType>();
+        }
+        this.externalIdentifier = externalIdentifier;
     }
 
     /**

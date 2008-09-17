@@ -150,6 +150,9 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0".equals(namespaceUri) )
             prefix = "rim";
         
+        else if( "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5".equals(namespaceUri) )
+            prefix = "rim25";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

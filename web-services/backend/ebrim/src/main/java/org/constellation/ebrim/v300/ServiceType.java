@@ -65,5 +65,22 @@ public class ServiceType extends RegistryObjectType {
         }
         return this.serviceBinding;
     }
+    
+    /**
+     * Sets the value of the serviceBinding property.
+     */
+    public void setServiceBinding(ServiceBindingType serviceBinding) {
+        if (this.serviceBinding == null) {
+            this.serviceBinding = new ArrayList<ServiceBindingType>();
+        }
+        this.serviceBinding.add(serviceBinding);
+    }
+    
+    /**
+     * Sets the value of the serviceBinding property.
+     */
+    public void setServiceBinding(List<ServiceBindingType> serviceBinding) {
+        this.serviceBinding = serviceBinding;
+    }
 
 }

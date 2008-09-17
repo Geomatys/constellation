@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -54,6 +55,7 @@ import javax.xml.bind.annotation.XmlType;
     "usageDescription",
     "usageParameter"
 })
+@XmlRootElement(name = "SpecificationLink")
 public class SpecificationLinkType extends RegistryObjectType {
 
     @XmlElement(name = "UsageDescription")
@@ -89,6 +91,23 @@ public class SpecificationLinkType extends RegistryObjectType {
             usageParameter = new ArrayList<String>();
         }
         return this.usageParameter;
+    }
+    
+    /**
+     * Sets the value of the usageParameter property.
+     */
+    public void setUsageParameter(String usageParameter) {
+        if (this.usageParameter == null) {
+            this.usageParameter = new ArrayList<String>();
+        }
+        this.usageParameter.add(usageParameter);
+    }
+    
+    /**
+     * Sets the value of the usageParameter property.
+     */
+    public void setUsageParameter(List<String> usageParameter) {
+        this.usageParameter = usageParameter;
     }
 
     /**

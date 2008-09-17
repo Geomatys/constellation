@@ -129,9 +129,14 @@ public class MetadataReader {
     private List<String> CSWPackage;
     
     /**
-     * A list of package containing the Ebrim implementation
+     * A list of package containing the Ebrim V3.0 implementation
      */
-    private List<String> ebrimPackage;
+    private List<String> ebrimV3Package;
+    
+     /**
+     * A list of package containing the Ebrim V2.5 implementation
+     */
+    private List<String> ebrimV25Package;
     
     /**
      * A List of the already see object for the current metadata readed
@@ -196,7 +201,8 @@ public class MetadataReader {
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
         this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
                                                 "org.constellation.ogc");
-        this.ebrimPackage    = searchSubPackage("org.constellation.ebrim.v300");
+        this.ebrimV3Package  = searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
+        this.ebrimV25Package = searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
@@ -1115,8 +1121,11 @@ public class MetadataReader {
             standardName.equals("OGC Web Service")     || standardName.equals("OGC Filter")) {
             packagesName = CSWPackage;
             
-        } else if (standardName.equals("Ebrim v3.0")) {
-            packagesName = ebrimPackage;
+        } else if (standardName.equals("Ebrim v3.0") || standardName.equals("Web Registry Service v1.0")) {
+            packagesName = ebrimV3Package;
+            
+        } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
+            packagesName = ebrimV25Package;
             
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType")) {

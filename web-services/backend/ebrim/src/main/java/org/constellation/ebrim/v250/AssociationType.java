@@ -20,6 +20,7 @@ package org.constellation.ebrim.v250;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -58,6 +59,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AssociationType")
+@XmlRootElement(name = "Association")
 public class AssociationType extends RegistryObjectType {
 
     @XmlAttribute(required = true)
@@ -76,23 +78,13 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Gets the value of the associationType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+      */
     public String getAssociationType() {
         return associationType;
     }
 
     /**
      * Sets the value of the associationType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAssociationType(String value) {
         this.associationType = value;
@@ -100,11 +92,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Gets the value of the sourceObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSourceObject() {
         return sourceObject;
@@ -112,11 +99,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Sets the value of the sourceObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSourceObject(String value) {
         this.sourceObject = value;
@@ -124,11 +106,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Gets the value of the targetObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTargetObject() {
         return targetObject;
@@ -136,11 +113,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Sets the value of the targetObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setTargetObject(String value) {
         this.targetObject = value;
@@ -148,11 +120,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Gets the value of the isConfirmedBySourceOwner property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public Boolean isIsConfirmedBySourceOwner() {
         return isConfirmedBySourceOwner;
@@ -160,11 +127,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Sets the value of the isConfirmedBySourceOwner property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setIsConfirmedBySourceOwner(Boolean value) {
         this.isConfirmedBySourceOwner = value;
@@ -172,11 +134,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Gets the value of the isConfirmedByTargetOwner property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public Boolean isIsConfirmedByTargetOwner() {
         return isConfirmedByTargetOwner;
@@ -184,11 +141,6 @@ public class AssociationType extends RegistryObjectType {
 
     /**
      * Sets the value of the isConfirmedByTargetOwner property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setIsConfirmedByTargetOwner(Boolean value) {
         this.isConfirmedByTargetOwner = value;

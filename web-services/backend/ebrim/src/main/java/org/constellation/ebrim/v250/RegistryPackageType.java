@@ -20,6 +20,7 @@ package org.constellation.ebrim.v250;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.wrs.v090.ApplicationModuleType;
@@ -58,6 +59,7 @@ import org.constellation.cat.wrs.v090.ApplicationModuleType;
 @XmlSeeAlso({
     ApplicationModuleType.class
 })
+@XmlRootElement( name = "RegistryPackage")        
 public class RegistryPackageType extends RegistryEntryType {
 
     @XmlElement(name = "RegistryObjectList")
