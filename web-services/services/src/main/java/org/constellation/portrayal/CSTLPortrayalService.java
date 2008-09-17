@@ -96,7 +96,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                 }
             }
             
-            MapLayer layer = layerDPS.get(layerName,style);
+            MapLayer layer = layerDPS.get(layerName).getMapLayer(style);
             
             if(layer == null){
                 throw new PortrayalException("Layer : "+layerName+" could not be created");

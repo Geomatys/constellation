@@ -18,32 +18,18 @@ package org.constellation.query;
 
 
 /**
- * Interface for web queries.
- * Thoses are containers for real java objects, that means this should hold only
- * functionnal objects, and the minimum strings possible.
+ * A list of authorised {@code request} name when requesting the webservice.
  *
  * @version $Id$
- * @author Johann Sorel (Geomayts)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class Query {
+public abstract class QueryRequest {
     /**
-     * Returns the request type specified for this query.
+     * The key of the request parameter.
      */
-    public abstract QueryRequest getRequest();
+    private final String key;
 
-    /**
-     * Returns the service name.
-     */
-    public abstract QueryService getService();
-
-    /**
-     * Returns the version of the service chosen.
-     */
-    public abstract QueryVersion getVersion();
-    
-    /**
-     * Returns the exception format.
-     */
-    public abstract String getExceptionFormat();
+    protected QueryRequest(final String key) {
+        this.key = key;
+    }
 }

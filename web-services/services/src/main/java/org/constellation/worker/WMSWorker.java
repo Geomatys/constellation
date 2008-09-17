@@ -22,15 +22,19 @@ import java.io.File;
 import java.util.List;
 
 import org.constellation.portrayal.CSTLPortrayalService;
-import org.constellation.query.WMSQuery;
+import org.constellation.query.wms.GetMap;
+import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-
 import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.opengis.geometry.Envelope;
+
 
 /**
+ * 
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
 public class WMSWorker{
@@ -49,16 +53,19 @@ public class WMSWorker{
     }
         
     public File getMap() throws PortrayalException{
-        
-        final List<String> layers = query.layers;
-        final List<String> styles = query.styles;
-        final MutableStyledLayerDescriptor sld = query.sld;
-        final ReferencedEnvelope contextEnv = new ReferencedEnvelope(query.bbox, query.crs);
-        final String mime = query.format;
-        final Dimension canvasDimension = query.size;
+        if (!(query instanceof GetMap)) {
+            throw new PortrayalException("The request defined is not a GetMap");
+        }
+        final GetMap getMap = (GetMap) query;
+        final List<String> layers = getMap.getLayers();
+        final List<String> styles = getMap.getStyles();
+        final MutableStyledLayerDescriptor sld = getMap.getSld();
+        final Envelope contextEnv = getMap.getEnvelope();
+        final String mime = getMap.getFormat();
+        final Dimension canvasDimension = getMap.getSize();
         final Hints hints = null;
         
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("Layers => ");
         for(String layer : layers){
             builder.append(layer +",");
@@ -73,15 +80,15 @@ public class WMSWorker{
         builder.append("Mime => " + mime.toString() + "\n");
         builder.append("Dimension => " + canvasDimension.toString() + "\n");
         builder.append("File => " + output.toString() + "\n");
-        builder.append("BGColor => " + query.background + "\n");
-        builder.append("Transparant => " + query.transparent + "\n");
+        builder.append("BGColor => " + getMap.getBackground() + "\n");
+        builder.append("Transparent => " + getMap.getTransparent() + "\n");
         
-        Color bgcolor = (query.transparent) ? null : query.background ;
+        Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
         System.out.println("REAL COLOR => " + bgcolor);
         
         System.out.println(builder.toString());
-        
-        service.portray(layers, styles, bgcolor, sld, contextEnv, output, mime, canvasDimension, hints);
+        final ReferencedEnvelope refEnv = new ReferencedEnvelope(contextEnv);
+        service.portray(layers, styles, bgcolor, sld, refEnv, output, mime, canvasDimension, hints);
         
         return output;
     }

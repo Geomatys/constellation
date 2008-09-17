@@ -1020,12 +1020,8 @@ public abstract class ImageProducer {
                 return file;
             }
         }
-        final Dimension dimension;
-        if (gridRange != null) {
-            dimension = new Dimension(gridRange.getHigh(0), gridRange.getHigh(1));
-        } else {
-            dimension = new Dimension(200, 40);
-        }
+        final Dimension dimension = (gridRange != null) ?
+            new Dimension(gridRange.getHigh(0), gridRange.getHigh(1)) : new Dimension(200, 40);
         return getImageFile(request, getLayer().getLegend(dimension));
     }
 

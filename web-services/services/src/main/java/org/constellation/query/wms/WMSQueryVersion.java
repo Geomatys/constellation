@@ -14,36 +14,29 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.query;
+package org.constellation.query.wms;
+
+import org.constellation.query.QueryVersion;
 
 
 /**
- * Interface for web queries.
- * Thoses are containers for real java objects, that means this should hold only
- * functionnal objects, and the minimum strings possible.
+ * Stores the version number available for this webservice.
  *
  * @version $Id$
- * @author Johann Sorel (Geomayts)
- * @author Cédric Briançon (Geomatys)
+ * @author Cédric Briançon
  */
-public abstract class Query {
+public class WMSQueryVersion extends QueryVersion {
     /**
-     * Returns the request type specified for this query.
+     * Key for the WMS service in version {@code 1.1.1}.
      */
-    public abstract QueryRequest getRequest();
+    public static final WMSQueryVersion WMS_1_1_1 = new WMSQueryVersion("1.1.1");
 
     /**
-     * Returns the service name.
+     * Key for the WMS service in version {@code 1.3.0}.
      */
-    public abstract QueryService getService();
-
-    /**
-     * Returns the version of the service chosen.
-     */
-    public abstract QueryVersion getVersion();
+    public static final WMSQueryVersion WMS_1_3_0 = new WMSQueryVersion("1.3.0");
     
-    /**
-     * Returns the exception format.
-     */
-    public abstract String getExceptionFormat();
+    private WMSQueryVersion(final String key) {
+        super(key);
+    }
 }

@@ -19,11 +19,7 @@ package org.constellation.coverage.ws;
 
 import com.sun.jersey.spi.resource.Singleton;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -38,8 +34,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -47,13 +41,9 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Collections;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -63,7 +53,6 @@ import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.sld.v110.TypeNameType;
 import org.constellation.sld.v110.DescribeLayerResponseType;
 import org.constellation.sld.v110.LayerDescriptionType;
-import org.constellation.sld.v110.StyledLayerDescriptor;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.coverage.web.WebServiceWorker;
 import org.constellation.coverage.web.ServiceVersion;
@@ -72,14 +61,9 @@ import org.constellation.gml.v311.PointType;
 import org.constellation.se.OnlineResourceType;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.wms.AbstractDCP;
 import org.constellation.wms.AbstractDimension;
 import org.constellation.wms.AbstractLayer;
-import org.constellation.wms.AbstractRequest;
-import org.constellation.wms.AbstractOperation;
-import org.constellation.wms.AbstractProtocol;
 import org.constellation.wms.v111.LatLonBoundingBox;
-import org.constellation.wms.v130.OperationType;
 import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.coverage.metadata.LayerMetadata;
 import org.constellation.coverage.metadata.SeriesMetadata;
@@ -87,20 +71,9 @@ import org.constellation.coverage.metadata.LayerMetadataTable;
 import org.constellation.coverage.metadata.PointOfContact;
 import org.constellation.coverage.metadata.PointOfContactTable;
 import org.constellation.coverage.metadata.SeriesMetadataTable;
-import org.constellation.portrayal.CSTLPortrayalService;
-import org.constellation.provider.NamedLayerDP;
-import org.constellation.query.WMSQueryAdapter;
-import org.constellation.query.WMSQuery;
-import org.constellation.wms.AbstractHTTP;
-import org.constellation.worker.WMSWorker;
 import org.constellation.ws.rs.WebService;
 
 //geotools dependencies
-import org.geotools.display.service.PortrayalException;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.map.MapLayer;
-import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.DateRange;
 import org.geotools.util.MeasurementRange;
 
@@ -108,11 +81,9 @@ import org.geotools.util.MeasurementRange;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.constellation.coverage.wms.WMSExceptionCode.*;
-import static org.constellation.query.WMSQuery.*;
+import static org.constellation.query.wms.WMSQuery.*;
 
 /**
  * WMS 1.3.0 / 1.1.1
@@ -329,16 +300,6 @@ public class WMService extends WebService {
         LOGGER.info("getMap request received");
         verifyBaseParameter(0);
 
-        final String errorType = getParameter(KEY_EXCEPTIONS, false);
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
-
-        //Set to true if you want to use the new GO2 renderer-------------------
-        if(false){
-            return getGo2RendererMap(errorInImage);
-        }
-
-        // Previous SEAGIS renderer, only PostGrid support----------------------
-
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         //we set the attribute od the webservice worker with the parameters.
@@ -358,45 +319,6 @@ public class WMService extends WebService {
         webServiceWorker.setTransparency(getParameter(KEY_TRANSPARENT, false));
 
         return webServiceWorker.getImageFile();
-    }
-
-    /**
-     * Return a map for the specified parameters in the query: works with
-     * the new GO2 Renderer.
-     *
-     * @return
-     * @throws fr.geomatys.wms.WebServiceException
-     */
-    private synchronized File getGo2RendererMap(boolean errorInImage) throws WebServiceException {
-        final WMSQuery query = adaptQuery();
-        final File tempFile;
-        try {
-            tempFile = createTempFile(query.format);
-        } catch (IOException io) {
-            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
-        }
-        final WMSWorker worker = new WMSWorker(query,tempFile);
-
-        File image = null;
-        File errorFile = null;
-        try {
-            image = worker.getMap();
-        } catch (PortrayalException ex) {
-            if(errorInImage) {
-                try {
-                    errorFile = createTempFile(query.format);
-                } catch (IOException io) {
-                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
-                }
-                CSTLPortrayalService.writeInImage(ex, query.size.width, query.size.height, errorFile, query.format);
-            } else {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
-                        ex.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
-            }
-        }
-
-        return (errorFile != null) ? errorFile : image;
     }
 
     /**
@@ -635,63 +557,11 @@ public class WMService extends WebService {
         crs.add("EPSG:27574");
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        final AbstractRequest request = response.getCapability().getRequest();
-
-        updateURL(request.getGetCapabilities().getDCPType());
-        updateURL(request.getGetFeatureInfo().getDCPType());
-        updateURL(request.getGetMap().getDCPType());
-        updateExtendedOperationURL(request);
 
         //we build the layers object of the document
 
         //we get the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
-
-        // layers from data providers ------------------------------------------
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final Set<String> keys = dp.getKeys();
-        for(String key : keys){
-            MapLayer layer = dp.get(key);
-            if(layer != null){
-                //we build and add a layer
-                AbstractLayer outputLayer = null;
-                final String name = key;
-                final String title = key;
-                final String desc = "";
-
-                List<AbstractLayer> subLayers = Collections.emptyList();
-
-                if (getCurrentVersion().toString().equals("1.1.1")) {
-                    //version 1.1.1
-                    double minx = -180d;
-                    double maxx = +180d;
-                    double miny = -90d;
-                    double maxy = +90d;
-                    LatLonBoundingBox bbox = new LatLonBoundingBox(minx, miny, maxx, maxy);
-
-                    outputLayer = new org.constellation.wms.v111.Layer(name,title,desc,crs,bbox,subLayers);
-                }
-
-                else{
-                    //version 1.3.0
-                    double westBoundLongitude = -180d;
-                    double eastBoundLongitude = +180d;
-                    double southBoundLatitude = -90d;
-                    double northBoundLatitude = +90d;
-                    EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(westBoundLongitude, southBoundLatitude, eastBoundLongitude, northBoundLatitude);
-                    outputLayer = new org.constellation.wms.v130.Layer(name,title,desc,crs,bbox,subLayers);
-                }
-
-                if(outputLayer != null){
-                    layers.add(outputLayer);
-                }
-
-            }
-        }
-
-        //----------------------------------------------------------------------
-
-
         for (org.constellation.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {
@@ -939,6 +809,7 @@ public class WMService extends WebService {
         webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
         webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
         webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
         webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
 
         /*String style = getParameter(KEY_STYLE, false);
@@ -956,159 +827,4 @@ public class WMService extends WebService {
         return  webServiceWorker.getLegendFile();
 
     }
-
-    /**
-     * update The URL in capabilities document with the service actual URL.
-     */
-    private void updateURL(final List<? extends AbstractDCP> dcpList) {
-        for(AbstractDCP dcp: dcpList) {
-            final AbstractHTTP http = dcp.getHTTP();
-            final AbstractProtocol getMethod = http.getGet();
-            if (getMethod != null) {
-                getMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
-            }
-            final AbstractProtocol postMethod = http.getPost();
-            if (postMethod != null) {
-                postMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
-            }
-        }
-    }
-
-    /**
-     * update The URL in capabilities document for the extended operation.
-     */
-    private void updateExtendedOperationURL(AbstractRequest request) {
-
-        if (getCurrentVersion().toString().equals("1.3.0")) {
-            org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
-            List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
-            for(JAXBElement<OperationType> extOp: extendedOperations) {
-                updateURL(extOp.getValue().getDCPType());
-            }
-
-        // version 1.1.1
-        } else {
-           org.constellation.wms.v111.Request r = (org.constellation.wms.v111.Request) request;
-           AbstractOperation op = r.getDescribeLayer();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getGetLegendGraphic();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getGetStyles();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getPutStyles();
-           if (op != null)
-                updateURL(op.getDCPType());
-        }
-
-    }
-
-    /**
-     * Transform the Query in a container of real java objects, not strings.
-     *
-     * @return WMSQuery
-     * @throws org.constellation.coverage.web.WebServiceException
-     */
-    private WMSQuery adaptQuery() throws WebServiceException {
-        final WMSQueryAdapter adapter = new WMSQueryAdapter();
-
-        final String strCRS             = getParameter( (getCurrentVersion().toString().equals("1.3.0")) ?
-                                                        KEY_CRS_v130 : KEY_CRS_v110, true );
-        final String strBBox            = getParameter( KEY_BBOX, true );
-        final String strMime            = getParameter( KEY_FORMAT, true );
-        final String strLayers          = getParameter( KEY_LAYERS, true );
-        //final String strElevation       = getParameter( KEY_ELEVATION, false );
-        //final String strTime            = getParameter( KEY_TIME, false );
-        final String strWidth           = getParameter( KEY_WIDTH, true );
-        final String strHeight          = getParameter( KEY_HEIGHT, true );
-        final String strBGColor         = getParameter( KEY_BGCOLOR, false );
-        final String strTransparent     = getParameter( KEY_TRANSPARENT, false );
-        final String strStyles          = getParameter( KEY_STYLES, true );
-        final String strSLD             = getParameter( KEY_SLD, false );
-        //final String strRemoteOwsType   = getParameter( KEY_REMOTE_OWS_TYPE, false );
-        final String strRemoteOwsUrl    = getParameter( KEY_REMOTE_OWS_URL, false );
-
-        final GeneralEnvelope env = adapter.toBBox(strBBox);
-        final Rectangle2D bbox = env.toRectangle2D();
-        CoordinateReferenceSystem crs = null;
-
-        try {
-            crs = adapter.toCRS(strCRS);
-        } catch (FactoryException ex) {
-            Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        final String format = strMime;
-        final List<String> layers = adapter.toLayers(strLayers);
-        final List<String> styles = adapter.toStyles(strStyles);
-        MutableStyledLayerDescriptor sld = null;
-        final Double elevation = 0d;
-        final Date date = new Date();
-        final Dimension size = new Dimension( adapter.toInt(null, strWidth), adapter.toInt(null, strHeight));
-        final Color background = adapter.toColor(strBGColor);
-        final boolean transparent = adapter.toBoolean(strTransparent);
-
-        if(strSLD != null){
-            sld = adapter.toSLD(strSLD);
-        }else if(strRemoteOwsUrl != null){
-
-//            URL url = null;
-//            try {
-//                url = new URL(strRemoteOwsUrl);
-//            } catch (MalformedURLException ex) {
-//                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-            try {
-                InputStream stream = new FileInputStream(new File(strRemoteOwsUrl));
-                XMLUtilities sldparser = new XMLUtilities();
-                try{
-                    sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
-                }catch(JAXBException ex){
-                    System.out.println("Not a SLD v1.0");
-                }
-                if(sld == null){
-                    try{
-                        sld = sldparser.readSLD(stream, org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
-                    }catch(JAXBException ex){
-                        System.out.println("Not a SLD v1.1");
-                    }
-                }
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-
-        //TODO check here if the query is valid
-
-        return new WMSQuery(bbox, crs, format, layers,
-                styles, sld, elevation, date, size, background, transparent);
-    }
-
-    /**
-     * Create a temporary file used for map images
-     */
-    private File createTempFile(String type) throws IOException {
-        //TODO, I dont know if using a temp file is correct or if it should be
-        //somewhere else.
-
-        final String ending;
-        if ("image/jpeg".equalsIgnoreCase(type)) {
-            ending = ".jpeg";
-        } else if ("image/gif".equalsIgnoreCase(type)) {
-            ending = ".gif";
-        } else {
-            ending = ".png";
-        }
-
-        final File f = File.createTempFile("map", ending);
-        f.deleteOnExit();
-
-        return f;
-    }
-
-
-
 }

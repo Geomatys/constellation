@@ -20,36 +20,52 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
+
+import org.constellation.query.wms.WMSQuery;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.Specification.StyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
+
+import org.geotools.util.MeasurementRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 
 /**
  * Convinient class to transform Strings to real Java objects.
  *
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
-public class WMSQueryAdapter {
+public class QueryAdapter {
     /**
      * The default logger.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.constellation.query");
+    public static final Logger LOGGER = Logger.getLogger("org.constellation.query.wms");
 
-    public CoordinateReferenceSystem toCRS(String epsg) throws FactoryException{
-        final String epsgTimmed = epsg.trim();
-        if(epsgTimmed.endsWith("4326") || epsgTimmed.endsWith(WMSQuery.UNDEFINED_CRS)){
+    /**
+     * Converts a string like "EPSG:xxxx" into a {@link CoordinateReferenceSystem}.
+     *
+     * @param epsg An EPSG code.
+     * @return The {@link CoordinateReferenceSystem} for this code, or {@code null}
+     *         if the espg parameter is {@code null}.
+     * @throws FactoryException if an error occurs during the decoding of the CRS code.
+     */
+    public static CoordinateReferenceSystem toCRS(final String epsg) throws FactoryException {
+        if (epsg == null) {
+            return null;
+        }
+        final String epsgTrimmed = epsg.trim();
+        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith(WMSQuery.UNDEFINED_CRS)) {
             //TODO fix this
             //we should return the good EPSG 32662
             LOGGER.info("WARNING : CRS 4326 used.");
@@ -58,10 +74,17 @@ public class WMSQueryAdapter {
         return CRS.decode(epsg);
     }
 
-    public GeneralEnvelope toBBox(final String bbox) {
+    /**
+     * Converts a string representing the bbox coordinates into a {@link GeneralEnvelope}.
+     *
+     * @param bbox Coordinates of the bounding box, seperated by comas.
+     * @return The enveloppe for the bounding box specified, or an
+     *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
+     *         if the bbox is {@code null}.
+     */
+    public static GeneralEnvelope toBBox(final String bbox) {
         GeneralEnvelope envelope = new GeneralEnvelope(2);
         envelope.setToInfinite();
-
         if (bbox == null) {
             if (envelope != null) {
                 envelope.setToInfinite();
@@ -113,25 +136,20 @@ public class WMSQueryAdapter {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2));
             }
         }
-
         return envelope;
     }
 
-    public List<String> toLayers(String strLayers){
-        List<String> layers = new ArrayList<String>();
-
-        if(strLayers == null || strLayers.isEmpty()){
-            return layers;
+    public static MeasurementRange toMeasurementRange(final String strDimRange) {
+        if (strDimRange == null) {
+            return null;
         }
-
-        StringTokenizer token = new StringTokenizer(strLayers,",",false);
-        while(token.hasMoreTokens()){
-            layers.add(token.nextToken());
-        }
-        return layers;
+        final String[] split = strDimRange.split(",");
+        final double min = Double.valueOf(split[0]);
+        final double max = Double.valueOf(split[1]);
+        return MeasurementRange.create(min, max, null);
     }
 
-    public MutableStyledLayerDescriptor toSLD(String strSLD) {
+    public static MutableStyledLayerDescriptor toSLD(String strSLD) {
         if(strSLD == null || strSLD.trim().length() == 0){
             return null;
         }
@@ -144,7 +162,7 @@ public class WMSQueryAdapter {
         try {
             sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_0_0);
         } catch (JAXBException ex) {
-            Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if(sld == null){
@@ -152,14 +170,14 @@ public class WMSQueryAdapter {
             try {
                 sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_1_0);
             } catch (JAXBException ex) {
-                Logger.getLogger(WMSQueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
         return sld;
     }
 
-    public List<String> toStyles(String strLayers){
+    public static List<String> toStringList(String strLayers){
         List<String> styles = new ArrayList<String>();
         StringTokenizer token = new StringTokenizer(strLayers,",");
         while(token.hasMoreTokens()){
@@ -168,20 +186,17 @@ public class WMSQueryAdapter {
         return styles;
     }
 
-    public int toInt(final String name, String value) throws NumberFormatException {
-        if (value == null) {
-            throw new NullPointerException("value " + name+ " can not be null");
-        }
+    public static int toInt(String value) throws NumberFormatException {
         value = value.trim();
         return Integer.parseInt(value);
     }
 
-    public double toDouble(String value) throws NumberFormatException {
+    public static double toDouble(String value) throws NumberFormatException {
         value = value.trim();
         return Double.parseDouble(value);
     }
 
-    public Color toColor(String background) throws NumberFormatException{
+    public static Color toColor(String background) throws NumberFormatException{
         Color color = null;
         if (background != null) {
             background = background.trim();
@@ -193,7 +208,7 @@ public class WMSQueryAdapter {
         return color;
     }
 
-    public boolean toBoolean(String strTransparent) {
+    public static boolean toBoolean(String strTransparent) {
         if (strTransparent != null) {
             strTransparent = strTransparent.trim();
         }else{

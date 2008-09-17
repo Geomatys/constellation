@@ -41,6 +41,7 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
 
 import org.geotools.map.MapLayer;
@@ -50,7 +51,7 @@ import org.geotools.style.MutableStyle;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridNamedLayerDP implements LayerDataProvider<String,MapLayer>{
+public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDetails>{
 
     private static PostGridNamedLayerDP instance = null;
     
@@ -198,8 +199,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String,MapLayer>{
     /**
      * {@inheritDoc }
      */
-    public Class<MapLayer> getValueClass() {
-        return MapLayer.class;
+    public Class<LayerDetails> getValueClass() {
+        return LayerDetails.class;
     }
 
     /**
@@ -219,15 +220,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String,MapLayer>{
     /**
      * {@inheritDoc }
      */
-    public MapLayer get(String key) {
-        MapLayer layer = null;
-        
-        Layer gridLayer = index.get(key);
-        if(gridLayer != null){
-            layer = new PostGridMapLayer(database, gridLayer);
-        }
-        
-        return layer;
+    public LayerDetails get(String key) {
+        return null;
     }
 
     /**
@@ -291,10 +285,6 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String,MapLayer>{
             instance = new PostGridNamedLayerDP();
         }
         return instance;
-    }
-
-    public MapLayer get(String layerName, MutableStyle style) {
-        return get(layerName);
     }
 
     public List<String> getFavoriteStyles(String layerName) {

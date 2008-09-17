@@ -14,36 +14,51 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.query;
+package org.constellation.query.wms;
+
+import org.constellation.query.QueryRequest;
+import org.constellation.query.QueryVersion;
 
 
 /**
- * Interface for web queries.
- * Thoses are containers for real java objects, that means this should hold only
- * functionnal objects, and the minimum strings possible.
  *
  * @version $Id$
- * @author Johann Sorel (Geomayts)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class Query {
+public class GetCapabilities extends WMSQuery {
     /**
-     * Returns the request type specified for this query.
+     * Version of the GetCapabilities requested.
      */
-    public abstract QueryRequest getRequest();
+    private final QueryVersion version;
 
     /**
-     * Returns the service name.
+     * 
      */
-    public abstract QueryService getService();
+    public GetCapabilities(final QueryVersion version) {
+        this.version = version;
+    }
 
     /**
-     * Returns the version of the service chosen.
+     * {@inheritDoc}
      */
-    public abstract QueryVersion getVersion();
-    
+    @Override
+    public String getExceptionFormat() {
+        return "application/vnd.ogc.se_xml";
+    }
+
     /**
-     * Returns the exception format.
+     * {@inheritDoc}
      */
-    public abstract String getExceptionFormat();
+    @Override
+    public QueryRequest getRequest() {
+        return WMSQueryRequest.GET_CAPABILITIES;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public QueryVersion getVersion() {
+        return version;
+    }
 }

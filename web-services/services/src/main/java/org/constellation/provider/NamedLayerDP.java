@@ -28,10 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import org.constellation.provider.postgrid.PostGridNamedLayerDP;
-import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
 import org.constellation.ws.rs.WebService;
-import org.geotools.map.MapLayer;
-import org.geotools.style.MutableStyle;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
@@ -39,22 +36,22 @@ import org.geotools.style.MutableStyle;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
+public class NamedLayerDP implements LayerDataProvider<String, LayerDetails>{
 
     private static final String KEY_SHAPEFILE_DP = "shapefile_folder";
     
     private static NamedLayerDP instance = null;
     
-    private final Collection<LayerDataProvider<String,MapLayer>> dps = new ArrayList<LayerDataProvider<String,MapLayer>>();
+    private final Collection<LayerDataProvider<String,LayerDetails>> dps = new ArrayList<LayerDataProvider<String,LayerDetails>>();
     
     
     private NamedLayerDP(){
         
         List<File> folders = getShapefileFolders();
-        for(File folder : folders){
-            ShapeFileNamedLayerDP shapeDP = new ShapeFileNamedLayerDP(folder);
-            dps.add(shapeDP);
-        }
+//        for(File folder : folders){
+//            ShapeFileNamedLayerDP shapeDP = new ShapeFileNamedLayerDP(folder);
+//            dps.add(shapeDP);
+//        }
                 
         PostGridNamedLayerDP postGridDP = PostGridNamedLayerDP.getDefault();
         dps.add(postGridDP);
@@ -70,8 +67,8 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
     /**
      * {@inheritDoc }
      */
-    public Class<MapLayer> getValueClass() {
-        return MapLayer.class;
+    public Class<LayerDetails> getValueClass() {
+        return LayerDetails.class;
     }
 
     /**
@@ -79,7 +76,7 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
      */
     public Set<String> getKeys() {
         Set<String> keys = new HashSet<String>();
-        for(DataProvider<String,MapLayer> dp : dps){
+        for(DataProvider<String,LayerDetails> dp : dps){
             keys.addAll( dp.getKeys() );
         }
         return keys;
@@ -89,7 +86,7 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
      * {@inheritDoc }
      */
     public boolean contains(String key) {
-        for(DataProvider<String,MapLayer> dp : dps){
+        for(DataProvider<String,LayerDetails> dp : dps){
             if(dp.contains(key)) return true;
         }
         return false;
@@ -98,33 +95,21 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
     /**
      * {@inheritDoc }
      */
-    public MapLayer get(String key) {
-        MapLayer layer = null;
+    public LayerDetails get(String key) {
+        /*MapLayer layer = null;
         for(LayerDataProvider<String,MapLayer> dp : dps){
             layer = dp.get(key);
             if(layer != null) return layer;
-        }
+        }*/
         return null;
     }
 
     /**
      * {@inheritDoc }
      */
-    public MapLayer get(String layerName, MutableStyle style) {
-        MapLayer layer = null;
-        for(LayerDataProvider<String,MapLayer> dp : dps){
-            layer = dp.get(layerName,style);
-            if(layer != null) return layer;
-        }
-        return null;
-    }
-    
-    /**
-     * {@inheritDoc }
-     */
     public List<String> getFavoriteStyles(String layerName) {
         List<String> styles = new ArrayList<String>();
-        for(LayerDataProvider<String,MapLayer> dp : dps){
+        for(LayerDataProvider<String,LayerDetails> dp : dps){
             List<String> sts = dp.getFavoriteStyles(layerName);
             styles.addAll(sts);
         }
@@ -135,7 +120,7 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
      * {@inheritDoc }
      */
     public void reload() {
-        for(DataProvider<String,MapLayer> dp : dps){
+        for(DataProvider<String,LayerDetails> dp : dps){
             dp.reload();
         }
     }
@@ -144,7 +129,7 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
      * {@inheritDoc }
      */
     public void dispose() {
-        for(DataProvider<String,MapLayer> dp : dps){
+        for(DataProvider<String,LayerDetails> dp : dps){
             dp.dispose();
         }
         dps.clear();
@@ -185,8 +170,4 @@ public class NamedLayerDP implements LayerDataProvider<String,MapLayer>{
         
         return instance;
     }
-
-    
-
-
 }
