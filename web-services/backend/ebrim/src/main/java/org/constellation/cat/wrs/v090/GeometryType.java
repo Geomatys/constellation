@@ -26,14 +26,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
+ * Extends WRSExtrinsicObjectType to include the basic properties of a geometry 
+ * instance as defined in the OGC simple features model (99-049).
+ * The repositoryItem property references an encoding of the geometry instance.
  * 
- *       Extends WRSExtrinsicObjectType to include the basic properties of a 
- *       geometry instance as defined in the OGC simple features model (99-049).
- *       The repositoryItem property references an encoding of the geometry 
- *       instance.
- *       dimension    - inherent dimension of the geometry instance
- *       geometryType - any concrete GML 3 geometry type
- *       srid         - id of the spatial reference system for this instance
+ *  dimension    - inherent dimension of the geometry instance
+ *  geometryType - any concrete GML 3 geometry type
+ *  srid         - id of the spatial reference system for this instance
  *       
  * 
  * <p>Java class for GeometryType complex type.
@@ -65,7 +64,7 @@ import javax.xml.bind.annotation.XmlType;
 public class GeometryType extends WRSExtrinsicObjectType {
 
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger dimension;
+    private Integer dimension;
     @XmlElement(required = true)
     @XmlSchemaType(name = "anyURI")
     private String geometryType;
@@ -74,35 +73,20 @@ public class GeometryType extends WRSExtrinsicObjectType {
 
     /**
      * Gets the value of the dimension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
-    public BigInteger getDimension() {
+    public Integer getDimension() {
         return dimension;
     }
 
     /**
      * Sets the value of the dimension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
      */
-    public void setDimension(BigInteger value) {
+    public void setDimension(Integer value) {
         this.dimension = value;
     }
 
     /**
      * Gets the value of the geometryType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getGeometryType() {
         return geometryType;
@@ -110,11 +94,6 @@ public class GeometryType extends WRSExtrinsicObjectType {
 
     /**
      * Sets the value of the geometryType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setGeometryType(String value) {
         this.geometryType = value;
@@ -122,11 +101,6 @@ public class GeometryType extends WRSExtrinsicObjectType {
 
     /**
      * Gets the value of the srid property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSrid() {
         return srid;
@@ -134,11 +108,6 @@ public class GeometryType extends WRSExtrinsicObjectType {
 
     /**
      * Sets the value of the srid property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSrid(String value) {
         this.srid = value;

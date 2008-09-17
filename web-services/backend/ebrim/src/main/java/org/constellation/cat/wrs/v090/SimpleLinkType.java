@@ -25,13 +25,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * 
- *         The xlink:href property provides a reference to the content associated 
- * 	with an extrinsic object. The value may be an absolute or a relative 
- * 	URI as defined in RFC 2396. If the URI specifies a resource located in 
- * 	a repository maintained by another party, then the catalogue must 
- * 	perform an HTTP redirect (status code 303) and set the value of the 
- * 	Location header accordingly. 
+ * The xlink:href property provides a reference to the content associated with an extrinsic object. 
+ * The value may be an absolute or a relative URI as defined in RFC 2396. 
+ * If the URI specifies a resource located in a repository maintained by another party, 
+ * then the catalogue must perform an HTTP redirect (status code 303) and set the value of the Location header accordingly. 
  *       
  * 
  * <p>Java class for SimpleLinkType complex type.
@@ -74,11 +71,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getType() {
         if (type == null) {
@@ -90,11 +82,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setType(String value) {
         this.type = value;
@@ -102,11 +89,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the href property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHref() {
         return href;
@@ -114,11 +96,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the href property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setHref(String value) {
         this.href = value;
@@ -126,11 +103,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the role property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRole() {
         return role;
@@ -138,11 +110,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the role property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRole(String value) {
         this.role = value;
@@ -150,11 +117,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the arcrole property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getArcrole() {
         return arcrole;
@@ -162,11 +124,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the arcrole property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setArcrole(String value) {
         this.arcrole = value;
@@ -174,11 +131,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTitle() {
         return title;
@@ -186,11 +138,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setTitle(String value) {
         this.title = value;
@@ -198,11 +145,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the show property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getShow() {
         return show;
@@ -210,11 +152,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the show property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setShow(String value) {
         this.show = value;
@@ -222,11 +159,6 @@ public class SimpleLinkType {
 
     /**
      * Gets the value of the actuate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getActuate() {
         return actuate;
@@ -234,11 +166,6 @@ public class SimpleLinkType {
 
     /**
      * Sets the value of the actuate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setActuate(String value) {
         this.actuate = value;

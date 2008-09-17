@@ -74,11 +74,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Gets the value of the affectedObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ObjectRefListType }
-     *     
      */
     public ObjectRefListType getAffectedObject() {
         return affectedObject;
@@ -86,23 +81,13 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Sets the value of the affectedObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ObjectRefListType }
-     *     
-     */
+    */
     public void setAffectedObject(ObjectRefListType value) {
         this.affectedObject = value;
     }
 
     /**
      * Gets the value of the eventType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getEventType() {
         return eventType;
@@ -110,11 +95,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Sets the value of the eventType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setEventType(String value) {
         this.eventType = value;
@@ -122,11 +102,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Gets the value of the timestamp property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public XMLGregorianCalendar getTimestamp() {
         return timestamp;
@@ -134,11 +109,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Sets the value of the timestamp property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public void setTimestamp(XMLGregorianCalendar value) {
         this.timestamp = value;
@@ -146,11 +116,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Gets the value of the user property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getUser() {
         return user;
@@ -158,11 +123,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Sets the value of the user property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setUser(String value) {
         this.user = value;
@@ -170,11 +130,6 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Gets the value of the requestId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRequestId() {
         return requestId;
@@ -182,12 +137,7 @@ public class AuditableEventType extends RegistryObjectType {
 
     /**
      * Sets the value of the requestId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
+    */
     public void setRequestId(String value) {
         this.requestId = value;
     }

@@ -65,11 +65,6 @@ public class ExternalIdentifierType extends RegistryObjectType {
 
     /**
      * Gets the value of the registryObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRegistryObject() {
         return registryObject;
@@ -77,11 +72,6 @@ public class ExternalIdentifierType extends RegistryObjectType {
 
     /**
      * Sets the value of the registryObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRegistryObject(String value) {
         this.registryObject = value;
@@ -89,11 +79,6 @@ public class ExternalIdentifierType extends RegistryObjectType {
 
     /**
      * Gets the value of the identificationScheme property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getIdentificationScheme() {
         return identificationScheme;
@@ -101,35 +86,20 @@ public class ExternalIdentifierType extends RegistryObjectType {
 
     /**
      * Sets the value of the identificationScheme property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
+    */
     public void setIdentificationScheme(String value) {
         this.identificationScheme = value;
     }
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+    */
     public String getValue() {
         return value;
     }
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setValue(String value) {
         this.value = value;

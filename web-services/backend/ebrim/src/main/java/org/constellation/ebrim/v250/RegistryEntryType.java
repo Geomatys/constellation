@@ -17,7 +17,6 @@
 
 package org.constellation.ebrim.v250;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -72,9 +71,9 @@ public class RegistryEntryType extends RegistryObjectType {
     @XmlAttribute
     private XMLGregorianCalendar expiration;
     @XmlAttribute
-    private BigInteger majorVersion;
+    private Integer majorVersion;
     @XmlAttribute
-    private BigInteger minorVersion;
+    private Integer minorVersion;
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String stability;
@@ -83,11 +82,6 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Gets the value of the expiration property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public XMLGregorianCalendar getExpiration() {
         return expiration;
@@ -95,11 +89,6 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Sets the value of the expiration property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public void setExpiration(XMLGregorianCalendar value) {
         this.expiration = value;
@@ -107,15 +96,10 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Gets the value of the majorVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
-    public BigInteger getMajorVersion() {
+    public Integer getMajorVersion() {
         if (majorVersion == null) {
-            return new BigInteger("1");
+            return new Integer("1");
         } else {
             return majorVersion;
         }
@@ -123,27 +107,17 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Sets the value of the majorVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
      */
-    public void setMajorVersion(BigInteger value) {
+    public void setMajorVersion(Integer value) {
         this.majorVersion = value;
     }
 
     /**
      * Gets the value of the minorVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
-    public BigInteger getMinorVersion() {
+    public Integer getMinorVersion() {
         if (minorVersion == null) {
-            return new BigInteger("0");
+            return new Integer("0");
         } else {
             return minorVersion;
         }
@@ -151,23 +125,13 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Sets the value of the minorVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
      */
-    public void setMinorVersion(BigInteger value) {
+    public void setMinorVersion(Integer value) {
         this.minorVersion = value;
     }
 
     /**
      * Gets the value of the stability property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getStability() {
         return stability;
@@ -175,11 +139,6 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Sets the value of the stability property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setStability(String value) {
         this.stability = value;
@@ -187,11 +146,6 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Gets the value of the userVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getUserVersion() {
         return userVersion;
@@ -199,11 +153,6 @@ public class RegistryEntryType extends RegistryObjectType {
 
     /**
      * Sets the value of the userVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setUserVersion(String value) {
         this.userVersion = value;

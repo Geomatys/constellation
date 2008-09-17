@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5}Slot" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
+ *       &lt;/sequence> 
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

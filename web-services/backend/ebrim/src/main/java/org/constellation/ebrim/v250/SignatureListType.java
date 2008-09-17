@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SignatureListType", propOrder = {
-    "signature"
+   
 })
 public class SignatureListType {
 

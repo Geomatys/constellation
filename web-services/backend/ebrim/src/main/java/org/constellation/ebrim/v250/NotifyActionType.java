@@ -68,11 +68,6 @@ public abstract class NotifyActionType extends ActionType {
 
     /**
      * Gets the value of the notificationOption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getNotificationOption() {
         if (notificationOption == null) {
@@ -84,11 +79,6 @@ public abstract class NotifyActionType extends ActionType {
 
     /**
      * Sets the value of the notificationOption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setNotificationOption(String value) {
         this.notificationOption = value;
@@ -96,11 +86,6 @@ public abstract class NotifyActionType extends ActionType {
 
     /**
      * Gets the value of the endPoint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getEndPoint() {
         return endPoint;
@@ -108,11 +93,6 @@ public abstract class NotifyActionType extends ActionType {
 
     /**
      * Sets the value of the endPoint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setEndPoint(String value) {
         this.endPoint = value;

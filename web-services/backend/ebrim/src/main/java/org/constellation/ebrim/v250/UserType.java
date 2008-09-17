@@ -87,11 +87,6 @@ public class UserType extends RegistryObjectType {
 
     /**
      * Gets the value of the personName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link PersonNameType }
-     *     
      */
     public PersonNameType getPersonName() {
         return personName;
@@ -99,11 +94,6 @@ public class UserType extends RegistryObjectType {
 
     /**
      * Sets the value of the personName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PersonNameType }
-     *     
      */
     public void setPersonName(PersonNameType value) {
         this.personName = value;

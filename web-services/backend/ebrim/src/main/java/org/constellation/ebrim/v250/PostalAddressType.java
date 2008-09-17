@@ -79,24 +79,6 @@ public class PostalAddressType {
     /**
      * Gets the value of the slot property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the slot property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSlot().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SlotType1 }
-     * 
-     * 
      */
     public List<SlotType> getSlot() {
         if (slot == null) {
@@ -107,11 +89,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the city property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCity() {
         return city;
@@ -119,11 +96,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the city property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setCity(String value) {
         this.city = value;
@@ -131,11 +103,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the country property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCountry() {
         return country;
@@ -143,11 +110,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the country property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setCountry(String value) {
         this.country = value;
@@ -155,11 +117,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the postalCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPostalCode() {
         return postalCode;
@@ -167,11 +124,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the postalCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setPostalCode(String value) {
         this.postalCode = value;
@@ -179,11 +131,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the stateOrProvince property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getStateOrProvince() {
         return stateOrProvince;
@@ -191,11 +138,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the stateOrProvince property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setStateOrProvince(String value) {
         this.stateOrProvince = value;
@@ -203,11 +145,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the street property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getStreet() {
         return street;
@@ -215,11 +152,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the street property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setStreet(String value) {
         this.street = value;
@@ -227,11 +159,6 @@ public class PostalAddressType {
 
     /**
      * Gets the value of the streetNumber property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getStreetNumber() {
         return streetNumber;
@@ -239,11 +166,6 @@ public class PostalAddressType {
 
     /**
      * Sets the value of the streetNumber property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setStreetNumber(String value) {
         this.streetNumber = value;

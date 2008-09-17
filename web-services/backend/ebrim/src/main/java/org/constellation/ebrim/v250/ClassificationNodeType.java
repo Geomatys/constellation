@@ -77,25 +77,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Gets the value of the classificationNode property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the classificationNode property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getClassificationNode().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link ClassificationNodeType }
-     * 
-     * 
      */
     public List<ClassificationNodeType> getClassificationNode() {
         if (classificationNode == null) {
@@ -106,11 +87,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Gets the value of the parent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getParent() {
         return parent;
@@ -118,11 +94,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Sets the value of the parent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setParent(String value) {
         this.parent = value;
@@ -130,11 +101,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Gets the value of the code property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCode() {
         return code;
@@ -142,11 +108,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Sets the value of the code property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setCode(String value) {
         this.code = value;
@@ -154,11 +115,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Gets the value of the path property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPath() {
         return path;
@@ -166,11 +122,6 @@ public class ClassificationNodeType extends RegistryObjectType {
 
     /**
      * Sets the value of the path property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setPath(String value) {
         this.path = value;

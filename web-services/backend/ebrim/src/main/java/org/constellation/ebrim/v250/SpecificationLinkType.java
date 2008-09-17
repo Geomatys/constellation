@@ -69,11 +69,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Gets the value of the usageDescription property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link InternationalStringType }
-     *     
      */
     public InternationalStringType getUsageDescription() {
         return usageDescription;
@@ -81,11 +76,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Sets the value of the usageDescription property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link InternationalStringType }
-     *     
      */
     public void setUsageDescription(InternationalStringType value) {
         this.usageDescription = value;
@@ -103,11 +93,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Gets the value of the serviceBinding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getServiceBinding() {
         return serviceBinding;
@@ -115,11 +100,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Sets the value of the serviceBinding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setServiceBinding(String value) {
         this.serviceBinding = value;
@@ -127,11 +107,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Gets the value of the specificationObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSpecificationObject() {
         return specificationObject;
@@ -139,11 +114,6 @@ public class SpecificationLinkType extends RegistryObjectType {
 
     /**
      * Sets the value of the specificationObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSpecificationObject(String value) {
         this.specificationObject = value;

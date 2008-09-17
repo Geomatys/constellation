@@ -29,12 +29,9 @@ import org.constellation.ebrim.v250.RegistryPackageType;
 
 
 /**
- * 
- *       Defines an expansion pack that bundles extensions for handling 
- *       domain-specific resources; it may include ClassificationScheme, 
- *       ClassificationNode, Association, XMLSchema, WRS query extensions (e.g. 
- *       stored queries), plus constraints on the use of slots.
- *       
+ * Defines an expansion pack that bundles extensions for handling domain-specific resources; 
+ * it may include ClassificationScheme, ClassificationNode, Association, XMLSchema, 
+ * WRS query extensions (e.g. stored queries), plus constraints on the use of slots.
  * 
  * <p>Java class for ApplicationModuleType complex type.
  * 

@@ -84,11 +84,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Gets the value of the selector property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSelector() {
         return selector;
@@ -96,11 +91,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Sets the value of the selector property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSelector(String value) {
         this.selector = value;
@@ -109,10 +99,6 @@ public class Subscription extends RegistryObjectType {
     /**
      * Gets the value of the startDate property.
      * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public XMLGregorianCalendar getStartDate() {
         return startDate;
@@ -120,11 +106,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Sets the value of the startDate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public void setStartDate(XMLGregorianCalendar value) {
         this.startDate = value;
@@ -132,11 +113,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Gets the value of the endDate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public XMLGregorianCalendar getEndDate() {
         return endDate;
@@ -144,11 +120,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Sets the value of the endDate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
      */
     public void setEndDate(XMLGregorianCalendar value) {
         this.endDate = value;
@@ -156,10 +127,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Gets the value of the notificationInterval property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Duration }
      *     
      */
     public Duration getNotificationInterval() {
@@ -168,10 +135,6 @@ public class Subscription extends RegistryObjectType {
 
     /**
      * Sets the value of the notificationInterval property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Duration }
      *     
      */
     public void setNotificationInterval(Duration value) {

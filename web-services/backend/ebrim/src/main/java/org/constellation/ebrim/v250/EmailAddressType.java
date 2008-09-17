@@ -66,25 +66,6 @@ public class EmailAddressType {
 
     /**
      * Gets the value of the slot property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the slot property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSlot().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SlotType1 }
-     * 
-     * 
      */
     public List<SlotType> getSlot() {
         if (slot == null) {
@@ -95,11 +76,6 @@ public class EmailAddressType {
 
     /**
      * Gets the value of the address property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAddress() {
         return address;
@@ -107,11 +83,6 @@ public class EmailAddressType {
 
     /**
      * Sets the value of the address property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAddress(String value) {
         this.address = value;
@@ -119,11 +90,6 @@ public class EmailAddressType {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getType() {
         return type;
@@ -131,12 +97,7 @@ public class EmailAddressType {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
+    */
     public void setType(String value) {
         this.type = value;
     }

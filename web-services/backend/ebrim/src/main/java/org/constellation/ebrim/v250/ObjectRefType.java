@@ -65,11 +65,6 @@ public class ObjectRefType {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getId() {
         return id;
@@ -77,11 +72,6 @@ public class ObjectRefType {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setId(String value) {
         this.id = value;
@@ -89,11 +79,6 @@ public class ObjectRefType {
 
     /**
      * Gets the value of the home property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHome() {
         return home;
@@ -101,11 +86,6 @@ public class ObjectRefType {
 
     /**
      * Sets the value of the home property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setHome(String value) {
         this.home = value;
@@ -113,11 +93,6 @@ public class ObjectRefType {
 
     /**
      * Gets the value of the createReplica property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isCreateReplica() {
         if (createReplica == null) {
@@ -129,12 +104,7 @@ public class ObjectRefType {
 
     /**
      * Sets the value of the createReplica property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
+    */
     public void setCreateReplica(Boolean value) {
         this.createReplica = value;
     }

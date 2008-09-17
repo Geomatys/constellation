@@ -70,11 +70,6 @@ public class TelephoneNumberType {
 
     /**
      * Gets the value of the areaCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAreaCode() {
         return areaCode;
@@ -82,11 +77,6 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the areaCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAreaCode(String value) {
         this.areaCode = value;
@@ -94,11 +84,6 @@ public class TelephoneNumberType {
 
     /**
      * Gets the value of the countryCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCountryCode() {
         return countryCode;
@@ -106,23 +91,13 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the countryCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
+    */
     public void setCountryCode(String value) {
         this.countryCode = value;
     }
 
     /**
      * Gets the value of the extension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getExtension() {
         return extension;
@@ -130,11 +105,6 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the extension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setExtension(String value) {
         this.extension = value;
@@ -142,11 +112,6 @@ public class TelephoneNumberType {
 
     /**
      * Gets the value of the number property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getNumber() {
         return number;
@@ -154,11 +119,6 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the number property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setNumber(String value) {
         this.number = value;
@@ -166,11 +126,6 @@ public class TelephoneNumberType {
 
     /**
      * Gets the value of the phoneType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPhoneType() {
         return phoneType;
@@ -178,11 +133,6 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the phoneType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setPhoneType(String value) {
         this.phoneType = value;
@@ -190,11 +140,6 @@ public class TelephoneNumberType {
 
     /**
      * Gets the value of the url property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getUrl() {
         return url;
@@ -202,11 +147,6 @@ public class TelephoneNumberType {
 
     /**
      * Sets the value of the url property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setUrl(String value) {
         this.url = value;

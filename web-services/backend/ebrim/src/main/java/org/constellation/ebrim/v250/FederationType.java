@@ -62,11 +62,6 @@ public class FederationType extends RegistryEntryType {
 
     /**
      * Gets the value of the members property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ObjectRefListType }
-     *     
      */
     public ObjectRefListType getMembers() {
         return members;
@@ -74,11 +69,6 @@ public class FederationType extends RegistryEntryType {
 
     /**
      * Sets the value of the members property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ObjectRefListType }
-     *     
      */
     public void setMembers(ObjectRefListType value) {
         this.members = value;
@@ -86,11 +76,6 @@ public class FederationType extends RegistryEntryType {
 
     /**
      * Gets the value of the replicationSyncLatency property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Duration }
-     *     
      */
     public Duration getReplicationSyncLatency() {
         return replicationSyncLatency;
@@ -98,11 +83,6 @@ public class FederationType extends RegistryEntryType {
 
     /**
      * Sets the value of the replicationSyncLatency property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Duration }
-     *     
      */
     public void setReplicationSyncLatency(Duration value) {
         this.replicationSyncLatency = value;

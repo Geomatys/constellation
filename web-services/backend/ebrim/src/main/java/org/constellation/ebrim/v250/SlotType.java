@@ -60,11 +60,6 @@ public class SlotType {
 
     /**
      * Gets the value of the valueList property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ValueListType }
-     *     
      */
     public ValueListType getValueList() {
         return valueList;
@@ -72,11 +67,6 @@ public class SlotType {
 
     /**
      * Sets the value of the valueList property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ValueListType }
-     *     
      */
     public void setValueList(ValueListType value) {
         this.valueList = value;
@@ -84,11 +74,6 @@ public class SlotType {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getName() {
         return name;
@@ -96,11 +81,6 @@ public class SlotType {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setName(String value) {
         this.name = value;
@@ -108,11 +88,6 @@ public class SlotType {
 
     /**
      * Gets the value of the slotType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSlotType() {
         return slotType;
@@ -120,11 +95,6 @@ public class SlotType {
 
     /**
      * Sets the value of the slotType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSlotType(String value) {
         this.slotType = value;

@@ -65,11 +65,6 @@ public class RegistryPackageType extends RegistryEntryType {
 
     /**
      * Gets the value of the registryObjectList property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link RegistryObjectListType }
-     *     
      */
     public RegistryObjectListType getRegistryObjectList() {
         return registryObjectList;
@@ -77,11 +72,6 @@ public class RegistryPackageType extends RegistryEntryType {
 
     /**
      * Sets the value of the registryObjectList property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link RegistryObjectListType }
-     *     
      */
     public void setRegistryObjectList(RegistryObjectListType value) {
         this.registryObjectList = value;

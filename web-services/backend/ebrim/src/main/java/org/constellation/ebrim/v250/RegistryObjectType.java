@@ -132,10 +132,6 @@ public class RegistryObjectType {
     /**
      * Gets the value of the name property.
      * 
-     * @return
-     *     possible object is
-     *     {@link InternationalStringType }
-     *     
      */
     public InternationalStringType getName() {
         return name;
@@ -143,11 +139,6 @@ public class RegistryObjectType {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link InternationalStringType }
-     *     
      */
     public void setName(InternationalStringType value) {
         this.name = value;
@@ -155,10 +146,6 @@ public class RegistryObjectType {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link InternationalStringType }
      *     
      */
     public InternationalStringType getDescription() {
@@ -167,11 +154,6 @@ public class RegistryObjectType {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link InternationalStringType }
-     *     
      */
     public void setDescription(InternationalStringType value) {
         this.description = value;
@@ -210,11 +192,6 @@ public class RegistryObjectType {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getId() {
         return id;
@@ -223,10 +200,6 @@ public class RegistryObjectType {
     /**
      * Sets the value of the id property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setId(String value) {
         this.id = value;
@@ -234,11 +207,6 @@ public class RegistryObjectType {
 
     /**
      * Gets the value of the home property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHome() {
         return home;
@@ -246,11 +214,6 @@ public class RegistryObjectType {
 
     /**
      * Sets the value of the home property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setHome(String value) {
         this.home = value;
@@ -258,11 +221,6 @@ public class RegistryObjectType {
 
     /**
      * Gets the value of the objectType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getObjectType() {
         return objectType;
@@ -270,11 +228,6 @@ public class RegistryObjectType {
 
     /**
      * Sets the value of the objectType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setObjectType(String value) {
         this.objectType = value;
@@ -282,11 +235,6 @@ public class RegistryObjectType {
 
     /**
      * Gets the value of the status property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getStatus() {
         return status;
@@ -294,11 +242,6 @@ public class RegistryObjectType {
 
     /**
      * Sets the value of the status property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setStatus(String value) {
         this.status = value;

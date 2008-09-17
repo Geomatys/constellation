@@ -62,11 +62,6 @@ public class ExtrinsicObjectType extends RegistryEntryType {
 
     /**
      * Gets the value of the mimeType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getMimeType() {
         if (mimeType == null) {
@@ -78,11 +73,6 @@ public class ExtrinsicObjectType extends RegistryEntryType {
 
     /**
      * Sets the value of the mimeType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setMimeType(String value) {
         this.mimeType = value;
@@ -90,11 +80,6 @@ public class ExtrinsicObjectType extends RegistryEntryType {
 
     /**
      * Gets the value of the isOpaque property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isIsOpaque() {
         if (isOpaque == null) {
@@ -106,11 +91,6 @@ public class ExtrinsicObjectType extends RegistryEntryType {
 
     /**
      * Sets the value of the isOpaque property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setIsOpaque(Boolean value) {
         this.isOpaque = value;

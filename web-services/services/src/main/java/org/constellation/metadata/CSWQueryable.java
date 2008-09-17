@@ -468,5 +468,6 @@ public class CSWQueryable {
     protected final static QName _Registry_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Registry");
     protected final static QName _Organization_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Organization");
     protected final static QName _ExternalLink_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalLink");
+    protected final static QName _WRSExtrinsicObject_QNAME   = new QName("http://www.opengis.net/cat/wrs/1.0",          "ExtrinsicObject");
     
 }

@@ -56,11 +56,6 @@ public class ExternalLinkType extends RegistryObjectType {
 
     /**
      * Gets the value of the externalURI property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getExternalURI() {
         return externalURI;
@@ -68,11 +63,6 @@ public class ExternalLinkType extends RegistryObjectType {
 
     /**
      * Sets the value of the externalURI property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setExternalURI(String value) {
         this.externalURI = value;

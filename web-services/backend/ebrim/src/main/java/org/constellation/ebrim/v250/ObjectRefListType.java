@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5}ObjectRef"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
- *   &lt;/complexContent>
+ *   &lt;/complexContent> 
  * &lt;/complexType>
  * </pre>
  * 

@@ -77,11 +77,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the operator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getOperator() {
         return operator;
@@ -89,11 +84,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the operator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setOperator(String value) {
         this.operator = value;
@@ -101,11 +91,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the specificationVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSpecificationVersion() {
         return specificationVersion;
@@ -113,11 +98,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the specificationVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setSpecificationVersion(String value) {
         this.specificationVersion = value;
@@ -125,11 +105,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the replicationSyncLatency property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Duration }
-     *     
      */
     public Duration getReplicationSyncLatency() {
         return replicationSyncLatency;
@@ -137,11 +112,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the replicationSyncLatency property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Duration }
-     *     
      */
     public void setReplicationSyncLatency(Duration value) {
         this.replicationSyncLatency = value;
@@ -149,11 +119,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the catalogingLatency property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Duration }
-     *     
      */
     public Duration getCatalogingLatency() {
         return catalogingLatency;
@@ -161,11 +126,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the catalogingLatency property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Duration }
-     *     
      */
     public void setCatalogingLatency(Duration value) {
         this.catalogingLatency = value;
@@ -173,11 +133,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the sqlQuerySupported property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isSqlQuerySupported() {
         if (sqlQuerySupported == null) {
@@ -189,11 +144,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the sqlQuerySupported property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setSqlQuerySupported(Boolean value) {
         this.sqlQuerySupported = value;
@@ -201,12 +151,7 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the eventNotificationSupported property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
+    */
     public boolean isEventNotificationSupported() {
         if (eventNotificationSupported == null) {
             return false;
@@ -217,11 +162,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the eventNotificationSupported property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setEventNotificationSupported(Boolean value) {
         this.eventNotificationSupported = value;
@@ -229,12 +169,7 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the objectReplicationSupported property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
+      */
     public boolean isObjectReplicationSupported() {
         if (objectReplicationSupported == null) {
             return false;
@@ -245,11 +180,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the objectReplicationSupported property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setObjectReplicationSupported(Boolean value) {
         this.objectReplicationSupported = value;
@@ -257,11 +187,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Gets the value of the objectRelocationSupported property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isObjectRelocationSupported() {
         if (objectRelocationSupported == null) {
@@ -273,11 +198,6 @@ public class RegistryType extends RegistryEntryType {
 
     /**
      * Sets the value of the objectRelocationSupported property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setObjectRelocationSupported(Boolean value) {
         this.objectRelocationSupported = value;

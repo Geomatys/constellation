@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -142,6 +143,9 @@ public class MetadataWriter {
             // Ebrim Types    
             } else if (object instanceof IdentifiableType) {
                 mainStandard = Standard.EBRIM_V3;
+           
+            } else if (object instanceof RegistryObjectType) {
+                mainStandard = Standard.EBRIM_V2_5;
             
             // CSW Types    
             } else if (className.equals("RecordType")) {

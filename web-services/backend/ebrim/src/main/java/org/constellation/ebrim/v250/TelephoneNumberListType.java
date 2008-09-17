@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5}TelephoneNumber" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
- *   &lt;/complexContent>
+ *   &lt;/complexContent> 
  * &lt;/complexType>
  * </pre>
  * 

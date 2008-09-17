@@ -273,6 +273,7 @@ public class CSWworker {
         SUPPORTED_TYPE_NAME.add(_SpecificationLink_QNAME);
         SUPPORTED_TYPE_NAME.add(_Subscription_QNAME);
         SUPPORTED_TYPE_NAME.add(_User_QNAME);
+        SUPPORTED_TYPE_NAME.add(_WRSExtrinsicObject_QNAME);
     }
     
     /**

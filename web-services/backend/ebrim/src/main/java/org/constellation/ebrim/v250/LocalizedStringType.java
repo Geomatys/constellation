@@ -62,10 +62,6 @@ public class LocalizedStringType {
 
     /**
      * Gets the value of the lang property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
      *     
      */
     public String getLang() {
@@ -78,11 +74,6 @@ public class LocalizedStringType {
 
     /**
      * Sets the value of the lang property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setLang(String value) {
         this.lang = value;
@@ -90,11 +81,6 @@ public class LocalizedStringType {
 
     /**
      * Gets the value of the charset property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCharset() {
         if (charset == null) {
@@ -106,11 +92,6 @@ public class LocalizedStringType {
 
     /**
      * Sets the value of the charset property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setCharset(String value) {
         this.charset = value;
@@ -118,23 +99,13 @@ public class LocalizedStringType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+    */
     public String getValue() {
         return value;
     }
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setValue(String value) {
         this.value = value;

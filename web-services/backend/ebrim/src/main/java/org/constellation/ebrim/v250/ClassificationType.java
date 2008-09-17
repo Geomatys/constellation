@@ -72,10 +72,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Gets the value of the classificationScheme property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
      *     
      */
     public String getClassificationScheme() {
@@ -84,11 +80,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Sets the value of the classificationScheme property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setClassificationScheme(String value) {
         this.classificationScheme = value;
@@ -96,11 +87,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Gets the value of the classifiedObject property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getClassifiedObject() {
         return classifiedObject;
@@ -108,11 +94,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Sets the value of the classifiedObject property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setClassifiedObject(String value) {
         this.classifiedObject = value;
@@ -120,23 +101,13 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Gets the value of the classificationNode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+    */
     public String getClassificationNode() {
         return classificationNode;
     }
 
     /**
      * Sets the value of the classificationNode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setClassificationNode(String value) {
         this.classificationNode = value;
@@ -144,11 +115,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Gets the value of the nodeRepresentation property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getNodeRepresentation() {
         return nodeRepresentation;
@@ -156,11 +122,6 @@ public class ClassificationType extends RegistryObjectType {
 
     /**
      * Sets the value of the nodeRepresentation property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setNodeRepresentation(String value) {
         this.nodeRepresentation = value;

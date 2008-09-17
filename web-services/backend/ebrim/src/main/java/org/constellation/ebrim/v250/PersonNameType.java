@@ -69,25 +69,6 @@ public class PersonNameType {
 
     /**
      * Gets the value of the slot property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the slot property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSlot().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SlotType1 }
-     * 
-     * 
      */
     public List<SlotType> getSlot() {
         if (slot == null) {
@@ -98,11 +79,6 @@ public class PersonNameType {
 
     /**
      * Gets the value of the firstName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getFirstName() {
         return firstName;
@@ -110,11 +86,6 @@ public class PersonNameType {
 
     /**
      * Sets the value of the firstName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setFirstName(String value) {
         this.firstName = value;
@@ -122,11 +93,6 @@ public class PersonNameType {
 
     /**
      * Gets the value of the middleName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getMiddleName() {
         return middleName;
@@ -134,11 +100,6 @@ public class PersonNameType {
 
     /**
      * Sets the value of the middleName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setMiddleName(String value) {
         this.middleName = value;
@@ -146,11 +107,6 @@ public class PersonNameType {
 
     /**
      * Gets the value of the lastName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getLastName() {
         return lastName;
@@ -158,11 +114,6 @@ public class PersonNameType {
 
     /**
      * Sets the value of the lastName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setLastName(String value) {
         this.lastName = value;

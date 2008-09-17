@@ -54,7 +54,7 @@ public class ValueListType {
     private List<String> value;
 
     /**
-     * Gets the value of the value property.
+     * Gets the value of the value property. 
      */
     public List<String> getValue() {
         if (value == null) {

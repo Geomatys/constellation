@@ -77,11 +77,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Gets the value of the address property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link PostalAddressType }
-     *     
      */
     public PostalAddressType getAddress() {
         return address;
@@ -89,11 +84,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Sets the value of the address property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PostalAddressType }
-     *     
      */
     public void setAddress(PostalAddressType value) {
         this.address = value;
@@ -101,25 +91,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Gets the value of the telephoneNumber property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the telephoneNumber property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getTelephoneNumber().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link TelephoneNumberType }
-     * 
-     * 
      */
     public List<TelephoneNumberType> getTelephoneNumber() {
         if (telephoneNumber == null) {
@@ -130,25 +101,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Gets the value of the emailAddress property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the emailAddress property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getEmailAddress().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link EmailAddressType }
-     * 
-     * 
      */
     public List<EmailAddressType> getEmailAddress() {
         if (emailAddress == null) {
@@ -159,11 +111,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Gets the value of the parent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getParent() {
         return parent;
@@ -171,11 +118,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Sets the value of the parent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setParent(String value) {
         this.parent = value;
@@ -183,11 +125,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Gets the value of the primaryContact property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPrimaryContact() {
         return primaryContact;
@@ -195,11 +132,6 @@ public class OrganizationType extends RegistryObjectType {
 
     /**
      * Sets the value of the primaryContact property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setPrimaryContact(String value) {
         this.primaryContact = value;

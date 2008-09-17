@@ -64,11 +64,6 @@ public class WRSExtrinsicObjectType extends ExtrinsicObjectType {
 
     /**
      * Gets the value of the content property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SimpleLinkType }
-     *     
      */
     public SimpleLinkType getContent() {
         return content;
@@ -76,11 +71,6 @@ public class WRSExtrinsicObjectType extends ExtrinsicObjectType {
 
     /**
      * Sets the value of the content property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SimpleLinkType }
-     *     
      */
     public void setContent(SimpleLinkType value) {
         this.content = value;
