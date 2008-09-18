@@ -44,20 +44,21 @@ import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
 
-import org.geotools.map.MapLayer;
-import org.geotools.style.MutableStyle;
 
 /**
  *
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDetails>{
-
     private static PostGridNamedLayerDP instance = null;
-    
-    protected static final Logger logger = Logger.getLogger("net.seagis.provider.postgrid");
-    
+
+    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
+
+    private final Map<String,Layer> index = new HashMap<String,Layer>();
+
     protected static Database database;
+
     static {
         Database tempDB = null;
         try {
@@ -159,10 +160,10 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
         } catch (SQLException n) {
             logger.log(Level.SEVERE,"SQL Error",n);
         }
-        
+
         PostGridNamedLayerDP.database = tempDB;
     }
-    
+
     /**
      * Returns the context value for the key specified, or {@code null} if not found
      * in this context.
@@ -181,14 +182,10 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
         }
     }
 
-    //--------------------------------------------------------------------------
-    
-    private final Map<String,Layer> index = new HashMap<String,Layer>();
-    
     private PostGridNamedLayerDP(){
         visit();
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -221,7 +218,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
      * {@inheritDoc }
      */
     public LayerDetails get(String key) {
-        return null;
+        final Layer layer = index.get(key);
+        return (layer != null) ? new PostGridLayerDetails(database, layer) : null;
     }
 
     /**
@@ -242,16 +240,16 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
             index.clear();
         }
     }
-    
+
     private void visit() {
         LayerTable layers = null;
-        
+
         try {
             layers = database.getTable(LayerTable.class);
         } catch (NoSuchTableException ex) {
             Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         if(layers != null){
             Set<Layer> set = null;
             try {
@@ -261,25 +259,19 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
             } catch (SQLException ex) {
                 Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             if(set != null && !set.isEmpty()){
                 for(Layer layer : set){
                     index.put(layer.getName(),layer);
                 }
             }
-            
+
         }else{
             logger.log(Level.SEVERE,"Layer table is null");
         }
-        
+
     }
-        
-    private MapLayer createMapLayer(Layer gridLayer){
-        MapLayer layer = null;
-        
-        return layer;
-    }
-    
+
     public static PostGridNamedLayerDP getDefault(){
         if(instance == null){
             instance = new PostGridNamedLayerDP();
@@ -290,6 +282,5 @@ public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDeta
     public List<String> getFavoriteStyles(String layerName) {
         return Collections.emptyList();
     }
-    
-    
+
 }

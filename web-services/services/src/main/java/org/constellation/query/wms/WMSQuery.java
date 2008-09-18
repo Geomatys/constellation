@@ -17,7 +17,6 @@
 package org.constellation.query.wms;
 
 import org.constellation.query.Query;
-import org.constellation.query.QueryRequest;
 import org.constellation.query.QueryService;
 
 
@@ -28,6 +27,8 @@ import org.constellation.query.QueryService;
  * @author Johann Sorel (Geomatys)
  */
 public abstract class WMSQuery extends Query {
+    public static final String KEY_SERVICE = "SERVICE";
+    public static final String KEY_VERSION = "VERSION";
     /**
      * Request parameters.
      */

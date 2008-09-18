@@ -96,11 +96,10 @@ public class NamedLayerDP implements LayerDataProvider<String, LayerDetails>{
      * {@inheritDoc }
      */
     public LayerDetails get(String key) {
-        /*MapLayer layer = null;
-        for(LayerDataProvider<String,MapLayer> dp : dps){
-            layer = dp.get(key);
+        for(LayerDataProvider<String,LayerDetails> dp : dps){
+            LayerDetails layer = dp.get(key);
             if(layer != null) return layer;
-        }*/
+        }
         return null;
     }
 

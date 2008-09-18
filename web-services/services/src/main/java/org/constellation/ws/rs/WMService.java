@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -108,10 +109,8 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Singleton
 public class WMService extends WebService {
     /**
-     * A list of layer initialized a begining;
+     * Connection to the database.
      */
-    private Set<org.constellation.coverage.catalog.Layer> layerList;
-
     private static Database database;
 
     /**
@@ -228,13 +227,12 @@ public class WMService extends WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         WMSQuery query = null;
         try {
-            query = adaptQuery();
-            String request = (String) getParameter(KEY_REQUEST, true);
-            LOGGER.info("new request:" + request);
+            final String request = (String) getParameter(KEY_REQUEST, true);
+            LOGGER.info("New request: " + request);
+            query = adaptQuery(request);
             writeParameters();
 
             if (REQUEST_MAP.equalsIgnoreCase(request)) {
@@ -274,12 +272,11 @@ public class WMService extends WebService {
      * @throws fr.geomatys.wms.WebServiceException
      */
     private synchronized Response getMap() throws WebServiceException {
-        LOGGER.info("getMap request received");
         verifyBaseParameter(0);
 
         final String errorType = getParameter(KEY_EXCEPTIONS, false);
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
-        final WMSQuery query = adaptQuery();
+        final WMSQuery query = adaptQuery(getParameter(KEY_REQUEST, true));
         if (!(query instanceof GetMap)) {
             throw new WMSWebServiceException("Invalid request found, should be GetMap.", INVALID_REQUEST, getCurrentVersion());
         }
@@ -326,16 +323,15 @@ public class WMService extends WebService {
      * @throws javax.xml.bind.JAXBException
      */
     private Response getCapabilities() throws WebServiceException, JAXBException {
-        LOGGER.info("getCapabilities request processing" + '\n');
-
         //we begin by extract the mandatory attribute
-        if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
-            throw new WMSWebServiceException("The parameters SERVICE=WMS must be specified",
+        if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WMS")) {
+            throw new WMSWebServiceException("The parameter SERVICE=WMS must be specified",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
 
         //and the the optional attribute
-        final String inputVersion = getParameter("VERSION", false);
+        final String inputVersion = getParameter(KEY_VERSION, false);
+        //setCurrentVersion(getBestVersion(inputVersion).toString());
         if (inputVersion != null && inputVersion.equals("1.3.0")) {
             setCurrentVersion("1.3.0");
         } else {
@@ -438,8 +434,12 @@ public class WMService extends WebService {
                     new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
-                for (Number n : elevations) {
-                    elevs.append(n.toString()).append(',');
+                for (Iterator<Number> it = elevations.iterator(); it.hasNext();) {
+                    final Number n = it.next();
+                    elevs.append(n.toString());
+                    if (!it.hasNext()) {
+                        elevs.append(',');
+                    }
                 }
                 dim.setValue(elevs.toString());
                 dimensions.add(dim);
@@ -560,7 +560,7 @@ public class WMService extends WebService {
     /**
      * update The URL in capabilities document for the extended operation.
      */
-    private void updateExtendedOperationURL(AbstractRequest request) {
+    private void updateExtendedOperationURL(final AbstractRequest request) {
 
         if (getCurrentVersion().toString().equals("1.3.0")) {
             org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
@@ -593,11 +593,16 @@ public class WMService extends WebService {
      * @return WMSQuery
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private WMSQuery adaptQuery() throws WebServiceException {
+    private WMSQuery adaptQuery(final String request) throws WebServiceException {
         final ServiceVersion version  = getCurrentVersion();
-        final String strRequest       = getParameter( KEY_REQUEST, true);
+        final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+        if (request.equalsIgnoreCase(REQUEST_CAPABILITIES)) {
+            return new GetCapabilities(wmsVersion);
+        }
+        
         final String strFormat        = getParameter( KEY_FORMAT, true);
-        final String strCRS           = getParameter( (version.equals("1.3.0")) ?
+        final String strCRS           = getParameter( (version.toString().equals("1.3.0")) ?
                                                       KEY_CRS_v130 : KEY_CRS_v110, true );
         final String strBBox          = getParameter( KEY_BBOX, true );
         final String strLayers        = getParameter( KEY_LAYERS, true );
@@ -613,19 +618,17 @@ public class WMService extends WebService {
         //final String strRemoteOwsType = getParameter( KEY_REMOTE_OWS_TYPE, false );
         final String strRemoteOwsUrl  = getParameter( KEY_REMOTE_OWS_URL, false );
 
-        final ImmutableEnvelope env = (ImmutableEnvelope) QueryAdapter.toBBox(strBBox);
-        //final Rectangle2D bbox = env.toRectangle2D();
         final CoordinateReferenceSystem crs;
         try {
             crs = QueryAdapter.toCRS(strCRS);
         } catch (FactoryException ex) {
             throw new WMSWebServiceException(ex, INVALID_CRS, version);
         }
-
+        final ImmutableEnvelope env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
         final List<String> layers = QueryAdapter.toStringList(strLayers);
         final List<String> styles = QueryAdapter.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
-        final Double elevation = QueryAdapter.toDouble(strElevation);
+        final Double elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Dimension size = new Dimension( QueryAdapter.toInt(strWidth), QueryAdapter.toInt(strHeight));
         final Color background = QueryAdapter.toColor(strBGColor);
@@ -656,14 +659,10 @@ public class WMService extends WebService {
         }
 
         // Builds the request.
-        final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
-                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
-        if (strRequest.equalsIgnoreCase("GetMap")) {
-            return new GetMap(crs, env, wmsVersion, strFormat, layers, styles, sld, elevation,
+
+        if (request.equalsIgnoreCase(REQUEST_MAP)) {
+            return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
                     strTime, dimRange, size, background, transparent, null);
-        }
-        if (strRequest.equalsIgnoreCase("GetCapabilities")) {
-            return new GetCapabilities(wmsVersion);
         }
         throw new WMSWebServiceException("Unknown request type.", INVALID_REQUEST, version);
     }

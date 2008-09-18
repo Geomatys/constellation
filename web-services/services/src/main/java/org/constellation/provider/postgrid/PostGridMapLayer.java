@@ -58,6 +58,7 @@ import org.opengis.style.RasterSymbolizer;
 
 /**
  *
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer{

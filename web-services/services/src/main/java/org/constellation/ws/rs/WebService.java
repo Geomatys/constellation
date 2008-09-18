@@ -106,7 +106,7 @@ public abstract class WebService {
     /**
      * Default logger for all web services.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs");
 
     /**
      * The user directory where to store the configuration file on Unix platforms.
@@ -662,10 +662,8 @@ public abstract class WebService {
 
     /**
      * Temporary test method until we put in place an authentification process.
-     * @return
      */
     private Group getAuthentifiedUser() {
-
         //for now we consider an user and is group as the same.
         Principal anonymous    = new PrincipalImpl("anonymous");
         Group     anonymousGrp = new GroupImpl("anonymous");
@@ -686,8 +684,6 @@ public abstract class WebService {
             if (identifiedGrp == null) {
                 identifiedGrp = anonymousGrp;
             }
-
-            LOGGER.info("identified user: " + identifiedGrp.getName());
             return identifiedGrp;
         }
         return anonymousGrp;
@@ -890,25 +886,23 @@ public abstract class WebService {
     }
 
     /**
-     * Transform a exception code into the ows specification.
-     * example : MISSING_PARAMETER_VALUE become MissingParameterValue.
+     * Transform an exception code into the OWS specification.
+     * Example : MISSING_PARAMETER_VALUE become MissingParameterValue.
      *
      * @param code
      * @return
      */
     private String transformCodeName(String code) {
         String result = "";
+        final String prefix = code.charAt(0) + "";
         while (code.indexOf('_') != -1) {
-            String prefix = code.charAt(0) + "";
-            String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
+            final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
             result += tmp.replace(tmp.charAt(0), prefix.charAt(0));
             code = code.substring(code.indexOf('_') + 1, code.length());
-            System.out.println(code);
+            //System.out.println(code);
         }
-        String prefix = code.charAt(0) + "";
         code = code.toLowerCase();
         result += code.replace(code.charAt(0), prefix.charAt(0));
-
         return result;
     }
 

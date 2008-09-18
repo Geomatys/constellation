@@ -24,7 +24,6 @@ import org.constellation.query.QueryVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -34,11 +33,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon
  */
 public class GetMap extends WMSQuery {
-    /**
-     * The {@linkplain CoordinateReferenceSystem coordinate reference system}.
-     */
-    private final CoordinateReferenceSystem crs;
-
     /**
      * Envelope which contains the bounds and the crs for the request.
      */
@@ -107,56 +101,50 @@ public class GetMap extends WMSQuery {
     /**
      * Default minimal constructor to generate a {@code GetMap} request.
      */
-    public GetMap(final CoordinateReferenceSystem crs, final Envelope envelope,
-                  final QueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final Dimension size)
     {
-        this(crs, envelope, version, format, layers, null, size);
+        this(envelope, version, format, layers, null, size);
     }
 
     /**
      * GetMap with a list of styles defined.
      */
-    public GetMap(final CoordinateReferenceSystem crs, final Envelope envelope,
-                  final QueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Dimension size)
     {
-        this(crs, envelope, version, format, layers, styles, null, null, size);
+        this(envelope, version, format, layers, styles, null, null, size);
     }
 
     /**
      * GetMap with a list of styles, an elevation and a time value.
      */
-    public GetMap(final CoordinateReferenceSystem crs, final Envelope envelope,
-                  final QueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
                   final String date, final Dimension size)
     {
-        this(crs, envelope, version, format, layers, styles, elevation, date, null, size);
+        this(envelope, version, format, layers, styles, elevation, date, null, size);
     }
 
     /**
      * GetMap with a list of styles, an elevation, a time value and a {@code dim_range}.
      */
-    public GetMap(final CoordinateReferenceSystem crs, final Envelope envelope,
-                  final QueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
                   final String date, final MeasurementRange dimRange, final Dimension size)
     {
-        this(crs, envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, null);
+        this(envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, null);
     }
 
     /**
      * Constructor which contains all possible parameters in a {@code GetMap} request.
      */
-    public GetMap(final CoordinateReferenceSystem crs, final Envelope envelope,
-                  final QueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final String date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions)
     {
-        this.crs = crs;
         this.envelope = envelope;
         this.version = version;
         this.format = format;

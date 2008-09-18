@@ -41,7 +41,6 @@ public class GetCapabilities extends WMSQuery {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getExceptionFormat() {
         return "application/vnd.ogc.se_xml";
     }
@@ -49,7 +48,6 @@ public class GetCapabilities extends WMSQuery {
     /**
      * {@inheritDoc}
      */
-    @Override
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_CAPABILITIES;
     }
@@ -57,7 +55,6 @@ public class GetCapabilities extends WMSQuery {
     /**
      * {@inheritDoc}
      */
-    @Override
     public QueryVersion getVersion() {
         return version;
     }

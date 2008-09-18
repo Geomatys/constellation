@@ -84,8 +84,9 @@ public class QueryAdapter {
      *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
      *         if the bbox is {@code null}.
      */
-    public static Envelope toBBox(final String bbox) {
+    public static Envelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs) {
         GeneralEnvelope envelope = new GeneralEnvelope(2);
+        envelope.setCoordinateReferenceSystem(crs);
         envelope.setToInfinite();
         if (bbox == null) {
             if (envelope != null) {
@@ -96,6 +97,7 @@ public class QueryAdapter {
         final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
         if (envelope == null) {
             envelope = new GeneralEnvelope((tokens.countTokens() + 1) >> 1);
+            envelope.setCoordinateReferenceSystem(crs);
             envelope.setToInfinite();
         }
         final double[] coordinates = new double[envelope.getDimension() * 2];
@@ -189,11 +191,17 @@ public class QueryAdapter {
     }
 
     public static int toInt(String value) throws NumberFormatException {
+        if (value == null) {
+            throw new NumberFormatException("Int value not defined.");
+        }
         value = value.trim();
         return Integer.parseInt(value);
     }
 
     public static double toDouble(String value) throws NumberFormatException {
+        if (value == null) {
+            return Double.NaN;
+        }
         value = value.trim();
         return Double.parseDouble(value);
     }
@@ -211,12 +219,10 @@ public class QueryAdapter {
     }
 
     public static boolean toBoolean(String strTransparent) {
-        if (strTransparent != null) {
-            strTransparent = strTransparent.trim();
-        }else{
+        if (strTransparent == null) {
             return false;
         }
-        return Boolean.parseBoolean(strTransparent);
+        return Boolean.parseBoolean(strTransparent.trim());
     }
 
 
