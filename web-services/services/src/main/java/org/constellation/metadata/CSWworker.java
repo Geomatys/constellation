@@ -130,6 +130,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
+import org.constellation.filter.FilterParser;
+import org.constellation.filter.SQLFilterParser;
+import org.constellation.filter.SQLQuery;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
@@ -228,7 +231,12 @@ public class CSWworker {
     /**
      * A filter parser whitch create lucene query from OGC filter
      */
-    private final LuceneFilterParser filterParser;
+    private final FilterParser luceneFilterParser;
+    
+    /**
+     * A filter parser whitch create SQL query from OGC filter
+     */
+    private final FilterParser sqlFilterParser;
     
     /**
      * A flag indicating if the worker is correctly started.
@@ -251,8 +259,11 @@ public class CSWworker {
     private final static List<QName> SUPPORTED_TYPE_NAME;
     static {
         SUPPORTED_TYPE_NAME = new ArrayList<QName>();
+        //dublin core typeNames
         SUPPORTED_TYPE_NAME.add(_Record_QNAME);
+        //iso 19115 typeNames
         SUPPORTED_TYPE_NAME.add(_Metadata_QNAME);
+        //ebrim v3.0 typeNames
         SUPPORTED_TYPE_NAME.add(_AdhocQuery_QNAME);
         SUPPORTED_TYPE_NAME.add(_Association_QNAME);
         SUPPORTED_TYPE_NAME.add(_AuditableEvent_QNAME);
@@ -276,6 +287,29 @@ public class CSWworker {
         SUPPORTED_TYPE_NAME.add(_Subscription_QNAME);
         SUPPORTED_TYPE_NAME.add(_User_QNAME);
         SUPPORTED_TYPE_NAME.add(_WRSExtrinsicObject_QNAME);
+        //ebrim v2.5 typenames
+        SUPPORTED_TYPE_NAME.add(_ExtrinsicObject25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Federation25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ExternalLink25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ClassificationNode25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_User25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Classification25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_RegistryPackage25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_RegistryObject25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Association25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_RegistryEntry25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ClassificationScheme25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Organization25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ExternalIdentifier25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_SpecificationLink25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Registry25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ServiceBinding25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Service25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_AuditableEvent25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Subscription25_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Geometry09_QNAME);
+        SUPPORTED_TYPE_NAME.add(_ApplicationModule09_QNAME);
+        SUPPORTED_TYPE_NAME.add(_WRSExtrinsicObject09_QNAME);
     }
     
     /**
@@ -356,7 +390,8 @@ public class CSWworker {
             cascad.load(in);
             in.close();
             String s = "Cascaded Services:" + '\n';
-            for (String serverName: cascad.stringPropertyNames()) {
+            for (Object server: cascad.keySet()) {
+                String serverName = (String) server;
                 String servURL = (String)cascad.getProperty(serverName);
                 s = s + servURL + '\n';
                 cascadedCSWservers.add(servURL);
@@ -367,18 +402,10 @@ public class CSWworker {
             logger.info("no cascaded CSW server found (optionnal)");
         }
         
-        // we initialize the filterParser
-        LuceneFilterParser fp = null;
-        try {
-            fp = new LuceneFilterParser(version);
-        } catch (JAXBException ex) {
-            isStarted = false;
-            
-            logger.severe("The CSW service is not working!"       + '\n' + 
-                          "Unable to create Filter JAXB Context." + '\n' + 
-                          "Cause: " + ex.getMessage());
-        }
-        filterParser = fp;
+        // we initialize the filterParsers
+        luceneFilterParser = new LuceneFilterParser(version);
+        sqlFilterParser    = new SQLFilterParser(version);
+        
         
         //we create a connection to the metadata database
         if (isStarted) {
@@ -628,7 +655,8 @@ public class CSWworker {
         //We initialize (and verify) the principal attribute of the query
         QueryType query;
         List<QName> typeNames;
-        Map<String, String> variables = new HashMap<String, String>();
+        Map<String, QName> variables = new HashMap<String, QName>();
+        Map<String, String> prefixs  = new HashMap<String, String>();
         if (request.getAbstractQuery() != null) {
             query = (QueryType)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
@@ -637,13 +665,13 @@ public class CSWworker {
                                                  INVALID_PARAMETER_VALUE, "TypeNames", version);
             } else {
                 for (QName type:typeNames) {
-                    
+                    prefixs.put(type.getPrefix(), type.getNamespaceURI());
                     //for ebrim mode the user can put variable after the Qname
                     if (type.getLocalPart().indexOf('_') != -1) {
                         StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
                         type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
                         while (tokenizer.hasMoreTokens()) {
-                            variables.put(tokenizer.nextToken(), type.getLocalPart());
+                            variables.put(tokenizer.nextToken(), type);
                         }
                     }
                     //we verify that the typeName is supported        
@@ -662,6 +690,11 @@ public class CSWworker {
                     var = var + s + " = " + variables.get(s) + '\n';
                 }
                 logger.info(var);
+                String prefix = "prefixs:" + '\n';
+                for (String s : prefixs.keySet()) {
+                    prefix = prefix + s + " = " + prefixs.get(s) + '\n';
+                }
+                logger.info(prefix);
             }
             
         } else {
@@ -686,33 +719,48 @@ public class CSWworker {
             throw new OWSWebServiceException("The start position must be > 0.",
                                              NO_APPLICABLE_CODE, "startPosition", version);
         }
-        
-        // build the lucene query from the specified filter
-        SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
-        
-        //we look for a sorting request (for now only one sort is used)
-        SortByType sortBy = query.getSortBy();
-        if (sortBy != null && sortBy.getSortProperty().size() > 0) {
-            SortPropertyType first = sortBy.getSortProperty().get(0);
-            if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
-                throw new OWSWebServiceException("A SortBy filter must specify a propertyName.",
-                                             NO_APPLICABLE_CODE, null, version);
-            String propertyName = removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+
+        List<String> results;
+        if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0") || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+           
+            // build the sql query from the specified filter
+           SQLQuery sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs); 
+           
+           // TODO sort not yet implemented
+           logger.info("ebrim SQL query obtained:" + sqlQuery);
+           
+           // we try to execute the query
+           results = executeSQLQuery(sqlQuery);
             
-            Sort sortFilter;
-            if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
-                sortFilter = new Sort(propertyName, false);
-                logger.info("sort ASC");
-            } else {
-                sortFilter = new Sort(propertyName, true);
-                logger.info("sort DSC");
-            }
-            luceneQuery.setSort(sortFilter);
-        }
+        } else {
+            
+            // build the lucene query from the specified filter
+            SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs);
         
-        logger.info("Lucene query obtained:" + luceneQuery);
-        // we try to execute the query
-        List<String> results = executeLuceneQuery(luceneQuery);
+            //we look for a sorting request (for now only one sort is used)
+            SortByType sortBy = query.getSortBy();
+            if (sortBy != null && sortBy.getSortProperty().size() > 0) {
+                SortPropertyType first = sortBy.getSortProperty().get(0);
+                if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
+                    throw new OWSWebServiceException("A SortBy filter must specify a propertyName.",
+                                                     NO_APPLICABLE_CODE, null, version);
+                String propertyName = removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+            
+                Sort sortFilter;
+                if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
+                    sortFilter = new Sort(propertyName, false);
+                    logger.info("sort ASC");
+                } else {
+                    sortFilter = new Sort(propertyName, true);
+                    logger.info("sort DSC");
+                }
+                luceneQuery.setSort(sortFilter);
+            }
+        
+            logger.info("Lucene query obtained:" + luceneQuery);
+            // we try to execute the query
+            results = executeLuceneQuery(luceneQuery);
+        }
         
         //we look for distributed queries
         CatalogueHarvester.DistributedResults distributedResults = catalogueHarvester.new DistributedResults();
@@ -800,7 +848,7 @@ public class CSWworker {
                 int mode;
                 if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
                     mode = ISO_19115;
-                } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")) {
+                } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")  || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
                     mode = EBRIM;
                 } else {
                     mode = DUBLINCORE;
@@ -903,6 +951,18 @@ public class CSWworker {
             throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
                                              NO_APPLICABLE_CODE, null, version);
         }
+    }
+    
+    /**
+     * Execute a Lucene spatial query and return the result as a List of form identifier (form_ID:CatalogCode)
+     * 
+     * @param query
+     * @return
+     * @throws org.constellation.ows.v100.OWSWebServiceException
+     */
+    private List<String> executeSQLQuery(SQLQuery query) {
+        
+            return new ArrayList<String>();
     }
     
     /**

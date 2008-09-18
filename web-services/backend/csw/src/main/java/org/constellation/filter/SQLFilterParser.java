@@ -14,63 +14,52 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.filter;
 
-// J2SE dependencies
 import java.awt.geom.Line2D;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-
-// Constellation dependencies
-import javax.xml.namespace.QName;
+import org.apache.lucene.search.Filter;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
 import org.constellation.gml.v311.PointType;
-import org.constellation.gml.v311.AbstractGeometryType;
 import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialFilter;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.ogc.AbstractIdType;
-import org.constellation.ogc.BBOXType;
 import org.constellation.ogc.BinaryComparisonOpType;
 import org.constellation.ogc.BinaryLogicOpType;
-import org.constellation.ogc.BinarySpatialOpType;
 import org.constellation.ogc.ComparisonOpsType;
-import org.constellation.ogc.DistanceBufferType;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.LiteralType;
 import org.constellation.ogc.LogicOpsType;
 import org.constellation.ogc.PropertyIsBetweenType;
 import org.constellation.ogc.PropertyIsLikeType;
 import org.constellation.ogc.PropertyIsNullType;
-import org.constellation.ogc.PropertyNameType;
 import org.constellation.ogc.SpatialOpsType;
 import org.constellation.ogc.UnaryLogicOpType;
 import org.constellation.ows.v100.OWSWebServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
-
-// Lucene dependencies
-import org.apache.lucene.search.Filter;
-
-// geotools dependencies
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
-
-// GeoAPI dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import static org.constellation.ows.OWSExceptionCode.*;
+import java.text.ParseException;
+import javax.xml.namespace.QName;
+import org.constellation.gml.v311.AbstractGeometryType;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.ogc.AbstractIdType;
+import org.constellation.ogc.BBOXType;
+import org.constellation.ogc.BinarySpatialOpType;
+import org.constellation.ogc.DistanceBufferType;
+import org.constellation.ogc.PropertyNameType;
+import org.geotools.referencing.CRS;
+import org.mdweb.model.schemas.Standard;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -78,12 +67,24 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Guilhem Legal
  */
-public class LuceneFilterParser extends FilterParser {
+public class SQLFilterParser extends FilterParser {
+    
+    /**
+     * A map of variables (used in ebrim syntax).
+     */
+    private Map<String, QName> variables;
+    
+    /**
+     * A map of prefix and their correspounding namespace(used in ebrim syntax).
+     */
+    private Map<String, String> prefixs;
+    
+    private int nbField;
     
     /**
      * Build a new FilterParser with the specified version.
      */
-    public LuceneFilterParser(final ServiceVersion version) {
+    public SQLFilterParser(final ServiceVersion version) {
         super(version);
     }
     
@@ -92,12 +93,14 @@ public class LuceneFilterParser extends FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public SpatialQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws WebServiceException {
+    public SQLQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws WebServiceException {
+        this.variables    = variables;
+        this.prefixs      = prefixs;
+        nbField           = 0;
         FilterType filter = null;
         //if the constraint is null we make a null filter
         if (constraint == null)  {
-            Filter nullFilter = null;
-            return new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
+            return new SQLQuery("Select identifier, catalog from Form where catalog != 'MDATA");
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
@@ -110,7 +113,7 @@ public class LuceneFilterParser extends FilterParser {
         if (constraint.getCqlText() != null) {
             try {
                 filter = CQLtoFilter(constraint.getCqlText());
-                 
+
             } catch (JAXBException ex) {
                 ex.printStackTrace();
                 throw new OWSWebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
@@ -125,21 +128,17 @@ public class LuceneFilterParser extends FilterParser {
             filter = constraint.getFilter();
             
         }
-        return getLuceneQuery(filter);
+        return getSqlQuery(filter);
     }
-    
     
      /**
      * Build a lucene request from the specified Filter.
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public SpatialQuery getLuceneQuery(final FilterType filter) throws WebServiceException {
+    public SQLQuery getSqlQuery(final FilterType filter) throws WebServiceException {
         
-        SpatialQuery response = null;
-        //for ambigous purpose
-        Filter nullFilter     = null;
-        
+        SQLQuery response = null;
         if (filter != null) { 
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
@@ -147,16 +146,22 @@ public class LuceneFilterParser extends FilterParser {
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             } else if (filter.getComparisonOps() != null) {
-                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), nullFilter, SerialChainFilter.AND);
+                response = new SQLQuery(treatComparisonOperator(filter.getComparisonOps()));
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
             } else if (filter.getSpatialOps() != null) {
-                response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
+                response = new SQLQuery(treatSpatialOperator(filter.getSpatialOps()));
                 
             } else if (filter.getId() != null) {
-                response = new SpatialQuery(treatIDOperator(filter.getId()), nullFilter, SerialChainFilter.AND);
+                response = new SQLQuery(treatIDOperator(filter.getId()));
             }  
         }
+        StringBuilder select = new StringBuilder("SELECT identifier, catalog FROM \"Forms\" ");
+        for (int i = 1; i <= nbField; i++) {
+            select.append(" , \"TextValues\" v").append(i);
+        }
+        select.append(" WHERE ");
+        response.addSelect(select.toString());
         return response;
     }
     
@@ -167,14 +172,12 @@ public class LuceneFilterParser extends FilterParser {
      * @return
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
-        List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
+    protected SQLQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
+        List<SQLQuery> subQueries     = new ArrayList<SQLQuery>();
         StringBuilder queryBuilder    = new StringBuilder();
         LogicOpsType logicOps         = JBlogicOps.getValue();
         String operator               = JBlogicOps.getName().getLocalPart();
         List<Filter> filters          = new ArrayList<Filter>();
-        //for ambigous purpose
-        Filter nullFilter             = null;
         
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
@@ -184,6 +187,7 @@ public class LuceneFilterParser extends FilterParser {
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
                 queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
             }
             
             // we treat logical Operators like AND, OR, ...
@@ -191,14 +195,13 @@ public class LuceneFilterParser extends FilterParser {
             
                 boolean writeOperator = true;
                 
-                SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                SQLQuery sq      = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
                 String subQuery  = sq.getQuery();
                 Filter subFilter = sq.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
                 if ((subFilter != null && !subQuery.equals("")) 
-                    || sq.getSubQueries().size() != 0 
-                    || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
+                    || sq.getSubQueries().size() != 0) {
                         
                     subQueries.add(sq);
                     writeOperator = false;
@@ -258,22 +261,23 @@ public class LuceneFilterParser extends FilterParser {
                 
              // we treat logical Operators like AND, OR, ...
             } else if (unary.getLogicOps() != null) {
-                SpatialQuery sq  = treatLogicalOperator(unary.getLogicOps());
+                SQLQuery sq  = treatLogicalOperator(unary.getLogicOps());
                 String subQuery  = sq.getQuery();
                 Filter subFilter = sq.getSpatialFilter();
                     
-                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("")) ||
+               /* if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("")) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
                    
-                  } else {
-                        
-                        if (!subQuery.equals("")) {
-                            queryBuilder.append(subQuery);
-                        }
-                        if (subFilter != null)
-                            filters.add(sq.getSpatialFilter());
-                  }
+                  } else {*/
+
+                if (!subQuery.equals("")) {
+                    queryBuilder.append(subQuery);
+                }
+                if (subFilter != null) {
+                    filters.add(sq.getSpatialFilter());
+                }
+                  //}
             }
         }
         
@@ -306,7 +310,7 @@ public class LuceneFilterParser extends FilterParser {
         }
         
             
-        SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
+        SQLQuery response = new SQLQuery(query, spatialFilter);
         response.setSubQueries(subQueries);
         return response;
     }
@@ -320,6 +324,7 @@ public class LuceneFilterParser extends FilterParser {
      */
     protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
         StringBuilder response = new StringBuilder();
+        nbField++;
         
         ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
         
@@ -329,7 +334,8 @@ public class LuceneFilterParser extends FilterParser {
             //we get the field
             if (pil.getPropertyName() != null) {
                 propertyName = pil.getPropertyName().getContent();
-                response.append(removePrefix(propertyName)).append(':');
+                response.append('v').append(nbField).append(".path ='").append(transformSyntax(propertyName)).append("' AND ");
+                response.append('v').append(nbField).append("value LIKE '");
             } else {
                 throw new OWSWebServiceException("An operator propertyIsLike must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
@@ -340,9 +346,9 @@ public class LuceneFilterParser extends FilterParser {
                 
                 //we format the value by replacing the specified special char by the lucene special char
                 String brutValue = pil.getLiteral();
-                brutValue = brutValue.replace(pil.getWildCard(),    "*");
-                brutValue = brutValue.replace(pil.getSingleChar(),  "?");
-                brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
+                brutValue = brutValue.replace(pil.getWildCard(),    "%");
+                brutValue = brutValue.replace(pil.getSingleChar(),  "%"); //TODO find this in SQL
+                brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");// SAME
                 
                 //for a date we remove the '-'
                 if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
@@ -350,7 +356,8 @@ public class LuceneFilterParser extends FilterParser {
                         brutValue = brutValue.replace("Z", "");
                 }
                 
-                response.append(brutValue);
+                response.append(brutValue).append("' ");
+                response.append(" AND v").append(nbField).append(".form=identifier ");
                 
             } else {
                 throw new OWSWebServiceException("An operator propertyIsLike must specified the literal value.",
@@ -361,7 +368,9 @@ public class LuceneFilterParser extends FilterParser {
 
             //we get the field
             if (pin.getPropertyName() != null) {
-                response.append(removePrefix(pin.getPropertyName().getContent())).append(':').append("null");
+                response.append('v').append(nbField).append(".path = '").append(transformSyntax(pin.getPropertyName().getContent())).append("' AND ");
+                response.append('v').append(nbField).append(".value IS NULL ");
+                response.append(" AND v").append(nbField).append(".form=identifier ");
             } else {
                 throw new OWSWebServiceException("An operator propertyIsNull must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
@@ -383,12 +392,15 @@ public class LuceneFilterParser extends FilterParser {
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
-                    response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
+                    response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                    response.append('v').append(nbField).append(".value='").append(literal.getStringValue()).append("' ");
+                    response.append(" AND v").append(nbField).append(".form=identifier ");
                 
                 } else if (operator.equals("PropertyIsNotEqualTo")) {
                     
-                   response.append("metafile:doc NOT ");
-                   response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
+                   response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                   response.append('v').append(nbField).append(".value != '").append(literal.getStringValue()).append("' ");
+                   response.append(" AND v").append(nbField).append(".form=identifier ");
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
                     if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
@@ -400,9 +412,10 @@ public class LuceneFilterParser extends FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
-                        response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
+                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".value >= '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new OWSWebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
@@ -418,9 +431,10 @@ public class LuceneFilterParser extends FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
-                        response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
+                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".value > '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new OWSWebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
@@ -437,9 +451,10 @@ public class LuceneFilterParser extends FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
-                        response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
+                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".value < '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new OWSWebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
@@ -455,9 +470,10 @@ public class LuceneFilterParser extends FilterParser {
                             throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
-                        response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
+                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".value <= '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                          throw new OWSWebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
@@ -689,13 +705,39 @@ public class LuceneFilterParser extends FilterParser {
     }
     
     /**
-     * Remove the prefix on propertyName.
+     * Format the propertyName from ebrim syntax to mdweb syntax.
      */
-    private String removePrefix(String s) {
-        int i = s.indexOf(':');
-        if ( i != -1) {
-            s = s.substring(i + 1, s.length());
+    private String transformSyntax(String s) {
+        if (s.indexOf(':') != -1) {
+            String prefix = s.substring(0, s.indexOf(':'));
+            s = s.replace(prefix, getStandardFromPrefix(prefix).getName());
         }
+        // we replace the variableName
+        for (String varName : variables.keySet()) {
+            QName var =  variables.get(varName);
+            String mdwebVar = getStandardFromNamespace(var.getNamespaceURI()).getName() + ':' + var.getLocalPart();
+            s = s.replace("$" + varName,  mdwebVar);
+        }
+        // we replace the ebrim separator /@ by :
+        s = s.replace("/@", ":");
         return s;
+    }
+    
+    private Standard getStandardFromNamespace(String namespace) {
+        if (namespace.equals("http://www.opengis.net/cat/wrs/1.0"))
+            return Standard.WRS;
+        else if (namespace.equals("http://www.opengis.net/cat/wrs"))
+            return Standard.WRS_V09;
+        else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5"))
+            return Standard.EBRIM_V2_5;
+        else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"))
+            return Standard.EBRIM_V3;
+        else 
+            throw new IllegalArgumentException("unexpected namespace: " + namespace);
+    }
+    
+    private Standard getStandardFromPrefix(String prefix) {
+       String namespace = prefixs.get(prefix);
+       return getStandardFromNamespace(namespace);
     }
 }

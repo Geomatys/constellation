@@ -331,6 +331,7 @@ public class CSWQueryable {
         paths.add("Ebrim v2.5:AdhocQuery:id");
         paths.add("Ebrim v2.5:Subscription:id");
         paths.add("Ebrim v2.5:RegistryPackage:id");
+        paths.add("Ebrim v2.5:RegistryObject:id");
         paths.add("Ebrim v2.5:ClassificationScheme:id");
         paths.add("Ebrim v2.5:Service:id");
         paths.add("Ebrim v2.5:Registry:id");
@@ -492,7 +493,7 @@ public class CSWQueryable {
     protected final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
     
     /**
-     * some QName for ebrim types
+     * some QName for ebrim 3.0 types
      */
     protected final static QName _ExtrinsicObject_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExtrinsicObject");
     protected final static QName _RegistryPackage_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryPackage");
@@ -518,4 +519,29 @@ public class CSWQueryable {
     protected final static QName _ExternalLink_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalLink");
     protected final static QName _WRSExtrinsicObject_QNAME   = new QName("http://www.opengis.net/cat/wrs/1.0",          "ExtrinsicObject");
     
+    /**
+     * some QName for ebrim 2.5 types
+     */
+    protected final static QName _ExtrinsicObject25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
+    protected final static QName _Federation25_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Federation");
+    protected final static QName _ExternalLink25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalLink");
+    protected final static QName _ClassificationNode25_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationNode");
+    protected final static QName _User25_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "User");
+    protected final static QName _Classification25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Classification");
+    protected final static QName _RegistryPackage25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryPackage");
+    protected final static QName _RegistryObject25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObject");
+    protected final static QName _Association25_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
+    protected final static QName _RegistryEntry25_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryEntry");
+    protected final static QName _ClassificationScheme25_QNAME  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationScheme");
+    protected final static QName _Organization25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Organization");
+    protected final static QName _ExternalIdentifier25_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalIdentifier");
+    protected final static QName _SpecificationLink25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SpecificationLink");
+    protected final static QName _Registry25_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Registry");
+    protected final static QName _ServiceBinding25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ServiceBinding");
+    protected final static QName _Service25_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
+    protected final static QName _AuditableEvent25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
+    protected final static QName _Subscription25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Subscription");
+    protected final static QName _Geometry09_QNAME              = new QName("http://www.opengis.net/cat/wrs", "Geometry");
+    protected final static QName _ApplicationModule09_QNAME     = new QName("http://www.opengis.net/cat/wrs", "ApplicationModule");
+    protected final static QName _WRSExtrinsicObject09_QNAME    = new QName("http://www.opengis.net/cat/wrs", "WRSExtrinsicObject");
 }
