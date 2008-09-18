@@ -437,7 +437,7 @@ public class WMService extends WebService {
                 for (Iterator<Number> it = elevations.iterator(); it.hasNext();) {
                     final Number n = it.next();
                     elevs.append(n.toString());
-                    if (!it.hasNext()) {
+                    if (it.hasNext()) {
                         elevs.append(',');
                     }
                 }
