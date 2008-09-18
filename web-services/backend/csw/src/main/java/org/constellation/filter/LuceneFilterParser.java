@@ -85,7 +85,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Guilhem Legal
  */
-public class FilterParser {
+public class LuceneFilterParser {
     
     /**
      * use for debugging purpose
@@ -105,7 +105,7 @@ public class FilterParser {
     /**
      * Build a new FilterParser with the specified version.
      */
-    public FilterParser(final ServiceVersion version) throws JAXBException {
+    public LuceneFilterParser(final ServiceVersion version) throws JAXBException {
         if (version == null) {
             // TODO restore this throw new IllegalArgumentException("version must not null");
             this.version = new ServiceVersion(Service.OWS, "2.0.2");

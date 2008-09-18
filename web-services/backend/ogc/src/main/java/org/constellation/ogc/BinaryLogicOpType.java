@@ -152,6 +152,9 @@ public class BinaryLogicOpType extends LogicOpsType {
     }
 
     public List<JAXBElement<? extends ComparisonOpsType>> getComparisonOps() {
+        if (this.comparisonOps == null) {
+            this.comparisonOps = new ArrayList<JAXBElement<? extends ComparisonOpsType>>();
+        }
         return comparisonOps;
     }
 
@@ -167,6 +170,9 @@ public class BinaryLogicOpType extends LogicOpsType {
     }
 
     public List<JAXBElement<? extends SpatialOpsType>> getSpatialOps() {
+        if (this.spatialOps == null) {
+            this.spatialOps = new ArrayList<JAXBElement<? extends SpatialOpsType>>();
+        }
         return spatialOps;
     }
 

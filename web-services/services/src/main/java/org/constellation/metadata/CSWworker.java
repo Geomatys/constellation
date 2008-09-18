@@ -37,7 +37,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -89,7 +91,7 @@ import org.constellation.cat.csw.v202.EchoedRequestType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.dublincore.AbstractSimpleLiteral;
-import org.constellation.filter.FilterParser;
+import org.constellation.filter.LuceneFilterParser;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.ogc.FilterCapabilities;
 import org.constellation.ogc.SortByType;
@@ -226,7 +228,7 @@ public class CSWworker {
     /**
      * A filter parser whitch create lucene query from OGC filter
      */
-    private final FilterParser filterParser;
+    private final LuceneFilterParser filterParser;
     
     /**
      * A flag indicating if the worker is correctly started.
@@ -366,9 +368,9 @@ public class CSWworker {
         }
         
         // we initialize the filterParser
-        FilterParser fp = null;
+        LuceneFilterParser fp = null;
         try {
-            fp = new FilterParser(version);
+            fp = new LuceneFilterParser(version);
         } catch (JAXBException ex) {
             isStarted = false;
             
@@ -535,20 +537,21 @@ public class CSWworker {
                     }
                 }
                 
-                
-                
-                
                 Operation grbi = om.getOperation("GetRecordById");
                 if (grbi != null) {
                     DomainType os = grbi.getParameter("outputSchema");
                     if (os != null) {
                         os.setValue(ACCEPTED_RESOURCE_TYPE);
                     }
-                    DomainType tn = grbi.getParameter("TypeNames");
+                }
+                
+                Operation dr = om.getOperation("DescribeRecord");
+                if (dr != null) {
+                    DomainType tn = dr.getParameter("TypeName");
                     if (tn != null) {
                         List<String> values = new ArrayList<String>();
                         for (QName qn : SUPPORTED_TYPE_NAME) {
-                            values.add(qn.getPrefix() + ':' + qn.getLocalPart());
+                            values.add(prefixMapper.getPreferredPrefix(qn.getNamespaceURI(), "", true) + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
                     }
@@ -625,6 +628,7 @@ public class CSWworker {
         //We initialize (and verify) the principal attribute of the query
         QueryType query;
         List<QName> typeNames;
+        Map<String, String> variables = new HashMap<String, String>();
         if (request.getAbstractQuery() != null) {
             query = (QueryType)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
@@ -633,6 +637,16 @@ public class CSWworker {
                                                  INVALID_PARAMETER_VALUE, "TypeNames", version);
             } else {
                 for (QName type:typeNames) {
+                    
+                    //for ebrim mode the user can put variable after the Qname
+                    if (type.getLocalPart().indexOf('_') != -1) {
+                        StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
+                        type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
+                        while (tokenizer.hasMoreTokens()) {
+                            variables.put(tokenizer.nextToken(), type.getLocalPart());
+                        }
+                    }
+                    //we verify that the typeName is supported        
                     if (!SUPPORTED_TYPE_NAME.contains(type)) {
                         String typeName = "null";
                         if (type != null)
@@ -642,6 +656,12 @@ public class CSWworker {
                                                          INVALID_PARAMETER_VALUE, "TypeNames", version);
                     }
                 }
+                // debugging part
+                String var = "variables:" + '\n';
+                for (String s : variables.keySet()) {
+                    var = var + s + " = " + variables.get(s) + '\n';
+                }
+                logger.info(var);
             }
             
         } else {

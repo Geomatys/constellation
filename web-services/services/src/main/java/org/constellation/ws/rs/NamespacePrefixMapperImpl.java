@@ -152,6 +152,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         
         else if( "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5".equals(namespaceUri) )
             prefix = "rim25";
+       
+        else if( "http://www.opengis.net/cat/wrs/1.0".equals(namespaceUri) )
+            prefix = "wrs";
+        
+        else if( "http://www.opengis.net/cat/wrs".equals(namespaceUri) )
+            prefix = "wrs09";
         
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;

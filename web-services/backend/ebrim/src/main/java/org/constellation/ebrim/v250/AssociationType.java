@@ -121,7 +121,7 @@ public class AssociationType extends RegistryObjectType {
     /**
      * Gets the value of the isConfirmedBySourceOwner property.
      */
-    public Boolean isIsConfirmedBySourceOwner() {
+    public Boolean getIsConfirmedBySourceOwner() {
         return isConfirmedBySourceOwner;
     }
 
@@ -135,7 +135,7 @@ public class AssociationType extends RegistryObjectType {
     /**
      * Gets the value of the isConfirmedByTargetOwner property.
      */
-    public Boolean isIsConfirmedByTargetOwner() {
+    public Boolean getIsConfirmedByTargetOwner() {
         return isConfirmedByTargetOwner;
     }
 

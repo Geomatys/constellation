@@ -65,5 +65,22 @@ public class ValueListType extends org.constellation.ebrim.v300.ValueListType {
         }
         return this.anyValue;
     }
+    
+    /**
+     * Sets the value of the anyValue property.
+     */
+    public void setAnyValue(AnyValueType anyValue) {
+        if (this.anyValue == null) {
+            this.anyValue = new ArrayList<AnyValueType>();
+        }
+        this.anyValue.add(anyValue);
+    }
+    
+    /**
+     * Sets the value of the anyValue property.
+     */
+    public void setAnyValue(List<AnyValueType> anyValue) {
+        this.anyValue = anyValue;
+    }
 
 }

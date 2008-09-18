@@ -364,19 +364,19 @@ public class IndexLucene extends AbstractIndex {
         } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("Identifiable", Standard.EBRIM_V3))) {
             logger.info("indexing Ebrim 3.0 Record");
             
-            for (String term :EBRIM_QUERYABLE.keySet()) {
+           /* for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
-            }
+            }*/
         
              // For an ebrim v 2.5 form    
         } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("RegistryObject", Standard.EBRIM_V2_5))) {
             logger.info("indexing Ebrim 2.5 Record");
             
-            for (String term :EBRIM_QUERYABLE.keySet()) {
+            /*for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
-            }
+            }*/
             
             
         // For a csw:Record (indexing is made in next generic indexing bloc)

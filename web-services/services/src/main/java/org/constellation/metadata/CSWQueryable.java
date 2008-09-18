@@ -287,11 +287,58 @@ public class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        
         paths.add("Catalog Web Service:Record:identifier:content");
+        
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
+        
         paths.add("Ebrim v3.0:RegistryObject:id");
         paths.add("Ebrim v3.0:RegistryPackage:id");
+        paths.add("Ebrim v3.0:ExtrinsicObject:id");
+        paths.add("Ebrim v3.0:ClassificationScheme:id");
+        paths.add("Ebrim v3.0:Service:id"); 
+        paths.add("Ebrim v3.0:ClassificationNode:id");
+        paths.add("Ebrim v3.0:Association:id");
+        paths.add("Ebrim v3.0:Organization:id");
+        paths.add("Ebrim v3.0:AdhocQuery:id");
+        paths.add("Ebrim v3.0:Registry:id");
+        paths.add("Ebrim v3.0:Classification:id");
+        paths.add("Ebrim v3.0:Federation:id");
+        paths.add("Ebrim v3.0:ServiceBinding:id");
+        paths.add("Ebrim v3.0:Notification:id");
+        paths.add("Ebrim v3.0:SpecificationLink:id");
+        paths.add("Ebrim v3.0:ExternalLink:id");
+        paths.add("Ebrim v3.0:AuditableEvent:id");
+        paths.add("Ebrim v3.0:Subscription:id");
+        paths.add("Ebrim v3.0:Person:id");
+        paths.add("Ebrim v3.0:ExternalIdentifier:id");
+        paths.add("Ebrim v3.0:User:id");
+        paths.add("Ebrim v3.0:ObjectRef:id");
+        paths.add("Web Registry Service v1.0:ExtrinsicObject:id");
+        
         paths.add("Ebrim v2.5:ExtrinsicObject:id");
+        paths.add("Ebrim v2.5:User:id");
+        paths.add("Ebrim v2.5:ClassificationNode:id");
+        paths.add("Ebrim v2.5:Association:id");
+        paths.add("Ebrim v2.5:Organization:id");
+        paths.add("Ebrim v2.5:Classification:id");
+        paths.add("Ebrim v2.5:RegistryEntry:id");
+        paths.add("Ebrim v2.5:ServiceBinding:id");
+        paths.add("Ebrim v2.5:SpecificationLink:id");
+        paths.add("Ebrim v2.5:ExternalLink:id");
+        paths.add("Ebrim v2.5:AuditableEvent:id");
+        paths.add("Ebrim v2.5:ExternalIdentifier:id");
+        paths.add("Ebrim v2.5:AdhocQuery:id");
+        paths.add("Ebrim v2.5:Subscription:id");
+        paths.add("Ebrim v2.5:RegistryPackage:id");
+        paths.add("Ebrim v2.5:ClassificationScheme:id");
+        paths.add("Ebrim v2.5:Service:id");
+        paths.add("Ebrim v2.5:Registry:id");
+        paths.add("Ebrim v2.5:Federation:id");
+        paths.add("Web Registry Service v0.9:WRSExtrinsicObject:id");
+        paths.add("Web Registry Service v0.9:ApplicationModule:id");
+        paths.add("Web Registry Service v0.9:Geometry:id");
+        
         DUBLIN_CORE_QUERYABLE.put("identifier", paths);
         
         paths = new ArrayList<String>();

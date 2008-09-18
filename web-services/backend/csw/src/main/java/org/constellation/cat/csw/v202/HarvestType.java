@@ -29,24 +29,19 @@ import javax.xml.datatype.Duration;
 
 
 /**
+ * Requests that the catalogue attempt to harvest a resource from some 
+ * network location identified by the source URL.
  * 
- *          Requests that the catalogue attempt to harvest a resource from some 
- *          network location identified by the source URL.
- * 
- *          Source          - a URL from which the resource is retrieved
- *          ResourceType    - normally a URI that specifies the type of the resource
- *                            (DCMES v1.1) being harvested if it is known.
- *          ResourceFormat  - a media type indicating the format of the 
- *                            resource being harvested.  The default is 
- *                            "application/xml".
- *          ResponseHandler - a reference to some endpoint to which the 
- *                            response shall be forwarded when the
- *                            harvest operation has been completed
- *          HarvestInterval - an interval expressed using the ISO 8601 syntax; 
- *                            it specifies the interval between harvest 
- *                            attempts (e.g., P6M indicates an interval of 
- *                            six months).
- *          
+ * Source          - A URL from which the resource is retrieved
+ * ResourceType    - Normally a URI that specifies the type of the resource
+ *                   (DCMES v1.1) being harvested if it is known.
+ * ResourceFormat  - A media type indicating the format of the resource being harvested.
+ *                   The default is "application/xml".
+ * ResponseHandler - A reference to some endpoint to which the response shall be forwarded when the
+ *                   harvest operation has been completed
+ * HarvestInterval - An interval expressed using the ISO 8601 syntax; 
+ *                   it specifies the interval between harvest attempts 
+ *                   (e.g., P6M indicates an interval of six months).
  * 
  * <p>Java class for HarvestType complex type.
  * 
@@ -143,12 +138,26 @@ public class HarvestType extends RequestBaseType {
     public String getResourceType() {
         return resourceType;
     }
+    
+    /**
+     * Sets the value of the resourceType property.
+     */
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
 
     /**
      * Gets the value of the resourceFormat property.
      */
     public String getResourceFormat() {
         return resourceFormat;
+    }
+    
+    /**
+     * Sets the value of the resourceFormat property.
+     */
+    public void setResourceFormat(String resourceFormat) {
+        this.resourceFormat = resourceFormat;
     }
 
     
@@ -157,6 +166,13 @@ public class HarvestType extends RequestBaseType {
      */
     public Duration getHarvestInterval() {
         return harvestInterval;
+    }
+    
+    /**
+     * Sets the value of the harvestInterval property.
+     */
+    public void setHarvestInterval(Duration harvestInterval) {
+        this.harvestInterval = harvestInterval;
     }
 
     /**

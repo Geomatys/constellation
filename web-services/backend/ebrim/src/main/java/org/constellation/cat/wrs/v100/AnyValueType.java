@@ -64,5 +64,22 @@ public class AnyValueType {
         }
         return this.content;
     }
+    
+    /**
+     * Sets the value of the content property.
+     */
+    public void setContent(List<Object> content) {
+        this.content = content;
+    }
+    
+    /**
+     * Sets the value of the content property.
+     */
+    public void setContent(Object content) {
+        if (content == null) {
+            content = new ArrayList<Object>();
+        }
+        this.content.add(content);
+    }
 
 }

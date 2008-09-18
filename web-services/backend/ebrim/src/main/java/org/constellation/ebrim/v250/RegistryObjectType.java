@@ -32,12 +32,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
+ * id may be empty. 
+ * If specified it may be in urn:uuid format or be in some arbitrary format.
+ * If id is empty registry must generate globally unique id.
  * 
- * id may be empty. If specified it may be in urn:uuid format or be in some
- * arbitrary format. If id is empty registry must generate globally unique id.
- * 
- * If id is provided and in proper UUID syntax (starts with urn:uuid:) 
- * registry will honour it.
+ * If id is provided and in proper UUID syntax (starts with urn:uuid:) registry will honour it.
  * 
  * If id is provided and is not in proper UUID syntax then it is used for
  * linkage within document and is ignored by the registry. In this case the
