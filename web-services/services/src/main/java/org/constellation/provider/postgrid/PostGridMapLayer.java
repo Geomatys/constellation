@@ -39,7 +39,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.DefaultMapLayer;
+import org.geotools.map.AbstractMapLayer;
 import org.geotools.map.DynamicMapLayer;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
@@ -60,7 +60,7 @@ import org.opengis.style.RasterSymbolizer;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridMapLayer extends DefaultMapLayer implements DynamicMapLayer{
+public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer{
         
     /**
      * The <cite>grid to CRS</cite> transform specified by the user.
