@@ -24,13 +24,17 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
+import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.display.service.PortrayalException;
@@ -46,12 +50,13 @@ import org.geotools.sld.MutableNamedLayer;
 import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
+import org.geotools.util.MeasurementRange;
 
 
 /**
  * Portrayal service, extends the GT portrayal service by adding support
  * to reconize Named layers and styles from constellation data providers.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService{
@@ -64,23 +69,28 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
 
     public void portray(List<String> layers, List<String> styles, Color background,
             MutableStyledLayerDescriptor sld,ReferencedEnvelope contextEnv, Object output,
-            String mime, Dimension canvasDimension,Hints hints)
-            throws PortrayalException{
+            String mime, Dimension canvasDimension, Double elevation, Date date,
+            MeasurementRange dimRange, Hints hints) throws PortrayalException{
 
-        MapContext context = toMapContext(layers,styles,sld);
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put(WMSQuery.KEY_ELEVATION, elevation);
+        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
+        params.put(WMSQuery.KEY_TIME, date);
+        MapContext context = toMapContext(layers,styles,sld, params);
 
-        this.portray(context, contextEnv, background, output, mime, canvasDimension, hints);
+        portray(context, contextEnv, background, output, mime, canvasDimension, hints);
     }
 
-    private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld) 
+    private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld,
+                                    final Map<String, Object> params)
             throws PortrayalException {
         MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
         int index = 0;
         for(String layerName : layers){
-            
+
             MutableStyle style = null;
-            
+
             if(sld != null){
                 //try to use the provided SLD
                 style = extractStyle(layerName,sld);
@@ -91,22 +101,22 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             } else {
                 //no defined styles, use the favorite one
                 List<String> favorites = layerDPS.getFavoriteStyles(layerName);
-                if(!favorites.isEmpty()){
+                if (favorites.size() > 0) {
                     //take the first one
                     style = styleDPS.get(favorites.get(0));
                 }
             }
-            
+
             MapLayer layer = null;
             final LayerDetails details = layerDPS.get(layerName);
             if(details != null){
-                layer = layerDPS.get(layerName).getMapLayer(style);
+                layer = layerDPS.get(layerName).getMapLayer(style, params);
             }
-                        
+
             if(layer == null){
                 throw new PortrayalException("Layer : "+layerName+" could not be created");
             }
-            
+
             ctx.layers().add(layer);
             index++;
         }
@@ -126,7 +136,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                 //we can only extract style from a NamedLayer that has the same name
                 final MutableNamedLayer mnl = (MutableNamedLayer) layer;
                 final List<MutableLayerStyle> styles = mnl.styles();
-                
+
                 for(MutableLayerStyle mls : styles){
                     MutableStyle GTStyle = null;
                     if(mls instanceof MutableNamedStyle){
@@ -135,13 +145,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                     }else if(mls instanceof MutableStyle){
                         GTStyle = (MutableStyle) mls;
                     }
-                    
+
                     if(GTStyle != null){
                         //we have found a valid style
                         return GTStyle;
                     }
                 }
-                
+
             }
         }
 
@@ -151,18 +161,18 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
 
     public static synchronized File writeInImage(Exception e, int width, int height, File output, String mime){
         Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.WARNING, "Error image created : " + output,e);
-        
-        final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);        
+
+        final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g = img.createGraphics();
         final Font f = new Font("Dialog",Font.BOLD,12);
         final FontMetrics metrics = g.getFontMetrics(f);
         final int fontHeight = metrics.getHeight();
         final int maxCharPerLine = width / metrics.charWidth('A');
         final String message = e.getMessage();
-        
+
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
-        
+
         g.setColor(Color.RED);
         if(maxCharPerLine < 1){
             //not enough space to draw error, simply use a red background
@@ -172,7 +182,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             int y = fontHeight;
             String remain = message;
 
-            while(!remain.isEmpty()){
+            while(remain != null && remain.length() > 0){
                 int lastChar = (maxCharPerLine > remain.length()) ? remain.length() : maxCharPerLine;
                 String oneLine = remain.substring(0, lastChar);
                 remain = remain.substring(lastChar);
@@ -185,8 +195,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             }
         }
         g.dispose();
-        
-        
+
+
         try {
             writeImage(img, mime, output);
         } catch (IOException ex) {
@@ -194,6 +204,6 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         }
         return output;
     }
-    
+
 
 }

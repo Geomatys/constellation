@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
 import java.util.TreeSet;
@@ -76,11 +77,11 @@ class ShapefileLayerDetails implements LayerDetails{
         
     }
     
-    public MapLayer getMapLayer() {
+    public MapLayer getMapLayer(final Map<String, Object> params) {
         return createMapLayer(store,null);
     }
 
-    public MapLayer getMapLayer(MutableStyle style) {
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
         return createMapLayer(store,style);
     }
 

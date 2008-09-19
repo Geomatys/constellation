@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Date;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.query.QueryVersion;
@@ -61,7 +62,7 @@ public class GetMap extends WMSQuery {
     /**
      * Date to request in a nD layer. It can be a period. Optional.
      */
-    private final String date;
+    private final Date date;
 
     /**
      * Range value to define a color pal.
@@ -121,7 +122,7 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
-                  final String date, final Dimension size)
+                  final Date date, final Dimension size)
     {
         this(envelope, version, format, layers, styles, elevation, date, null, size);
     }
@@ -131,7 +132,7 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
-                  final String date, final MeasurementRange dimRange, final Dimension size)
+                  final Date date, final MeasurementRange dimRange, final Dimension size)
     {
         this(envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, null);
     }
@@ -141,7 +142,7 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final Envelope envelope, final QueryVersion version, final String format,
                   final List<String> layers, final List<String> styles,
-                  final MutableStyledLayerDescriptor sld, final Double elevation, final String date,
+                  final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions)
     {
@@ -170,7 +171,7 @@ public class GetMap extends WMSQuery {
     /**
      * Returns the date to request in a nD layer, or {@code null} if not defined.
      */
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -242,7 +243,6 @@ public class GetMap extends WMSQuery {
      * Returns the exception format specified, or {@code "application/vnd.ogc.se_xml"}
      * if {@code null}.
      */
-    @Override
     public String getExceptionFormat() {
         return (exceptions == null) ? "application/vnd.ogc.se_xml" : exceptions;
     }
@@ -250,7 +250,6 @@ public class GetMap extends WMSQuery {
     /**
      * {@inheritDoc}
      */
-    @Override
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_MAP;
     }
@@ -258,7 +257,6 @@ public class GetMap extends WMSQuery {
     /**
      * {@inheritDoc}
      */
-    @Override
     public QueryVersion getVersion() {
         return version;
     }

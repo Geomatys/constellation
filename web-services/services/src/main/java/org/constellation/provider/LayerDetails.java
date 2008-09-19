@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.SortedSet;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
@@ -33,9 +34,9 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  */
 public interface LayerDetails {
     
-    public MapLayer getMapLayer();
+    public MapLayer getMapLayer(final Map<String, Object> params);
     
-    public MapLayer getMapLayer(MutableStyle style);
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
     
     /**
      * @see Layer#getName

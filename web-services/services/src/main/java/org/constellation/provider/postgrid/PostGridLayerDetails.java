@@ -17,6 +17,7 @@
 package org.constellation.provider.postgrid;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.constellation.catalog.CatalogException;
@@ -25,6 +26,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
 
+import org.constellation.query.wms.WMSQuery;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
@@ -62,17 +64,23 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public MapLayer getMapLayer() {
-        return new PostGridMapLayer(database, layer);
+    public MapLayer getMapLayer(final Map<String, Object> params) {
+        return getMapLayer(null, params);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public MapLayer getMapLayer(MutableStyle style) {
-        return new PostGridMapLayer(database, layer);
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
+        final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
+        if (params != null) {
+            mapLayer.setDimRange((MeasurementRange) params.get(WMSQuery.KEY_DIM_RANGE));
+            final Double elevation = (Double) params.get(WMSQuery.KEY_ELEVATION);
+            if (elevation != null) {
+                mapLayer.setElevation(elevation);
+            }
+        }
+        return mapLayer;
     }
 
     /**

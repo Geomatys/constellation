@@ -19,6 +19,7 @@ package org.constellation.worker;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 import org.constellation.portrayal.CSTLPortrayalService;
@@ -29,12 +30,13 @@ import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
 
 
 /**
- * 
+ *
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
@@ -43,8 +45,8 @@ public class WMSWorker{
     private final CSTLPortrayalService service = new CSTLPortrayalService();
     private final WMSQuery query;
     private final File output;
-    
-    
+
+
     public WMSWorker(WMSQuery query, File output){
         if(query == null || output == null){
             throw new NullPointerException("Query and outpur file can not be null");
@@ -52,20 +54,23 @@ public class WMSWorker{
         this.query = query;
         this.output = output;
     }
-        
+
     public File getMap() throws PortrayalException{
         if (!(query instanceof GetMap)) {
             throw new PortrayalException("The request defined is not a GetMap");
         }
         final GetMap getMap = (GetMap) query;
-        final List<String> layers = getMap.getLayers();
-        final List<String> styles = getMap.getStyles();
+        final List<String> layers              = getMap.getLayers();
+        final List<String> styles              = getMap.getStyles();
         final MutableStyledLayerDescriptor sld = getMap.getSld();
-        final Envelope contextEnv = getMap.getEnvelope();
-        final String mime = getMap.getFormat();
-        final Dimension canvasDimension = getMap.getSize();
+        final Envelope contextEnv              = getMap.getEnvelope();
+        final String mime                      = getMap.getFormat();
+        final Double elevation                 = getMap.getElevation();
+        final Date date                        = getMap.getDate();
+        final MeasurementRange dimRange        = getMap.getDimRange();
+        final Dimension canvasDimension        = getMap.getSize();
         final Hints hints = null;
-        
+
         final StringBuilder builder = new StringBuilder();
         builder.append("Layers => ");
         for(String layer : layers){
@@ -83,16 +88,15 @@ public class WMSWorker{
         builder.append("File => " + output.toString() + "\n");
         builder.append("BGColor => " + getMap.getBackground() + "\n");
         builder.append("Transparent => " + getMap.getTransparent() + "\n");
-        
+
         Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
         System.out.println("REAL COLOR => " + bgcolor);
-        
+
         System.out.println(builder.toString());
         final ReferencedEnvelope refEnv = new ReferencedEnvelope(contextEnv);
-        service.portray(layers, styles, bgcolor, sld, refEnv, output, mime, canvasDimension, hints);
-        
+        service.portray(layers, styles, bgcolor, sld, refEnv, output, mime, canvasDimension,
+                elevation, date, dimRange, hints);
+
         return output;
     }
-
-    
 }

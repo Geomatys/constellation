@@ -17,9 +17,14 @@
 package org.constellation.query;
 
 import java.awt.Color;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -74,6 +79,15 @@ public class QueryAdapter {
             return DefaultGeographicCRS.WGS84;
         }
         return CRS.decode(epsg);
+    }
+
+    public static Date toDate(final String strTime) throws ParseException {
+        if (strTime == null) {
+            return null;
+        }
+        final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.parse(strTime);
     }
 
     /**

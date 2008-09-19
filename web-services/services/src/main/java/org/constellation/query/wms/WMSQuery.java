@@ -115,7 +115,6 @@ public abstract class WMSQuery extends Query {
     /**
      * {@inheritDoc}
      */
-    @Override
     public QueryService getService() {
         return new QueryService.WMS();
     }

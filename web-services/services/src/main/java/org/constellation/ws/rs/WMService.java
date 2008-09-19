@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -630,6 +631,12 @@ public class WMService extends WebService {
         MutableStyledLayerDescriptor sld = null;
         final Double elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
+        final Date date;
+        try {
+            date = QueryAdapter.toDate(strTime);
+        } catch (ParseException ex) {
+            throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, version);
+        }
         final Dimension size = new Dimension( QueryAdapter.toInt(strWidth), QueryAdapter.toInt(strHeight));
         final Color background = QueryAdapter.toColor(strBGColor);
         final boolean transparent = QueryAdapter.toBoolean(strTransparent);
@@ -662,7 +669,7 @@ public class WMService extends WebService {
 
         if (request.equalsIgnoreCase(REQUEST_MAP)) {
             return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
-                    strTime, dimRange, size, background, transparent, null);
+                    date, dimRange, size, background, transparent, null);
         }
         throw new WMSWebServiceException("Unknown request type.", INVALID_REQUEST, version);
     }
