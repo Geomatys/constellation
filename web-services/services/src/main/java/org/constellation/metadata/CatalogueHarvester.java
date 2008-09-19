@@ -368,9 +368,9 @@ public class CatalogueHarvester {
                     }
                     
                     //if there is more results we need to make another request
-                    moreResults = results.getNumberOfRecordsReturned() != 0;
+                    moreResults = (results.getAbstractRecord().size() + results.getAny().size()) != 0;
                     if (moreResults) {
-                        startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
+                        startPosition = startPosition +  results.getAbstractRecord().size() + results.getAny().size();
                         logger.info("startPosition=" + startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     }
@@ -511,7 +511,7 @@ public class CatalogueHarvester {
             
             if (outputDomain != null) {
                 List<String> availableOutputSchema = new ArrayList<String>();
-                availableOutputSchema              = outputDomain.getValue();
+                availableOutputSchema              = cleanStrings(outputDomain.getValue());
                 String defaultValue                = outputDomain.getDefaultValue(); 
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
@@ -639,6 +639,18 @@ public class CatalogueHarvester {
         }
     }
     
+    private List<String> cleanStrings(List<String> list) {
+        List<String> result = new ArrayList<String>();
+        for (String s : list) {
+            //we remove the bad character before the real value
+           s = s.replace(" ", "");
+           s = s.replace("\t", "");
+           s = s.replace("\n", "");
+           result.add(s);
+        }
+        return result;
+    }
+    
     /**
      * Send a request to another CSW service.
      * 
@@ -668,6 +680,7 @@ public class CatalogueHarvester {
                 OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
                 StringWriter sw = new StringWriter();
                 try {
+                    
                     worker.marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
                     throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
@@ -688,7 +701,7 @@ public class CatalogueHarvester {
                     XMLRequest = XMLRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
                     logger.info("special obtained request: " + '\n' + XMLRequest);
                 }
-            
+                logger.info("sended:" + XMLRequest);
                 wr.write(XMLRequest);
                 wr.flush();
             }
@@ -751,7 +764,7 @@ public class CatalogueHarvester {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
        s = s.replace("http://schemas.opengis.net/iso19115full", "http://www.isotc211.org/2005/gmd");
        s = s.replace("http://metadata.dgiwg.org/smXML", "http://www.isotc211.org/2005/gmd");
-       s = replacePrefix(s, "CharacterString");
+       s = replacePrefix(s, "CharacterString", "gco");
        return s;
    } 
    
@@ -762,31 +775,10 @@ public class CatalogueHarvester {
     * @param localPart
     * @return
     */ 
-   public String replacePrefix(String s, String localPart) {
-   
-       int position = 0;
-       boolean end  = false;
-       while (!end) {
-           
-           int prefixSize = 4;
-           int i = s.indexOf(':' + localPart, position);
-           if (i == -1) {
-               end = true;
-           } else {
-            
-               String previousPrefix = s.substring(i - prefixSize, i);
-               if (previousPrefix.indexOf('<') == -1) {
-                   prefixSize++;
-                   previousPrefix = s.substring(i - prefixSize, i);
-               }
-            
-               s = s.replace(previousPrefix +':'+localPart, "<gco:" + localPart);
-               s = s.replace(previousPrefix.charAt(0) + "/" + previousPrefix.substring(1) +':'+localPart, "</gco:" + localPart);
-               position = position + s.lastIndexOf("</gco:") + 6 + localPart.length();
-           }
-       }
-       return s;
-   }
+    public static String replacePrefix(String s, String localPart, String prefix) {
+
+        return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
+    }
    
     /**
      * return The namespace URI for the specified prefix end version.
@@ -801,11 +793,20 @@ public class CatalogueHarvester {
             if (prefix.equals("csw"))
                 return "http://www.opengis.net/cat/csw/2.0.2";
             
-            else if (prefix.equals("ebrim"))
+            else if (prefix.equals("ebrim") || prefix.equals("rim"))
                 return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
+            
+            else if (prefix.equals("rim25"))
+                return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
             else if (prefix.equals("gmd"))
                 return "http://www.isotc211.org/2005/gmd";
+            
+            else if (prefix.equals("wrs"))
+                return "http://www.opengis.net/cat/wrs/1.0";
+            
+             else if (prefix.equals("wrs09"))
+                return "http://www.opengis.net/cat/wrs";
             
             else 
                 throw new IllegalArgumentException("2.0.2 prefix unsupported: " + prefix + ".");
@@ -813,11 +814,14 @@ public class CatalogueHarvester {
             if (prefix.equals("csw"))
                 return "http://www.opengis.net/cat/csw";
             
-            else if (prefix.equals("ebrim"))
+            else if (prefix.equals("ebrim") || prefix.equals("rim") || prefix.equals("rim25"))
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
             else if (prefix.equals("gmd"))
                 return "http://www.isotc211.org/2005/gmd";
+            
+            else if (prefix.equals("wrs") || prefix.equals("wrs09"))
+                return "http://www.opengis.net/cat/wrs";
             
             else 
                 throw new IllegalArgumentException("2.0.0 prefix unsupported: " + prefix + ".");

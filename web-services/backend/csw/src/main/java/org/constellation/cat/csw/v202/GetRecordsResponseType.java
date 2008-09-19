@@ -94,7 +94,6 @@ public class GetRecordsResponseType implements GetRecordsResponse {
     /**
      * Gets the value of the requestId property.
      */
-    @Override
     public String getRequestId() {
         return requestId;
     }

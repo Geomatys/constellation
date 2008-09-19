@@ -107,7 +107,6 @@ public class RequestStatusType implements RequestStatus {
      * Sets the timestamp property with a XMLGregorianCalendar value.
      * @param value
      */
-    @Override
     public void setTimestamp(XMLGregorianCalendar value) {
         this.timestamp = value;
     }

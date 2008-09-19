@@ -667,7 +667,7 @@ public class CSWworker {
                 for (QName type:typeNames) {
                     prefixs.put(type.getPrefix(), type.getNamespaceURI());
                     //for ebrim mode the user can put variable after the Qname
-                    if (type.getLocalPart().indexOf('_') != -1) {
+                    if (type.getLocalPart().indexOf('_') != -1 && !type.getLocalPart().startsWith("MD")) {
                         StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
                         type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
                         while (tokenizer.hasMoreTokens()) {
@@ -954,15 +954,25 @@ public class CSWworker {
     }
     
     /**
-     * Execute a Lucene spatial query and return the result as a List of form identifier (form_ID:CatalogCode)
+     * Execute a SQL query and return the result as a List of form identifier (form_ID:CatalogCode)
      * 
      * @param query
      * @return
      * @throws org.constellation.ows.v100.OWSWebServiceException
      */
-    private List<String> executeSQLQuery(SQLQuery query) {
-        
-            return new ArrayList<String>();
+    private List<String> executeSQLQuery(SQLQuery query) throws OWSWebServiceException {
+        try {
+            List<String> results = new ArrayList<String>();
+            Statement stmt = MDConnection.createStatement();
+            ResultSet result = stmt.executeQuery(query.getQuery());
+            while (result.next()) {
+                results.add(result.getInt("identifier") + ":" + result.getString("catalog"));
+            }
+            return results;
+        } catch (SQLException ex) {
+           throw new OWSWebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
+                                            "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE, null, version);
+        }
     }
     
     /**

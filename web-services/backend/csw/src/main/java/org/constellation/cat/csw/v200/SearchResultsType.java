@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
@@ -83,7 +84,7 @@ public class SearchResultsType implements SearchResults {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
-    //@XmlAnyElement(lax = true)
+    @XmlAnyElement(lax = true)
     private List<Object> any;
     
     @XmlAttribute
