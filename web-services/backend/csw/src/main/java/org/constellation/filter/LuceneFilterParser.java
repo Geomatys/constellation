@@ -184,6 +184,7 @@ public class LuceneFilterParser extends FilterParser {
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
                 queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
             }
             
             // we treat logical Operators like AND, OR, ...
