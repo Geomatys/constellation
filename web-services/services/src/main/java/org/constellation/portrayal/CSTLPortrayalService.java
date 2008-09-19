@@ -78,7 +78,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         params.put(WMSQuery.KEY_TIME, date);
         MapContext context = toMapContext(layers,styles,sld, params);
 
-        portray(context, contextEnv, background, output, mime, canvasDimension, hints);
+        portray(context, contextEnv, background, output, mime, canvasDimension, hints,true);
     }
 
     private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld,

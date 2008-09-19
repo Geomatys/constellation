@@ -47,15 +47,12 @@ public class NamedLayerDP implements LayerDataProvider{
     
     
     private NamedLayerDP(){
-        
-        List<File> folders = getShapefileFolders();
-        for(File folder : folders){
-            ShapeFileNamedLayerDP shapeDP = new ShapeFileNamedLayerDP(folder);
-            dps.add(shapeDP);
+        final List<File> folders = getShapefileFolders();
+        for(final File folder : folders){
+            dps.add( new ShapeFileNamedLayerDP(folder) );
         }
                 
-        PostGridNamedLayerDP postGridDP = PostGridNamedLayerDP.getDefault();
-        dps.add(postGridDP);
+        dps.add(PostGridNamedLayerDP.getDefault());
     }
     
     /**
