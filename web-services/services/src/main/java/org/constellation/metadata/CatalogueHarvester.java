@@ -195,7 +195,7 @@ public class CatalogueHarvester {
                                                                                          new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                                          constraint2); 
         JAXBElement<? extends org.constellation.cat.csw.v200.AbstractQueryType> jbQuery2 =  worker.cswFactory200.createQuery(query2);
-        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery2, null);
+        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw", 1, 20, jbQuery2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
