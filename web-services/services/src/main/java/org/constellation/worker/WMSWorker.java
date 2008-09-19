@@ -29,6 +29,7 @@ import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.sld.MutableStyledLayerDescriptor;
+
 import org.opengis.geometry.Envelope;
 
 

@@ -32,6 +32,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Cédric Briançon
  */
 public interface LayerDetails {
+    
     public MapLayer getMapLayer();
     
     public MapLayer getMapLayer(MutableStyle style);

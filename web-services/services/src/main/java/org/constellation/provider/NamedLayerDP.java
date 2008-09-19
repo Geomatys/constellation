@@ -22,12 +22,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
+
 import org.constellation.provider.postgrid.PostGridNamedLayerDP;
+import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
 import org.constellation.ws.rs.WebService;
 
 /**
@@ -36,22 +37,22 @@ import org.constellation.ws.rs.WebService;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class NamedLayerDP implements LayerDataProvider<String, LayerDetails>{
+public class NamedLayerDP implements LayerDataProvider{
 
     private static final String KEY_SHAPEFILE_DP = "shapefile_folder";
     
     private static NamedLayerDP instance = null;
     
-    private final Collection<LayerDataProvider<String,LayerDetails>> dps = new ArrayList<LayerDataProvider<String,LayerDetails>>();
+    private final Collection<LayerDataProvider> dps = new ArrayList<LayerDataProvider>();
     
     
     private NamedLayerDP(){
         
         List<File> folders = getShapefileFolders();
-//        for(File folder : folders){
-//            ShapeFileNamedLayerDP shapeDP = new ShapeFileNamedLayerDP(folder);
-//            dps.add(shapeDP);
-//        }
+        for(File folder : folders){
+            ShapeFileNamedLayerDP shapeDP = new ShapeFileNamedLayerDP(folder);
+            dps.add(shapeDP);
+        }
                 
         PostGridNamedLayerDP postGridDP = PostGridNamedLayerDP.getDefault();
         dps.add(postGridDP);
@@ -96,7 +97,7 @@ public class NamedLayerDP implements LayerDataProvider<String, LayerDetails>{
      * {@inheritDoc }
      */
     public LayerDetails get(String key) {
-        for(LayerDataProvider<String,LayerDetails> dp : dps){
+        for(LayerDataProvider dp : dps){
             LayerDetails layer = dp.get(key);
             if(layer != null) return layer;
         }
@@ -108,7 +109,7 @@ public class NamedLayerDP implements LayerDataProvider<String, LayerDetails>{
      */
     public List<String> getFavoriteStyles(String layerName) {
         List<String> styles = new ArrayList<String>();
-        for(LayerDataProvider<String,LayerDetails> dp : dps){
+        for(LayerDataProvider dp : dps){
             List<String> sts = dp.getFavoriteStyles(layerName);
             styles.addAll(sts);
         }

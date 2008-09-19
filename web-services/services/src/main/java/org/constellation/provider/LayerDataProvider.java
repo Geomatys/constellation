@@ -24,7 +24,7 @@ import java.util.List;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerDataProvider<K,V> extends DataProvider<K,V>{
+public interface LayerDataProvider extends DataProvider<String,LayerDetails>{
 
     List<String> getFavoriteStyles(String layerName);    
 }

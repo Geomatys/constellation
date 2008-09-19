@@ -25,9 +25,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
 
@@ -96,8 +97,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                 }
             }
             
-            MapLayer layer = layerDPS.get(layerName).getMapLayer(style);
-            
+            MapLayer layer = null;
+            final LayerDetails details = layerDPS.get(layerName);
+            if(details != null){
+                layer = layerDPS.get(layerName).getMapLayer(style);
+            }
+                        
             if(layer == null){
                 throw new PortrayalException("Layer : "+layerName+" could not be created");
             }

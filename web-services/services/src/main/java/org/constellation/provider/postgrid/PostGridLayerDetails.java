@@ -18,14 +18,17 @@ package org.constellation.provider.postgrid;
 
 import java.util.Date;
 import java.util.SortedSet;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
+
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
+
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -33,7 +36,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @version $Id$
  * @author Cédric Briançon
  */
-public class PostGridLayerDetails implements LayerDetails {
+class PostGridLayerDetails implements LayerDetails {
     /**
      * The database connection.
      */
@@ -51,7 +54,7 @@ public class PostGridLayerDetails implements LayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    public PostGridLayerDetails(final Database database, final Layer layer) {
+    PostGridLayerDetails(final Database database, final Layer layer) {
         this.database = database;
         this.layer = layer;
     }

@@ -50,7 +50,7 @@ import org.constellation.provider.LayerDataProvider;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridNamedLayerDP implements LayerDataProvider<String, LayerDetails>{
+public class PostGridNamedLayerDP implements LayerDataProvider{
     private static PostGridNamedLayerDP instance = null;
 
     protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");

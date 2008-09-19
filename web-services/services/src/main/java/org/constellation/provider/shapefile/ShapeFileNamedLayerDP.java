@@ -17,12 +17,11 @@
  */
 package org.constellation.provider.shapefile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,21 +30,17 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.LayerDataProvider;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.SoftHashMap;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.map.MapLayer;
-import org.geotools.map.MapLayerBuilder;
-import org.geotools.style.MutableStyle;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
-
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,7 +53,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class ShapeFileNamedLayerDP implements LayerDataProvider<String,MapLayer>{
+public class ShapeFileNamedLayerDP implements LayerDataProvider{
 
     private static final String FILE_LAYERLINKS = "layerlinks.xml";
     private static ShapeFileNamedLayerDP instance = null;
@@ -92,8 +87,8 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider<String,MapLayer>
     /**
      * {@inheritDoc }
      */
-    public Class<MapLayer> getValueClass() {
-        return MapLayer.class;
+    public Class<LayerDetails> getValueClass() {
+        return LayerDetails.class;
     }
 
     /**
@@ -113,12 +108,11 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider<String,MapLayer>
     /**
      * {@inheritDoc }
      */
-    public MapLayer get(String key) {
-        MapLayer layer = null;
-        
+    public LayerDetails get(String key) {
         DataStore store = cache.get(key);
         
         if(store == null){
+            //datastore is not in the cache, try to load it
             File f = index.get(key);
             if(f != null){
                 //we have this data source in the folder
@@ -131,41 +125,13 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider<String,MapLayer>
         }
         
         if(store != null){
-            //DataStore is in cache, reuse it.
-            layer = createMapLayer(store,null);
+            final List<String> styles = getFavoriteStyles(key);
+            return new ShapefileLayerDetails(key, store, styles);
         }
         
-        return layer;
+        return null;
     }
-    
-    /**
-     * {@inheritDoc }
-     */
-    public MapLayer get(String key, MutableStyle style) {
-        MapLayer layer = null;
         
-        DataStore store = cache.get(key);
-        
-        if(store == null){
-            File f = index.get(key);
-            if(f != null){
-                //we have this data source in the folder
-                store = loadDataStore(f);
-                if(store != null){
-                    //cache the datastore
-                    cache.put(key, store);
-                }
-            }
-        }
-        
-        if(store != null){
-            //DataStore is in cache, reuse it.
-            layer = createMapLayer(store,style);
-        }
-        
-        return layer;
-    }
-    
     /**
      * {@inheritDoc }
      */
@@ -291,34 +257,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider<String,MapLayer>
         }
         return styles;
     }
-    
-    private MapLayer createMapLayer(DataStore store, MutableStyle style){
-        MapLayer layer = null;
         
-        FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
-                
-        try{
-            fs = store.getFeatureSource(store.getTypeNames()[0]);
-        }catch(IOException ex){
-            //TODO log error
-            ex.printStackTrace();
-        }
-        
-        if(fs != null){
-            
-            if(style == null){
-                style = RANDOM_FACTORY.createRandomVectorStyle(fs);
-            }
-            
-            layer = new MapLayerBuilder().create(fs, style);
-        }else{
-            System.err.println(ShapeFileNamedLayerDP.class +" Error : Could not create shapefile maplayer.");
-            //TODO log error
-        }
-        
-        return layer;
-    }
-    
     private DataStore loadDataStore(File f){
         DataStore store = null;
         
