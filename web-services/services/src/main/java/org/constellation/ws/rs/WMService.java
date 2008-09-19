@@ -77,6 +77,7 @@ import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.GetCapabilities;
+import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.query.wms.WMSQueryVersion;
 import org.constellation.wms.AbstractHTTP;
@@ -240,6 +241,9 @@ public class WMService extends WebService {
                 return getMap();
             } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
                 return getCapabilities();
+            } else if (REQUEST_LEGENDGRAPHIC.equalsIgnoreCase(request)) {
+                final String mimeType = getParameter(KEY_FORMAT, true);
+                return Response.ok(getLegendGraphic(), mimeType).build();
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
@@ -263,56 +267,6 @@ public class WMService extends WebService {
                 throw new IllegalArgumentException("this service can't return OWS Exception");
             }
         }
-    }
-
-    /**
-     * Return a map for the specified parameters in the query: works with
-     * the new GO2 Renderer.
-     *
-     * @return
-     * @throws fr.geomatys.wms.WebServiceException
-     */
-    private synchronized Response getMap() throws WebServiceException {
-        verifyBaseParameter(0);
-
-        final String errorType = getParameter(KEY_EXCEPTIONS, false);
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
-        final WMSQuery query = adaptQuery(getParameter(KEY_REQUEST, true));
-        if (!(query instanceof GetMap)) {
-            throw new WMSWebServiceException("Invalid request found, should be GetMap.", INVALID_REQUEST, getCurrentVersion());
-        }
-        final GetMap getMap = (GetMap) query;
-        final String format = getMap.getFormat();
-        final File tempFile;
-        try {
-            tempFile = createTempFile(format);
-        } catch (IOException io) {
-            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
-        }
-        final WMSWorker worker = new WMSWorker(query,tempFile);
-
-        File image = null;
-        File errorFile = null;
-        try {
-            image = worker.getMap();
-        } catch (PortrayalException ex) {
-            if(errorInImage) {
-                try {
-                    errorFile = createTempFile(format);
-                } catch (IOException io) {
-                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
-                }
-                final Dimension dim = getMap.getSize();
-                CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
-            } else {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
-                        ex.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
-            }
-        }
-
-        File result = (errorFile != null) ? errorFile : image;
-        return Response.ok(result, getMap.getFormat()).build();
     }
 
     /**
@@ -542,6 +496,75 @@ public class WMService extends WebService {
     }
 
     /**
+     * Return the legend graphic for the current layer.
+     * 
+     * @return a file containing the legend graphic image.
+     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws javax.xml.bind.JAXBException
+     */
+    private File getLegendGraphic() throws WebServiceException, JAXBException {
+        /*verifyBaseParameter(2);
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
+        webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
+        webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
+        webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
+        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
+        return  webServiceWorker.getLegendFile();*/
+        return null;
+    }
+
+    /**
+     * Return a map for the specified parameters in the query: works with
+     * the new GO2 Renderer.
+     *
+     * @return
+     * @throws fr.geomatys.wms.WebServiceException
+     */
+    private synchronized Response getMap() throws WebServiceException {
+        verifyBaseParameter(0);
+
+        final String errorType = getParameter(KEY_EXCEPTIONS, false);
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
+        final WMSQuery query = adaptQuery(getParameter(KEY_REQUEST, true));
+        if (!(query instanceof GetMap)) {
+            throw new WMSWebServiceException("Invalid request found, should be GetMap.", INVALID_REQUEST, getCurrentVersion());
+        }
+        final GetMap getMap = (GetMap) query;
+        final String format = getMap.getFormat();
+        final File tempFile;
+        try {
+            tempFile = createTempFile(format);
+        } catch (IOException io) {
+            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+        }
+        final WMSWorker worker = new WMSWorker(query,tempFile);
+
+        File image = null;
+        File errorFile = null;
+        try {
+            image = worker.getMap();
+        } catch (PortrayalException ex) {
+            if(errorInImage) {
+                try {
+                    errorFile = createTempFile(format);
+                } catch (IOException io) {
+                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+                }
+                final Dimension dim = getMap.getSize();
+                CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
+            } else {
+                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
+                        ex.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
+            }
+        }
+
+        File result = (errorFile != null) ? errorFile : image;
+        return Response.ok(result, getMap.getFormat()).build();
+    }
+
+    /**
      * update The URL in capabilities document with the service actual URL.
      */
     private void updateURL(final List<? extends AbstractDCP> dcpList) {
@@ -597,12 +620,15 @@ public class WMService extends WebService {
     private WMSQuery adaptQuery(final String request) throws WebServiceException {
         final ServiceVersion version  = getCurrentVersion();
         final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
-                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+                    WMSQueryVersion.WMS_GETMAP_1_1_1 : WMSQueryVersion.WMS_GETMAP_1_3_0;
         if (request.equalsIgnoreCase(REQUEST_CAPABILITIES)) {
             return new GetCapabilities(wmsVersion);
         }
-        
+        final String strLayer         = getParameter( KEY_LAYER, true );
         final String strFormat        = getParameter( KEY_FORMAT, true);
+        if (request.equalsIgnoreCase(REQUEST_LEGENDGRAPHIC)) {
+            return new GetLegendGraphic(strLayer, strFormat);
+        }
         final String strCRS           = getParameter( (version.toString().equals("1.3.0")) ?
                                                       KEY_CRS_v130 : KEY_CRS_v110, true );
         final String strBBox          = getParameter( KEY_BBOX, true );
@@ -626,7 +652,7 @@ public class WMService extends WebService {
             throw new WMSWebServiceException(ex, INVALID_CRS, version);
         }
         final ImmutableEnvelope env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
-        final List<String> layers = QueryAdapter.toStringList(strLayers);
+        final List<String> layers  = QueryAdapter.toStringList(strLayers);
         final List<String> styles = QueryAdapter.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
         final Double elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;

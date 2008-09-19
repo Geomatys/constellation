@@ -74,11 +74,26 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      */
     private GeneralEnvelope envelope;
 
+    /**
+     * Range for the {@linkplain ColorMap color map} to apply on the
+     * {@linkplain GridCoverage2D grid coverage}.
+     */
     private MeasurementRange dimRange;
-    private final Database db;
-    private final Layer layer;
+
+    /**
+     * List of available dates for a request.
+     */
     private final List<Date> times;
 
+    /**
+     * Connection to a PostGRID database.
+     */
+    private final Database db;
+
+    /**
+     * Layer to consider.
+     */
+    private final Layer layer;
 
     public PostGridMapLayer(Database db, Layer layer){
         super(createDefaultRasterStyle());
@@ -178,7 +193,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         return buffer;
     }
 
-    @Override
     public ReferencedEnvelope getBounds() {
         CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         GeographicBoundingBox bbox = null;
@@ -197,10 +211,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
          return new ReferencedEnvelope(crs);
         }
 
-    }
-
-    public List<Date> times() {
-        return times;
     }
 
     /**
@@ -234,8 +244,16 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     public void setDimRange(final MeasurementRange dimRange) {
         this.dimRange = dimRange;
     }
-    
+
     public void setElevation(final double elevation) {
         this.elevation = elevation;
     }
+
+    /**
+     * Returns a modifiable list of dates.
+     */
+    public List<Date> times() {
+        return times;
+    }
+
 }
