@@ -16,6 +16,8 @@
  */
 package org.constellation.provider.postgrid;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
@@ -25,13 +27,14 @@ import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
-
 import org.constellation.query.wms.WMSQuery;
+
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
+
 
 /**
  *
@@ -86,7 +89,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getName() {
         return layer.getName();
     }
@@ -94,7 +96,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isQueryable(Service service) {
         return layer.isQueryable(service);
     }
@@ -102,7 +103,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         return layer.getGeographicBoundingBox();
     }
@@ -110,7 +110,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         return layer.getAvailableTimes();
     }
@@ -118,7 +117,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         return layer.getAvailableElevations();
     }
@@ -126,7 +124,13 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
+    public BufferedImage getLegendGraphic(final Dimension dimension) {
+        return layer.getLegend((dimension != null) ? dimension : LEGEND_SIZE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public MeasurementRange<?>[] getSampleValueRanges() {
         return layer.getSampleValueRanges();
     }
@@ -134,7 +138,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getRemarks() {
         return layer.getRemarks();
     }
@@ -142,7 +145,6 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getThematic() {
         return layer.getThematic();
     }

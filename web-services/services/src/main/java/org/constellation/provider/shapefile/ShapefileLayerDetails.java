@@ -17,6 +17,8 @@
  */
 package org.constellation.provider.shapefile;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -174,6 +176,10 @@ class ShapefileLayerDetails implements LayerDetails{
         }
         
         return layer;
+    }
+
+    public BufferedImage getLegendGraphic(Dimension dimension) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

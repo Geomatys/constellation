@@ -16,6 +16,8 @@
  */
 package org.constellation.provider;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
@@ -27,32 +29,43 @@ import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
+
 /**
+ * Information about a {@linkplain Layer layer}.
  *
  * @version $Id$
  * @author Cédric Briançon
  */
 public interface LayerDetails {
-    
+    /**
+     * Default legend size, if not specified in the {@code GetLegend} request.
+     */
+    public static final Dimension LEGEND_SIZE = new Dimension(200, 40);
+
     public MapLayer getMapLayer(final Map<String, Object> params);
-    
+
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
-    
+
+    /**
+     * @see Layer#getLegend(Dimension)
+     */
+    public BufferedImage getLegendGraphic(final Dimension dimension);
+
     /**
      * @see Layer#getName
      */
     public String getName();
-    
+
     /**
      * @see Layer#isQueryable
      */
     public boolean isQueryable(Service service);
-    
+
     /**
      * @see Layer#getGeographicBoundingBox
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
-    
+
     /**
      * @see Layer#getAvailableTimes
      */
@@ -62,12 +75,12 @@ public interface LayerDetails {
      * @see Layer#getAvailableElevations
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException;
-    
+
     /**
      * @see Layer#getSampleValueRanges
      */
     public MeasurementRange<?>[] getSampleValueRanges();
-    
+
     /**
      * @see Layer#getRemarks
      */
