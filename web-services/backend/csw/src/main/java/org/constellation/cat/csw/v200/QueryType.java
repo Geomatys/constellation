@@ -72,7 +72,7 @@ public class QueryType extends AbstractQueryType {
     private ElementSetNameType elementSetName;
     @XmlElement(name = "ElementName")
     @XmlSchemaType(name = "anyURI")
-    private List<String> elementName;
+    private List<QName> elementName;
     @XmlElement(name = "Constraint")
     private QueryConstraintType constraint;
     @XmlAttribute(required = true)
@@ -92,6 +92,19 @@ public class QueryType extends AbstractQueryType {
         
         this.typeNames      = typeNames;
         this.elementSetName = elementSetName; 
+        this.constraint     = constraint;
+    }
+
+    /**
+     * 
+     * @param typeNames
+     * @param elementName
+     * @param constraint
+     */
+    public QueryType(List<QName> typeNames, List<QName> elementName, QueryConstraintType constraint) {
+        
+        this.typeNames      = typeNames;
+        this.elementName    = elementName; 
         this.constraint     = constraint;
     }
     
@@ -115,9 +128,9 @@ public class QueryType extends AbstractQueryType {
      * Gets the value of the elementName property.
      * 
      */
-    public List<String> getElementName() {
+    public List<QName> getElementName() {
         if (elementName == null) {
-            elementName = new ArrayList<String>();
+            elementName = new ArrayList<QName>();
         }
         return this.elementName;
     }
