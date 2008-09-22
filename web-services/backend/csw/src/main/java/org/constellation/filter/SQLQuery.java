@@ -29,6 +29,8 @@ public class SQLQuery {
     
     private String query;
     
+    public int nbField;
+    
     private Filter spatialFilter;
     
     private List<SQLQuery> subQueries;
@@ -36,24 +38,32 @@ public class SQLQuery {
     public SQLQuery(String query) {
         this.query         = query;
         this.spatialFilter = null;
+        nbField            = 0;
     }
     
     public SQLQuery(Filter spatialFilter) {
         this.query         = "";
         this.spatialFilter = spatialFilter;
+        nbField            = 0;
     }
     
     public SQLQuery(String query, Filter spatialFilter) {
         this.query         = query;
         this.spatialFilter = spatialFilter;
+        nbField            = 0;
     }
 
     public String getQuery() {
         return query;
     }
     
-    public void addSelect(String select) {
-        query = select + ' ' + query;
+    public void createSelect() {
+        StringBuilder select = new StringBuilder("SELECT distinct identifier, catalog FROM \"Forms\" ");
+        for (int i = 1; i <= nbField; i++) {
+            select.append(" , \"TextValues\" v").append(i);
+        }
+        select.append(" WHERE ");
+        query = select.toString() + query;
     }
 
     public Filter getSpatialFilter() {

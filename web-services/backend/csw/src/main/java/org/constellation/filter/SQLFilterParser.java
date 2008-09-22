@@ -81,6 +81,8 @@ public class SQLFilterParser extends FilterParser {
     
     private int nbField;
     
+    private boolean executeSelect;
+    
     /**
      * Build a new FilterParser with the specified version.
      */
@@ -94,9 +96,8 @@ public class SQLFilterParser extends FilterParser {
      * @param constraint a constraint expressed in CQL or FilterType
      */
     public SQLQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws WebServiceException {
-        this.variables    = variables;
-        this.prefixs      = prefixs;
-        nbField           = 0;
+        this.setVariables(variables);
+        this.setPrefixs(prefixs);
         FilterType filter = null;
         //if the constraint is null we make a null filter
         if (constraint == null)  {
@@ -139,6 +140,7 @@ public class SQLFilterParser extends FilterParser {
     public SQLQuery getSqlQuery(final FilterType filter) throws WebServiceException {
         
         SQLQuery response = null;
+        executeSelect     = true;
         if (filter != null) { 
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
@@ -156,12 +158,9 @@ public class SQLFilterParser extends FilterParser {
                 response = new SQLQuery(treatIDOperator(filter.getId()));
             }  
         }
-        StringBuilder select = new StringBuilder("SELECT identifier, catalog FROM \"Forms\" ");
-        for (int i = 1; i <= nbField; i++) {
-            select.append(" , \"TextValues\" v").append(i);
-        }
-        select.append(" WHERE ");
-        response.addSelect(select.toString());
+        response.nbField = nbField - 1;
+        if (executeSelect)
+            response.createSelect();
         return response;
     }
     
@@ -178,16 +177,26 @@ public class SQLFilterParser extends FilterParser {
         LogicOpsType logicOps         = JBlogicOps.getValue();
         String operator               = JBlogicOps.getName().getLocalPart();
         List<Filter> filters          = new ArrayList<Filter>();
+        nbField                       = 1;
         
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
-            queryBuilder.append('(');
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
-                queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
-                queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
+                SQLQuery query = new SQLQuery(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                if (operator.equalsIgnoreCase("OR")) {
+                    query.nbField = nbField -1;
+                    query.createSelect();
+                    queryBuilder.append('(').append(query.getQuery());
+                    queryBuilder.append(") UNION ");
+                     executeSelect = false;
+                } else {
+                    
+                    queryBuilder.append(query.getQuery());
+                    queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
+                }
             }
             
             // we treat logical Operators like AND, OR, ...
@@ -195,22 +204,30 @@ public class SQLFilterParser extends FilterParser {
             
                 boolean writeOperator = true;
                 
-                SQLQuery sq      = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
-                String subQuery  = sq.getQuery();
-                Filter subFilter = sq.getSpatialFilter();
+                SQLQuery query   = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                String subQuery  = query.getQuery();
+                Filter subFilter = query.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
                 if ((subFilter != null && !subQuery.equals("")) 
-                    || sq.getSubQueries().size() != 0) {
+                    || query.getSubQueries().size() != 0) {
                         
-                    subQueries.add(sq);
+                    subQueries.add(query);
                     writeOperator = false;
                 } else {
                         
                     if (subQuery.equals("")) {
                         writeOperator = false;
                     } else  {
-                        queryBuilder.append(subQuery);
+                        if (operator.equalsIgnoreCase("OR")) {
+                            query.nbField = nbField -1;
+                            query.createSelect();
+                            queryBuilder.append('(').append(query.getQuery());
+                            queryBuilder.append(") UNION ");
+                            executeSelect = false;
+                        } else {
+                            queryBuilder.append(subQuery);
+                        }
                     }
                     if (subFilter != null)
                         filters.add(subFilter);
@@ -239,11 +256,15 @@ public class SQLFilterParser extends FilterParser {
             }
                 
           // we remove the last Operator and add a ') '
-          int pos = queryBuilder.length()- (operator.length() + 2);
-          if (pos > 0)
-            queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
+          int pos;
+          if (operator.equalsIgnoreCase("OR"))  
+              pos = queryBuilder.length()- (10);
+          else
+              pos = queryBuilder.length()- (operator.length() + 2);
           
-          queryBuilder.append(')');
+          if (pos > 0)
+            queryBuilder.delete(pos, queryBuilder.length());
+          
                 
         } else if (logicOps instanceof UnaryLogicOpType) {
             UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
@@ -324,7 +345,6 @@ public class SQLFilterParser extends FilterParser {
      */
     protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
         StringBuilder response = new StringBuilder();
-        nbField++;
         
         ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
         
@@ -484,6 +504,7 @@ public class SQLFilterParser extends FilterParser {
                 }
             }
         }
+        nbField++;
         return response.toString();
     }
     
@@ -737,7 +758,17 @@ public class SQLFilterParser extends FilterParser {
     }
     
     private Standard getStandardFromPrefix(String prefix) {
-       String namespace = prefixs.get(prefix);
-       return getStandardFromNamespace(namespace);
+        if (prefixs != null) {
+            String namespace = prefixs.get(prefix);
+            return getStandardFromNamespace(namespace);
+        } return null;
+    }
+
+    public void setVariables(Map<String, QName> variables) {
+        this.variables = variables;
+    }
+
+    public void setPrefixs(Map<String, String> prefixs) {
+        this.prefixs = prefixs;
     }
 }

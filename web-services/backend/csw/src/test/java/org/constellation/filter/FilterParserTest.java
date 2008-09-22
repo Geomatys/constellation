@@ -50,7 +50,7 @@ import static org.junit.Assert.*;
  */
 public class FilterParserTest {
     
-    private FilterParser filterParser;
+    private LuceneFilterParser filterParser;
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller filterUnmarshaller;
    
@@ -64,7 +64,7 @@ public class FilterParserTest {
 
     @Before
     public void setUp() throws Exception {
-        filterParser = new FilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
+        filterParser = new LuceneFilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
         JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterUnmarshaller = jbcontext.createUnmarshaller();
     }
@@ -331,6 +331,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
+        System.out.println(spaQuery.getQuery());
         assertEquals(spaQuery.getQuery(), "(Title:\"starship trooper\" AND Author:\"Timothee Gustave\")");
         
         /**
@@ -466,7 +467,7 @@ public class FilterParserTest {
         SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
@@ -502,7 +503,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
@@ -536,7 +537,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
@@ -591,7 +592,7 @@ public class FilterParserTest {
         SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -643,7 +644,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -711,7 +712,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -1201,7 +1202,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 1);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
         
