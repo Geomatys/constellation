@@ -51,6 +51,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // MDWeb dependencies
 import org.mdweb.lucene.AbstractIndex;
+import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
@@ -92,6 +93,11 @@ public class IndexLucene extends AbstractIndex {
     private final Map<String, Path> pathMap;
     
     /**
+     * A Map containing some classes (used when reader is null)
+     */
+    private final  Map<String, Classe> classeMap;
+    
+    /**
      * Creates a new Lucene Index with the specified MDweb reader.
      * 
      * @param reader An mdweb reader for read the metadata database.
@@ -102,6 +108,7 @@ public class IndexLucene extends AbstractIndex {
         this.reader = reader;
         analyzer    = new StandardAnalyzer();
         pathMap     = null;
+        classeMap   = null;
         
         // we get the configuration file
         File f = new File(configDirectory, "index");
@@ -156,10 +163,16 @@ public class IndexLucene extends AbstractIndex {
      * @param paths The list of path used in the forms (necesary because of there is no reader)
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    protected IndexLucene(List<Form> forms, List<Path> paths, File configDirectory) throws SQLException {
+    protected IndexLucene(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
         
-        analyzer    = new StandardAnalyzer();
-        reader      = null;
+        analyzer     = new StandardAnalyzer();
+        reader       = null;
+        
+        //we fill the map of classe
+        classeMap = new HashMap<String, Classe>();
+        for (Classe c: classes) {
+            classeMap.put(c.getName(), c);
+        }
         
         //we fill the map of path
         pathMap = new HashMap<String, Path>();
@@ -327,6 +340,15 @@ public class IndexLucene extends AbstractIndex {
         doc.add(new Field("catalog", form.getCatalog().getCode() , Field.Store.YES, Field.Index.TOKENIZED));        
         doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.TOKENIZED));
         
+        Classe identifiable, registryObject;
+        if (reader == null) {
+            identifiable   = classeMap.get("Identifiable");
+            registryObject = classeMap.get("RegistryObject");
+        } else {
+            identifiable   = reader.getClasse("Identifiable", Standard.EBRIM_V3);
+            registryObject = reader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
+        }
+        
         // For an ISO 19115 form
         if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
             
@@ -361,7 +383,7 @@ public class IndexLucene extends AbstractIndex {
             }
             
          // For an ebrim v 3.0 form    
-        } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("Identifiable", Standard.EBRIM_V3))) {
+        } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
             logger.info("indexing Ebrim 3.0 Record");
             
            /* for (String term :EBRIM_QUERYABLE.keySet()) {
@@ -370,7 +392,7 @@ public class IndexLucene extends AbstractIndex {
             }*/
         
              // For an ebrim v 2.5 form    
-        } else if (form.getTopValue().getType().isSubClassOf(reader.getClasse("RegistryObject", Standard.EBRIM_V2_5))) {
+        } else if (form.getTopValue().getType().isSubClassOf(registryObject)) {
             logger.info("indexing Ebrim 2.5 Record");
             
             /*for (String term :EBRIM_QUERYABLE.keySet()) {

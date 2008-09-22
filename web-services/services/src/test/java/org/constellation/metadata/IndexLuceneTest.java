@@ -79,14 +79,15 @@ public class IndexLuceneTest {
 
     @Before
     public void setUp() throws Exception {
-        List<Form> forms = new ArrayList<Form>();
-        List<Path> paths = new ArrayList<Path>();
-        forms            = fillTestData(paths); 
+        List<Form> forms     = new ArrayList<Form>();
+        List<Path> paths     = new ArrayList<Path>();
+        List<Classe> classes = new ArrayList<Classe>();
+        forms                = fillTestData(paths, classes); 
         
         File configDirectory = new File("config-test");
         configDirectory.mkdir();
         
-        indexLucene = new IndexLucene(forms, paths, configDirectory);
+        indexLucene = new IndexLucene(forms, classes, paths, configDirectory);
     }
 
     @After
@@ -115,7 +116,7 @@ public class IndexLuceneTest {
         logger.info("SimpleSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("1");
+        expectedResult.add("1:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -132,10 +133,10 @@ public class IndexLuceneTest {
         logger.info("SimpleSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1");
-        expectedResult.add("2");
-        expectedResult.add("3");
-        expectedResult.add("4");
+        expectedResult.add("1:catalogTest");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("4:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -152,9 +153,9 @@ public class IndexLuceneTest {
         logger.info("SimpleSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2");
-        expectedResult.add("3");
-        expectedResult.add("4");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("4:catalogTest");
         
         assertEquals(expectedResult, result);
     }
@@ -184,10 +185,10 @@ public class IndexLuceneTest {
         logger.info("SortedSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3");
-        expectedResult.add("2");
-        expectedResult.add("1");
-        expectedResult.add("4");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("1:catalogTest");
+        expectedResult.add("4:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -206,10 +207,10 @@ public class IndexLuceneTest {
         logger.info("SortedSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4");
-        expectedResult.add("1");
-        expectedResult.add("2");
-        expectedResult.add("3");
+        expectedResult.add("4:catalogTest");
+        expectedResult.add("1:catalogTest");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("3:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -228,10 +229,10 @@ public class IndexLuceneTest {
         logger.info("SortedSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2");
-        expectedResult.add("3");
-        expectedResult.add("1");
-        expectedResult.add("4");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("1:catalogTest");
+        expectedResult.add("4:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -250,10 +251,10 @@ public class IndexLuceneTest {
         logger.info("SortedSearch 4:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4");
-        expectedResult.add("1");
-        expectedResult.add("3");
-        expectedResult.add("2");
+        expectedResult.add("4:catalogTest");
+        expectedResult.add("1:catalogTest");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("2:catalogTest");
         
         assertEquals(expectedResult, result);
     }
@@ -287,8 +288,9 @@ public class IndexLuceneTest {
         logger.info("spatialSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3");
-        expectedResult.add("4");
+        expectedResult.add("2:catalogTest");
+        expectedResult.add("3:catalogTest");
+        expectedResult.add("4:catalogTest");
         
         assertEquals(expectedResult, result);
         
@@ -311,18 +313,17 @@ public class IndexLuceneTest {
         logger.info("spatialSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1");
-        expectedResult.add("2");
+        expectedResult.add("1:catalogTest");
         
         assertEquals(expectedResult, result);
     }
 
     
-    public List<Form> fillTestData(List<Path> paths) {
+    public List<Form> fillTestData(List<Path> paths, List<Classe> classes) {
         List<Form> result       = new ArrayList<Form>();
         
         //we create a new Catalog
-        Catalog cat             = new Catalog("Test", "Test");
+        Catalog cat             = new Catalog("catalogTest", "catalogTest");
         
         //then we build the classes
         Classe sLiteralClass    = new Classe(Standard.DUBLINCORE, "SimpleLiteral", "sl", "no definition", null, false, ' ');
@@ -338,6 +339,11 @@ public class IndexLuceneTest {
         Property titleProp      = new Property(Standard.DUBLINCORE, "title", "ti", "no definition", recordClass, sLiteralClass, 0, 1, Obligation.OPTIONNAL, 2, ' ');
         Property typeProp       = new Property(Standard.DUBLINCORE, "type", "ty", "no definition", recordClass, sLiteralClass, 0, 1, Obligation.OPTIONNAL, 3, ' ');
         Property bboxProp       = new Property(Standard.OWS, "BoundingBox", "box", "no definition", recordClass, boundingBoxClass, 0, 1, Obligation.OPTIONNAL, 4, ' ');
+        
+        Classe identifiable     = new Classe(Standard.EBRIM_V3, "Identifiable", "id", "no definition", null, false, ' ');
+        Classe registryObject   = new Classe(Standard.EBRIM_V2_5, "RegsitryObject", "ro", "no definition", null, false, ' ');
+        classes.add(identifiable);
+        classes.add(registryObject);
         
         //The paths
         Path recordPath      = new Path(Standard.CSW, recordClass);

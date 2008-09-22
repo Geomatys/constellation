@@ -197,10 +197,9 @@ public class LuceneFilterParser extends FilterParser {
                 Filter subFilter = sq.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                if ((subFilter != null && !subQuery.equals("")) 
+                if ((subFilter != null && !subQuery.equals("metafile:doc")) 
                     || sq.getSubQueries().size() != 0 
                     || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
-                        
                     subQueries.add(sq);
                     writeOperator = false;
                 } else {
@@ -224,16 +223,8 @@ public class LuceneFilterParser extends FilterParser {
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...   
             for (JAXBElement<? extends SpatialOpsType> jb: binary.getSpatialOps()) {
                 
-                boolean writeOperator = true;
                 //for the spatial filter we don't need to write into the lucene query 
                 filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
-                writeOperator = false;
-                
-                if (writeOperator) {
-                    queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
-                } else {
-                    writeOperator = true;
-                }
             }
                 
           // we remove the last Operator and add a ') '
@@ -263,7 +254,7 @@ public class LuceneFilterParser extends FilterParser {
                 String subQuery  = sq.getQuery();
                 Filter subFilter = sq.getSpatialFilter();
                     
-                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("")) ||
+                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("metafile:doc")) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
                    

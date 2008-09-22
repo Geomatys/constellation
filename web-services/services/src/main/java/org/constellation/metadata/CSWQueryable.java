@@ -541,7 +541,7 @@ public class CSWQueryable {
     protected final static QName _Service25_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
     protected final static QName _AuditableEvent25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
     protected final static QName _Subscription25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Subscription");
-    protected final static QName _Geometry09_QNAME              = new QName("http://www.opengis.net/cat/wrs", "Geometry");
-    protected final static QName _ApplicationModule09_QNAME     = new QName("http://www.opengis.net/cat/wrs", "ApplicationModule");
-    protected final static QName _WRSExtrinsicObject09_QNAME    = new QName("http://www.opengis.net/cat/wrs", "WRSExtrinsicObject");
+    protected final static QName _Geometry09_QNAME              = new QName("http://www.opengis.net/cat/wrs",              "Geometry");
+    protected final static QName _ApplicationModule09_QNAME     = new QName("http://www.opengis.net/cat/wrs",              "ApplicationModule");
+    protected final static QName _WRSExtrinsicObject09_QNAME    = new QName("http://www.opengis.net/cat/wrs",              "WRSExtrinsicObject");
 }

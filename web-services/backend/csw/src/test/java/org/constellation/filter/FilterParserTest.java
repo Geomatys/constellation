@@ -331,7 +331,6 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        System.out.println(spaQuery.getQuery());
         assertEquals(spaQuery.getQuery(), "(Title:\"starship trooper\" AND Author:\"Timothee Gustave\")");
         
         /**
@@ -712,7 +711,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "metafile:doc");
+        assertEquals(spaQuery.getQuery(), "(metafile:doc)");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -723,11 +722,11 @@ public class FilterParserTest {
         assertEquals(chainFilter.getChain().size(),       2);
         
         //we verify each filter
-        f1 = (SpatialFilter) chainFilter.getChain().get(0);
+        f1 = (SpatialFilter) chainFilter.getChain().get(1);
         assertEquals(f1.getFilterType(), SpatialFilter.INTERSECT);
         assertTrue(f1.getGeometry() instanceof GeneralEnvelope);
         
-        SerialChainFilter cf2 = (SerialChainFilter) chainFilter.getChain().get(1);
+        SerialChainFilter cf2 = (SerialChainFilter) chainFilter.getChain().get(0);
         assertEquals(cf2.getActionType().length,  1);
         assertEquals(cf2.getActionType()[0],      SerialChainFilter.OR);
         assertEquals(cf2.getChain().size(),       2);
@@ -785,7 +784,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "(metafile:doc)");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -861,7 +860,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "(metafile:doc)");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
@@ -1458,7 +1457,7 @@ public class FilterParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getQuery(), "(metafile:doc)");
         assertEquals(spaQuery.getSubQueries().size(), 3);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
         
@@ -1485,7 +1484,7 @@ public class FilterParserTest {
         // second sub-query
         subQuery2 = spaQuery.getSubQueries().get(1);
         assertTrue  (subQuery2.getSpatialFilter() == null);
-        assertEquals(subQuery2.getQuery(), "");
+        assertEquals(subQuery2.getQuery(), "metafile:doc");
         assertEquals(subQuery2.getSubQueries().size(), 1);
         assertEquals(subQuery2.getLogicalOperator(), SerialChainFilter.NOT);
         
