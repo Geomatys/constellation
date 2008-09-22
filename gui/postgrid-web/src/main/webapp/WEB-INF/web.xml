@@ -13,7 +13,7 @@
 	  <!-- To disable CSW     service remove packageName: org.constellation.metadata.ws.rs-->
           <!-- To disable WMS/WCS service remove packageName: org.constellation.coverage.ws   -->
           <!-- To enable  SOS     service add    packageName: org.constellation.sos.ws.rs     -->
-          <param-value>org.constellation.metadata.ws.rs</param-value>
+          <param-value>org.constellation.coverage.ws;org.constellation.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
