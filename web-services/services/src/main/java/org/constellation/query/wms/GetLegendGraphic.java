@@ -38,11 +38,37 @@ public class GetLegendGraphic extends WMSQuery {
     private final String format;
 
     /**
+     * Width of the generated legend image. Optional.
+     */
+    private final int width;
+
+    /**
+     * Height of the generated legend image. Optional.
+     */
+    private final int height;
+
+    private static final int DEFAULT_WIDTH = 140;
+
+    private static final int DEFAULT_HEIGHT = 15;
+
+    /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified.
      */
     public GetLegendGraphic(final String layer, final String format) {
-        this.layer = layer;
+        this(layer, format, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    /**
+     * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
+     * and width and height for the image. All parameters should not be {@code null}.
+     */
+    public GetLegendGraphic(final String layer, final String format,
+                            final int width, final int height)
+    {
+        this.layer  = layer;
         this.format = format;
+        this.width  = width;
+        this.height = height;
     }
 
     /**
@@ -57,6 +83,20 @@ public class GetLegendGraphic extends WMSQuery {
      */
     public String getFormat() {
         return format;
+    }
+
+    /**
+     * Returns the width of the legend image.
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * Returns the height of the legend image.
+     */
+    public int getHeight() {
+        return height;
     }
 
     /**

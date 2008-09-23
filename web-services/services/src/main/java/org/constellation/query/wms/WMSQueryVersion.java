@@ -27,14 +27,14 @@ import org.constellation.query.QueryVersion;
  */
 public class WMSQueryVersion extends QueryVersion {
     /**
-     * Key for the WMS GetMap request in version {@code 1.1.1}.
+     * Key for the WMS request in version {@code 1.1.1}.
      */
-    public static final WMSQueryVersion WMS_GETMAP_1_1_1 = new WMSQueryVersion("1.1.1");
+    public static final WMSQueryVersion WMS_1_1_1 = new WMSQueryVersion("1.1.1");
 
     /**
-     * Key for the WMS GetMap request in version {@code 1.3.0}.
+     * Key for the WMS request in version {@code 1.3.0}.
      */
-    public static final WMSQueryVersion WMS_GETMAP_1_3_0 = new WMSQueryVersion("1.3.0");
+    public static final WMSQueryVersion WMS_1_3_0 = new WMSQueryVersion("1.3.0");
 
     /**
      * Key for the WMS GetMap request in version {@code 1.3.0}.

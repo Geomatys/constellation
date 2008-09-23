@@ -21,6 +21,7 @@ import com.sun.jersey.spi.resource.Singleton;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,6 +43,10 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
 import javax.measure.unit.Unit;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -74,8 +79,9 @@ import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
-import org.constellation.query.wms.GetMap;
 import org.constellation.query.QueryAdapter;
+import org.constellation.query.QueryVersion;
+import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.WMSQuery;
@@ -233,17 +239,21 @@ public class WMService extends WebService {
         WMSQuery query = null;
         try {
             final String request = (String) getParameter(KEY_REQUEST, true);
+            final String version = (String) getParameter(KEY_VERSION, false);
+            setCurrentVersion(version);
             LOGGER.info("New request: " + request);
-            query = adaptQuery(request);
             writeParameters();
 
             if (REQUEST_MAP.equalsIgnoreCase(request)) {
-                return getMap();
+                query = adaptGetMap();
+                return getMap(query);
             } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
-                return getCapabilities();
+                query = adaptGetCapabilities();
+                return getCapabilities(query);
             } else if (REQUEST_LEGENDGRAPHIC.equalsIgnoreCase(request)) {
+                query = adaptGetLegendGraphic();
                 final String mimeType = getParameter(KEY_FORMAT, true);
-                return Response.ok(getLegendGraphic(), mimeType).build();
+                return Response.ok(getLegendGraphic(query), mimeType).build();
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
@@ -271,26 +281,27 @@ public class WMService extends WebService {
 
     /**
      * Describe the capabilities and the layers available of this service.
-     *
+     * 
+     * @param query The {@linkplain WMSQuery wms query}.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private Response getCapabilities() throws WebServiceException, JAXBException {
+    private Response getCapabilities(final WMSQuery query) throws WebServiceException, JAXBException {
         //we begin by extract the mandatory attribute
-        if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WMS")) {
-            throw new WMSWebServiceException("The parameter SERVICE=WMS must be specified",
-                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
+        if (!(query instanceof GetCapabilities)) {
+            throw new WMSWebServiceException("Invalid request found, should be GetCapabilities.",
+                    INVALID_REQUEST, getCurrentVersion());
         }
-
+        final GetCapabilities capabRequest = (GetCapabilities) query;
         //and the the optional attribute
-        final String inputVersion = getParameter(KEY_VERSION, false);
-        //setCurrentVersion(getBestVersion(inputVersion).toString());
-        if (inputVersion != null && inputVersion.equals("1.3.0")) {
-            setCurrentVersion("1.3.0");
-        } else {
+        final QueryVersion queryVersion = capabRequest.getVersion();
+        if (queryVersion == null) {
             setCurrentVersion("1.1.1");
+        } else {
+            final String inputVersion = queryVersion.toString();
+            setCurrentVersion(getBestVersion(inputVersion).toString());
         }
         // Now the version has been chosen.
         final ServiceVersion serviceVersion = getCurrentVersion();
@@ -497,48 +508,77 @@ public class WMService extends WebService {
 
     /**
      * Return the legend graphic for the current layer.
-     * 
+     *
+     * @param query The {@linkplain WMSQuery wms query}.
      * @return a file containing the legend graphic image.
+     *
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private File getLegendGraphic() throws WebServiceException, JAXBException {
-        /*verifyBaseParameter(2);
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        webServiceWorker.setLayer(getParameter(KEY_LAYER, true));
-        webServiceWorker.setFormat(getParameter(KEY_FORMAT, false));
-        webServiceWorker.setElevation(getParameter(KEY_ELEVATION, false));
-        webServiceWorker.setColormapRange(getParameter(KEY_DIM_RANGE, false));
-        webServiceWorker.setDimension(getParameter(KEY_WIDTH, false), getParameter(KEY_HEIGHT, false), null);
-        return  webServiceWorker.getLegendFile();*/
-        return null;
+    private synchronized File getLegendGraphic(final WMSQuery query) throws WebServiceException,
+                                                                            JAXBException
+    {
+        if (!(query instanceof GetLegendGraphic)) {
+            throw new WMSWebServiceException("Invalid request found, should be GetLegendGraphic.",
+                    INVALID_REQUEST, getCurrentVersion());
+        }
+        final GetLegendGraphic legendRequest = (GetLegendGraphic) query;
+        //setCurrentVersion(legendRequest.getVersion().toString());
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
+        final LayerDetails layer = dp.get(legendRequest.getLayer());
+        if (layer == null) {
+            throw new WMSWebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
+                    getCurrentVersion());
+        }
+        final int width  = legendRequest.getWidth();
+        final int height = legendRequest.getHeight();
+        final Dimension dims = new Dimension(width, height);
+        final BufferedImage image = layer.getLegendGraphic(dims);
+        final String mimeType = legendRequest.getFormat();
+        try {
+            final File legendFile = createTempFile("legend", mimeType);
+            legendFile.deleteOnExit();
+            writeImage(image, mimeType, legendFile);
+            return legendFile;
+        } catch (IOException ex) {
+            throw new WMSWebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+        }
     }
 
     /**
      * Return a map for the specified parameters in the query: works with
      * the new GO2 Renderer.
      *
-     * @return
-     * @throws fr.geomatys.wms.WebServiceException
+     * @param query The {@linkplain WMSQuery wms query}.
+     * @return The map requested, or an error.
+     * @throws WebServiceException
      */
-    private synchronized Response getMap() throws WebServiceException {
+    private synchronized Response getMap(final WMSQuery query) throws WebServiceException {
         verifyBaseParameter(0);
-
-        final String errorType = getParameter(KEY_EXCEPTIONS, false);
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
-        final WMSQuery query = adaptQuery(getParameter(KEY_REQUEST, true));
         if (!(query instanceof GetMap)) {
-            throw new WMSWebServiceException("Invalid request found, should be GetMap.", INVALID_REQUEST, getCurrentVersion());
+            throw new WMSWebServiceException("Invalid request found, should be GetMap.",
+                    INVALID_REQUEST, getCurrentVersion());
         }
         final GetMap getMap = (GetMap) query;
+        final QueryVersion queryVersion = getMap.getVersion();
+        if (queryVersion == null) {
+            setCurrentVersion("1.1.1");
+        } else {
+            final String inputVersion = queryVersion.toString();
+            setCurrentVersion((inputVersion.equals("1.3.0")) ? "1.3.0" : "1.1.1");
+        }
+        // Now the version has been chosen.
+        final ServiceVersion serviceVersion = getCurrentVersion();
+        final String errorType = getMap.getExceptionFormat();
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
         final String format = getMap.getFormat();
         final File tempFile;
         try {
-            tempFile = createTempFile(format);
+            tempFile = createTempFile("map", format);
         } catch (IOException io) {
-            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, serviceVersion);
         }
-        final WMSWorker worker = new WMSWorker(query,tempFile);
+        final WMSWorker worker = new WMSWorker(query, tempFile);
 
         File image = null;
         File errorFile = null;
@@ -547,21 +587,33 @@ public class WMService extends WebService {
         } catch (PortrayalException ex) {
             if(errorInImage) {
                 try {
-                    errorFile = createTempFile(format);
+                    errorFile = createTempFile("map", format);
                 } catch (IOException io) {
-                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, getCurrentVersion());
+                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, serviceVersion);
                 }
                 final Dimension dim = getMap.getSize();
                 CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
             } else {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
                 throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
-                        ex.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
+                        ex.getMessage(), NO_APPLICABLE_CODE, serviceVersion);
             }
         }
 
-        File result = (errorFile != null) ? errorFile : image;
+        final File result = (errorFile != null) ? errorFile : image;
         return Response.ok(result, getMap.getFormat()).build();
+    }
+
+    /**
+     * Check if the provided object is an instance of one of the given classes.
+     */
+    private static synchronized boolean isValidType(final Class<?>[] validTypes, final Object type) {
+        for (final Class<?> t : validTypes) {
+            if (t.isInstance(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -611,24 +663,37 @@ public class WMService extends WebService {
         }
     }
 
+    private GetCapabilities adaptGetCapabilities() throws WebServiceException {
+        final ServiceVersion version     = getCurrentVersion();
+        final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+        return new GetCapabilities(wmsVersion);
+    }
+
+    private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {
+        final String strLayer  = getParameter( KEY_LAYER,  true );
+        final String strFormat = getParameter( KEY_FORMAT, true );
+        final String strWidth  = getParameter( KEY_WIDTH, false );
+        final String strHeight = getParameter( KEY_HEIGHT, false);
+        if (strWidth == null || strHeight == null) {
+            return new GetLegendGraphic(strLayer, strFormat);
+        } else {
+            return new GetLegendGraphic(strLayer, strFormat, Integer.parseInt(strWidth),
+                                                             Integer.parseInt(strHeight));
+        }
+    }
+
     /**
      * Transform the Query in a container of real java objects, not strings.
      *
      * @return WMSQuery
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private WMSQuery adaptQuery(final String request) throws WebServiceException {
+    private GetMap adaptGetMap() throws WebServiceException {
         final ServiceVersion version  = getCurrentVersion();
         final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
-                    WMSQueryVersion.WMS_GETMAP_1_1_1 : WMSQueryVersion.WMS_GETMAP_1_3_0;
-        if (request.equalsIgnoreCase(REQUEST_CAPABILITIES)) {
-            return new GetCapabilities(wmsVersion);
-        }
-        final String strLayer         = getParameter( KEY_LAYER, true );
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
         final String strFormat        = getParameter( KEY_FORMAT, true);
-        if (request.equalsIgnoreCase(REQUEST_LEGENDGRAPHIC)) {
-            return new GetLegendGraphic(strLayer, strFormat);
-        }
         final String strCRS           = getParameter( (version.toString().equals("1.3.0")) ?
                                                       KEY_CRS_v130 : KEY_CRS_v110, true );
         final String strBBox          = getParameter( KEY_BBOX, true );
@@ -692,18 +757,15 @@ public class WMService extends WebService {
         }
 
         // Builds the request.
-
-        if (request.equalsIgnoreCase(REQUEST_MAP)) {
             return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
                     date, dimRange, size, background, transparent, null);
-        }
-        throw new WMSWebServiceException("Unknown request type.", INVALID_REQUEST, version);
+        //throw new WMSWebServiceException("Unknown request type.", INVALID_REQUEST, version);
     }
 
     /**
-     * Create a temporary file used for map images
+     * Creates a temporary file which will be deleted at ending-time of the webservice.
      */
-    private static File createTempFile(String type) throws IOException {
+    private static File createTempFile(final String prefix, final String type) throws IOException {
         //TODO, I dont know if using a temp file is correct or if it should be
         //somewhere else.
 
@@ -716,12 +778,44 @@ public class WMService extends WebService {
             ending = ".png";
         }
 
-        final File f = File.createTempFile("map", ending);
+        final File f = File.createTempFile(prefix, ending);
         f.deleteOnExit();
 
         return f;
     }
 
-
-
+    /**
+     * Write an {@linkplain BufferedImage image} into an output stream, using the mime
+     * type specified.
+     *
+     * @param image The image to write into an output stream.
+     * @param mime Mime-type of the output
+     * @param output Output stream containing the image.
+     * @throws java.io.IOException if a writing error occurs.
+     */
+    private static synchronized void writeImage(final BufferedImage image,
+            final String mime, Object output) throws IOException
+    {
+        if(image == null) throw new NullPointerException("Image can not be null");
+        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
+        while (writers.hasNext()) {
+            final ImageWriter writer = writers.next();
+            final ImageWriterSpi spi = writer.getOriginatingProvider();
+            if (spi.canEncodeImage(image)) {
+                ImageOutputStream stream = null;
+                if (!isValidType(spi.getOutputTypes(), output)) {
+                    stream = ImageIO.createImageOutputStream(output);
+                    output = stream;
+                }
+                writer.setOutput(output);
+                writer.write(image);
+                writer.dispose();
+                if (stream != null) {
+                    stream.close();
+                }
+                return;
+            }
+        }
+        throw new IOException("Unknowed image type");
+    }
 }

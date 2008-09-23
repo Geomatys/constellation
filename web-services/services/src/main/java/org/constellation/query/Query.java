@@ -33,17 +33,17 @@ public abstract class Query {
     public abstract QueryRequest getRequest();
 
     /**
-     * Returns the service name.
+     * Returns the service name. Never {@code null}.
      */
     public abstract QueryService getService();
 
     /**
-     * Returns the version of the service chosen.
+     * Returns the version of the service chosen, or {@code null} if not specified.
      */
     public abstract QueryVersion getVersion();
     
     /**
-     * Returns the exception format.
+     * Returns the exception format. Never {@code null}.
      */
     public abstract String getExceptionFormat();
 }

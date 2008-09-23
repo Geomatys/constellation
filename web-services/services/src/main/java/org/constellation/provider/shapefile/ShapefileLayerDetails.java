@@ -34,6 +34,7 @@ import org.constellation.provider.NamedStyleDP;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
+import org.geotools.display.renderer.GlyphLegendFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
@@ -178,8 +179,10 @@ class ShapefileLayerDetails implements LayerDetails{
         return layer;
     }
 
-    public BufferedImage getLegendGraphic(Dimension dimension) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public BufferedImage getLegendGraphic(final Dimension dimension) {
+        final GlyphLegendFactory sldFact = new GlyphLegendFactory();
+        
+        return sldFact.create(getMapLayer(null).getStyle(), dimension);
     }
     
 }

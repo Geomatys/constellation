@@ -35,6 +35,7 @@ import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
@@ -55,6 +56,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.RasterSymbolizer;
 
@@ -100,6 +102,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         this.db = db;
         this.layer = layer;
         this.times = new ArrayList<Date>();
+        setName(layer.getName());
     }
 
     public Object prepare(ReferencedEnvelope env, int width, int height,
@@ -116,7 +119,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         } catch (TransformException ex) {
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         GeneralEnvelope renv = new GeneralEnvelope(genv);
 
         //Create BBOX-----------------------------------------------------------
@@ -126,7 +128,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         } catch (TransformException ex) {
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         //Create resolution-----------------------------------------------------
         double w = renv.toRectangle2D().getWidth() /width;
         double h = renv.toRectangle2D().getHeight() /height;
@@ -158,10 +159,17 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        final ColorMap colorMap = new ColorMap();
-        colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
-        coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
-
+        if (dimRange != null) {
+            final GridSampleDimension[] samples = coverage.getSampleDimensions();
+            if (samples != null && samples.length == 1 && samples[0] != null) {
+                if (samples[0].getSampleToGeophysics() != null) {
+                    final ColorMap colorMap = new ColorMap();
+                    colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
+                    coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
+                    coverage = coverage.geophysics(false);
+                }
+            }
+        }
         //TODO RETURN a RenderedImage, but doesnt work
 //        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, displayCRS);
 //        return coverage.getRenderedImage();
@@ -173,8 +181,14 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         AffineTransform dataToObj = null;
         try {
-            dataToObj = (AffineTransform) CRS.findMathTransform(env.getCoordinateReferenceSystem(),
-                    coverage.getCoordinateReferenceSystem(), true);
+            MathTransform objToCoverage = CRS.findMathTransform(env.getCoordinateReferenceSystem(),
+                    coverage.getCoordinateReferenceSystem2D(), true);
+            if (objToCoverage instanceof AffineTransform) {
+                dataToObj = (AffineTransform) objToCoverage;
+            } else {
+                Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, getName(), new ClassCastException());
+                return buffer;
+            }
         } catch (FactoryException ex) {
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -185,8 +199,13 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         trs.concatenate(dataToObj);
         g2.setTransform(trs);
 
-        AffineTransform transform = (AffineTransform)coverage.getGridGeometry().getGridToCRS();
-        g2.drawRenderedImage(img, transform);
+        final MathTransform2D mathTrans2D = coverage.getGridGeometry().getGridToCRS2D();
+        if (mathTrans2D instanceof AffineTransform) {
+            AffineTransform transform = (AffineTransform) mathTrans2D;
+            g2.drawRenderedImage(img, transform);
+        } else {
+            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, new IllegalArgumentException());
+        }
         g2.dispose();
 
 

@@ -22,9 +22,8 @@ import javax.media.jai.Interpolation;
 import static java.lang.Float.floatToIntBits;
 
 import org.geotools.util.NumberRange;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.coverage.grid.GridGeometry;
-import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
