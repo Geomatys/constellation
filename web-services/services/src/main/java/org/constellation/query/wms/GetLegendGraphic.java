@@ -47,8 +47,14 @@ public class GetLegendGraphic extends WMSQuery {
      */
     private final int height;
 
+    /**
+     * Default values for the width.
+     */
     private static final int DEFAULT_WIDTH = 140;
 
+    /**
+     * Default value for the height.
+     */
     private static final int DEFAULT_HEIGHT = 15;
 
     /**

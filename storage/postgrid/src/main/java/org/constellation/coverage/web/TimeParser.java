@@ -34,7 +34,7 @@ import org.geotools.util.logging.LoggedFormat;
  * @author Martin Desruisseaux
  * @version $Id$
  */
-final class TimeParser {
+public final class TimeParser {
     /**
      * Amount of milliseconds in a day.
      */

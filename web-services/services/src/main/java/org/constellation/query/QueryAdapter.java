@@ -17,18 +17,16 @@
 package org.constellation.query;
 
 import java.awt.Color;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
+import org.constellation.coverage.web.TimeParser;
 import org.constellation.query.wms.WMSQuery;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -81,19 +79,28 @@ public class QueryAdapter {
         return CRS.decode(epsg);
     }
 
+    /**
+     * Convert a string containing a date into a {@link Date}, respecting the ISO 8601 standard.
+     *
+     * @param strTime Date as a string.
+     * @return A date parsed from a string, or {@code null} if it doesn't respect the ISO 8601.
+     * @throws java.text.ParseException
+     */
     public static Date toDate(final String strTime) throws ParseException {
         if (strTime == null) {
             return null;
         }
-        final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dateFormat.parse(strTime);
+        final List<Date> dates = new ArrayList<Date>();
+        TimeParser.parse(strTime, 0L, dates);
+        return (dates != null && !dates.isEmpty()) ? dates.get(0) : null;
     }
 
     /**
      * Converts a string representing the bbox coordinates into a {@link GeneralEnvelope}.
      *
      * @param bbox Coordinates of the bounding box, seperated by comas.
+     * @param crs  The {@linkplain CoordinateReferenceSystem coordinate reference system} in
+     *             which the envelope is expressed. Should not be {@code null}.
      * @return The enveloppe for the bounding box specified, or an
      *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
      *         if the bbox is {@code null}.

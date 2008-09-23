@@ -53,17 +53,19 @@ import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.RasterSymbolizer;
 
+
 /**
  *
  * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer{
     /**
@@ -97,7 +99,13 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      */
     private final Layer layer;
 
-    public PostGridMapLayer(Database db, Layer layer){
+    /**
+     * Builds a map layer, using a database connection and a layer.
+     *
+     * @param db The database connection.
+     * @param layer The current layer.
+     */
+    public PostGridMapLayer(final Database db, final Layer layer){
         super(createDefaultRasterStyle());
         this.db = db;
         this.layer = layer;
@@ -174,40 +182,25 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 //        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, displayCRS);
 //        return coverage.getRenderedImage();
 
-
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-        RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
 
+        // Here a resample is done, to get the coverage into the requested crs.
+        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
 
-        AffineTransform dataToObj = null;
-        try {
-            MathTransform objToCoverage = CRS.findMathTransform(env.getCoordinateReferenceSystem(),
-                    coverage.getCoordinateReferenceSystem2D(), true);
-            if (objToCoverage instanceof AffineTransform) {
-                dataToObj = (AffineTransform) objToCoverage;
-            } else {
-                Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, getName(), new ClassCastException());
-                return buffer;
-            }
-        } catch (FactoryException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Graphics2D g2 = buffer.createGraphics();
-        AffineTransform trs = g2.getTransform();
+        final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
+        final Graphics2D g2 = buffer.createGraphics();
+        final AffineTransform trs = g2.getTransform();
         trs.concatenate((AffineTransform)objToDisp);
-        trs.concatenate(dataToObj);
         g2.setTransform(trs);
 
         final MathTransform2D mathTrans2D = coverage.getGridGeometry().getGridToCRS2D();
         if (mathTrans2D instanceof AffineTransform) {
-            AffineTransform transform = (AffineTransform) mathTrans2D;
+            final AffineTransform transform = (AffineTransform) mathTrans2D;
             g2.drawRenderedImage(img, transform);
         } else {
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, new IllegalArgumentException());
         }
         g2.dispose();
-
 
         return buffer;
     }
@@ -241,6 +234,9 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         return times.isEmpty() ? null : times.get(times.size() - 1);
     }
 
+    /**
+     * Returns the maximum range for the color map to apply.
+     */
     public MeasurementRange getDimRange() {
         return dimRange;
     }
@@ -260,10 +256,16 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         return sf.createRasterStyle(symbol);
     }
 
+    /**
+     * Fixes the range to apply for the color map.
+     */
     public void setDimRange(final MeasurementRange dimRange) {
         this.dimRange = dimRange;
     }
 
+    /**
+     * Fixes the elevation to request.
+     */
     public void setElevation(final double elevation) {
         this.elevation = elevation;
     }
