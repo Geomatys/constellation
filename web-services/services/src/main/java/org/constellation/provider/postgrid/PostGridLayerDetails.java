@@ -82,6 +82,10 @@ class PostGridLayerDetails implements LayerDetails {
             if (elevation != null) {
                 mapLayer.setElevation(elevation);
             }
+            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
+            if (date != null) {
+                mapLayer.times().add(date);
+            }
         }
         return mapLayer;
     }
