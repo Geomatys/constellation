@@ -56,6 +56,9 @@ class PostGridLayerDetails implements LayerDetails {
      */
     private final Layer layer;
     
+    /**
+     * Favorites styles associated with this layer.
+     */
     private final List<String> favorites;
 
     /**
@@ -72,7 +75,7 @@ class PostGridLayerDetails implements LayerDetails {
         if(favorites == null){
             this.favorites = Collections.emptyList();
         }else{
-            this.favorites = Collections.unmodifiableList(favorites);
+            this.favorites = favorites;
         }
     }
 
@@ -86,29 +89,10 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public MapLayer getMapLayer(final Map<String, Object> params) {
-        return createMapLayer(null, params);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
-        if(style instanceof String){
-            System.out.println("before style : "+ style);
-            style = NamedStyleDP.getInstance().get((String)style);
-        }
-        System.out.println("after style : "+ style);
         return createMapLayer(style, params);
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
-        return createMapLayer(style, params);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -116,6 +100,9 @@ class PostGridLayerDetails implements LayerDetails {
         return layer.getName();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public List<String> getFavoriteStyles(){
         return favorites;
     }   
@@ -179,30 +166,35 @@ class PostGridLayerDetails implements LayerDetails {
     private MapLayer createMapLayer(Object style, final Map<String, Object> params){
         final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
         
-        System.out.println(" style 1 : "+ style);
         if(style == null){
-            //no style provided try to get the favorite one
+            System.out.println(favorites.size());
+            //no style provided, try to get the favorite one
             if(favorites.size() > 0){
-                String favorite = favorites.get(0);
-                style = NamedStyleDP.getInstance().get(favorite);
-            }
-            if(style == null){
-                //could not load a favorite style, create a random one
+                //there are some favorites styles
+                style = favorites.get(0);
+            }else{
+                //no favorites defined, create a default one
                 style = RANDOM_FACTORY.createRasterStyle();
             }
         }
-        
+                
+        if(style instanceof String){
+            //the given style is a named style
+            style = NamedStyleDP.getInstance().get((String)style);
+            if(style == null){
+                //somehting is wrong, the named style doesnt exist, create a default one
+                style = RANDOM_FACTORY.createRasterStyle();
+            }
+        }
+               
         if(style instanceof MutableStyle){
-            System.out.println("mutable style !");
             //style is a commun SLD style
             mapLayer.setStyle((MutableStyle) style);
         }else if( style instanceof GraphicBuilder){
-            System.out.println("graphic builder!");
             //special graphic builder
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
             mapLayer.graphicBuilders().add((GraphicBuilder) style);
         }else{
-            System.out.println("unknown style !");
             //style is unknowed type, use a random style
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
         }

@@ -27,9 +27,9 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 
+import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
-import org.geotools.style.MutableStyle;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
@@ -63,7 +63,10 @@ public interface LayerDetails {
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException;
 
-    List<String> getFavoriteStyles();
+    /**
+     * Returns a list of favorites styles associated to this layer.
+     */
+    public List<String> getFavoriteStyles();
 
     /**
      * @see Layer#getGeographicBoundingBox
@@ -84,11 +87,14 @@ public interface LayerDetails {
      */
     public BufferedImage getLegendGraphic(final Dimension dimension);
 
-    public MapLayer getMapLayer(final Map<String, Object> params);
-
-    MapLayer getMapLayer(Object style, final Map<String, Object> params);
-    
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
+    /**
+     * Create a MapLayer with the given style and parameters.
+     * if style is null, the favorite style of this layer will be used.
+     * 
+     * @param style : can be null. reconized types are String/GraphicBuilder/MutableStyle.
+     * @param params : can be null.
+     */
+    public MapLayer getMapLayer(Object style, final Map<String, Object> params) throws PortrayalException;
 
     /**
      * @see Layer#getName
@@ -103,7 +109,7 @@ public interface LayerDetails {
     /**
      * @see Layer#getSampleValueRanges
      */
-    MeasurementRange<?>[] getSampleValueRanges();
+    public MeasurementRange<?>[] getSampleValueRanges();
 
     /**
      * @see Layer#getThematic

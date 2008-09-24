@@ -35,6 +35,7 @@ import org.constellation.provider.NamedStyleDP;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.display.renderer.GlyphLegendFactory;
+import org.geotools.display.service.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
@@ -74,29 +75,17 @@ class ShapefileLayerDetails implements LayerDetails{
         }else{
             this.favorites = Collections.unmodifiableList(favorites);
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
-    public MapLayer getMapLayer(final Map<String, Object> params) {
-        return createMapLayer(store,null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
-        if(style instanceof String){
-            style = NamedStyleDP.getInstance().get((String)style);
+    public MapLayer getMapLayer(Object style, final Map<String, Object> params) throws PortrayalException{
+        try {
+            return createMapLayer(style, params);
+        } catch (IOException ex) {
+            throw new PortrayalException(ex);
         }
-        
-        return createMapLayer(store, style);
-    }
-
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
-        return createMapLayer(store,style);
     }
 
     /**
@@ -113,6 +102,9 @@ class ShapefileLayerDetails implements LayerDetails{
         return favorites;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isQueryable(Service service) {
         return true;
     }
@@ -181,64 +173,12 @@ class ShapefileLayerDetails implements LayerDetails{
         return "Vector datas";
     }
 
-    private MapLayer createMapLayer(DataStore store, Object style){
-        MapLayer layer = null;
-
-        FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
-
-        try{
-            fs = store.getFeatureSource(store.getTypeNames()[0]);
-        }catch(IOException ex){
-            //TODO log error
-            ex.printStackTrace();
-        }
-
-        if(fs != null){
-
-            if(style == null){
-                //no style provided try to get the favorite one
-                if(favorites.size() > 0){
-                    String favorite = favorites.get(0);
-                    style = NamedStyleDP.getInstance().get(favorite);
-                }
-
-                if(style == null){
-                    //could not load a favorite style, create a random one
-                    style = RANDOM_FACTORY.createRandomVectorStyle(fs);
-                }
-
-            }
-
-            
-            if(style instanceof MutableStyle){
-                //style is a commun SLD style
-                layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
-            }else if( style instanceof GraphicBuilder){
-                //special graphic builder
-                final MutableStyle mutable = RANDOM_FACTORY.createRandomVectorStyle(fs);
-                layer = new MapLayerBuilder().create(fs, mutable);
-                layer.graphicBuilders().add((GraphicBuilder) style);
-            }else{
-                //style is unknowed type, use a random style
-                final MutableStyle mutable = RANDOM_FACTORY.createRandomVectorStyle(fs);
-                layer = new MapLayerBuilder().create(fs, mutable);
-            }
-            
-        }else{
-            System.err.println(ShapeFileNamedLayerDP.class +" Error : Could not create shapefile maplayer.");
-            //TODO log error
-        }
-
-        return layer;
-    }
-
     /**
      * {@inheritDoc}
      */
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final GlyphLegendFactory sldFact = new GlyphLegendFactory();
-
-        return sldFact.create(getMapLayer(null).getStyle(), dimension);
+        return sldFact.create(RANDOM_FACTORY.createPolygonStyle(), dimension);
     }
 
     /**
@@ -246,6 +186,47 @@ class ShapefileLayerDetails implements LayerDetails{
      */
     public String getInformationAt(double x, double y) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    private MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{
+        MapLayer layer = null;
+        final FeatureSource<SimpleFeatureType,SimpleFeature> fs = store.getFeatureSource(store.getTypeNames()[0]);
+
+        if(style == null){
+            //no style provided, try to get the favorite one
+            if(favorites.size() > 0){
+                //there are some favorites styles
+                style = favorites.get(0);
+            }else{
+                //no favorites defined, create a default one
+                style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            }
+        }
+
+        if(style instanceof String){
+            //the given style is a named style
+            style = NamedStyleDP.getInstance().get((String)style);
+            if(style == null){
+                //somehting is wrong, the named style doesnt exist, create a default one
+                style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            }
+        }
+
+        if(style instanceof MutableStyle){
+            //style is a commun SLD style
+            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+        }else if( style instanceof GraphicBuilder){
+            //special graphic builder
+            style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+            layer.graphicBuilders().add((GraphicBuilder) style);
+        }else{
+            //style is unknowed type, use a random style
+            style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+        }
+
+        return layer;
     }
 
 }

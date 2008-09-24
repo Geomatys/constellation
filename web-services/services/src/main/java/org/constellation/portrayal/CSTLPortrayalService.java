@@ -62,7 +62,6 @@ import org.geotools.util.MeasurementRange;
 public class CSTLPortrayalService extends DefaultPortrayalService{
 
     private final NamedLayerDP layerDPS = NamedLayerDP.getInstance();
-    private final NamedStyleDP styleDPS = NamedStyleDP.getInstance();
 
 
     public CSTLPortrayalService(){}
@@ -81,41 +80,42 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         portray(context, contextEnv, background, output, mime, canvasDimension, hints,true);
     }
 
-    private MapContext toMapContext(List<String> layers, List<String> styles, MutableStyledLayerDescriptor sld,
+    private MapContext toMapContext(final List<String> layers, final List<String> styles, 
+                                    final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
-            throws PortrayalException {
-        MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+                                    throws PortrayalException {
+        
+        final MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
-        int index = 0;
-        for(String layerName : layers){
-
-            MapLayer layer = null;
+        for(int index=0, n = layers.size();index<n;index++){
+            final String layerName = layers.get(index);
             final LayerDetails details = layerDPS.get(layerName);
             
             if(details == null){
-                throw new PortrayalException("Layer : "+layerName+" could not be created");
+                throw new PortrayalException("Layer détails for "+layerName+" could not be created");
             }
 
+            final Object style;
+            
             if(sld != null){
                 //try to use the provided SLD
-                Object style = extractStyle(layerName,sld);
-                layer = details.getMapLayer(style, params);
+                style = extractStyle(layerName,sld);
             } else if (styles.size() > index){
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                String style = styles.get(index);
-                layer = details.getMapLayer(style, params);
+                style = styles.get(index);
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
-                layer = details.getMapLayer(params);
+                style = null;
             }
 
+            final MapLayer layer = details.getMapLayer(style,params);
+            
             if(layer == null){
-                throw new PortrayalException("Layer : "+layerName+" could not be created");
+                throw new PortrayalException("Map layer : "+layerName+" could not be created");
             }
 
             ctx.layers().add(layer);
-            index++;
         }
 
         return ctx;
@@ -126,15 +126,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             throw new NullPointerException("SLD should not be null");
         }
 
-        List<MutableLayer> layers = sld.layers();
-        for(MutableLayer layer : layers){
+        for(final MutableLayer layer : sld.layers()){
 
             if(layer instanceof MutableNamedLayer && layerName.equals(layer.getName()) ){
                 //we can only extract style from a NamedLayer that has the same name
                 final MutableNamedLayer mnl = (MutableNamedLayer) layer;
-                final List<MutableLayerStyle> styles = mnl.styles();
 
-                for(MutableLayerStyle mls : styles){
+                for(final MutableLayerStyle mls : mnl.styles()){
                     Object GTStyle = null;
                     if(mls instanceof MutableNamedStyle){
                         MutableNamedStyle mns = (MutableNamedStyle) mls;
@@ -148,7 +146,6 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                         return GTStyle;
                     }
                 }
-
             }
         }
 

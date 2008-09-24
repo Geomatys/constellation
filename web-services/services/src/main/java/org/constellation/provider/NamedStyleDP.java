@@ -51,12 +51,15 @@ public class NamedStyleDP implements DataProvider<String,Object>{
     private NamedStyleDP(){
         
         List<File> folders = getSLDFolders();
+        
+        dps.add(GO2NamedStyleDP.getDefault());
+        
         for(File folder : folders){
             SLDNamedStyleDP sldDP = new SLDNamedStyleDP(folder);
             dps.add(sldDP);
         }
         
-        dps.add(GO2NamedStyleDP.getDefault());
+        
         
     }
     

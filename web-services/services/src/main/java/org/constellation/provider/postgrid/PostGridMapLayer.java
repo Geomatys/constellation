@@ -17,6 +17,7 @@
 package org.constellation.provider.postgrid;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
@@ -175,24 +176,12 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        // use the provided dim range
-        if (dimRange != null) {
-            final GridSampleDimension[] samples = coverage.getSampleDimensions();
-            if (samples != null && samples.length == 1 && samples[0] != null) {
-                if (samples[0].getSampleToGeophysics() != null) {
-                    final ColorMap colorMap = new ColorMap();
-                    colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
-                    coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
-                    coverage = coverage.geophysics(false);
-                }
-            }
-        }
-        //TODO RETURN a RenderedImage, but doesnt work
-//        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, displayCRS);
-//        return coverage.getRenderedImage();
-
-        
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+        
+        if(coverage == null){
+            return buffer;
+        }
+        
         // Here a resample is done, to get the coverage into the requested crs.
         coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
         final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
@@ -200,15 +189,10 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         
         
         //---------------GRAPHIC BUILDER----------------------------------------
-        for (GraphicBuilder graph : graphicBuilders()) {
-            System.out.println("graph : " + graph);
-        }
+        
         final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
 
-        System.out.println("--->> BUILDER = " + builder);
-        System.out.println("--->> CONTEXT = " + extent);
         if(builder != null && extent instanceof RenderingContext2D){
-            System.out.println("OK, try to paint vector field");
             //TODO Find a better way to solve this issue
             final MapLayerBuilder mapBuilder = new MapLayerBuilder();
             final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
@@ -217,11 +201,10 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
             g2.setClip(context2D.getGraphics().getClip());
             context2D = context2D.create(g2);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             for(GraphicJ2D gra : graphics){
                 try {
-                    System.out.println("Paint arrow");
                     gra.paint(context2D);
-                    System.out.println("Paint finished");
                 } catch (TransformException ex) {
                     Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -235,7 +218,19 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         
         //----------------------------------------------------------------------
 
-
+        // use the provided dim range
+        if (dimRange != null) {
+            final GridSampleDimension[] samples = coverage.getSampleDimensions();
+            if (samples != null && samples.length == 1 && samples[0] != null) {
+                if (samples[0].getSampleToGeophysics() != null) {
+                    final ColorMap colorMap = new ColorMap();
+                    colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
+                    coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
+                    coverage = coverage.geophysics(false);
+                }
+            }
+        }
+        
         //normal image rendering
         final AffineTransform trs = g2.getTransform();
         trs.concatenate((AffineTransform)objToDisp);

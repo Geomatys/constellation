@@ -47,6 +47,7 @@ import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerLinkReader;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.ws.rs.WebService;
+
 import org.xml.sax.SAXException;
 
 
@@ -310,22 +311,12 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
                 favorites.putAll(links);
             }
         }
-        for (String url : favorites.keySet()) {
-            for (String style : favorites.get(url)) {
-                System.out.println("layer :"+ url +" style : "+ style);
-                System.out.println("builder : "+ NamedStyleDP.getInstance().get(style));
-            }
-        }
     }
     
     public List<String> getFavoriteStyles(String layerName) {
         List<String> favs = favorites.get(layerName);
-        System.out.println("layerName "+ layerName);
         if(favs == null){
             favs = Collections.emptyList();
-        }
-        for (String fav : favs) {
-            System.out.println("style = " + fav);
         }
         return favs;
     }
