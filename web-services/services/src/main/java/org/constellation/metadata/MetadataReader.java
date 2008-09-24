@@ -523,52 +523,53 @@ public class MetadataReader {
      * Create a bounding box from a geographiqueElement Value
      */
     private BoundingBoxType createBoundingBoxFromValue(int ordinal, Form f) throws SQLException {
-        
-        //we get the CRS
-        List<Value> crsValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code"));
-        String crs  = null;
-        for (Value v: crsValues) {
-            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                crs = ((TextValue)v).getValue();
-                
-            }
-        }
-        
-        //we get the east value
-        List<Value> eastValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude"));
-        Double eastValue  =null;
-        for (Value v: eastValues) {
-            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                eastValue = Double.parseDouble(((TextValue)v).getValue());
-                
-            }
-        }
-        
-        //we get the east value
-        List<Value> westValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude"));
-        Double  westValue  = null;
-        for (Value v: westValues) {
-            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                westValue = Double.parseDouble(((TextValue)v).getValue());
-            }
-        }
-        
-        //we get the north value
-        List<Value> northValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude"));
-        Double northValue  = null;
-        for (Value v: northValues) {
-            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                northValue = Double.parseDouble(((TextValue)v).getValue());
-            }
-        }
-        
-        //we get the south value
-        List<Value> southValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude"));
         Double  southValue  = null;
-        for (Value v: southValues) {
-            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                southValue = Double.parseDouble(((TextValue)v).getValue());
+        Double eastValue    = null;
+        Double  westValue   = null;
+        Double northValue  = null;
+        String crs  = null;
+            try {
+            //we get the CRS
+            List<Value> crsValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code"));
+            for (Value v: crsValues) {
+                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                    crs = ((TextValue)v).getValue();
+                }
             }
+        
+            //we get the east value
+            List<Value> eastValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude"));
+            for (Value v: eastValues) {
+                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                    eastValue = Double.parseDouble(((TextValue)v).getValue());
+                }
+            }
+        
+            //we get the east value
+            List<Value> westValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude"));
+            for (Value v: westValues) {
+                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                    westValue = Double.parseDouble(((TextValue)v).getValue());
+                }
+            }
+        
+            //we get the north value
+            List<Value> northValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude"));
+            for (Value v: northValues) {
+                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                    northValue = Double.parseDouble(((TextValue)v).getValue());
+                }
+            }
+        
+            //we get the south value
+            List<Value> southValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude"));
+            for (Value v: southValues) {
+                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                    southValue = Double.parseDouble(((TextValue)v).getValue());
+                }
+            }
+        } catch (NumberFormatException ex) {
+            logger.severe("unable to parse a double in bounding box value:" + '\n' + ex.getMessage() ) ;
         }
         
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
