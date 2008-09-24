@@ -57,7 +57,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-class ShapefileLayerDetails implements LayerDetails{
+class ShapefileLayerDetails implements LayerDetails {
 
     private static final GeographicBoundingBox DUMMY_BBOX =
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
@@ -184,7 +184,7 @@ class ShapefileLayerDetails implements LayerDetails{
     /**
      * {@inheritDoc}
      */
-    public String getInformationAt(double x, double y) {
+    public double getInformationAt(double x, double y, Date time, double elevation) throws CatalogException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -228,5 +228,4 @@ class ShapefileLayerDetails implements LayerDetails{
 
         return layer;
     }
-
 }

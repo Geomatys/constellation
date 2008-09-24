@@ -525,10 +525,10 @@ public class WMService extends WebService {
         final GetFeatureInfo info = (GetFeatureInfo) query;
         final QueryVersion queryVersion = info.getVersion();
         if (queryVersion == null) {
-            setCurrentVersion("1.1.1");
+            setCurrentVersion(WMSQueryVersion.WMS_1_1_1.key);
         } else {
-            final String inputVersion = queryVersion.toString();
-            setCurrentVersion((inputVersion.equals("1.3.0")) ? "1.3.0" : "1.1.1");
+            setCurrentVersion((queryVersion.equals(WMSQueryVersion.WMS_1_3_0)) ?
+                WMSQueryVersion.WMS_1_3_0.key : WMSQueryVersion.WMS_1_1_1.key);
         }
 
         String infoFormat = info.getFormat();
@@ -536,20 +536,29 @@ public class WMService extends WebService {
             if(!(infoFormat.equals("text/plain") || infoFormat.equals("text/html") ||
                  infoFormat.equals("application/vnd.ogc.gml") || infoFormat.equals("text/xml")))
             {
-                throw new WMSWebServiceException("This MIME type " + infoFormat + 
+                throw new WMSWebServiceException("This MIME type " + infoFormat +
                         " is not accepted by the service", INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         } else {
             infoFormat = "text/plain";
         }
-
+        final double elevation = info.getElevation();
+        final Date time = info.getDate();
         final List<String> layers = info.getLayers();
         final StringBuilder response = new StringBuilder();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
-            response.append(layer.getInformationAt(info.getX(), info.getY()));
+            try {
+            final double currentValue = layer.getInformationAt(info.getX(), info.getY(),
+                    time, elevation);
+            
+            response.append("Result for layer ").append(layer.getName());
+            response.append(" : ").append(currentValue);
             response.append("\n");
+            } catch (CatalogException cat) {
+                throw new WMSWebServiceException(cat, NO_APPLICABLE_CODE, getCurrentVersion());
+            }
         }
         return Response.ok(response.toString(), infoFormat).build();
     }
@@ -711,6 +720,12 @@ public class WMService extends WebService {
         }
     }
 
+    /**
+     * Converts a GetCapabilities request composed of string values, to a container of real java objects.
+     *
+     * @return A GetCapabilities request.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private GetCapabilities adaptGetCapabilities() throws WebServiceException {
         final ServiceVersion version     = getCurrentVersion();
         final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
@@ -725,9 +740,19 @@ public class WMService extends WebService {
             getParameter(KEY_I_v110, true) : getParameter(KEY_I_v130, true);
         final String strY    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
             getParameter(KEY_J_v110, true) : getParameter(KEY_J_v130, true);
-        return new GetFeatureInfo(getMap, Double.parseDouble(strX), Double.parseDouble(strY), null, null);
+        final String queryLayers = getParameter(KEY_QUERY_LAYERS, true);
+        final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
+        final List<String> layers = QueryAdapter.toStringList(queryLayers);
+        return new GetFeatureInfo(getMap, Double.parseDouble(strX),
+                Double.parseDouble(strY), layers, infoFormat);
     }
 
+    /**
+     * Converts a GetLegendGraphic request composed of string values, to a container of real java objects.
+     *
+     * @return The GetLegendGraphic request.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {
         final String strLayer  = getParameter( KEY_LAYER,  true );
         final String strFormat = getParameter( KEY_FORMAT, true );
@@ -749,9 +774,9 @@ public class WMService extends WebService {
     }
 
     /**
-     * Transform the Query in a container of real java objects, not strings.
+     * Converts a GetMap request composed of string values, to a container of real java objects.
      *
-     * @return WMSQuery
+     * @return The GetMap request.
      * @throws org.constellation.coverage.web.WebServiceException
      */
     private GetMap adaptGetMap() throws WebServiceException {

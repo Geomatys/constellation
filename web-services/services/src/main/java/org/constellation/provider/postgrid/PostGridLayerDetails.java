@@ -18,6 +18,7 @@ package org.constellation.provider.postgrid;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.SortedSet;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.WebServiceException;
@@ -33,11 +35,16 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.WMSQuery;
 
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 
@@ -84,18 +91,22 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public String getInformationAt(final double x, final double y) {
-        /*final double xv, yv;
-        String n = null;
+    public double getInformationAt(final double x, final double y, final Date time,
+                                   final double elevation) throws CatalogException
+    {
+        final CoverageReference coverage = layer.getCoverageReference(time, elevation);
         try {
-            xv = Double.parseDouble(n = x.trim());
-            yv = Double.parseDouble(n = y.trim());
-        } catch (NumberFormatException exception) {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
-                    exception, INVALID_POINT, version);
+            final GridCoverage2D grid2D = coverage.getCoverage(null);
+            final DirectPosition position = new DirectPosition2D(x, y);
+            final Object result = grid2D.evaluate(position);
+            if (result instanceof Double) {
+                return (Double) result;
+            } else {
+                throw new CatalogException(Errors.format(ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, Double.class));
+            }
+        } catch (IOException io) {
+            throw new CatalogException(io);
         }
-        return evaluatePixel(xv, yv);*/
-        return null;
     }
 
     /**

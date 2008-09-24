@@ -21,6 +21,7 @@ import org.constellation.query.QueryVersion;
 
 
 /**
+ * Representation of a {@code WMS GetCapabilities} request, with its parameters.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)

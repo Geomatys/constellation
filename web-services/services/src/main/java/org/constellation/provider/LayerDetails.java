@@ -27,6 +27,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 
+import org.constellation.coverage.web.WebServiceException;
 import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
@@ -80,7 +81,8 @@ public interface LayerDetails {
      * @param y Y coordinate.
      * @return A string representation of the information at the coordinates specified.
      */
-    public String getInformationAt(final double x, final double y);
+    public double getInformationAt(final double x, final double y, final Date time,
+                                   final double elevation) throws CatalogException;
 
     /**
      * @see Layer#getLegend(Dimension)

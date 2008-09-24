@@ -25,10 +25,15 @@ import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
 
+
 /**
+ * Representation of a {@code WMS GetFeatureInfo} request, with its parameters. It
+ * is an extension of the {@link GetMap} request.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
+ *
+ * @see GetMap
  */
 public class GetFeatureInfo extends GetMap {
     /**
@@ -41,18 +46,22 @@ public class GetFeatureInfo extends GetMap {
      */
     private final double y;
 
-    private final String queryLayers;
+    /**
+     * Layers to request.
+     */
+    private final List<String> queryLayers;
 
+    /**
+     * Format of the returned information.
+     */
     private final String infoFormat;
 
     public GetFeatureInfo(final GetMap getMap, final double x, final double y,
-                          final String queryLayers, final String infoFormat)
+                          final List<String> queryLayers, final String infoFormat)
     {
         super(getMap);
-        this.x = x;
-        this.y = y;
-        this.queryLayers = queryLayers;
-        this.infoFormat  = infoFormat;
+        this.x = x;     this.queryLayers = queryLayers;
+        this.y = y;     this.infoFormat  = infoFormat;
     }
 
     public GetFeatureInfo(final Envelope envelope, final QueryVersion version,
@@ -60,7 +69,7 @@ public class GetFeatureInfo extends GetMap {
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions, final double x, final double y,
-                  final String queryLayers, final String infoFormat)
+                  final List<String> queryLayers, final String infoFormat)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
                 background, transparent, exceptions);
@@ -80,5 +89,19 @@ public class GetFeatureInfo extends GetMap {
      */
     public double getY() {
         return y;
+    }
+
+    /**
+     * Returns a list of layers to request.
+     */
+    public List<String> getQueryLayers() {
+        return queryLayers;
+    }
+
+    /**
+     * Returns the format of the information to returned.
+     */
+    public String getInfoFormat() {
+        return infoFormat;
     }
 }
