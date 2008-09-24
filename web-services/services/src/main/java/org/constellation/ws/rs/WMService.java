@@ -531,7 +531,7 @@ public class WMService extends WebService {
                 WMSQueryVersion.WMS_1_3_0.key : WMSQueryVersion.WMS_1_1_1.key);
         }
 
-        String infoFormat = info.getFormat();
+        String infoFormat = info.getInfoFormat();
         if (infoFormat != null) {
             if(!(infoFormat.equals("text/plain") || infoFormat.equals("text/html") ||
                  infoFormat.equals("application/vnd.ogc.gml") || infoFormat.equals("text/xml")))
@@ -544,7 +544,7 @@ public class WMService extends WebService {
         }
         final double elevation = info.getElevation();
         final Date time = info.getDate();
-        final List<String> layers = info.getLayers();
+        final List<String> layers = info.getQueryLayers();
         final StringBuilder response = new StringBuilder();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         for (final String key : layers) {

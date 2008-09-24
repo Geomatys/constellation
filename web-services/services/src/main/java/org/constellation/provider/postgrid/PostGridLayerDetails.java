@@ -30,21 +30,18 @@ import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.WebServiceException;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
-import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 
@@ -96,14 +93,20 @@ class PostGridLayerDetails implements LayerDetails {
     {
         final CoverageReference coverage = layer.getCoverageReference(time, elevation);
         try {
-            final GridCoverage2D grid2D = coverage.getCoverage(null);
-            final DirectPosition position = new DirectPosition2D(x, y);
-            final Object result = grid2D.evaluate(position);
-            if (result instanceof Double) {
-                return (Double) result;
-            } else {
-                throw new CatalogException(Errors.format(ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, Double.class));
+            final Envelope envelope = coverage.getEnvelope();
+            final int dimension = envelope.getDimension();
+            final GeneralDirectPosition generalPosition = new GeneralDirectPosition(dimension);
+            for (int i=0; i<dimension; i++) {
+                generalPosition.setOrdinate(i, envelope.getMedian(i));
+                System.out.println(envelope.getMedian(i));
             }
+            generalPosition.setOrdinate(0, x);
+            generalPosition.setOrdinate(1, y);
+            final GridCoverage2D grid2D = coverage.getCoverage(null);
+            //final DirectPosition position = new DirectPosition2D(x, y);
+            double[] result = null;
+            result = grid2D.evaluate(generalPosition, result);
+            return result[0];
         } catch (IOException io) {
             throw new CatalogException(io);
         }

@@ -79,6 +79,8 @@ public interface LayerDetails {
      *
      * @param x X coordinate.
      * @param y Y coordinate.
+     * @param elevation The elevation to request.
+     * @param time The date to request.
      * @return A string representation of the information at the coordinates specified.
      */
     public double getInformationAt(final double x, final double y, final Date time,
