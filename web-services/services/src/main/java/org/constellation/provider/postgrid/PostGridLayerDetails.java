@@ -18,7 +18,9 @@ package org.constellation.provider.postgrid;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -27,8 +29,10 @@ import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.WMSQuery;
 
+import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
@@ -51,6 +55,8 @@ class PostGridLayerDetails implements LayerDetails {
      * Current layer to consider.
      */
     private final Layer layer;
+    
+    private final List<String> favorites;
 
     /**
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
@@ -59,35 +65,40 @@ class PostGridLayerDetails implements LayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    PostGridLayerDetails(final Database database, final Layer layer) {
+    PostGridLayerDetails(final Database database, final Layer layer, List<String> favorites) {
         this.database = database;
         this.layer = layer;
+        
+        if(favorites == null){
+            this.favorites = Collections.emptyList();
+        }else{
+            this.favorites = Collections.unmodifiableList(favorites);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public MapLayer getMapLayer(final Map<String, Object> params) {
-        return getMapLayer(null, params);
+        return createMapLayer(null, params);
     }
 
     /**
      * {@inheritDoc}
      */
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
-        final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
-        if (params != null) {
-            mapLayer.setDimRange((MeasurementRange) params.get(WMSQuery.KEY_DIM_RANGE));
-            final Double elevation = (Double) params.get(WMSQuery.KEY_ELEVATION);
-            if (elevation != null) {
-                mapLayer.setElevation(elevation);
-            }
-            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
-            if (date != null) {
-                mapLayer.times().add(date);
-            }
+    public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
+        if(style instanceof String){
+            style = NamedStyleDP.getInstance().get((String)style);
         }
-        return mapLayer;
+        
+        return createMapLayer(style, params);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
+        return createMapLayer(style, params);
     }
 
     /**
@@ -96,6 +107,10 @@ class PostGridLayerDetails implements LayerDetails {
     public String getName() {
         return layer.getName();
     }
+    
+    public List<String> getFavoriteStyles(){
+        return favorites;
+    }   
 
     /**
      * {@inheritDoc}
@@ -152,4 +167,48 @@ class PostGridLayerDetails implements LayerDetails {
     public String getThematic() {
         return layer.getThematic();
     }
+    
+    private MapLayer createMapLayer(Object style, final Map<String, Object> params){
+        final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
+        
+        
+        if(style == null){
+            //no style provided try to get the favorite one
+            if(favorites.size() > 0){
+                String favorite = favorites.get(0);
+                style = NamedStyleDP.getInstance().get(favorite);
+            }
+            if(style == null){
+                //could not load a favorite style, create a random one
+                style = RANDOM_FACTORY.createRasterStyle();
+            }
+        }
+        
+        if(style instanceof MutableStyle){
+            //style is a commun SLD style
+            mapLayer.setStyle((MutableStyle) style);;
+        }else if( style instanceof GraphicBuilder){
+            //special graphic builder
+            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
+            mapLayer.graphicBuilders().add((GraphicBuilder) style);
+        }else{
+            //style is unknowed type, use a random style
+            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
+        }
+        
+        if (params != null) {
+            mapLayer.setDimRange((MeasurementRange) params.get(WMSQuery.KEY_DIM_RANGE));
+            final Double elevation = (Double) params.get(WMSQuery.KEY_ELEVATION);
+            if (elevation != null) {
+                mapLayer.setElevation(elevation);
+            }
+            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
+            if (date != null) {
+                mapLayer.times().add(date);
+            }
+        }
+        
+        return mapLayer;
+    }
+    
 }

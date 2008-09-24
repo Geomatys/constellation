@@ -86,11 +86,10 @@ public class WMSWorker{
         builder.append("Mime => " + mime.toString() + "\n");
         builder.append("Dimension => " + canvasDimension.toString() + "\n");
         builder.append("File => " + output.toString() + "\n");
-        builder.append("BGColor => " + getMap.getBackground() + "\n");
+        Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
+        builder.append("BGColor => " + bgcolor + "\n");
         builder.append("Transparent => " + getMap.getTransparent() + "\n");
 
-        Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
-        System.out.println("REAL COLOR => " + bgcolor);
 
         System.out.println(builder.toString());
         final ReferencedEnvelope refEnv = new ReferencedEnvelope(contextEnv);

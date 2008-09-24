@@ -34,6 +34,7 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
@@ -43,6 +44,10 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
+import org.constellation.provider.LayerLinkReader;
+import org.constellation.provider.NamedStyleDP;
+import org.constellation.ws.rs.WebService;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -51,11 +56,13 @@ import org.constellation.provider.LayerDataProvider;
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridNamedLayerDP implements LayerDataProvider{
+    
+    private static final String KEY_POSTGRID_STYLES = "postgrid_style";
+    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
     private static PostGridNamedLayerDP instance = null;
 
-    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
-
     private final Map<String,Layer> index = new HashMap<String,Layer>();
+    private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
 
     protected static Database database;
 
@@ -219,7 +226,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public LayerDetails get(String key) {
         final Layer layer = index.get(key);
-        return (layer != null) ? new PostGridLayerDetails(database, layer) : null;
+        return (layer != null) ? 
+            new PostGridLayerDetails(database, layer, getFavoriteStyles(key)) : null;
     }
 
     /**
@@ -227,6 +235,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public void reload() {
         synchronized(this){
+            favorites.clear();
             index.clear();
             visit();
         }
@@ -237,6 +246,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public void dispose() {
         synchronized(this){
+            favorites.clear();
             index.clear();
         }
     }
@@ -269,7 +279,46 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         }else{
             logger.log(Level.SEVERE,"Layer table is null");
         }
+        
+        extractLinks();
+    }
 
+    private void extractLinks(){
+        
+        String styleLinks = "";
+        try {
+            styleLinks = WebService.getPropertyValue(JNDI_GROUP, KEY_POSTGRID_STYLES);
+        } catch (NamingException ex) {
+            Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        final File file = new File(styleLinks);
+        
+        if(file.exists()){
+            Map<String,List<String>> links = null;
+            try {
+                links = LayerLinkReader.read(file);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SAXException ex) {
+                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            if(links != null){
+                favorites.putAll(links);
+            }
+        }
+        
+    }
+    
+    public List<String> getFavoriteStyles(String layerName) {
+        List<String> favs = favorites.get(layerName);
+        if(favs == null){
+            favs = Collections.emptyList();
+        }
+        return favs;
     }
 
     public static PostGridNamedLayerDP getDefault(){
@@ -278,9 +327,5 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         }
         return instance;
     }
-
-    public List<String> getFavoriteStyles(String layerName) {
-        return Collections.emptyList();
-    }
-
+    
 }

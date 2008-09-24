@@ -25,8 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-
 import java.util.TreeSet;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
@@ -35,16 +35,14 @@ import org.constellation.provider.NamedStyleDP;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.display.renderer.GlyphLegendFactory;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.map.MapLayerBuilder;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.RandomStyleFactory;
-import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
@@ -61,9 +59,6 @@ class ShapefileLayerDetails implements LayerDetails{
     private static final GeographicBoundingBox DUMMY_BBOX = 
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
     
-    private static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
-    private static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
-    
     private final DataStore store;
     private final List<String> favorites;
     private final String name;
@@ -75,7 +70,7 @@ class ShapefileLayerDetails implements LayerDetails{
         if(favorites == null){
             this.favorites = Collections.emptyList();
         }else{
-            this.favorites = favorites;
+            this.favorites = Collections.unmodifiableList(favorites);
         }
         
     }
@@ -84,6 +79,14 @@ class ShapefileLayerDetails implements LayerDetails{
         return createMapLayer(store,null);
     }
 
+    public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
+        if(style instanceof String){
+            style = NamedStyleDP.getInstance().get((String)style);
+        }
+        
+        return createMapLayer(store, style);
+    }
+    
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
         return createMapLayer(store,style);
     }
@@ -92,6 +95,13 @@ class ShapefileLayerDetails implements LayerDetails{
         return name;
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    public List<String> getFavoriteStyles() {
+        return favorites;
+    }
+    
     public boolean isQueryable(Service service) {
         return true;
     }
@@ -142,7 +152,7 @@ class ShapefileLayerDetails implements LayerDetails{
         return "Vector datas";
     }
 
-    private MapLayer createMapLayer(DataStore store, MutableStyle style){
+    private MapLayer createMapLayer(DataStore store, Object style){
         MapLayer layer = null;
         
         FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
@@ -170,7 +180,21 @@ class ShapefileLayerDetails implements LayerDetails{
                 
             }
             
-            layer = new MapLayerBuilder().create(fs, style);
+            
+            if(style instanceof MutableStyle){
+                //style is a commun SLD style
+                layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+            }else if( style instanceof GraphicBuilder){
+                //special graphic builder
+                final MutableStyle mutable = RANDOM_FACTORY.createRandomVectorStyle(fs);
+                layer = new MapLayerBuilder().create(fs, mutable);
+                layer.graphicBuilders().add((GraphicBuilder) style);
+            }else{
+                //style is unknowed type, use a random style
+                final MutableStyle mutable = RANDOM_FACTORY.createRandomVectorStyle(fs);
+                layer = new MapLayerBuilder().create(fs, mutable);
+            }
+            
         }else{
             System.err.println(ShapeFileNamedLayerDP.class +" Error : Could not create shapefile maplayer.");
             //TODO log error

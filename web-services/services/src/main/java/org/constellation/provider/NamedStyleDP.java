@@ -27,7 +27,8 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
-import org.constellation.provider.sld.SLDFileNamedLayerDP;
+import org.constellation.provider.styling.GO2NamedStyleDP;
+import org.constellation.provider.styling.SLDNamedStyleDP;
 
 import org.constellation.ws.rs.WebService;
 import org.geotools.style.MutableStyle;
@@ -38,21 +39,23 @@ import org.geotools.style.MutableStyle;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class NamedStyleDP implements DataProvider<String,MutableStyle>{
+public class NamedStyleDP implements DataProvider<String,Object>{
 
     private static String KEY_SLD_DP = "sld_folder";
     
     private static NamedStyleDP instance = null;
     
-    private final Collection<DataProvider<String,MutableStyle>> dps = new ArrayList<DataProvider<String,MutableStyle>>();
+    private final Collection<DataProvider<String,? extends Object>> dps = new ArrayList<DataProvider<String,? extends Object>>();
     
     private NamedStyleDP(){
         
         List<File> folders = getSLDFolders();
         for(File folder : folders){
-            SLDFileNamedLayerDP sldDP = new SLDFileNamedLayerDP(folder);
+            SLDNamedStyleDP sldDP = new SLDNamedStyleDP(folder);
             dps.add(sldDP);
         }
+        
+        dps.add(GO2NamedStyleDP.getDefault());
         
     }
     
@@ -66,8 +69,8 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
+    public Class<Object> getValueClass() {
+        return Object.class;
     }
 
     /**
@@ -75,7 +78,7 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
      */
     public Set<String> getKeys() {
         Set<String> keys = new HashSet<String>();
-        for(DataProvider<String,MutableStyle> dp : dps){
+        for(DataProvider<String,? extends Object> dp : dps){
             keys.addAll( dp.getKeys() );
         }
         return keys;
@@ -85,7 +88,7 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
      * {@inheritDoc }
      */
     public boolean contains(String key) {
-        for(DataProvider<String,MutableStyle> dp : dps){
+        for(DataProvider<String,? extends Object> dp : dps){
             if(dp.contains(key)) return true;
         }
         return false;
@@ -94,9 +97,9 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
-    public MutableStyle get(String key) {
-        MutableStyle style = null;
-        for(DataProvider<String,MutableStyle> dp : dps){
+    public Object get(String key) {
+        Object style = null;
+        for(DataProvider<String,? extends Object> dp : dps){
             style = dp.get(key);
             if(style != null) return style;
         }
@@ -107,7 +110,7 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
      * {@inheritDoc }
      */
     public void reload() {
-        for(DataProvider<String,MutableStyle> dp : dps){
+        for(DataProvider<String,? extends Object> dp : dps){
             dp.reload();
         }
     }
@@ -116,7 +119,7 @@ public class NamedStyleDP implements DataProvider<String,MutableStyle>{
      * {@inheritDoc }
      */
     public void dispose() {
-        for(DataProvider<String,MutableStyle> dp : dps){
+        for(DataProvider<String,? extends Object> dp : dps){
             dp.dispose();
         }
         dps.clear();

@@ -19,14 +19,21 @@ package org.constellation.provider;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
+import org.geotools.style.RandomStyleFactory;
+import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
+
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 
@@ -37,57 +44,70 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Cédric Briançon
  */
 public interface LayerDetails {
+    
+    static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
+    static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
+    
     /**
      * Default legend size, if not specified in the {@code GetLegend} request.
      */
     public static final Dimension LEGEND_SIZE = new Dimension(200, 40);
 
-    public MapLayer getMapLayer(final Map<String, Object> params);
+    MapLayer getMapLayer(final Map<String, Object> params);
 
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
-
-    /**
-     * @see Layer#getLegend(Dimension)
-     */
-    public BufferedImage getLegendGraphic(final Dimension dimension);
+    MapLayer getMapLayer(Object style, final Map<String, Object> params);
+    
+    MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
 
     /**
      * @see Layer#getName
      */
-    public String getName();
+    String getName();
 
+    /**
+     * Returns a list of style names for this layer.
+     * The first style should be the default style used to render this layer,
+     * while the others are some "favorites" styles.
+     */
+    List<String> getFavoriteStyles();   
+    
     /**
      * @see Layer#isQueryable
      */
-    public boolean isQueryable(Service service);
+    boolean isQueryable(Service service);
 
     /**
      * @see Layer#getGeographicBoundingBox
      */
-    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+    GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
      * @see Layer#getAvailableTimes
      */
-    public SortedSet<Date> getAvailableTimes() throws CatalogException;
+    SortedSet<Date> getAvailableTimes() throws CatalogException;
 
     /**
      * @see Layer#getAvailableElevations
      */
-    public SortedSet<Number> getAvailableElevations() throws CatalogException;
+    SortedSet<Number> getAvailableElevations() throws CatalogException;
 
     /**
      * @see Layer#getSampleValueRanges
      */
-    public MeasurementRange<?>[] getSampleValueRanges();
+    MeasurementRange<?>[] getSampleValueRanges();
 
     /**
      * @see Layer#getRemarks
      */
-    public String getRemarks();
+    String getRemarks();
 
     /**
      * @see Layer#getThematic
      */
-    public String getThematic();
+    String getThematic();
+    
+    /**
+     * @see Layer#getLegend(Dimension)
+     */
+    BufferedImage getLegendGraphic(final Dimension dimension);
 }

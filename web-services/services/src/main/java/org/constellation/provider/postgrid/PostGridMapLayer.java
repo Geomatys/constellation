@@ -24,6 +24,7 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,11 +40,16 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.display.primitive.GraphicJ2D;
+import org.geotools.display.renderer.RenderingContext2D;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.AbstractMapLayer;
 import org.geotools.map.DynamicMapLayer;
+import org.geotools.map.GraphicBuilder;
+import org.geotools.map.MapLayer;
+import org.geotools.map.MapLayerBuilder;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -114,12 +120,14 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     }
 
     public Object prepare(ReferencedEnvelope env, int width, int height,
-            MathTransform objToDisp, CoordinateReferenceSystem displayCRS) {
-        return query(env, width, height,objToDisp,displayCRS);
+            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
+            Object extent) {
+        return query(env, width, height,objToDisp,displayCRS,extent);
     }
 
     public Object query(ReferencedEnvelope env, int width, int height,
-            MathTransform objToDisp, CoordinateReferenceSystem displayCRS) {
+            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
+            Object extent) {
 
         Envelope genv = null;
         try {
@@ -167,6 +175,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        // use the provided dim range
         if (dimRange != null) {
             final GridSampleDimension[] samples = coverage.getSampleDimensions();
             if (samples != null && samples.length == 1 && samples[0] != null) {
@@ -182,13 +191,48 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 //        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, displayCRS);
 //        return coverage.getRenderedImage();
 
+        
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-
         // Here a resample is done, to get the coverage into the requested crs.
         coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
-
         final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
         final Graphics2D g2 = buffer.createGraphics();
+        
+        
+        //---------------GRAPHIC BUILDER----------------------------------------
+        final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
+
+        System.out.println("--->> BUILDER = " + builder);
+        System.out.println("--->> CONTEXT = " + extent);
+        if(builder != null && extent instanceof RenderingContext2D){
+            System.out.println("OK, try to paint vector field");
+            //TODO Find a better way to solve this issue
+            final MapLayerBuilder mapBuilder = new MapLayerBuilder();
+            final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
+            RenderingContext2D context2D = (RenderingContext2D) extent;
+            //special graphic builder
+            Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
+            context2D = context2D.create(g2);
+            for(GraphicJ2D gra : graphics){
+                try {
+                    System.out.println("Paint arrow");
+                    gra.paint(context2D);
+                    System.out.println("Paint finished");
+                } catch (TransformException ex) {
+                    Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            g2.dispose();
+            return buffer;
+        }
+        
+        //----------------------------------------------------------------------
+
+
+        //normal image rendering
         final AffineTransform trs = g2.getTransform();
         trs.concatenate((AffineTransform)objToDisp);
         g2.setTransform(trs);

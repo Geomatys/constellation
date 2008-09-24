@@ -89,28 +89,25 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         int index = 0;
         for(String layerName : layers){
 
-            MutableStyle style = null;
+            MapLayer layer = null;
+            final LayerDetails details = layerDPS.get(layerName);
+            
+            if(details == null){
+                throw new PortrayalException("Layer : "+layerName+" could not be created");
+            }
 
             if(sld != null){
                 //try to use the provided SLD
-                style = extractStyle(layerName,sld);
+                Object style = extractStyle(layerName,sld);
+                layer = details.getMapLayer(style, params);
             } else if (styles.size() > index){
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                style = styleDPS.get(styles.get(index));
+                String style = styles.get(index);
+                layer = details.getMapLayer(style, params);
             } else {
-                //no defined styles, use the favorite one
-                List<String> favorites = layerDPS.getFavoriteStyles(layerName);
-                if (favorites.size() > 0) {
-                    //take the first one
-                    style = styleDPS.get(favorites.get(0));
-                }
-            }
-
-            MapLayer layer = null;
-            final LayerDetails details = layerDPS.get(layerName);
-            if(details != null){
-                layer = layerDPS.get(layerName).getMapLayer(style, params);
+                //no defined styles, use the favorite one, let the layer get it himself.
+                layer = details.getMapLayer(params);
             }
 
             if(layer == null){
@@ -124,7 +121,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         return ctx;
     }
 
-    private MutableStyle extractStyle(String layerName,MutableStyledLayerDescriptor sld){
+    private Object extractStyle(String layerName,MutableStyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");
         }
@@ -138,10 +135,10 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                 final List<MutableLayerStyle> styles = mnl.styles();
 
                 for(MutableLayerStyle mls : styles){
-                    MutableStyle GTStyle = null;
+                    Object GTStyle = null;
                     if(mls instanceof MutableNamedStyle){
                         MutableNamedStyle mns = (MutableNamedStyle) mls;
-                        GTStyle = styleDPS.get(mns.getName());
+                        GTStyle = mns.getName();
                     }else if(mls instanceof MutableStyle){
                         GTStyle = (MutableStyle) mls;
                     }

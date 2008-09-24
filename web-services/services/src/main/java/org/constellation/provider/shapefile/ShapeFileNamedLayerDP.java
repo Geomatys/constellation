@@ -22,18 +22,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerLinkReader;
 import org.constellation.provider.SoftHashMap;
 
 import org.geotools.data.DataStore;
@@ -42,9 +39,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -125,24 +119,13 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         }
         
         if(store != null){
-            final List<String> styles = getFavoriteStyles(key);
+            final List<String> styles = favorites.get(key);
             return new ShapefileLayerDetails(key, store, styles);
         }
         
         return null;
     }
-        
-    /**
-     * {@inheritDoc }
-     */
-    public List<String> getFavoriteStyles(String layerName) {
-        List<String> favs = favorites.get(layerName);
-        if(favs == null){
-            favs = Collections.emptyList();
-        }
-        return favs;
-    }
-    
+       
     /**
      * {@inheritDoc }
      */
@@ -188,10 +171,9 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         
         File candidate = new File(path);
         if(candidate.exists()){
-            
-            Map<String,String> links = new HashMap<String, String>();
+            Map<String,List<String>> links = null;
             try {
-                links = extract(links, candidate);
+                links = LayerLinkReader.read(candidate);
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
@@ -199,42 +181,13 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
             } catch (IOException ex) {
                 Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Set<String> keys = links.keySet();
-            for(String key : keys){
-                String strStyles = links.get(key);
-                List<String> styles = parseStyles(strStyles);
-                favorites.put(key, styles);
+            if(links != null){
+                favorites.putAll(links);
             }
             
         }
         
     }
-    
-    private Map<String,String> extract(Map<String,String>links,File f) throws ParserConfigurationException, SAXException, IOException{
-        
-        DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
-        DocumentBuilder constructeur = fabrique.newDocumentBuilder();
-
-        Document document = constructeur.parse(f);
-        
-        Element racine = document.getDocumentElement();
-        String tag = "Link";
-        NodeList liste = racine.getElementsByTagName(tag);
-        for(int i=0, n=liste.getLength(); i<n; i++){
-            Element link = (Element)liste.item(i);
-            if(link.hasAttribute("LayerName")){
-                String layer = link.getAttribute("LayerName");
-                String styles = link.getTextContent();
-                if(layer != null && styles != null){
-                    links.put(layer, styles);
-                }
-            }
-                    
-        }
-        
-        return links;
-    }
-    
     
     private void test(File candidate){
         if(candidate.isFile()){
@@ -246,17 +199,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         }
     }
     
-    private List<String> parseStyles(String strStyles) {
-        if(strStyles == null || strStyles.trim().isEmpty()){
-            return Collections.emptyList();
-        }
-        List<String> styles = new ArrayList<String>();
-        StringTokenizer token = new StringTokenizer(strStyles.trim(),";",false);
-        while(token.hasMoreTokens()){
-            styles.add(token.nextToken());
-        }
-        return styles;
-    }
+    
         
     private DataStore loadDataStore(File f){
         DataStore store = null;

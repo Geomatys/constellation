@@ -16,8 +16,6 @@
  */
 package org.constellation.provider;
 
-import java.util.List;
-
 
 /**
  *
@@ -25,6 +23,5 @@ import java.util.List;
  * @author Johann Sorel (Geomatys)
  */
 public interface LayerDataProvider extends DataProvider<String,LayerDetails>{
-
-    List<String> getFavoriteStyles(String layerName);    
+ 
 }

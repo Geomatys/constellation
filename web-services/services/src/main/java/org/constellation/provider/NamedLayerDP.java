@@ -107,7 +107,7 @@ public class NamedLayerDP implements LayerDataProvider{
     public List<String> getFavoriteStyles(String layerName) {
         List<String> styles = new ArrayList<String>();
         for(LayerDataProvider dp : dps){
-            List<String> sts = dp.getFavoriteStyles(layerName);
+            List<String> sts = dp.get(layerName).getFavoriteStyles();
             styles.addAll(sts);
         }
         return styles;
