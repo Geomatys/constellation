@@ -137,6 +137,11 @@
       <artifactId>sos</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation</groupId>
+      <artifactId>metadata-FRA</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- web service-->
     <dependency>
       <groupId>javax.persistence</groupId>

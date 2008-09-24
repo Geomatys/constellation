@@ -138,6 +138,30 @@ public class OperationsMetadata {
         }
         return null; 
     }
+    
+    public void removeConstraint(String name) {
+        if (constraint == null) {
+            constraint = new ArrayList<DomainType>();
+            return;
+        }
+        
+        for (DomainType d : constraint) {
+            if (d.getName().equals(name))
+                constraint.remove(d);
+        }
+    }
+    
+     public void removeConstraint(DomainType constraint) {
+        if (this.constraint == null) {
+            this.constraint = new ArrayList<DomainType>();
+            return;
+        }
+        
+        for (DomainType d : this.constraint) {
+            if (d.equals(constraint))
+                this.constraint.remove(d);
+        }
+    }
 
     /**
      * Gets the value of the extendedCapabilities property.

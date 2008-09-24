@@ -156,16 +156,16 @@ public class MetadataReader {
         DublinCorePathMap          = new HashMap<Standard, Map<String, String>>();
         
         Map<String, String> isoMap = new HashMap<String, String>();
-        isoMap.put("identifier", "ISO 19115:MD_Metadata:fileIdentifier");
-        isoMap.put("type",       "ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm");
-        isoMap.put("date",       "ISO 19115:MD_Metadata:dateStamp");
-        isoMap.put("subject",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
-        isoMap.put("format",     "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
-        isoMap.put("abstract",   "ISO 19115:MD_Metadata:identificationInfo:abstract");
-        isoMap.put("boudingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
-        isoMap.put("creator",    "ISO 19115:MD_Metadata:identificationInfo:credit");
-        isoMap.put("publisher",  "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
-        isoMap.put("language",   "ISO 19115:MD_Metadata:language");
+        isoMap.put("identifier",  "ISO 19115:MD_Metadata:fileIdentifier");
+        isoMap.put("type",        "ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm");
+        isoMap.put("date",        "ISO 19115:MD_Metadata:dateStamp");
+        isoMap.put("subject",     "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        isoMap.put("format",      "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
+        isoMap.put("abstract",    "ISO 19115:MD_Metadata:identificationInfo:abstract");
+        isoMap.put("boundingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
+        isoMap.put("creator",     "ISO 19115:MD_Metadata:identificationInfo:credit");
+        isoMap.put("publisher",   "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        isoMap.put("language",    "ISO 19115:MD_Metadata:language");
         DublinCorePathMap.put(Standard.ISO_19115, isoMap);
         
         Map<String, String> ebrimMap = new HashMap<String, String>();
@@ -196,7 +196,8 @@ public class MetadataReader {
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
-                                                "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
+                                                "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
+                                                "org.constellation.metadata.fra");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
         this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
@@ -570,8 +571,8 @@ public class MetadataReader {
             }
         }
         
-        if (crs != null && eastValue != null && westValue != null && northValue != null && southValue != null) {
-            if (crs.indexOf("EPSG:") != -1) {
+        if (eastValue != null && westValue != null && northValue != null && southValue != null) {
+            if (crs != null && crs.indexOf("EPSG:") != -1) {
                 crs = "EPSG:" + crs;
             }
             BoundingBoxType result = new BoundingBoxType(crs,
@@ -579,8 +580,10 @@ public class MetadataReader {
                                                          southValue,
                                                          westValue,
                                                          northValue);
+            logger.info("boundingBox created");
             return result;
         } else {
+            logger.info("boundingBox null");
             return null;
         }
     } 
@@ -620,10 +623,6 @@ public class MetadataReader {
     }
     
     private Object applyElementSet(Object result, ElementSetType type, List<QName> elementName) {
-        //if the result can't be filtered by Set filter we return it.
-        if (!(result instanceof Settable)) {
-            return result;
-        }
 
          if (type == null)
             type = ElementSetType.FULL;
@@ -632,6 +631,11 @@ public class MetadataReader {
         
         // for an ElementSetName mode
         if (elementName == null || elementName.size() == 0) {
+            
+            //if the result can't be filtered by Set filter we return it.
+            if (!(result instanceof Settable)) {
+                return result;
+            }
             // for a element set FULL we return the record directly
             if (type == null || type.equals(ElementSetType.FULL)) {
                 return result;
@@ -922,11 +926,13 @@ public class MetadataReader {
 
         //if the result is a subClasses of MetaDataEntity
         Map<String, Object> metaMap = null;
-        boolean isMeta = false;
+        boolean isMeta  = false;
+        boolean wasMeta = false;
         if (result instanceof MetadataEntity) {
             MetadataEntity meta = (MetadataEntity) result;
             metaMap = meta.asMap();
-            isMeta = true;
+            isMeta  = true;
+            wasMeta = true;
         }
 
         // then we search the setter for all the child value
@@ -985,12 +991,20 @@ public class MetadataReader {
                                 attribName = path.getName() + "es";
                                 casee = 2;
                                 break;
+                            case 2:
+                                attribName = path.getName();
+                                casee      = 3;
+                                isMeta = false;
+                                break;
                             default:
+                                
                                 logger.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                                 tryAgain = false;
                         }
                     }
                 }
+                if (wasMeta == true)
+                    isMeta = true;
             }
         }
         return result;
@@ -1089,7 +1103,7 @@ public class MetadataReader {
     private Class getClassFromName(String className, String standardName) {
         Class result = classBinding.get(standardName + ':' + className);
         if (result == null) {
-            logger.finer("searche for class " + className);
+            logger.finer("search for class " + className);
         } else {
             return result;
         }
@@ -1110,11 +1124,7 @@ public class MetadataReader {
             className = "CI_OnLineResource";
         } else if (className.equals("CI_Date")) {
             className = "CitationDate";
-        } else if (className.equals("FRA_DirectReferenceSystem")) {
-            className = "MD_ReferenceSystem";
         }
-
-
 
         List<String> packagesName = new ArrayList<String>();
         if (standardName.equals("Catalog Web Service") || standardName.equals("DublinCore") || 
@@ -1145,10 +1155,12 @@ public class MetadataReader {
                 packageName = "org.opengis.metadata.maintenance";
             else if (className.equals("SV_ServiceIdentification")) 
                 packageName = "org.geotools.service";
+             else if (className.startsWith("FRA_")) 
+                packageName = "org.constellation.metadata.fra";
             
             String name = className;
             int nameType = 0;
-            while (nameType < 5) {
+            while (nameType < 6) {
                 try {
                     logger.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
@@ -1193,8 +1205,13 @@ public class MetadataReader {
                             nameType = 4;
                             break;
                         }
-                        default:
+                        case 4: {
+                            name = "FRA" + name;
                             nameType = 5;
+                            break;
+                        }
+                        default:
+                            nameType = 6;
                             break;
                     }
 

@@ -522,11 +522,17 @@ public class CSWworker {
                 
                 DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
                 if (cascadedCSW == null) {
-                    DomainType Fcata = new DomainType("FederatedCatalogues", cascadedCSWservers);
-                    om.getConstraint().add(Fcata);
+                    if (cascadedCSWservers != null && cascadedCSWservers.size() != 0) {
+                        DomainType Fcata = new DomainType("FederatedCatalogues", cascadedCSWservers);
+                        om.getConstraint().add(Fcata);
+                    }
                 } else {
-                    cascadedCSW.setValue(cascadedCSWservers);
+                    if (cascadedCSWservers != null && cascadedCSWservers.size() != 0)
+                        cascadedCSW.setValue(cascadedCSWservers);
+                    else
+                        om.removeConstraint(cascadedCSW);
                 }
+                
                 
                 //we update the operation parameters 
                 Operation gr = om.getOperation("GetRecords");
@@ -584,8 +590,6 @@ public class CSWworker {
                     }
                 }
             }
-            
-               
         }
             
         //we enter the information filter capablities.
@@ -1299,6 +1303,21 @@ public class CSWworker {
                 components.add(component);
             }
             
+            if (containsOneOfEbrim30(typeNames)) {
+                InputStream in = getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
+                Document d = constructor.parse(in);
+                SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, d.getDocumentElement());
+                components.add(component);
+            }
+            
+            if (containsOneOfEbrim25(typeNames)) {
+                InputStream in = getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
+                Document d = constructor.parse(in);
+                SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, d.getDocumentElement());
+                components.add(component);
+            }
+                
+                
             response  = new DescribeRecordResponseType(components);
             
         } catch (ParserConfigurationException ex) {
@@ -1313,6 +1332,75 @@ public class CSWworker {
         }
         logger.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return response;
+    }
+    
+    /**
+     * Return true if the specified list of QNames contains an ebrim V3.0 QName.
+     *
+     * @param qnames A list of QNames.
+     * @return true if the list contains at least one ebrim V3.0 QName.
+     */
+    private boolean containsOneOfEbrim30(List<QName> qnames) {
+        
+        if (qnames.contains(_AdhocQuery_QNAME)
+         || qnames.contains(_Association_QNAME)
+         || qnames.contains(_AuditableEvent_QNAME)
+         || qnames.contains(_ClassificationNode_QNAME)
+         || qnames.contains(_ClassificationScheme_QNAME)
+         || qnames.contains(_Classification_QNAME)
+         || qnames.contains(_ExternalIdentifier_QNAME)
+         || qnames.contains(_ExternalLink_QNAME)
+         || qnames.contains(_ExtrinsicObject_QNAME)
+         || qnames.contains(_Federation_QNAME)
+         || qnames.contains(_Notification_QNAME)
+         || qnames.contains(_ObjectRefList_QNAME)
+         || qnames.contains(_Person_QNAME)
+         || qnames.contains(_Organization_QNAME)
+         || qnames.contains(_RegistryObject_QNAME)
+         || qnames.contains(_RegistryPackage_QNAME)
+         || qnames.contains(_Registry_QNAME)
+         || qnames.contains(_ServiceBinding_QNAME)
+         || qnames.contains(_Service_QNAME)
+         || qnames.contains(_SpecificationLink_QNAME)
+         || qnames.contains(_Subscription_QNAME)
+         || qnames.contains(_User_QNAME)
+         || qnames.contains(_WRSExtrinsicObject_QNAME))
+            return true;
+        return false;
+    }
+    
+    /**
+     * Return true if the specified list of QNames contains an ebrim V2.5 QName.
+     *
+     * @param qnames A list of QNames.
+     * @return true if the list contains at least one ebrim V2.5 QName.
+     */
+    private boolean containsOneOfEbrim25(List<QName> qnames) {
+        
+        if (qnames.contains(_ExtrinsicObject25_QNAME)
+         || qnames.contains(_Federation25_QNAME)
+         || qnames.contains(_ExternalLink25_QNAME)
+         || qnames.contains(_ClassificationNode25_QNAME)
+         || qnames.contains(_User25_QNAME)
+         || qnames.contains(_Classification25_QNAME)
+         || qnames.contains(_RegistryPackage25_QNAME)
+         || qnames.contains(_RegistryObject25_QNAME)
+         || qnames.contains(_Association25_QNAME)
+         || qnames.contains(_RegistryEntry25_QNAME)
+         || qnames.contains(_ClassificationScheme25_QNAME)
+         || qnames.contains(_Organization25_QNAME)
+         || qnames.contains(_ExternalIdentifier25_QNAME)
+         || qnames.contains(_SpecificationLink25_QNAME)
+         || qnames.contains(_Registry25_QNAME)
+         || qnames.contains(_ServiceBinding25_QNAME)
+         || qnames.contains(_Service25_QNAME)
+         || qnames.contains(_AuditableEvent25_QNAME)
+         || qnames.contains(_Subscription25_QNAME)
+         || qnames.contains(_Geometry09_QNAME)
+         || qnames.contains(_ApplicationModule09_QNAME)
+         || qnames.contains(_WRSExtrinsicObject09_QNAME))
+            return true;
+        return false;
     }
     
     /**

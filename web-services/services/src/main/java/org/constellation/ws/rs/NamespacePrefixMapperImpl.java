@@ -159,6 +159,9 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.opengis.net/cat/wrs".equals(namespaceUri) )
             prefix = "wrs09";
         
+        else if( "http://www.cnig.gouv.fr/2005/fra".equals(namespaceUri) )
+            prefix = "fra";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

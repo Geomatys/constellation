@@ -110,6 +110,9 @@ public class CSWService extends WebService {
             //ISO 19115 class
             classeList.add(MetaDataImpl.class);
             
+            //ISO 19115 French profile class
+            classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
+            
             //CSW 2.0.2 classes
             classeList.addAll(Arrays.asList(Capabilities.class, 
                                             DescribeRecordType.class,

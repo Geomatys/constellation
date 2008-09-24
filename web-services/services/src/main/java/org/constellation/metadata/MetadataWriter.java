@@ -526,8 +526,6 @@ public class MetadataWriter {
             className = "OnlineResource";
         } else if (className.equals("CitationDate") || className.equals("CitationDateImpl")) {
             className = "CI_Date";
-        } else if (className.equals("FRA_DirectReferenceSystem")) {
-            className = "MD_ReferenceSystem";
         } else if (className.equals("ScopeImpl")) {
             className = "DQ_Scope";
         } 
@@ -538,11 +536,17 @@ public class MetadataWriter {
             className = className.substring(0, i);
         }
         
+        //We replace The FRA prefix by FRA_
+        if (className.startsWith("FRA"))
+            className = "FRA_" + className.substring(3);
+        
         //we remove the Type suffix
         if (className.endsWith("Type") && !className.equals("CouplingType") 
                                        && !className.equals("DateType") 
                                        && !className.equals("KeywordType")
-                                       && !className.equals("FeatureType")) {
+                                       && !className.equals("FeatureType")
+                                       && !className.equals("GeometricObjectType")
+                                       && !className.equals("SpatialRepresentationType")) {
             className = className.substring(0, className.length() - 4);
         }
         
@@ -550,6 +554,7 @@ public class MetadataWriter {
         
         // ISO 19115 and its sub standard (ISO 19119, 19110)
         if (mainStandard.equals(Standard.ISO_19115)) {
+            availableStandards.add(Standard.ISO_19115_FRA);
             availableStandards.add(mainStandard);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
@@ -590,7 +595,10 @@ public class MetadataWriter {
              */
             if (packageName.equals("org.geotools.service")) {
                 standard = MDReader.getStandard("ISO 19119");
-            }       
+            } else if (packageName.equals("org.constellation.metadata.fra")) {
+                standard = Standard.ISO_19115_FRA;
+            }
+                
             String name = className;
             int nameType = 0;
             while (nameType < 11) {
@@ -598,7 +606,7 @@ public class MetadataWriter {
                 logger.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
                 if (result != null) {
-                    logger.finer("class found:" + standard.getName() + ":" + name);
+                    logger.info("class found:" + standard.getName() + ":" + name);
                     classBinding.put(object.getClass(), result);
                     return result;
                 } 

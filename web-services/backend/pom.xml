@@ -71,6 +71,7 @@
     <module>xacml</module>
     <module>sos</module>
     <module>ebrim</module>
+    <module>metadata-FRA</module>
   </modules>
 
 </project>
