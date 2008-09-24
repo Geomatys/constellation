@@ -79,6 +79,13 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    public String getInformationAt(final double x, final double y) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public MapLayer getMapLayer(final Map<String, Object> params) {
         return createMapLayer(null, params);
     }
@@ -88,9 +95,10 @@ class PostGridLayerDetails implements LayerDetails {
      */
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
         if(style instanceof String){
+            System.out.println("before style : "+ style);
             style = NamedStyleDP.getInstance().get((String)style);
         }
-        
+        System.out.println("after style : "+ style);
         return createMapLayer(style, params);
     }
     
@@ -171,7 +179,7 @@ class PostGridLayerDetails implements LayerDetails {
     private MapLayer createMapLayer(Object style, final Map<String, Object> params){
         final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
         
-        
+        System.out.println(" style 1 : "+ style);
         if(style == null){
             //no style provided try to get the favorite one
             if(favorites.size() > 0){
@@ -185,13 +193,16 @@ class PostGridLayerDetails implements LayerDetails {
         }
         
         if(style instanceof MutableStyle){
+            System.out.println("mutable style !");
             //style is a commun SLD style
-            mapLayer.setStyle((MutableStyle) style);;
+            mapLayer.setStyle((MutableStyle) style);
         }else if( style instanceof GraphicBuilder){
+            System.out.println("graphic builder!");
             //special graphic builder
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
             mapLayer.graphicBuilders().add((GraphicBuilder) style);
         }else{
+            System.out.println("unknown style !");
             //style is unknowed type, use a random style
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
         }

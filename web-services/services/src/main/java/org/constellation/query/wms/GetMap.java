@@ -162,6 +162,19 @@ public class GetMap extends WMSQuery {
     }
 
     /**
+     * Copy constructor for subclasses.
+     */
+    protected GetMap(final GetMap getMap) {
+        this.envelope   = getMap.envelope;    this.version     = getMap.version;
+        this.format     = getMap.format;      this.layers      = getMap.layers;
+        this.styles     = getMap.styles;      this.sld         = getMap.sld;
+        this.elevation  = getMap.elevation;   this.date        = getMap.date;
+        this.dimRange   = getMap.dimRange;    this.size        = getMap.size;
+        this.background = getMap.background;  this.transparent = getMap.transparent;
+        this.exceptions = getMap.exceptions;
+    }
+
+    /**
      * Returns the background color, or {@code null} if not defined.
      */
     public Color getBackground() {

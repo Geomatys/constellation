@@ -53,43 +53,52 @@ public interface LayerDetails {
      */
     public static final Dimension LEGEND_SIZE = new Dimension(200, 40);
 
-    MapLayer getMapLayer(final Map<String, Object> params);
-
-    MapLayer getMapLayer(Object style, final Map<String, Object> params);
-    
-    MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
-
-    /**
-     * @see Layer#getName
-     */
-    String getName();
-
-    /**
-     * Returns a list of style names for this layer.
-     * The first style should be the default style used to render this layer,
-     * while the others are some "favorites" styles.
-     */
-    List<String> getFavoriteStyles();   
-    
-    /**
-     * @see Layer#isQueryable
-     */
-    boolean isQueryable(Service service);
-
-    /**
-     * @see Layer#getGeographicBoundingBox
-     */
-    GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
-
     /**
      * @see Layer#getAvailableTimes
      */
-    SortedSet<Date> getAvailableTimes() throws CatalogException;
+    public SortedSet<Date> getAvailableTimes() throws CatalogException;
 
     /**
      * @see Layer#getAvailableElevations
      */
-    SortedSet<Number> getAvailableElevations() throws CatalogException;
+    public SortedSet<Number> getAvailableElevations() throws CatalogException;
+
+    List<String> getFavoriteStyles();
+
+    /**
+     * @see Layer#getGeographicBoundingBox
+     */
+    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+
+    /**
+     * Returns the information at the coordinates specified.
+     *
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @return A string representation of the information at the coordinates specified.
+     */
+    public String getInformationAt(final double x, final double y);
+
+    /**
+     * @see Layer#getLegend(Dimension)
+     */
+    public BufferedImage getLegendGraphic(final Dimension dimension);
+
+    public MapLayer getMapLayer(final Map<String, Object> params);
+
+    MapLayer getMapLayer(Object style, final Map<String, Object> params);
+    
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params);
+
+    /**
+     * @see Layer#getName
+     */
+    public String getName();
+
+    /**
+     * @see Layer#getRemarks
+     */
+    public String getRemarks();
 
     /**
      * @see Layer#getSampleValueRanges
@@ -97,17 +106,12 @@ public interface LayerDetails {
     MeasurementRange<?>[] getSampleValueRanges();
 
     /**
-     * @see Layer#getRemarks
-     */
-    String getRemarks();
-
-    /**
      * @see Layer#getThematic
      */
-    String getThematic();
-    
+    public String getThematic();
+
     /**
-     * @see Layer#getLegend(Dimension)
+     * @see Layer#isQueryable
      */
-    BufferedImage getLegendGraphic(final Dimension dimension);
+    public boolean isQueryable(Service service);
 }

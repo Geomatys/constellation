@@ -89,9 +89,9 @@ public class WMSWorker{
         Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
         builder.append("BGColor => " + bgcolor + "\n");
         builder.append("Transparent => " + getMap.getTransparent() + "\n");
-
-
-        System.out.println(builder.toString());
+        if (false) {
+            System.out.println(builder.toString());
+        }
         final ReferencedEnvelope refEnv = new ReferencedEnvelope(contextEnv);
         service.portray(layers, styles, bgcolor, sld, refEnv, output, mime, canvasDimension,
                 elevation, date, dimRange, hints);

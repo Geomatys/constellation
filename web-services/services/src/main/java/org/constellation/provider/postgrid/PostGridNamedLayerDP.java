@@ -310,13 +310,22 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
                 favorites.putAll(links);
             }
         }
-        
+        for (String url : favorites.keySet()) {
+            for (String style : favorites.get(url)) {
+                System.out.println("layer :"+ url +" style : "+ style);
+                System.out.println("builder : "+ NamedStyleDP.getInstance().get(style));
+            }
+        }
     }
     
     public List<String> getFavoriteStyles(String layerName) {
         List<String> favs = favorites.get(layerName);
+        System.out.println("layerName "+ layerName);
         if(favs == null){
             favs = Collections.emptyList();
+        }
+        for (String fav : favs) {
+            System.out.println("style = " + fav);
         }
         return favs;
     }

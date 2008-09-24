@@ -83,6 +83,7 @@ import org.constellation.query.QueryAdapter;
 import org.constellation.query.QueryVersion;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
+import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.query.wms.WMSQueryVersion;
@@ -247,6 +248,9 @@ public class WMService extends WebService {
             if (REQUEST_MAP.equalsIgnoreCase(request)) {
                 query = adaptGetMap();
                 return getMap(query);
+            } else if (REQUEST_FEATUREINFO.equalsIgnoreCase(request)) {
+                query = adaptGetFeatureInfo();
+                return getFeatureInfo(query);
             } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
                 query = adaptGetCapabilities();
                 return getCapabilities(query);
@@ -281,7 +285,7 @@ public class WMService extends WebService {
 
     /**
      * Describe the capabilities and the layers available of this service.
-     * 
+     *
      * @param query The {@linkplain WMSQuery wms query}.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
@@ -507,6 +511,50 @@ public class WMService extends WebService {
     }
 
     /**
+     * Return the value of a point in a map.
+     *
+     * @return text, HTML , XML or GML code.
+     *
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    private synchronized Response getFeatureInfo(final WMSQuery query) throws WebServiceException {
+        if (!(query instanceof GetFeatureInfo)) {
+            throw new WMSWebServiceException("Invalid request found, should be GetFeatureInfo.",
+                    INVALID_REQUEST, getCurrentVersion());
+        }
+        final GetFeatureInfo info = (GetFeatureInfo) query;
+        final QueryVersion queryVersion = info.getVersion();
+        if (queryVersion == null) {
+            setCurrentVersion("1.1.1");
+        } else {
+            final String inputVersion = queryVersion.toString();
+            setCurrentVersion((inputVersion.equals("1.3.0")) ? "1.3.0" : "1.1.1");
+        }
+
+        String infoFormat = info.getFormat();
+        if (infoFormat != null) {
+            if(!(infoFormat.equals("text/plain") || infoFormat.equals("text/html") ||
+                 infoFormat.equals("application/vnd.ogc.gml") || infoFormat.equals("text/xml")))
+            {
+                throw new WMSWebServiceException("This MIME type " + infoFormat + 
+                        " is not accepted by the service", INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+        } else {
+            infoFormat = "text/plain";
+        }
+
+        final List<String> layers = info.getLayers();
+        final StringBuilder response = new StringBuilder();
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
+        for (final String key : layers) {
+            final LayerDetails layer = dp.get(key);
+            response.append(layer.getInformationAt(info.getX(), info.getY()));
+            response.append("\n");
+        }
+        return Response.ok(response.toString(), infoFormat).build();
+    }
+
+    /**
      * Return the legend graphic for the current layer.
      *
      * @param query The {@linkplain WMSQuery wms query}.
@@ -668,6 +716,16 @@ public class WMService extends WebService {
         final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
         return new GetCapabilities(wmsVersion);
+    }
+
+    private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException {
+        final GetMap getMap  = adaptGetMap();
+        final String version = getCurrentVersion().toString();
+        final String strX    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
+            getParameter(KEY_I_v110, true) : getParameter(KEY_I_v130, true);
+        final String strY    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
+            getParameter(KEY_J_v110, true) : getParameter(KEY_J_v130, true);
+        return new GetFeatureInfo(getMap, Double.parseDouble(strX), Double.parseDouble(strY));
     }
 
     private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {

@@ -31,12 +31,13 @@ import org.constellation.provider.styling.GO2NamedStyleDP;
 import org.constellation.provider.styling.SLDNamedStyleDP;
 
 import org.constellation.ws.rs.WebService;
-import org.geotools.style.MutableStyle;
+
 
 /**
  * Main Data provider for styles objects. This class act as a proxy for
  * several SLD folder providers.
- * 
+ *
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
 public class NamedStyleDP implements DataProvider<String,Object>{

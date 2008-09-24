@@ -200,6 +200,9 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         
         
         //---------------GRAPHIC BUILDER----------------------------------------
+        for (GraphicBuilder graph : graphicBuilders()) {
+            System.out.println("graph : " + graph);
+        }
         final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
 
         System.out.println("--->> BUILDER = " + builder);
@@ -212,6 +215,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             RenderingContext2D context2D = (RenderingContext2D) extent;
             //special graphic builder
             Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
+            g2.setClip(context2D.getGraphics().getClip());
             context2D = context2D.create(g2);
             for(GraphicJ2D gra : graphics){
                 try {
