@@ -736,8 +736,15 @@ public class WMService extends WebService {
         if (strWidth == null || strHeight == null) {
             return new GetLegendGraphic(strLayer, strFormat);
         } else {
-            return new GetLegendGraphic(strLayer, strFormat, Integer.parseInt(strWidth),
-                                                             Integer.parseInt(strHeight));
+            final int width;
+            final int height;
+            try {
+                width  = QueryAdapter.toInt(strWidth);
+                height = QueryAdapter.toInt(strHeight);
+            } catch (NumberFormatException n) {
+                throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+            return new GetLegendGraphic(strLayer, strFormat, width, height);
         }
     }
 
@@ -778,7 +785,12 @@ public class WMService extends WebService {
         final List<String> layers  = QueryAdapter.toStringList(strLayers);
         final List<String> styles = QueryAdapter.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
-        final Double elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
+        final Double elevation;
+        try {
+            elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
+        } catch (NumberFormatException n) {
+            throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, version);
+        }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
@@ -786,7 +798,15 @@ public class WMService extends WebService {
         } catch (ParseException ex) {
             throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, version);
         }
-        final Dimension size = new Dimension( QueryAdapter.toInt(strWidth), QueryAdapter.toInt(strHeight));
+        final int width;
+        final int height;
+        try {
+            width  = QueryAdapter.toInt(strWidth);
+            height = QueryAdapter.toInt(strHeight);
+        } catch (NumberFormatException n) {
+            throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, version);
+        }
+        final Dimension size = new Dimension(width, height);
         final Color background = QueryAdapter.toColor(strBGColor);
         final boolean transparent = QueryAdapter.toBoolean(strTransparent);
 
@@ -815,9 +835,8 @@ public class WMService extends WebService {
         }
 
         // Builds the request.
-            return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
+        return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
                     date, dimRange, size, background, transparent, null);
-        //throw new WMSWebServiceException("Unknown request type.", INVALID_REQUEST, version);
     }
 
     /**
