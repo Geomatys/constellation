@@ -725,7 +725,7 @@ public class WMService extends WebService {
             getParameter(KEY_I_v110, true) : getParameter(KEY_I_v130, true);
         final String strY    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
             getParameter(KEY_J_v110, true) : getParameter(KEY_J_v130, true);
-        return new GetFeatureInfo(getMap, Double.parseDouble(strX), Double.parseDouble(strY));
+        return new GetFeatureInfo(getMap, Double.parseDouble(strX), Double.parseDouble(strY), null, null);
     }
 
     private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {

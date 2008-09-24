@@ -41,22 +41,31 @@ public class GetFeatureInfo extends GetMap {
      */
     private final double y;
 
-    public GetFeatureInfo(final GetMap getMap, final double x, final double y) {
+    private final String queryLayers;
+
+    private final String infoFormat;
+
+    public GetFeatureInfo(final GetMap getMap, final double x, final double y,
+                          final String queryLayers, final String infoFormat)
+    {
         super(getMap);
         this.x = x;
         this.y = y;
+        this.queryLayers = queryLayers;
+        this.infoFormat  = infoFormat;
     }
 
     public GetFeatureInfo(final Envelope envelope, final QueryVersion version,
                   final String format, final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
-                  final Boolean transparent, final String exceptions, final double x, final double y)
+                  final Boolean transparent, final String exceptions, final double x, final double y,
+                  final String queryLayers, final String infoFormat)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
                 background, transparent, exceptions);
-        this.x = x;
-        this.y = y;
+        this.x = x;     this.queryLayers = queryLayers;
+        this.y = y;     this.infoFormat  = infoFormat;
     }
 
     /**

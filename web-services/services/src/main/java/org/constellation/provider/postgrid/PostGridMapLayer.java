@@ -177,19 +177,20 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         }
 
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
-        
+
         if(coverage == null){
             return buffer;
         }
-        
+
+        coverage = coverage.geophysics(false);
         // Here a resample is done, to get the coverage into the requested crs.
         coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
         final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
         final Graphics2D g2 = buffer.createGraphics();
-        
-        
+
+
         //---------------GRAPHIC BUILDER----------------------------------------
-        
+
         final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
 
         if(builder != null && extent instanceof RenderingContext2D){
@@ -211,12 +212,10 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             g2.dispose();
             return buffer;
         }
-        
-        //----------------------------------------------------------------------
 
         // use the provided dim range
         if (dimRange != null) {
@@ -226,11 +225,10 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     final ColorMap colorMap = new ColorMap();
                     colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
                     coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
-                    coverage = coverage.geophysics(false);
                 }
             }
         }
-        
+
         //normal image rendering
         final AffineTransform trs = g2.getTransform();
         trs.concatenate((AffineTransform)objToDisp);

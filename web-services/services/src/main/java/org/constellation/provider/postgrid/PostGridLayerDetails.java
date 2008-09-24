@@ -28,6 +28,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.WebServiceException;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.WMSQuery;
@@ -41,6 +42,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 
 /**
+ * Regroups information about a {@linkplain Layer layer}.
  *
  * @version $Id$
  * @author Cédric Briançon
@@ -68,13 +70,13 @@ class PostGridLayerDetails implements LayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    PostGridLayerDetails(final Database database, final Layer layer, List<String> favorites) {
+    PostGridLayerDetails(final Database database, final Layer layer, final List<String> favorites) {
         this.database = database;
         this.layer = layer;
-        
-        if(favorites == null){
+
+        if (favorites == null) {
             this.favorites = Collections.emptyList();
-        }else{
+        } else {
             this.favorites = favorites;
         }
     }
@@ -83,7 +85,17 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public String getInformationAt(final double x, final double y) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        /*final double xv, yv;
+        String n = null;
+        try {
+            xv = Double.parseDouble(n = x.trim());
+            yv = Double.parseDouble(n = y.trim());
+        } catch (NumberFormatException exception) {
+            throw new WMSWebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
+                    exception, INVALID_POINT, version);
+        }
+        return evaluatePixel(xv, yv);*/
+        return null;
     }
 
     /**
@@ -167,7 +179,6 @@ class PostGridLayerDetails implements LayerDetails {
         final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
         
         if(style == null){
-            System.out.println(favorites.size());
             //no style provided, try to get the favorite one
             if(favorites.size() > 0){
                 //there are some favorites styles
@@ -213,5 +224,4 @@ class PostGridLayerDetails implements LayerDetails {
         
         return mapLayer;
     }
-    
 }

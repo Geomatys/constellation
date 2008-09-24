@@ -380,20 +380,20 @@ public class WMService extends WebService {
         // if we return html
         if (infoFormat.equals("text/html")) {
             final StringBuilder builder = new StringBuilder();
-            builder.append("<html>")
-                   .append("    <head>")
-                   .append("        <title>GetFeatureInfo output</title>")
-                   .append("    </head>")
-                   .append("    <body>")
-                   .append("    <table>")
-                   .append("        <tr>")
-                   .append("            <th>").append(layer).append("</th>")
-                   .append("        </tr>")
-                   .append("        <tr>")
-                   .append("            <th>").append(result).append("</th>")
-                   .append("       </tr>")
-                   .append("    </table>")
-                   .append("    </body>")
+            builder.append("<html>\n")
+                   .append("    <head>\n")
+                   .append("        <title>GetFeatureInfo output</title>\n")
+                   .append("    </head>\n")
+                   .append("    <body>\n")
+                   .append("    <table>\n")
+                   .append("        <tr>\n")
+                   .append("            <th>").append(layer).append("</th>\n")
+                   .append("        </tr>\n")
+                   .append("        <tr>\n")
+                   .append("            <th>").append(result).append("</th>\n")
+                   .append("       </tr>\n")
+                   .append("    </table>\n")
+                   .append("    </body>\n")
                    .append("</html>");
             response = builder.toString();
         }
