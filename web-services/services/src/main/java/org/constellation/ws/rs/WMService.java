@@ -220,7 +220,8 @@ public class WMService extends WebService {
      */
     public WMService() throws JAXBException, WebServiceException, SQLException,
                                 IOException, NamingException {
-        super("WMS", new ServiceVersion(Service.WMS, "1.3.0"), new ServiceVersion(Service.WMS, "1.1.1"));
+        super("WMS", new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_3_0.key),
+                     new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_1_1.key));
         ensureDatabaseInitialized();
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -302,9 +303,9 @@ public class WMService extends WebService {
         //and the the optional attribute
         final QueryVersion queryVersion = capabRequest.getVersion();
         if (queryVersion == null) {
-            setCurrentVersion("1.1.1");
+            setCurrentVersion(WMSQueryVersion.WMS_1_1_1.key);
         } else {
-            final String inputVersion = queryVersion.toString();
+            final String inputVersion = queryVersion.key;
             setCurrentVersion(getBestVersion(inputVersion).toString());
         }
         // Now the version has been chosen.
@@ -383,7 +384,7 @@ public class WMService extends WebService {
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 defaut = df.format(dates.last());
-                dim = (version.endsWith("1.1.1")) ?
+                dim = (version.endsWith(WMSQueryVersion.WMS_1_1_1.key)) ?
                     new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null) :
                     new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
@@ -400,7 +401,7 @@ public class WMService extends WebService {
             }
             if (elevations != null && !(elevations.isEmpty())) {
                 defaut = elevations.first().toString();
-                dim = (version.endsWith("1.1.1")) ?
+                dim = (version.endsWith(WMSQueryVersion.WMS_1_1_1.key)) ?
                     new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
@@ -425,7 +426,7 @@ public class WMService extends WebService {
                 defaut = minRange + "," + maxRange;
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
-                dim = (version.endsWith("1.1.1")) ?
+                dim = (version.endsWith(WMSQueryVersion.WMS_1_1_1.key)) ?
                     new org.constellation.wms.v111.Dimension("dim_range", unit, defaut, minRange + "," + maxRange) :
                     new org.constellation.wms.v130.Dimension("dim_range", unit, defaut, minRange + "," + maxRange);
                 dimensions.add(dim);
@@ -439,7 +440,7 @@ public class WMService extends WebService {
             final String legendUrlGif = beginLegendUrl + formatGif + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + formatPng + "&LAYER=" + layerName;
             final AbstractLayer outputLayer;
-            if (version.equals("1.1.1")) {
+            if (version.equals(WMSQueryVersion.WMS_1_1_1.key)) {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
@@ -493,7 +494,7 @@ public class WMService extends WebService {
         }
 
         //we build the general layer and add it to the document
-        final AbstractLayer mainLayer = (version.equals("1.1.1")) ?
+        final AbstractLayer mainLayer = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
             new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", crs, null, layers) :
             new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
@@ -503,7 +504,7 @@ public class WMService extends WebService {
 
         //we marshall the response and return the XML String
         final StringWriter sw = new StringWriter();
-        marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (version.equals("1.1.1")) ?
+        marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
             "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
         marshaller.marshal(response, sw);
 
@@ -595,7 +596,7 @@ public class WMService extends WebService {
         }
 
         // Info format not handled.
-        throw new WMSWebServiceException("", INVALID_FORMAT, getCurrentVersion());
+        throw new WMSWebServiceException("Unsupported format chosen", INVALID_FORMAT, getCurrentVersion());
     }
 
     /**
@@ -654,10 +655,10 @@ public class WMService extends WebService {
         final GetMap getMap = (GetMap) query;
         final QueryVersion queryVersion = getMap.getVersion();
         if (queryVersion == null) {
-            setCurrentVersion("1.1.1");
+            setCurrentVersion(WMSQueryVersion.WMS_1_1_1.key);
         } else {
             final String inputVersion = queryVersion.toString();
-            setCurrentVersion((inputVersion.equals("1.3.0")) ? "1.3.0" : "1.1.1");
+            setCurrentVersion((inputVersion.equals(WMSQueryVersion.WMS_1_3_0.key)) ? WMSQueryVersion.WMS_1_3_0.key : WMSQueryVersion.WMS_1_1_1.key);
         }
         // Now the version has been chosen.
         final ServiceVersion serviceVersion = getCurrentVersion();
@@ -730,7 +731,7 @@ public class WMService extends WebService {
      */
     private void updateExtendedOperationURL(final AbstractRequest request) {
 
-        if (getCurrentVersion().toString().equals("1.3.0")) {
+        if (getCurrentVersion().toString().equals(WMSQueryVersion.WMS_1_3_0.key)) {
             org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
             List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
             for(JAXBElement<OperationType> extOp: extendedOperations) {
@@ -763,7 +764,10 @@ public class WMService extends WebService {
      */
     private GetCapabilities adaptGetCapabilities() throws WebServiceException {
         final ServiceVersion version     = getCurrentVersion();
-        final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
+        if (version == null || version.toString() == null) {
+            return new GetCapabilities(WMSQueryVersion.WMS_1_1_1);
+        }
+        final WMSQueryVersion wmsVersion = (version.toString().equals(WMSQueryVersion.WMS_1_1_1.key)) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
         return new GetCapabilities(wmsVersion);
     }
@@ -771,10 +775,10 @@ public class WMService extends WebService {
     private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException {
         final GetMap getMap  = adaptGetMap();
         final String version = getCurrentVersion().toString();
-        final String strX    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
-            getParameter(KEY_I_v110, true) : getParameter(KEY_I_v130, true);
-        final String strY    = (version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
-            getParameter(KEY_J_v110, true) : getParameter(KEY_J_v130, true);
+        final String strX    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
+                                                            KEY_I_v110 : KEY_I_v130, true);
+        final String strY    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.key)) ?
+                                                            KEY_J_v110 : KEY_J_v130, true);
         final String queryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final List<String> layers = QueryAdapter.toStringList(queryLayers);
@@ -816,10 +820,10 @@ public class WMService extends WebService {
      */
     private GetMap adaptGetMap() throws WebServiceException {
         final ServiceVersion version  = getCurrentVersion();
-        final WMSQueryVersion wmsVersion = (version.toString().equals("1.1.1")) ?
+        final WMSQueryVersion wmsVersion = (version.toString().equals(WMSQueryVersion.WMS_1_1_1.key)) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
         final String strFormat        = getParameter( KEY_FORMAT, true);
-        final String strCRS           = getParameter( (version.toString().equals("1.3.0")) ?
+        final String strCRS           = getParameter( (version.toString().equals(WMSQueryVersion.WMS_1_3_0.key)) ?
                                                       KEY_CRS_v130 : KEY_CRS_v110, true );
         final String strBBox          = getParameter( KEY_BBOX, true );
         final String strLayers        = getParameter( KEY_LAYERS, true );
