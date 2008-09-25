@@ -45,7 +45,6 @@ import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerLinkReader;
-import org.constellation.provider.NamedStyleDP;
 import org.constellation.ws.rs.WebService;
 
 import org.xml.sax.SAXException;
@@ -292,7 +291,9 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         } catch (NamingException ex) {
             Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        if (styleLinks == null) {
+            return;
+        }
         final File file = new File(styleLinks);
         
         if(file.exists()){

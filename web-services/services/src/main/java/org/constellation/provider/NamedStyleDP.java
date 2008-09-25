@@ -19,6 +19,7 @@ package org.constellation.provider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -142,9 +143,10 @@ public class NamedStyleDP implements DataProvider<String,Object>{
         }catch(NamingException ex){
             Logger.getLogger(NamedStyleDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SLD_DP);
         }
-        
-//        strFolders = "/home/sorel/GIS_DATA/Styles";
-        
+
+        if (strFolders == null) {
+            return Collections.emptyList();
+        }
         StringTokenizer token = new StringTokenizer(strFolders,";");
         while(token.hasMoreElements()){
             String path = token.nextToken();
