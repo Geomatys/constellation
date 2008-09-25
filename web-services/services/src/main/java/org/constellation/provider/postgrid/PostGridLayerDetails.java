@@ -92,18 +92,16 @@ class PostGridLayerDetails implements LayerDetails {
                                    final double elevation) throws CatalogException
     {
         final CoverageReference coverage = layer.getCoverageReference(time, elevation);
+        final Envelope envelope = coverage.getEnvelope();
+        final int dimension = envelope.getDimension();
+        final GeneralDirectPosition generalPosition = new GeneralDirectPosition(dimension);
+        for (int i = 0; i < dimension; i++) {
+            generalPosition.setOrdinate(i, envelope.getMedian(i));
+        }
+        generalPosition.setOrdinate(0, x);
+        generalPosition.setOrdinate(1, y);
         try {
-            final Envelope envelope = coverage.getEnvelope();
-            final int dimension = envelope.getDimension();
-            final GeneralDirectPosition generalPosition = new GeneralDirectPosition(dimension);
-            for (int i=0; i<dimension; i++) {
-                generalPosition.setOrdinate(i, envelope.getMedian(i));
-                System.out.println(envelope.getMedian(i));
-            }
-            generalPosition.setOrdinate(0, x);
-            generalPosition.setOrdinate(1, y);
             final GridCoverage2D grid2D = coverage.getCoverage(null);
-            //final DirectPosition position = new DirectPosition2D(x, y);
             double[] result = null;
             result = grid2D.evaluate(generalPosition, result);
             return result[0];

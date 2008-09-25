@@ -544,23 +544,58 @@ public class WMService extends WebService {
         }
         final double elevation = info.getElevation();
         final Date time = info.getDate();
-        final List<String> layers = info.getQueryLayers();
-        final StringBuilder response = new StringBuilder();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
+        final List<String> layers = info.getQueryLayers();
+        final int size = layers.size();
+        final List<Double> results = new ArrayList<Double>(size);
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
             try {
-            final double currentValue = layer.getInformationAt(info.getX(), info.getY(),
-                    time, elevation);
-            
-            response.append("Result for layer ").append(layer.getName());
-            response.append(" : ").append(currentValue);
-            response.append("\n");
+                final double currentValue = layer.getInformationAt(info.getX(), info.getY(),
+                                                                   time, elevation);
+                results.add(currentValue);
             } catch (CatalogException cat) {
                 throw new WMSWebServiceException(cat, NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
-        return Response.ok(response.toString(), infoFormat).build();
+
+        // We now build the response, according to the format chosen.
+        StringBuilder response = new StringBuilder();
+
+        // TEXT / PLAIN
+        if (infoFormat.equalsIgnoreCase("text/plain")) {
+            for (int i=0; i<size; i++) {
+                response.append("result for ").append(layers.get(i));
+                response.append(" is:").append(results.get(i));
+                response.append("\n");
+            }
+            return Response.ok(response.toString(), infoFormat).build();
+        }
+
+        // TEXT / HTML
+        if (infoFormat.equalsIgnoreCase("text/html")) {
+            response.append("<html>\n")
+                    .append("    <head>\n")
+                    .append("        <title>GetFeatureInfo output</title>\n")
+                    .append("    </head>\n")
+                    .append("    <body>\n")
+                    .append("    <table>\n");
+            for (int i=0; i<size; i++) {
+                response.append("        <tr>\n")
+                        .append("            <th>").append(layers.get(i)).append("</th>\n")
+                        .append("        </tr>\n")
+                        .append("        <tr>\n")
+                        .append("            <th>").append(results.get(i)).append("</th>\n")
+                        .append("       </tr>\n");
+            }
+            response.append("    </table>\n")
+                    .append("    </body>\n")
+                    .append("</html>");
+            return Response.ok(response.toString(), infoFormat).build();
+        }
+
+        // Info format not handled.
+        throw new WMSWebServiceException("", INVALID_FORMAT, getCurrentVersion());
     }
 
     /**
