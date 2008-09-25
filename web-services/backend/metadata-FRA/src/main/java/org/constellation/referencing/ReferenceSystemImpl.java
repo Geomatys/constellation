@@ -22,7 +22,13 @@ package org.constellation.referencing;
 
 import java.util.Collection;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.metadata.fra.FRADirectReferenceSystemType;
+import org.constellation.metadata.fra.FRAIndirectReferenceSystemType;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.ReferenceSystem;
@@ -34,15 +40,19 @@ import org.opengis.util.InternationalString;
  *
  * @author legal
  */
-@XmlType(name = "RS_ReferenceSystem")
+@XmlType(name = "")
+@XmlRootElement(name = "RS_ReferenceSystem")
+@XmlSeeAlso({FRADirectReferenceSystemType.class, FRAIndirectReferenceSystemType.class})
 public class ReferenceSystemImpl implements ReferenceSystem {
-                                
+      
     private ReferenceIdentifier referenceSystemIdentifier;
     
     public ReferenceSystemImpl() {
         
     }
-    
+
+    @XmlJavaTypeAdapter(ReferenceIdentifierAdapter.class)
+    @XmlElement(name = "referenceSystemIdentifier", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public ReferenceIdentifier getReferenceSystemIdentifier() {
         return referenceSystemIdentifier;
     }
@@ -85,6 +95,6 @@ public class ReferenceSystemImpl implements ReferenceSystem {
     
     @Override
     public String toString() {
-        return "[ReferenceSystemImpl] referenceSystemIdentifier:" + referenceSystemIdentifier;
+        return "[" + this.getClass().getSimpleName() + "] referenceSystemIdentifier:" + referenceSystemIdentifier;
     }
 }

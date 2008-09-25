@@ -167,7 +167,7 @@ public abstract class WebService {
      * The http context containing the request parameter
      */
     @Context
-    private UriInfo context;
+    protected UriInfo context;
 
     /**
      * A servlet context used for access deployed file
@@ -640,7 +640,7 @@ public abstract class WebService {
      * @param codeName
      * @return
      */
-    private StringWriter launchException(String message, String codeName) throws JAXBException {
+    protected StringWriter launchException(String message, String codeName) throws JAXBException {
         StringWriter sw = new StringWriter();
 
         if (getCurrentVersion().isOWS()) {

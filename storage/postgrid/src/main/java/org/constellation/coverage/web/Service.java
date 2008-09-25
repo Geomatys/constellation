@@ -47,5 +47,10 @@ public enum Service {
     /**
      * Sensor Observation Service.
      */
-    SOS
+    SOS,
+            
+    /**
+     * any other Service.
+     */
+    OTHER
 }

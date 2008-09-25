@@ -1,0 +1,304 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.constellation.security.ws;
+
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.spi.resource.Singleton;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.security.Principal;
+import java.security.acl.Group;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.ws.rs.WebService;
+import org.constellation.xacml.CstlPDP;
+import org.constellation.xacml.PEP;
+import org.constellation.xacml.SecurityActions;
+import org.constellation.xacml.XACMLConstants;
+import org.constellation.xacml.api.PolicyDecisionPoint;
+import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.api.RequestContext;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.factory.FactoryException;
+import org.constellation.xacml.factory.PolicyFactory;
+import org.constellation.xacml.locators.JBossPolicyLocator;
+import org.constellation.xacml.policy.PolicyType;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+/**
+ *
+ * @author guilhem
+ */
+@Path("pep")
+@Singleton
+public class GeoDRMService extends WebService {
+
+    /**
+     * A Policy Decision Point allowing to secure the access to the resources.
+     */
+    private PolicyDecisionPoint PDP;
+
+    /**
+     * A Policy Enforcement Point allowing to secure the access to the resources.
+     */
+    private PEP pep;
+    
+    private String SERVICEURL = "http://test.geomatys.fr/seagis/WS/wms";
+    
+    public GeoDRMService() {
+        super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
+    } 
+    
+    /**
+     * Initialize the policy Decision Point and load all the correspounding policy file.
+     */
+    private void initializePolicyDecisionPoint() {
+        //we create a new PDP
+        PDP = new CstlPDP();
+
+        //load the correspounding policy file
+        final String url = "org/constellation/xacml/wmsPolicy.xml";
+        final InputStream is = SecurityActions.getResourceAsStream(url);
+        if (is == null) {
+            LOGGER.severe("unable to find the resource: " + url);
+            return;
+        }
+        Object p = null;
+        try {
+            JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.xacml.policy");
+            Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
+            p = policyUnmarshaller.unmarshal(is);
+        } catch (JAXBException e) {
+            LOGGER.severe("JAXB exception while unmarshalling policyFile wmsPolicy.xml");
+        }
+
+        if (p instanceof JAXBElement) {
+            p = ((JAXBElement)p).getValue();
+        }
+
+        if (p == null) {
+            LOGGER.severe("the unmarshalled service policy is null.");
+            return;
+        } else if (!(p instanceof PolicyType)) {
+            LOGGER.severe("unknow unmarshalled type for service policy file:" + p.getClass());
+            return;
+        }
+        final PolicyType servicePolicy  = (PolicyType) p;
+
+        try {
+            final XACMLPolicy policy = PolicyFactory.createPolicy(servicePolicy);
+            final Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
+            policies.add(policy);
+            PDP.setPolicies(policies);
+
+            //Add the basic locators also
+            final PolicyLocator policyLocator = new JBossPolicyLocator();
+            policyLocator.setPolicies(policies);
+
+            //Locators need to be given the policies
+            final Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
+            locators.add(policyLocator);
+            PDP.setLocators(locators);
+
+            pep = new PEP(PDP);
+
+        } catch (FactoryException e) {
+            LOGGER.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
+        }
+        LOGGER.info("PDP succesfully initialized");
+    }
+    
+    /**
+     * Temporary test method until we put in place an authentification process.
+     */
+    private Group getAuthentifiedUser() {
+        //for now we consider an user and is group as the same.
+        Principal anonymous    = new PrincipalImpl("anonymous");
+        Group     anonymousGrp = new GroupImpl("anonymous");
+        anonymousGrp.addMember(anonymous);
+
+        if (httpContext != null && httpContext.getRequest() != null) {
+            HttpRequestContext httpRequest = httpContext.getRequest();
+            Cookie authent = httpRequest.getCookies().get("authent");
+
+            Group identifiedGrp = null;
+            if (authent != null) {
+                if (authent.getValue().equals("admin:admin")) {
+                    Principal user = new PrincipalImpl("admin");
+                    identifiedGrp  = new GroupImpl("admin");
+                    identifiedGrp.addMember(user);
+                }
+            }
+            if (identifiedGrp == null) {
+                identifiedGrp = anonymousGrp;
+            }
+            return identifiedGrp;
+        }
+        return anonymousGrp;
+    }
+
+    
+    /**
+     * Decide if the user who send the request has access to this resource.
+     */
+    private Response allowRequest(Object objectRequest) throws JAXBException {
+        try {
+            //we look for an authentified user
+            Group userGrp = getAuthentifiedUser();
+            Principal user = userGrp.members().nextElement();
+
+            if (objectRequest instanceof JAXBElement) {
+                objectRequest = ((JAXBElement) objectRequest).getValue();
+            }
+
+            // if the request is not an xml request we fill the request parameter.
+            String request = "";
+            if (objectRequest == null) {
+                request = (String) getParameter("REQUEST", true);
+            }
+
+            //we define the action
+            String action = request;
+            if (action.equals("") && objectRequest != null) {
+                action = objectRequest.getClass().getSimpleName();
+                action = action.replace("Type", "");
+            }
+            action = action.toLowerCase();
+
+            //we define the selected URI
+            String requestedURI = context.getRequestUri().toString();
+            if (objectRequest == null) {
+                objectRequest = requestedURI.substring(requestedURI.indexOf('?'));
+            }
+
+
+            LOGGER.finer("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
+            RequestContext decisionRequest = pep.createXACMLRequest(SERVICEURL, user, userGrp, action);
+            int decision = pep.getDecision(decisionRequest);
+
+            if (decision == XACMLConstants.DECISION_PERMIT) {
+                LOGGER.finer("request allowed");
+                return sendRequest(objectRequest);
+            } else if (decision == XACMLConstants.DECISION_DENY) {
+                StringWriter sw = launchException("You are not authorized to execute this request. " +
+                        "Please identify yourself first.", "NO_APPLICABLE_CODE");
+                return Response.ok(sw.toString(), "text/xml").build();
+            } else {
+                LOGGER.severe("Unable to take a decision for the request, we let pass");
+                return sendRequest(objectRequest);
+            }
+        } catch (WebServiceException ex) {
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(ex.getExceptionReport(), sw);
+            return Response.ok(sw.toString(), "text/xml").build();
+        }  catch (IOException ex) {
+            StringWriter sw = launchException("The service has throw an IO exception",  "NO_APPLICABLE_CODE");
+            return Response.ok(sw.toString(), "text/xml").build();
+        } catch (URISyntaxException ex) {
+            StringWriter sw = launchException("The service has throw an URI syntax exception",  "NO_APPLICABLE_CODE");
+            return Response.ok(sw.toString(), "text/xml").build();
+        }
+    }
+    
+    
+    @Override
+    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        return allowRequest(objectRequest);
+    }
+
+    private Response sendRequest(Object objectRequest) throws OWSWebServiceException, MalformedURLException {
+        Object response = null;
+        
+        try {
+             URLConnection conec;
+             
+            // for a POST request
+            if (!(objectRequest instanceof String)) {
+                URL source  = new URL(SERVICEURL);
+                conec       = source.openConnection();
+                
+                conec.setDoOutput(true);
+                conec.setRequestProperty("Content-Type","text/xml");
+                OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+                StringWriter sw = new StringWriter();
+                try {
+                    
+                    marshaller.marshal(objectRequest, sw);
+                } catch (JAXBException ex) {
+                    throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());
+                }
+                String XMLRequest = sw.toString();
+            
+                // in the special case 1 we need to remove ogc prefix inside  the >Filter
+                LOGGER.info("sended:" + XMLRequest);
+                wr.write(XMLRequest);
+                wr.flush();
+            
+            // for a GET request
+            } else {
+                 
+                URL source  = new URL(SERVICEURL + "?" + objectRequest);
+                conec       = source.openConnection(); 
+            }
+        
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            if (conec.getContentType().contains("xml") || conec.getContentType().contains("text")) {
+                while ((size = in.read(buffer, 0, 1024)) > 0) {
+                    out.write(new String(buffer, 0, size));
+                }
+                
+                //we convert the brut String value into UTF-8 encoding
+                String brutString = out.toString();
+
+                //we need to replace % character by "percent because they are reserved char for url encoding
+                brutString = brutString.replaceAll("%", "percent");
+                String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
+                
+                try {
+                    response = unmarshaller.unmarshal(new StringReader(decodedString));
+                    if (response != null && response instanceof JAXBElement) {
+                        response = ((JAXBElement) response).getValue();
+                    }
+                } catch (JAXBException ex) {
+                    LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                                 "cause: " + ex.getMessage());
+                }
+            } else {
+                response = conec.getContent();
+            }
+            
+            
+        } catch (IOException ex) {
+            LOGGER.severe("The Distant service have made an error");
+            return null;
+        }
+        return Response.ok(response).build();
+    }
+}

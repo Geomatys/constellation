@@ -44,5 +44,8 @@ import org.constellation.referencing.ReferenceSystemImpl;
 @XmlType(name = "")
 @XmlRootElement(name= "FRA_IndirectReferenceSystem")
 public class FRAIndirectReferenceSystemType extends ReferenceSystemImpl {
-
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

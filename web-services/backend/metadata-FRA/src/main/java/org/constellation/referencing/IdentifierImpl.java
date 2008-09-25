@@ -21,6 +21,7 @@ package org.constellation.referencing;
 
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.metadata.iso.MetadataEntity;
 import org.opengis.metadata.citation.Citation;
@@ -29,12 +30,13 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import static org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
 
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
  */
-@XmlType(name = "RS_Identifier")
+@XmlType(name = "")
+@XmlRootElement(name = "RS_Identifier")
 public class IdentifierImpl extends MetadataEntity implements ReferenceIdentifier {
     /**
      * Serial number for interoperability with different versions.
@@ -88,6 +90,14 @@ public class IdentifierImpl extends MetadataEntity implements ReferenceIdentifie
         authority = null;
         version   = null;
         remarks   = null;
+    }
+
+    public IdentifierImpl(ReferenceIdentifier identifier) {
+         this.authority = identifier.getAuthority();
+         this.code      = identifier.getCode();
+         this.codespace = identifier.getCodeSpace();
+         this.version   = identifier.getVersion();
+         this.remarks   = null;
     }
 
 
