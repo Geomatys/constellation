@@ -50,18 +50,12 @@ public class NamedStyleDP implements DataProvider<String,Object>{
     private final Collection<DataProvider<String,? extends Object>> dps = new ArrayList<DataProvider<String,? extends Object>>();
     
     private NamedStyleDP(){
-        
-        List<File> folders = getSLDFolders();
-        
         dps.add(GO2NamedStyleDP.getDefault());
         
-        for(File folder : folders){
+        for(File folder : getSLDFolders()){
             SLDNamedStyleDP sldDP = new SLDNamedStyleDP(folder);
             dps.add(sldDP);
         }
-        
-        
-        
     }
     
     /**
@@ -147,10 +141,10 @@ public class NamedStyleDP implements DataProvider<String,Object>{
         if (strFolders == null) {
             return Collections.emptyList();
         }
-        StringTokenizer token = new StringTokenizer(strFolders,";");
+        final StringTokenizer token = new StringTokenizer(strFolders,";");
         while(token.hasMoreElements()){
-            String path = token.nextToken();
-            File f = new File(path);
+            final String path = token.nextToken();
+            final File f = new File(path);
             if(f.exists() && f.isDirectory()){
                 folders.add(f);
             }else{

@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
@@ -178,7 +180,20 @@ class ShapefileLayerDetails implements LayerDetails {
      */
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final GlyphLegendFactory sldFact = new GlyphLegendFactory();
-        return sldFact.create(RANDOM_FACTORY.createPolygonStyle(), dimension);
+        
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = null;
+        try {
+            fs = store.getFeatureSource(store.getTypeNames()[0]);
+        } catch (IOException ex) {
+            Logger.getLogger(ShapefileLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(fs != null){
+            return sldFact.create(RANDOM_FACTORY.createDefaultVectorStyle(fs), dimension);
+        }else{
+            return sldFact.create(RANDOM_FACTORY.createPolygonStyle(), dimension);
+        }
+        
     }
 
     /**
@@ -199,7 +214,7 @@ class ShapefileLayerDetails implements LayerDetails {
                 style = favorites.get(0);
             }else{
                 //no favorites defined, create a default one
-                style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+                style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
             }
         }
 
@@ -208,7 +223,7 @@ class ShapefileLayerDetails implements LayerDetails {
             style = NamedStyleDP.getInstance().get((String)style);
             if(style == null){
                 //somehting is wrong, the named style doesnt exist, create a default one
-                style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+                style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
             }
         }
 
@@ -217,12 +232,12 @@ class ShapefileLayerDetails implements LayerDetails {
             layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
         }else if( style instanceof GraphicBuilder){
             //special graphic builder
-            style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
             layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
             layer.graphicBuilders().add((GraphicBuilder) style);
         }else{
             //style is unknowed type, use a random style
-            style = RANDOM_FACTORY.createRandomVectorStyle(fs);
+            style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
             layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
         }
 
