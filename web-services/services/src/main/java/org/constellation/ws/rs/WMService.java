@@ -567,8 +567,9 @@ public class WMService extends WebService {
         if (infoFormat.equalsIgnoreCase("text/plain")) {
             for (int i=0; i<size; i++) {
                 response.append("result for ").append(layers.get(i));
-                response.append(" is:").append(results.get(i));
-                response.append("\n");
+                response.append(" is:");
+                float floatRes = results.get(i).floatValue();
+                response.append(floatRes).append("\n");
             }
             return Response.ok(response.toString(), infoFormat).build();
         }
@@ -582,11 +583,12 @@ public class WMService extends WebService {
                     .append("    <body>\n")
                     .append("    <table>\n");
             for (int i=0; i<size; i++) {
+                float floatRes = results.get(i).floatValue();
                 response.append("        <tr>\n")
                         .append("            <th>").append(layers.get(i)).append("</th>\n")
                         .append("        </tr>\n")
                         .append("        <tr>\n")
-                        .append("            <th>").append(results.get(i)).append("</th>\n")
+                        .append("            <th>").append(floatRes).append("</th>\n")
                         .append("       </tr>\n");
             }
             response.append("    </table>\n")
