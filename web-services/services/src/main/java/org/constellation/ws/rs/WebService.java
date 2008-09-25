@@ -566,6 +566,10 @@ public abstract class WebService {
      * Decide if the user who send the request has access to this resource.
      */
     private Response allowRequest(Object objectRequest) throws JAXBException {
+        if (pep == null || PDP == null) {
+            return treatIncomingRequest(objectRequest);
+        }
+        
         try {
             //we look for an authentified user
             Group userGrp = getAuthentifiedUser();
@@ -602,7 +606,7 @@ public abstract class WebService {
                 return treatIncomingRequest(objectRequest);
             } else if (decision == XACMLConstants.DECISION_DENY) {
                 StringWriter sw = launchException("You are not authorized to execute this request. " +
-                        "Please identify yourself first.", "NO_APPLICABLE_CODE");
+                                                  "Please identify yourself first.", "NO_APPLICABLE_CODE");
                 return Response.ok(sw.toString(), "text/xml").build();
             } else {
                 LOGGER.severe("Unable to take a decision for the request, we let pass");
@@ -934,10 +938,10 @@ public abstract class WebService {
             }
         }
         ServiceVersion wrongVersion = new ServiceVersion(null, number);
-        if (wrongVersion.compareTo(versions.get(0)) > 0) {
+        if (wrongVersion.compareTo(versions.get(0)) < 0) {
             return this.versions.get(0);
         } else {
-            if (wrongVersion.compareTo(versions.get(versions.size() - 1)) < 0) {
+            if (wrongVersion.compareTo(versions.get(versions.size() - 1)) > 0) {
                 return versions.get(versions.size() - 1);
             }
         }
