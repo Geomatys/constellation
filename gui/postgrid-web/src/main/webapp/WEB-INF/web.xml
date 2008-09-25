@@ -13,9 +13,9 @@
 	  <!-- To disable CSW     service remove packageName: org.constellation.metadata.ws.rs-->
           <!-- To disable WMS/WCS service remove packageName: org.constellation.coverage.ws   -->
           <!-- To enable  SOS     service add    packageName: org.constellation.sos.ws.rs     -->
-          <!-- To enable  config  service add    packageName: org.constellation.configuration.ws.rs -->
-          <!-- To enable  GeoDRM  service add    packageName: org.constellation.security.ws.rs      -->
-          <param-value>org.constellation.metadata.ws.rs</param-value>
+          <!-- To enable  config  service add    packageName: org.constellation.configuration.ws -->
+          <!-- To enable  GeoDRM  service add    packageName: org.constellation.security.ws    -->
+          <param-value>org.constellation.coverage.ws;org.constellation.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

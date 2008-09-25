@@ -7,6 +7,14 @@ package org.constellation.security.ws;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.spi.resource.Singleton;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -20,6 +28,7 @@ import java.security.Principal;
 import java.security.acl.Group;
 import java.util.HashSet;
 import java.util.Set;
+import javax.imageio.ImageIO;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
@@ -44,6 +53,7 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
 import org.constellation.xacml.policy.PolicyType;
+import sun.awt.image.URLImageSource;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -64,10 +74,19 @@ public class GeoDRMService extends WebService {
      */
     private PEP pep;
     
-    private String SERVICEURL = "http://test.geomatys.fr/seagis/WS/wms";
+    private String SERVICEURL = "http://demo.geomatys.fr/seagis/WS/wms";
     
     public GeoDRMService() {
         super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
+        try {
+            initializePolicyDecisionPoint();
+            setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.coverage.web", "");
+        } catch (JAXBException ex){
+            LOGGER.severe("The GeoDRM service is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' + 
+                          " details: " + ex.toString());
+        }
     } 
     
     /**
@@ -141,19 +160,24 @@ public class GeoDRMService extends WebService {
         if (httpContext != null && httpContext.getRequest() != null) {
             HttpRequestContext httpRequest = httpContext.getRequest();
             Cookie authent = httpRequest.getCookies().get("authent");
-
+            
             Group identifiedGrp = null;
             if (authent != null) {
+                LOGGER.info("cookie authent present");
                 if (authent.getValue().equals("admin:admin")) {
                     Principal user = new PrincipalImpl("admin");
                     identifiedGrp  = new GroupImpl("admin");
                     identifiedGrp.addMember(user);
                 }
+            } else {
+                LOGGER.info("no cookie authent found");
             }
             if (identifiedGrp == null) {
                 identifiedGrp = anonymousGrp;
             }
             return identifiedGrp;
+        } else {
+            LOGGER.severe("httpcontext null");
         }
         return anonymousGrp;
     }
@@ -179,12 +203,11 @@ public class GeoDRMService extends WebService {
             }
 
             //we define the action
-            String action = request;
+            String action = getParameter("LAYERS", true);
             if (action.equals("") && objectRequest != null) {
                 action = objectRequest.getClass().getSimpleName();
                 action = action.replace("Type", "");
             }
-            action = action.toLowerCase();
 
             //we define the selected URI
             String requestedURI = context.getRequestUri().toString();
@@ -193,12 +216,12 @@ public class GeoDRMService extends WebService {
             }
 
 
-            LOGGER.finer("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
+            LOGGER.info("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
             RequestContext decisionRequest = pep.createXACMLRequest(SERVICEURL, user, userGrp, action);
             int decision = pep.getDecision(decisionRequest);
 
             if (decision == XACMLConstants.DECISION_PERMIT) {
-                LOGGER.finer("request allowed");
+                LOGGER.info("request allowed");
                 return sendRequest(objectRequest);
             } else if (decision == XACMLConstants.DECISION_DENY) {
                 StringWriter sw = launchException("You are not authorized to execute this request. " +
@@ -229,7 +252,7 @@ public class GeoDRMService extends WebService {
 
     private Response sendRequest(Object objectRequest) throws OWSWebServiceException, MalformedURLException {
         Object response = null;
-        
+        String contentType = "";
         try {
              URLConnection conec;
              
@@ -259,17 +282,19 @@ public class GeoDRMService extends WebService {
             // for a GET request
             } else {
                  
-                URL source  = new URL(SERVICEURL + "?" + objectRequest);
+                URL source  = new URL(SERVICEURL + objectRequest);
+                LOGGER.info("url sended:" + SERVICEURL + objectRequest);
                 conec       = source.openConnection(); 
             }
         
             // we get the response document
             InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
-            int size;
-
-            if (conec.getContentType().contains("xml") || conec.getContentType().contains("text")) {
+            contentType = conec.getContentType();
+            
+            if (contentType.contains("xml") || contentType.contains("text")) {
+                byte[] buffer = new byte[1024];
+                int size;
+                StringWriter out = new StringWriter();
                 while ((size = in.read(buffer, 0, 1024)) > 0) {
                     out.write(new String(buffer, 0, size));
                 }
@@ -291,14 +316,24 @@ public class GeoDRMService extends WebService {
                                  "cause: " + ex.getMessage());
                 }
             } else {
-                response = conec.getContent();
+                File temp = File.createTempFile("keeperWriter", "tmp");
+                temp.deleteOnExit();
+                FileOutputStream byteArrayOut = new FileOutputStream(temp);
+                int c;
+                while ((c = in.read()) != -1) {
+                    byteArrayOut.write(c);
+                }
+                byteArrayOut.close();
+                response = temp;
             }
             
+            LOGGER.info("ResponseType : " + response.getClass().getName() + '\n' + 
+                        "MIME Type    : " + contentType);
             
         } catch (IOException ex) {
             LOGGER.severe("The Distant service have made an error");
             return null;
         }
-        return Response.ok(response).build();
+        return Response.ok(response, contentType).build();
     }
 }

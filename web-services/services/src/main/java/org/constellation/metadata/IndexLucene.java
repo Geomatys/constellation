@@ -475,8 +475,9 @@ public class IndexLucene extends AbstractIndex {
     public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
         
         List<String> results = new ArrayList<String>();
-        
-        IndexReader ireader = IndexReader.open(getFileDirectory());
+        File indexDirectory = getFileDirectory();
+        logger.info("index directory:" + indexDirectory.getPath());
+        IndexReader ireader = IndexReader.open(indexDirectory);
         Searcher searcher   = new IndexSearcher(ireader);
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
@@ -556,6 +557,7 @@ public class IndexLucene extends AbstractIndex {
         logger.info(results.size() + " total matching documents");
         
         ireader.close();
+        searcher.close();
         return results;
     } 
     
@@ -579,6 +581,7 @@ public class IndexLucene extends AbstractIndex {
             results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
         }
         ireader.close();
+        searcher.close();
         logger.info(results.size() + " total matching documents");
         
         return results;

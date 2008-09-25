@@ -39,17 +39,22 @@ public class AuthentificationBean {
     
     private HttpServletResponse response;
     
+    private String contextPath;
+    
     public AuthentificationBean() {
         
         // we get the sevlet context to read the capabilities files in the deployed war
         FacesContext context = FacesContext.getCurrentInstance();
         response = (HttpServletResponse) context.getExternalContext().getResponse();
+        contextPath = ((ServletContext)context.getExternalContext().getContext()).getContextPath();
         
     }
     
     public String authentify() {
         Cookie cookie = new Cookie("authent", login + ':' + password);
+        cookie.setPath(contextPath);
         response.addCookie(cookie);
+        logger.info("cookie added with value:" + login + ':' + password);
         return "authentified";
     }
 

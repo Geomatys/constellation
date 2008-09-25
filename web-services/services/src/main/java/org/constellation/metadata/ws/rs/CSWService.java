@@ -179,7 +179,7 @@ public class CSWService extends WebService {
             worker.setVersion(getCurrentVersion());
             
         } catch (JAXBException ex){
-            LOGGER.severe("The CSW serving is not running."       + '\n' +
+            LOGGER.severe("The CSW service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' + 
                           " details: " + ex.toString());
