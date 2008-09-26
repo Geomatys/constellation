@@ -78,12 +78,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         final MeasurementRange dimRange        = query.getDimRange();
         final Dimension canvasDimension        = query.getSize();
         final Map<String, Object> params       = new HashMap<String, Object>();
-        final MapContext context               = toMapContext(layers,styles,sld, params);
-        final Color background                    = (query.getTransparent()) ? null : query.getBackground();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, date);
-        
+        final MapContext context               = toMapContext(layers,styles,sld, params);
+        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
+
         if (false) {
             //for debug
             final StringBuilder builder = new StringBuilder();
@@ -105,27 +105,27 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             builder.append("Transparent => " + query.getTransparent() + "\n");
             System.out.println(builder.toString());
         }
-        
+
         portray(context, refEnv, background, output, mime, canvasDimension, null,true);
     }
-    
-    private MapContext toMapContext(final List<String> layers, final List<String> styles, 
+
+    private MapContext toMapContext(final List<String> layers, final List<String> styles,
                                     final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
                                     throws PortrayalException {
-        
+
         final MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
         for(int index=0, n = layers.size();index<n;index++){
             final String layerName = layers.get(index);
             final LayerDetails details = layerDPS.get(layerName);
-            
+
             if(details == null){
                 throw new PortrayalException("Layer détails for "+layerName+" could not be created");
             }
 
             final Object style;
-            
+
             if(sld != null){
                 //try to use the provided SLD
                 style = extractStyle(layerName,sld);
@@ -139,7 +139,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
             }
 
             final MapLayer layer = details.getMapLayer(style,params);
-            
+
             if(layer == null){
                 throw new PortrayalException("Map layer : "+layerName+" could not be created");
             }
@@ -222,7 +222,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
 
 
         writeImage(img, mime, output);
-        
+
         return output;
     }
 
