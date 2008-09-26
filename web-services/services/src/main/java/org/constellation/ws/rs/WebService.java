@@ -93,6 +93,7 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
 import org.constellation.xacml.policy.PolicyType;
+import org.geotools.util.Version;
 
 
 /**
@@ -696,6 +697,17 @@ public abstract class WebService {
         return anonymousGrp;
     }
 
+    /**
+     * Returns the file where to read the capabilities document for each service.
+     * If no such file is found, then this method returns {@code null}.
+     *
+     * @return The capabilities Object, or {@code null} if none.
+     *
+     * @deprecated
+     */
+    public Object getCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
+        return getCapabilitiesObject(getCurrentVersion());
+    }
 
     /**
      * Returns the file where to read the capabilities document for each service.
@@ -703,8 +715,8 @@ public abstract class WebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
-       String fileName = this.service + "Capabilities" + getCurrentVersion().toString() + ".xml";
+    public Object getCapabilitiesObject(final Version version) throws JAXBException, FileNotFoundException, IOException {
+       String fileName = this.service + "Capabilities" + version.toString() + ".xml";
        File changeFile = getFile("change.properties");
        Properties p = new Properties();
 
