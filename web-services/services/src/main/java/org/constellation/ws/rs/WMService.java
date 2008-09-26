@@ -91,7 +91,7 @@ import org.constellation.wms.AbstractHTTP;
 import org.constellation.worker.WMSWorker;
 
 // Geotools dependencies
-import org.geotools.display.service.PortrayalException;
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
@@ -687,7 +687,11 @@ public class WMService extends WebService {
                     throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, serviceVersion);
                 }
                 final Dimension dim = getMap.getSize();
-                CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
+                try {
+                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
+                } catch (IOException ex1) {
+                    Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             } else {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
                 throw new WMSWebServiceException("The requested map could not be renderered correctly :" +

@@ -36,8 +36,8 @@ import org.constellation.provider.NamedStyleDP;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.GlyphLegendFactory;
-import org.geotools.display.service.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;

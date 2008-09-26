@@ -27,8 +27,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 
-import org.constellation.coverage.web.WebServiceException;
-import org.geotools.display.service.PortrayalException;
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.RandomStyleFactory;

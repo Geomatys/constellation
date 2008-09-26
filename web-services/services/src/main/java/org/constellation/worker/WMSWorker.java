@@ -26,7 +26,7 @@ import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 
-import org.geotools.display.service.PortrayalException;
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.sld.MutableStyledLayerDescriptor;

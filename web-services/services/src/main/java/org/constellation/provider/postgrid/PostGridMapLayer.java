@@ -17,9 +17,11 @@
 package org.constellation.provider.postgrid;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -41,7 +43,9 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.primitive.GraphicJ2D;
+import org.geotools.display.renderer.RenderingContext;
 import org.geotools.display.renderer.RenderingContext2D;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.GeneralEnvelope;
@@ -120,15 +124,34 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         setName(layer.getName());
     }
 
-    public Object prepare(ReferencedEnvelope env, int width, int height,
-            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
-            Object extent) {
-        return query(env, width, height,objToDisp,displayCRS,extent);
+    public Object prepare(final RenderingContext context) throws PortrayalException{
+        return query(context);
     }
 
-    public Object query(ReferencedEnvelope env, int width, int height,
-            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
-            Object extent) {
+    public Object query(final RenderingContext context) throws PortrayalException{
+            
+        final ReferencedEnvelope env;
+        final int width;
+        final int height;
+        final MathTransform objToDisp;
+        
+        if(context instanceof RenderingContext2D){
+            final RenderingContext2D context2D = (RenderingContext2D) context;
+            final Rectangle2D shape = context2D.getObjectiveShape().getBounds2D();
+            final Rectangle rect = context2D.getDisplayBounds();
+            env = new ReferencedEnvelope(shape, context2D.getObjectiveCRS());
+            width = rect.width;
+            height = rect.height;
+            objToDisp = context2D.getCanvas().getObjectiveToDisplayTransform();
+        }else{
+            throw new PortrayalException("PostGrid layer only support rendering for RenderingContext2D");
+        }         
+        
+        
+        
+//            ReferencedEnvelope env, int width, int height,
+//            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
+//            Object extent) {
 
         Envelope genv = null;
         try {
@@ -193,24 +216,18 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
 
-        if(builder != null && extent instanceof RenderingContext2D){
+        if(builder != null ){
             //TODO Find a better way to solve this issue
             final MapLayerBuilder mapBuilder = new MapLayerBuilder();
             final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
-            RenderingContext2D context2D = (RenderingContext2D) extent;
+            RenderingContext2D context2D = (RenderingContext2D) context;
             //special graphic builder
             Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
             g2.setClip(context2D.getGraphics().getClip());
             context2D = context2D.create(g2);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             for(GraphicJ2D gra : graphics){
-                try {
-                    gra.paint(context2D);
-                } catch (TransformException ex) {
-                    Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                gra.paint(context2D);
             }
 
             g2.dispose();

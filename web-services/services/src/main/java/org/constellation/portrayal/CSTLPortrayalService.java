@@ -33,11 +33,10 @@ import java.util.logging.Logger;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
-import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.WMSQuery;
 
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.service.DefaultPortrayalService;
-import org.geotools.display.service.PortrayalException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
@@ -153,7 +152,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         return null;
     }
 
-    public static synchronized File writeInImage(Exception e, int width, int height, File output, String mime){
+    public static synchronized File writeInImage(Exception e, int width, int height, File output, String mime)
+                    throws IOException{
         Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.WARNING, "Error image created : " + output,e);
 
         final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -191,11 +191,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         g.dispose();
 
 
-        try {
-            writeImage(img, mime, output);
-        } catch (IOException ex) {
-            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        writeImage(img, mime, output);
+        
         return output;
     }
 
