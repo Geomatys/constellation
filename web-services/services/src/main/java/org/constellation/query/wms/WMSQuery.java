@@ -111,11 +111,24 @@ public abstract class WMSQuery extends Query {
      * Parameter used in all WMS requests.
      */
     public static final String UNDEFINED_CRS = "UndefinedCRS";
-    
+
+    protected final WMSQueryVersion version;
+
     /**
      * {@inheritDoc}
      */
-    public QueryService getService() {
+    public final QueryService getService() {
         return new QueryService.WMS();
+    }
+
+    protected WMSQuery(final WMSQueryVersion version) {
+        if (version == null) {
+            throw new NullPointerException("Version should not be null !");
+        }
+        this.version = version;
+    }
+
+    public final WMSQueryVersion getVersion() {
+        return version;
     }
 }

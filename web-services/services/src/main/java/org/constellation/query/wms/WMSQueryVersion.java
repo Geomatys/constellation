@@ -16,7 +16,8 @@
  */
 package org.constellation.query.wms;
 
-import org.constellation.query.QueryVersion;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
 
 
 /**
@@ -25,7 +26,7 @@ import org.constellation.query.QueryVersion;
  * @version $Id$
  * @author Cédric Briançon
  */
-public class WMSQueryVersion extends QueryVersion {
+public class WMSQueryVersion extends ServiceVersion {
     /**
      * Key for the WMS request in version {@code 1.1.1}.
      */
@@ -42,6 +43,6 @@ public class WMSQueryVersion extends QueryVersion {
     public static final WMSQueryVersion WMS_GETLEGENDGRAPHIC_1_1_0 = new WMSQueryVersion("1.1.0");
 
     private WMSQueryVersion(final String key) {
-        super(key);
+        super(Service.WMS, key);
     }
 }

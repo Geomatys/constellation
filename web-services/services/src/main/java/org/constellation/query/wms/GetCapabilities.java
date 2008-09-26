@@ -17,7 +17,6 @@
 package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
-import org.constellation.query.QueryVersion;
 
 
 /**
@@ -28,15 +27,10 @@ import org.constellation.query.QueryVersion;
  */
 public class GetCapabilities extends WMSQuery {
     /**
-     * Version of the GetCapabilities requested.
-     */
-    private final QueryVersion version;
-
-    /**
      * 
      */
-    public GetCapabilities(final QueryVersion version) {
-        this.version = version;
+    public GetCapabilities(final WMSQueryVersion version) {
+        super(version);
     }
 
     /**
@@ -51,12 +45,5 @@ public class GetCapabilities extends WMSQuery {
      */
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_CAPABILITIES;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public QueryVersion getVersion() {
-        return version;
     }
 }

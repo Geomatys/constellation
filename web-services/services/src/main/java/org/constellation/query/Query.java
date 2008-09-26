@@ -16,6 +16,8 @@
  */
 package org.constellation.query;
 
+import org.constellation.coverage.web.ServiceVersion;
+
 
 /**
  * Interface for web queries.
@@ -40,7 +42,7 @@ public abstract class Query {
     /**
      * Returns the version of the service chosen, or {@code null} if not specified.
      */
-    public abstract QueryVersion getVersion();
+    public abstract ServiceVersion getVersion();
     
     /**
      * Returns the exception format. Never {@code null}.

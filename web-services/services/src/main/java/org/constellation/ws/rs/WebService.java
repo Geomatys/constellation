@@ -98,7 +98,6 @@ import org.constellation.xacml.policy.PolicyType;
 /**
  * Main class for all web services.
  *
- *
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
@@ -463,6 +462,8 @@ public abstract class WebService {
 
     /**
      * Return the current version of the Web Service.
+     *
+     * @deprecated
      */
     protected ServiceVersion getCurrentVersion() {
         return this.currentVersion;
@@ -470,6 +471,8 @@ public abstract class WebService {
 
     /**
      * Return the current version of the Web Service.
+     *
+     * @deprecated
      */
     protected void setCurrentVersion(String versionNumber) {
         currentVersion = getVersionFromNumber(versionNumber);
