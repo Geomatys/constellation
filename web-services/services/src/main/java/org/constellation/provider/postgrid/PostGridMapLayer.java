@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
@@ -42,6 +41,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.ColorMap;
+import org.geotools.coverage.processing.CoverageProcessingException;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.primitive.GraphicJ2D;
@@ -60,8 +60,8 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
 import org.geotools.style.StyleFactory;
-
 import org.geotools.util.MeasurementRange;
+
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -78,7 +78,12 @@ import org.opengis.style.RasterSymbolizer;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer{
+public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer {
+    /**
+     * Default logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
+
     /**
      * The requested elevation.
      */
@@ -116,7 +121,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      * @param db The database connection.
      * @param layer The current layer.
      */
-    public PostGridMapLayer(final Database db, final Layer layer){
+    public PostGridMapLayer(final Database db, final Layer layer) {
         super(createDefaultRasterStyle());
         this.db = db;
         this.layer = layer;
@@ -124,18 +129,17 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         setName(layer.getName());
     }
 
-    public Object prepare(final RenderingContext context) throws PortrayalException{
+    public Object prepare(final RenderingContext context) throws PortrayalException {
         return query(context);
     }
 
-    public Object query(final RenderingContext context) throws PortrayalException{
-            
+    public Object query(final RenderingContext context) throws PortrayalException {
         final ReferencedEnvelope env;
         final int width;
         final int height;
         final MathTransform objToDisp;
-        
-        if(context instanceof RenderingContext2D){
+
+        if(context instanceof RenderingContext2D) {
             final RenderingContext2D context2D = (RenderingContext2D) context;
             final Rectangle2D shape = context2D.getObjectiveShape().getBounds2D();
             final Rectangle rect = context2D.getDisplayBounds();
@@ -143,42 +147,35 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             width = rect.width;
             height = rect.height;
             objToDisp = context2D.getCanvas().getObjectiveToDisplayTransform();
-        }else{
+        } else {
             throw new PortrayalException("PostGrid layer only support rendering for RenderingContext2D");
-        }         
-        
-        
-        
-//            ReferencedEnvelope env, int width, int height,
-//            MathTransform objToDisp, CoordinateReferenceSystem displayCRS,
-//            Object extent) {
+        }
 
-        Envelope genv = null;
+        final Envelope genv;
         try {
             genv = CRS.transform(env, DefaultGeographicCRS.WGS84);
         } catch (TransformException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         }
-        GeneralEnvelope renv = new GeneralEnvelope(genv);
+        final GeneralEnvelope renv = new GeneralEnvelope(genv);
 
         //Create BBOX-----------------------------------------------------------
-        GeographicBoundingBox bbox = null;
+        final GeographicBoundingBox bbox;
         try {
             bbox = new GeographicBoundingBoxImpl(renv);
         } catch (TransformException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         }
         //Create resolution-----------------------------------------------------
-        double w = renv.toRectangle2D().getWidth() /width;
-        double h = renv.toRectangle2D().getHeight() /height;
-        Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
-
+        final double w = renv.toRectangle2D().getWidth() /width;
+        final double h = renv.toRectangle2D().getHeight() /height;
+        final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
 
         GridCoverageTable table = null;
         try {
             table = db.getTable(GridCoverageTable.class);
         } catch (NoSuchTableException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         }
         table = new GridCoverageTable(table);
 
@@ -192,11 +189,11 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         try {
             coverage = table.getEntry().getCoverage(null);
         } catch (CatalogException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         } catch (SQLException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         } catch (IOException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PortrayalException(ex);
         }
 
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
@@ -206,7 +203,11 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         }
 
         // Here a resample is done, to get the coverage into the requested crs.
-        coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
+        try {
+            coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
+        } catch (CoverageProcessingException c) {
+            throw new PortrayalException(c);
+        }
         final Graphics2D g2 = buffer.createGraphics();
 
 
@@ -220,7 +221,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
             RenderingContext2D context2D = (RenderingContext2D) context;
             //special graphic builder
-            Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
+            final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
             g2.setClip(context2D.getGraphics().getClip());
             context2D = context2D.create(g2);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -239,7 +240,11 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                 if (samples[0].getSampleToGeophysics() != null) {
                     final ColorMap colorMap = new ColorMap();
                     colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
-                    coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
+                    try {
+                        coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
+                    } catch (CoverageProcessingException c) {
+                        throw new PortrayalException(c);
+                    }
                 }
             }
         }
@@ -256,7 +261,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             final AffineTransform transform = (AffineTransform) mathTrans2D;
             g2.drawRenderedImage(img, transform);
         } else {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, new IllegalArgumentException());
+            throw new PortrayalException("Should have been an affine transform at this state.");
         }
         g2.dispose();
 
@@ -264,23 +269,19 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     }
 
     public ReferencedEnvelope getBounds() {
-        CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-        GeographicBoundingBox bbox = null;
+        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        final GeographicBoundingBox bbox;
         try {
             bbox = layer.getGeographicBoundingBox();
         } catch (CatalogException ex) {
-            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.warning(ex.getLocalizedMessage());
+            return new ReferencedEnvelope(crs);
         }
-        if(bbox != null){
-            return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
-                                    bbox.getEastBoundLongitude(),
-                                    bbox.getSouthBoundLatitude(),
-                                    bbox.getNorthBoundLatitude(),
-                                    crs);
-        }else{
-         return new ReferencedEnvelope(crs);
-        }
-
+        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
+                bbox.getEastBoundLongitude(),
+                bbox.getSouthBoundLatitude(),
+                bbox.getNorthBoundLatitude(),
+                crs);
     }
 
     /**
@@ -308,9 +309,9 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         return (envelope != null) ? envelope.getCoordinateReferenceSystem() : null;
     }
 
-    private static final MutableStyle createDefaultRasterStyle(){
-        StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
-        RasterSymbolizer symbol =sf.createDefaultRasterSymbolizer();
+    private static final MutableStyle createDefaultRasterStyle() {
+        final StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+        final RasterSymbolizer symbol =sf.createDefaultRasterSymbolizer();
         return sf.createRasterStyle(symbol);
     }
 
