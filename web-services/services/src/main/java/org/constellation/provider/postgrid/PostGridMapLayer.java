@@ -205,7 +205,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             return buffer;
         }
 
-        coverage = coverage.geophysics(false);
         // Here a resample is done, to get the coverage into the requested crs.
         coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
         final Graphics2D g2 = buffer.createGraphics();
@@ -244,6 +243,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                 }
             }
         }
+        coverage = coverage.geophysics(false);
         final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
 
         //normal image rendering
