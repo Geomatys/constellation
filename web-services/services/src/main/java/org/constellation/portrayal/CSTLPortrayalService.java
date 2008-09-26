@@ -33,11 +33,11 @@ import java.util.logging.Logger;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
+import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.service.DefaultPortrayalService;
-import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -51,6 +51,8 @@ import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
+import org.opengis.geometry.Envelope;
+
 
 /**
  * Portrayal service, extends the GT portrayal service by adding support
@@ -62,23 +64,51 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
 
     private final NamedLayerDP layerDPS = NamedLayerDP.getInstance();
 
-
     public CSTLPortrayalService(){}
 
-    public void portray(List<String> layers, List<String> styles, Color background,
-            MutableStyledLayerDescriptor sld,ReferencedEnvelope contextEnv, Object output,
-            String mime, Dimension canvasDimension, Double elevation, Date date,
-            MeasurementRange dimRange, Hints hints) throws PortrayalException{
-
-        final Map<String, Object> params = new HashMap<String, Object>();
+    public synchronized void portray(final GetMap query, final File output) throws PortrayalException{
+        final List<String> layers              = query.getLayers();
+        final List<String> styles              = query.getStyles();
+        final MutableStyledLayerDescriptor sld = query.getSld();
+        final Envelope contextEnv              = query.getEnvelope();
+        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(contextEnv);
+        final String mime                      = query.getFormat();
+        final Double elevation                 = query.getElevation();
+        final Date date                        = query.getDate();
+        final MeasurementRange dimRange        = query.getDimRange();
+        final Dimension canvasDimension        = query.getSize();
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        final MapContext context               = toMapContext(layers,styles,sld, params);
+        final Color background                    = (query.getTransparent()) ? null : query.getBackground();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, date);
-        MapContext context = toMapContext(layers,styles,sld, params);
-
-        portray(context, contextEnv, background, output, mime, canvasDimension, hints,true);
+        
+        if (false) {
+            //for debug
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Layers => ");
+            for(String layer : layers){
+                builder.append(layer +",");
+            }
+            builder.append("\n");
+            builder.append("Styles => ");
+            for(String style : styles){
+                builder.append(style +",");
+            }
+            builder.append("\n");
+            builder.append("Context env => " + contextEnv.toString() + "\n");
+            builder.append("Mime => " + mime.toString() + "\n");
+            builder.append("Dimension => " + canvasDimension.toString() + "\n");
+            builder.append("File => " + output.toString() + "\n");
+            builder.append("BGColor => " + background + "\n");
+            builder.append("Transparent => " + query.getTransparent() + "\n");
+            System.out.println(builder.toString());
+        }
+        
+        portray(context, refEnv, background, output, mime, canvasDimension, null,true);
     }
-
+    
     private MapContext toMapContext(final List<String> layers, final List<String> styles, 
                                     final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
@@ -195,6 +225,5 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
         
         return output;
     }
-
 
 }

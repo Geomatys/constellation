@@ -16,23 +16,12 @@
  */
 package org.constellation.worker;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.io.File;
-import java.util.Date;
-import java.util.List;
 
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.wms.GetMap;
-import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.factory.Hints;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.util.MeasurementRange;
-
-import org.opengis.geometry.Envelope;
 
 
 /**
@@ -43,11 +32,11 @@ import org.opengis.geometry.Envelope;
 public class WMSWorker{
 
     private final CSTLPortrayalService service = new CSTLPortrayalService();
-    private final WMSQuery query;
+    private final GetMap query;
     private final File output;
 
 
-    public WMSWorker(WMSQuery query, File output){
+    public WMSWorker(GetMap query, File output){
         if(query == null || output == null){
             throw new NullPointerException("Query and outpur file can not be null");
         }
@@ -56,46 +45,7 @@ public class WMSWorker{
     }
 
     public File getMap() throws PortrayalException{
-        if (!(query instanceof GetMap)) {
-            throw new PortrayalException("The request defined is not a GetMap");
-        }
-        final GetMap getMap = (GetMap) query;
-        final List<String> layers              = getMap.getLayers();
-        final List<String> styles              = getMap.getStyles();
-        final MutableStyledLayerDescriptor sld = getMap.getSld();
-        final Envelope contextEnv              = getMap.getEnvelope();
-        final String mime                      = getMap.getFormat();
-        final Double elevation                 = getMap.getElevation();
-        final Date date                        = getMap.getDate();
-        final MeasurementRange dimRange        = getMap.getDimRange();
-        final Dimension canvasDimension        = getMap.getSize();
-        final Hints hints = null;
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append("Layers => ");
-        for(String layer : layers){
-            builder.append(layer +",");
-        }
-        builder.append("\n");
-        builder.append("Styles => ");
-        for(String style : styles){
-            builder.append(style +",");
-        }
-        builder.append("\n");
-        builder.append("Context env => " + contextEnv.toString() + "\n");
-        builder.append("Mime => " + mime.toString() + "\n");
-        builder.append("Dimension => " + canvasDimension.toString() + "\n");
-        builder.append("File => " + output.toString() + "\n");
-        Color bgcolor = (getMap.getTransparent()) ? null : getMap.getBackground();
-        builder.append("BGColor => " + bgcolor + "\n");
-        builder.append("Transparent => " + getMap.getTransparent() + "\n");
-        if (false) {
-            System.out.println(builder.toString());
-        }
-        final ReferencedEnvelope refEnv = new ReferencedEnvelope(contextEnv);
-        service.portray(layers, styles, bgcolor, sld, refEnv, output, mime, canvasDimension,
-                elevation, date, dimRange, hints);
-
+        service.portray(query, output);
         return output;
     }
 }

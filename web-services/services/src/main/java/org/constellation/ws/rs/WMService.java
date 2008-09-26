@@ -674,7 +674,7 @@ public class WMService extends WebService {
         } catch (IOException io) {
             throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, serviceVersion);
         }
-        final WMSWorker worker = new WMSWorker(query, tempFile);
+        final WMSWorker worker = new WMSWorker(getMap, tempFile);
 
         File image = null;
         File errorFile = null;
