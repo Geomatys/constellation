@@ -311,18 +311,19 @@ public abstract class WebService {
     }
 
     /**
-     *
-     * Extract The parameter named parameterName from the query.
-     * If the parameter is mandatory and if it is null it throw an exception.
-     * else it return null.
+     * Extracts the value, for a parameter specified, from a query.
+     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
+     * Otherwise returns {@code null} in the case of an optional paramater not found.
      *
      * @param parameterName The name of the parameter.
      * @param mandatory true if this parameter is mandatory, false if its optional.
       *
-     * @return the parameter or null if not specified and not mandatory.
+     * @return the parameter, or {@code null} if not specified and not mandatory.
      * @throw WebServiceException
      */
-    protected String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
+    protected String getParameter(final String parameterName, final boolean mandatory)
+                                                            throws WebServiceException
+    {
         final MultivaluedMap parameters = context.getQueryParameters();
         final Set<String> keySet = parameters.keySet();
         final Iterator<String> it = keySet.iterator();
@@ -334,19 +335,27 @@ public abstract class WebService {
             s = it.next();
             if (parameterName.equalsIgnoreCase(s)) {
                 notFound = false;
+                break;
             }
         }
         if (notFound) {
             if (mandatory) {
                 throwException("The parameter " + parameterName + " must be specified",
-                               "MISSING_PARAMETER_VALUE", parameterName);
-                //never reach;
+                        "MISSING_PARAMETER_VALUE", parameterName);
+                // never reached
+                throw new AssertionError();
+            }
+            return null;
+        } else {
+            final String value = (String) ((LinkedList) parameters.get(s)).get(0);
+            if ((value == null || value.equals("")) && mandatory) {
+                throwException("The parameter " + parameterName + " should have a value",
+                        "INVALID_PARAMETER_VALUE", parameterName);
+                // never reached
                 throw new AssertionError();
             } else {
-                return null;
+                return value;
             }
-        } else {
-             return (String) ((LinkedList) parameters.get(s)).get(0);
         }
     }
 
@@ -901,7 +910,6 @@ public abstract class WebService {
         } else {
             throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
         }
-
     }
 
     /**

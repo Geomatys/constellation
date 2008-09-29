@@ -762,6 +762,11 @@ public class WMService extends WebService {
         final ServiceVersion bestVersion = getBestVersion(version);
         final WMSQueryVersion wmsVersion = (bestVersion.toString().equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+        final String service = getParameter(KEY_SERVICE, true);
+        if (!Service.WMS.toString().equalsIgnoreCase(service)) {
+            throw new WMSWebServiceException("Invalid service specified. Should be WMS.",
+                    INVALID_PARAMETER_VALUE, wmsVersion);
+        }
         return new GetCapabilities(wmsVersion);
     }
 
