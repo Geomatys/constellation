@@ -327,7 +327,7 @@ public class WMService extends WebService {
         final List<String> crs = new ArrayList<String>();
         crs.add("EPSG:4326");  crs.add("EPSG:3395");  crs.add("EPSG:27574");
         crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573");
-        crs.add("EPSG:27574");
+        crs.add("EPSG:27574"); crs.add("CRS:84");
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
         final AbstractRequest request = response.getCapability().getRequest();

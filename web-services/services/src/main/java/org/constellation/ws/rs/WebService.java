@@ -81,6 +81,7 @@ import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
 import org.constellation.ows.AbstractRequest;
 import org.constellation.ows.OWSExceptionCode;
+import org.constellation.query.wms.WMSQuery;
 import org.constellation.xacml.CstlPDP;
 import org.constellation.xacml.PEP;
 import org.constellation.xacml.SecurityActions;
@@ -349,6 +350,19 @@ public abstract class WebService {
         } else {
             final String value = (String) ((LinkedList) parameters.get(s)).get(0);
             if ((value == null || value.equals("")) && mandatory) {
+                /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
+                 * Nevertheless we do not know what to put in for raster, that's why for these
+                 * parameters we will just return the value, even if it is empty.
+                 *
+                 * According to the WMS standard, if STYLES="" is set, then the default style
+                 * should be applied.
+                 *
+                 * todo: fix the style parameter.
+                 */
+                if (parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLE) ||
+                    parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLES)) {
+                    return value;
+                }
                 throwException("The parameter " + parameterName + " should have a value",
                         "INVALID_PARAMETER_VALUE", parameterName);
                 // never reached
@@ -582,7 +596,7 @@ public abstract class WebService {
         if (pep == null || PDP == null) {
             return treatIncomingRequest(objectRequest);
         }
-        
+
         try {
             //we look for an authentified user
             Group userGrp = getAuthentifiedUser();
