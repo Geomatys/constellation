@@ -415,7 +415,11 @@ public class WMService extends WebService {
             //the dimension range
             defaut = null;
             final MeasurementRange[] ranges = layer.getSampleValueRanges();
-            if (ranges != null && ranges.length > 0 && ranges[0] != null) {
+            /* If the layer has only one sample dimension, then we can apply the dim_range
+             * parameter. Otherwise it can be a multiple sample dimensions layer, and we
+             * don't apply the dim_range.
+             */
+            if (ranges != null && ranges.length == 1 && ranges[0] != null) {
                 final MeasurementRange firstRange = ranges[0];
                 final double minRange = firstRange.getMinimum();
                 final double maxRange = firstRange.getMaximum();
