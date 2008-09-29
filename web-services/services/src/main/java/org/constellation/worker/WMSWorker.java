@@ -18,6 +18,7 @@ package org.constellation.worker;
 
 import java.io.File;
 
+import org.constellation.coverage.web.WebServiceException;
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.wms.GetMap;
 
@@ -44,7 +45,7 @@ public class WMSWorker{
         this.output = output;
     }
 
-    public File getMap() throws PortrayalException{
+    public File getMap() throws PortrayalException, WebServiceException {
         service.portray(query, output);
         return output;
     }
