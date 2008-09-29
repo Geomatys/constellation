@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
  */
 public class CQLParserTest {
     
-    private FilterParser filterParser;
+    private LuceneFilterParser filterParser;
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller filterUnmarshaller;
     private FilterFactoryImpl filterFactory = new FilterFactoryImpl();
@@ -63,7 +63,7 @@ public class CQLParserTest {
 
     @Before
     public void setUp() throws Exception {
-        filterParser = new FilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
+        filterParser = new LuceneFilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
         JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterUnmarshaller = jbcontext.createUnmarshaller();
     }

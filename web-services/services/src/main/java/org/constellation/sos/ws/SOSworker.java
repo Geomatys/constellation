@@ -983,15 +983,15 @@ public class SOSworker {
         if (template.getSamplingTime() instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) template.getSamplingTime();
             
-            SQLrequest.append("AND sampling_time_begin>'").append(ti.getTimePosition().getValue()).append("'");
+            SQLrequest.append("AND sampling_time_begin>='").append(ti.getTimePosition().getValue()).append("'");
         
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
             TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
             
-            SQLrequest.append("AND sampling_time_begin>'").append(tp.getBeginPosition().getValue()).append("'");
+            SQLrequest.append("AND sampling_time_begin>='").append(tp.getBeginPosition().getValue()).append("'");
             if (tp.getEndPosition()!= null && !tp.getEndPosition().getValue().equals("")) {
-                SQLrequest.append("AND ( sampling_time_end<'").append(tp.getEndPosition().getValue()).append("'");
-                SQLrequest.append("OR sampling_time_end IS NULL)");
+                SQLrequest.append("AND ( (sampling_time_end<='").append(tp.getEndPosition().getValue()).append("' )");
+                SQLrequest.append("OR ( sampling_time_begin<='").append(tp.getEndPosition().getValue()).append("' AND sampling_time_end IS NULL ))");
             }
         }
         
@@ -1412,7 +1412,7 @@ public class SOSworker {
                         TimeInstantType ti = (TimeInstantType)j;
                         String position = getTimeValue(ti.getTimePosition());
                         if (!template) { 
-                            SQLrequest.append("sampling_time_begin<'").append(position).append("' )");
+                            SQLrequest.append("sampling_time_begin<='").append(position).append("' )");
                         } else {
                             templateTime = ti;
                         }
@@ -1439,7 +1439,7 @@ public class SOSworker {
                         TimeInstantType ti = (TimeInstantType)j;
                         String position = getTimeValue(ti.getTimePosition());
                         if (!template) {
-                            SQLrequest.append("sampling_time_begin>'").append(position).append("' )");
+                            SQLrequest.append("sampling_time_begin>='").append(position).append("' )");
                         } else {
                             templateTime = ti;
                         }
@@ -1466,8 +1466,8 @@ public class SOSworker {
                         String end   = getTimeValue(tp.getEndPosition()); 
                         
                         if (!template) {
-                            SQLrequest.append(" sampling_time_begin>'").append(begin).append("' AND ");
-                            SQLrequest.append(" (sampling_time_end<'").append(end).append("' OR  sampling_time_end IS NULL)) ");
+                             SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' ) OR");
+                             SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)) ");
                         } else {
                             templateTime = tp;
                         }

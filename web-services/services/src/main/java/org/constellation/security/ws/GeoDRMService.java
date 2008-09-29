@@ -7,14 +7,8 @@ package org.constellation.security.ws;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.spi.resource.Singleton;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -28,7 +22,6 @@ import java.security.Principal;
 import java.security.acl.Group;
 import java.util.HashSet;
 import java.util.Set;
-import javax.imageio.ImageIO;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
@@ -53,7 +46,6 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
 import org.constellation.xacml.policy.PolicyType;
-import sun.awt.image.URLImageSource;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -74,7 +66,7 @@ public class GeoDRMService extends WebService {
      */
     private PEP pep;
     
-    private String SERVICEURL = "http://demo.geomatys.fr/seagis/WS/wms";
+    private String SERVICEURL = "http://demo.geomatys.fr/constellation/WS/wms";
     
     public GeoDRMService() {
         super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));

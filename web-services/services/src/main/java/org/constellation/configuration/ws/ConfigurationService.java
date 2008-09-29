@@ -45,12 +45,17 @@ public class ConfigurationService extends WebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
+            String request = "";
+            
             if (objectRequest == null) {
-                throw new OWSWebServiceException("This service only accept POST XML request.", OWSExceptionCode.INVALID_REQUEST, null, getCurrentVersion());
-            } else {
-                return Response.ok("<wait>wait a little we are working on it</wait>", "text/xml").build();
+                request = (String) getParameter("REQUEST", true);
             }
-        
+            
+            if (request.equalsIgnoreCase("restart")) {
+                return restartService();
+            }
+            
+            return Response.ok("<wait>wait a little we are working on it</wait>", "text/xml").build();
         
         } catch (WebServiceException ex) {
 
@@ -78,6 +83,10 @@ public class ConfigurationService extends WebService {
             return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
         
+    }
+    
+    private Response restartService() {
+        return Response.ok("<restart>wait a little we are working on it</restart>", "text/xml").build();
     }
 
 }

@@ -349,8 +349,14 @@ public class IndexLucene extends AbstractIndex {
             registryObject = reader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
         }
         
+        if (form.getTopValue() == null) {
+            logger.severe("unable to index form:" + form.getId() + " top value is null");
+            
+        } else if (form.getTopValue().getType() == null) {
+            logger.severe("unable to index form:" + form.getId() + " top value type is null");
+        
         // For an ISO 19115 form
-        if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
+        } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
             
             logger.info("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
