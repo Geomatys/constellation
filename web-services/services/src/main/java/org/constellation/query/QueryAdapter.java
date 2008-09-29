@@ -19,14 +19,21 @@ package org.constellation.query;
 import java.awt.Color;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.web.TimeParser;
+import org.constellation.coverage.web.WMSWebServiceException;
+import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.query.wms.WMSQuery;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -105,7 +112,9 @@ public class QueryAdapter {
      *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
      *         if the bbox is {@code null}.
      */
-    public static Envelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs) {
+    public static Envelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs)
+                                                              throws IllegalArgumentException
+    {
         GeneralEnvelope envelope = new GeneralEnvelope(2);
         envelope.setCoordinateReferenceSystem(crs);
         envelope.setToInfinite();
@@ -174,7 +183,7 @@ public class QueryAdapter {
         return MeasurementRange.create(min, max, null);
     }
 
-    public static MutableStyledLayerDescriptor toSLD(String strSLD) {
+    public static MutableStyledLayerDescriptor toSLD(final String strSLD) {
         if(strSLD == null || strSLD.trim().length() == 0){
             return null;
         }
@@ -202,7 +211,11 @@ public class QueryAdapter {
         return sld;
     }
 
-    public static List<String> toStringList(String strLayers){
+    public static List<String> toStringList(String strLayers) {
+        if (strLayers == null) {
+            return Collections.emptyList();
+        }
+        strLayers = strLayers.trim();
         List<String> styles = new ArrayList<String>();
         StringTokenizer token = new StringTokenizer(strLayers,",");
         while(token.hasMoreTokens()){
@@ -232,19 +245,30 @@ public class QueryAdapter {
         if (background != null) {
             background = background.trim();
             color = Color.decode(background);
-        }else{
+        } else {
             //return the defautl specification color
             color = Color.WHITE;
         }
         return color;
     }
 
-    public static boolean toBoolean(String strTransparent) {
+    public static boolean toBoolean(final String strTransparent) {
         if (strTransparent == null) {
             return false;
         }
         return Boolean.parseBoolean(strTransparent.trim());
     }
 
-
+    public static String toFormat(String format) throws IllegalArgumentException {
+        if (format == null) {
+            return null;
+        }
+        format = format.trim();
+        final Set<String> formats = new HashSet<String>(Arrays.asList(ImageIO.getWriterMIMETypes()));
+        formats.addAll(Arrays.asList(ImageIO.getWriterFormatNames()));
+        if (!formats.contains(format)) {
+            throw new IllegalArgumentException("Invalid format specified.");
+        }
+        return format;
+    }
 }

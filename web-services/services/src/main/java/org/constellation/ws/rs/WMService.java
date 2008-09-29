@@ -790,6 +790,12 @@ public class WMService extends WebService {
         final String strFormat = getParameter( KEY_FORMAT, true );
         final String strWidth  = getParameter( KEY_WIDTH, false );
         final String strHeight = getParameter( KEY_HEIGHT, false);
+        final String format;
+        try {
+            format = QueryAdapter.toFormat(strFormat);
+        } catch (IllegalArgumentException i) {
+            throw new WMSWebServiceException(i, INVALID_FORMAT, WMSQueryVersion.WMS_GETLEGENDGRAPHIC_1_1_0);
+        }
         if (strWidth == null || strHeight == null) {
             return new GetLegendGraphic(strLayer, strFormat);
         } else {
@@ -801,7 +807,7 @@ public class WMService extends WebService {
             } catch (NumberFormatException n) {
                 throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, WMSQueryVersion.WMS_GETLEGENDGRAPHIC_1_1_0);
             }
-            return new GetLegendGraphic(strLayer, strFormat, width, height);
+            return new GetLegendGraphic(strLayer, format, width, height);
         }
     }
 
@@ -838,7 +844,18 @@ public class WMService extends WebService {
         } catch (FactoryException ex) {
             throw new WMSWebServiceException(ex, INVALID_CRS, wmsVersion);
         }
-        final ImmutableEnvelope env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
+        final ImmutableEnvelope env;
+        try {
+            env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
+        } catch (IllegalArgumentException i) {
+            throw new WMSWebServiceException(i, INVALID_PARAMETER_VALUE, wmsVersion);
+        }
+        final String format;
+        try {
+            format = QueryAdapter.toFormat(strFormat);
+        } catch (IllegalArgumentException i) {
+            throw new WMSWebServiceException(i, INVALID_FORMAT, wmsVersion);
+        }
         final List<String> layers  = QueryAdapter.toStringList(strLayers);
         final List<String> styles = QueryAdapter.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
@@ -892,7 +909,7 @@ public class WMService extends WebService {
         }
 
         // Builds the request.
-        return new GetMap(env, wmsVersion, strFormat, layers, styles, sld, elevation,
+        return new GetMap(env, wmsVersion, format, layers, styles, sld, elevation,
                     date, dimRange, size, background, transparent, null);
     }
 
