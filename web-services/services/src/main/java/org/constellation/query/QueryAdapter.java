@@ -113,7 +113,6 @@ public class QueryAdapter {
         if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith(WMSQuery.UNDEFINED_CRS)) {
             //TODO fix this
             //we should return the good EPSG 32662
-            LOGGER.info("WARNING : CRS 4326 used.");
             return DefaultGeographicCRS.WGS84;
         }
         return CRS.decode(epsg);

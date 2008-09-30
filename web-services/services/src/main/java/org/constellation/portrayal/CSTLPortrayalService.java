@@ -64,12 +64,20 @@ import org.opengis.geometry.Envelope;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CSTLPortrayalService extends DefaultPortrayalService{
+public class CSTLPortrayalService extends DefaultPortrayalService {
+    /**
+     * Data provider for layers.
+     */
+    private static final NamedLayerDP LAYERDP = NamedLayerDP.getInstance();
 
-    private final NamedLayerDP layerDPS = NamedLayerDP.getInstance();
-
-    public CSTLPortrayalService(){}
-
+    /**
+     * Makes the portray of a {@code GetMap} request.
+     *
+     * @param query A {@link GetMap} query.
+     * @param output The output file where to write the result of the {@link GetMap} request.
+     * @throws PortrayalException
+     * @throws WebServiceException if an error occurs during the creation of the map context
+     */
     public synchronized void portray(final GetMap query, final File output)
                             throws PortrayalException, WebServiceException
     {
@@ -123,21 +131,18 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
     {
         final MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
-        for(int index=0, n = layers.size();index<n;index++){
+        for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
-            final LayerDetails details = layerDPS.get(layerName);
-
-            if(details == null){
+            final LayerDetails details = LAYERDP.get(layerName);
+            if (details == null) {
                 throw new WMSWebServiceException("Layer "+layerName+" could not be found.",
                         WMSExceptionCode.LAYER_NOT_DEFINED, version);
             }
-
             final Object style;
-
-            if(sld != null){
+            if (sld != null) {
                 //try to use the provided SLD
                 style = extractStyle(layerName,sld);
-            } else if (styles.size() > index){
+            } else if (styles.size() > index) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 style = styles.get(index);
@@ -145,13 +150,10 @@ public class CSTLPortrayalService extends DefaultPortrayalService{
                 //no defined styles, use the favorite one, let the layer get it himself.
                 style = null;
             }
-
             final MapLayer layer = details.getMapLayer(style,params);
-
-            if(layer == null){
-                throw new PortrayalException("Map layer : "+layerName+" could not be created");
+            if (layer == null) {
+                throw new PortrayalException("Map layer "+layerName+" could not be created");
             }
-
             ctx.layers().add(layer);
         }
 

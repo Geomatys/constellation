@@ -252,7 +252,11 @@ public class GetMap extends WMSQuery {
      * if {@code null}.
      */
     public String getExceptionFormat() {
-        return (exceptions == null) ? "application/vnd.ogc.se_xml" : exceptions;
+        if (exceptions != null) {
+            return exceptions;
+        }
+        return (WMSQueryVersion.WMS_1_1_1.equals(super.getVersion())) ?
+            "application/vnd.ogc.se_xml" : "text/xml";
     }
 
     /**

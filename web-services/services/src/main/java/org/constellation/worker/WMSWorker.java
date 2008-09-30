@@ -39,7 +39,7 @@ public class WMSWorker{
 
     public WMSWorker(GetMap query, File output){
         if(query == null || output == null){
-            throw new NullPointerException("Query and outpur file can not be null");
+            throw new NullPointerException("Query and output file cannot be null");
         }
         this.query = query;
         this.output = output;

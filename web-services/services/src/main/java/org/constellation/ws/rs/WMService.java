@@ -41,8 +41,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
@@ -650,7 +648,7 @@ public class WMService extends WebService {
         final GetMap getMap = (GetMap) query;
         final WMSQueryVersion queryVersion = getMap.getVersion();
         final String errorType = getMap.getExceptionFormat();
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equals(errorType);
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
         final String format = getMap.getFormat();
         final File tempFile;
         try {
@@ -668,19 +666,26 @@ public class WMService extends WebService {
             if(errorInImage) {
                 try {
                     errorFile = createTempFile("map", format);
+                    final Dimension dim = getMap.getSize();
+                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
                 } catch (IOException io) {
                     throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
                 }
-                final Dimension dim = getMap.getSize();
-                try {
-                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
-                } catch (IOException ex1) {
-                    Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex1);
-                }
             } else {
-                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
                 throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
                         ex.getMessage(), NO_APPLICABLE_CODE, queryVersion);
+            }
+        } catch (WebServiceException ex) {
+            if (errorInImage) {
+                try {
+                    errorFile = createTempFile("map", format);
+                    final Dimension dim = getMap.getSize();
+                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
+                } catch (IOException io) {
+                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
+                }
+            } else {
+                throw new WMSWebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
         }
 
@@ -831,25 +836,26 @@ public class WMService extends WebService {
      * @throws org.constellation.coverage.web.WebServiceException
      */
     private GetMap adaptGetMap() throws WebServiceException {
-        final String version = getParameter(KEY_VERSION, true);
+        final String version         = getParameter(KEY_VERSION,         true);
         final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
-        final String strFormat        = getParameter( KEY_FORMAT, true);
-        final String strCRS           = getParameter( (version.equals(WMSQueryVersion.WMS_1_3_0.toString())) ?
-                                                      KEY_CRS_v130 : KEY_CRS_v110, true );
-        final String strBBox          = getParameter( KEY_BBOX, true );
-        final String strLayers        = getParameter( KEY_LAYERS, true );
-        final String strWidth         = getParameter( KEY_WIDTH, true );
-        final String strHeight        = getParameter( KEY_HEIGHT, true );
-        final String strStyles        = getParameter( KEY_STYLES, true );
-        final String strElevation     = getParameter( KEY_ELEVATION, false );
-        final String strTime          = getParameter( KEY_TIME, false );
-        final String strDimRange      = getParameter( KEY_DIM_RANGE, false);
-        final String strBGColor       = getParameter( KEY_BGCOLOR, false );
-        final String strTransparent   = getParameter( KEY_TRANSPARENT, false );
-        final String strSLD           = getParameter( KEY_SLD, false );
-        //final String strRemoteOwsType = getParameter( KEY_REMOTE_OWS_TYPE, false );
-        final String strRemoteOwsUrl  = getParameter( KEY_REMOTE_OWS_URL, false );
+        final String strFormat       = getParameter(KEY_FORMAT,          true);
+        final String strCRS          = getParameter((version.equals(WMSQueryVersion.WMS_1_3_0.toString())) ?
+                                                     KEY_CRS_v130 : KEY_CRS_v110, true );
+        final String strBBox         = getParameter(KEY_BBOX,            true);
+        final String strLayers       = getParameter(KEY_LAYERS,          true);
+        final String strWidth        = getParameter(KEY_WIDTH,           true);
+        final String strHeight       = getParameter(KEY_HEIGHT,          true);
+        final String strStyles       = getParameter(KEY_STYLES,          true);
+        final String strElevation    = getParameter(KEY_ELEVATION,      false);
+        final String strTime         = getParameter(KEY_TIME,           false);
+        final String strDimRange     = getParameter(KEY_DIM_RANGE,      false);
+        final String strBGColor      = getParameter(KEY_BGCOLOR,        false);
+        final String strTransparent  = getParameter(KEY_TRANSPARENT,    false);
+        final String strSLD          = getParameter(KEY_SLD,            false);
+        //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
+        final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
+        final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
 
         final CoordinateReferenceSystem crs;
         try {
@@ -923,7 +929,7 @@ public class WMService extends WebService {
 
         // Builds the request.
         return new GetMap(env, wmsVersion, format, layers, styles, sld, elevation,
-                    date, dimRange, size, background, transparent, null);
+                    date, dimRange, size, background, transparent, strExceptions);
     }
 
     /**
