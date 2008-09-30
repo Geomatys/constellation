@@ -325,9 +325,8 @@ public class WMService extends WebService {
 
         //we build the list of accepted crs
         final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");  crs.add("EPSG:3395");  crs.add("EPSG:27574");
-        crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573");
-        crs.add("EPSG:27574"); crs.add("CRS:84");
+        crs.add("CRS:84");     crs.add("EPSG:4326");  crs.add("EPSG:3395");
+        crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573"); crs.add("EPSG:27574");
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
         final AbstractRequest request = response.getCapability().getRequest();
@@ -770,18 +769,27 @@ public class WMService extends WebService {
         return new GetCapabilities(wmsVersion);
     }
 
+    /**
+     * Converts a GetFeatureInfo request composed of string values, to a container of real java objects.
+     *
+     * @return A GetFeatureInfo request.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException {
         final GetMap getMap  = adaptGetMap();
         final String version = getParameter(KEY_VERSION, true);
+        final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0; 
         final String strX    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                                                             KEY_I_v110 : KEY_I_v130, true);
         final String strY    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                                                             KEY_J_v110 : KEY_J_v130, true);
-        final String queryLayers = getParameter(KEY_QUERY_LAYERS, true);
+        final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
-        final List<String> layers = QueryAdapter.toStringList(queryLayers);
+        final List<String> queryLayers = QueryAdapter.toStringList(strQueryLayers);
+        final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, wmsVersion);
         return new GetFeatureInfo(getMap, Double.parseDouble(strX),
-                Double.parseDouble(strY), layers, infoFormat);
+                Double.parseDouble(strY), queryableLayers, infoFormat);
     }
 
     /**

@@ -31,10 +31,11 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 
+import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.TimeParser;
-import org.constellation.coverage.web.WMSWebServiceException;
-import org.constellation.coverage.wms.WMSExceptionCode;
+import org.constellation.coverage.web.WebServiceException;
 import org.constellation.query.wms.WMSQuery;
+
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.referencing.CRS;
@@ -44,8 +45,9 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.Specification.StyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
-
 import org.geotools.util.MeasurementRange;
+import org.geotools.util.Version;
+
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -63,6 +65,37 @@ public class QueryAdapter {
      * The default logger.
      */
     public static final Logger LOGGER = Logger.getLogger("org.constellation.query.wms");
+
+    /**
+     * Verify that all layers are queryable for a {@code GetFeatureInfo}.
+     *
+     * @param queryLayers A list of requested layer names
+     * @param version The version of the WMS service.
+     * @return The same list as provided if all layers are queryable.
+     * @throws WebServiceException if a layer is not queryable.
+     *
+     * @todo The method {@link Layer#isQueryable} is not valid. It should verify in the
+     *       database if a layer is queryable, meaning if a layer is queryable by a
+     *       {@code GetFeatureInfo} request. Either rename the {@link Layer#isQueryable}
+     *       or create a new one that provides this information.
+     */
+    public static List<String> areQueryableLayers(final List<String> queryLayers, 
+                                final Version version) throws WebServiceException
+    {
+        /* Do nothing for the moment, waiting for a method in {@link Layer} in order to
+         * handle the queryable attribute for a {@link Layer}.
+         */
+
+        /*final NamedLayerDP dp = NamedLayerDP.getInstance();
+        for (String layerName : queryLayers) {
+            final LayerDetails layer = dp.get(layerName);
+            if (!layer.isQueryable(Service.WMS)) {
+                throw new WMSWebServiceException("Layer "+ layerName +" is not queryable",
+                        WMSExceptionCode.LAYER_NOT_QUERYABLE, version);
+            }
+        }*/
+        return queryLayers;
+    }
 
     /**
      * Converts a string like "EPSG:xxxx" into a {@link CoordinateReferenceSystem}.
