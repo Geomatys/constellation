@@ -18,6 +18,7 @@ package org.constellation.provider;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.SortedSet;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
+import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
@@ -76,14 +78,11 @@ public interface LayerDetails {
     /**
      * Returns the information at the coordinates specified.
      *
-     * @param x X coordinate.
-     * @param y Y coordinate.
-     * @param elevation The elevation to request.
-     * @param time The date to request.
-     * @return A string representation of the information at the coordinates specified.
+     * @return The information at the coordinates specified.
+     * @throws CatalogException
+     * @throws IOException
      */
-    public double getInformationAt(final double x, final double y, final Date time,
-                                   final double elevation) throws CatalogException;
+    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException;
 
     /**
      * @see Layer#getLegend(Dimension)
@@ -120,7 +119,7 @@ public interface LayerDetails {
     public String getThematic();
 
     /**
-     * @see Layer#isQueryable
+     * Returns {@code true} if the layer is queryable by the specified service.
      */
     public boolean isQueryable(Service service);
 }

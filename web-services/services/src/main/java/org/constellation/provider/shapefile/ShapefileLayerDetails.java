@@ -20,24 +20,30 @@ package org.constellation.provider.shapefile;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
+import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.GlyphLegendFactory;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
@@ -50,14 +56,22 @@ import org.geotools.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
  *
  * @version $Id$
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 class ShapefileLayerDetails implements LayerDetails {
 
@@ -199,8 +213,67 @@ class ShapefileLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public double getInformationAt(double x, double y, Date time, double elevation) throws CatalogException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
+        // Pixel coordinates in the request.
+        final double pixelUpX     = gfi.getX();
+        final double pixelUpY     = gfi.getY();
+        final double pixelDownX   = gfi.getX() + 1;
+        final double pixelDownY   = gfi.getY() + 1;
+        final Envelope envObj     = gfi.getEnvelope();
+        final double widthEnv     = envObj.getSpan(0);
+        final double heightEnv    = envObj.getSpan(1);
+        // Coordinates of the lower corner and upper corner of the objective envelope.
+        final double lowerCornerX = widthEnv  * pixelUpX   / gfi.getSize().width + envObj.getMinimum(0);
+        final double lowerCornerY = heightEnv * pixelUpY   / gfi.getSize().height + envObj.getMinimum(1);
+        final double upperCornerX = widthEnv  * pixelDownX / gfi.getSize().width + envObj.getMinimum(0);
+        final double upperCornerY = heightEnv * pixelDownY / gfi.getSize().height + envObj.getMinimum(1);
+
+        final SimpleFeatureType sft = store.getSchema(store.getTypeNames()[0]);
+        final CoordinateReferenceSystem crsObj = envObj.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crsData = sft.getCoordinateReferenceSystem();
+        /* Here we build the final envelope on which to filter features.
+         * If the objective crs is the same as the data one, then we do not have to apply
+         * a transformation on the coordinates.
+         */
+        final ReferencedEnvelope filterEnv;
+        if (!crsObj.equals(crsData)) {
+            final GeneralEnvelope objEnv = new GeneralEnvelope(crsObj);
+            objEnv.setRange(0, lowerCornerX, upperCornerX);
+            objEnv.setRange(1, lowerCornerY, upperCornerY);
+            try {
+                filterEnv = new ReferencedEnvelope(CRS.transform(objEnv, crsData));
+            } catch (TransformException t) {
+                throw new CatalogException(t);
+            } catch (MismatchedDimensionException m) {
+                throw new CatalogException(m);
+            }
+        } else {
+            filterEnv = new ReferencedEnvelope(lowerCornerX, upperCornerX, lowerCornerY, upperCornerY, crsData);
+        }
+
+        /* Now that we have the envelope, we need to know the name of the property which
+         * stores the geometry (usually "the_geom").
+         */
+        final Name geomAtt = sft.getGeometryDescriptor().getName();
+        final FilterFactory2 factory = CommonFactoryFinder.getFilterFactory2(null);
+        final PropertyName geomProp = factory.property(geomAtt);
+        final Filter filter = factory.bbox(geomProp, filterEnv);
+        final FeatureSource<SimpleFeatureType, SimpleFeature> source = store.getFeatureSource(name);
+
+        // Apply the bbox filter on the feature source.
+        final FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures(filter);
+        final FeatureIterator<SimpleFeature> featureIt = features.features();
+
+        final List<SimpleFeature> requestedFeatures = new ArrayList<SimpleFeature>();
+        while (featureIt.hasNext()) {
+            final SimpleFeature feature = featureIt.next();
+            if (feature == null) {
+                continue;
+            }
+            requestedFeatures.add(feature);
+        }
+        featureIt.close();
+        return requestedFeatures;
     }
 
     private MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{

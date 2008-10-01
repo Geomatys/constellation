@@ -95,6 +95,8 @@ import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //Geoapi dependencies
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -534,20 +536,19 @@ public class WMService extends WebService {
         } else {
             infoFormat = "text/plain";
         }
-        final double elevation = info.getElevation();
-        final Date time = info.getDate();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final List<String> layers = info.getQueryLayers();
         final int size = layers.size();
-        final List<Double> results = new ArrayList<Double>(size);
+        final List<Object> results = new ArrayList<Object>(size);
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
             try {
-                final double currentValue = layer.getInformationAt(info.getX(), info.getY(),
-                                                                   time, elevation);
+                final Object currentValue = layer.getInformationAt(info);
                 results.add(currentValue);
             } catch (CatalogException cat) {
                 throw new WMSWebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
+            } catch (IOException io) {
+                throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
             }
         }
 
@@ -559,8 +560,23 @@ public class WMService extends WebService {
             for (int i=0; i<size; i++) {
                 response.append("result for ").append(layers.get(i));
                 response.append(" is:");
-                float floatRes = results.get(i).floatValue();
-                response.append(floatRes).append("\n");
+                final Object currentRes = results.get(i);
+                if (currentRes instanceof Double) {
+                    response.append(((Double) currentRes).floatValue());
+                } else {
+                    final List<SimpleFeature> features = (List<SimpleFeature>) results.get(i);
+                    for (SimpleFeature feature : features) {
+                        List<Object> attrs = feature.getAttributes();
+                        List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
+                        for (int j=0; j<attrs.size(); j++) {
+                            response.append(attrTypes.get(j).getName().toString())
+                                    .append("[").append(attrs.get(j).toString())
+                                    .append("] ");
+                        }
+                        response.append("\n");
+                    }
+                }
+                response.append("\n");
             }
             return Response.ok(response.toString(), infoFormat).build();
         }
@@ -574,12 +590,28 @@ public class WMService extends WebService {
                     .append("    <body>\n")
                     .append("    <table>\n");
             for (int i=0; i<size; i++) {
-                float floatRes = results.get(i).floatValue();
+                final Object currentRes = results.get(i);
                 response.append("        <tr>\n")
                         .append("            <th>").append(layers.get(i)).append("</th>\n")
                         .append("        </tr>\n")
                         .append("        <tr>\n")
-                        .append("            <th>").append(floatRes).append("</th>\n")
+                        .append("            <th>");
+                if (currentRes instanceof Double) {
+                    response.append(((Double) results.get(i)).floatValue());
+                } else {
+                    final List<SimpleFeature> features = (List<SimpleFeature>) results.get(i);
+                    for (SimpleFeature feature : features) {
+                        List<Object> attrs = feature.getAttributes();
+                        List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
+                        for (int j=0; j<attrs.size(); j++) {
+                            response.append(attrTypes.get(j).getName().toString())
+                                    .append("[").append(attrs.get(j).toString())
+                                    .append("] ");
+                        }
+                        response.append("\n");
+                    }
+                }
+                response.append("           </th>\n")
                         .append("       </tr>\n");
             }
             response.append("    </table>\n")

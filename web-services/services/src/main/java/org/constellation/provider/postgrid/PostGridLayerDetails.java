@@ -32,6 +32,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
+import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -88,26 +89,20 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public double getInformationAt(final double x, final double y, final Date time,
-                                   final double elevation) throws CatalogException
-    {
-        final CoverageReference coverage = layer.getCoverageReference(time, elevation);
+    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
+        final CoverageReference coverage = layer.getCoverageReference(gfi.getDate(), gfi.getElevation());
         final Envelope envelope = coverage.getEnvelope();
         final int dimension = envelope.getDimension();
         final GeneralDirectPosition generalPosition = new GeneralDirectPosition(dimension);
         for (int i = 0; i < dimension; i++) {
             generalPosition.setOrdinate(i, envelope.getMedian(i));
         }
-        generalPosition.setOrdinate(0, x);
-        generalPosition.setOrdinate(1, y);
-        try {
-            final GridCoverage2D grid2D = coverage.getCoverage(null);
-            double[] result = null;
-            result = grid2D.evaluate(generalPosition, result);
-            return result[0];
-        } catch (IOException io) {
-            throw new CatalogException(io);
-        }
+        generalPosition.setOrdinate(0, gfi.getX());
+        generalPosition.setOrdinate(1, gfi.getY());
+        final GridCoverage2D grid2D = coverage.getCoverage(null);
+        double[] result = null;
+        result = grid2D.evaluate(generalPosition, result);
+        return result[0];
     }
 
     /**
