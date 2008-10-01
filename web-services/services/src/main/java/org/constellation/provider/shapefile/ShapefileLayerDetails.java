@@ -17,6 +17,11 @@
  */
 package org.constellation.provider.shapefile;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -74,7 +79,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Cédric Briançon (Geomatys)
  */
 class ShapefileLayerDetails implements LayerDetails {
-
+    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private static final GeographicBoundingBox DUMMY_BBOX =
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
 
@@ -251,13 +256,21 @@ class ShapefileLayerDetails implements LayerDetails {
             filterEnv = new ReferencedEnvelope(lowerCornerX, upperCornerX, lowerCornerY, upperCornerY, crsData);
         }
 
+        final Coordinate[] coord = new Coordinate[5];
+        coord[0] = new Coordinate(filterEnv.getMinX(), filterEnv.getMinY());
+        coord[1] = new Coordinate(filterEnv.getMinX(), filterEnv.getMaxY());
+        coord[2] = new Coordinate(filterEnv.getMaxX(), filterEnv.getMaxY());
+        coord[3] = new Coordinate(filterEnv.getMaxX(), filterEnv.getMinY());
+        coord[4] = coord[0];
+        final LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
+        final Geometry geom = GEOMETRY_FACTORY.createPolygon(lr1, null);
         /* Now that we have the envelope, we need to know the name of the property which
          * stores the geometry (usually "the_geom").
          */
         final Name geomAtt = sft.getGeometryDescriptor().getName();
         final FilterFactory2 factory = CommonFactoryFinder.getFilterFactory2(null);
         final PropertyName geomProp = factory.property(geomAtt);
-        final Filter filter = factory.bbox(geomProp, filterEnv);
+        final Filter filter = factory.intersects(geomProp, factory.literal(geom));
         final FeatureSource<SimpleFeatureType, SimpleFeature> source = store.getFeatureSource(name);
 
         // Apply the bbox filter on the feature source.
