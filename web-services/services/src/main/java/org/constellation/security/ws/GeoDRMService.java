@@ -1,8 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2008, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
-
 package org.constellation.security.ws;
 
 import com.sun.jersey.api.core.HttpRequestContext;
@@ -20,8 +31,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
 import java.security.acl.Group;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
@@ -196,9 +210,15 @@ public class GeoDRMService extends WebService {
 
             //we define the action
             String action = getParameter("LAYERS", true);
+            List<String> actions = new ArrayList<String>();
             if (action.equals("") && objectRequest != null) {
                 action = objectRequest.getClass().getSimpleName();
                 action = action.replace("Type", "");
+            } else {
+                final StringTokenizer tokens = new StringTokenizer(action, ",;");
+                while (tokens.hasMoreTokens()) {
+                    actions.add(tokens.nextToken());
+                }
             }
 
             //we define the selected URI
@@ -209,20 +229,32 @@ public class GeoDRMService extends WebService {
 
 
             LOGGER.info("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
-            RequestContext decisionRequest = pep.createXACMLRequest(SERVICEURL, user, userGrp, action);
-            int decision = pep.getDecision(decisionRequest);
-
-            if (decision == XACMLConstants.DECISION_PERMIT) {
+            
+            boolean allowed;
+            if ( actions.size() <= 1 ) {
+                
+                RequestContext decisionRequest = pep.createXACMLRequest(SERVICEURL, user, userGrp, action);
+                int decision = pep.getDecision(decisionRequest);
+                allowed = decision == XACMLConstants.DECISION_PERMIT;
+                
+            } else {
+                
+                allowed = true;
+                for (String act : actions) {
+                    RequestContext decisionRequest = pep.createXACMLRequest(SERVICEURL, user, userGrp, act);
+                    if (pep.getDecision(decisionRequest) == XACMLConstants.DECISION_DENY)
+                        allowed = false;
+                }
+            }
+            
+            if (allowed) {
                 LOGGER.info("request allowed");
                 return sendRequest(objectRequest);
-            } else if (decision == XACMLConstants.DECISION_DENY) {
+            } else {
                 StringWriter sw = launchException("You are not authorized to execute this request. " +
                         "Please identify yourself first.", "NO_APPLICABLE_CODE");
                 return Response.ok(sw.toString(), "text/xml").build();
-            } else {
-                LOGGER.severe("Unable to take a decision for the request, we let pass");
-                return sendRequest(objectRequest);
-            }
+            } 
         } catch (WebServiceException ex) {
             StringWriter sw = new StringWriter();
             marshaller.marshal(ex.getExceptionReport(), sw);
