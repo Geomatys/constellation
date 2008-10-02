@@ -17,8 +17,10 @@
 package org.constellation.provider.postgrid;
 
 import java.awt.Dimension;
+import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +29,8 @@ import java.util.SortedSet;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
-import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.provider.LayerDetails;
@@ -37,13 +40,19 @@ import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -62,7 +71,7 @@ class PostGridLayerDetails implements LayerDetails {
      * Current layer to consider.
      */
     private final Layer layer;
-    
+
     /**
      * Favorites styles associated with this layer.
      */
@@ -90,19 +99,67 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
-        final CoverageReference coverage = layer.getCoverageReference(gfi.getDate(), gfi.getElevation());
-        final Envelope envelope = coverage.getEnvelope();
-        final int dimension = envelope.getDimension();
-        final GeneralDirectPosition generalPosition = new GeneralDirectPosition(dimension);
-        for (int i = 0; i < dimension; i++) {
-            generalPosition.setOrdinate(i, envelope.getMedian(i));
+        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
+        final int width = gfi.getSize().width;
+        final int height = gfi.getSize().height;
+        final Envelope genv;
+        try {
+            genv = CRS.transform(objEnv, DefaultGeographicCRS.WGS84);
+        } catch (TransformException ex) {
+            throw new CatalogException(ex);
         }
-        generalPosition.setOrdinate(0, gfi.getX());
-        generalPosition.setOrdinate(1, gfi.getY());
-        final GridCoverage2D grid2D = coverage.getCoverage(null);
+        final GeneralEnvelope renv = new GeneralEnvelope(genv);
+
+        //Create BBOX-----------------------------------------------------------
+        final GeographicBoundingBox bbox;
+        try {
+            bbox = new GeographicBoundingBoxImpl(renv);
+        } catch (TransformException ex) {
+            throw new CatalogException(ex);
+        }
+        //Create resolution-----------------------------------------------------
+        final double w = renv.toRectangle2D().getWidth()  / width;
+        final double h = renv.toRectangle2D().getHeight() / height;
+        final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
+
+        GridCoverageTable table = null;
+        try {
+            table = database.getTable(GridCoverageTable.class);
+        } catch (NoSuchTableException ex) {
+            throw new CatalogException(ex);
+        }
+        table = new GridCoverageTable(table);
+
+        table.setGeographicBoundingBox(bbox);
+        table.setPreferredResolution(resolution);
+        table.setTimeRange(gfi.getDate(), gfi.getDate());
+        table.setVerticalRange(gfi.getElevation(), gfi.getElevation());
+        table.setLayer(layer);
+
+        GridCoverage2D coverage = null;
+        try {
+            coverage = table.getEntry().getCoverage(null);
+        } catch (SQLException ex) {
+            throw new CatalogException(ex);
+        }
+
+        // Pixel coordinates in the request.
+        final double pixelUpX     = gfi.getX();
+        final double pixelUpY     = gfi.getY();
+        final double widthEnv     = objEnv.getSpan(0);
+        final double heightEnv    = objEnv.getSpan(1);
+        final double resX         =      widthEnv  / width;
+        final double resY         = -1 * heightEnv / height;
+        // Coordinates of the lower corner and upper corner of the objective envelope.
+        final double lowerCornerX = (pixelUpX + 0.5) * resX + objEnv.getMinimum(0);
+        final double lowerCornerY = (pixelUpY + 0.5) * resY + objEnv.getMaximum(1);
+
+        final GeneralDirectPosition position = new GeneralDirectPosition(lowerCornerX, lowerCornerY);
+        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
+
         double[] result = null;
-        result = grid2D.evaluate(generalPosition, result);
-        return result[0];
+        result = coverage.evaluate(position, result);
+        return (result == null) ? null : result[0];
     }
 
     /**
@@ -111,20 +168,20 @@ class PostGridLayerDetails implements LayerDetails {
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
         return createMapLayer(style, params);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public String getName() {
         return layer.getName();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public List<String> getFavoriteStyles(){
         return favorites;
-    }   
+    }
 
     /**
      * {@inheritDoc}
@@ -181,10 +238,10 @@ class PostGridLayerDetails implements LayerDetails {
     public String getThematic() {
         return layer.getThematic();
     }
-    
+
     private MapLayer createMapLayer(Object style, final Map<String, Object> params){
         final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
-        
+
         if(style == null){
             //no style provided, try to get the favorite one
             if(favorites.size() > 0){
@@ -195,7 +252,7 @@ class PostGridLayerDetails implements LayerDetails {
                 style = RANDOM_FACTORY.createRasterStyle();
             }
         }
-                
+
         if(style instanceof String){
             //the given style is a named style
             style = NamedStyleDP.getInstance().get((String)style);
@@ -204,7 +261,7 @@ class PostGridLayerDetails implements LayerDetails {
                 style = RANDOM_FACTORY.createRasterStyle();
             }
         }
-               
+
         if(style instanceof MutableStyle){
             //style is a commun SLD style
             mapLayer.setStyle((MutableStyle) style);
@@ -216,7 +273,7 @@ class PostGridLayerDetails implements LayerDetails {
             //style is unknowed type, use a random style
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
         }
-        
+
         if (params != null) {
             mapLayer.setDimRange((MeasurementRange) params.get(WMSQuery.KEY_DIM_RANGE));
             final Double elevation = (Double) params.get(WMSQuery.KEY_ELEVATION);
@@ -228,7 +285,7 @@ class PostGridLayerDetails implements LayerDetails {
                 mapLayer.times().add(date);
             }
         }
-        
+
         return mapLayer;
     }
 }
