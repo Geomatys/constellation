@@ -311,8 +311,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
     private static final MutableStyle createDefaultRasterStyle() {
         final StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
-        final RasterSymbolizer symbol =sf.createDefaultRasterSymbolizer();
-        return sf.createRasterStyle(symbol);
+        final RasterSymbolizer symbol =sf.createRasterSymbolizer();
+        return sf.createStyle(symbol);
     }
 
     /**

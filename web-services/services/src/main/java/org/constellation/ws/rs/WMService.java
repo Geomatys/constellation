@@ -35,8 +35,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
@@ -539,44 +541,51 @@ public class WMService extends WebService {
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final List<String> layers = info.getQueryLayers();
         final int size = layers.size();
-        final List<Object> results = new ArrayList<Object>(size);
+        /* Now proceed to the calculation of the values, and use the toString method to store them.
+         * This map will store couples of <layerName, value> obtained by the getInformationAt() method.
+         */
+        final Map<String, List<String>> results = new HashMap<String, List<String>>();
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
+            final Object currentValue;
             try {
-                final Object currentValue = layer.getInformationAt(info);
-                results.add(currentValue);
+                currentValue = layer.getInformationAt(info);
             } catch (CatalogException cat) {
                 throw new WMSWebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
             } catch (IOException io) {
                 throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
             }
+            final List<String> values = new ArrayList<String>();
+            if (currentValue instanceof Double) {
+                values.add(Float.toString(((Double) currentValue).floatValue()));
+            } else {
+                final List<SimpleFeature> features = (List<SimpleFeature>) currentValue;
+                // Fill the list of values with features found.
+                for (SimpleFeature feature : features) {
+                    List<Object> attrs = feature.getAttributes();
+                    List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
+                    final StringBuilder value = new StringBuilder();
+                    for (int j = 0; j < attrs.size(); j++) {
+                        value.append(attrTypes.get(j).getName().toString() + "[" +
+                                attrs.get(j).toString() + "] ");
+                    }
+                    values.add(value.toString());
+                }
+            }
+            results.put(key, values);
         }
 
         // We now build the response, according to the format chosen.
-        StringBuilder response = new StringBuilder();
-
+        final StringBuilder response = new StringBuilder();
         // TEXT / PLAIN
         if (infoFormat.equalsIgnoreCase("text/plain")) {
-            for (int i=0; i<size; i++) {
-                response.append("result for ").append(layers.get(i));
-                response.append(" is:");
-                final Object currentRes = results.get(i);
-                if (currentRes instanceof Double) {
-                    response.append(((Double) currentRes).floatValue());
-                } else {
-                    final List<SimpleFeature> features = (List<SimpleFeature>) results.get(i);
-                    for (SimpleFeature feature : features) {
-                        List<Object> attrs = feature.getAttributes();
-                        List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
-                        for (int j=0; j<attrs.size(); j++) {
-                            response.append(attrTypes.get(j).getName().toString())
-                                    .append("[").append(attrs.get(j).toString())
-                                    .append("] ");
-                        }
-                        response.append("\n");
-                    }
+            for (String layer : layers) {
+                final List<String> values = results.get(layer);
+                response.append((values.size() < 2) ? "Result for " : "Results for ").append(layer);
+                response.append((values.size() < 2) ? " is :" : " are : ");
+                for (String value : values) {
+                    response.append(value).append("\n");
                 }
-                response.append("\n");
             }
             return Response.ok(response.toString(), infoFormat).build();
         }
@@ -589,30 +598,18 @@ public class WMService extends WebService {
                     .append("    </head>\n")
                     .append("    <body>\n")
                     .append("    <table>\n");
-            for (int i=0; i<size; i++) {
-                final Object currentRes = results.get(i);
-                response.append("        <tr>\n")
-                        .append("            <th>").append(layers.get(i)).append("</th>\n")
-                        .append("        </tr>\n")
-                        .append("        <tr>\n")
-                        .append("            <th>");
-                if (currentRes instanceof Double) {
-                    response.append(((Double) results.get(i)).floatValue());
-                } else {
-                    final List<SimpleFeature> features = (List<SimpleFeature>) results.get(i);
-                    for (SimpleFeature feature : features) {
-                        List<Object> attrs = feature.getAttributes();
-                        List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
-                        for (int j=0; j<attrs.size(); j++) {
-                            response.append(attrTypes.get(j).getName().toString())
-                                    .append("[").append(attrs.get(j).toString())
-                                    .append("] ");
-                        }
-                        response.append("\n");
-                    }
+            for (String layer : layers) {
+                response.append("       <tr>")
+                        .append("           <th>").append(layer).append("</th>")
+                        .append("       </tr>");
+                final List<String> values = results.get(layer);
+                for (String value : values) {
+                    response.append("       <tr>")
+                            .append("           <th>")
+                            .append(value)
+                            .append("           </th>")
+                            .append("       </tr>");
                 }
-                response.append("           </th>\n")
-                        .append("       </tr>\n");
             }
             response.append("    </table>\n")
                     .append("    </body>\n")
@@ -816,7 +813,7 @@ public class WMService extends WebService {
         final GetMap getMap  = adaptGetMap();
         final String version = getParameter(KEY_VERSION, true);
         final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
-                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0; 
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
         final String strX    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                                                             KEY_I_v110 : KEY_I_v130, true);
         final String strY    = getParameter((version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
