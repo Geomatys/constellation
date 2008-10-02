@@ -17,7 +17,6 @@
 package org.constellation.sos;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -100,7 +99,7 @@ public class GetResult extends RequestBaseType {
         if (eventTime == null){
             eventTime = new ArrayList<EventTime>();
         }
-        return Collections.unmodifiableList(eventTime);
+        return eventTime;
     }
     
     /**

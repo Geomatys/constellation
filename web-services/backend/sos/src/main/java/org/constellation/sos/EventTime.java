@@ -91,6 +91,13 @@ public class EventTime {
          this.tDuring = tDuring;
      }
      
+     /**
+     * Build a new Event time with T_Equals.
+     */
+     public EventTime(BinaryTemporalOpType tEquals){
+         this.tEquals = tEquals;
+     }
+     
     /**
      * Gets the value of the temporalOps property.
      */
@@ -232,6 +239,54 @@ public class EventTime {
         hash = 53 * hash + (this.tContains != null ? this.tContains.hashCode() : 0);
         hash = 53 * hash + (this.tDuring != null ? this.tDuring.hashCode() : 0);
         return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if (temporalOps != null) {
+            s.append("TemporalOps: ").append(temporalOps.toString());
+        }
+        if (tOveralps != null) {
+            s.append("tOveralps: ").append(tOveralps.toString());
+        }
+        if (tEquals != null) {
+            s.append("tEquals: ").append(tEquals);
+        }
+        if (tMeets != null) {
+            s.append("tMeets: ").append(tMeets);
+        }
+        if (tOverlappedBy != null) {
+            s.append("tOverlappedBy: ").append(tOverlappedBy);
+        }
+        if (tEndedBy != null) {
+            s.append("tEndedBy: ").append(tEndedBy);
+        }
+        if (tEnds != null) {
+            s.append("tEnds: ").append(tEnds);
+        }
+        if (tAfter != null) {
+            s.append("tAfter: ").append(tAfter);
+        }
+        if (tMetBy != null) {
+            s.append("tMetBy: ").append(tMetBy);
+        }
+        if (tBegins != null) {
+            s.append("tBegins: ").append(tBegins);
+        }
+        if (tBefore != null) {
+            s.append("tBefore: ").append(tBefore);
+        }
+        if (tBegunBy != null) {
+            s.append("tBegunBy: ").append(tBegunBy);
+        }
+        if (tContains != null) {
+            s.append("tContains: ").append(tContains);
+        }
+        if (tDuring != null) {
+            s.append("tDuring: ").append(tDuring);
+        }
+        return s.toString();
     }
 }
 

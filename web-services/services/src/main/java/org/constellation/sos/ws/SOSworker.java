@@ -33,6 +33,9 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -83,6 +87,7 @@ import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.FeaturePropertyType;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.ReferenceTable;
+import org.constellation.gml.v311.TimeIndeterminateValueType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
@@ -95,6 +100,7 @@ import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.observation.ProcessEntry;
 import org.constellation.observation.ProcessTable;
+import org.constellation.ogc.BinaryTemporalOpType;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointEntry;
@@ -115,6 +121,7 @@ import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
 import org.constellation.sos.ResponseModeType;
+import org.constellation.swe.v101.AbstractEncodingEntry;
 import org.constellation.swe.v101.AbstractEncodingPropertyType;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;
@@ -122,6 +129,7 @@ import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.DataComponentPropertyType;
 import org.constellation.swe.v101.PhenomenonPropertyType;
+import org.constellation.swe.v101.TextBlockEntry;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -150,10 +158,12 @@ import org.w3c.dom.NodeList;
  */
 public class SOSworker {
 
+    public final static int DISCOVERY     = 0;
+    public final static int TRANSACTIONAL = 1;
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.sos.webservice");
+    Logger logger = Logger.getLogger("net.seagis.sos.webservice");
     
     /**
      * A simple Connection to the SensorML database.
@@ -261,6 +271,11 @@ public class SOSworker {
     private String outputFormat;
     
     /**
+     * A list of schreduled Task (used in clos method).
+     */
+    private List<Timer> schreduledTask = new ArrayList<Timer>();
+    
+    /**
      * A list of supported MIME type 
      */
     private final static List<String> ACCEPTED_OUTPUT_FORMATS;
@@ -272,10 +287,26 @@ public class SOSworker {
     }
     
     /**
+     * The profile of the SOS service (transational/discovery). 
+     */
+    private final int profile;
+    
+    /**
+     * A date formater used to parse datablock.
+     */
+    private DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    
+    
+    /**
      * Initialize the database connection.
      */
-    public SOSworker() throws SQLException, IOException, NoSuchTableException {
+    public SOSworker(int profile) throws SQLException, IOException, NoSuchTableException {
        
+        this.profile = profile;
+        if (profile != TRANSACTIONAL && profile != DISCOVERY) {
+            throw new IllegalArgumentException("the flag profile must be equals to TRANSACTIONAL or DISCOVERY!");
+        }
+        
         //we load the properties files
         Properties prop = new Properties();
         map    = new Properties();
@@ -456,8 +487,17 @@ public class SOSworker {
             if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
                 
                om = staticCapabilities.getOperationsMetadata();
+               
+               //we remove the operation not supported in this profile (transactional/discovery)
+               if (profile == DISCOVERY) {
+                   om.removeOperation("InsertObservation");
+                   om.removeOperation("RegisterSensor");
+               }
+               
+               
                //we update the URL
                WebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
+              
                
                //we update the parameter in operation metadata.
                Operation go = om.getOperation("GetObservation");
@@ -702,7 +742,7 @@ public class SOSworker {
                     }
                 }
             } else {
-            //if is not specified we use the process of the offering   
+            //if is not specified we use all the process of the offering   
                 for (ReferenceEntry proc: off.getProcedure()) {
                 
                     SQLrequest.append(" procedure='").append(proc.getHref()).append("' OR ");
@@ -857,7 +897,7 @@ public class SOSworker {
                                                       MISSING_PARAMETER_VALUE, "lessThan", version);
                     } 
                     
-                                    
+                        
                 } else if (result.getPropertyIsGreaterThan() != null) {
                     
                     String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
@@ -865,10 +905,10 @@ public class SOSworker {
                     if (propertyName == null || propertyName.equals("") || literal == null) {
                         throw new OWSWebServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
                                                      MISSING_PARAMETER_VALUE, "greaterThan", version);
-                    }
-                
-                } else if (result.getPropertyIsEqualTo() != null) {
+                    } 
                     
+                } else if (result.getPropertyIsEqualTo() != null) {
+                        
                     String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
                     LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
                     if (propertyName == null || propertyName.equals("") || literal == null) {
@@ -876,7 +916,7 @@ public class SOSworker {
                                                        MISSING_PARAMETER_VALUE, "propertyIsEqualTo", version);
                     } 
                     
-                
+                        
                 } else if (result.getPropertyIsLike() != null) {
                     throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
                                                   OPERATION_NOT_SUPPORTED, "propertyIsLike", version);
@@ -926,6 +966,8 @@ public class SOSworker {
                         Date d = new Date(next);
                         logger.info("this template will be destroyed at:" + d.toString());
                         t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
+                        schreduledTask.add(t);
+                        
                         response.add(temporaryTemplate);
                     } else {
                         response.add(o);
@@ -958,6 +1000,8 @@ public class SOSworker {
      */
     public GetResultResponse getResult(GetResult requestResult) throws WebServiceException {
         logger.info("getResult request processing"  + '\n');
+        long start = System.currentTimeMillis();
+        
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
         
@@ -975,31 +1019,50 @@ public class SOSworker {
         }
         
         //we begin to create the sql request
-        StringBuilder SQLrequest = new StringBuilder("SELECT result FROM observations WHERE ");
+        StringBuilder SQLrequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
         
         //we add to the request the property of the template
         SQLrequest.append("procedure='").append(((ProcessEntry)template.getProcedure()).getHref()).append("'");
         
+        //we treat the time constraint
+        List<EventTime> times = requestResult.getEventTime();
+        
+        /**
+         * The template time :
+         */ 
+        
+        // case TEquals with time instant
         if (template.getSamplingTime() instanceof TimeInstantType) {
-            TimeInstantType ti = (TimeInstantType) template.getSamplingTime();
-            
-            SQLrequest.append("AND sampling_time_begin>='").append(ti.getTimePosition().getValue()).append("'");
+           TimeInstantType ti = (TimeInstantType) template.getSamplingTime();
+           BinaryTemporalOpType equals  = new BinaryTemporalOpType(ti);
+           EventTime e                  = new EventTime(equals);
+           times.add(e);
         
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
             TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
             
-            SQLrequest.append("AND sampling_time_begin>='").append(tp.getBeginPosition().getValue()).append("'");
-            if (tp.getEndPosition()!= null && !tp.getEndPosition().getValue().equals("")) {
-                SQLrequest.append("AND ( (sampling_time_end<='").append(tp.getEndPosition().getValue()).append("' )");
-                SQLrequest.append("OR ( sampling_time_begin<='").append(tp.getEndPosition().getValue()).append("' AND sampling_time_end IS NULL ))");
+            //case TBefore
+            if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
+                BinaryTemporalOpType before  = new BinaryTemporalOpType(new TimeInstantType(tp.getEndPosition()));
+                EventTime e                  = new EventTime(null, before, null);
+                times.add(e);
+            
+            //case TAfter    
+            } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
+                BinaryTemporalOpType after  = new BinaryTemporalOpType(new TimeInstantType(tp.getBeginPosition()));
+                EventTime e                  = new EventTime(after, null, null);
+                times.add(e);
+            
+            //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull) 
+            } else {
+                BinaryTemporalOpType during  = new BinaryTemporalOpType(tp);
+                EventTime e                  = new EventTime(null, null, during);
+                times.add(e);
             }
         }
         
         //we treat the time constraint
-        if (requestResult.getEventTime() != null) {
-            List<EventTime> times = requestResult.getEventTime();
-            treatEventTimeRequest(times, SQLrequest, false);
-        }
+        treatEventTimeRequest(times, SQLrequest, false);
         
         //we prepare the response document
         GetResultResponse response = null;
@@ -1008,25 +1071,29 @@ public class SOSworker {
             Statement stmt    = OMDatabase.getConnection().createStatement();
             ResultSet results = stmt.executeQuery(SQLrequest.toString());
             AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
-            String datablock = "";
+            StringBuilder datablock = new StringBuilder();
             while (results.next()) {
                 AnyResultEntry a = null;
+                Timestamp tBegin = results.getTimestamp(2);
+                Timestamp tEnd   = results.getTimestamp(3);
                 try {
                     a = resTable.getEntry(results.getString(1));
+                
                 } catch (NoSuchRecordException ex) {
-                        
-                        logger.info("nos usch record in result Table");
+                    logger.info("no such record in result Table");
                 }
                 if (a != null) {
-                    if (a.getArray() != null) {
-                        datablock += a.getArray().getValues() + '\n';
+                    DataArrayEntry array = a.getArray();
+                    if (array != null) {
+                        String values = getResultValues(tBegin, tEnd, array, times);
+                        datablock.append(values).append('\n');
                     } else {
                         throw new IllegalArgumentException("Array is null");
                     }
                 }
             }
 
-            GetResultResponse.Result r = new GetResultResponse.Result(datablock, serviceURL + '/' + requestResult.getObservationTemplateId());
+            GetResultResponse.Result r = new GetResultResponse.Result(datablock.toString(), serviceURL + '/' + requestResult.getObservationTemplateId());
             response = new GetResultResponse(r);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1038,7 +1105,141 @@ public class SOSworker {
                                           NO_APPLICABLE_CODE, null, version);
         }
 
+        logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
+    }
+    
+    private String getResultValues(Timestamp tBegin, Timestamp tEnd, DataArrayEntry array, List<EventTime> eventTimes) throws WebServiceException {
+        String values = null;
+        
+        //for multiple observations we parse the brut values (if we got a time constraint)
+        if (tBegin != null && tEnd != null) {
+
+            values = array.getValues();
+            
+            for (EventTime bound: eventTimes) {
+                logger.finer(" Values: " + values);
+                if (bound.getTEquals() != null) {
+                    if (bound.getTEquals().getRest().get(0) instanceof TimeInstantType) {
+                        TimeInstantType ti = (TimeInstantType) bound.getTEquals().getRest().get(0);
+                        Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                        
+                        logger.finer("TE case 1");
+                        //case 1 the periods contains a matching values
+                        values = parseDataBlock(values, array.getEncoding(), null, null, boundEquals);
+                        
+                    }
+                    
+                } else if (bound.getTAfter()  != null) {
+                    TimeInstantType ti = (TimeInstantType) bound.getTAfter().getRest().get(0);
+                    Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    
+                    // case 1 the period overlaps the bound 
+                    if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
+                        logger.finer("TA case 1");
+                        values = parseDataBlock(values, array.getEncoding(), boundBegin, null, null);
+                    
+                    }
+                        
+                } else if (bound.getTBefore() != null) {
+                    TimeInstantType ti = (TimeInstantType) bound.getTBefore().getRest().get(0);
+                    Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    
+                    // case 1 the period overlaps the bound 
+                    if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
+                        logger.finer("TB case 1");
+                        values = parseDataBlock(values, array.getEncoding(), null, boundEnd, null);
+                    
+                    }
+                    
+                } else if (bound.getTDuring() != null) {
+                    
+                    TimePeriodType tp = (TimePeriodType) bound.getTDuring().getRest().get(0);
+                    Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
+                    Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
+                    
+                    // case 1 the period overlaps the first bound 
+                    if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
+                        logger.finer("TD case 1");
+                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
+
+                    // case 2 the period overlaps the second bound    
+                    } else if (tBegin.after(boundBegin) && tEnd.after(boundEnd) && tBegin.before(boundEnd)) {
+                        logger.finer("TD case 2");
+                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
+
+                    // case 3 the period totaly overlaps the bounds
+                    } else if (tBegin.before(boundBegin) && tEnd.after(boundEnd)) {
+                        logger.finer("TD case 3");
+                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
+                    } 
+                    
+                } 
+            }
+            
+                    
+        //if this is a simple observation, or if there is no time bound    
+        } else {
+            values = array.getValues();
+        }
+        return values;
+    }
+    
+    private String parseDataBlock(String brutValues, AbstractEncodingEntry abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
+        String values = "";
+        if (abstractEncoding instanceof TextBlockEntry) {
+                TextBlockEntry encoding = (TextBlockEntry) abstractEncoding;
+                StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
+                int i = 1;
+                while (tokenizer.hasMoreTokens()) {
+                    String block = tokenizer.nextToken();
+                    logger.finer(i + " eme block =" + block);
+                    i++;
+                    String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                    samplingTimeValue = samplingTimeValue.replace('T', ' ');
+                    Date d;
+                    try {
+                        d = dateformat.parse(samplingTimeValue);
+                    } catch (ParseException ex) {
+                        logger.severe("unable to parse the value: " + samplingTimeValue);
+                        continue;
+                    }
+                    Timestamp t = new Timestamp(d.getTime());
+                    
+                    // time during case
+                    if (boundBegin != null && boundEnd != null) {
+                        if (t.after(boundBegin) && t.before(boundEnd)) {
+                            values += block + encoding.getBlockSeparator();
+                            logger.finer("TD matching");
+                        }
+                        
+                    //time after case    
+                    } else if (boundBegin != null && boundEnd == null) {
+                        if (t.after(boundBegin)) {
+                            values += block + encoding.getBlockSeparator();
+                            logger.finer("TA matching");
+                        }
+                    
+                    //time before case    
+                    } else if (boundBegin == null && boundEnd != null) {
+                        if (t.before(boundEnd)) {
+                            values += block + encoding.getBlockSeparator();
+                            logger.finer("TB matching");
+                        }
+                        
+                    //time equals case    
+                    } else if (boundEquals != null) {
+                        if (t.equals(boundEquals)) {
+                            values += block + encoding.getBlockSeparator();
+                            logger.finer("TE matching");
+                        }
+                    }
+                }
+            } else {
+                logger.severe("unable to parse datablock unknown encoding");
+                values = brutValues;
+            }
+        return values;
     }
     
     private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
@@ -1127,7 +1328,6 @@ public class SOSworker {
             
             //we create a new Tempory File SensorML
             File tempFile = File.createTempFile("sml", "xml");
-            tempFile.deleteOnExit();
             FileOutputStream outstr = new FileOutputStream(tempFile);
             OutputStreamWriter outstrR = new OutputStreamWriter(outstr,"UTF-8");
             BufferedWriter output = new BufferedWriter(outstrR);
@@ -1254,6 +1454,7 @@ public class SOSworker {
             if (obs != null) {
                 obs.setProcedure(proc);
                 obs.setName(getObservationId());
+                logger.finer("samplingTime received: " + obs.getSamplingTime()); 
                 logger.finer("template received:" + '\n' + obs.toString());
             } else {
                 throw new OWSWebServiceException("The observation template must be specified",
@@ -1268,7 +1469,7 @@ public class SOSworker {
             } else if (obs instanceof ObservationEntry) {
                 
                 //in first we verify that the observation is conform to the template
-                ObservationEntry template = (ObservationEntry)obsTable.getEntry( observationTemplateIdBase + num);
+                ObservationEntry template = (ObservationEntry) obsTable.getEntry( observationTemplateIdBase + num);
                 //if the observation to insert match the template we can insert it in the OM db
                 if (obs.matchTemplate(template)) {
                     if (obs.getSamplingTime() != null && obs.getResult() != null) {
@@ -1347,14 +1548,15 @@ public class SOSworker {
      */
     private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, StringBuilder SQLrequest, boolean template) throws WebServiceException {
         
-        //In mode template this method return a temporal Object.
+        //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
         
         if (times.size() != 0) {
-            if (!template)
-                SQLrequest.append("AND (");
             
             for (EventTime time: times) {
+
+                if (!template)
+                    SQLrequest.append("AND (");
                 
                 // The operation Time Equals
                 if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
@@ -1375,6 +1577,7 @@ public class SOSworker {
                         String begin = getTimeValue(tp.getBeginPosition());
                         String end   = getTimeValue(tp.getEndPosition()); 
                         if (!template) {
+                            // we request directly a multiple observation or a period observation (one measure during a period)
                             SQLrequest.append(" sampling_time_begin='").append(begin).append("' AND ");
                             SQLrequest.append(" sampling_time_end='").append(end).append("') ");
                         } else {
@@ -1386,7 +1589,12 @@ public class SOSworker {
                         TimeInstantType ti = (TimeInstantType) j;
                         String position = getTimeValue(ti.getTimePosition());
                         if (!template) {
-                            SQLrequest.append(" sampling_time_begin='").append(position).append("' AND sampling_time_end=NULL )");
+                            // case 1 a single observation
+                            SQLrequest.append("(sampling_time_begin='").append(position).append("' AND sampling_time_end=NULL)");
+                            SQLrequest.append(" OR ");
+                            
+                            //case 2 multiple observations containing a matching value
+                            SQLrequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
                         } else {
                             templateTime = ti;
                         }
@@ -1412,9 +1620,10 @@ public class SOSworker {
                         TimeInstantType ti = (TimeInstantType)j;
                         String position = getTimeValue(ti.getTimePosition());
                         if (!template) { 
-                            SQLrequest.append("sampling_time_begin<='").append(position).append("' )");
+                            // the single and multpile observations whitch begin after the bound
+                            SQLrequest.append("(sampling_time_begin<='").append(position).append("'))");
                         } else {
-                            templateTime = ti;
+                            templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                         }
                         
                     } else {
@@ -1439,9 +1648,14 @@ public class SOSworker {
                         TimeInstantType ti = (TimeInstantType)j;
                         String position = getTimeValue(ti.getTimePosition());
                         if (!template) {
-                            SQLrequest.append("sampling_time_begin>='").append(position).append("' )");
+                            // the single and multpile observations whitch begin after the bound
+                            SQLrequest.append("(sampling_time_begin>='").append(position).append("')");
+                            SQLrequest.append(" OR ");
+                            // the multiple observations overlapping the bound
+                            SQLrequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
+                            
                         } else {
-                            templateTime = ti;
+                            templateTime = new TimePeriodType(ti.getTimePosition());
                         }
                     } else {
                        throw new OWSWebServiceException("TM_After operation require timeInstant!",
@@ -1466,8 +1680,21 @@ public class SOSworker {
                         String end   = getTimeValue(tp.getEndPosition()); 
                         
                         if (!template) {
-                             SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' ) OR");
-                             SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)) ");
+                            // the multiple observations included in the period
+                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("')");
+                            SQLrequest.append(" OR ");
+                            // the single observations included in the period
+                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)");
+                            SQLrequest.append(" OR ");
+                            // the multiple observations whitch overlaps the first bound
+                            SQLrequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' AND sampling_time_end>='").append(begin).append("')");
+                            SQLrequest.append(" OR ");
+                            // the multiple observations whitch overlaps the second bound
+                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end>= '").append(end).append("' AND sampling_time_begin<='").append(end).append("')");
+                            SQLrequest.append(" OR ");
+                            // the multiple observations whitch overlaps the whole period
+                            SQLrequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end>= '").append(end).append("'))");
+                            
                         } else {
                             templateTime = tp;
                         }
@@ -1499,7 +1726,7 @@ public class SOSworker {
     private String getTimeValue(TimePositionType time) throws WebServiceException {
         if (time != null && time.getValue() != null) {
             String value = time.getValue();
-            value = value.replace('T', ' ');
+            value = value.replace("T", " ");
             
             //we delete the data after the second
             if (value.indexOf('.') != -1) {
@@ -1511,11 +1738,17 @@ public class SOSworker {
                  return t.toString();
                  
              } catch(IllegalArgumentException e) {
-                throw new OWSWebServiceException("bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms",
+                throw new OWSWebServiceException("Unable to parse the value: " + value + '\n' +
+                                                 "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
                                                  INVALID_PARAMETER_VALUE, "eventTime", version);
              }
           } else {
-            throw new OWSWebServiceException("bad format of time, TimePostion mustn't be null",
+            String locator;
+            if (time == null)
+                locator = "Timeposition";
+            else
+                locator = "TimePosition value";
+            throw new OWSWebServiceException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime", version);
           }
     }
@@ -1823,8 +2056,8 @@ public class SOSworker {
                             resultModel.add(new QName("http://www.opengis.net/om/1.0",
                                                       "Observation",
                                                       "om"));
-                            List<String> outputFormat = new ArrayList<String>();
-                            outputFormat.add("text/xml");
+                            List<String> offerinfOutputFormat = new ArrayList<String>();
+                            offerinfOutputFormat.add("text/xml");
                             
                             List<String> srsName = new ArrayList<String>();
                             srsName.add("EPSG:4326");
@@ -1840,7 +2073,7 @@ public class SOSworker {
                                                                     process,
                                                                     phenos,
                                                                     stations,
-                                                                    outputFormat,
+                                                                    offerinfOutputFormat,
                                                                     resultModel,
                                                                     responses);
                             offTable.getIdentifier(offering);
@@ -1914,8 +2147,8 @@ public class SOSworker {
                             resultModel.add(new QName("http://www.opengis.net/om/1.0",
                                                       "Observation",
                                                       "om"));
-                            List<String> outputFormat = new ArrayList<String>();
-                            outputFormat.add("text/xml");
+                            List<String> offeringOutputFormat = new ArrayList<String>();
+                            offeringOutputFormat.add("text/xml");
                             
                             List<String> srsName = new ArrayList<String>();
                             srsName.add("EPSG:4326");
@@ -1931,7 +2164,7 @@ public class SOSworker {
                                                                     process,
                                                                     phenos,
                                                                     stations,
-                                                                    outputFormat,
+                                                                    offeringOutputFormat,
                                                                     resultModel,
                                                                     responses);
                             offTable.getIdentifier(offering);
@@ -2106,6 +2339,20 @@ public class SOSworker {
     public void setServiceURL(String serviceURL){
         this.serviceURL = serviceURL;
     }
+    
+    public void close() {
+        try {
+            sensorMLConnection.close();
+            sensorMLReader.dispose();
+            sensorMLWriter.dispose();
+            OMDatabase.close();
+            for (Timer t: schreduledTask) {
+                t.cancel();
+            }
+        } catch (SQLException ex) {
+            logger.severe("SQLException while closing SOSWorker");
+        }
+    }    
     
     /**
      * A task destroying a observation template when the template validity period pass.

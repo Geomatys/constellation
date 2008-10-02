@@ -651,21 +651,19 @@ public class XacmlTest {
         logger.info('\n' + "-------- Fin SOS Policy Test --------" + '\n');
     }
     
+    
     /**
      * Test sending WMS/WCS request to the PDP.
      * 
      * @throws java.lang.Exception
      */
     @Test
-    public void testCoveragePolicy() throws Exception {
+    public void testWMSPolicy() throws Exception {
         
-        logger.info('\n' + "-------- Coverage Policy Test --------" + '\n');
-        
-         //we build the services policies
-         List<PolicyType> WservicePolicies = getWebServicePolicies("cswPolicy.xml", "sosPolicy.xml");
+        logger.info('\n' + "-------- WMS Policy Test --------" + '\n');
         
          //we get the coverage policySet
-         WservicePolicies = getWebServicePolicies("wmsPolicy.xml", "wcsPolicy.xml");
+         List<PolicyType> WservicePolicies = getWebServicePolicies("wmsPolicy.xml");
          PolicySetType coveragePolicySet = buildSimplePolicySet(WservicePolicies);
          
          //we build a policySet 
@@ -682,7 +680,59 @@ public class XacmlTest {
         /**
          * wms TEST
          */
-        String requestURI   = "http://test.geomatys.fr/constellation/WS/wms";
+        String requestURI   = "http://demo.geomatys.fr/constellation/WS/wms";
+        
+        //Check PERMIT condition
+        RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "BlueMarble");
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check DENY condition
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "Caraibes");
+        assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
+        
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "BlueMarble");
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        //Check PERMIT condition
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "Caraibes");
+        assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
+        
+        
+        logger.info('\n' + "-------- Fin WMS Policy Test --------" + '\n');
+    }
+    
+    
+    /**
+     * Test sending WMS/WCS request to the PDP.
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testCoveragePolicy() throws Exception {
+        
+        logger.info('\n' + "-------- Coverage Policy Test --------" + '\n');
+        
+         //we get the coverage policySet
+         List<PolicyType> WservicePolicies = getWebServicePolicies("wmsPolicy.xml", "wcsPolicy.xml");
+         PolicySetType coveragePolicySet = buildSimplePolicySet(WservicePolicies);
+         
+         //we build a policySet 
+         PolicySetType policySet = buildComplexPolicySet(WservicePolicies, coveragePolicySet);
+                  
+         
+         if (debug)
+             marshaller.marshal(policySet, System.out);
+         
+         PDP = new CstlPDP(policySet);
+         pep = new PEP(PDP);
+        
+
+        /**
+         * wms TEST
+         */
+        String requestURI   = "http://demo.geomatys.fr/constellation/WS/wms";
         
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer3");

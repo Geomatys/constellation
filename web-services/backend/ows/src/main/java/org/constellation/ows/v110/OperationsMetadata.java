@@ -95,6 +95,15 @@ public class OperationsMetadata {
         return operation;
     }
     
+    public void removeOperation(String operationName) {
+        for (Operation op: operation){
+            if (op.getName().equals(operationName)) {
+                operation.remove(op);
+                return;
+            }
+        }
+    }
+    
     /**
      * Return the operation for the specified name
      */

@@ -101,7 +101,7 @@ public class SOService {
      * Initialize the database connection.
      */
     public SOService() throws SQLException, IOException, NoSuchTableException, JAXBException {
-       worker = new SOSworker();
+       worker = new SOSworker(SOSworker.TRANSACTIONAL);
        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url

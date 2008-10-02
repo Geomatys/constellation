@@ -485,10 +485,15 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     
                 } else if (obs.getSamplingTime() instanceof TimeInstantType) {
                     TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
-                    String s = sampTime.getTimePosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
-                    statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
-                    statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+                    if (sampTime.getTimePosition() !=null) {
+                        String s       = sampTime.getTimePosition().getValue();
+                        Timestamp date = Timestamp.valueOf(s);
+                        statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
+                        statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+                    } else {
+                        statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
+                        statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+                    }
                     
                 } else {
                     throw new IllegalArgumentException("type allowed for sampling time: TimePeriod or TimeInstant");

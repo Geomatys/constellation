@@ -68,7 +68,7 @@ public class SOService extends WebService {
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", new ServiceVersion(Service.OWS, "1.0.0"));
-        worker = new SOSworker();
+        worker = new SOSworker(SOSworker.TRANSACTIONAL);
         worker.setVersion(getCurrentVersion());
         setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe:org.constellation.observation",
                       "");

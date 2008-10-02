@@ -5,7 +5,7 @@
         <Resources>
              <Resource>
                  <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
-                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://demo.geomatys.fr/seagis/WS/wms</AttributeValue>
+                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://demo.geomatys.fr/constellation/WS/wms</AttributeValue>
                       <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#anyURI" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
                  </ResourceMatch>
              </Resource>
