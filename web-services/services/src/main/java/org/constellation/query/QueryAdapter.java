@@ -64,7 +64,7 @@ public class QueryAdapter {
     /**
      * The default logger.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.constellation.query.wms");
+    public static final Logger LOGGER = Logger.getLogger("org.constellation.query");
 
     /**
      * Verify that all layers are queryable for a {@code GetFeatureInfo}.
@@ -79,7 +79,7 @@ public class QueryAdapter {
      *       {@code GetFeatureInfo} request. Either rename the {@link Layer#isQueryable}
      *       or create a new one that provides this information.
      */
-    public static List<String> areQueryableLayers(final List<String> queryLayers, 
+    public static List<String> areQueryableLayers(final List<String> queryLayers,
                                 final Version version) throws WebServiceException
     {
         /* Do nothing for the moment, waiting for a method in {@link Layer} in order to
@@ -95,6 +95,25 @@ public class QueryAdapter {
             }
         }*/
         return queryLayers;
+    }
+
+    public static boolean toBoolean(final String strTransparent) {
+        if (strTransparent == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(strTransparent.trim());
+    }
+
+    public static Color toColor(String background) throws NumberFormatException{
+        Color color = null;
+        if (background != null) {
+            background = background.trim();
+            color = Color.decode(background);
+        } else {
+            //return the defautl specification color
+            color = Color.WHITE;
+        }
+        return color;
     }
 
     /**
@@ -132,6 +151,14 @@ public class QueryAdapter {
         final List<Date> dates = new ArrayList<Date>();
         TimeParser.parse(strTime, 0L, dates);
         return (dates != null && !dates.isEmpty()) ? dates.get(0) : null;
+    }
+
+    public static double toDouble(String value) throws NumberFormatException {
+        if (value == null) {
+            return Double.NaN;
+        }
+        value = value.trim();
+        return Double.parseDouble(value);
     }
 
     /**
@@ -205,6 +232,42 @@ public class QueryAdapter {
         return new ImmutableEnvelope(envelope);
     }
 
+    /**
+     * Returns {@code 1} by default if the string passed is {@code null}, or the specified value
+     * converted in int.
+     *
+     * @param strFeatureCount An integer in a string, or {@code null}.
+     * @return 1 if not specified, or the value.
+     * @throws NumberFormatException
+     */
+    public static int toFeatureCount(final String strFeatureCount) throws NumberFormatException {
+        if (strFeatureCount == null || strFeatureCount.equals("")) {
+            return 1;
+        }
+        return toInt(strFeatureCount);
+    }
+
+    public static String toFormat(String format) throws IllegalArgumentException {
+        if (format == null) {
+            return null;
+        }
+        format = format.trim();
+        final Set<String> formats = new HashSet<String>(Arrays.asList(ImageIO.getWriterMIMETypes()));
+        formats.addAll(Arrays.asList(ImageIO.getWriterFormatNames()));
+        if (!formats.contains(format)) {
+            throw new IllegalArgumentException("Invalid format specified.");
+        }
+        return format;
+    }
+
+    public static int toInt(String value) throws NumberFormatException {
+        if (value == null) {
+            throw new NumberFormatException("Int value not defined.");
+        }
+        value = value.trim();
+        return Integer.parseInt(value);
+    }
+
     public static MeasurementRange toMeasurementRange(final String strDimRange) {
         if (strDimRange == null) {
             return null;
@@ -254,53 +317,5 @@ public class QueryAdapter {
             styles.add(token.nextToken());
         }
         return styles;
-    }
-
-    public static int toInt(String value) throws NumberFormatException {
-        if (value == null) {
-            throw new NumberFormatException("Int value not defined.");
-        }
-        value = value.trim();
-        return Integer.parseInt(value);
-    }
-
-    public static double toDouble(String value) throws NumberFormatException {
-        if (value == null) {
-            return Double.NaN;
-        }
-        value = value.trim();
-        return Double.parseDouble(value);
-    }
-
-    public static Color toColor(String background) throws NumberFormatException{
-        Color color = null;
-        if (background != null) {
-            background = background.trim();
-            color = Color.decode(background);
-        } else {
-            //return the defautl specification color
-            color = Color.WHITE;
-        }
-        return color;
-    }
-
-    public static boolean toBoolean(final String strTransparent) {
-        if (strTransparent == null) {
-            return false;
-        }
-        return Boolean.parseBoolean(strTransparent.trim());
-    }
-
-    public static String toFormat(String format) throws IllegalArgumentException {
-        if (format == null) {
-            return null;
-        }
-        format = format.trim();
-        final Set<String> formats = new HashSet<String>(Arrays.asList(ImageIO.getWriterMIMETypes()));
-        formats.addAll(Arrays.asList(ImageIO.getWriterFormatNames()));
-        if (!formats.contains(format)) {
-            throw new IllegalArgumentException("Invalid format specified.");
-        }
-        return format;
     }
 }

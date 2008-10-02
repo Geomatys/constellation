@@ -55,12 +55,19 @@ public class GetFeatureInfo extends GetMap {
      */
     private final String infoFormat;
 
+    /**
+     * Number of maximal features that the request has to handle.
+     */
+    private final int featureCount;
+
     public GetFeatureInfo(final GetMap getMap, final double x, final double y,
-                          final List<String> queryLayers, final String infoFormat)
+                          final List<String> queryLayers, final String infoFormat,
+                          final int featureCount)
     {
         super(getMap);
         this.x = x;     this.queryLayers = queryLayers;
         this.y = y;     this.infoFormat  = infoFormat;
+        this.featureCount = featureCount;
     }
 
     public GetFeatureInfo(final Envelope envelope, final WMSQueryVersion version,
@@ -68,12 +75,13 @@ public class GetFeatureInfo extends GetMap {
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions, final double x, final double y,
-                  final List<String> queryLayers, final String infoFormat)
+                  final List<String> queryLayers, final String infoFormat, final int featureCount)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
                 background, transparent, exceptions);
         this.x = x;     this.queryLayers = queryLayers;
         this.y = y;     this.infoFormat  = infoFormat;
+        this.featureCount = featureCount;
     }
 
     /**
@@ -102,5 +110,13 @@ public class GetFeatureInfo extends GetMap {
      */
     public String getInfoFormat() {
         return infoFormat;
+    }
+
+    /**
+     * Returns the number of features to request. If a negative or {@code 0} is defined,
+     * then it returns the default value {@code 1}.
+     */
+    public int getFeatureCount() {
+        return (featureCount < 1) ? 1 : featureCount;
     }
 }

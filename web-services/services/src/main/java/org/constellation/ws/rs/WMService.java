@@ -542,9 +542,9 @@ public class WMService extends WebService {
         final List<String> layers = info.getQueryLayers();
         final int size = layers.size();
         /* Now proceed to the calculation of the values, and use the toString method to store them.
-         * This map will store couples of <layerName, value> obtained by the getInformationAt() method.
+         * This map will store couples of <layerName, List<values>> obtained by the getInformationAt() method.
          */
-        final Map<String, List<String>> results = new HashMap<String, List<String>>();
+        final Map<String, List<String>> results = new HashMap<String, List<String>>(size);
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
             final Object currentValue;
@@ -560,10 +560,14 @@ public class WMService extends WebService {
                 values.add(Float.toString(((Double) currentValue).floatValue()));
             } else {
                 final List<SimpleFeature> features = (List<SimpleFeature>) currentValue;
+                // Defines how many features we will take in the list of results.
+                final int featuresSize = (info.getFeatureCount() > features.size()) ?
+                                          features.size() : info.getFeatureCount();
                 // Fill the list of values with features found.
-                for (SimpleFeature feature : features) {
-                    List<Object> attrs = feature.getAttributes();
-                    List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
+                for (int i=0; i<featuresSize; i++) {
+                    final SimpleFeature feature = features.get(i);
+                    final List<Object> attrs = feature.getAttributes();
+                    final List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
                     final StringBuilder value = new StringBuilder();
                     for (int j = 0; j < attrs.size(); j++) {
                         value.append(attrTypes.get(j).getName().toString() + "[" +
@@ -820,10 +824,20 @@ public class WMService extends WebService {
                                                             KEY_J_v110 : KEY_J_v130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
+        final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = QueryAdapter.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, wmsVersion);
-        return new GetFeatureInfo(getMap, Double.parseDouble(strX),
-                Double.parseDouble(strY), queryableLayers, infoFormat);
+        final double x;
+        final double y;
+        final int featureCount;
+        try {
+            x = QueryAdapter.toDouble(strX);
+            y = QueryAdapter.toDouble(strY);
+            featureCount = QueryAdapter.toFeatureCount(strFeatureCount);
+        } catch (NumberFormatException n) {
+            throw new WMSWebServiceException(n, NO_APPLICABLE_CODE, wmsVersion);
+        }
+        return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
     }
 
     /**
