@@ -889,16 +889,17 @@ public class WMService extends WebService {
         final String strLayers       = getParameter(KEY_LAYERS,          true);
         final String strWidth        = getParameter(KEY_WIDTH,           true);
         final String strHeight       = getParameter(KEY_HEIGHT,          true);
-        final String strStyles       = getParameter(KEY_STYLES,          true);
         final String strElevation    = getParameter(KEY_ELEVATION,      false);
         final String strTime         = getParameter(KEY_TIME,           false);
         final String strDimRange     = getParameter(KEY_DIM_RANGE,      false);
         final String strBGColor      = getParameter(KEY_BGCOLOR,        false);
         final String strTransparent  = getParameter(KEY_TRANSPARENT,    false);
-        final String strSLD          = getParameter(KEY_SLD,            false);
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
+        final String strSLD          = getParameter(KEY_SLD,            false);
+        final String strStyles       = getParameter(KEY_STYLES, 
+                ((strSLD != null) && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : true);
 
         final CoordinateReferenceSystem crs;
         try {
