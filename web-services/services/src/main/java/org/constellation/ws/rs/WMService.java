@@ -622,7 +622,7 @@ public class WMService extends WebService {
         }
 
         // Info format not handled.
-        throw new WMSWebServiceException("Unsupported format chosen", INVALID_FORMAT, queryVersion);
+        throw new WMSWebServiceException("Unsupported info format chosen", INVALID_FORMAT, queryVersion);
     }
 
     /**
@@ -827,12 +827,12 @@ public class WMService extends WebService {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = QueryAdapter.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, wmsVersion);
-        final double x;
-        final double y;
+        final int x;
+        final int y;
         final int featureCount;
         try {
-            x = QueryAdapter.toDouble(strX);
-            y = QueryAdapter.toDouble(strY);
+            x = QueryAdapter.toInt(strX);
+            y = QueryAdapter.toInt(strY);
             featureCount = QueryAdapter.toFeatureCount(strFeatureCount);
         } catch (NumberFormatException n) {
             throw new WMSWebServiceException(n, NO_APPLICABLE_CODE, wmsVersion);

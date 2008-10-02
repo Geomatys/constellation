@@ -38,12 +38,12 @@ public class GetFeatureInfo extends GetMap {
     /**
      * X coordinate to request.
      */
-    private final double x;
+    private final int x;
 
     /**
      * Y coordinate to request.
      */
-    private final double y;
+    private final int y;
 
     /**
      * Layers to request.
@@ -60,7 +60,7 @@ public class GetFeatureInfo extends GetMap {
      */
     private final int featureCount;
 
-    public GetFeatureInfo(final GetMap getMap, final double x, final double y,
+    public GetFeatureInfo(final GetMap getMap, final int x, final int y,
                           final List<String> queryLayers, final String infoFormat,
                           final int featureCount)
     {
@@ -74,7 +74,7 @@ public class GetFeatureInfo extends GetMap {
                   final String format, final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
-                  final Boolean transparent, final String exceptions, final double x, final double y,
+                  final Boolean transparent, final String exceptions, final int x, final int y,
                   final List<String> queryLayers, final String infoFormat, final int featureCount)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
@@ -87,14 +87,14 @@ public class GetFeatureInfo extends GetMap {
     /**
      * Returns the X coordinate to request value.
      */
-    public double getX() {
+    public int getX() {
         return x;
     }
 
     /**
      * Returns the Y coordinate to request value.
      */
-    public double getY() {
+    public int getY() {
         return y;
     }
 

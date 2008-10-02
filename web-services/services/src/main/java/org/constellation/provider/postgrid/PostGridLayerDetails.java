@@ -132,8 +132,14 @@ class PostGridLayerDetails implements LayerDetails {
 
         table.setGeographicBoundingBox(bbox);
         table.setPreferredResolution(resolution);
-        table.setTimeRange(gfi.getDate(), gfi.getDate());
-        table.setVerticalRange(gfi.getElevation(), gfi.getElevation());
+        final Date date = gfi.getDate();
+        table.setTimeRange(date, date);
+        final Double elev = gfi.getElevation();
+        if (elev != null) {
+            table.setVerticalRange(elev, elev);
+        } else {
+            table.setVerticalRange(null);
+        }
         table.setLayer(layer);
 
         GridCoverage2D coverage = null;
