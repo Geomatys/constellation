@@ -220,18 +220,20 @@ class ShapefileLayerDetails implements LayerDetails {
      */
     public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
         // Pixel coordinates in the request.
-        final double pixelUpX     = gfi.getX();
-        final double pixelUpY     = gfi.getY();
-        final double pixelDownX   = gfi.getX() + 1;
-        final double pixelDownY   = gfi.getY() + 1;
+        final int pixelUpX        = gfi.getX();
+        final int pixelUpY        = gfi.getY();
+        final int pixelDownX      = pixelUpX + 1;
+        final int pixelDownY      = pixelUpY + 1;
         final Envelope envObj     = gfi.getEnvelope();
         final double widthEnv     = envObj.getSpan(0);
         final double heightEnv    = envObj.getSpan(1);
+        final int width           = gfi.getSize().width;
+        final int height          = gfi.getSize().height;
         // Coordinates of the lower corner and upper corner of the objective envelope.
-        final double lowerCornerX = widthEnv  * pixelUpX   / gfi.getSize().width + envObj.getMinimum(0);
-        final double lowerCornerY = heightEnv * pixelUpY   / gfi.getSize().height + envObj.getMinimum(1);
-        final double upperCornerX = widthEnv  * pixelDownX / gfi.getSize().width + envObj.getMinimum(0);
-        final double upperCornerY = heightEnv * pixelDownY / gfi.getSize().height + envObj.getMinimum(1);
+        final double lowerCornerX = widthEnv  * pixelUpX   / width  + envObj.getMinimum(0);
+        final double lowerCornerY = heightEnv * pixelUpY   / height + envObj.getMinimum(1);
+        final double upperCornerX = widthEnv  * pixelDownX / width  + envObj.getMinimum(0);
+        final double upperCornerY = heightEnv * pixelDownY / height + envObj.getMinimum(1);
 
         final SimpleFeatureType sft = store.getSchema(store.getTypeNames()[0]);
         final CoordinateReferenceSystem crsObj = envObj.getCoordinateReferenceSystem();

@@ -150,8 +150,8 @@ class PostGridLayerDetails implements LayerDetails {
         }
 
         // Pixel coordinates in the request.
-        final double pixelUpX     = gfi.getX();
-        final double pixelUpY     = gfi.getY();
+        final int pixelUpX        = gfi.getX();
+        final int pixelUpY        = gfi.getY();
         final double widthEnv     = objEnv.getSpan(0);
         final double heightEnv    = objEnv.getSpan(1);
         final double resX         =      widthEnv  / width;

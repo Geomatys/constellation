@@ -381,11 +381,17 @@
       <name>java.net community</name>
       <url>http://download.java.net/maven/1</url>
       <layout>legacy</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>java.net.2</id>
       <name>java.net community</name>
       <url>http://download.java.net/maven/2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>geomatys</id>
