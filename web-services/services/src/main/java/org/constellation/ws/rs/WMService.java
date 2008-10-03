@@ -111,7 +111,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  * WMS 1.3.0 / 1.1.1
  * web service implementing the operation getMap, getFeatureInfo and getCapabilities.
  *
- * @version
+ * @version $Id$
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
@@ -529,8 +529,10 @@ public class WMService extends WebService {
 
         String infoFormat = info.getInfoFormat();
         if (infoFormat != null) {
-            if(!(infoFormat.equals("text/plain") || infoFormat.equals("text/html") ||
-                 infoFormat.equals("application/vnd.ogc.gml") || infoFormat.equals("text/xml")))
+            if(!(infoFormat.equalsIgnoreCase("text/plain") || infoFormat.equalsIgnoreCase("text/html") ||
+                 infoFormat.equalsIgnoreCase("application/vnd.ogc.gml") || infoFormat.equalsIgnoreCase("text/xml") ||
+                 infoFormat.equalsIgnoreCase("application/vnd.ogc.xml") || infoFormat.equalsIgnoreCase("xml") ||
+                 infoFormat.equalsIgnoreCase("gml")))
             {
                 throw new WMSWebServiceException("This MIME type " + infoFormat +
                         " is not accepted by the service", INVALID_PARAMETER_VALUE, queryVersion);
@@ -619,6 +621,15 @@ public class WMService extends WebService {
                     .append("    </body>\n")
                     .append("</html>");
             return Response.ok(response.toString(), infoFormat).build();
+        }
+
+        // GML
+        if (infoFormat.equalsIgnoreCase("application/vnd.ogc.gml") || infoFormat.equalsIgnoreCase("text/xml") ||
+            infoFormat.equalsIgnoreCase("application/vnd.ogc.xml") || infoFormat.equalsIgnoreCase("xml") ||
+            infoFormat.equalsIgnoreCase("gml"))
+        {
+            // todo: returns gml information of features
+            throw new WMSWebServiceException("Unsupported info format chosen", INVALID_FORMAT, queryVersion);
         }
 
         // Info format not handled.
