@@ -44,7 +44,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
-import org.constellation.provider.LayerLinkReader;
+import org.constellation.provider.configuration.LayerLinkReader;
 import org.constellation.ws.rs.WebService;
 
 import org.xml.sax.SAXException;

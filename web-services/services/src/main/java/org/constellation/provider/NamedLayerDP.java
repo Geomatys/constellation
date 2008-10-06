@@ -16,21 +16,15 @@
  */
 package org.constellation.provider;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.NamingException;
 
+import org.constellation.provider.postgis.PostGisNamedLayerDP;
 import org.constellation.provider.postgrid.PostGridNamedLayerDP;
 import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
-import org.constellation.ws.rs.WebService;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
@@ -40,19 +34,18 @@ import org.constellation.ws.rs.WebService;
  */
 public class NamedLayerDP implements LayerDataProvider{
 
-    private static final String KEY_SHAPEFILE_DP = "shapefile_folder";
-    
     private static NamedLayerDP instance = null;
     
     private final Collection<LayerDataProvider> dps = new ArrayList<LayerDataProvider>();
     
     
     private NamedLayerDP(){
-        final List<File> folders = getShapefileFolders();
-        for(final File folder : folders){
-            dps.add( new ShapeFileNamedLayerDP(folder) );
-        }
-                
+        //load shapefile dataproviders
+        dps.addAll( ShapeFileNamedLayerDP.loadProviders() );
+        
+        //load postgis data providers
+        dps.addAll( PostGisNamedLayerDP.loadProviders() );
+        
         dps.add(PostGridNamedLayerDP.getDefault());
     }
     
@@ -131,37 +124,6 @@ public class NamedLayerDP implements LayerDataProvider{
             dp.dispose();
         }
         dps.clear();
-    }
-    
-    /**
-     * 
-     * @return List of folders holding shapefiles
-     */
-    private static List<File> getShapefileFolders(){
-        List<File> folders = new ArrayList<File>();
-        
-        String strFolders = "";
-        try{
-            strFolders = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_DP);
-        }catch(NamingException ex){
-            Logger.getLogger(NamedStyleDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SHAPEFILE_DP);
-        }
-
-        if (strFolders == null) {
-            return Collections.emptyList();
-        }
-        StringTokenizer token = new StringTokenizer(strFolders, ";", false);
-        while(token.hasMoreElements()){
-            String path = token.nextToken();
-            File f = new File(path);
-            if(f.exists() && f.isDirectory()){
-                folders.add(f);
-            }else{
-                Logger.getLogger(NamedStyleDP.class.toString()).log(Level.WARNING, "Shapefile folder provided is unvalid : "+ path);
-            }
-        }
-        
-        return folders;
     }
     
     public static NamedLayerDP getInstance(){

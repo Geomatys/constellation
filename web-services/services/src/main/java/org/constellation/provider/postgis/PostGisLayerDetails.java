@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.shapefile;
+package org.constellation.provider.postgis;
 
 
 import java.io.IOException;
@@ -36,14 +36,15 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
- *
+ * PostGIS layer details.
+ * 
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
+class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
-    ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
+    PostGisLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
         super(name,fs,favorites);
     }
 
