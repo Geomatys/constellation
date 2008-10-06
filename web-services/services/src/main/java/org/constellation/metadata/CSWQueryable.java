@@ -117,22 +117,21 @@ public class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle");
         ISO_QUERYABLE.put("AlternateTitle",   paths);
         
-        //TODO verify codelist  CI_DateTypeCode=revision
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=3");
         ISO_QUERYABLE.put("RevisionDate",  paths);
         
-        //TODO verify codelist  CI_DateTypeCode=creation
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=1");
         ISO_QUERYABLE.put("CreationDate",  paths);
         
-        //TODO verify codelist  CI_DateTypeCode=publication
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=2");
         ISO_QUERYABLE.put("PublicationDate",  paths);
-        
+      
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        // TODO remove the following path are not normalized
         paths.add("ISO 19115:MD_Metadata:contact:organisationName");
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName");
@@ -232,9 +231,8 @@ public class CSWQueryable {
         paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
-        //TODO verify codelist=originator
-        paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+       paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=6");
         paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
         
@@ -255,15 +253,13 @@ public class CSWQueryable {
         paths.add("Ebrim v3.0:RegistryPackage:description:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
         
-        //TODO verify codelist=publisher
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=10");
         paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
         
-        //TODO verify codelist=contributor
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=11");
         paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
         
@@ -390,8 +386,9 @@ public class CSWQueryable {
     }
     
     /**
-     * The queryable element from DublinCore and their path id.
+     * The queryable element from ebrim and their path id.
      */
+    @Deprecated
     protected static Map<String, List<String>> EBRIM_QUERYABLE;
     static {
         EBRIM_QUERYABLE = new HashMap<String, List<String>>();

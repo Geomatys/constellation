@@ -52,7 +52,11 @@ import org.apache.lucene.store.LockObtainFailedException;
 // MDWeb dependencies
 import org.mdweb.lucene.AbstractIndex;
 import org.mdweb.model.schemas.Classe;
+import org.mdweb.model.schemas.CodeList;
+import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Locale;
 import org.mdweb.model.schemas.Path;
+import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -299,19 +303,85 @@ public class IndexLucene extends AbstractIndex {
         List<String> paths = queryable.get(term);
         
         if (paths != null) {
-            for (String pathID: paths) {
+            for (String fullPathID: paths) {
                 Path path;
+                String pathID;
+                Path conditionalPath     = null;
+                String conditionalPathID = null;
+                String conditionalValue  = null;
+                
+                // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
+                int separator = fullPathID.indexOf('#'); 
+                if (separator != -1) {
+                    pathID            = fullPathID.substring(0, separator);
+                    conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+                    conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
+                    logger.finer("pathID           : " + pathID            + '\n' +
+                                "conditionalPathID: " + conditionalPathID + '\n' +
+                                "conditionalValue : " + conditionalValue); 
+                } else {
+                    pathID = fullPathID;
+                }
+                
                 if (reader != null) {
                     path   = reader.getPath(pathID);
+                    if (conditionalPathID != null)
+                        conditionalPath = reader.getPath(conditionalPathID);
                 } else {
                     path = pathMap.get(pathID);
+                    if (conditionalPathID != null)
+                        conditionalPath = pathMap.get(conditionalPathID);
                 }
-                List<Value> values = form.getValueFromPath(path);
+                List<Value> values;
+                if (conditionalPath != null) {
+                    values = form.getValueFromPath(path);
+                } else {
+                    values = new ArrayList<Value>();
+                    values.add(form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
+                }
                 for (Value v: values) {
                     if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
                 
                         TextValue tv = (TextValue) v;
-                        response.append(tv.getValue()).append(','); 
+                        
+                        //for a codelist value we don't write the code but the codlistElement value.
+                        if (tv.getType() instanceof CodeList) {
+                            CodeList cl = (CodeList) tv.getType();
+                            
+                            // we look if the codelist contains locale element.
+                            boolean locale = false;
+                            List<Property> props = cl.getProperties();
+                            if (props != null && props.size() > 0) {
+                                if (props.get(0) instanceof Locale)
+                                    locale = true;
+                            }
+                            
+                            if (locale) {
+                                response.append(tv.getValue()).append(','); 
+                                
+                            } else {
+                                int code = 1;
+                                try {
+                                    code = Integer.parseInt(tv.getValue());
+                                } catch (NumberFormatException ex) {
+                                    logger.severe("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
+                                }
+                                CodeListElement element = cl.getElementByCode(code); 
+                            
+                                if (element != null) {
+                                    response.append(element.getName()).append((','));
+                                } else {
+                                    logger.severe("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
+                                } 
+                            }
+                        } else if (tv.getType().getName().equals("Date")) {
+                            String value = tv.getValue();
+                            value = value.replaceAll("-", "");
+                            response.append(value).append(',');
+                        // else we write the text value.    
+                        } else {
+                            response.append(tv.getValue()).append(','); 
+                        }
                     } 
                 }
             }
