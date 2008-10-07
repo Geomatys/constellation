@@ -32,14 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
-import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.GlyphLegendFactory;
@@ -135,6 +132,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
+        System.out.println(">>>>requested BBOX");
         //TODO handle this correctly
         try{
             final ReferencedEnvelope env = fs.getBounds();
@@ -146,7 +144,6 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
 
             if(renv != null){
                 GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(renv);
-                System.out.println(bbox);
                 return bbox;
             }
 
@@ -205,7 +202,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
+    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {        
         // Pixel coordinates in the request.
         final int pixelUpX        = gfi.getX();
         final int pixelUpY        = gfi.getY();

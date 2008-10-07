@@ -70,6 +70,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
     private static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
             
+    private final Map<String,Object> params = new HashMap<String,Object>();
     private final DataStore store;
     private final ProviderSource source;
     private final List<String> index = new ArrayList<String>();
@@ -78,7 +79,6 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private PostGisNamedLayerDP(ProviderSource source) throws IllegalArgumentException, IOException{
         this.source = source;
         
-        final Map params = new HashMap();
         params.put("dbtype", "postgis");
         
         // HOST ----------------------------------------------------------------
@@ -125,7 +125,6 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
 //            final Boolean wkb        = source.parameters.get(KEY_WKBENABLED);
         
         store = DataStoreFinder.getDataStore(params);
-        
         visit();
     }
     
@@ -161,7 +160,6 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
      * {@inheritDoc }
      */
     public LayerDetails get(String key) {
-        
         if(index.contains(key)){
             FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
 
