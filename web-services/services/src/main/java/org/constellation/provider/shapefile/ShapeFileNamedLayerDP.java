@@ -51,6 +51,7 @@ import org.xml.sax.SAXException;
  */
 public class ShapeFileNamedLayerDP implements LayerDataProvider{
 
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.shapefile");
     private static final String KEY_SHAPEFILE_CONFIG = "shapefile_config";
     private static final String KEY_FOLDER_PATH = "path";
     
@@ -132,7 +133,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
                 return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles);
             } catch (IOException ex) {
                 //we could not create the feature source
-                Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
             }
         }
         
@@ -196,12 +197,10 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
                 params.put( "url", f.toURI().toURL() );
                 store = DataStoreFinder.getDataStore(params);
             }catch(IOException ex){
-                ex.printStackTrace();
-                //TODO log error
+                LOGGER.log(Level.WARNING, null, ex);
             }
         }else{
-            System.err.println(ShapeFileNamedLayerDP.class +" Error : Could not create shapefile datastore. File does not exits.");
-            //TODO log error
+            LOGGER.warning(" Error : Could not create shapefile datastore. File does not exits.");
         }
         
         return store;
@@ -213,21 +212,23 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         try {
             config = getConfig();
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (SAXException ex) {
-            Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (IOException ex) {
-            Logger.getLogger(ShapeFileNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         }
-        
+        if (config == null) {
+            return dps;
+        }
         for(final ProviderSource ps : config.sources){
             try{
                 dps.add(new ShapeFileNamedLayerDP(ps));
             }catch(IllegalArgumentException ex){
-                Logger.getLogger(ShapeFileNamedLayerDP.class.toString()).log(Level.WARNING, "Invalide shapefile provider config");
+                LOGGER.log(Level.WARNING, "Invalide shapefile provider config", ex);
             }
         }
         
@@ -242,9 +243,9 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         
         String configFile = "";
         try{
-            configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);
+            configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);      
         }catch(NamingException ex){
-            Logger.getLogger(ShapeFileNamedLayerDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SHAPEFILE_CONFIG);
+            LOGGER.log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SHAPEFILE_CONFIG, ex);
         }
 
         if (configFile == null || configFile.trim().isEmpty()) {

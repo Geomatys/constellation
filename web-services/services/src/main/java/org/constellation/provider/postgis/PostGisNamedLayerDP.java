@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  * @author Johann Sorel (Geomatys)
  */
 public class PostGisNamedLayerDP implements LayerDataProvider{
-
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
     private static final String KEY_HOST            = PostgisDataStoreFactory.HOST.key;
     private static final String KEY_PORT            = PostgisDataStoreFactory.PORT.key;
@@ -98,7 +98,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             }catch(NumberFormatException ex){
                 //just log it, use the default port
                 params.put(KEY_PORT, 5432);
-                Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }else{
             //this parameter is needed
@@ -169,7 +169,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
                 fs = store.getFeatureSource(key);
             } catch (IOException ex) {
                 //could not create the requested featuresource
-                Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
 
             if(fs != null){
@@ -210,7 +210,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         } catch (IOException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
-            Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
     
@@ -220,23 +220,26 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         try {
             config = getConfig();
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (SAXException ex) {
-            Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (IOException ex) {
-            Logger.getLogger(PostGisNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         }
-        
+
+        if (config == null) {
+            return dps;
+        }
         for(final ProviderSource ps : config.sources){
             try{
                 dps.add(new PostGisNamedLayerDP(ps));
             }catch(IllegalArgumentException ex){
-                Logger.getLogger(PostGisNamedLayerDP.class.toString()).log(Level.WARNING, "Invalide postgis provider config");
+                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
             }catch(IOException ex){
-                Logger.getLogger(PostGisNamedLayerDP.class.toString()).log(Level.WARNING, "Invalide postgis provider config");
+                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
             }
         }
         
@@ -253,7 +256,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         try{
             configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
         }catch(NamingException ex){
-            Logger.getLogger(PostGisNamedLayerDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_POSTGIS_CONFIG);
+            LOGGER.log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_POSTGIS_CONFIG, ex);
         }
 
         if (configFile == null || configFile.trim().isEmpty()) {
