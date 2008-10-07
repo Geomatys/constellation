@@ -80,7 +80,7 @@ public class QueryAdapter {
      *       or create a new one that provides this information.
      */
     public static List<String> areQueryableLayers(final List<String> queryLayers,
-                                final Version version) throws WebServiceException
+                                final Version version)
     {
         /* Do nothing for the moment, waiting for a method in {@link Layer} in order to
          * handle the queryable attribute for a {@link Layer}.
@@ -289,7 +289,7 @@ public class QueryAdapter {
 
         //try sld v1.0
         try {
-            sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_0_0);
+            sld = sldUtilities.readSLD(strSLD, StyledLayerDescriptor.V_1_0_0);
         } catch (JAXBException ex) {
             Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -297,7 +297,7 @@ public class QueryAdapter {
         if(sld == null){
             //try sld v1.1
             try {
-                sld = sldUtilities.readSLD(sld, StyledLayerDescriptor.V_1_1_0);
+                sld = sldUtilities.readSLD(strSLD, StyledLayerDescriptor.V_1_1_0);
             } catch (JAXBException ex) {
                 Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }

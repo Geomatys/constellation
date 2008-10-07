@@ -33,12 +33,12 @@ public abstract class WMSQuery extends Query {
      * Request parameters.
      */
     public static final String KEY_REQUEST = "REQUEST";
-    public static final String REQUEST_MAP = "GetMap";
-    public static final String REQUEST_FEATUREINFO = "GetFeatureInfo";
-    public static final String REQUEST_CAPABILITIES = "GetCapabilities";
-    public static final String REQUEST_DESCRIBELAYER = "DescribeLayer";
-    public static final String REQUEST_LEGENDGRAPHIC = "GetLegendGraphic";
-    public static final String REQUEST_ORIGFILE = "GetOrigFile";
+    public static final String GETMAP = "GetMap";
+    public static final String GETFEATUREINFO = "GetFeatureInfo";
+    public static final String GETCAPABILITIES = "GetCapabilities";
+    public static final String DESCRIBELAYER = "DescribeLayer";
+    public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
+    public static final String GETORIGFILE = "GetOrigFile";
 
     /** Parameter used in getMap */
     public static final String KEY_EXCEPTIONS = "EXCEPTIONS";

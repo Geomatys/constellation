@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -48,10 +46,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.measure.unit.Unit;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -59,8 +54,6 @@ import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
@@ -119,111 +112,11 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Singleton
 public class WMService extends WebService {
     /**
-     * Connection to the database.
-     */
-    private static Database database;
-
-    /**
-     * Instanciate the {@link WebServiceWorker} if not already defined, trying to get some
-     * information already defined in the JNDI configuration of the application server.
-     *
-     * @throws IOException if we try to connect to the database using information stored in the
-     *                     configuration file.
-     * @throws NamingException if an error in getting properties from JNDI references occured.
-     *                         For the moment, it is not thrown, and it fall backs on the
-     *                         configuration defined in the config.xml file.
-     * @throws SQLException if an error occured while configuring the connection.
-     */
-    private static synchronized void ensureDatabaseInitialized() throws SQLException, IOException,
-                                                                      NamingException {
-
-        if (database == null) {
-            try {
-                final Connection connection;
-                final Properties properties = new Properties();
-                String permission = null, readOnly = null, rootDir = null;
-                final InitialContext ctx = new InitialContext();
-                /* domain.name is a property only present when using the glassfish application
-                 * server.
-                 */
-                if (System.getProperty("domain.name") != null) {
-                    final DataSource ds = (DataSource) ctx.lookup("Coverages");
-                    if (ds == null) {
-                        throw new NamingException("DataSource \"Coverages\" is not defined.");
-                    }
-                    connection = ds.getConnection();
-                    final String coverageProps = "Coverages Properties";
-                    permission = getPropertyValue(coverageProps, "Permission");
-                    readOnly   = getPropertyValue(coverageProps, "ReadOnly");
-                    rootDir    = getPropertyValue(coverageProps, "RootDirectory");
-                } else {
-                    // Here we are not in glassfish, probably in a Tomcat application server.
-                    final Context envContext = (Context) ctx.lookup("java:/comp/env");
-                    final DataSource ds = (DataSource) envContext.lookup("Coverages");
-                    if (ds == null) {
-                        throw new NamingException("DataSource \"Coverages\" is not defined.");
-                    }
-                    connection = ds.getConnection();
-                    permission = getPropertyValue(null, "Permission");
-                    readOnly   = getPropertyValue(null, "ReadOnly");
-                    rootDir    = getPropertyValue(null, "RootDirectory");
-                }
-                // Put all properties found in the JNDI reference into the Properties HashMap
-                if (permission != null) {
-                    properties.setProperty(ConfigurationKey.PERMISSION.getKey(), permission);
-                }
-                if (readOnly != null) {
-                    properties.setProperty(ConfigurationKey.READONLY.getKey(), readOnly);
-                }
-                if (rootDir != null) {
-                    properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), rootDir);
-                }
-                try {
-                    database = new Database(connection, properties);
-                } catch (IOException io) {
-                    /* This error should never appear, because the IOException on the Database
-                     * constructor can only overcome if we use the constructor
-                     * Database(DataSource, Properties, String), and here the string for the
-                     * configuration file is null, so no reading method on a file will be used.
-                     * Anyways if this error occurs, an AssertionError is then thrown.
-                     */
-                    throw new AssertionError(io);
-                }
-            } catch (NamingException n) {
-                /* If a NamingException occurs, it is because the JNDI connection is not
-                 * correctly defined, and some information are lacking.
-                 * In this case we try to use the old system of configuration file.
-                 */
-
-                /* Ifremer's server does not contain any .sicade directory, so the
-                 * configuration file is put under the WEB-INF directory of constellation.
-                 * todo: get the webservice name (here ifremerWS) from the servlet context.
-                 */
-                File configFile = null;
-                File dirCatalina = null;
-                final String catalinaPath = System.getenv().get("CATALINA_HOME");
-                if (catalinaPath != null) {
-                    dirCatalina = new File(catalinaPath);
-                }
-                if (dirCatalina != null && dirCatalina.exists()) {
-                    configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
-                    if (!configFile.exists()) {
-                        configFile = null;
-                    }
-                }
-                database = (configFile != null) ? new Database(configFile) : new Database();
-            }
-        }
-    }
-
-    /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
-    public WMService() throws JAXBException, WebServiceException, SQLException,
-                                IOException, NamingException {
+    public WMService() throws JAXBException, SQLException, IOException, NamingException {
         super("WMS", new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_3_0.toString()),
                      new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_1_1.toString()));
-        ensureDatabaseInitialized();
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.coverage.web:org.constellation.wms.v111:org.constellation.wms.v130:" +
@@ -245,31 +138,34 @@ public class WMService extends WebService {
             LOGGER.info("New request: " + request);
             writeParameters();
 
-            if (REQUEST_MAP.equalsIgnoreCase(request)) {
+            if (GETMAP.equalsIgnoreCase(request)) {
                 query = adaptGetMap();
                 return getMap(query);
-            } else if (REQUEST_FEATUREINFO.equalsIgnoreCase(request)) {
+            }
+            if (GETFEATUREINFO.equalsIgnoreCase(request)) {
                 query = adaptGetFeatureInfo();
                 return getFeatureInfo(query);
-            } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
+            }
+            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 query = adaptGetCapabilities();
                 return getCapabilities(query);
-            } else if (REQUEST_LEGENDGRAPHIC.equalsIgnoreCase(request)) {
+            }
+            if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 query = adaptGetLegendGraphic();
                 final String mimeType = getParameter(KEY_FORMAT, true);
                 return Response.ok(getLegendGraphic(query), mimeType).build();
-            } else {
-                final String version = (String) getParameter(KEY_VERSION, false);
-                final WMSQueryVersion queryVersion;
-                if (version == null) {
-                    queryVersion = WMSQueryVersion.WMS_1_1_1;
-                } else {
-                    queryVersion = (version.equalsIgnoreCase(WMSQueryVersion.WMS_1_1_1.toString())) ?
-                        WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
-                }
-                throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
-                                              OPERATION_NOT_SUPPORTED, queryVersion);
             }
+            final String version = (String) getParameter(KEY_VERSION, false);
+            final WMSQueryVersion queryVersion;
+            if (version == null) {
+                queryVersion = WMSQueryVersion.WMS_1_1_1;
+            } else {
+                queryVersion = (version.equalsIgnoreCase(WMSQueryVersion.WMS_1_1_1.toString())) ?
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+            }
+            throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
+                    OPERATION_NOT_SUPPORTED, queryVersion);
+
         } catch (WebServiceException ex) {
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
@@ -288,6 +184,25 @@ public class WMService extends WebService {
             } else {
                 throw new IllegalArgumentException("this service can't return OWS Exception");
             }
+        } catch (NumberFormatException n) {
+            String version;
+            try {
+                version = (String) getParameter(KEY_VERSION, false);
+            } catch (WebServiceException ex) {
+                version = WMSQueryVersion.WMS_1_1_1.toString();
+            }
+            final WMSQueryVersion queryVersion;
+            if (version == null) {
+                queryVersion = WMSQueryVersion.WMS_1_1_1;
+            } else {
+                queryVersion = (version.equalsIgnoreCase(WMSQueryVersion.WMS_1_1_1.toString())) ?
+                    WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
+            }
+            final WMSWebServiceException wmsEx = new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, queryVersion);
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(wmsEx.getExceptionReport(), sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()),
+                                   (query == null) ? "application/vnd.ogc.se_xml" : query.getExceptionFormat()).build();
         }
     }
 
@@ -519,7 +434,7 @@ public class WMService extends WebService {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private synchronized Response getFeatureInfo(final WMSQuery query) throws WebServiceException {
+    private synchronized Response getFeatureInfo(final WMSQuery query) throws WMSWebServiceException {
         if (!(query instanceof GetFeatureInfo)) {
             throw new WMSWebServiceException("Invalid request found, should be GetFeatureInfo.",
                     INVALID_REQUEST, query.getVersion());
@@ -645,7 +560,7 @@ public class WMService extends WebService {
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private synchronized File getLegendGraphic(final WMSQuery query) throws WebServiceException,
+    private synchronized File getLegendGraphic(final WMSQuery query) throws WMSWebServiceException,
                                                                             JAXBException
     {
         if (!(query instanceof GetLegendGraphic)) {
@@ -683,8 +598,8 @@ public class WMService extends WebService {
      * @return The map requested, or an error.
      * @throws WebServiceException
      */
-    private synchronized Response getMap(final WMSQuery query) throws WebServiceException {
-        verifyBaseParameter(0);
+    private synchronized Response getMap(final WMSQuery query) throws WMSWebServiceException {
+        //verifyBaseParameter(0);
         if (!(query instanceof GetMap)) {
             throw new WMSWebServiceException("Invalid request found, should be GetMap.",
                     INVALID_REQUEST, query.getVersion());
@@ -824,7 +739,7 @@ public class WMService extends WebService {
      * @return A GetFeatureInfo request.
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException {
+    private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap();
         final String version = getParameter(KEY_VERSION, true);
         final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
@@ -838,16 +753,9 @@ public class WMService extends WebService {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = QueryAdapter.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, wmsVersion);
-        final int x;
-        final int y;
-        final int featureCount;
-        try {
-            x = QueryAdapter.toInt(strX);
-            y = QueryAdapter.toInt(strY);
-            featureCount = QueryAdapter.toFeatureCount(strFeatureCount);
-        } catch (NumberFormatException n) {
-            throw new WMSWebServiceException(n, NO_APPLICABLE_CODE, wmsVersion);
-        }
+        final int x = QueryAdapter.toInt(strX);
+        final int y = QueryAdapter.toInt(strY);
+        final int featureCount = QueryAdapter.toFeatureCount(strFeatureCount);
         return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
     }
 

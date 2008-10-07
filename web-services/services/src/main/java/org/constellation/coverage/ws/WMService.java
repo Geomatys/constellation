@@ -239,17 +239,17 @@ public class WMService extends WebService {
             LOGGER.info("new request:" + request);
             writeParameters();
 
-            if (REQUEST_MAP.equalsIgnoreCase(request)) {
+            if (GETMAP.equalsIgnoreCase(request)) {
                 return Response.ok(getMap(), webServiceWorker.getMimeType()).build();
-            } else if (REQUEST_FEATUREINFO.equalsIgnoreCase(request)) {
+            } else if (GETFEATUREINFO.equalsIgnoreCase(request)) {
                 return getFeatureInfo();
-            } else if (REQUEST_CAPABILITIES.equalsIgnoreCase(request)) {
+            } else if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 return getCapabilities();
-            } else if (REQUEST_DESCRIBELAYER.equalsIgnoreCase(request)) {
+            } else if (DESCRIBELAYER.equalsIgnoreCase(request)) {
                 return Response.ok(describeLayer(), "text/xml").build();
-            } else if (REQUEST_LEGENDGRAPHIC.equalsIgnoreCase(request)) {
+            } else if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 return Response.ok(getLegendGraphic(), webServiceWorker.getMimeType()).build();
-            } else if (REQUEST_ORIGFILE.equalsIgnoreCase(request)) {
+            } else if (GETORIGFILE.equalsIgnoreCase(request)) {
                 return Response.ok(getOrigFile()).build();
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",

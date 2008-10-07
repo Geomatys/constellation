@@ -56,15 +56,15 @@ import org.xml.sax.SAXException;
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridNamedLayerDP implements LayerDataProvider{
-    
+
     private static final String KEY_POSTGRID_STYLES = "postgrid_style";
-    protected static final Logger logger = Logger.getLogger("org.constellation.provider.postgrid");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
     private static PostGridNamedLayerDP instance = null;
 
     private final Map<String,Layer> index = new HashMap<String,Layer>();
     private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
 
-    protected static Database database;
+    protected static final Database database;
 
     static {
         Database tempDB = null;
@@ -131,11 +131,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
                  * Anyways if this error occurs, an AssertionError is then thrown.
                  */
                 throw new AssertionError(io);
-             }catch (SQLException io) {
-                /* Could not connect to postgrid.
-                 */
-                throw new AssertionError(io);
-            }
+             }
         } catch (NamingException n) {
             /* If a NamingException occurs, it is because the JNDI connection is not
              * correctly defined, and some information are lacking.
@@ -146,7 +142,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
              * configuration file is put under the WEB-INF directory of constellation.
              * todo: get the webservice name (here ifremerWS) from the servlet context.
              */
-            logger.warning("Connecting to the database using config.xml file !");
+            LOGGER.warning("Connecting to the database using config.xml file !");
             File configFile = null;
             File dirCatalina = null;
             final String catalinaPath = System.getenv().get("CATALINA_HOME");
@@ -159,16 +155,16 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
                     configFile = null;
                 }
             }
-            try{
+            try {
                 tempDB = (configFile != null) ? new Database(configFile) : new Database();
-            }catch(IOException io){
-                logger.log(Level.SEVERE,"SQL Error",io);
+            } catch(IOException io) {
+                LOGGER.log(Level.SEVERE, "Unable to retrieve information from the config file", io);
             }
-        } catch (SQLException n) {
-            logger.log(Level.SEVERE,"SQL Error",n);
+        } catch (SQLException sql) {
+            LOGGER.log(Level.SEVERE,"Unable to connect to the database", sql);
         }
 
-        PostGridNamedLayerDP.database = tempDB;
+        database = tempDB;
     }
 
     /**
@@ -189,7 +185,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         }
     }
 
-    private PostGridNamedLayerDP(){
+    private PostGridNamedLayerDP() {
         visit();
     }
 
@@ -226,7 +222,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public LayerDetails get(String key) {
         final Layer layer = index.get(key);
-        return (layer != null) ? 
+        return (layer != null) ?
             new PostGridLayerDetails(database, layer, getFavoriteStyles(key)) : null;
     }
 
@@ -257,64 +253,64 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         try {
             layers = database.getTable(LayerTable.class);
         } catch (NoSuchTableException ex) {
-            Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Unknown specified type in the database", ex);
         }
 
-        if(layers != null){
+        if(layers != null) {
             Set<Layer> set = null;
             try {
                 set = layers.getEntries();
             } catch (CatalogException ex) {
-                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
 
-            if(set != null && !set.isEmpty()){
-                for(Layer layer : set){
+            if(set != null && !set.isEmpty()) {
+                for(Layer layer : set) {
                     index.put(layer.getName(),layer);
                 }
             }
 
-        }else{
-            logger.log(Level.SEVERE,"Layer table is null");
+        } else {
+            LOGGER.log(Level.SEVERE, "Layer table is null");
         }
-        
+
         extractLinks();
     }
 
-    private void extractLinks(){
-        
+    private void extractLinks() {
+
         String styleLinks = "";
         try {
             styleLinks = WebService.getPropertyValue(JNDI_GROUP, KEY_POSTGRID_STYLES);
         } catch (NamingException ex) {
-            Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
         if (styleLinks == null) {
             return;
         }
         final File file = new File(styleLinks);
-        
+
         if(file.exists()){
             Map<String,List<String>> links = null;
             try {
                 links = LayerLinkReader.read(file);
             } catch (ParserConfigurationException ex) {
-                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
-                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(PostGridNamedLayerDP.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
-            
+
             if(links != null){
                 favorites.putAll(links);
             }
         }
     }
-    
-    public List<String> getFavoriteStyles(String layerName) {
+
+    public List<String> getFavoriteStyles(final String layerName) {
         List<String> favs = favorites.get(layerName);
         if(favs == null){
             favs = Collections.emptyList();
@@ -328,5 +324,5 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         }
         return instance;
     }
-    
+
 }
