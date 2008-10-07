@@ -39,10 +39,8 @@ public class ProviderConfig {
 
     private static final String TAG_SOURCE = "Source";
     private static final String TAG_PARAMETER = "Parameter";
-    private static final String TAG_STYLE = "Style";
-    private static final String TAG_IGNORE = "Ignore";
-    private static final String ATT_PARAMETER_NAME = "ParameterName";
-    private static final String ATT_LAYER_NAME = "LayerName";
+    private static final String TAG_LAYER = "Layer";
+    private static final String ATT_NAME = "name";
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
@@ -68,35 +66,24 @@ public class ProviderConfig {
         final ProviderSource source = new ProviderSource();
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
-        final NodeList ignoreNodes = element.getElementsByTagName(TAG_IGNORE);
-        final NodeList styleNodes = element.getElementsByTagName(TAG_STYLE);
+        final NodeList layerNodes = element.getElementsByTagName(TAG_LAYER);
         
         //parse parameters
         for(int i=0, n=paramNodes.getLength(); i<n; i++){
             final Element paramNode = (Element)paramNodes.item(i);
             final String text = paramNode.getTextContent();
-            if(paramNode.hasAttribute(ATT_PARAMETER_NAME) && text != null && !text.trim().isEmpty()){
-                source.parameters.put(paramNode.getAttribute(ATT_PARAMETER_NAME), text.trim());
+            if(paramNode.hasAttribute(ATT_NAME) && text != null && !text.trim().isEmpty()){
+                source.parameters.put(paramNode.getAttribute(ATT_NAME), text.trim());
             }
         }
-        
-        //parse ignores
-        for(int i=0, n=ignoreNodes.getLength(); i<n; i++){
-            final Element ignoreNode = (Element)ignoreNodes.item(i);
-            if(ignoreNode.hasAttribute(ATT_LAYER_NAME)){
-                source.ignores.add(ignoreNode.getAttribute(ATT_LAYER_NAME));
-            }
-        }
-        
-        //parse styles
-        for(int i=0, n=styleNodes.getLength(); i<n; i++){
-            final Element styleNode = (Element)styleNodes.item(i);
-            final String text = styleNode.getTextContent();
-            if(styleNode.hasAttribute(ATT_LAYER_NAME) && text != null && !text.trim().isEmpty()){
-                final String layerName = styleNode.getAttribute(ATT_LAYER_NAME);
-                if(!source.ignores.contains(layerName)){
-                    source.styleLinks.put(layerName, parseStyles(text.trim()));
-                }
+                
+        //parse layers and styles
+        for(int i=0, n=layerNodes.getLength(); i<n; i++){
+            final Element layerNode = (Element)layerNodes.item(i);
+            final String text = layerNode.getTextContent();
+            if(layerNode.hasAttribute(ATT_NAME)){
+                final String layerName = layerNode.getAttribute(ATT_NAME);
+                source.layers.put(layerName, parseStyles(text));
             }
         }
         
@@ -114,6 +101,5 @@ public class ProviderConfig {
         }
         return styles;
     }
-    
     
 }

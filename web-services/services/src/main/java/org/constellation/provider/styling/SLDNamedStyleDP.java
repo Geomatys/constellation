@@ -27,10 +27,7 @@ import java.util.Set;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.SoftHashMap;
 
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.RandomStyleFactory;
-import org.geotools.style.StyleFactory;
 import org.geotools.style.sld.Specification.SymbologyEncoding;
 import org.geotools.style.sld.XMLUtilities;
 
@@ -41,10 +38,6 @@ import org.geotools.style.sld.XMLUtilities;
  */
 public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
 
-    private static SLDNamedStyleDP instance = null;
-    
-    private static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
-    private static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
     private static final String mask = ".xml";
     
     private final XMLUtilities sldParser = new XMLUtilities();

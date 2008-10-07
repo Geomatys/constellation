@@ -16,8 +16,6 @@
  */
 package org.constellation.provider.configuration;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +29,7 @@ public class ProviderSource {
 
     public final Map<String,String> parameters = new HashMap<String, String>();
     
-    public final Map<String,List<String>> styleLinks = new HashMap<String, List<String>>();
-    
-    public final Collection<String> ignores = new ArrayList<String>();
-    
+    public final Map<String,List<String>> layers = new HashMap<String, List<String>>();
+        
     ProviderSource() {}
 }

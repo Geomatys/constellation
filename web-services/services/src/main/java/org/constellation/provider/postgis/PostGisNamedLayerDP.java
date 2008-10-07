@@ -173,7 +173,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             }
 
             if(fs != null){
-                final List<String> styles = source.styleLinks.get(key);
+                final List<String> styles = source.layers.get(key);
                 return new PostGisLayerDetails(key, fs, styles);
             }
         }
@@ -203,7 +203,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private void visit() {
         try {
             for (final String name : store.getTypeNames()) {
-                if (!source.ignores.contains(name)) {
+                if (source.layers.containsKey(name)) {
                     index.add(name);
                 }
             }

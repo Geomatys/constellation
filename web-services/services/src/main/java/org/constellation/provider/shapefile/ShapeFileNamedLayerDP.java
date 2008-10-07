@@ -127,7 +127,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         }
         
         if(store != null){
-            final List<String> styles = source.styleLinks.get(key);
+            final List<String> styles = source.layers.get(key);
             try {
                 return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles);
             } catch (IOException ex) {
@@ -179,7 +179,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
             String fullName = candidate.getName();
             if(fullName.toLowerCase().endsWith(mask)){
                 String name = fullName.substring(0, fullName.length()-4);
-                if(!source.ignores.contains(name)){
+                if(source.layers.containsKey(name)){
                     index.put(name, candidate);
                 }
             }
