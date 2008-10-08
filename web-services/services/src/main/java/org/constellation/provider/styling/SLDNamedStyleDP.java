@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +29,16 @@ import java.util.Set;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.SoftHashMap;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.sld.MutableLayer;
+import org.geotools.sld.MutableLayerStyle;
+import org.geotools.sld.MutableNamedLayer;
+import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.geotools.sld.MutableUserLayer;
+import org.geotools.style.MutableFeatureTypeStyle;
 import org.geotools.style.MutableStyle;
+import org.geotools.style.StyleFactory;
+import org.geotools.style.sld.Specification.StyledLayerDescriptor;
 import org.geotools.style.sld.Specification.SymbologyEncoding;
 import org.geotools.style.sld.XMLUtilities;
 
@@ -37,8 +48,13 @@ import org.geotools.style.sld.XMLUtilities;
  * @author Johann Sorel (Geomatys)
  */
 public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
-
-    private static final String mask = ".xml";
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.styling");
+    private static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
+    private static final Collection<String> masks = new ArrayList<String>();
+    static{
+        masks.add(".xml");
+        masks.add(".sld");
+    }
     
     private final XMLUtilities sldParser = new XMLUtilities();
     private final File folder;
@@ -87,26 +103,84 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
      * {@inheritDoc }
      */
     public MutableStyle get(String key) {
-        MutableStyle style = null;
         
-        style = cache.get(key);
+        final MutableStyle ms = cache.get(key);
+        if(ms != null) return ms;
         
-        if(style == null){
-            File f = index.get(key);
-            if(f != null){
-                try {
-                    style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
-                } catch (JAXBException ex) {
-                    Logger.getLogger(SLDNamedStyleDP.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        
+        final File f = index.get(key);
+        if(f != null){
+            
+            //try SLD 1.1
+            try {
+                final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_1_0);
+                final MutableStyle style = getFirstStyle(sld);
                 if(style != null){
-                    //cache the style
                     cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is an SLD 1.1.0");
+                    return style;
                 }
-            }
+            } catch (JAXBException ex) { /* dont log*/ }
+            
+            //try SLD 1.0
+            try {
+                final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_0_0);
+                final MutableStyle style = getFirstStyle(sld);
+                if(style != null){
+                    cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is an SLD 1.0.0");
+                    return style;
+                }
+            } catch (JAXBException ex) { /*dont log*/ }
+            
+            //try UserStyle SLD 1.1
+            try {
+                final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
+                if(style != null){
+                    cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is a UserStyle SLD 1.1.0");
+                    return style;
+                }
+            } catch (JAXBException ex) { /*dont log*/ }
+            
+            //try UserStyle SLD 1.0
+            try {
+                final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.SLD_1_0_0);
+                if(style != null){
+                    cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is a UserStyle SLD 1.0.0");
+                    return style;
+                }
+            } catch (JAXBException ex) { /*dont log*/ }
+            
+            //try FeatureTypeStyle SE 1.1
+            try {
+                final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(f, SymbologyEncoding.V_1_1_0);
+                final MutableStyle style = SF.createStyle();
+                style.featureTypeStyles().add(fts);
+                if(style != null){
+                    cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is FeatureTypeStyle SE 1.1");
+                    return style;
+                }
+            } catch (JAXBException ex) { /*dont log*/ }
+            
+            //try FeatureTypeStyle SLD 1.0
+            try {
+                final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(f, SymbologyEncoding.SLD_1_0_0);
+                final MutableStyle style = SF.createStyle();
+                style.featureTypeStyles().add(fts);
+                if(style != null){
+                    cache.put(key, style);
+                    LOGGER.log(Level.INFO, "Style " + key + "is an FeatureTypeStyle SLD 1.0");
+                    return style;
+                }
+            } catch (JAXBException ex) { /*dont log*/ }
+            
+            LOGGER.log(Level.WARNING, "Style " + key + " could not be parsed");
         }
         
-        return style;
+        return null;
     }
 
     /**
@@ -130,6 +204,26 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
         }
     }
     
+    private MutableStyle getFirstStyle(final MutableStyledLayerDescriptor sld){
+        if(sld == null) return null;
+        for(final MutableLayer layer : sld.layers()){
+            if(layer instanceof MutableNamedLayer){
+                final MutableNamedLayer mnl = (MutableNamedLayer) layer;
+                for(final MutableLayerStyle stl : mnl.styles()){
+                    if(stl instanceof MutableStyle){
+                        return (MutableStyle) stl;
+                    }
+                }
+            }else if(layer instanceof MutableUserLayer){
+                final MutableUserLayer mnl = (MutableUserLayer) layer;
+                for(final MutableStyle stl : mnl.styles()){
+                    return stl;
+                }
+            }
+        }
+        return null;
+    }
+    
     private void visit(File file) {
 
         if (file.isDirectory()) {
@@ -146,10 +240,13 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
     
     private void test(File candidate){
         if(candidate.isFile()){
-            String fullName = candidate.getName();
-            if(fullName.toLowerCase().endsWith(mask)){
-                String name = fullName.substring(0, fullName.length()-4);
-                index.put(name, candidate);
+            final String fullName = candidate.getName();
+            final String lowerCase = fullName.toLowerCase();
+            for(final String mask : masks){
+                if(lowerCase.endsWith(mask)){
+                    String name = fullName.substring(0, fullName.length()-4);
+                    index.put(name, candidate);
+                }
             }
         }
     }

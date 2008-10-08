@@ -232,6 +232,16 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
             }
         }
         
+        final StringBuilder builder = new StringBuilder("DATA PROVIDER : ShapeFile ");
+        for(final ShapeFileNamedLayerDP dp : dps){
+            builder.append("\n["+ dp.source.parameters.get(KEY_FOLDER_PATH)+"=");
+            for(final String layer : dp.getKeys()){
+                builder.append(layer+",");
+            }
+            builder.append("]");
+        }
+        LOGGER.log(Level.INFO, builder.toString());
+        
         return dps;
     }
     

@@ -42,7 +42,7 @@ import org.constellation.ws.rs.WebService;
  * @author Johann Sorel (Geomatys)
  */
 public class NamedStyleDP implements DataProvider<String,Object>{
-
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider");
     private static String KEY_SLD_DP = "sld_folder";
     
     private static NamedStyleDP instance = null;
@@ -159,6 +159,16 @@ public class NamedStyleDP implements DataProvider<String,Object>{
         
         if(instance == null){
             instance = new NamedStyleDP();
+            final StringBuilder builder = new StringBuilder("STYLE PROVIDER : ");
+            for(final DataProvider<String,? extends Object> dp : instance.dps){
+                builder.append("\n[");
+                for(final String style : dp.getKeys()){
+                    builder.append(style + ",");
+                }
+                builder.append("]");
+            }
+            LOGGER.log(Level.INFO, builder.toString());
+            
         }
         
         return instance;

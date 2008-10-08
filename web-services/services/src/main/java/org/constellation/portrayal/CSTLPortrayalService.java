@@ -121,7 +121,15 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             System.out.println(builder.toString());
         }
 
-        portray(context, refEnv, background, output, mime, canvasDimension, null, true);
+        //TODO horrible TRY CATCH to remove when the renderer will have a fine
+        //error handeling. This catch doesnt happen in normal case, but because of
+        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
+        //thread exceptions.
+        try{
+            portray(context, refEnv, background, output, mime, canvasDimension, null, true);
+        }catch(Exception ex){
+            throw new PortrayalException(ex);
+        }
     }
 
     private MapContext toMapContext(final List<String> layers, final WMSQueryVersion version,

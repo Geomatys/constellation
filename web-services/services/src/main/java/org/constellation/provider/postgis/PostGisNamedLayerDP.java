@@ -241,6 +241,16 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             }
         }
         
+        final StringBuilder builder = new StringBuilder("DATA PROVIDER : PostGIS ");
+        for(final PostGisNamedLayerDP dp : dps){
+            builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
+            for(final String layer : dp.getKeys()){
+                builder.append(layer + ",");
+            }
+            builder.append("]");
+        }
+        LOGGER.log(Level.INFO, builder.toString());
+        
         return dps;
     }
     
