@@ -19,7 +19,6 @@ package org.constellation.provider.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
@@ -42,6 +41,12 @@ public class ProviderConfig {
     private static final String TAG_LAYER = "Layer";
     private static final String ATT_NAME = "name";
     
+    private static final String PARAM_STYLE = "style";
+    private static final String PARAM_PERIODE_START = "periode_start";
+    private static final String PARAM_PERIODE_END = "periode_end";
+    private static final String PARAM_ELEVATION_START = "elevation_start";
+    private static final String PARAM_ELEVATION_END = "elevation_end";
+    
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
     private ProviderConfig(){}
@@ -56,13 +61,13 @@ public class ProviderConfig {
         
         for(int i=0, n=nodes.getLength(); i<n; i++){
             final Element sourceNode = (Element)nodes.item(i);
-            config.sources.add(extract(sourceNode));
+            config.sources.add( parseSource(sourceNode));
         }
         
         return config;
     }
     
-    private static final ProviderSource extract(final Element element){
+    private static final ProviderSource parseSource(final Element element){
         final ProviderSource source = new ProviderSource();
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
@@ -77,29 +82,57 @@ public class ProviderConfig {
             }
         }
                 
-        //parse layers and styles
+        //parse layers
         for(int i=0, n=layerNodes.getLength(); i<n; i++){
             final Element layerNode = (Element)layerNodes.item(i);
-            final String text = layerNode.getTextContent();
             if(layerNode.hasAttribute(ATT_NAME)){
-                final String layerName = layerNode.getAttribute(ATT_NAME);
-                source.layers.put(layerName, parseStyles(text));
+                source.layers.add(parseLayer(layerNode));
             }
         }
         
         return source;
     }
     
-    private static final List<String> parseStyles(String strStyles) {
-        if(strStyles == null || strStyles.trim().isEmpty()){
-            return Collections.emptyList();
+    private static final ProviderLayer parseLayer(final Element element){
+        final String layerName = element.getAttribute(ATT_NAME);
+        final List<String> layerStyles = new ArrayList<String>();
+        String startDate = null;
+        String endDate = null;
+        String startElevation = null;
+        String endElevation = null;
+        
+        final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
+        for(int i=0, n=paramNodes.getLength(); i<n; i++){
+            final Element paramNode = (Element)paramNodes.item(i);
+            final String name = paramNode.getAttribute(ATT_NAME);
+            final String text = paramNode.getTextContent();
+            
+            if(PARAM_STYLE.equalsIgnoreCase(name)){
+                //there should be only one style node, but whatever, parse N node if there are N.
+                parseStyles(text, layerStyles);
+            }else if(PARAM_PERIODE_START.equalsIgnoreCase(name)){
+                startDate = text;
+            }else if(PARAM_PERIODE_END.equalsIgnoreCase(name)){
+                endDate = text;
+            }else if(PARAM_ELEVATION_START.equalsIgnoreCase(name)){
+                startElevation = text;
+            }else if(PARAM_ELEVATION_END.equalsIgnoreCase(name)){
+                endElevation = text;
+            }
+            
         }
-        final List<String> styles = new ArrayList<String>();
+        return new ProviderLayer(layerName, layerStyles, startDate, endDate, startElevation, endElevation);
+    }
+    
+    
+    private static final void parseStyles(String strStyles, List<String> styles) {
+        if(strStyles == null || strStyles.trim().isEmpty()){
+            return;
+        }
         final StringTokenizer token = new StringTokenizer(strStyles.trim(),";",false);
         while(token.hasMoreTokens()){
             styles.add(token.nextToken());
         }
-        return styles;
     }
     
 }

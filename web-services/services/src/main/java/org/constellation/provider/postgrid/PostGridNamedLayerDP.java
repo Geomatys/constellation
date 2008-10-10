@@ -242,8 +242,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public void dispose() {
         synchronized(this){
-            favorites.clear();
-            index.clear();
+//            favorites.clear();
+//            index.clear();
         }
     }
 

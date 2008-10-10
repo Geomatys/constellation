@@ -40,13 +40,7 @@ public class NamedLayerDP implements LayerDataProvider{
     
     
     private NamedLayerDP(){
-        //load shapefile dataproviders
-        dps.addAll( ShapeFileNamedLayerDP.loadProviders() );
-        
-        //load postgis data providers
-        dps.addAll( PostGisNamedLayerDP.loadProviders() );
-        
-        dps.add(PostGridNamedLayerDP.getDefault());
+        loadDP();
     }
     
     /**
@@ -112,10 +106,23 @@ public class NamedLayerDP implements LayerDataProvider{
      */
     public void reload() {
         for(DataProvider<String,LayerDetails> dp : dps){
-            dp.reload();
+            dp.dispose();
         }
+        dps.clear();
+        loadDP();
     }
 
+    private void loadDP(){
+        //load shapefile dataproviders
+        dps.addAll( ShapeFileNamedLayerDP.loadProviders() );
+        
+        //load postgis data providers
+        dps.addAll( PostGisNamedLayerDP.loadProviders() );
+        
+        //load postgrid single DP
+        dps.add(PostGridNamedLayerDP.getDefault());
+    }
+    
     /**
      * {@inheritDoc }
      */

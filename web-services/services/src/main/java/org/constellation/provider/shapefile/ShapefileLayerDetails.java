@@ -19,12 +19,14 @@ package org.constellation.provider.shapefile;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.NamedStyleDP;
 
+import org.constellation.query.wms.WMSQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
@@ -44,9 +46,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
 
     ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
-        super(name,fs,favorites);
+        this(name,fs,favorites,null,null,null,null);
     }
-
+    
+    ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
+        String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+        super(name,fs,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
+    }
+    
     protected MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{
         MapLayer layer = null;
 
@@ -84,6 +91,12 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
             layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
         }
 
+        if (params != null) {
+            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
+            final Number elevation = (Number) params.get(WMSQuery.KEY_ELEVATION);
+            layer.setQuery(createQuery(date, elevation));
+        }
+        
         return layer;
     }
 }

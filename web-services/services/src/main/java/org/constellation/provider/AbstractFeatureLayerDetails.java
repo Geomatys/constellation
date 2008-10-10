@@ -33,16 +33,22 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.GlyphLegendFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
@@ -53,6 +59,7 @@ import org.geotools.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
@@ -72,6 +79,8 @@ import org.opengis.referencing.operation.TransformException;
  * @author Cédric Briançon (Geomatys)
  */
 public abstract class AbstractFeatureLayerDetails implements LayerDetails {
+    
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider");
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
@@ -79,8 +88,18 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     protected final FeatureSource<SimpleFeatureType,SimpleFeature> fs;
     protected final List<String> favorites;
     protected final String name;
+    protected final String dateStartField;
+    protected final String dateEndField;
+    protected final String elevationStartField;
+    protected final String elevationEndField;
 
     protected AbstractFeatureLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
+        this(name,fs,favorites,null,null,null,null);
+        
+    }
+    
+    protected AbstractFeatureLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
+            String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         
         if(fs == null){
             throw new NullPointerException("FeatureSource can not be null.");
@@ -94,7 +113,25 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         }else{
             this.favorites = Collections.unmodifiableList(favorites);
         }
+        
+        if(dateStart != null)       this.dateStartField = dateStart;
+        else if(dateEnd != null)    this.dateStartField = dateEnd;
+        else                        this.dateStartField = null;
+        
+        if(dateEnd != null)         this.dateEndField = dateEnd;
+        else if(dateStart != null)  this.dateEndField = dateStart;
+        else                        this.dateEndField = null;
+        
+        if(elevationStart != null)      this.elevationStartField = elevationStart;
+        else if(elevationEnd != null)   this.elevationStartField = elevationEnd;
+        else                            this.elevationStartField = null;
+        
+        if(elevationEnd != null)        this.elevationEndField = elevationEnd;
+        else if(elevationStart != null) this.elevationEndField = elevationStart;
+        else                            this.elevationEndField = null;
+        
     }
+    
 
     /**
      * {@inheritDoc}
@@ -132,7 +169,6 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        System.out.println(">>>>requested BBOX");
         //TODO handle this correctly
         try{
             final ReferencedEnvelope env = fs.getBounds();
@@ -148,7 +184,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             }
 
         }catch(Exception e){
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING , "Could not evaluate bounding box",e);
         }
 
         return DUMMY_BBOX;
@@ -158,14 +194,94 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
-        return Collections.unmodifiableSortedSet(new TreeSet<Date>());
+        final SortedSet<Date> dates = new TreeSet<Date>();
+        
+        if(dateStartField != null){
+            
+            final AttributeDescriptor desc = fs.getSchema().getDescriptor(dateStartField);
+            if(desc == null){
+                LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
+                return dates;
+            }
+            
+            final Class type = desc.getType().getBinding();
+            if( !(Date.class.isAssignableFrom(type)) ){
+                LOGGER.log(Level.WARNING , "Invalide field type for dates, layer" + name +", must be a Date, found a " + type);
+                return dates;
+            }
+            
+            final DefaultQuery query = new DefaultQuery();
+            query.setPropertyNames(new String[]{dateStartField});
+            
+            FeatureIterator<SimpleFeature> features = null;
+            try{
+                final FeatureCollection<SimpleFeatureType,SimpleFeature> coll = fs.getFeatures(query);
+                features = coll.features();
+                while(features.hasNext()){
+                    final SimpleFeature sf = features.next();
+                    Date date = (Date) sf.getAttribute(dateStartField);
+                    if(date != null){
+                        dates.add(date);
+                    }
+                    
+                }
+                
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING , "Could not evaluate dates",ex);
+            }finally{
+                if(features != null) features.close();
+            }
+            
+        }
+        
+        return dates;
     }
 
     /**
      * {@inheritDoc}
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
-        return Collections.unmodifiableSortedSet(new TreeSet<Number>());
+        final SortedSet<Number> elevations = new TreeSet<Number>();
+        
+        if(elevationStartField != null){
+            
+            final AttributeDescriptor desc = fs.getSchema().getDescriptor(elevationStartField);
+            if(desc == null){
+                LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
+                return elevations;
+            }
+            
+            final Class type = desc.getType().getBinding();
+            if( !(Number.class.isAssignableFrom(type)) ){
+                LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer" + name +", must be a Number, found a " + type);
+                return elevations;
+            }
+            
+            final DefaultQuery query = new DefaultQuery();
+            query.setPropertyNames(new String[]{elevationStartField});
+            
+            FeatureIterator<SimpleFeature> features = null;
+            try{
+                final FeatureCollection<SimpleFeatureType,SimpleFeature> coll = fs.getFeatures(query);
+                features = coll.features();
+                while(features.hasNext()){
+                    final SimpleFeature sf = features.next();
+                    Number date = (Number) sf.getAttribute(elevationStartField);
+                    if(date != null){
+                        elevations.add(date);
+                    }
+                    
+                }
+                
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING , "Could not evaluate elevationss",ex);
+            }finally{
+                if(features != null) features.close();
+            }
+            
+        }
+        
+        return elevations;
     }
 
     /**
@@ -274,6 +390,41 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return requestedFeatures;
     }
 
+    protected Query createQuery(final Date date, final Number elevation){
+        final DefaultQuery query = new DefaultQuery();
+        final StringBuilder builder = new StringBuilder();
+        
+        if (date != null && this.dateStartField != null) {
+            //make the date CQL
+            builder.append("(").append(this.dateStartField).append(" <= '").append(date).append("'");
+            builder.append(" AND ");
+            builder.append(this.dateEndField).append(" >= '").append(date).append("'").append(")");
+        }
+        
+        if(elevation != null && this.elevationStartField != null){
+            //make the elevation CQL
+            
+            if(builder.length() >0){
+                builder.append(" AND ");
+            }
+            
+            builder.append("(").append(this.elevationStartField).append(" <= '").append(elevation.floatValue()).append("'");
+            builder.append(" AND ");
+            builder.append(this.elevationEndField).append(" >= '").append(elevation.floatValue()).append("'").append(")");
+        }
+        
+        final String cqlQuery = builder.toString();
+        if(cqlQuery != null && !cqlQuery.isEmpty()){
+            try {
+                query.setFilter(CQL.toFilter(cqlQuery));
+            } catch (CQLException ex) {
+                LOGGER.log(Level.SEVERE, "Could not parse CQL query", ex);
+            }
+        }
+        
+        return query;
+    }
+    
     protected abstract MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException;
     
 }

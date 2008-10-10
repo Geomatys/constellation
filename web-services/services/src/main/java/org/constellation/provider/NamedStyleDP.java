@@ -50,12 +50,7 @@ public class NamedStyleDP implements DataProvider<String,Object>{
     private final Collection<DataProvider<String,? extends Object>> dps = new ArrayList<DataProvider<String,? extends Object>>();
     
     private NamedStyleDP(){
-        dps.add(GO2NamedStyleDP.getDefault());
-        
-        for(File folder : getSLDFolders()){
-            SLDNamedStyleDP sldDP = new SLDNamedStyleDP(folder);
-            dps.add(sldDP);
-        }
+        loadDP();
     }
     
     /**
@@ -110,10 +105,21 @@ public class NamedStyleDP implements DataProvider<String,Object>{
      */
     public void reload() {
         for(DataProvider<String,? extends Object> dp : dps){
-            dp.reload();
+            dp.dispose();
         }
+        dps.clear();
+        loadDP();
     }
 
+    private void loadDP(){
+        dps.add(GO2NamedStyleDP.getDefault());
+        
+        for(File folder : getSLDFolders()){
+            SLDNamedStyleDP sldDP = new SLDNamedStyleDP(folder);
+            dps.add(sldDP);
+        }
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -129,7 +135,7 @@ public class NamedStyleDP implements DataProvider<String,Object>{
      * @return List of folders holding sld files
      */
     private static List<File> getSLDFolders(){
-        List<File> folders = new ArrayList<File>();
+        final List<File> folders = new ArrayList<File>();
         
         String strFolders = "";
         try{

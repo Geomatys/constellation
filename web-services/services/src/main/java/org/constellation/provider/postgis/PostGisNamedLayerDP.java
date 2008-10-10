@@ -35,6 +35,7 @@ import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerDetails;
 
 import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
 import org.constellation.ws.rs.WebService;
@@ -159,8 +160,9 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     /**
      * {@inheritDoc }
      */
-    public LayerDetails get(String key) {
+    public LayerDetails get(final String key) {
         if(index.contains(key)){
+            final ProviderLayer layer = source.getLayer(key);
             FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
 
             try {
@@ -171,8 +173,10 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             }
 
             if(fs != null){
-                final List<String> styles = source.layers.get(key);
-                return new PostGisLayerDetails(key, fs, styles);
+                final List<String> styles = layer.styles;
+                return new PostGisLayerDetails(key, fs, styles,
+                        layer.dateStartField,layer.dateEndField,
+                        layer.elevationStartField,layer.elevationEndField);
             }
         }
         
@@ -195,13 +199,16 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     public void dispose() {
         synchronized(this){
             index.clear();
+            params.clear();
+            source.layers.clear();
+            source.parameters.clear();
         }
     }
     
     private void visit() {
         try {
             for (final String name : store.getTypeNames()) {
-                if (source.layers.containsKey(name)) {
+                if (source.containsLayer(name)) {
                     index.add(name);
                 }
             }

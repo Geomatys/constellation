@@ -35,6 +35,7 @@ import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.SoftHashMap;
 import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.ws.rs.WebService;
 
@@ -128,9 +129,12 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         }
         
         if(store != null){
-            final List<String> styles = source.layers.get(key);
+            final ProviderLayer layer = source.getLayer(key);
+            final List<String> styles = layer.styles;
             try {
-                return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles);
+                return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles,
+                        layer.dateStartField,layer.dateEndField,
+                        layer.elevationStartField,layer.elevationEndField);
             } catch (IOException ex) {
                 //we could not create the feature source
                 LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
@@ -158,6 +162,8 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         synchronized(this){
             index.clear();
             cache.clear();
+            source.layers.clear();
+            source.parameters.clear();
         }
     }
 
@@ -180,7 +186,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
             String fullName = candidate.getName();
             if(fullName.toLowerCase().endsWith(mask)){
                 String name = fullName.substring(0, fullName.length()-4);
-                if(source.layers.containsKey(name)){
+                if(source.containsLayer(name)){
                     index.put(name, candidate);
                 }
             }
