@@ -44,43 +44,59 @@ import org.geotools.data.DataStoreFinder;
 
 import org.xml.sax.SAXException;
 
+
 /**
  * Shapefile Data provider. index and cache Datastores for the shapefiles
  * whithin the given folder.
- * 
+ *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
-public class ShapeFileNamedLayerDP implements LayerDataProvider{
-
+public class ShapeFileNamedLayerDP implements LayerDataProvider {
+    /**
+     * Default logger.
+     */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.shapefile");
     private static final String KEY_SHAPEFILE_CONFIG = "shapefile_config";
     private static final String KEY_FOLDER_PATH = "path";
-    
-    private static final String mask = ".shp";
-    
+
+    /**
+     * Mask to select only shape files.
+     */
+    private static final String MASK = ".shp";
+
+    /**
+     * Folder where are stored shape files.
+     */
     private final File folder;
     private final ProviderSource source;
+
+    /**
+     * Keeps a link between the file name and the file.
+     */
     private final Map<String,File> index = new HashMap<String,File>();
     private final SoftHashMap<String,DataStore> cache = new SoftHashMap<String, DataStore>(20);
-    
-    
+
+
     private ShapeFileNamedLayerDP(final ProviderSource source) throws IllegalArgumentException {
         this.source = source;
         final String path = source.parameters.get(KEY_FOLDER_PATH);
-        
+
         if(path == null){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
-        
+
         folder = new File(path);
-        
+
         if(folder == null || !folder.exists() || !folder.isDirectory()){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
-        
+
         visit(folder);
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -105,30 +121,30 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
     /**
      * {@inheritDoc }
      */
-    public boolean contains(String key) {
+    public boolean contains(final String key) {
         return index.containsKey(key);
     }
 
     /**
      * {@inheritDoc }
      */
-    public LayerDetails get(String key) {
+    public LayerDetails get(final String key) {
         DataStore store = cache.get(key);
-        
-        if(store == null){
+
+        if(store == null) {
             //datastore is not in the cache, try to load it
             File f = index.get(key);
-            if(f != null){
+            if (f != null) {
                 //we have this data source in the folder
                 store = loadDataStore(f);
-                if(store != null){
+                if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
                 }
             }
         }
-        
-        if(store != null){
+
+        if(store != null) {
             final ProviderLayer layer = source.getLayer(key);
             final List<String> styles = layer.styles;
             try {
@@ -140,10 +156,10 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
                 LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
             }
         }
-        
+
         return null;
     }
-       
+
     /**
      * {@inheritDoc }
      */
@@ -167,8 +183,13 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         }
     }
 
-    private void visit(File file) {
-
+    /**
+     * Visit all files and directories contained in the directory specified, and add
+     * all shape files in {@link #index}.
+     *
+     * @param file The starting file or folder.
+     */
+    private void visit(final File file) {
         if (file.isDirectory()) {
             File[] list = file.listFiles();
             if (list != null) {
@@ -176,15 +197,20 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
                     visit(list[i]);
                 }
             }
-        }else{
+        } else {
             test(file);
         }
     }
-        
-    private void test(File candidate){
+
+    /**
+     * Add the file to the {@link #index} if it respects the {@linkplain #MASK mask}.
+     *
+     * @param candidate Candidate to be a shape file.
+     */
+    private void test(final File candidate){
         if(candidate.isFile()){
             String fullName = candidate.getName();
-            if(fullName.toLowerCase().endsWith(mask)){
+            if(fullName.toLowerCase().endsWith(MASK)){
                 String name = fullName.substring(0, fullName.length()-4);
                 if(source.containsLayer(name)){
                     index.put(name, candidate);
@@ -192,28 +218,23 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
             }
         }
     }
-    
-    private DataStore loadDataStore(File f){
-        DataStore store = null;
-        
-        if(f.exists()){
-            Map<String,Object> params = new HashMap<String,Object>();
-            
-            try{
-                params.put( "url", f.toURI().toURL() );
-                store = DataStoreFinder.getDataStore(params);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, null, ex);
-            }
-        }else{
-            LOGGER.warning(" Error : Could not create shapefile datastore. File does not exits.");
+
+    private DataStore loadDataStore(final File f) {
+        if (f == null || !f.exists()) {
+            return null;
         }
-        
-        return store;
+
+        final Map<String,Object> params = new HashMap<String,Object>();
+        try {
+            params.put("url", f.toURI().toURL());
+            return DataStoreFinder.getDataStore(params);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return null;
+        }
     }
 
-    public static final Collection<ShapeFileNamedLayerDP> loadProviders(){
-        final Collection<ShapeFileNamedLayerDP> dps = new ArrayList<ShapeFileNamedLayerDP>();
+    public static final Collection<ShapeFileNamedLayerDP> loadProviders() {
         final ProviderConfig config;
         try {
             config = getConfig();
@@ -226,50 +247,51 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider{
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
+        } catch (NamingException ex) {
+            return Collections.emptyList();
         }
+        final Collection<ShapeFileNamedLayerDP> dps = new ArrayList<ShapeFileNamedLayerDP>();
         if (config == null) {
             return dps;
         }
-        for(final ProviderSource ps : config.sources){
-            try{
+        for (final ProviderSource ps : config.sources) {
+            try {
                 dps.add(new ShapeFileNamedLayerDP(ps));
-            }catch(IllegalArgumentException ex){
+            } catch(IllegalArgumentException ex) {
                 LOGGER.log(Level.WARNING, "Invalide shapefile provider config", ex);
             }
         }
-        
-        final StringBuilder builder = new StringBuilder("DATA PROVIDER : ShapeFile ");
-        for(final ShapeFileNamedLayerDP dp : dps){
-            builder.append("\n["+ dp.source.parameters.get(KEY_FOLDER_PATH)+"=");
-            for(final String layer : dp.getKeys()){
-                builder.append(layer+",");
+
+        if (false) {
+            final StringBuilder builder = new StringBuilder("DATA PROVIDER : ShapeFile ");
+            for (final ShapeFileNamedLayerDP dp : dps) {
+                builder.append("\n[" + dp.source.parameters.get(KEY_FOLDER_PATH) + "=");
+                for (final String layer : dp.getKeys()) {
+                    builder.append(layer + ",");
+                }
+                builder.append("]");
             }
-            builder.append("]");
+            LOGGER.log(Level.INFO, builder.toString());
         }
-        LOGGER.log(Level.INFO, builder.toString());
-        
         return dps;
     }
-    
+
     /**
-     * 
+     *
      * @return List of folders holding shapefiles
      */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException, SAXException, IOException{
-        
-        String configFile = "";
-        try{
-            configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);      
-        }catch(NamingException ex){
-            LOGGER.log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SHAPEFILE_CONFIG, ex);
-        }
+    private static final ProviderConfig getConfig() throws ParserConfigurationException,
+            SAXException, IOException, NamingException
+    {
+
+        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;
         }
-        
+
         return ProviderConfig.read(new File(configFile.trim()));
     }
-    
-    
+
+
 }

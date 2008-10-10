@@ -51,12 +51,13 @@ import org.xml.sax.SAXException;
 /**
  * Shapefile Data provider. index and cache Datastores for the shapefiles
  * whithin the given folder.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class PostGisNamedLayerDP implements LayerDataProvider{
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
+    private static final String KEY_DBTYPE          = PostgisDataStoreFactory.DBTYPE.key;
     private static final String KEY_HOST            = PostgisDataStoreFactory.HOST.key;
     private static final String KEY_PORT            = PostgisDataStoreFactory.PORT.key;
     private static final String KEY_SCHEMA          = PostgisDataStoreFactory.SCHEMA.key;
@@ -70,42 +71,38 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private static final String KEY_ESTIMATEDEXTENT = PostgisDataStoreFactory.ESTIMATEDEXTENT.key;
     private static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
     private static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
-            
-    private final Map<String,Object> params = new HashMap<String,Object>();
+
+    private final Map<String,Object> params;
     private final DataStore store;
     private final ProviderSource source;
     private final List<String> index = new ArrayList<String>();
-    
-    
-    private PostGisNamedLayerDP(ProviderSource source) throws IllegalArgumentException, IOException{
+
+
+    private PostGisNamedLayerDP(ProviderSource source) throws IOException {
         this.source = source;
-        
-        params.put("dbtype", "postgis");
-        
+        params = new HashMap<String,Object>();
+        params.put(KEY_DBTYPE, "postgis");
+
         // HOST ----------------------------------------------------------------
-        final String host = source.parameters.get(KEY_HOST);
-        if(host != null){
-            params.put(KEY_HOST, host);
-        }else{
-            params.put(KEY_HOST, "localhost");
-        }
-        
+        final String host = source.parameters.get(KEY_HOST);        
+        params.put(KEY_HOST, (host != null) ? host : "localhost");
+
         // PORT ----------------------------------------------------------------
         final String port = source.parameters.get(KEY_PORT);
-        if(port != null){
+        if (port != null) {
             try{
                 final Integer iport = Integer.valueOf(port);
                 params.put(KEY_PORT, iport);
-            }catch(NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 //just log it, use the default port
                 params.put(KEY_PORT, 5432);
                 LOGGER.log(Level.SEVERE, null, ex);
             }
-        }else{
+        } else {
             //this parameter is needed
             params.put(KEY_PORT, 5432);
         }
-        
+
         // OTHERS --------------------------------------------------------------
         final String schema = source.parameters.get(KEY_SCHEMA);
         final String database = source.parameters.get(KEY_DATABASE);
@@ -115,7 +112,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         params.put(KEY_DATABASE, database);
         params.put(KEY_USER, user);
         params.put(KEY_PASSWD, passwd);
-        
+
         //TODO Handle thoses when we think it is necessary
 //            final Integer maxconn    = source.parameters.get(KEY_MAXCONN);
 //            final Integer minconn    = source.parameters.get(KEY_MINCONN);
@@ -124,11 +121,11 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
 //            final Boolean estimated  = source.parameters.get(KEY_ESTIMATEDEXTENT);
 //            final Boolean bbox       = source.parameters.get(KEY_LOOSEBBOX);
 //            final Boolean wkb        = source.parameters.get(KEY_WKBENABLED);
-        
+
         store = DataStoreFinder.getDataStore(params);
         visit();
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -161,28 +158,27 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
      * {@inheritDoc }
      */
     public LayerDetails get(final String key) {
-        if(index.contains(key)){
-            final ProviderLayer layer = source.getLayer(key);
-            FeatureSource<SimpleFeatureType,SimpleFeature> fs = null;
-
-            try {
-                fs = store.getFeatureSource(key);
-            } catch (IOException ex) {
-                //could not create the requested featuresource
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
-
-            if(fs != null){
-                final List<String> styles = layer.styles;
-                return new PostGisLayerDetails(key, fs, styles,
-                        layer.dateStartField,layer.dateEndField,
-                        layer.elevationStartField,layer.elevationEndField);
-            }
+        if (!index.contains(key)) {
+            return null;
         }
-        
-        return null;
+        final ProviderLayer layer = source.getLayer(key);
+        final FeatureSource<SimpleFeatureType, SimpleFeature> fs;
+        try {
+            fs = store.getFeatureSource(key);
+        } catch (IOException ex) {
+            //could not create the requested featuresource
+            LOGGER.log(Level.SEVERE, null, ex);
+            return null;
+        }
+        if (fs == null) {
+            return null;
+        }
+        final List<String> styles = layer.styles;
+        return new PostGisLayerDetails(key, fs, styles,
+                layer.dateStartField, layer.dateEndField,
+                layer.elevationStartField, layer.elevationEndField);
     }
-       
+
     /**
      * {@inheritDoc }
      */
@@ -204,7 +200,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             source.parameters.clear();
         }
     }
-    
+
     private void visit() {
         try {
             for (final String name : store.getTypeNames()) {
@@ -218,7 +214,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static final Collection<PostGisNamedLayerDP> loadProviders(){
         final Collection<PostGisNamedLayerDP> dps = new ArrayList<PostGisNamedLayerDP>();
         final ProviderConfig config;
@@ -233,21 +229,21 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return Collections.emptyList();
+        } catch (NamingException ex) {
+            return Collections.emptyList();
         }
 
         if (config == null) {
             return dps;
         }
-        for(final ProviderSource ps : config.sources){
-            try{
+        for(final ProviderSource ps : config.sources) {
+            try {
                 dps.add(new PostGisNamedLayerDP(ps));
-            }catch(IllegalArgumentException ex){
-                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
-            }catch(IOException ex){
+            } catch(IOException ex){
                 LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
             }
         }
-        
+
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : PostGIS ");
         for(final PostGisNamedLayerDP dp : dps){
             builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
@@ -257,28 +253,25 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             builder.append("]");
         }
         LOGGER.log(Level.INFO, builder.toString());
-        
+
         return dps;
     }
-    
+
     /**
-     * 
+     *
      * @return List of folders holding shapefiles
      */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException, SAXException, IOException{
-        
-        String configFile = "";
-        try{
-            configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
-        }catch(NamingException ex){
-            LOGGER.log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_POSTGIS_CONFIG, ex);
-        }
+    private static final ProviderConfig getConfig() throws ParserConfigurationException,
+            SAXException, IOException, NamingException
+    {
+
+        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;
         }
-        
+
         return ProviderConfig.read(new File(configFile.trim()));
     }
-    
+
 }
