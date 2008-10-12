@@ -68,10 +68,10 @@ import org.constellation.coverage.catalog.WritableGridCoverageTable;
  * the following options must be specified:
  * <p>
  * <ul>
- *   <li>{@code -write}     writes the tiles to the target directory, skipping existing ones.</li>
- *   <li>{@code -overwrite} writes the tiles to the target directory, overwriting existing ones.</li>
- *   <li>{@code -insert}    inserts the tiles metadata in the database.</li>
- *   <li>{@code -pretend}   like {@code -insert} but prints the SQL statement instead
+ *   <li>{@code --write}     writes the tiles to the target directory, skipping existing ones.</li>
+ *   <li>{@code --overwrite} writes the tiles to the target directory, overwriting existing ones.</li>
+ *   <li>{@code --insert}    inserts the tiles metadata in the database.</li>
+ *   <li>{@code --pretend}   like {@code -insert} but prints the SQL statement instead
  *                          of executing them.</li>
  * </ul>
  *
