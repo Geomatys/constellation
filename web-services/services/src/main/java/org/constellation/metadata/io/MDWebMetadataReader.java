@@ -18,14 +18,10 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -33,15 +29,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
@@ -128,6 +119,11 @@ public class MDWebMetadataReader extends MetadataReader {
     private Map<Value, Object> alreadyRead;
     
     /**
+     * A List of the already logged Missing MDWeb Classe.
+     */
+    private List<String> classeNotFound;
+    
+    /**
      * A map of binding term-path for each standard.
      */
     private final static Map<Standard, Map<String, String>> DublinCorePathMap;
@@ -186,6 +182,7 @@ public class MDWebMetadataReader extends MetadataReader {
         
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();
+        this.classeNotFound  = new ArrayList<String>();
     }
 
     /**
@@ -1166,7 +1163,10 @@ public class MDWebMetadataReader extends MetadataReader {
                 }
             }
         }
-        logger.severe("class no found: " + classNameSave);
+        if (!classeNotFound.contains(classNameSave)) {
+            logger.severe("class no found: " + classNameSave);
+            classeNotFound.add(classNameSave);
+        }
         return null;
     }
 

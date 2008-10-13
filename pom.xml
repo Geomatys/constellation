@@ -154,7 +154,7 @@
       <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-server</artifactId>
-        <version>0.9-ea</version>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
@@ -180,16 +180,6 @@
         <groupId>javax.faces</groupId>
         <artifactId>jsf-impl</artifactId>
         <version>1.1_02</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>persistence-api</artifactId>
-        <version>1.0</version>
       </dependency>
       <dependency>
    	<groupId>javax.servlet</groupId>
@@ -355,11 +345,6 @@
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>8.1-407.jdbc3</version>
-      </dependency>
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome</artifactId>
-        <version>0.9</version>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
