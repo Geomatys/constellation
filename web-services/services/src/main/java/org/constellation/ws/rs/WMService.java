@@ -174,7 +174,9 @@ public class WMService extends WebService {
             if (ex instanceof WMSWebServiceException) {
                 WMSWebServiceException wmsex = (WMSWebServiceException)ex;
                 if (!wmsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                    !wmsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+                {
                     wmsex.printStackTrace();
                 }
                 StringWriter sw = new StringWriter();
@@ -355,6 +357,7 @@ public class WMService extends WebService {
             final String formatGif = "image/gif";
             final String legendUrlGif = beginLegendUrl + formatGif + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + formatPng + "&LAYER=" + layerName;
+            final int queryable = (layer.isQueryable(Service.GETINFO) == true) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.equals(WMSQueryVersion.WMS_1_1_1)) {
                 /*
@@ -379,7 +382,7 @@ public class WMService extends WebService {
                         cleanSpecialCharacter(layer.getThematic()), crs,
                         new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(), inputGeoBox.getSouthBoundLatitude(),
                                               inputGeoBox.getEastBoundLongitude(), inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, 1, dimensions, style);
+                        outputBBox, queryable, dimensions, style);
             } else {
                 /*
                  * TODO
@@ -404,7 +407,7 @@ public class WMService extends WebService {
                         cleanSpecialCharacter(layer.getThematic()), crs,
                         new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), inputGeoBox.getSouthBoundLatitude(),
                         inputGeoBox.getEastBoundLongitude(), inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, 1, dimensions, style);
+                        outputBBox, queryable, dimensions, style);
             }
             layers.add(outputLayer);
         }
@@ -464,6 +467,10 @@ public class WMService extends WebService {
         final Map<String, List<String>> results = new HashMap<String, List<String>>(size);
         for (final String key : layers) {
             final LayerDetails layer = dp.get(key);
+            if (!layer.isQueryable(Service.GETINFO)) {
+                throw new WMSWebServiceException("The requested layer \""+ key +"\" for a GetFeatureInfo" +
+                        " is not queryable.", OPERATION_NOT_SUPPORTED, queryVersion);
+            }
             final Object currentValue;
             try {
                 currentValue = layer.getInformationAt(info);

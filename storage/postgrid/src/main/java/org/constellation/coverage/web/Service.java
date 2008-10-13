@@ -48,7 +48,12 @@ public enum Service {
      * Sensor Observation Service.
      */
     SOS,
-            
+
+    /**
+     * GetFeatureInfo WMS request.
+     */
+    GETINFO,
+
     /**
      * any other Service.
      */

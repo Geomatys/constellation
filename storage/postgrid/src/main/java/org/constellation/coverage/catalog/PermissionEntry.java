@@ -46,6 +46,12 @@ final class PermissionEntry extends Entry {
     private final boolean WCS;
 
     /**
+     * {@code true} if the data can be requested with a GetFeatureInfo request,
+     * in a Web Map Server (WMS).
+     */
+    private final boolean getInfo;
+
+    /**
      * User for who the permission will apply. By default the user is {@code Anonymous}.
      */
     private final String user;
@@ -53,20 +59,21 @@ final class PermissionEntry extends Entry {
     /**
      * Creates a new entry.
      */
-    public PermissionEntry(final String name, final String user,
-            final boolean WCS, final boolean WMS, final String remarks)
+    public PermissionEntry(final String name, final String user, final boolean WCS,
+            final boolean WMS, final boolean getInfo, final String remarks)
     {
         super(name, remarks);
-        this.WCS  = WCS;
-        this.WMS  = WMS;
-        this.user = user;
+        this.WCS     = WCS;
+        this.WMS     = WMS;
+        this.getInfo = getInfo;
+        this.user    = user;
     }
 
     /**
      * Returns {@code true} if the user can obtain data of at least one service.
      */
     public boolean isVisible() {
-        return WCS | WMS;
+        return WCS | WMS | getInfo;
     }
 
     /**
@@ -74,8 +81,9 @@ final class PermissionEntry extends Entry {
      */
     public boolean isAccessibleService(final Service service) {
         switch (service) {
-            case WMS: return WMS;
-            case WCS: return WCS;
+            case WMS:     return WMS;
+            case WCS:     return WCS;
+            case GETINFO: return getInfo;
         }
         return false;
     }
@@ -90,7 +98,7 @@ final class PermissionEntry extends Entry {
         }
         if (super.equals(object)) {
             final PermissionEntry that = (PermissionEntry) object;
-            return this.WMS == that.WMS && this.WCS == that.WCS &&
+            return this.WMS == that.WMS && this.WCS == that.WCS && this.getInfo == that.getInfo &&
                    Utilities.equals(this.user, that.user);
         }
         return false;

@@ -10,14 +10,14 @@ SET search_path = postgrid, postgis;
 -- Fills the "Permissions" table.                                                               --
 --------------------------------------------------------------------------------------------------
 
-INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
-  VALUES ('Public', TRUE, TRUE, 'Data accessible to anyone.');
-INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
-  VALUES ('Display', TRUE, FALSE, 'Data to be available for display only.');
-INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
-  VALUES ('Download', FALSE, TRUE, 'Data available for download only.');
-INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
-  VALUES ('Hidden', FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "getInfo", "description")
+  VALUES ('Public', TRUE, TRUE, TRUE, 'Data accessible to anyone.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "getInfo", "description")
+  VALUES ('Display', TRUE, FALSE, FALSE, 'Data to be available for display only.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "getInfo", "description")
+  VALUES ('Download', FALSE, TRUE, TRUE, 'Data available for download only.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "getInfo", "description")
+  VALUES ('Hidden', FALSE, FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
 
 
 --------------------------------------------------------------------------------------------------

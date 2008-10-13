@@ -26,6 +26,7 @@ CREATE TABLE "Permissions" (
     "user"        character varying NOT NULL DEFAULT 'Anonymous',
     "WMS"         boolean NOT NULL DEFAULT TRUE,
     "WCS"         boolean NOT NULL DEFAULT TRUE,
+    "getInfo"     boolean NOT NULL DEFAULT TRUE,
     "description" character varying,
     PRIMARY KEY ("name", "user")
 );
@@ -44,6 +45,8 @@ COMMENT ON COLUMN "Permissions"."WMS" IS
     'Whatever permission allows Web Map Server (WMS) access.';
 COMMENT ON COLUMN "Permissions"."WCS" IS
     'Whatever permission allows Web Coverage Server (WCS) access.';
+COMMENT ON COLUMN "Permissions"."getInfo" IS
+    'Permission to allow a WMS GetFeatureInfo request to be done on a layer.';
 COMMENT ON COLUMN "Permissions"."description" IS
     'A description of this permission (scope, etc.).';
 

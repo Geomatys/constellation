@@ -109,6 +109,7 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
                                    results.getString (indexOf(query.user)),
                                    results.getBoolean(indexOf(query.WCS)),
                                    results.getBoolean(indexOf(query.WMS)),
+                                   results.getBoolean(indexOf(query.getInfo)),
                                    results.getString (indexOf(query.description)));
     }
 }

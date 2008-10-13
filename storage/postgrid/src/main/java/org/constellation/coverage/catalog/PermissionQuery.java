@@ -42,7 +42,7 @@ final class PermissionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, user, WMS, WCS, description;
+    protected final Column name, user, WMS, WCS, getInfo, description;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -61,6 +61,7 @@ final class PermissionQuery extends Query {
         user        = addColumn("user",    DEFAULT,      SL);
         WMS         = addColumn("WMS",     Boolean.TRUE, SL);
         WCS         = addColumn("WCS",     Boolean.TRUE, SL);
+        getInfo     = addColumn("getInfo", Boolean.TRUE, SL);
         description = addColumn("description",           SL);
         byName      = addParameter(name, SL);
         byUser      = addParameter(user, SL);

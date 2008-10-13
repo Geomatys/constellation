@@ -76,7 +76,8 @@ public interface LayerDetails {
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
-     * Returns the information at the coordinates specified.
+     * Returns the information at the coordinates specified, if the layer
+     * {@linkplain Layer#isQueryable is queryable}. 
      *
      * @return The information at the coordinates specified.
      * @throws CatalogException
@@ -120,6 +121,8 @@ public interface LayerDetails {
 
     /**
      * Returns {@code true} if the layer is queryable by the specified service.
+     *
+     * @see Layer#isQueryable 
      */
     public boolean isQueryable(Service service);
 }

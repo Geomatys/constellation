@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 public class PostGridNamedLayerDP implements LayerDataProvider{
 
     private static final String KEY_POSTGRID_STYLES = "postgrid_style";
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
     private static PostGridNamedLayerDP instance = null;
 
     private final Map<String,Layer> index = new HashMap<String,Layer>();
@@ -280,12 +280,11 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
     }
 
     private void extractLinks() {
-
-        String styleLinks = "";
+        final String styleLinks;
         try {
             styleLinks = WebService.getPropertyValue(JNDI_GROUP, KEY_POSTGRID_STYLES);
         } catch (NamingException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            return;
         }
         if (styleLinks == null) {
             return;
