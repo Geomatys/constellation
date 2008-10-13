@@ -40,7 +40,10 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.query.wms.WMSQueryVersion;
 
+import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.exception.PortrayalException;
+import org.geotools.display.renderer.Go2rendererHints;
+import org.geotools.display.renderer.J2DRenderer;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
@@ -56,6 +59,7 @@ import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -65,11 +69,55 @@ import org.opengis.geometry.Envelope;
  * @author Johann Sorel (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
+    
+    /**
+     * static instance, singleton.
+     */
+    private static final ThreadLocal<CSTLPortrayalService> instances = new ThreadLocal<CSTLPortrayalService>() {
+        @Override
+        protected CSTLPortrayalService initialValue() {
+            return new CSTLPortrayalService();
+        }
+    };
+    
     /**
      * Data provider for layers.
      */
-    private static final NamedLayerDP LAYERDP = NamedLayerDP.getInstance();
-
+    private final NamedLayerDP LAYERDP = NamedLayerDP.getInstance();
+    
+    private final BufferedImageCanvas2D canvas;
+    private final J2DRenderer renderer;
+    private final MapContext context;
+    
+    
+    private CSTLPortrayalService(){
+        canvas = new  BufferedImageCanvas2D(new Dimension(1,1),null);
+        renderer = new J2DRenderer(canvas);
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        
+        canvas.setRenderer(renderer);
+        canvas.getController().setAutoRepaint(false);
+        
+        //disable mutlithread rendering, to avoid possibility of several buffers created
+        canvas.setRenderingHint(Go2rendererHints.KEY_MULTI_THREAD, Go2rendererHints.MULTI_THREAD_OFF);
+        
+        //we specifically say to not repect X/Y proportions
+        try {
+            canvas.getController().setAxisProportions(Double.NaN);
+        } catch (PortrayalException ex) {
+            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            renderer.setContext(context);
+        } catch (IOException ex) {
+            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformException ex) {
+            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     /**
      * Makes the portray of a {@code GetMap} request.
      *
@@ -79,8 +127,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @throws WebServiceException if an error occurs during the creation of the map context
      */
     public synchronized void portray(final GetMap query, final File output)
-                            throws PortrayalException, WebServiceException
-    {
+                            throws PortrayalException, WebServiceException{
+        
+        if(query == null || output == null){
+            throw new NullPointerException("Query and output file cannot be null");
+        }
+        
         final List<String> layers              = query.getLayers();
         final List<String> styles              = query.getStyles();
         final MutableStyledLayerDescriptor sld = query.getSld();
@@ -96,7 +148,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, date);
-        final MapContext context               = toMapContext(layers, version, styles, sld, params);
+        updateContext(layers, version, styles, sld, params);
         final Color background                 = (query.getTransparent()) ? null : query.getBackground();
 
         if (false) {
@@ -126,18 +178,61 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         //some strange behavior when deployed in web app, we sometimes catch runtimeException or
         //thread exceptions.
         try{
-            portray(context, refEnv, background, output, mime, canvasDimension, null, true);
+            portrayUsingCache(refEnv, background, output, mime, canvasDimension);
         }catch(Exception ex){
             throw new PortrayalException(ex);
         }
     }
 
-    private MapContext toMapContext(final List<String> layers, final WMSQueryVersion version,
+    /**
+     * Portray a MapContext and outpur it in the given
+     * stream.
+     *
+     * @param context : Mapcontext to render
+     * @param contextEnv : MapArea to render
+     * @param output : output srteam or file or url
+     * @param mime : mime output type
+     * @param canvasDimension : size of the wanted image
+     * @param hints : canvas hints
+     */
+    private void portrayUsingCache(final ReferencedEnvelope contextEnv, final Color background, 
+            final Object output, final String mime, final Dimension canvasDimension) 
+            throws PortrayalException {
+
+        
+        canvas.setSize(canvasDimension);
+        canvas.setBackground(background);
+        
+        try {
+            canvas.getController().setObjectiveCRS(contextEnv.getCoordinateReferenceSystem());
+        } catch (TransformException ex) {
+            throw new PortrayalException(ex);
+        }
+
+        canvas.getController().setVisibleArea(contextEnv);
+        canvas.repaint();
+
+        final BufferedImage image = canvas.getSnapShot();
+
+        if(image == null){
+            throw new PortrayalException("No image created by the canvas.");
+        }
+        
+        try {
+            writeImage(image, mime, output);
+        } catch (IOException ex) {
+            throw new PortrayalException(ex);
+        }
+        
+        //clear the layers to avoid potential memory leack;
+        context.layers().clear();
+    }
+    
+    
+    private void updateContext(final List<String> layers, final WMSQueryVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
-                                    throws PortrayalException, WebServiceException
-    {
-        final MapContext ctx = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+                                    throws PortrayalException, WebServiceException {
 
         for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
@@ -162,10 +257,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             if (layer == null) {
                 throw new PortrayalException("Map layer "+layerName+" could not be created");
             }
-            ctx.layers().add(layer);
+            context.layers().add(layer);
         }
 
-        return ctx;
     }
 
     private Object extractStyle(String layerName,MutableStyledLayerDescriptor sld){
@@ -243,5 +337,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
 
         return output;
     }
-
+    
+    public static CSTLPortrayalService getInstance(){
+        return instances.get();
+    }
+    
 }

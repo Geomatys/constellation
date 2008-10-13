@@ -80,7 +80,6 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.query.wms.WMSQueryVersion;
 import org.constellation.wms.AbstractHTTP;
-import org.constellation.worker.WMSWorker;
 
 // Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
@@ -616,18 +615,16 @@ public class WMService extends WebService {
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
         final String format = getMap.getFormat();
-        final File tempFile;
+        final File imageFile;
         try {
-            tempFile = createTempFile("map", format);
+            imageFile = createTempFile("map", format);
         } catch (IOException io) {
             throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
         }
-        final WMSWorker worker = new WMSWorker(getMap, tempFile);
 
-        File image = null;
         File errorFile = null;
         try {
-            image = worker.getMap();
+            CSTLPortrayalService.getInstance().portray(getMap, imageFile);
         } catch (PortrayalException ex) {
             if(errorInImage) {
                 try {
@@ -655,7 +652,7 @@ public class WMService extends WebService {
             }
         }
 
-        final File result = (errorFile != null) ? errorFile : image;
+        final File result = (errorFile != null) ? errorFile : imageFile;
         return Response.ok(result, getMap.getFormat()).build();
     }
 

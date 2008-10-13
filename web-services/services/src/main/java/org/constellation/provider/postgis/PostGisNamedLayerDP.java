@@ -72,15 +72,14 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
     private static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
 
-    private final Map<String,Object> params;
+    private final Map<String,Object> params = new HashMap<String,Object>();
+    private final List<String> index = new ArrayList<String>();
     private final DataStore store;
     private final ProviderSource source;
-    private final List<String> index = new ArrayList<String>();
 
 
     private PostGisNamedLayerDP(ProviderSource source) throws IOException {
         this.source = source;
-        params = new HashMap<String,Object>();
         params.put(KEY_DBTYPE, "postgis");
 
         // HOST ----------------------------------------------------------------

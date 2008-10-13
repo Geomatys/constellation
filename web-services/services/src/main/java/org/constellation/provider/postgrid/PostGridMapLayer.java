@@ -194,6 +194,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             throw new PortrayalException(ex);
         } catch (IOException ex) {
             throw new PortrayalException(ex);
+        } finally{
+            table.flush();
         }
 
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
