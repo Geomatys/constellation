@@ -160,6 +160,7 @@ public class SOSworker {
 
     public final static int DISCOVERY     = 0;
     public final static int TRANSACTIONAL = 1;
+    
     /**
      * use for debugging purpose
      */

@@ -17,14 +17,13 @@
 package org.constellation.ows.v100;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

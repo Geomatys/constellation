@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -95,6 +95,11 @@ public class OperationsMetadata {
         return operation;
     }
     
+    /**
+     * Remove the specified operation from the list of available operations displayed in the capabilities document.
+     * 
+     * @param operationName the name of the operation to remove.
+     */
     public void removeOperation(String operationName) {
         for (Operation op: operation){
             if (op.getName().equals(operationName)) {

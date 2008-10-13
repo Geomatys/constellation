@@ -109,6 +109,20 @@ public class OperationsMetadata {
         }
         return null;
     }
+    
+    /**
+     * Remove the specified operation from the list of available operations displayed in the capabilities document.
+     * 
+     * @param operationName the name of the operation to remove.
+     */
+    public void removeOperation(String operationName) {
+        for (Operation op: operation){
+            if (op.getName().equals(operationName)) {
+                operation.remove(op);
+                return;
+            }
+        }
+    }
 
     /**
      * Gets the value of the parameter property.

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.io;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -116,6 +116,13 @@ public class MetadataWriter {
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
+    /**
+     * Write an MDWeb form into the database
+     */
+    public void writeForm(Form f) throws SQLException {
+        
+        MDWriter.writeForm(f, false);
+    }
     /**
      * Return an MDWeb formular from an object.
      * 

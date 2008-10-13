@@ -108,7 +108,7 @@ import org.constellation.ows.v100.ServiceProvider;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ebrim.v300.IdentifiableType;
 import static org.constellation.ows.OWSExceptionCode.*;
-import static org.constellation.metadata.MetadataReader.*;
+import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // Apache Lucene dependencies
@@ -133,6 +133,10 @@ import javax.xml.namespace.QName;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
+import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.metadata.io.MDWebMetadataReader;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
@@ -177,16 +181,6 @@ public class CSWworker {
      * A connection to the Database
      */
     private Connection MDConnection;
-    
-    /**
-     * A Reader to the Metadata database.
-     */
-    private Reader20 databaseReader;
-    
-    /**
-     * A Writer to the Metadata database.
-     */
-    private Writer20 databaseWriter;
     
     /**
      * An object creator from the MDWeb database.
@@ -234,7 +228,7 @@ public class CSWworker {
     private final FilterParser luceneFilterParser;
     
     /**
-     * A filter parser whitch create SQL query from OGC filter
+     * A filter parser whitch create SQL query from OGC filter (used for ebrim query)
      */
     private final FilterParser sqlFilterParser;
     
@@ -342,6 +336,14 @@ public class CSWworker {
      */
     private List<String> cascadedCSWservers;
     
+    public final static int DISCOVERY     = 0;
+    public final static int TRANSACTIONAL = 1;
+    
+    /**
+     * A flag indicating if the service have to support Transactional operations.
+     */
+    private int profile;
+    
     /**
      * Build a new CSW worker
      * 
@@ -409,40 +411,87 @@ public class CSWworker {
         
         //we create a connection to the metadata database
         if (isStarted) {
-            PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
-            dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-            dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
-            dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
-            dataSourceMD.setUser(prop.getProperty("MDDBUser"));
-            dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-            try {
-                MDConnection    = dataSourceMD.getConnection();
-            } catch (SQLException e) {
-                MDConnection = null;
-                logger.severe(e.getMessage());
-            }
-            if (MDConnection == null) {
-                logger.severe("The CSW service is not working!" + '\n' + 
-                              "cause: The web service can't connect to the metadata database!");
-                isStarted           = false;
-            } else {
-                 
-                 try {
-                    databaseReader     = new Reader20(Standard.ISO_19115,  MDConnection);
-                    databaseWriter     = new Writer20(MDConnection);
-                    index              = new IndexLucene(databaseReader, env);
-                    MDReader           = new MetadataReader(databaseReader, dataSourceMD.getConnection());
-                    MDWriter           = new MetadataWriter(databaseReader, databaseWriter);
-                    catalogueHarvester = new CatalogueHarvester(this);
-                 
-                    logger.info("CSW service running");
-                 } catch (SQLException e) {
+            String databaseType = prop.getProperty("DBType");
+            
+            // if The database is unknow to the service we use the generic metadata reader.
+            if (databaseType != null && databaseType.equals("generic")) {
+                
+                profile = DISCOVERY;
+                
+                // TODO make it generic for any Database Type
+                PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
+                dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
+                dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
+                dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
+                dataSourceMD.setUser(prop.getProperty("MDDBUser"));
+                dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
+                try {
+                    MDConnection    = dataSourceMD.getConnection();
+                } catch (SQLException e) {
+                    MDConnection = null;
                     logger.severe(e.getMessage());
+                }
+                if (MDConnection == null) {
                     logger.severe("The CSW service is not working!" + '\n' + 
-                                  "cause: The web service can't connect to the metadata database!");
+                                  "cause: The web service can't connect to the generic metadata database!");
+                    isStarted = false;
+                } else {
+                 
+                    try {
+                        MDReader                = new GenericMetadataReader();
+                        index                   = new IndexLucene((GenericMetadataReader)MDReader, env);
+                        //in generic mode there is no transactionnal part.
+                        MDWriter                = null;
+                        catalogueHarvester      = null;
+                 
+                        logger.info("CSW service (Generic database) running");
+                    } catch (SQLException e) {
+                        logger.severe(e.getMessage());
+                        logger.severe("The CSW service is not working!" + '\n' + 
+                                  "cause: The web service can't connect to the generic metadata database!");
+                    }
+                }
+            
+            // else we use the defaut database mode: MDWeb.
+            } else {
+                logger.info("Using default database type; MDWeb");
+            
+                profile = TRANSACTIONAL;
+                
+                PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
+                dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
+                dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
+                dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
+                dataSourceMD.setUser(prop.getProperty("MDDBUser"));
+                dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
+                try {
+                    MDConnection    = dataSourceMD.getConnection();
+                } catch (SQLException e) {
+                    MDConnection = null;
+                    logger.severe(e.getMessage());
+                }
+                if (MDConnection == null) {
+                    logger.severe("The CSW service is not working!" + '\n' + 
+                                  "cause: The web service can't connect to the MDWeb metadata database!");
+                    isStarted = false;
+                } else {
+                 
+                    try {
+                        Reader20 databaseReader = new Reader20(Standard.ISO_19115,  MDConnection);
+                        Writer20 databaseWriter = new Writer20(MDConnection);
+                        index                   = new IndexLucene(databaseReader, env);
+                        MDReader                = new MDWebMetadataReader(databaseReader);
+                        MDWriter                = new MetadataWriter(databaseReader, databaseWriter);
+                        catalogueHarvester      = new CatalogueHarvester(this);
+                 
+                        logger.info("CSW service (MDweb database) running");
+                    } catch (SQLException e) {
+                        logger.severe(e.getMessage());
+                        logger.severe("The CSW service is not working!" + '\n' + 
+                                  "cause: The web service can't connect to the MDWeb metadata database!");
+                    }
                 }
             }
-            
         }
     }
     
@@ -516,6 +565,13 @@ public class CSWworker {
         if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
                 
             om = staticCapabilities.getOperationsMetadata();
+            
+             //we remove the operation not supported in this profile (transactional/discovery)
+            if (profile == DISCOVERY) {
+                om.removeOperation("Harvest");
+                om.removeOperation("Transaction");
+            }
+            
             //we update the URL
             if (om != null) {
                 WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
@@ -1517,6 +1573,12 @@ public class CSWworker {
      */
     public TransactionResponseType transaction(TransactionType request) throws WebServiceException {
         logger.info("Transaction request processing" + '\n');
+        
+        if (profile == DISCOVERY) {
+            throw new OWSWebServiceException("This method is not supported by this mode of CSW",
+                                             OPERATION_NOT_SUPPORTED, "Request", version);
+        }
+        
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the report
@@ -1615,7 +1677,7 @@ public class CSWworker {
         if (f != null) {
             try {
                 long startWrite = System.currentTimeMillis();
-                databaseWriter.writeForm(f, false);
+                MDWriter.writeForm(f);
                 writeTime = System.currentTimeMillis() - startWrite;
             } catch (IllegalArgumentException e) {
                 //TODO restore catching at this point
@@ -1759,6 +1821,10 @@ public class CSWworker {
      */
     public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
         logger.info("Harvest request processing" + '\n');
+        if (profile == DISCOVERY) {
+            throw new OWSWebServiceException("This method is not supported by this mode of CSW",
+                                             OPERATION_NOT_SUPPORTED, "Request", version);
+        }
         verifyBaseRequest(request);
         HarvestResponseType response;
         // we prepare the report

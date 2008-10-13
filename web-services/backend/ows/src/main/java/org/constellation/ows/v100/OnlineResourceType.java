@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.AbstractOnlineResourceType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

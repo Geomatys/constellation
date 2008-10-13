@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.io;
 
 // J2SE dependencies
 import java.io.File;
@@ -26,9 +26,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -81,22 +78,17 @@ import org.opengis.util.CodeList;
  * 
  * @author Guilhem legal
  */
-public class MetadataReader {
+public class MDWebMetadataReader implements MetadataReader {
 
     /**
      * A debugging logger
      */
-    private Logger logger = Logger.getLogger("org.constellation.coverage.wms");
+    private Logger logger = Logger.getLogger("org.constellation.metadata.io");
     
     /**
      * A reader to the MDWeb database.
      */
     private Reader MDReader;
-    
-    /**
-     * A connection to the MDWeb database.
-     */
-    private Connection connection;
     
     /**
      * A map containing the metadata already extract from the database.
@@ -144,11 +136,9 @@ public class MetadataReader {
      */
     private Map<Value, Object> alreadyRead;
     
-
-    public final static int DUBLINCORE = 0;
-    public final static int ISO_19115  = 1;
-    public final static int EBRIM      = 2;
-    
+    /**
+     * A service version used in exception launch.
+     */
     private ServiceVersion version;
     
     private final static Map<Standard, Map<String, String>> DublinCorePathMap;
@@ -190,9 +180,8 @@ public class MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MetadataReader(Reader MDReader, Connection c) throws SQLException {
+    public MDWebMetadataReader(Reader MDReader) throws SQLException {
         this.MDReader        = MDReader;
-        this.connection      = c;
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
@@ -273,11 +262,18 @@ public class MetadataReader {
         return result;
     }
     
+    
     /**
+     * 
+     * The following methods have been removed in order to let no more SQL code in this class.
+     * btw the getIdFromTitke methods is not described in the CSW specification. 
+     * 
+     * 
+     
      * Return the MDWeb form ID from the fileIdentifier
      * 
      * @Deprectated use a lucene query instead to retrieve form identifier and Catalogue name.
-     */
+     
     @Deprecated
     public int getIDFromFileIdentifier(String identifier) throws SQLException {
         
@@ -293,9 +289,10 @@ public class MetadataReader {
        return -1;
     }
     
+    
     /**
      * Return the MDWeb form ID from the fileIdentifier
-     */
+    @Deprecated
     public int getIDFromTitle(String title) throws SQLException {
         
        PreparedStatement stmt = connection.prepareStatement("Select identifier from \"Forms\" WHERE title=? ");
@@ -306,6 +303,8 @@ public class MetadataReader {
        }
        return -1;
     }
+      
+    */
     
     /**
      * Return a dublinCore record from a MDWeb formular

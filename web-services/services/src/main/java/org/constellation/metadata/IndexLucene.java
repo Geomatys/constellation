@@ -50,6 +50,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // MDWeb dependencies
+import org.constellation.metadata.io.GenericMetadataReader;
 import org.mdweb.lucene.AbstractIndex;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -77,9 +78,14 @@ public class IndexLucene extends AbstractIndex {
     private final Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
-     * The Reader of this lucene index.
+     * The Reader of this lucene index (MDWeb DB mode).
      */
-    private final Reader reader;
+    private final Reader MDWebReader;
+    
+    /**
+     * The Reader of this lucene index (generic DB mode).
+     */
+    private final GenericMetadataReader genericReader;
     
     /**
      * A lucene analyser.
@@ -109,10 +115,11 @@ public class IndexLucene extends AbstractIndex {
      */
     public IndexLucene(Reader reader, File configDirectory) throws SQLException {
         
-        this.reader = reader;
-        analyzer    = new StandardAnalyzer();
-        pathMap     = null;
-        classeMap   = null;
+        MDWebReader   = reader;
+        analyzer      = new StandardAnalyzer();
+        pathMap       = null;
+        classeMap     = null;
+        genericReader = null;
         
         // we get the configuration file
         File f = new File(configDirectory, "index");
@@ -159,6 +166,61 @@ public class IndexLucene extends AbstractIndex {
     }
     
     /**
+     * Creates a new Lucene Index with the specified MDweb reader.
+     * 
+     * @param reader An mdweb reader for read the metadata database.
+     * @param configDirectory A directory where the index can write indexation file. 
+     */
+    public IndexLucene(GenericMetadataReader reader, File configDirectory) throws SQLException {
+        
+        genericReader = reader;
+        analyzer      = new StandardAnalyzer();
+        pathMap       = null;
+        classeMap     = null;
+        MDWebReader   = null;
+        
+        // we get the configuration file
+        File f = new File(configDirectory, "index");
+        
+        setFileDirectory(f);
+        
+        //if the index File exists we don't need to index the documents again.
+        if(!getFileDirectory().exists()) {
+            logger.info("Creating lucene index for the first time...");
+            long time = System.currentTimeMillis();
+            IndexWriter writer;
+            int nbEntries  = 0; 
+            try {
+                writer = new IndexWriter(getFileDirectory(), analyzer, true);
+                
+                // TODO getting the objects list and index avery item in the IndexWriter.
+                List<String> ids = null;//reader.getAllForm(cats);
+                logger.info("end read all entries");
+                nbEntries    =  ids.size();
+                for (Object entry : ids) {
+                    indexDocument(writer, entry);
+                }
+                writer.optimize();
+                writer.close();
+                
+            } catch (CorruptIndexException ex) {
+                logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            } catch (LockObtainFailedException ex) {
+                logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                logger.severe("IOException while indexing document: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
+                        " documents indexed: " + nbEntries);
+        } else {
+            logger.info("Index already created");
+        }
+    }
+    
+    /**
      * Creates a new Lucene Index with the specified list of Form.
      * This mode of lucene index don't use a MDweb reader (he don't need a database).
      * for now it is used only in JUnit test.
@@ -169,9 +231,9 @@ public class IndexLucene extends AbstractIndex {
      */
     protected IndexLucene(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
         
-        analyzer     = new StandardAnalyzer();
-        reader       = null;
-        
+        analyzer      = new StandardAnalyzer();
+        MDWebReader   = null;
+        genericReader = null;
         //we fill the map of classe
         classeMap = new HashMap<String, Classe>();
         for (Classe c: classes) {
@@ -323,10 +385,10 @@ public class IndexLucene extends AbstractIndex {
                     pathID = fullPathID;
                 }
                 
-                if (reader != null) {
-                    path   = reader.getPath(pathID);
+                if (MDWebReader != null) {
+                    path   = MDWebReader.getPath(pathID);
                     if (conditionalPathID != null)
-                        conditionalPath = reader.getPath(conditionalPathID);
+                        conditionalPath = MDWebReader.getPath(conditionalPathID);
                 } else {
                     path = pathMap.get(pathID);
                     if (conditionalPathID != null)
@@ -411,12 +473,12 @@ public class IndexLucene extends AbstractIndex {
         doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.TOKENIZED));
         
         Classe identifiable, registryObject;
-        if (reader == null) {
+        if (MDWebReader == null) {
             identifiable   = classeMap.get("Identifiable");
             registryObject = classeMap.get("RegistryObject");
         } else {
-            identifiable   = reader.getClasse("Identifiable", Standard.EBRIM_V3);
-            registryObject = reader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
+            identifiable   = MDWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
+            registryObject = MDWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
         }
         
         if (form.getTopValue() == null) {
