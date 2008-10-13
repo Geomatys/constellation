@@ -237,8 +237,9 @@ public class ServicesBean {
 
         //we create the JAXBContext and read the selected file 
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
-                WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
-                org.constellation.cat.csw.v202.Capabilities.class, UserData.class);
+                                                        WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
+                                                        org.constellation.cat.csw.v202.Capabilities.class, UserData.class,
+                                                        org.constellation.sos.Capabilities.class);
 
         unmarshaller = JBcontext.createUnmarshaller();
         marshaller = JBcontext.createMarshaller();
@@ -1405,5 +1406,13 @@ public class ServicesBean {
 
     public void setExistPrefrence(boolean existPrefrence) {
         this.existPrefrence = existPrefrence;
+    }
+    
+    public void restartServices() {
+        logger.info("restart services");
+    }
+    
+    public void generateIndex() {
+        logger.info("generate index");
     }
 }

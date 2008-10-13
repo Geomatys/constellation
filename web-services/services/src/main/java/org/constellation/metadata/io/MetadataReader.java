@@ -19,7 +19,10 @@
 package org.constellation.metadata.io;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.coverage.web.ServiceVersion;
@@ -29,11 +32,30 @@ import org.constellation.ows.v100.OWSWebServiceException;
  *
  * @author Guilhem Legal
  */
-public interface MetadataReader {
+public abstract class MetadataReader {
     
     public final static int DUBLINCORE = 0;
     public final static int ISO_19115  = 1;
     public final static int EBRIM      = 2;
+    
+    /**
+     * A debugging logger
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.metadata.io");
+    
+    /**
+     * A service version used in exception launch.
+     */
+    protected ServiceVersion version;
+    
+    /**
+     * A map containing the metadata already extract from the database.
+     */
+    protected final Map<String, Object> metadatas;
+    
+    public MetadataReader() {
+        this.metadatas = new HashMap<String, Object>();
+    }
     
     /**
      * Return a metadata object from the specified identifier.
@@ -44,9 +66,11 @@ public interface MetadataReader {
      * @return An metadata object.
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException;
     
     
-    public void setVersion(ServiceVersion version);
+    public final void setVersion(ServiceVersion version) {
+        this.version = version;
+    }
 
 }

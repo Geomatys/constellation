@@ -51,11 +51,18 @@ public class AuthentificationBean {
     }
     
     public String authentify() {
-        Cookie cookie = new Cookie("authent", login + ':' + password);
-        cookie.setPath(contextPath);
-        response.addCookie(cookie);
-        logger.info("cookie added with value:" + login + ':' + password);
-        return "authentified";
+        
+        //TODO remove this ugly thing
+        if (login != null && login.equals("admin") && password != null && password.equals("admin")) {
+            Cookie cookie = new Cookie("authent", login + ':' + password);
+            cookie.setPath(contextPath);
+            response.addCookie(cookie);
+            logger.info("cookie added with value:" + login + ':' + password);
+            return "authentified";
+        } else {
+            return "notAllowed";
+        }
+        
     }
 
     public String getLogin() {

@@ -209,18 +209,24 @@ public class GeoDRMService extends WebService {
             }
 
             //we define the action
-            String action = getParameter("LAYERS", true);
+            String action;
             List<String> actions = new ArrayList<String>();
-            if (action.equals("") && objectRequest != null) {
-                action = objectRequest.getClass().getSimpleName();
-                action = action.replace("Type", "");
-            } else {
-                final StringTokenizer tokens = new StringTokenizer(action, ",;");
-                while (tokens.hasMoreTokens()) {
-                    actions.add(tokens.nextToken());
+            
+            if (request.equalsIgnoreCase("getMap")) {
+                action = getParameter("LAYERS", true);
+                if (action.equals("") && objectRequest != null) {
+                    action = objectRequest.getClass().getSimpleName();
+                    action = action.replace("Type", "");
+                } else {
+                    final StringTokenizer tokens = new StringTokenizer(action, ",;");
+                    while (tokens.hasMoreTokens()) {
+                        actions.add(tokens.nextToken());
+                    }
                 }
+            } else {
+                action = request;
             }
-
+            
             //we define the selected URI
             String requestedURI = context.getRequestUri().toString();
             if (objectRequest == null) {

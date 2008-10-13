@@ -454,7 +454,7 @@ public class CSWworker {
             
             // else we use the defaut database mode: MDWeb.
             } else {
-                logger.info("Using default database type; MDWeb");
+                logger.info("Using default database type: MDWeb");
             
                 profile = TRANSACTIONAL;
                 

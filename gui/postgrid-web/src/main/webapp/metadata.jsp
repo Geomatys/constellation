@@ -14,7 +14,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Seagis Metadata Editor</title>
+        <title>Constellation Metadata Editor</title>
         <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
     </head>
     <body>
@@ -61,7 +61,7 @@
             <h:form id="form_2">
                 <div id="content" class="content">
                     
-                    <h:outputText value="Web Services Metadata editor for Seagis" style="font-size:17px;font-weight:bold;"/>
+                    <h:outputText value="Web Services Metadata editor for Constellation" style="font-size:17px;font-weight:bold;"/>
                     <br/>
                     <h:panelGrid id="ServiceIdentificationGrid" columns="2" cellpadding="2" cellspacing="30" width="100%">
                         <h:outputLabel for="selone_lb" value="Select Web services metadata : " />
@@ -88,6 +88,27 @@
                 </div>
                 <h:inputText id="urlId" value="#{servicesBean.urlPreference}" style="display:none;" onchange="document.getElementById('target_xml').src=(document.getElementById('form_2:urlId').value);"/>
             </h:form>
+
+             <h:form id="form_3">
+                <div id="configuration" class="content">
+                    
+                    <h:outputText value="Web Services configuration and maintenance for Constellation" style="font-size:17px;font-weight:bold;"/>
+                    <br/>
+                    <h:panelGrid id="maintenanceGrid" columns="2" cellpadding="2" cellspacing="30" width="100%">
+                        <t:commandLink styleClass="button" id="restart-id" onclick="" action="#{servicesBean.restartServices}">
+                            <h:outputText id="restart_label" value="Restart the services"/>
+                        </t:commandLink>
+                        
+                        <t:commandLink styleClass="button" id="generateIndex-id" action="#{servicesBean.generateIndex}">
+                            <h:outputText id="generate_label" value="Generate Index"/>
+                        </t:commandLink>
+                        
+                    </h:panelGrid>
+                    
+                   
+                </div>
+            </h:form>
+
             <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
         </f:view>
     </body>

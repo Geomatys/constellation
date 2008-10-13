@@ -1,6 +1,6 @@
 <Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
         RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides"
-        Version="2.0" PolicyId="wcsPolicy">
+        Version="2.0" PolicyId="wmsPolicy">
     <Target>
         <Resources>
              <Resource>
@@ -17,6 +17,12 @@
                  <Action>
                       <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">BlueMarble</AttributeValue>
+                          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
+                      </ActionMatch>
+                 </Action>
+                 <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">GetCapabilities</AttributeValue>
                           <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
                       </ActionMatch>
                  </Action>
@@ -41,6 +47,12 @@
                  <Action>
                       <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Caraibes</AttributeValue>
+                          <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
+                      </ActionMatch>
+                 </Action>
+                 <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">GetCapabilities</AttributeValue>
                           <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"/>
                       </ActionMatch>
                  </Action>

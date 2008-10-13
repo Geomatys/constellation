@@ -18,21 +18,40 @@
 
 package org.constellation.metadata;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
- * @author Mehdi Sidhoum
+ * A set of utilitie methods.
+ * 
+ * @author Mehdi Sidhoum, Legal Guilhem.
  */
 public class Utils {
     
     /**
      * Returns true if the list contains a string in one of the list elements.
-     * @param list
-     * @param str
-     * @return
+     * 
+     * @param list A list of Strings. 
+     * @param str  A single string.
+     * 
+     * @return true if at least an element of the list contains the specifieds string.
      */
     public static boolean matchesStringfromList(List<String> list, String str) {
         boolean str_available = false;
@@ -44,6 +63,245 @@ public class Utils {
             }
         }
         return str_available;
+    }
+    
+    /**
+     * Return a string with the first character to upper casse.
+     * example : firstToUpper("hello") return "Hello".
+     * 
+     * @param s the string to modifiy
+     * 
+     * @return a string with the first character to upper casse.
+     */
+    public static String firstToUpper(String s) {
+        String first = s.substring(0, 1);
+        String result = s.substring(1);
+        result = first.toUpperCase() + result;
+        return result;
+    }
+    
+     /**
+     * Return a Date by parsing different kind of date format.
+     * 
+     * @param date a date representation (example 2002, 02-2007, 2004-03-04, ...)
+     * 
+     * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
+     */
+    public static Date createDate(String date, DateFormat dateFormat) throws ParseException {
+        
+        Map<String, String> POOL = new HashMap<String, String>();
+        POOL.put("janvier",   "01");
+        POOL.put("février",   "02");
+        POOL.put("mars",      "03");
+        POOL.put("avril",     "04");
+        POOL.put("mai",       "05");
+        POOL.put("juin",      "06");
+        POOL.put("juillet",   "07");
+        POOL.put("août",      "08");
+        POOL.put("septembre", "09");
+        POOL.put("octobre",   "10");
+        POOL.put("novembre",  "11");
+        POOL.put("décembre",  "12");
+        
+        Map<String, String> POOLcase = new HashMap<String, String>();
+        POOLcase.put("Janvier",   "01");
+        POOLcase.put("Février",   "02");
+        POOLcase.put("Mars",      "03");
+        POOLcase.put("Avril",     "04");
+        POOLcase.put("Mai",       "05");
+        POOLcase.put("Juin",      "06");
+        POOLcase.put("Juillet",   "07");
+        POOLcase.put("Août",      "08");
+        POOLcase.put("Septembre", "09");
+        POOLcase.put("Octobre",   "10");
+        POOLcase.put("Novembre",  "11");
+        POOLcase.put("Décembre",  "12");
+        
+        String year;
+        String month;
+        String day;
+        Date tmp = dateFormat.parse("1900" + "-" + "01" + "-" + "01");
+        if (date != null){
+            if(date.contains("/")){
+                
+                day   = date.substring(0, date.indexOf("/"));
+                date  = date.substring(date.indexOf("/")+1);
+                month = date.substring(0, date.indexOf("/"));
+                year  = date.substring(date.indexOf("/")+1);
+                                
+                tmp   = dateFormat.parse(year + "-" + month + "-" + day);
+            } else if ( getOccurence(date, " ") == 2 ) {
+                if (! date.contains("?")){
+                               
+                    day    = date.substring(0, date.indexOf(" "));
+                    date   = date.substring(date.indexOf(" ")+1);
+                    month  = POOL.get(date.substring(0, date.indexOf(" ")));
+                    year   = date.substring(date.indexOf(" ")+1);
+
+                    tmp    = dateFormat.parse(year + "-" + month + "-" + day);
+                } else tmp = dateFormat.parse("01" + "-" + "01" + "-" + "2000");
+                
+            } else if ( getOccurence(date, " ") == 1 ) {
+                
+                month = POOLcase.get(date.substring(0, date.indexOf(" ")));
+                year  = date.substring(date.indexOf(" ") + 1);   
+                tmp   = dateFormat.parse(year + "-" + month + "-01");
+                
+            } else if ( getOccurence(date, "-") == 1 ) {
+                
+                month = date.substring(0, date.indexOf("-"));
+                year  = date.substring(date.indexOf("-")+1);
+                                
+                tmp   = dateFormat.parse(year + "-" + month + "-01");
+                
+            } else if ( getOccurence(date, "-") == 2 ) {
+                
+                //if date is in format yyyy-mm-dd
+                if (date.substring(0, date.indexOf("-")).length()==4){
+                    year  = date.substring(0, date.indexOf("-"));
+                    date  = date.substring(date.indexOf("-")+1);
+                    month = date.substring(0, date.indexOf("-"));
+                    day   = date.substring(date.indexOf("-")+1);
+                    
+                    tmp   = dateFormat.parse(year + "-" + month + "-" + day);
+                }
+                else{
+                    day   = date.substring(0, date.indexOf("-"));
+                    date  = date.substring(date.indexOf("-")+1);
+                    month = date.substring(0, date.indexOf("-"));
+                    year  = date.substring(date.indexOf("-")+1);
+                    
+                    tmp =  dateFormat.parse(year + "-" + month + "-" + day);
+                }
+                
+            } else {
+                year = date;
+                tmp  =  dateFormat.parse(year + "-01-01");
+            }
+        }
+        return tmp;
+    }
+    
+        
+    /**
+     * This method returns a number of occurences occ in the string s.
+     */
+    public static int getOccurence (String s, String occ){
+        if (! s.contains(occ))
+            return 0;
+        else {
+            int nbocc = 0;
+            while(s.indexOf(occ) != -1){
+                s = s.substring(s.indexOf(occ)+1);
+                nbocc++;
+            }
+            return nbocc;
+        }
+    }
+    
+    /**
+     * Search in the librairies and the classes the child of the specified packages,
+     * and return all of them.
+     * 
+     * @param packages the packages to scan.
+     * 
+     * @return a list of package names.
+     */
+    public static List<String> searchSubPackage(String... packages) {
+        List<String> result = new ArrayList<String>();
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        for (String p : packages) {
+            try {
+                String fileP = p.replace('.', '/');
+                Enumeration<URL> urls = classloader.getResources(fileP);
+                while (urls.hasMoreElements()) {
+                    URL url = urls.nextElement();
+                    try {
+                        URI uri = url.toURI();
+                        Logger.getAnonymousLogger().log(Level.FINER, "scanning :" + uri);
+                        result.addAll(scan(uri, fileP));
+                    } catch (URISyntaxException e) {
+                        Logger.getAnonymousLogger().log(Level.SEVERE,"URL, " + url + "cannot be converted to a URI");
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getAnonymousLogger().log(Level.SEVERE,"The resources for the package" + p + ", could not be obtained");
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Scan a resource file (a JAR or a directory) to find the sub-package names of
+     * the specified "filePackageName"
+     * 
+     * @param u The URI of the file.
+     * @param filePackageName The package to scan.
+     * 
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    public static List<String> scan(URI u, String filePackageName) throws IOException {
+        List<String> result = new ArrayList<String>();
+        String scheme = u.getScheme();
+        if (scheme.equals("file")) {
+            File f = new File(u.getPath());
+            if (f.isDirectory()) {
+                result.addAll(scanDirectory(f, filePackageName));
+            }
+        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            URI jarUri = URI.create(u.getSchemeSpecificPart());
+            String jarFile = jarUri.getPath();
+            jarFile = jarFile.substring(0, jarFile.indexOf('!'));
+            result.addAll(scanJar(new File(jarFile), filePackageName));
+        }
+        return result; 
+    }
+
+    /**
+     * Scan a directory to find the sub-package names of
+     * the specified "parent" package
+     * 
+     * @param root The root file (directory) of the package to scan.
+     * @param parent the package name.
+     * 
+     * @return a list of package names.
+     */
+    public static List<String> scanDirectory(File root, String parent) {
+        List<String> result = new ArrayList<String>();
+        for (File child : root.listFiles()) {
+            if (child.isDirectory()) {
+                result.add(parent.replace('/', '.') + '.' + child.getName());
+                result.addAll(scanDirectory(child, parent));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Scan a jar to find the sub-package names of
+     * the specified "parent" package
+     * 
+     * @param file the jar file containing the package to scan
+     * @param parent the package name.
+     * 
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    public static List<String> scanJar(File file, String parent) throws IOException {
+        List<String> result = new ArrayList<String>();
+        final JarFile jar = new JarFile(file);
+        final Enumeration<JarEntry> entries = jar.entries();
+        while (entries.hasMoreElements()) {
+            JarEntry e = entries.nextElement();
+            if (e.isDirectory() && e.getName().startsWith(parent)) {
+                String s = e.getName().replace('/', '.');
+                s = s.substring(0, s.length() - 1);
+                result.add(s);
+            }
+        }
+        return result;
     }
 
 }

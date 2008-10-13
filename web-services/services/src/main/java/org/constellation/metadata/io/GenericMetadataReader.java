@@ -20,34 +20,42 @@ package org.constellation.metadata.io;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.ows.v100.OWSWebServiceException;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class GenericMetadataReader implements MetadataReader {
+public class GenericMetadataReader extends MetadataReader {
+    
+    public GenericMetadataReader() {
+        super();
+    }
     
     /**
-     * A debugging logger
+     * Return a new Metadata object read from the database for the specified identifier.
+     *  
+     * @param identifier An unique identifier
+     * @param mode An output schema mode: ISO_19115 and DUBLINCORE supported.
+     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param elementName A list of QName describing the requested fields. (implies type == null)
+     * @return A metadata Object (dublin core Record / geotools metadata)
+     * 
+     * @throws java.sql.SQLException
+     * @throws org.constellation.ows.v100.OWSWebServiceException
      */
-    private Logger logger = Logger.getLogger("org.constellation.metadata.io");
-    
-    /**
-     * A service version used in exception launch.
-     */
-    private ServiceVersion version;
-
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object result = null;
+        
+        if (mode == ISO_19115) {
+            
+        } else if (mode == DUBLINCORE) {
+            
+        } else {
+            throw new IllegalArgumentException("Unknow or unAuthorized standard mode: " + mode);
+        }
+        return result;
     }
-
-    public void setVersion(ServiceVersion version) {
-        this.version = version;
-    }
-
 }

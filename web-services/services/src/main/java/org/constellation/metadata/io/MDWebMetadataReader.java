@@ -40,10 +40,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 // Constellation Dependencies
-import javax.xml.namespace.QName;
 import org.constellation.cat.csw.Settable;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
@@ -51,9 +52,9 @@ import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ows.v100.OWSWebServiceException;
-import org.constellation.coverage.web.ServiceVersion;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -64,11 +65,11 @@ import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
+import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
 
-//geotools dependencies
+// geotools/GeoAPI dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.mdweb.model.storage.LinkedValue;
 import org.opengis.util.CodeList;
 
 
@@ -78,22 +79,12 @@ import org.opengis.util.CodeList;
  * 
  * @author Guilhem legal
  */
-public class MDWebMetadataReader implements MetadataReader {
+public class MDWebMetadataReader extends MetadataReader {
 
-    /**
-     * A debugging logger
-     */
-    private Logger logger = Logger.getLogger("org.constellation.metadata.io");
-    
     /**
      * A reader to the MDWeb database.
      */
     private Reader MDReader;
-    
-    /**
-     * A map containing the metadata already extract from the database.
-     */
-    private Map<String, Object> metadatas;
     
     /**
      * A map containing the mapping beetween the MDWeb className and java typeName
@@ -137,10 +128,8 @@ public class MDWebMetadataReader implements MetadataReader {
     private Map<Value, Object> alreadyRead;
     
     /**
-     * A service version used in exception launch.
+     * A map of binding term-path for each standard.
      */
-    private ServiceVersion version;
-    
     private final static Map<Standard, Map<String, String>> DublinCorePathMap;
     static {
         DublinCorePathMap          = new HashMap<Standard, Map<String, String>>();
@@ -181,20 +170,20 @@ public class MDWebMetadataReader implements MetadataReader {
      * @param MDReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(Reader MDReader) throws SQLException {
+        super();
         this.MDReader        = MDReader;
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
-        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
+        this.geotoolsPackage = Utils.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
                                                 "org.constellation.metadata.fra");
-        this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
+        this.opengisPackage  = Utils.searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.CSWPackage      = searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
+        this.CSWPackage      = Utils.searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
                                                 "org.constellation.ogc");
-        this.ebrimV3Package  = searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
-        this.ebrimV25Package = searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+        this.ebrimV3Package  = Utils.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
+        this.ebrimV25Package = Utils.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
-        this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();
     }
@@ -203,9 +192,12 @@ public class MDWebMetadataReader implements MetadataReader {
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      * 
-     * @param identifier The form identifier with the pattern : Form_ID:
+     * @param identifier The form identifier with the pattern : "Form_ID:Catalog_Code"
+     * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
+     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param elementName A list of QName describing the requested fields. (implies type == null)
+     * @return A metadata Object (dublin core Record / geotools metadata / ebrim registry object)
      * 
-     * @return An metadata object.
      * @throws java.sql.SQLException
      */
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
@@ -257,54 +249,10 @@ public class MDWebMetadataReader implements MetadataReader {
             result = applyElementSet(result, type, elementName);
             
         } else {
-            throw new IllegalArgumentException("unknow standard mode:" + mode);
+            throw new IllegalArgumentException("Unknow standard mode: " + mode);
         }
         return result;
     }
-    
-    
-    /**
-     * 
-     * The following methods have been removed in order to let no more SQL code in this class.
-     * btw the getIdFromTitke methods is not described in the CSW specification. 
-     * 
-     * 
-     
-     * Return the MDWeb form ID from the fileIdentifier
-     * 
-     * @Deprectated use a lucene query instead to retrieve form identifier and Catalogue name.
-     
-    @Deprecated
-    public int getIDFromFileIdentifier(String identifier) throws SQLException {
-        
-       PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
-                                                            "WHERE value=? " +
-                                                            "AND (path='ISO 19115:MD_Metadata:fileIdentifier' " +
-                                                            "OR  path like '%Catalog Web Service:Record:identifier%')");
-       stmt.setString(1, identifier);
-       ResultSet queryResult = stmt.executeQuery();
-       if (queryResult.next()) {
-            return queryResult.getInt(1);
-       }
-       return -1;
-    }
-    
-    
-    /**
-     * Return the MDWeb form ID from the fileIdentifier
-    @Deprecated
-    public int getIDFromTitle(String title) throws SQLException {
-        
-       PreparedStatement stmt = connection.prepareStatement("Select identifier from \"Forms\" WHERE title=? ");
-       stmt.setString(1, title);
-       ResultSet queryResult = stmt.executeQuery();
-       if (queryResult.next()) {
-            return queryResult.getInt(1);
-       }
-       return -1;
-    }
-      
-    */
     
     /**
      * Return a dublinCore record from a MDWeb formular
@@ -486,8 +434,8 @@ public class MDWebMetadataReader implements MetadataReader {
             Class recordClass = RecordType.class;
             for (QName qn : elementName) {
 
-                String getterName = "get" + firstToUpper(qn.getLocalPart());
-                String setterName = "set" + firstToUpper(qn.getLocalPart());
+                String getterName = "get" + Utils.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
                 try {
                     Method getter = recordClass.getMethod(getterName);
                     Object param = getter.invoke(fullResult);
@@ -660,8 +608,8 @@ public class MDWebMetadataReader implements MetadataReader {
 
             for (QName qn : elementName) {
 
-                String getterName = "get" + firstToUpper(qn.getLocalPart());
-                String setterName = "set" + firstToUpper(qn.getLocalPart());
+                String getterName = "get" + Utils.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
                 String currentMethodName = getterName + "()";
                 try {
                     Method getter = recordClass.getMethod(getterName);
@@ -803,7 +751,7 @@ public class MDWebMetadataReader implements MetadataReader {
                 } else if (classe.equals(Date.class)) {
                     /*Method method = DateFormat.class.getMethod("parse", String.class);
                     result = method.invoke(dateFormat, textValue);*/
-                    return createDate(textValue);
+                    return Utils.createDate(textValue, dateFormat);
 
                 // else we use a String constructor    
                 } else {
@@ -1242,7 +1190,7 @@ public class MDWebMetadataReader implements MetadataReader {
             propertyName = "ending";
         } 
         
-        String methodName = "set" + firstToUpper(propertyName);
+        String methodName = "set" + Utils.firstToUpper(propertyName);
         int occurenceType = 0;
         
         //TODO look all interfaces
@@ -1363,251 +1311,5 @@ public class MDWebMetadataReader implements MetadataReader {
         logger.severe("No setter have been found for attribute " + propertyName + 
                       " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
-    }
-
-    /**
-     * Return a string with the first character to upper casse.
-     * example : firstToUpper("hello") return "Hello".
-     * 
-     * @param s the string to modifiy
-     * 
-     * @return a string with the first character to upper casse.
-     */
-    private String firstToUpper(String s) {
-        String first = s.substring(0, 1);
-        String result = s.substring(1);
-        result = first.toUpperCase() + result;
-        return result;
-    }
-    
-    /**
-     * Search in the librairies and the classes the child of the specified packages,
-     * and return all of them.
-     * 
-     * @param packages the packages to scan.
-     * 
-     * @return a list of package names.
-     */
-    private List<String> searchSubPackage(String... packages) {
-        List<String> result = new ArrayList<String>();
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        for (String p : packages) {
-            try {
-                String fileP = p.replace('.', '/');
-                Enumeration<URL> urls = classloader.getResources(fileP);
-                while (urls.hasMoreElements()) {
-                    URL url = urls.nextElement();
-                    try {
-                        URI uri = url.toURI();
-                        logger.finer("scanning :" + uri);
-                        result.addAll(scan(uri, fileP));
-                    } catch (URISyntaxException e) {
-                        logger.severe("URL, " + url + "cannot be converted to a URI");
-                    }
-                }
-            } catch (IOException ex) {
-                logger.severe("The resources for the package" + p +
-                              ", could not be obtained");
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Scan a resource file (a JAR or a directory) to find the sub-package names of
-     * the specified "filePackageName"
-     * 
-     * @param u The URI of the file.
-     * @param filePackageName The package to scan.
-     * 
-     * @return a list of package names.
-     * @throws java.io.IOException
-     */
-    private List<String> scan(URI u, String filePackageName) throws IOException {
-        List<String> result = new ArrayList<String>();
-        String scheme = u.getScheme();
-        if (scheme.equals("file")) {
-            File f = new File(u.getPath());
-            if (f.isDirectory()) {
-                result.addAll(scanDirectory(f, filePackageName));
-            }
-        } else if (scheme.equals("jar") || scheme.equals("zip")) {
-            URI jarUri = URI.create(u.getSchemeSpecificPart());
-            String jarFile = jarUri.getPath();
-            jarFile = jarFile.substring(0, jarFile.indexOf('!'));
-            result.addAll(scanJar(new File(jarFile), filePackageName));
-        }
-        return result; 
-    }
-
-    /**
-     * Scan a directory to find the sub-package names of
-     * the specified "parent" package
-     * 
-     * @param root The root file (directory) of the package to scan.
-     * @param parent the package name.
-     * 
-     * @return a list of package names.
-     */
-    private List<String> scanDirectory(File root, String parent) {
-        List<String> result = new ArrayList<String>();
-        for (File child : root.listFiles()) {
-            if (child.isDirectory()) {
-                result.add(parent.replace('/', '.') + '.' + child.getName());
-                result.addAll(scanDirectory(child, parent));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Scan a jar to find the sub-package names of
-     * the specified "parent" package
-     * 
-     * @param file the jar file containing the package to scan
-     * @param parent the package name.
-     * 
-     * @return a list of package names.
-     * @throws java.io.IOException
-     */
-    private static List<String> scanJar(File file, String parent) throws IOException {
-        List<String> result = new ArrayList<String>();
-        final JarFile jar = new JarFile(file);
-        final Enumeration<JarEntry> entries = jar.entries();
-        while (entries.hasMoreElements()) {
-            JarEntry e = entries.nextElement();
-            if (e.isDirectory() && e.getName().startsWith(parent)) {
-                String s = e.getName().replace('/', '.');
-                s = s.substring(0, s.length() - 1);
-                result.add(s);
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * Return a Date by parsing different kind of date format.
-     * 
-     * @param date a date representation (example 2002, 02-2007, 2004-03-04, ...)
-     * 
-     * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
-     */
-    private Date createDate(String date) throws ParseException{
-        
-        Map<String, String> POOL = new HashMap<String, String>();
-        POOL.put("janvier",   "01");
-        POOL.put("février",   "02");
-        POOL.put("mars",      "03");
-        POOL.put("avril",     "04");
-        POOL.put("mai",       "05");
-        POOL.put("juin",      "06");
-        POOL.put("juillet",   "07");
-        POOL.put("août",      "08");
-        POOL.put("septembre", "09");
-        POOL.put("octobre",   "10");
-        POOL.put("novembre",  "11");
-        POOL.put("décembre",  "12");
-        
-        Map<String, String> POOLcase = new HashMap<String, String>();
-        POOLcase.put("Janvier",   "01");
-        POOLcase.put("Février",   "02");
-        POOLcase.put("Mars",      "03");
-        POOLcase.put("Avril",     "04");
-        POOLcase.put("Mai",       "05");
-        POOLcase.put("Juin",      "06");
-        POOLcase.put("Juillet",   "07");
-        POOLcase.put("Août",      "08");
-        POOLcase.put("Septembre", "09");
-        POOLcase.put("Octobre",   "10");
-        POOLcase.put("Novembre",  "11");
-        POOLcase.put("Décembre",  "12");
-        
-        String year;
-        String month;
-        String day;
-        Date tmp = dateFormat.parse("1900" + "-" + "01" + "-" + "01");
-        if (date != null){
-            if(date.contains("/")){
-                
-                day   = date.substring(0, date.indexOf("/"));
-                date  = date.substring(date.indexOf("/")+1);
-                month = date.substring(0, date.indexOf("/"));
-                year  = date.substring(date.indexOf("/")+1);
-                                
-                tmp   = dateFormat.parse(year + "-" + month + "-" + day);
-            } else if ( getOccurence(date, " ") == 2 ) {
-                if (! date.contains("?")){
-                               
-                    day    = date.substring(0, date.indexOf(" "));
-                    date   = date.substring(date.indexOf(" ")+1);
-                    month  = POOL.get(date.substring(0, date.indexOf(" ")));
-                    year   = date.substring(date.indexOf(" ")+1);
-
-                    tmp    = dateFormat.parse(year + "-" + month + "-" + day);
-                } else tmp = dateFormat.parse("01" + "-" + "01" + "-" + "2000");
-                
-            } else if ( getOccurence(date, " ") == 1 ) {
-                
-                month = POOLcase.get(date.substring(0, date.indexOf(" ")));
-                year  = date.substring(date.indexOf(" ") + 1);   
-                tmp   = dateFormat.parse(year + "-" + month + "-01");
-                
-            } else if ( getOccurence(date, "-") == 1 ) {
-                
-                month = date.substring(0, date.indexOf("-"));
-                year  = date.substring(date.indexOf("-")+1);
-                                
-                tmp   = dateFormat.parse(year + "-" + month + "-01");
-                
-            } else if ( getOccurence(date, "-") == 2 ) {
-                
-                //if date is in format yyyy-mm-dd
-                if (date.substring(0, date.indexOf("-")).length()==4){
-                    year  = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
-                    month = date.substring(0, date.indexOf("-"));
-                    day   = date.substring(date.indexOf("-")+1);
-                    
-                    tmp   = dateFormat.parse(year + "-" + month + "-" + day);
-                }
-                else{
-                    day   = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
-                    month = date.substring(0, date.indexOf("-"));
-                    year  = date.substring(date.indexOf("-")+1);
-                    
-                    tmp =  dateFormat.parse(year + "-" + month + "-" + day);
-                }
-                
-            } else {
-                year = date;
-                tmp  =  dateFormat.parse(year + "-01-01");
-            }
-        }
-        return tmp;
-    }
-    
-    /**
-     * This method returns a number of occurences occ in the string s.
-     */
-    private int getOccurence (String s, String occ){
-        if (! s.contains(occ))
-            return 0;
-        else {
-            int nbocc = 0;
-            while(s.indexOf(occ) != -1){
-                s = s.substring(s.indexOf(occ)+1);
-                nbocc++;
-            }
-            return nbocc;
-        }
-    }
-    
-    /**
-     * Set the current service version
-     */
-    public void setVersion(ServiceVersion version){
-        this.version = version;
     }
 }
