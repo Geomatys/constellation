@@ -30,6 +30,40 @@ import org.constellation.coverage.web.ServiceVersion;
  */
 public abstract class Query {
     /**
+     * Parameters for all requests.
+     */
+    public static final String KEY_SERVICE = "SERVICE";
+    public static final String KEY_VERSION = "VERSION";
+    public static final String KEY_REQUEST = "REQUEST";
+
+    /**
+     * Exception handling parameters.
+     */
+    public static final String KEY_EXCEPTIONS = "EXCEPTIONS";
+    public static final String EXCEPTIONS_INIMAGE = "INIMAGE";
+
+    /**
+     * Undefined CRS constant.
+     */
+    public static final String UNDEFINED_CRS = "UNDEFINEDCRS";
+
+    /**
+     * Formats values.
+     */
+    public static final String APP_GML = "application/vnd.ogc.gml";
+    public static final String APP_XML = "application/vnd.ogc.xml";
+    public static final String APP_WMS_XML = "application/vnd.ogc.wms_xml";
+    public static final String APP_INIMAGE = "application/vnd.ogc.se_inimage";
+    public static final String IMAGE_PNG = "image/png";
+    public static final String IMAGE_GIF = "image/gif";
+    public static final String IMAGE_JPEG = "image/jpeg";
+    public static final String GML = "gml";
+    public static final String XML = "xml";
+    public static final String TEXT_XML = "text/xml";
+    public static final String TEXT_PLAIN = "text/plain";
+    public static final String TEXT_HTML = "text/html";
+
+    /**
      * Returns the request type specified for this query.
      */
     public abstract QueryRequest getRequest();
@@ -43,7 +77,7 @@ public abstract class Query {
      * Returns the version of the service chosen, or {@code null} if not specified.
      */
     public abstract ServiceVersion getVersion();
-    
+
     /**
      * Returns the exception format. Never {@code null}.
      */

@@ -27,23 +27,15 @@ import org.constellation.query.QueryService;
  * @author Johann Sorel (Geomatys)
  */
 public abstract class WMSQuery extends Query {
-    public static final String KEY_SERVICE = "SERVICE";
-    public static final String KEY_VERSION = "VERSION";
     /**
      * Request parameters.
      */
-    public static final String KEY_REQUEST = "REQUEST";
     public static final String GETMAP = "GetMap";
     public static final String GETFEATUREINFO = "GetFeatureInfo";
     public static final String GETCAPABILITIES = "GetCapabilities";
     public static final String DESCRIBELAYER = "DescribeLayer";
     public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
     public static final String GETORIGFILE = "GetOrigFile";
-
-    /** Parameter used in getMap */
-    public static final String KEY_EXCEPTIONS = "EXCEPTIONS";
-    /** Parameter used in getMap */
-    public static final String EXCEPTIONS_INIMAGE = "INIMAGE";
 
     /** Parameter used in getMap, getLegendGraphic, getCapabilities */
     public static final String KEY_FORMAT = "FORMAT";
@@ -107,10 +99,6 @@ public abstract class WMSQuery extends Query {
     public static final String KEY_FEATURE_COUNT = "FEATURE_COUNT";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_GETMETADATA = "GetMetadata";
-    /**
-     * Parameter used in all WMS requests.
-     */
-    public static final String UNDEFINED_CRS = "UndefinedCRS";
 
     protected final WMSQueryVersion version;
 

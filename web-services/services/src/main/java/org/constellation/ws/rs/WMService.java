@@ -181,7 +181,7 @@ public class WMService extends WebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(wmsex.getExceptionReport(), sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()),
-                                   (query == null) ? "application/vnd.ogc.se_xml" : query.getExceptionFormat()).build();
+                                   (query == null) ? APP_XML : query.getExceptionFormat()).build();
             } else {
                 throw new IllegalArgumentException("this service can't return OWS Exception");
             }
@@ -203,7 +203,7 @@ public class WMService extends WebService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(wmsEx.getExceptionReport(), sw);
             return Response.ok(cleanSpecialCharacter(sw.toString()),
-                                   (query == null) ? "application/vnd.ogc.se_xml" : query.getExceptionFormat()).build();
+                                   (query == null) ? APP_XML : query.getExceptionFormat()).build();
         }
     }
 
@@ -213,8 +213,8 @@ public class WMService extends WebService {
      * @param query The {@linkplain WMSQuery wms query}.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
-     * @throws org.constellation.coverage.web.WebServiceException
-     * @throws javax.xml.bind.JAXBException
+     * @throws WebServiceException
+     * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private Response getCapabilities(final WMSQuery query) throws WebServiceException, JAXBException {
         //we begin by extracting the mandatory attribute
@@ -226,8 +226,10 @@ public class WMService extends WebService {
         //and the the optional attribute
         final WMSQueryVersion queryVersion = capabRequest.getVersion();
         String format = getParameter(KEY_FORMAT, false);
-        if (format == null || !(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
-            format = "text/xml";
+        if (format == null || !(format.equalsIgnoreCase(TEXT_XML) || format.equalsIgnoreCase(APP_WMS_XML) ||
+                format.equalsIgnoreCase(APP_XML)))
+        {
+            format = TEXT_XML;
         }
 
         final AbstractWMSCapabilities response;
@@ -243,7 +245,7 @@ public class WMService extends WebService {
 
         //we build the list of accepted crs
         final List<String> crs = new ArrayList<String>();
-        crs.add("CRS:84");     crs.add("EPSG:4326");  crs.add("EPSG:3395");
+        crs.add("CRS:4326");     crs.add("EPSG:84");  crs.add("EPSG:3395");
         crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573"); crs.add("EPSG:27574");
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
@@ -352,10 +354,8 @@ public class WMService extends WebService {
             // LegendUrl generation
             final String layerName = layer.getName();
             final String beginLegendUrl = getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=";
-            final String formatPng = "image/png";
-            final String formatGif = "image/gif";
-            final String legendUrlGif = beginLegendUrl + formatGif + "&LAYER=" + layerName;
-            final String legendUrlPng = beginLegendUrl + formatPng + "&LAYER=" + layerName;
+            final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
+            final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
             final int queryable = (layer.isQueryable(Service.GETINFO) == true) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.equals(WMSQueryVersion.WMS_1_1_1)) {
@@ -370,10 +370,10 @@ public class WMService extends WebService {
                     null;
 
                 org.constellation.wms.v111.OnlineResource or = new org.constellation.wms.v111.OnlineResource(legendUrlPng);
-                org.constellation.wms.v111.LegendURL legendURL1 = new org.constellation.wms.v111.LegendURL(formatPng, or);
+                org.constellation.wms.v111.LegendURL legendURL1 = new org.constellation.wms.v111.LegendURL(IMAGE_PNG, or);
 
                 or = new org.constellation.wms.v111.OnlineResource(legendUrlGif);
-                org.constellation.wms.v111.LegendURL legendURL2 = new org.constellation.wms.v111.LegendURL(formatGif, or);
+                org.constellation.wms.v111.LegendURL legendURL2 = new org.constellation.wms.v111.LegendURL(IMAGE_GIF, or);
                 org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
 
@@ -395,10 +395,10 @@ public class WMService extends WebService {
 
                 // we build a Style Object
                 org.constellation.wms.v130.OnlineResource or = new org.constellation.wms.v130.OnlineResource(legendUrlPng);
-                org.constellation.wms.v130.LegendURL legendURL1 = new org.constellation.wms.v130.LegendURL(formatPng, or);
+                org.constellation.wms.v130.LegendURL legendURL1 = new org.constellation.wms.v130.LegendURL(IMAGE_PNG, or);
 
                 or = new org.constellation.wms.v130.OnlineResource(legendUrlGif);
-                org.constellation.wms.v130.LegendURL legendURL2 = new org.constellation.wms.v130.LegendURL(formatGif, or);
+                org.constellation.wms.v130.LegendURL legendURL2 = new org.constellation.wms.v130.LegendURL(IMAGE_GIF, or);
                 org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
 
@@ -446,16 +446,16 @@ public class WMService extends WebService {
 
         String infoFormat = info.getInfoFormat();
         if (infoFormat != null) {
-            if(!(infoFormat.equalsIgnoreCase("text/plain") || infoFormat.equalsIgnoreCase("text/html") ||
-                 infoFormat.equalsIgnoreCase("application/vnd.ogc.gml") || infoFormat.equalsIgnoreCase("text/xml") ||
-                 infoFormat.equalsIgnoreCase("application/vnd.ogc.xml") || infoFormat.equalsIgnoreCase("xml") ||
-                 infoFormat.equalsIgnoreCase("gml")))
+            if(!(infoFormat.equalsIgnoreCase(TEXT_PLAIN) || infoFormat.equalsIgnoreCase(TEXT_HTML) ||
+                 infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+                 infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                 infoFormat.equalsIgnoreCase(GML)))
             {
                 throw new WMSWebServiceException("This MIME type " + infoFormat +
                         " is not accepted by the service", INVALID_PARAMETER_VALUE, queryVersion);
             }
         } else {
-            infoFormat = "text/plain";
+            infoFormat = TEXT_PLAIN;
         }
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final List<String> layers = info.getQueryLayers();
@@ -505,7 +505,7 @@ public class WMService extends WebService {
         // We now build the response, according to the format chosen.
         final StringBuilder response = new StringBuilder();
         // TEXT / PLAIN
-        if (infoFormat.equalsIgnoreCase("text/plain")) {
+        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
             for (String layer : layers) {
                 final List<String> values = results.get(layer);
                 response.append((values.size() < 2) ? "Result for " : "Results for ").append(layer);
@@ -518,7 +518,7 @@ public class WMService extends WebService {
         }
 
         // TEXT / HTML
-        if (infoFormat.equalsIgnoreCase("text/html")) {
+        if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
             response.append("<html>\n")
                     .append("    <head>\n")
                     .append("        <title>GetFeatureInfo output</title>\n")
@@ -545,9 +545,9 @@ public class WMService extends WebService {
         }
 
         // GML
-        if (infoFormat.equalsIgnoreCase("application/vnd.ogc.gml") || infoFormat.equalsIgnoreCase("text/xml") ||
-            infoFormat.equalsIgnoreCase("application/vnd.ogc.xml") || infoFormat.equalsIgnoreCase("xml") ||
-            infoFormat.equalsIgnoreCase("gml"))
+        if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+            infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+            infoFormat.equalsIgnoreCase(GML))
         {
             // todo: returns gml information of features
             throw new WMSWebServiceException("Unsupported info format chosen", INVALID_FORMAT, queryVersion);
@@ -907,9 +907,9 @@ public class WMService extends WebService {
         //somewhere else.
 
         final String ending;
-        if ("image/jpeg".equalsIgnoreCase(type)) {
+        if (IMAGE_JPEG.equalsIgnoreCase(type)) {
             ending = ".jpeg";
-        } else if ("image/gif".equalsIgnoreCase(type)) {
+        } else if (IMAGE_GIF.equalsIgnoreCase(type)) {
             ending = ".gif";
         } else {
             ending = ".png";
