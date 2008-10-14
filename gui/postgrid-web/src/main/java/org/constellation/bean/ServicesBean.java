@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -42,6 +45,7 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContext;
 
 // JAXB dependencies
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -218,6 +222,8 @@ public class ServicesBean {
     
     private boolean existPrefrence = false;
     
+    private HttpServletRequest servletRequest;
+    
     /**
      * Debugging purpose
      */
@@ -231,6 +237,8 @@ public class ServicesBean {
         FacesContext context = FacesContext.getCurrentInstance();
         servletContext = (ServletContext) context.getExternalContext().getContext();
 
+        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
+        
         //adding items into the webServices list.
         addWebServices();
 
@@ -1409,7 +1417,22 @@ public class ServicesBean {
     }
     
     public void restartServices() {
-        logger.info("restart services");
+        String URL = "";
+        
+        FacesContext context = FacesContext.getCurrentInstance();
+        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
+        
+        try {
+            logger.info("restart services");
+            URL = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" + servletRequest.getServerPort() + servletContext.getContextPath() + "/WS/configuration?request=restart";
+            URL source = new URL(URL);
+            URLConnection conec = source.openConnection();
+        } catch (MalformedURLException ex) {
+            logger.severe("Malformed URL exception: " + URL);
+        } catch (IOException ex) {
+            logger.severe("IO exception");
+        }
+        
     }
     
     public void generateIndex() {

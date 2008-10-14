@@ -83,7 +83,7 @@ public class GeoDRMService extends WebService {
     private String SERVICEURL = "http://demo.geomatys.fr/constellation/WS/wms";
     
     public GeoDRMService() {
-        super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
+        super("GeoDRM", false, new ServiceVersion(Service.OTHER, "1.0.0"));
         try {
             initializePolicyDecisionPoint();
             setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.coverage.web", "");

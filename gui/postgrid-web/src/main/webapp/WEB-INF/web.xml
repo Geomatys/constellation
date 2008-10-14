@@ -3,7 +3,7 @@
     <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
-        <servlet-class>com.sun.jersey.impl.container.servlet.ServletAdaptor</servlet-class>
+        <servlet-class>org.constellation.ws.rs.CstlServletContainer</servlet-class>
         <init-param>
           <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
           <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
@@ -13,7 +13,6 @@
 	  <!-- To disable CSW     service remove packageName: org.constellation.metadata.ws.rs-->
           <!-- To disable WMS/WCS service remove packageName: org.constellation.coverage.ws   -->
           <!-- To enable  SOS     service add    packageName: org.constellation.sos.ws.rs     -->
-          <!-- To enable  config  service add    packageName: org.constellation.configuration.ws -->
           <!-- To enable  GeoDRM  service add    packageName: org.constellation.security.ws    -->
           <param-value>org.constellation.coverage.ws;org.constellation.metadata.ws.rs</param-value>
         </init-param>

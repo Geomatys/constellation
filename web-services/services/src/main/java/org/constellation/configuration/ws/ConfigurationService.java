@@ -16,8 +16,12 @@
  */
 package org.constellation.configuration.ws;
 
+import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -26,6 +30,7 @@ import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.OWSExceptionCode;
+import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.WebService;
 
@@ -36,10 +41,17 @@ import org.constellation.ws.rs.WebService;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends WebService {
+public class ConfigurationService extends WebService implements ContainerNotifier {
 
+    private List<ContainerListener> cls;
+    
     public ConfigurationService() {
-        super("Configuration", new ServiceVersion(Service.OTHER, "1.0.0"));
+        super("Configuration", false, new ServiceVersion(Service.OTHER, "1.0.0"));
+        cls = new ArrayList<ContainerListener>();
+    }
+    
+    public void addListener(com.sun.jersey.spi.container.ContainerListener arg0) {
+        cls.add(arg0);
     }
     
     @Override
@@ -53,9 +65,10 @@ public class ConfigurationService extends WebService {
             
             if (request.equalsIgnoreCase("restart")) {
                 return restartService();
+            } else {
+                throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
+                                                 OPERATION_NOT_SUPPORTED, "Request", getCurrentVersion());
             }
-            
-            return Response.ok("<wait>wait a little we are working on it</wait>", "text/xml").build();
         
         } catch (WebServiceException ex) {
 
@@ -86,7 +99,16 @@ public class ConfigurationService extends WebService {
     }
     
     private Response restartService() {
-        return Response.ok("<restart>wait a little we are working on it</restart>", "text/xml").build();
+        System.out.println("reload method");
+        int i = 0;
+        for ( ContainerListener cl : cls) {
+           System.out.println("reload " + i);
+           i++;
+           if (!cl.equals(this))
+               cl.onReload();
+        }
+            
+        return Response.ok("<restart>performing</restart>", "text/xml").build();
     }
 
 }

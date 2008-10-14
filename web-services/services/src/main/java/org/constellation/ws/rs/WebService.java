@@ -218,6 +218,30 @@ public abstract class WebService {
         ImageIO.scanForPlugins();
         initializePolicyDecisionPoint();
     }
+    
+    /**
+     * Initialize the basic attribute of a web service.
+     *
+     * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
+     * @param secure The PDP is not initialized if secure id false.
+     * @param versions A list of the supported version of this service.
+     */
+    public WebService(String service, boolean secure, ServiceVersion... versions) {
+        this.service = service;
+
+        for (final ServiceVersion element : versions) {
+            this.versions.add(element);
+        }
+        if (this.versions.size() == 0)
+             throw new IllegalArgumentException("A web service must have at least one version");
+        else
+            this.currentVersion = this.versions.get(0);
+        unmarshaller = null;
+        serviceURL   = null;
+        ImageIO.scanForPlugins();
+        if (secure)
+            initializePolicyDecisionPoint();
+    }
 
     /**
      * Initialize the policy Decision Point and load all the correspounding policy file.
