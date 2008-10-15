@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.observation.ObservationEntry;
 import org.constellation.observation.SurveyProcedureEntry;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.observation.sampling.SamplingPoint;
 
 /**

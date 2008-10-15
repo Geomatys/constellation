@@ -36,7 +36,7 @@ import org.constellation.ogc.PropertyIsBetweenType;
 import org.constellation.ogc.PropertyIsLikeType;
 import org.constellation.ogc.PropertyIsNullType;
 import org.constellation.ogc.SpatialOpsType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

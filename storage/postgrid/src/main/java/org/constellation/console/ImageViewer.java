@@ -249,7 +249,7 @@ public final class ImageViewer {
             final String name = names.get(format.getKey());
             out.print("  ");
             out.print(name);
-            out.print(org.geotools.resources.Utilities.spaces(length - name.length()));
+            out.print(org.geotools.util.Utilities.spaces(length - name.length()));
             out.print(" (");
             out.print(format.getValue());
             out.println(')');

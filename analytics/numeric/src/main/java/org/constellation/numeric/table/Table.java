@@ -39,7 +39,7 @@ import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.System.arraycopy;
 import static org.geotools.resources.XArray.isSorted;
-import static org.geotools.resources.Utilities.spaces;
+import static org.geotools.util.Utilities.spaces;
 
 
 /**

@@ -38,7 +38,7 @@ import java.util.logging.LogRecord;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

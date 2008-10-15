@@ -31,7 +31,7 @@ import org.constellation.coverage.model.Model;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.util.WeakValueHashMap;
 import org.geotools.util.DateRange;
 

@@ -25,7 +25,7 @@ import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.GetCapabilitiesType;
 import org.constellation.ows.v110.SectionsType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

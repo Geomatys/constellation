@@ -39,7 +39,7 @@ import org.constellation.catalog.Query;
 import org.constellation.catalog.Table;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 // Constellation dependencies
 import org.constellation.coverage.model.Descriptor;

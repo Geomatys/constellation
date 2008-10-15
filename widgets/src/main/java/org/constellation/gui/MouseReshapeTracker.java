@@ -74,7 +74,7 @@ import java.io.ObjectInputStream;
 // Resources
 import org.geotools.resources.XMath;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.gui.swing.ExceptionMonitor;
 
 

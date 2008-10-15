@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

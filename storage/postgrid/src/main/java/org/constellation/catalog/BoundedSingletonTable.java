@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;

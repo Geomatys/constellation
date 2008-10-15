@@ -20,7 +20,7 @@ package org.constellation.coverage.model;
 import java.util.List;
 import org.opengis.coverage.Coverage;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.constellation.catalog.Entry;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;

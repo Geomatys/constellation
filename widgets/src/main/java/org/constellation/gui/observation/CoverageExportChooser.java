@@ -71,7 +71,7 @@ import org.geotools.gui.swing.ProgressWindow;
 import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.io.MetadataBuilder;
 import org.geotools.util.ProgressListener;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.CRSUtilities;
 

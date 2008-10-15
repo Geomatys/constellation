@@ -38,7 +38,7 @@ import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.swing.filechooser.FileFilter;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

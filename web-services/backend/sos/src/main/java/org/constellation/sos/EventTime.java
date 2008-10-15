@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ogc.BinaryTemporalOpType;
 import org.constellation.ogc.TemporalOpsType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 /**
  *

@@ -19,7 +19,7 @@ package org.constellation.coverage.catalog;
 import java.awt.geom.Dimension2D;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.util.DateRange;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.constellation.catalog.Entry;
 
 

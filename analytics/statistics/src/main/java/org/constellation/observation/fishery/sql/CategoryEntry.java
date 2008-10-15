@@ -18,7 +18,7 @@
 package org.constellation.observation.fishery.sql;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 // Constellation dependencies
 import org.constellation.coverage.model.Distribution;

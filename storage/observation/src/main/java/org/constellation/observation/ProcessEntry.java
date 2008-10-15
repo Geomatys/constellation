@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.Process;
 import org.constellation.catalog.Entry;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.constellation.coverage.model.Operation;
 
 

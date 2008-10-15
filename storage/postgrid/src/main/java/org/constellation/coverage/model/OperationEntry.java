@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.coverage.processing.AbstractProcessor;
 
 import org.constellation.catalog.Entry;

@@ -18,7 +18,7 @@
 package org.constellation.catalog;
 
 import java.io.Serializable;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

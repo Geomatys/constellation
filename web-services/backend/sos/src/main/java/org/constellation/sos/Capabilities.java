@@ -25,7 +25,7 @@ import org.constellation.ows.v110.CapabilitiesBaseType;
 import org.constellation.ows.v110.OperationsMetadata;
 import org.constellation.ows.v110.ServiceIdentification;
 import org.constellation.ows.v110.ServiceProvider;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

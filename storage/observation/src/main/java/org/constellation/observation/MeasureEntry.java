@@ -25,7 +25,7 @@ import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.UnitOfMeasureEntry;
 
 // GeoTools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 // OpenGis dependencies
 import org.opengis.observation.Measure;

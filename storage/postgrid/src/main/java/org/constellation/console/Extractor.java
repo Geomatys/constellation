@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
 import org.opengis.coverage.Coverage;
 import org.geotools.io.LineFormat;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
 

@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractFeatureEntry;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.observation.ObservationCollection;
 
 /**

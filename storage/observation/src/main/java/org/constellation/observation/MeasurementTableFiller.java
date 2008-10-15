@@ -34,7 +34,7 @@ import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.observation.sampling.SamplingFeature;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
