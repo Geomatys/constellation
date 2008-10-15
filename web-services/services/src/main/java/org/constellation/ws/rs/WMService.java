@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,6 +59,8 @@ import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.PointType;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.AbstractDCP;
@@ -546,11 +549,35 @@ public class WMService extends WebService {
 
         // GML
         if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-            infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-            infoFormat.equalsIgnoreCase(GML))
+                infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                infoFormat.equalsIgnoreCase(GML))
         {
-            // todo: returns gml information of features
-            throw new WMSWebServiceException("Unsupported info format chosen", INVALID_FORMAT, queryVersion);
+            final StringBuilder builder = new StringBuilder();
+            for (String layer : layers) {
+                final LayerDetails layerPostgrid = dp.get(layer);
+                final CoordinateReferenceSystem crs = info.getEnvelope().getCoordinateReferenceSystem();
+                final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
+                final List<String> uoms = new ArrayList<String>(3);
+                uoms.add("px");
+                uoms.add("px");
+                final MeasurementRange range = ranges[0];
+                uoms.add((range.getUnits() == null) ? "unknown" : range.getUnits().toString());
+                final List<Double> values = new ArrayList<Double>(3);
+                values.add((double) info.getX());
+                values.add((double) info.getY());
+                values.add(Double.parseDouble(results.get(layer).get(0)));
+                final List<String> axisLabels = new ArrayList<String>(3);
+                axisLabels.add("X");
+                axisLabels.add("Y");
+                axisLabels.add("values");
+                final DirectPositionType directPos = new DirectPositionType(crs.getName().getCode(),
+                        crs.getCoordinateSystem().getDimension(), axisLabels, values, uoms);
+                final PointType point = new PointType(layer, directPos);
+                final StringWriter writer = new StringWriter();
+                marshaller.marshal(point, writer);
+                builder.append(writer);
+            }
+            return Response.ok(builder.toString(), APP_GML).build();
         }
 
         // Info format not handled.

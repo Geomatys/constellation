@@ -30,7 +30,7 @@ import org.geotools.util.Utilities;
 /**
  * Direct position instances hold the coordinates for a position within some coordinate reference system (CRS). Since direct positions, as data types, will often be included in larger objects (such as geometry elements) that have references to CRS, the srsName attribute will in general be missing, if this particular direct position is included in a larger element with such a reference to a CRS. In this case, the CRS is implicitly assumed to take on the value of the containing object's CRS.
  * if no srsName attribute is given, the CRS shall be specified as part of the larger context this geometry element is part of, typically a geometric object like a point, curve, etc.
- * 
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DirectPositionType", propOrder = {
@@ -53,7 +53,25 @@ public class DirectPositionType {
      * Empty constructor used by JAXB.
      */
     DirectPositionType() {}
-    
+
+    /**
+     * Build a full Direct position.
+     * @param srsName
+     * @param srsDimension
+     * @param axisLabels
+     * @param value
+     * @param uomLabels
+     */
+    public DirectPositionType(String srsName, int srsDimension, List<String> axisLabels,
+            List<Double> value, List<String> uomLabels)
+    {
+        this.srsName      = srsName;
+        this.srsDimension = srsDimension;
+        this.axisLabels   = axisLabels;
+        this.value        = value;
+        this.uomLabels    = uomLabels;
+    }
+
     /**
      * Build a full Direct position.
      * @param srsName
@@ -61,13 +79,15 @@ public class DirectPositionType {
      * @param axisLabels
      * @param value
      */
-    public DirectPositionType(String srsName, int srsDimension, List<String> axisLabels, List<Double> value) {
+    public DirectPositionType(String srsName, int srsDimension, List<String> axisLabels,
+            List<Double> value)
+    {
         this.srsName      = srsName;
         this.srsDimension = srsDimension;
         this.axisLabels   = axisLabels;
-        this.value = value;
+        this.value        = value;
     }
-    
+
     /**
      * Build a full Direct position.
      * @param srsName
@@ -77,23 +97,23 @@ public class DirectPositionType {
     public DirectPositionType(String srsName, int srsDimension, List<Double> value) {
         this.srsName      = srsName;
         this.srsDimension = srsDimension;
-        this.value = value;
+        this.value        = value;
     }
-    
+
     /**
      * Build a light direct position.
-     * 
-     * @param 
+     *
+     * @param
      * @param value a List of coordinates.
      */
     public DirectPositionType(List<Double> value) {
-        this.value = value;
+        this.value        = value;
         this.srsDimension = null;
     }
-    
+
     /**
      * Build a light direct position.
-     * 
+     *
      * @param values a List of coordinates.
      */
     public DirectPositionType(Double... values) {
@@ -103,7 +123,7 @@ public class DirectPositionType {
         }
         this.srsDimension = null;
     }
-    
+
     /**
      * A type for a list of values of the respective simple type.
      * Gets the value of the value property.
@@ -151,7 +171,7 @@ public class DirectPositionType {
         }
         return Collections.unmodifiableList(uomLabels);
     }
-    
+
     /**
      * Return a description of the object.
      */
@@ -160,13 +180,13 @@ public class DirectPositionType {
         StringBuilder s = new StringBuilder("[DirectPositionType]:");
         s.append("srsName = ").append(srsName).append(" srsDimension = ").append(srsDimension);
         s.append('\n').append(" value: ");
-        
+
         for(double v :value) {
            s.append(v).append(' ');
         }
         return s.toString();
     }
-    
+
     /**
      * Verify that this entry is identical to the specified object.
      */
@@ -175,7 +195,7 @@ public class DirectPositionType {
         if (object == this) {
             return true;
         }
-        
+
         final DirectPositionType that = (DirectPositionType) object;
         return  Utilities.equals(this.axisLabels, that.axisLabels)     &&
                 Utilities.equals(this.srsDimension, that.srsDimension) &&

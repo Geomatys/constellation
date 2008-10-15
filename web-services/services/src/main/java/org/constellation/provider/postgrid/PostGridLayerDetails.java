@@ -141,7 +141,6 @@ class PostGridLayerDetails implements LayerDetails {
             table.setVerticalRange(null);
         }
         table.setLayer(layer);
-
         GridCoverage2D coverage = null;
         try {
             coverage = table.getEntry().getCoverage(null);
