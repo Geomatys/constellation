@@ -59,9 +59,9 @@ public class GetMap extends WMSQuery {
     private final Double elevation;
 
     /**
-     * Date to request in a nD layer. It can be a period. Optional.
+     * Time to request in a nD layer. It can be a period. Optional.
      */
-    private final Date date;
+    private final Date time;
 
     /**
      * Range value to define a color pal.
@@ -147,7 +147,7 @@ public class GetMap extends WMSQuery {
         this.styles = styles;
         this.sld = sld;
         this.elevation = elevation;
-        this.date = date;
+        this.time = date;
         this.dimRange = dimRange;
         this.size = size;
         this.background = background;
@@ -163,7 +163,7 @@ public class GetMap extends WMSQuery {
         this.envelope   = getMap.envelope;
         this.format     = getMap.format;      this.layers      = getMap.layers;
         this.styles     = getMap.styles;      this.sld         = getMap.sld;
-        this.elevation  = getMap.elevation;   this.date        = getMap.date;
+        this.elevation  = getMap.elevation;   this.time        = getMap.time;
         this.dimRange   = getMap.dimRange;    this.size        = getMap.size;
         this.background = getMap.background;  this.transparent = getMap.transparent;
         this.exceptions = getMap.exceptions;
@@ -177,10 +177,10 @@ public class GetMap extends WMSQuery {
     }
 
     /**
-     * Returns the date to request in a nD layer, or {@code null} if not defined.
+     * Returns the time to request in a nD layer, or {@code null} if not defined.
      */
-    public Date getDate() {
-        return date;
+    public Date getTime() {
+        return time;
     }
 
     /**

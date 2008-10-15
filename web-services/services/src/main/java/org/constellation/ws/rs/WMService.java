@@ -436,7 +436,7 @@ public class WMService extends WebService {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private synchronized Response getFeatureInfo(final WMSQuery query) throws WMSWebServiceException {
+    private synchronized Response getFeatureInfo(final WMSQuery query) throws WMSWebServiceException, JAXBException {
         if (!(query instanceof GetFeatureInfo)) {
             throw new WMSWebServiceException("Invalid request found, should be GetFeatureInfo.",
                     INVALID_REQUEST, query.getVersion());
@@ -635,8 +635,7 @@ public class WMService extends WebService {
                     throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
                 }
             } else {
-                throw new WMSWebServiceException("The requested map could not be renderered correctly :" +
-                        ex.getMessage(), NO_APPLICABLE_CODE, queryVersion);
+                throw new WMSWebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
         } catch (WebServiceException ex) {
             if (errorInImage) {
@@ -821,7 +820,7 @@ public class WMService extends WebService {
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         final String strSLD          = getParameter(KEY_SLD,            false);
-        final String strStyles       = getParameter(KEY_STYLES, 
+        final String strStyles       = getParameter(KEY_STYLES,
                 ((strSLD != null) && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : true);
 
         final CoordinateReferenceSystem crs;

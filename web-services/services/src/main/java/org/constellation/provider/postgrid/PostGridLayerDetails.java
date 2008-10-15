@@ -132,7 +132,7 @@ class PostGridLayerDetails implements LayerDetails {
 
         table.setGeographicBoundingBox(bbox);
         table.setPreferredResolution(resolution);
-        final Date date = gfi.getDate();
+        final Date date = gfi.getTime();
         table.setTimeRange(date, date);
         final Double elev = gfi.getElevation();
         if (elev != null) {
@@ -286,9 +286,9 @@ class PostGridLayerDetails implements LayerDetails {
             if (elevation != null) {
                 mapLayer.setElevation(elevation);
             }
-            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
-            if (date != null) {
-                mapLayer.times().add(date);
+            final Date time = (Date) params.get(WMSQuery.KEY_TIME);
+            if (time != null) {
+                mapLayer.times().add(time);
             }
         }
 

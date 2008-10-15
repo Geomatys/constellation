@@ -141,13 +141,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         final String mime                      = query.getFormat();
         final WMSQueryVersion version          = query.getVersion();
         final Double elevation                 = query.getElevation();
-        final Date date                        = query.getDate();
+        final Date time                        = query.getTime();
         final MeasurementRange dimRange        = query.getDimRange();
         final Dimension canvasDimension        = query.getSize();
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
-        params.put(WMSQuery.KEY_TIME, date);
+        params.put(WMSQuery.KEY_TIME, time);
         updateContext(layers, version, styles, sld, params);
         final Color background                 = (query.getTransparent()) ? null : query.getBackground();
 
