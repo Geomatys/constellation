@@ -33,7 +33,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.SoftHashMap;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
@@ -42,6 +41,7 @@ import org.constellation.ws.rs.WebService;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 
+import org.geotools.util.SoftValueHashMap;
 import org.xml.sax.SAXException;
 
 
@@ -77,7 +77,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
      * Keeps a link between the file name and the file.
      */
     private final Map<String,File> index = new HashMap<String,File>();
-    private final SoftHashMap<String,DataStore> cache = new SoftHashMap<String, DataStore>(20);
+    private final Map<String,DataStore> cache = new SoftValueHashMap<String, DataStore>(10);
 
 
     private ShapeFileNamedLayerDP(final ProviderSource source) throws IllegalArgumentException {

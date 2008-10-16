@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -846,9 +847,9 @@ public class WMService extends WebService {
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
-        final String strSLD          = getParameter(KEY_SLD,            false);
+        final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strStyles       = getParameter(KEY_STYLES,
-                ((strSLD != null) && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : true);
+                ((urlSLD != null) && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : true);
 
         final CoordinateReferenceSystem crs;
         try {
@@ -917,7 +918,11 @@ public class WMService extends WebService {
                 }
             }
         } else {
-            sld = QueryAdapter.toSLD(strSLD);
+            try {
+                sld = QueryAdapter.toSLD(urlSLD);
+            } catch (MalformedURLException ex) {
+                throw new WMSWebServiceException(ex, STYLE_NOT_DEFINED, wmsVersion);
+            }
         }
 
         // Builds the request.

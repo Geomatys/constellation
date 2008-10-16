@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.DataProvider;
-import org.constellation.provider.SoftHashMap;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.sld.MutableLayer;
@@ -41,6 +40,7 @@ import org.geotools.style.StyleFactory;
 import org.geotools.style.sld.Specification.StyledLayerDescriptor;
 import org.geotools.style.sld.Specification.SymbologyEncoding;
 import org.geotools.style.sld.XMLUtilities;
+import org.geotools.util.SoftValueHashMap;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
@@ -59,7 +59,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
     private final XMLUtilities sldParser = new XMLUtilities();
     private final File folder;
     private final Map<String,File> index = new HashMap<String,File>();
-    private final SoftHashMap<String,MutableStyle> cache = new SoftHashMap<String, MutableStyle>(20);
+    private final Map<String,MutableStyle> cache = new SoftValueHashMap<String, MutableStyle>(20);
     
     
     public SLDNamedStyleDP(File folder){

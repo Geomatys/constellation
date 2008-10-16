@@ -17,6 +17,8 @@
 package org.constellation.query;
 
 import java.awt.Color;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -278,26 +280,30 @@ public class QueryAdapter {
         return MeasurementRange.create(min, max, null);
     }
 
-    public static MutableStyledLayerDescriptor toSLD(final String strSLD) {
-        if(strSLD == null || strSLD.trim().length() == 0){
+    public static MutableStyledLayerDescriptor toSLD(final String sldURL) throws MalformedURLException {
+        
+        if(sldURL == null || sldURL.trim().length() == 0){
             return null;
         }
+        
+        final URL url = new URL(sldURL.trim());
+        
 
         MutableStyledLayerDescriptor sld = null;
 
         XMLUtilities sldUtilities = new XMLUtilities();
 
-        //try sld v1.0
+        //try sld v1.1
         try {
-            sld = sldUtilities.readSLD(strSLD, StyledLayerDescriptor.V_1_0_0);
+            sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_1_0);
         } catch (JAXBException ex) {
             Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if(sld == null){
-            //try sld v1.1
+            //try sld v1.0
             try {
-                sld = sldUtilities.readSLD(strSLD, StyledLayerDescriptor.V_1_1_0);
+                sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
                 Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
