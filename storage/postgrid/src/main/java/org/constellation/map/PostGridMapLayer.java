@@ -71,6 +71,7 @@ import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -214,20 +215,23 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         if(coverage == null) return buffer;
 
         
-        int coverageID = 0;
-        int requestID = 0;
+        int coverageID = -1;
+        int requestID = -1;
         try{
-            coverageID = CRS.lookupEpsgCode(coverage.getCoordinateReferenceSystem2D(),false);
-            requestID = CRS.lookupEpsgCode(requestCRS,false);
-        }catch(Exception ex){
+            final Integer crs1 = CRS.lookupEpsgCode(coverage.getCoordinateReferenceSystem2D(),false);
+            final Integer crs2 = CRS.lookupEpsgCode(requestCRS,false);
+            if(crs1 != null) coverageID = crs1;
+            if(crs2 != null) requestID = crs2;
+        }catch(FactoryException ex){
             LOGGER.log(Level.WARNING,"",ex);
         }
                 
         // Here a resample is done, to get the coverage into the requested crs.
-        if(coverageID != requestID){
+        if( !CRS.equalsIgnoreMetadata(coverage.getCoordinateReferenceSystem2D(), requestCRS)
+            || coverageID != requestID){
             
-            System.out.println("Different CRS, reprojecting coverage, coverage is :\n" + coverage.getCoordinateReferenceSystem2D()
-                    + " \n while request CRS is :\n" + requestCRS);
+//            System.out.println("Different CRS, reprojecting coverage, coverage is :\n" + coverage.getCoordinateReferenceSystem2D()
+//                    + " \n while request CRS is :\n" + requestCRS);
             
             if (coverage.getDimension() == env.getDimension()) {
                 //same dimension number

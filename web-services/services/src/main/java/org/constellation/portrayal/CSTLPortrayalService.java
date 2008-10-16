@@ -71,7 +71,7 @@ import org.opengis.referencing.operation.TransformException;
 public class CSTLPortrayalService extends DefaultPortrayalService {
     
     /**
-     * static instance, singleton.
+     * static instance, thread singleton.
      */
     private static final ThreadLocal<CSTLPortrayalService> instances = new ThreadLocal<CSTLPortrayalService>() {
         @Override
