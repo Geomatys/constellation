@@ -30,15 +30,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.media.jai.Interpolation;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridEnvelope;
+import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.CoverageProcessingException;
@@ -62,9 +67,12 @@ import org.geotools.style.MutableStyle;
 import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
 
+import org.opengis.coverage.grid.GridEnvelope;
+import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
@@ -135,6 +143,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
     public Object query(final RenderingContext context) throws PortrayalException {
         final ReferencedEnvelope env;
+        CoordinateReferenceSystem requestCRS;
         final int width;
         final int height;
         final MathTransform objToDisp;
@@ -144,6 +153,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
             final Rectangle2D shape = context2D.getObjectiveShape().getBounds2D();
             final Rectangle rect = context2D.getDisplayBounds();
             env = new ReferencedEnvelope(shape, context2D.getObjectiveCRS());
+            requestCRS = context2D.getObjectiveCRS();
             width = rect.width;
             height = rect.height;
             objToDisp = context2D.getCanvas().getObjectiveToDisplayTransform();
@@ -172,13 +182,9 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
 
         GridCoverageTable table = null;
-        try {
-            table = db.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            throw new PortrayalException(ex);
-        }
+        try { table = db.getTable(GridCoverageTable.class); } 
+        catch (NoSuchTableException ex) { throw new PortrayalException(ex); }
         table = new GridCoverageTable(table);
-
         table.setGeographicBoundingBox(bbox);
         table.setPreferredResolution(resolution);
         table.setTimeRange(getTime(), getTime());
@@ -187,7 +193,12 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         GridCoverage2D coverage = null;
         try {
-            coverage = table.getEntry().getCoverage(null);
+            final CoverageReference cref = table.getEntry();
+            if(cref != null){
+                coverage = cref.getCoverage(null);
+            }else{
+                LOGGER.log(Level.INFO, "No coverage reference found");
+            }
         } catch (CatalogException ex) {
             throw new PortrayalException(ex);
         } catch (SQLException ex) {
@@ -200,15 +211,80 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
 
-        if(coverage == null){
-            return buffer;
-        }
+        if(coverage == null) return buffer;
 
+        
+        int coverageID = 0;
+        int requestID = 0;
+        try{
+            coverageID = CRS.lookupEpsgCode(coverage.getCoordinateReferenceSystem2D(),false);
+            requestID = CRS.lookupEpsgCode(requestCRS,false);
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING,"",ex);
+        }
+                
         // Here a resample is done, to get the coverage into the requested crs.
-        try {
-            coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, env.getCoordinateReferenceSystem());
-        } catch (CoverageProcessingException c) {
-            throw new PortrayalException(c);
+        if(coverageID != requestID){
+            
+            System.out.println("Different CRS, reprojecting coverage, coverage is :\n" + coverage.getCoordinateReferenceSystem2D()
+                    + " \n while request CRS is :\n" + requestCRS);
+            
+            if (coverage.getDimension() == env.getDimension()) {
+                //same dimension number
+                try {
+                    coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
+                } catch (CoverageProcessingException c) {
+                    throw new PortrayalException(c);
+                }
+                
+            }else{
+                //different number of dimensions
+            
+
+            //FIRST TECHNIC USING a NEW CRS-------------------------------------
+//            final CoordinateReferenceSystem crscov = coverage.getCoordinateReferenceSystem();
+//            if(crscov instanceof CompoundCRS){
+//                System.out.println("IS COUMPOUND");
+//                final CompoundCRS comp = (CompoundCRS) crscov;
+//                final List<CoordinateReferenceSystem> crss = comp.getCoordinateReferenceSystems();
+//                final CoordinateReferenceSystem[] group = new CoordinateReferenceSystem[crss.size()];
+//                group[0] = requestCRS;
+//                for(int i=1,n=group.length; i<n; i++){
+//                    group[i] = crss.get(i);
+//                }
+//                requestCRS = new DefaultCompoundCRS("Extended CRS", group);
+//            }else{
+//                System.out.println("IS NOT COMPOUND");
+//            }
+//            try {
+//                coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
+//            } catch (CoverageProcessingException c) {
+//                throw new PortrayalException(c);
+//            }
+            
+            // SECOND TECHNIC USING A NEW GRID TO CRS---------------------------
+                try {
+                    final GeneralEnvelope general = new GeneralEnvelope(env);
+                    general.setCoordinateReferenceSystem(env.getCoordinateReferenceSystem());
+                    final GridEnvelope range = new GeneralGridEnvelope(new Rectangle(width, height), 2);
+                    final GridGeometry gridGeom = getGridGeometry(
+                                new GeneralEnvelope(env), 
+                                layer, 
+                                range);
+
+                    coverage = (GridCoverage2D) Operations.DEFAULT.resample(
+                            coverage, 
+                            requestCRS,
+                            gridGeom,
+                            Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+
+                } catch (CoverageProcessingException c) {
+                    throw new PortrayalException(c);
+                } catch (CatalogException c) {
+                    throw new PortrayalException(c);
+                }
+            }
+            
         }
         final Graphics2D g2 = buffer.createGraphics();
 
@@ -286,6 +362,48 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                 crs);
     }
 
+    /**
+     * Computes the grid geometry. Returns {@code null} if the geometry can not be computed.
+     * The geometry CRS is the one returned by {@link #getCoordinateReferenceSystem()},
+     * not the {@linkplain #getResponseCRS response CRS}.
+     *
+     * @param envelope : query envelope
+     * @return The grid geometry, or {@code null}.
+     * @throws WebServiceException if an error occured while querying the layer.
+     */
+    private GeneralGridGeometry getGridGeometry(GeneralEnvelope envelope, final Layer layer, GridEnvelope gridRange) throws CatalogException{
+        GeneralGridGeometry gridGeometry = null;
+        MathTransform gridToCRS = null;
+        
+        if (envelope == null || gridRange == null) {
+            if (gridRange == null) {
+                final Rectangle bounds = layer.getTypicalBounds();
+                if (bounds != null) {
+                    gridRange = new GeneralGridEnvelope(bounds, 2);
+                }
+            }
+            if (envelope == null) {
+                final GeographicBoundingBox box = layer.getGeographicBoundingBox();
+                if (box != null) {
+                    envelope = new GeneralEnvelope(box);
+                }
+            }
+
+        }
+        // We know that gridToCRS is null, but we try to select constructors that accept
+        // null arguments. If we are wrong, an IllegalArgumentException will be thrown.
+        if (envelope == null || envelope.isInfinite()) {
+            gridGeometry = new GeneralGridGeometry(gridRange, gridToCRS, getCoordinateReferenceSystem());
+        } else if (gridRange != null) {
+            gridGeometry = new GeneralGridGeometry(gridRange, envelope);
+        } else {
+            gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CENTER, gridToCRS, envelope);
+        }
+        
+        return gridGeometry;
+    }
+    
+    
     /**
      * Returns a single time from the {@linkplain #times} list, or {@code null} if none.
      * If there is more than one time, select the last one on the basis that it is typically
