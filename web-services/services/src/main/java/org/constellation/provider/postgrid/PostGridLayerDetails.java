@@ -33,6 +33,7 @@ import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
+import org.constellation.map.PostGridMapLayer;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.GetFeatureInfo;

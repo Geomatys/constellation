@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.postgrid;
+package org.constellation.map;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;

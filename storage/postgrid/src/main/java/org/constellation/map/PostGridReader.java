@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.constellation.provider.postgrid;
+package org.constellation.map;
 
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
