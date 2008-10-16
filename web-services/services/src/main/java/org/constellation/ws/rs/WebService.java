@@ -47,7 +47,6 @@ import javax.servlet.ServletContext;
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
-import java.net.URI;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -404,11 +403,6 @@ public abstract class WebService {
      *
      */
     protected void writeParameters() throws WebServiceException {
-        URI uri = context.getRequestUri();
-        
-        if (uri != null) {
-            LOGGER.info("requested URI: " + uri);
-        }
         final MultivaluedMap parameters = context.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
