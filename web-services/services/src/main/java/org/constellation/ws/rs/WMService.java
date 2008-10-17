@@ -34,7 +34,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,8 +59,6 @@ import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.PointType;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.AbstractDCP;
@@ -87,7 +84,10 @@ import org.constellation.wms.AbstractHTTP;
 
 // Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.ImmutableEnvelope;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.CRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
@@ -583,37 +583,57 @@ public class WMService extends WebService {
                 infoFormat.equalsIgnoreCase(GML))
         {
             final StringBuilder builder = new StringBuilder();
+            builder.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>").append("\n")
+                   .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
+                   .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
+                   .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
+                   .append("\n");
             for (String layer : layers) {
+                builder.append("\t<").append(layer).append("_layer").append(">\n")
+                       .append("\t\t<").append(layer).append("_feature").append(">\n");
+                       
                 final LayerDetails layerPostgrid = dp.get(layer);
-                final List<String> uoms = new ArrayList<String>(3);
-                uoms.add("px");
-                uoms.add("px");
-                final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
-                if (ranges != null && ranges.length > 0) {
-                    final MeasurementRange range = ranges[0];
-                    final Unit unit = range.getUnits();
-                    uoms.add((unit == null) ? "unknown" : unit.toString());
-                } else {
-                    uoms.add("unknown");
-                }
-                final List<Double> values = new ArrayList<Double>(3);
-                values.add((double) info.getX());
-                values.add((double) info.getY());
-                values.add(Double.parseDouble(results.get(layer).get(0)));
-                final List<String> axisLabels = new ArrayList<String>(3);
-                axisLabels.add("X");
-                axisLabels.add("Y");
-                axisLabels.add("values");
                 final CoordinateReferenceSystem crs =
                         info.getEnvelope().getCoordinateReferenceSystem();
-                final DirectPositionType directPos = new DirectPositionType(
-                        crs.getName().getCode(), crs.getCoordinateSystem().getDimension(),
-                        axisLabels, values, uoms);
-                final PointType point = new PointType(layer, directPos);
-                final StringWriter writer = new StringWriter();
-                marshaller.marshal(point, writer);
-                builder.append(writer);
+                ////////////////////////////////////////////////////////
+                // TODO : + Marshalling box
+                ////////////////////////////////////////////////////////
+                builder.append("\t\t\t<gml:boundedBy>").append("\n");
+                String crsName;
+                try {
+                    crsName = "EPSG:" + CRS.lookupIdentifier(Citations.EPSG, crs, true);
+                } catch (FactoryException ex) {
+                    crsName = crs.getName().getCode();
+                }
+                builder.append("\t\t\t\t<gml:Box srsName=\"").append(crsName).append("\">\n");
+                builder.append("\t\t\t\t\t<gml:coordinates>");
+                final GeneralDirectPosition pos = layerPostgrid.getPixelCoordinates(info);
+                builder.append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1)).append(" ")
+                       .append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1));
+                builder.append("</gml:coordinates>").append("\n");
+                builder.append("\t\t\t\t</gml:Box>").append("\n");
+                builder.append("\t\t\t</gml:boundedBy>").append("\n");
+                builder.append("\t\t\t<x>").append(pos.getOrdinate(0)).append("</x>").append("\n")
+                       .append("\t\t\t<y>").append(pos.getOrdinate(1)).append("</y>").append("\n");
+                if (info.getTime() != null) {
+                    builder.append("\t\t\t<time>").append(info.getTime()).append("</time>")
+                           .append("\n");
+                }
+                if (info.getElevation() != null) {
+                    builder.append("\t\t\t<elevation>").append(info.getElevation())
+                           .append("</elevation>").append("\n");
+                }
+                final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
+                if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
+                    builder.append("\t\t\t<variable>").append(ranges[0].toString())
+                           .append("</variable>").append("\n");
+                }
+                builder.append("\t\t\t<value>").append(results.get(layer).get(0))
+                       .append("</value>").append("\n")
+                       .append("\t\t</").append(layer).append("_feature").append(">\n")
+                       .append("\t</").append(layer).append("_layer").append(">\n");
             }
+            builder.append("</msGMLOutput>");
             return Response.ok(builder.toString(), APP_GML).build();
         }
 

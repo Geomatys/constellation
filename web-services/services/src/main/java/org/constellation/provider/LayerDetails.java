@@ -31,12 +31,14 @@ import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.map.MapLayer;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -103,6 +105,12 @@ public interface LayerDetails {
      * @see Layer#getName
      */
     public String getName();
+
+    /**
+     * Returns the coordinates of the requested pixel in the image, expressed in the
+     * {@linkplain CoordinateReferenceSystem crs} defined in the request.
+     */
+    public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi);
 
     /**
      * @see Layer#getRemarks

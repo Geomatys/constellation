@@ -185,6 +185,26 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi) {
+        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
+        final int width = gfi.getSize().width;
+        final int height = gfi.getSize().height;
+        final int pixelX = gfi.getX();
+        final int pixelY = gfi.getY();
+        final double widthEnv     = objEnv.getSpan(0);
+        final double heightEnv    = objEnv.getSpan(1);
+        final double resX         =      widthEnv  / width;
+        final double resY         = -1 * heightEnv / height;
+        final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
+        final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
+        final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
+        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
+        return position;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public List<String> getFavoriteStyles(){
         return favorites;
     }

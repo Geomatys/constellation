@@ -49,6 +49,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
@@ -390,6 +391,27 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return requestedFeatures;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public GeneralDirectPosition getPixelCoordinates(GetFeatureInfo gfi) {
+        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
+        final int width = gfi.getSize().width;
+        final int height = gfi.getSize().height;
+        final int pixelX = gfi.getX();
+        final int pixelY = gfi.getY();
+        final double widthEnv     = objEnv.getSpan(0);
+        final double heightEnv    = objEnv.getSpan(1);
+        final double resX         =      widthEnv  / width;
+        final double resY         = -1 * heightEnv / height;
+        final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
+        final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
+        final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
+        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
+        return position;
+    }
+
+    
     protected Query createQuery(final Date date, final Number elevation){
         final DefaultQuery query = new DefaultQuery();
         final StringBuilder builder = new StringBuilder();
