@@ -144,7 +144,7 @@ public class WMService extends WebService {
             writeParameters();
 
             if (GETMAP.equalsIgnoreCase(request)) {
-                query = adaptGetMap();
+                query = adaptGetMap(true);
                 return getMap(query);
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
@@ -584,7 +584,7 @@ public class WMService extends WebService {
                 infoFormat.equalsIgnoreCase(GML))
         {
             final StringBuilder builder = new StringBuilder();
-            builder.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>").append("\n")
+            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
                    .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
                    .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
                    .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
@@ -874,7 +874,7 @@ public class WMService extends WebService {
      * @throws org.constellation.coverage.web.WebServiceException
      */
     private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException, NumberFormatException {
-        final GetMap getMap  = adaptGetMap();
+        final GetMap getMap  = adaptGetMap(false);
         final String version = getParameter(KEY_VERSION, true);
         final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
@@ -932,14 +932,16 @@ public class WMService extends WebService {
      * Converts a GetMap request composed of string values, to a container of real
      * java objects.
      *
+     * @param fromGetMap {@code true} if the request is done for a GetMap, {@code false}
+     *                   otherwise (in the case of a GetFeatureInfo for example).
      * @return The GetMap request.
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private GetMap adaptGetMap() throws WebServiceException {
+    private GetMap adaptGetMap(final boolean fromGetMap) throws WebServiceException {
         final String version         = getParameter(KEY_VERSION,         true);
         final WMSQueryVersion wmsVersion = (version.equals(WMSQueryVersion.WMS_1_1_1.toString())) ?
                     WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0;
-        final String strFormat       = getParameter(KEY_FORMAT,          true);
+        final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         final String strCRS          = getParameter((version.equals(
                 WMSQueryVersion.WMS_1_3_0.toString())) ? KEY_CRS_v130 : KEY_CRS_v110, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
@@ -956,7 +958,7 @@ public class WMService extends WebService {
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null) 
-                && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : true);
+                && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : fromGetMap);
 
         final CoordinateReferenceSystem crs;
         try {
