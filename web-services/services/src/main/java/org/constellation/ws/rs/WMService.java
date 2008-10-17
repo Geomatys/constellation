@@ -83,6 +83,7 @@ import org.constellation.query.wms.WMSQueryVersion;
 import org.constellation.wms.AbstractHTTP;
 
 // Geotools dependencies
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -589,19 +590,20 @@ public class WMService extends WebService {
                    .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
                    .append("\n");
             for (String layer : layers) {
-                builder.append("\t<").append(layer).append("_layer").append(">\n")
-                       .append("\t\t<").append(layer).append("_feature").append(">\n");
+                final String layerNameCorrected = layer.replaceAll("\\W", "");
+                builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
+                       .append("\t\t<").append(layerNameCorrected).append("_feature").append(">\n");
                        
                 final LayerDetails layerPostgrid = dp.get(layer);
                 final CoordinateReferenceSystem crs =
                         info.getEnvelope().getCoordinateReferenceSystem();
-                ////////////////////////////////////////////////////////
-                // TODO : + Marshalling box
-                ////////////////////////////////////////////////////////
                 builder.append("\t\t\t<gml:boundedBy>").append("\n");
                 String crsName;
                 try {
-                    crsName = "EPSG:" + CRS.lookupIdentifier(Citations.EPSG, crs, true);
+                    crsName = CRS.lookupIdentifier(Citations.EPSG, crs, true);
+                    if (!crsName.startsWith("EPSG:")) {
+                        crsName = "ESPG:" + crsName;
+                    }
                 } catch (FactoryException ex) {
                     crsName = crs.getName().getCode();
                 }
@@ -618,20 +620,57 @@ public class WMService extends WebService {
                 if (info.getTime() != null) {
                     builder.append("\t\t\t<time>").append(info.getTime()).append("</time>")
                            .append("\n");
+                } else {
+                    SortedSet<Date> dates = null;
+                    try {
+                        dates = layerPostgrid.getAvailableTimes();
+                    } catch (CatalogException ex) {
+                        dates = null;
+                    }
+                    if (dates != null && !(dates.isEmpty())) {
+                        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        builder.append("\t\t\t<time>").append(df.format(dates.last()))
+                               .append("</time>").append("\n");
+                    }
                 }
                 if (info.getElevation() != null) {
                     builder.append("\t\t\t<elevation>").append(info.getElevation())
                            .append("</elevation>").append("\n");
+                } else {
+                    SortedSet<Number> elevs = null;
+                    try {
+                        elevs = layerPostgrid.getAvailableElevations();
+                    } catch (CatalogException ex) {
+                        elevs = null;
+                    }
+                    if (elevs != null && !(elevs.isEmpty())) {
+                        builder.append("\t\t\t<elevation>").append(elevs.first().toString())
+                               .append("</elevation>").append("\n");
+                    }
+                }
+                final GridCoverage2D coverage;
+                try {
+                    coverage = layerPostgrid.getCoverage(info);
+                } catch (CatalogException cat) {
+                    throw new WMSWebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
+                } catch (IOException io) {
+                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
+                }
+                if (coverage != null) {
+                    builder.append("\t\t\t<variable>")
+                           .append(coverage.getSampleDimension(0).getDescription())
+                           .append("</variable>").append("\n");
                 }
                 final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
                 if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
-                    builder.append("\t\t\t<variable>").append(ranges[0].toString())
-                           .append("</variable>").append("\n");
+                    builder.append("\t\t\t<unit>").append(ranges[0].getUnits().toString())
+                           .append("</unit>").append("\n");
                 }
                 builder.append("\t\t\t<value>").append(results.get(layer).get(0))
                        .append("</value>").append("\n")
-                       .append("\t\t</").append(layer).append("_feature").append(">\n")
-                       .append("\t</").append(layer).append("_layer").append(">\n");
+                       .append("\t\t</").append(layerNameCorrected).append("_feature").append(">\n")
+                       .append("\t</").append(layerNameCorrected).append("_layer").append(">\n");
             }
             builder.append("</msGMLOutput>");
             return Response.ok(builder.toString(), APP_GML).build();

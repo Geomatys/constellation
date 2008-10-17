@@ -99,7 +99,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
+    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException {
         final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
         final int width = gfi.getSize().width;
         final int height = gfi.getSize().height;
@@ -118,6 +118,7 @@ class PostGridLayerDetails implements LayerDetails {
         } catch (TransformException ex) {
             throw new CatalogException(ex);
         }
+
         //Create resolution-----------------------------------------------------
         final double w = renv.toRectangle2D().getWidth()  / width;
         final double h = renv.toRectangle2D().getHeight() / height;
@@ -148,7 +149,18 @@ class PostGridLayerDetails implements LayerDetails {
         } catch (SQLException ex) {
             throw new CatalogException(ex);
         }
+        return coverage;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
+        final GridCoverage2D coverage = getCoverage(gfi);
+
+        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
+        final int width  = gfi.getSize().width;
+        final int height = gfi.getSize().height;
         // Pixel coordinates in the request.
         final int pixelUpX        = gfi.getX();
         final int pixelUpY        = gfi.getY();

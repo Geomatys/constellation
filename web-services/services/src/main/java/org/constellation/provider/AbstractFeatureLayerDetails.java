@@ -39,6 +39,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -314,6 +315,10 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final GlyphLegendFactory sldFact = new GlyphLegendFactory();
         return sldFact.create(RANDOM_FACTORY.createDefaultVectorStyle(fs), dimension);
+    }
+
+    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException {
+        return null;
     }
 
     /**

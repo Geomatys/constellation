@@ -29,6 +29,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -66,6 +67,14 @@ public interface LayerDetails {
      * @see Layer#getAvailableElevations
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException;
+
+    /**
+     * Returns the coverage requested.
+     *
+     * @throws org.constellation.catalog.CatalogException
+     * @throws java.io.IOException
+     */
+    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException;
 
     /**
      * Returns a list of favorites styles associated to this layer.
