@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -1417,25 +1418,63 @@ public class ServicesBean {
     }
     
     public void restartServices() {
+        logger.info("GUI restart services");
         String URL = "";
-        
         FacesContext context = FacesContext.getCurrentInstance();
         servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
         
         try {
-            logger.info("restart services");
             URL = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" + servletRequest.getServerPort() + servletContext.getContextPath() + "/WS/configuration?request=restart";
+            System.out.println(URL);
             URL source = new URL(URL);
             URLConnection conec = source.openConnection();
+            
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(new String(buffer, 0, size));
+            }
+            
+            String response = out.toString();
+            
         } catch (MalformedURLException ex) {
             logger.severe("Malformed URL exception: " + URL);
         } catch (IOException ex) {
             logger.severe("IO exception");
         }
-        
     }
     
     public void generateIndex() {
-        logger.info("generate index");
+        logger.info("GUI generate index");
+        String URL = "";
+        FacesContext context = FacesContext.getCurrentInstance();
+        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
+        
+        try {
+            URL = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" + servletRequest.getServerPort() + servletContext.getContextPath() + "/WS/configuration?request=refreshIndex";
+            URL source = new URL(URL);
+            URLConnection conec = source.openConnection();
+
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(new String(buffer, 0, size));
+            }
+            
+            String response = out.toString();
+        
+        } catch (MalformedURLException ex) {
+            logger.severe("Malformed URL exception: " + URL);
+        } catch (IOException ex) {
+            logger.severe("IO exception");
+        }
     }
 }

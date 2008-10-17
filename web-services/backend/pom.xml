@@ -72,6 +72,7 @@
     <module>sos</module>
     <module>ebrim</module>
     <module>metadata-FRA</module>
+    <module>configuration</module>
   </modules>
 
 </project>

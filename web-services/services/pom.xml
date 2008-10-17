@@ -145,6 +145,11 @@
       <artifactId>metadata-FRA</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation</groupId>
+      <artifactId>configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- web service-->
     <dependency>
       <groupId>com.sun.jersey</groupId>
