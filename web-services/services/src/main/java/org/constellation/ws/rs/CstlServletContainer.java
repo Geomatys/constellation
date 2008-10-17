@@ -21,8 +21,10 @@ package org.constellation.ws.rs;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.lang.reflect.Type;
 import javax.servlet.ServletConfig;
-import org.constellation.configuration.ws.ConfigurationService;
+import javax.ws.rs.core.Context;
 
 /**
  *
@@ -30,19 +32,25 @@ import org.constellation.configuration.ws.ConfigurationService;
  */
 public class CstlServletContainer extends ServletContainer {
 
-    public static boolean reload = false;
+    public static boolean configured = false;
     
     @Override
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
         super.configure(sc, rc, wa);
-        ConfigurationService configService = new ConfigurationService();
-        
-        if (!reload) {
-            rc.getSingletons().add(configService);
-        } 
-        reload = true;
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, configService);
-        
-        
+        if (!configured) {
+            ContainerNotifierImpl cnImpl = new ContainerNotifierImpl();
+            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, cnImpl);
+            rc.getSingletons().add(new ContextInjectableProvider<ContainerNotifierImpl>(ContainerNotifierImpl.class, cnImpl));
+            configured = true;
+        }
+
+
+
     }
+
+    private static class ContextInjectableProvider<T> extends SingletonTypeInjectableProvider<Context, T> {
+        ContextInjectableProvider(Type type, T instance) {
+            super(type, instance);
+        }
+    } 
 }

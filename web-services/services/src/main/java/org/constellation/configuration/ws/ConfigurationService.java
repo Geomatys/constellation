@@ -19,10 +19,12 @@ package org.constellation.configuration.ws;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.resource.Singleton;
+import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import org.constellation.coverage.web.Service;
@@ -32,6 +34,7 @@ import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.OWSExceptionCode;
 import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ows.v110.OWSWebServiceException;
+import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.WebService;
 
 /**
@@ -41,18 +44,22 @@ import org.constellation.ws.rs.WebService;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends WebService implements ContainerNotifier {
+public class ConfigurationService extends WebService  {
 
-    private List<ContainerListener> cls;
+   @Context 
+   ContainerNotifierImpl cn; 
     
     public ConfigurationService() {
         super("Configuration", false, new ServiceVersion(Service.OTHER, "1.0.0"));
-        cls = new ArrayList<ContainerListener>();
+        try {
+            setXMLContext("org.constellation.ows.v110", "");
+        } catch (JAXBException ex) {
+            LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");
+            ex.printStackTrace();
+        }
+        LOGGER.info("Configuration service runing");
     }
     
-    public void addListener(com.sun.jersey.spi.container.ContainerListener arg0) {
-        cls.add(arg0);
-    }
     
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
@@ -65,6 +72,11 @@ public class ConfigurationService extends WebService implements ContainerNotifie
             
             if (request.equalsIgnoreCase("restart")) {
                 return restartService();
+                
+            } else if (request.equalsIgnoreCase("refreshIndex")) {
+            
+                return refreshIndex();
+            
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, "Request", getCurrentVersion());
@@ -99,16 +111,54 @@ public class ConfigurationService extends WebService implements ContainerNotifie
     }
     
     private Response restartService() {
-        System.out.println("reload method");
+        LOGGER.info("restart requested");
+        cn.reload();
+        return Response.ok("<restart>performing.</restart>", "text/xml").build();
+    }
+    
+    private Response refreshIndex() {
+        LOGGER.info("refresh index requested");
         int i = 0;
-        for ( ContainerListener cl : cls) {
-           System.out.println("reload " + i);
-           i++;
-           if (!cl.equals(this))
-               cl.onReload();
+        String response   = "<refreshIndex>performing...</refreshIndex>";
+        boolean succeed   = true;
+        
+        String home       = System.getProperty("user.home");
+        File cswConfigDir = new File(home, ".sicade/csw_configuration/");
+        File indexDir     = new File(cswConfigDir, "index");
+
+        if (indexDir.exists() && indexDir.isDirectory()) {
+            for (File f: indexDir.listFiles()) {
+                f.delete();
+            }
+            succeed =indexDir.delete();
+            
+            if (!succeed) {
+                response = "<refreshIndex>The service can't delete the index folder.</refreshIndex>";
+            }
+        } else {
+            succeed = false;
+            response = "<refreshIndex>the index folder does not exist.</refreshIndex>";
+        }
+        
+        //then we restart the service
+        if (succeed) {
+            cn.reload();
         }
             
-        return Response.ok("<restart>performing</restart>", "text/xml").build();
+        return Response.ok(response, "text/xml").build();
+    }
+    
+    @Override
+    public int hashCode() {
+        return "configuration".hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return obj.hashCode() == this.hashCode();
     }
 
 }
