@@ -16,10 +16,7 @@
  */
 package org.constellation.configuration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,6 +34,8 @@ public class CSWCascadingType {
     
     private HashMap<String, String> cascadedServices;
     
+    private boolean append;
+    
     /**
      * An empty constructor used by JAXB.
      */
@@ -47,8 +46,9 @@ public class CSWCascadingType {
     /**
      * An empty constructor used by JAXB.
      */
-    public CSWCascadingType(HashMap<String, String> cascadedServices) {
+    public CSWCascadingType(HashMap<String, String> cascadedServices, boolean append) {
         this.cascadedServices = cascadedServices;
+        this.append           = append;
         
     }
 
@@ -61,6 +61,14 @@ public class CSWCascadingType {
 
     public void setCascadedServices(HashMap<String, String> cascadedServices) {
         this.cascadedServices = cascadedServices;
+    }
+
+    public boolean isAppend() {
+        return append;
+    }
+
+    public void setAppend(boolean append) {
+        this.append = append;
     }
 
 }

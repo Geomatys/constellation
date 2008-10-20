@@ -48,11 +48,20 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link WRSExtrinsicObjectType }
+     * Create an instance of {@link UpdateCapabilitiesType }
      * 
      */
     public UpdateCapabilitiesType createUpdateCapabilitiesType() {
         return new UpdateCapabilitiesType();
     }
+    
+    /**
+     * Create an instance of {@link WRSExtrinsicObjectType }
+     * 
+     */
+    public AcknowlegementType createAcknowlegementType() {
+        return new AcknowlegementType();
+    }
+
 
 }

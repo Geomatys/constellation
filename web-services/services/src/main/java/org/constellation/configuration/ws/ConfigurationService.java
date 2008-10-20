@@ -24,12 +24,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
@@ -79,26 +78,31 @@ public class ConfigurationService extends WebService  {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
-            String request = "";
+            String request  = "";
+            StringWriter sw = new StringWriter();
             
             if (objectRequest == null) {
                 request = (String) getParameter("REQUEST", true);
             }
             
             if (request.equalsIgnoreCase("restart")) {
-                return restartService();
+                
+                marshaller.marshal(restartService(), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
                 
             } else if (request.equalsIgnoreCase("refreshIndex")) {
             
                 boolean synchrone = Boolean.parseBoolean((String) getParameter("SYNCHRONE", false));
                 
-                return refreshIndex(synchrone);
+                marshaller.marshal(refreshIndex(synchrone), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
             
             } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
                 
                 CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
                 
-                return refreshCascadedServers(refreshCS);
+                marshaller.marshal(refreshCascadedServers(refreshCS), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
             
                 
             } else {
@@ -134,17 +138,14 @@ public class ConfigurationService extends WebService  {
         
     }
     
-    private Response restartService() {
+    private AcknowlegementType restartService() {
         LOGGER.info("restart requested");
         cn.reload();
-        return Response.ok("<restart>services succefully restarted</restart>", "text/xml").build();
+        return new AcknowlegementType("success", "services succefully restarted");
     }
     
-    private Response refreshIndex(boolean synchrone) throws OWSWebServiceException {
+    private AcknowlegementType refreshIndex(boolean synchrone) throws OWSWebServiceException {
         LOGGER.info("refresh index requested");
-        int i = 0;
-        String response   = "<refreshIndex>CSW index succefully recreated</refreshIndex>";
-        
         
         File home = new File(System.getProperty("user.home"));
         if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -176,13 +177,11 @@ public class ConfigurationService extends WebService  {
         //then we restart the services
         cn.reload();
             
-        return Response.ok(response, "text/xml").build();
+        return new AcknowlegementType("success", "CSW index succefully recreated");
     }
     
-    private Response refreshCascadedServers(CSWCascadingType request) throws OWSWebServiceException {
+    private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws OWSWebServiceException {
         LOGGER.info("refresh cascaded servers requested");
-        
-        String response = "<resfreshCascadedServers>ok</resfreshCascadedServers>";
         
         File home = new File(System.getProperty("user.home"));
         if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -226,6 +225,10 @@ public class ConfigurationService extends WebService  {
             }
         }
         
+        if (!request.isAppend()) {
+            prop.clear();
+        }
+        
         for (String servName : request.getCascadedServices().keySet()) {
             prop.put(servName, request.getCascadedServices().get(servName));
         }
@@ -252,7 +255,7 @@ public class ConfigurationService extends WebService  {
         //then we restart the services
         cn.reload();
         
-        return Response.ok(response, "text/xml").build();
+        return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
     }
     
     
