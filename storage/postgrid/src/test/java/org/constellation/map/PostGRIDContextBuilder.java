@@ -18,6 +18,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
+import org.geotools.display.renderer.GridMarkGraphicBuilder;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -61,7 +62,7 @@ public class PostGRIDContextBuilder {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            context.layers().add(createPostGridLayer2());
+            context.layers().add(createPostGridLayer());
 
 //            context.setCoordinateReferenceSystem(layer.getFeatureSource().getSchema().getCoordinateReferenceSystem());
 //            context.setTitle("DemoContext");
@@ -84,9 +85,9 @@ public class PostGRIDContextBuilder {
         for (Layer lay : entries) {
             System.out.println(lay.getName());
         }
-//        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
+        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
 //        selectedLayer = layers.getEntry("BlueMarble");
-        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
+//        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
         PostGridMapLayer layer = new PostGridMapLayer(database, selectedLayer);
@@ -108,13 +109,13 @@ public class PostGRIDContextBuilder {
         for (Layer lay : entries) {
             System.out.println(lay.getName());
         }
-//        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
+        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
 //        selectedLayer = layers.getEntry("BlueMarble");
-        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
+//        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
         PostGridMapLayer2 layer = new PostGridMapLayer2(database, selectedLayer);
-        layer.setStyle(createCategorizeStyle());
+        layer.setStyle(createInterpolationStyle());
 //        layer.graphicBuilders().add(new GridMarkGraphicBuilder());
 
         return layer;

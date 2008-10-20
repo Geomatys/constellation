@@ -7,9 +7,6 @@ package org.constellation.map;
 
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
-import java.sql.SQLException;
-
-import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.GridCoverageTable;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -37,7 +34,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class PostGridReader implements CoverageReader{
     
-    private GridCoverageTable table;
+    private final GridCoverageTable table;
         
     private final ReferencedEnvelope ref;
     
@@ -54,14 +51,15 @@ public class PostGridReader implements CoverageReader{
             GridCoverage2D coverage = null;
             try {
                 coverage = table.getEntry().getCoverage(null);
-            } catch (CatalogException ex) {
-                throw new IOException(ex);
-            } catch (SQLException ex) {
-                throw new IOException(ex);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
+            //TODO fix in postgrid
+            //catch anything, looks like sometimes, postgrid throw an ArithmeticException
+//        Exception in thread "Thread-4" java.lang.ArithmeticException: Le calcul ne converge pas pour les points 89°20,3'W 00°06,6'S et 91°06,2'E 00°06,6'S.
+//        at org.geotools.referencing.datum.DefaultEllipsoid.orthodromicDistance(DefaultEllipsoid.java:507)
+//        at org.constellation.coverage.catalog.CoverageComparator.getArea(CoverageComparator.java:181)
                 throw new IOException(ex);
             } finally{
-                table.flush();
+//                table.flush();
             }
             
             return coverage;
@@ -96,14 +94,16 @@ public class PostGridReader implements CoverageReader{
         GridCoverage2D coverage = null;
         try {
             coverage = table.getEntry().getCoverage(null);
-        } catch (CatalogException ex) {
-            throw new IOException(ex);
-        } catch (SQLException ex) {
-            throw new IOException(ex);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
+            //TODO fix in postgrid
+            //catch anything, looks like sometimes, postgrid throw an ArithmeticException
+//        Exception in thread "Thread-4" java.lang.ArithmeticException: Le calcul ne converge pas pour les points 89°20,3'W 00°06,6'S et 91°06,2'E 00°06,6'S.
+//        at org.geotools.referencing.datum.DefaultEllipsoid.orthodromicDistance(DefaultEllipsoid.java:507)
+//        at org.constellation.coverage.catalog.CoverageComparator.getArea(CoverageComparator.java:181)
+            
             throw new IOException(ex);
         } finally{
-            table.flush();
+//            table.flush();
         }
         
         if(coverage != null){

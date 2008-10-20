@@ -466,7 +466,7 @@ public class WMService extends WebService {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private synchronized Response getFeatureInfo(final WMSQuery query)
+    private Response getFeatureInfo(final WMSQuery query)
                           throws WMSWebServiceException, JAXBException
     {
         if (!(query instanceof GetFeatureInfo)) {
@@ -690,7 +690,7 @@ public class WMService extends WebService {
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private synchronized File getLegendGraphic(final WMSQuery query) throws WMSWebServiceException,
+    private File getLegendGraphic(final WMSQuery query) throws WMSWebServiceException,
                                                                             JAXBException
     {
         if (!(query instanceof GetLegendGraphic)) {
@@ -728,7 +728,7 @@ public class WMService extends WebService {
      * @return The map requested, or an error.
      * @throws WebServiceException
      */
-    private synchronized Response getMap(final WMSQuery query) throws WMSWebServiceException {
+    private Response getMap(final WMSQuery query) throws WMSWebServiceException {
         //verifyBaseParameter(0);
         if (!(query instanceof GetMap)) {
             throw new WMSWebServiceException("Invalid request found, should be GetMap.",

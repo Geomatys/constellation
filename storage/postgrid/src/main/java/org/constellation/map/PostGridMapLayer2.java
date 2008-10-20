@@ -92,7 +92,17 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
      * Layer to consider.
      */
     private final Layer layer;
-
+    
+    /**
+     * grid coverage table.
+     */
+    private final GridCoverageTable table;
+    
+    /**
+     * postgrid reader
+     */
+    private final PostGridReader reader;
+    
     /**
      * Builds a map layer, using a database connection and a layer.
      *
@@ -105,6 +115,16 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
         this.layer = layer;
         this.times = new ArrayList<Date>();
         setName(layer.getName());
+        
+        GridCoverageTable immutableTable = null;
+        try {
+            immutableTable = db.getTable(GridCoverageTable.class);
+        } catch (NoSuchTableException ex) {
+            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+        }
+        this.table = new GridCoverageTable(immutableTable);
+        this.table.setLayer(layer);
+        this.reader = new PostGridReader(table, getBounds());
     }
 
     public ReferencedEnvelope getBounds() {
@@ -180,20 +200,9 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
     }
 
     public CoverageReader getCoverageReader() {
-                
-        GridCoverageTable table = null;
-        try {
-            table = db.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
-            return null;
-        }
-        table = new GridCoverageTable(table);
         table.setTimeRange(getTime(), getTime());
         table.setVerticalRange(elevation, elevation);
-        table.setLayer(layer);
-        
-        return new PostGridReader(table, getBounds());
+        return reader;
     }
 
     public GridCoverage2D getGridCoverage2D() {

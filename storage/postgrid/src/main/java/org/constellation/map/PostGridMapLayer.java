@@ -20,12 +20,9 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -34,10 +31,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.media.jai.Interpolation;
+import javax.swing.JOptionPane;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
-import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 
@@ -45,6 +42,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridEnvelope;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.io.CoverageReadParam;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.CoverageProcessingException;
 import org.geotools.coverage.processing.Operations;
@@ -60,7 +58,6 @@ import org.geotools.map.DynamicMapLayer;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.map.MapLayerBuilder;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
@@ -125,6 +122,16 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     private final Layer layer;
 
     /**
+     * grid coverage table.
+     */
+    private final GridCoverageTable table;
+
+    /**
+     * postgrid reader
+     */
+    private final PostGridReader reader;
+    
+    /**
      * Builds a map layer, using a database connection and a layer.
      *
      * @param db The database connection.
@@ -136,6 +143,16 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         this.layer = layer;
         this.times = new ArrayList<Date>();
         setName(layer.getName());
+        
+        GridCoverageTable immutableTable = null;
+        try {
+            immutableTable = db.getTable(GridCoverageTable.class);
+        } catch (NoSuchTableException ex) {
+            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+        }
+        this.table = new GridCoverageTable(immutableTable);
+        this.table.setLayer(layer);
+        this.reader = new PostGridReader(table, getBounds());
     }
 
     public Object prepare(final RenderingContext context) throws PortrayalException {
@@ -170,51 +187,26 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         }
         final GeneralEnvelope renv = new GeneralEnvelope(genv);
 
-        //Create BBOX-----------------------------------------------------------
-        final GeographicBoundingBox bbox;
-        try {
-            bbox = new GeographicBoundingBoxImpl(renv);
-        } catch (TransformException ex) {
-            throw new PortrayalException(ex);
-        }
         //Create resolution-----------------------------------------------------
         final double w = renv.toRectangle2D().getWidth() /width;
         final double h = renv.toRectangle2D().getHeight() /height;
-        final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
 
-        GridCoverageTable table = null;
-        try { table = db.getTable(GridCoverageTable.class); } 
-        catch (NoSuchTableException ex) { throw new PortrayalException(ex); }
-        table = new GridCoverageTable(table);
-        table.setGeographicBoundingBox(bbox);
-        table.setPreferredResolution(resolution);
         table.setTimeRange(getTime(), getTime());
         table.setVerticalRange(elevation, elevation);
-        table.setLayer(layer);
+
+        final CoverageReadParam readParam = new CoverageReadParam(renv, new double[]{w,h});
 
         GridCoverage2D coverage = null;
-        try {
-            final CoverageReference cref = table.getEntry();
-            if(cref != null){
-                coverage = cref.getCoverage(null);
-            }else{
-                LOGGER.log(Level.INFO, "No coverage reference found");
-            }
-        } catch (CatalogException ex) {
+        try{
+            coverage = reader.read(readParam);
+        }catch(Exception ex){
             throw new PortrayalException(ex);
-        } catch (SQLException ex) {
-            throw new PortrayalException(ex);
-        } catch (IOException ex) {
-            throw new PortrayalException(ex);
-        } finally{
-            table.flush();
         }
 
         final BufferedImage buffer = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
 
         if(coverage == null) return buffer;
 
-        
         int coverageID = -1;
         int requestID = -1;
         try{
@@ -350,6 +342,169 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         return buffer;
     }
 
+    @Override
+    public void portray(final RenderingContext context) throws PortrayalException {
+        
+        if( !(context instanceof RenderingContext2D) ){
+            throw new PortrayalException("PostGrid layer only support rendering for RenderingContext2D");
+        }
+
+        final RenderingContext2D context2D = (RenderingContext2D) context;
+        final CoordinateReferenceSystem requestCRS = context2D.getObjectiveCRS();
+
+        table.setTimeRange(getTime(), getTime());
+        table.setVerticalRange(elevation, elevation);
+
+        final GeneralEnvelope env = new GeneralEnvelope(context2D.getObjectiveBounds());
+        env.setCoordinateReferenceSystem(context2D.getObjectiveCRS());
+        final double[] resolution = context2D.getResolution();
+        final CoverageReadParam readParam = new CoverageReadParam(env, resolution);
+        
+        GridCoverage2D coverage = null;
+        try{
+            coverage = reader.read(readParam);
+        }catch(Exception ex){
+            throw new PortrayalException(ex);
+        }
+
+
+        if(coverage == null) return;
+
+        int coverageID = -1;
+        int requestID = -1;
+        try{
+            final Integer crs1 = CRS.lookupEpsgCode(coverage.getCoordinateReferenceSystem2D(),false);
+            final Integer crs2 = CRS.lookupEpsgCode(requestCRS,false);
+            if(crs1 != null) coverageID = crs1;
+            if(crs2 != null) requestID = crs2;
+        }catch(FactoryException ex){
+            LOGGER.log(Level.WARNING,"",ex);
+        }
+                
+        // Here a resample is done, to get the coverage into the requested crs.
+        if( !CRS.equalsIgnoreMetadata(coverage.getCoordinateReferenceSystem2D(), requestCRS)
+            || coverageID != requestID){
+            
+//            System.out.println("Different CRS, reprojecting coverage, coverage is :\n" + coverage.getCoordinateReferenceSystem2D()
+//                    + " \n while request CRS is :\n" + requestCRS);
+            
+            if (coverage.getDimension() == env.getDimension()) {
+                //same dimension number
+                try {
+                    coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
+                } catch (CoverageProcessingException c) {
+                    throw new PortrayalException(c);
+                }
+                
+            }else{
+                //different number of dimensions
+            
+
+            //FIRST TECHNIC USING a NEW CRS-------------------------------------
+//            final CoordinateReferenceSystem crscov = coverage.getCoordinateReferenceSystem();
+//            if(crscov instanceof CompoundCRS){
+//                System.out.println("IS COUMPOUND");
+//                final CompoundCRS comp = (CompoundCRS) crscov;
+//                final List<CoordinateReferenceSystem> crss = comp.getCoordinateReferenceSystems();
+//                final CoordinateReferenceSystem[] group = new CoordinateReferenceSystem[crss.size()];
+//                group[0] = requestCRS;
+//                for(int i=1,n=group.length; i<n; i++){
+//                    group[i] = crss.get(i);
+//                }
+//                requestCRS = new DefaultCompoundCRS("Extended CRS", group);
+//            }else{
+//                System.out.println("IS NOT COMPOUND");
+//            }
+//            try {
+//                coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
+//            } catch (CoverageProcessingException c) {
+//                throw new PortrayalException(c);
+//            }
+            
+            // SECOND TECHNIC USING A NEW GRID TO CRS---------------------------
+                try {
+                    final GeneralEnvelope general = new GeneralEnvelope(env);
+                    general.setCoordinateReferenceSystem(env.getCoordinateReferenceSystem());
+                    final GridEnvelope range = new GeneralGridEnvelope(context2D.getDisplayBounds(), 2);
+                    final GridGeometry gridGeom = getGridGeometry(
+                                new GeneralEnvelope(env), 
+                                layer, 
+                                range);
+
+                    coverage = (GridCoverage2D) Operations.DEFAULT.resample(
+                            coverage, 
+                            requestCRS,
+                            gridGeom,
+                            Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+
+                } catch (CoverageProcessingException c) {
+                    throw new PortrayalException(c);
+                } catch (CatalogException c) {
+                    throw new PortrayalException(c);
+                }
+            }
+            
+        }
+        final Graphics2D g2 = context2D.getGraphics();
+
+        try {
+            context2D.setGraphicsCRS(context2D.getDisplayCRS());
+        } catch (TransformException ex) {
+            throw new PortrayalException(ex);
+        }
+
+        //---------------GRAPHIC BUILDER----------------------------------------
+
+        final GraphicBuilder<? extends GraphicJ2D> builder = getGraphicBuilder(GraphicJ2D.class);
+
+        if(builder != null ){
+            //TODO Find a better way to solve this issue
+            final MapLayerBuilder mapBuilder = new MapLayerBuilder();
+            final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
+            //special graphic builder
+            final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            for(GraphicJ2D gra : graphics){
+                gra.paint(context2D);
+            }
+            return;
+        }
+
+        // use the provided dim range
+        if (dimRange != null) {
+            final GridSampleDimension[] samples = coverage.getSampleDimensions();
+            if (samples != null && samples.length == 1 && samples[0] != null) {
+                if (samples[0].getSampleToGeophysics() != null) {
+                    final ColorMap colorMap = new ColorMap();
+                    colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, dimRange);
+                    try {
+                        coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[]{colorMap});
+                    } catch (CoverageProcessingException c) {
+                        throw new PortrayalException(c);
+                    }
+                }
+            }
+        }
+        coverage = coverage.geophysics(false);
+        final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
+        
+        try {
+            context2D.setGraphicsCRS(context2D.getObjectiveCRS());
+        } catch (TransformException ex) {
+            throw new PortrayalException(ex);
+        }
+        
+        final MathTransform2D mathTrans2D = coverage.getGridGeometry().getGridToCRS2D();
+        if (mathTrans2D instanceof AffineTransform) {
+            final AffineTransform transform = (AffineTransform) mathTrans2D;
+            g2.drawRenderedImage(img, transform);
+        } else {
+            throw new PortrayalException("Should have been an affine transform at this state.");
+        }
+
+        return;
+    }
+    
     public ReferencedEnvelope getBounds() {
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         final GeographicBoundingBox bbox;
