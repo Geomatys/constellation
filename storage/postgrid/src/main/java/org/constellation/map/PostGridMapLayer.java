@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.media.jai.Interpolation;
-import javax.swing.JOptionPane;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
@@ -50,7 +49,12 @@ import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.primitive.GraphicJ2D;
 import org.geotools.display.renderer.RenderingContext;
 import org.geotools.display.renderer.RenderingContext2D;
+import org.geotools.display.style.CachedRasterSymbolizer;
+import org.geotools.display.style.CachedRule;
+import org.geotools.display.style.CachedSymbolizer;
+import org.geotools.display.style.J2DGraphicUtilities;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.NameImpl;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.AbstractMapLayer;
@@ -66,6 +70,7 @@ import org.geotools.util.MeasurementRange;
 
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -471,6 +476,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         }
 
         // use the provided dim range
+        final RenderedImage img;
         if (dimRange != null) {
             final GridSampleDimension[] samples = coverage.getSampleDimensions();
             if (samples != null && samples.length == 1 && samples[0] != null) {
@@ -484,25 +490,28 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     }
                 }
             }
-        }
-        coverage = coverage.geophysics(false);
-        final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
-        
-        try {
-            context2D.setGraphicsCRS(context2D.getObjectiveCRS());
-        } catch (TransformException ex) {
-            throw new PortrayalException(ex);
-        }
-        
-        final MathTransform2D mathTrans2D = coverage.getGridGeometry().getGridToCRS2D();
-        if (mathTrans2D instanceof AffineTransform) {
-            final AffineTransform transform = (AffineTransform) mathTrans2D;
-            g2.drawRenderedImage(img, transform);
-        } else {
-            throw new PortrayalException("Should have been an affine transform at this state.");
-        }
+            coverage = coverage.geophysics(false);
+            img = coverage.getRenderableImage(0, 1).createDefaultRendering();
+            
+            try {
+                context2D.setGraphicsCRS(context2D.getObjectiveCRS());
+            } catch (TransformException ex) {
+                throw new PortrayalException(ex);
+            }
 
-        return;
+            final MathTransform2D mathTrans2D = coverage.getGridGeometry().getGridToCRS2D();
+            if (mathTrans2D instanceof AffineTransform) {
+                final AffineTransform transform = (AffineTransform) mathTrans2D;
+                g2.drawRenderedImage(img, transform);
+            } else {
+                throw new PortrayalException("Should have been an affine transform at this state.");
+            }
+            
+        }else{
+            //normal portraying should replace dim range once ready
+            normalProtray(context2D, coverage);
+        }
+        
     }
     
     public ReferencedEnvelope getBounds() {
@@ -561,6 +570,44 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         
         return gridGeometry;
     }
+    
+    private void normalProtray(RenderingContext2D renderingContext, GridCoverage2D coverage) throws PortrayalException{
+        final Name coverageName = new NameImpl(getName());
+        final List<CachedRule> rules = J2DGraphicUtilities.getValidRules(getStyle(), renderingContext.getScale(), coverageName);
+
+        //we perform a first check on the style to see if there is at least
+        //one valid rule at this scale, if not we just continue.
+        if (rules.isEmpty()) {
+            return;   //----------------------------------------------------->CONTINUE
+        }
+        
+        if(coverage != null){
+            final CoordinateReferenceSystem dataCRS = coverage.getCoordinateReferenceSystem();
+            final CoordinateReferenceSystem displayCRS = renderingContext.getDisplayCRS();
+            final CoordinateReferenceSystem objectiveCRS = renderingContext.getObjectiveCRS();
+            final J2DGraphicUtilities J2Dtool = J2DGraphicUtilities.getInstance();
+        
+            J2Dtool.prepare(1,dataCRS,displayCRS,objectiveCRS,renderingContext.getCanvas().getObjectiveToDisplayTransform());
+                        
+            for(final CachedRule rule : rules){
+//                final Filter filter = rule.getFilter();
+                //test if the rule is valid for this feature
+//                if(filter == null  || filter.evaluate(feature)){
+                    final List<CachedSymbolizer> symbols = rule.symbolizers();
+                                     
+                    for(final CachedSymbolizer symbol : symbols){
+                        if(symbol instanceof CachedRasterSymbolizer){
+                            J2Dtool.portray(coverage, (CachedRasterSymbolizer)symbol, renderingContext);
+                        }
+                    }
+                    
+//                }
+            }
+            
+        }
+            
+    }
+    
     
     
     /**

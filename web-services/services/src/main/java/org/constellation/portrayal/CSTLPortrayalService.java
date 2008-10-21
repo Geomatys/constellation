@@ -228,7 +228,6 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         context.layers().clear();
     }
     
-    
     private void updateContext(final List<String> layers, final WMSQueryVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
@@ -262,7 +261,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
 
     }
 
-    private Object extractStyle(String layerName,MutableStyledLayerDescriptor sld){
+    private Object extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");
         }
@@ -274,18 +273,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                 final MutableNamedLayer mnl = (MutableNamedLayer) layer;
 
                 for(final MutableLayerStyle mls : mnl.styles()){
-                    Object GTStyle = null;
                     if(mls instanceof MutableNamedStyle){
-                        MutableNamedStyle mns = (MutableNamedStyle) mls;
-                        GTStyle = mns.getName();
+                        final MutableNamedStyle mns = (MutableNamedStyle) mls;
+                        return mns.getName();
                     }else if(mls instanceof MutableStyle){
-                        GTStyle = (MutableStyle) mls;
+                        return mls;
                     }
 
-                    if(GTStyle != null){
-                        //we have found a valid style
-                        return GTStyle;
-                    }
                 }
             }
         }
@@ -320,7 +314,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
 
             while(remain != null && remain.length() > 0){
                 int lastChar = (maxCharPerLine > remain.length()) ? remain.length() : maxCharPerLine;
-                String oneLine = remain.substring(0, lastChar);
+                final String oneLine = remain.substring(0, lastChar);
                 remain = remain.substring(lastChar);
                 g.drawString(oneLine, 2, y);
                 y += fontHeight ;

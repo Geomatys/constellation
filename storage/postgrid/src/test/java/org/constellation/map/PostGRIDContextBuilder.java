@@ -5,6 +5,7 @@
 package org.constellation.map;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,8 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
@@ -33,6 +37,8 @@ import org.geotools.style.function.InterpolationPoint;
 import org.geotools.style.function.Method;
 import org.geotools.style.function.Mode;
 import org.geotools.style.function.ThreshholdsBelongTo;
+import org.geotools.style.sld.Specification.StyledLayerDescriptor;
+import org.geotools.style.sld.XMLUtilities;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
@@ -56,7 +62,8 @@ public class PostGRIDContextBuilder {
     public static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
 
     public static MapContext buildPostGridContext() {
-
+      
+        
         MapContext context = null;
         MapLayer layer = null;
 
@@ -85,9 +92,9 @@ public class PostGRIDContextBuilder {
         for (Layer lay : entries) {
             System.out.println(lay.getName());
         }
-        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
+//        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
 //        selectedLayer = layers.getEntry("BlueMarble");
-//        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
+        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
         PostGridMapLayer layer = new PostGridMapLayer(database, selectedLayer);
@@ -109,9 +116,9 @@ public class PostGRIDContextBuilder {
         for (Layer lay : entries) {
             System.out.println(lay.getName());
         }
-        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
+//        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
 //        selectedLayer = layers.getEntry("BlueMarble");
-//        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
+        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
         PostGridMapLayer2 layer = new PostGridMapLayer2(database, selectedLayer);

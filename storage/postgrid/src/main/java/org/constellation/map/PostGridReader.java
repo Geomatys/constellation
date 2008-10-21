@@ -1,12 +1,24 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2008, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
-
 package org.constellation.map;
 
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
+
 import org.constellation.coverage.catalog.GridCoverageTable;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -14,7 +26,6 @@ import org.geotools.coverage.io.CoverageReadParam;
 import org.geotools.coverage.io.CoverageReader;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
