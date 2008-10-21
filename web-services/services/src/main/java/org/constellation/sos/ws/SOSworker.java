@@ -719,27 +719,34 @@ public class SOSworker {
             if (procedures.size() != 0 ) {
                         
                 for (String s: procedures) {
-                    String dbId = map.getProperty(s);
-                    if ( dbId == null) {
-                        dbId = s;
-                    } 
-                    logger.info("process ID: " + dbId);
-                    ReferenceEntry proc = null;
-                    try {
-                        proc = getReferenceFromHRef(dbId); 
-                    } catch (NoSuchRecordException ex) {
-                        throw new OWSWebServiceException(" this process is not registred in the table",
-                                                      INVALID_PARAMETER_VALUE, "procedure", version);
-                    } catch (CatalogException ex) {
-                        throw new OWSWebServiceException("Catalog exception while getting the procedure",
-                                                         NO_APPLICABLE_CODE, "offering", version);
-                    }
+                    if (s != null) {
+                        String dbId = map.getProperty(s);
+                        if ( dbId == null) {
+                            dbId = s;
+                        } 
+                        logger.info("process ID: " + dbId);
+                        ReferenceEntry proc = null;
+                        try {
+                            proc = getReferenceFromHRef(dbId); 
+                        } catch (NoSuchRecordException ex) {
+                            throw new OWSWebServiceException(" this process is not registred in the table",
+                                                          INVALID_PARAMETER_VALUE, "procedure", version);
+                        } catch (CatalogException ex) {
+                            throw new OWSWebServiceException("Catalog exception while getting the procedure",
+                                                             NO_APPLICABLE_CODE, "offering", version);
+                        }
                      
-                    if (!off.getProcedure().contains(proc)) {
-                       throw new OWSWebServiceException(" this process is not registred in the offering",
+                        if (!off.getProcedure().contains(proc)) {
+                           throw new OWSWebServiceException(" this process is not registred in the offering",
                                                         INVALID_PARAMETER_VALUE, "procedure", version);
+                        } else {
+                            SQLrequest.append(" procedure='").append(dbId).append("' OR ");
+                        }
                     } else {
-                        SQLrequest.append(" procedure='").append(dbId).append("' OR ");
+                        //if there is only one proccess null we return error (we'll see)
+                        if (procedures.size() == 1)
+                            throw new OWSWebServiceException("the process is null",
+                                                             INVALID_PARAMETER_VALUE, "procedure", version);
                     }
                 }
             } else {
@@ -984,6 +991,8 @@ public class SOSworker {
                   throw new OWSWebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
                                                   NO_APPLICABLE_CODE, "getObservation", version);
             }
+            results.close();
+            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new OWSWebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
@@ -1094,6 +1103,8 @@ public class SOSworker {
                 }
             }
 
+            results.close();
+            stmt.close();
             GetResultResponse.Result r = new GetResultResponse.Result(datablock.toString(), serviceURL + '/' + requestResult.getObservationTemplateId());
             response = new GetResultResponse(r);
         } catch (SQLException e) {
@@ -1510,9 +1521,9 @@ public class SOSworker {
         while (res.next()) {
             id = res.getInt(1);
         }
-        
+        res.close();
+        stmt.close();
         return (id + 1);
-        
     }
     
     /**
@@ -1534,7 +1545,8 @@ public class SOSworker {
             stmt.setString(1, observationIdBase + id);
             res = stmt.executeQuery();
         } while (res.next());
-        
+        res.close();
+        stmt.close();
         return observationIdBase + id;
         
     }
@@ -1811,6 +1823,7 @@ public class SOSworker {
                 } 
             }
             result.close();
+            stmt.close();
             i++;
         } 
         
@@ -1837,6 +1850,7 @@ public class SOSworker {
                 logger.severe("no value for supervisorcode identifier numero " + (i - 1));
             }
             result.close();
+            stmt.close();
             return value;
         }
     }
@@ -1900,6 +1914,8 @@ public class SOSworker {
             return;
         }
         result.close();
+        stmt.close();
+        
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
         Statement stmt2    = OMDatabase.getConnection().createStatement();
@@ -1930,8 +1946,12 @@ public class SOSworker {
                                               INVALID_PARAMETER_VALUE, null, version);
         }
         logger.info(request);
-        if (insert)
+        if (insert) {
             stmt2.executeUpdate(request);
+        }
+        result2.close();
+        stmt2.close();
+        
     }
     
     /**
@@ -1966,6 +1986,7 @@ public class SOSworker {
                 } 
             }
             result.close();
+            stmt.close();
             i++;
         } 
         
@@ -2083,6 +2104,7 @@ public class SOSworker {
                         logger.severe("no value for network classifier numero " + networksIndex[j]);
                     }
                     result.close();
+                    stmt.close();
                     
                 // we add the sensor to the global offering containing all the sensor    
                 } else {
@@ -2299,16 +2321,30 @@ public class SOSworker {
     /**
      * Return the minimal value for the offering event Time
      */
-    private String getMinimalEventTime() throws SQLException {
-        PreparedStatement stmt = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
-        ResultSet res = stmt.executeQuery();
-        Timestamp t = null;
-        while (res.next()) {
-            t = res.getTimestamp(1);
-        }
+    private String getMinimalEventTime() throws WebServiceException, SQLException {
         String ret = null;
-        if (t != null) {
-            ret = t.toString();
+        PreparedStatement stmt = null;
+        try {
+            stmt = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+            ResultSet res = stmt.executeQuery();
+            Timestamp t = null;
+            while (res.next()) {
+                t = res.getTimestamp(1);
+            }
+            
+            if (t != null) {
+                ret = t.toString();
+            } 
+            res.close();
+            stmt.close();
+        
+        } catch (SQLException ex) {
+           ex.printStackTrace();
+           if (stmt != null)
+                stmt.close();
+           throw new OWSWebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE, null, version);
+           
         } 
         return ret;
     }

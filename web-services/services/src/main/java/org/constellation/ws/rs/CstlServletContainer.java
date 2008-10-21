@@ -48,9 +48,16 @@ public class CstlServletContainer extends ServletContainer {
 
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        //TODO
+        
+    }
+    
     private static class ContextInjectableProvider<T> extends SingletonTypeInjectableProvider<Context, T> {
         ContextInjectableProvider(Type type, T instance) {
             super(type, instance);
         }
-    } 
+    }
 }

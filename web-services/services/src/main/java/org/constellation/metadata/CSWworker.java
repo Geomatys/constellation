@@ -1028,6 +1028,8 @@ public class CSWworker {
             while (result.next()) {
                 results.add(result.getInt("identifier") + ":" + result.getString("catalog"));
             }
+            result.close();
+            stmt.close();
             return results;
         } catch (SQLException ex) {
            throw new OWSWebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
@@ -1539,6 +1541,8 @@ public class CSWworker {
                             while (results.next()) {
                                 values.add(results.getString(1));
                             }
+                            results.close();
+                            stmt.close();
                             ListOfValuesType ListValues = new  ListOfValuesType(values);
                             DomainValuesType value      = new DomainValuesType(null, token, ListValues, _Metadata_QNAME); 
                             responseList.add(value);
