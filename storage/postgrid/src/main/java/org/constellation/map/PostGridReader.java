@@ -22,6 +22,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.geometry.XDimension2D;
 
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -65,7 +66,7 @@ public class PostGridReader implements CoverageReader{
             return coverage;
         }
         
-        GeneralEnvelope requestEnvelope = param.getEnveloppe();
+        Envelope requestEnvelope = param.getEnveloppe();
         final CoordinateReferenceSystem requestCRS = requestEnvelope.getCoordinateReferenceSystem();
         final double[] objResolution = param.getResolution();
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
