@@ -957,6 +957,7 @@ public class WMService extends WebService {
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
+        final String strAzimuth      = getParameter(KEY_DIM_AZIMUTH,    false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null) 
                 && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : fromGetMap);
 
@@ -1036,9 +1037,18 @@ public class WMService extends WebService {
             }
         }
 
+        double azimuth = 0;
+        if(strAzimuth != null){
+            try{
+                azimuth = QueryAdapter.toDouble(strAzimuth);
+            }catch(NumberFormatException ex){
+                throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, wmsVersion);
+            }
+        }
+
         // Builds the request.
         return new GetMap(env, wmsVersion, format, layers, styles, sld, elevation,
-                    date, dimRange, size, background, transparent, strExceptions);
+                    date, dimRange, size, background, transparent, azimuth, strExceptions);
     }
 
     /**

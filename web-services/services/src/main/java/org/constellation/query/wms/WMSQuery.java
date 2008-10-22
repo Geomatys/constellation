@@ -45,8 +45,6 @@ public abstract class WMSQuery extends Query {
     public static final String KEY_LAYER = "LAYER";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_QUERY_LAYERS = "QUERY_LAYERS";
-    /** Parameter used in getMap */
-    public static final String KEY_DIM_RANGE = "DIM_RANGE";
     /** Parameter used in getMap, getFeatureInfo */
     public static final String KEY_CRS_v110 = "SRS";
     /** Parameter used in getMap, getFeatureInfo */
@@ -99,6 +97,10 @@ public abstract class WMSQuery extends Query {
     public static final String KEY_FEATURE_COUNT = "FEATURE_COUNT";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_GETMETADATA = "GetMetadata";
+    /** Parameter used in getMap */
+    public static final String KEY_DIM_RANGE = "DIM_RANGE";
+    /** Parameter used in getMap */
+    public static final String KEY_DIM_AZIMUTH = "DIM_AZIMUTH";
 
     protected final WMSQueryVersion version;
 

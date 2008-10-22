@@ -78,7 +78,7 @@ public class GetFeatureInfo extends GetMap {
                   final List<String> queryLayers, final String infoFormat, final int featureCount)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
-                background, transparent, exceptions);
+                background, transparent, 0,exceptions);
         this.x = x;     this.queryLayers = queryLayers;
         this.y = y;     this.infoFormat  = infoFormat;
         this.featureCount = featureCount;

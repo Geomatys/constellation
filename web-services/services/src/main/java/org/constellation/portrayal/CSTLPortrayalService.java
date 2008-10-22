@@ -144,6 +144,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         final Date time                        = query.getTime();
         final MeasurementRange dimRange        = query.getDimRange();
         final Dimension canvasDimension        = query.getSize();
+        final double azimuth                   = query.getAzimuth();
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
@@ -165,6 +166,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             }
             builder.append("\n");
             builder.append("Context env => " + contextEnv.toString() + "\n");
+            builder.append("Azimuth => " + azimuth + "\n");
             builder.append("Mime => " + mime.toString() + "\n");
             builder.append("Dimension => " + canvasDimension.toString() + "\n");
             builder.append("File => " + output.toString() + "\n");
@@ -178,7 +180,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         //some strange behavior when deployed in web app, we sometimes catch runtimeException or
         //thread exceptions.
         try{
-            portrayUsingCache(refEnv, background, output, mime, canvasDimension);
+            portrayUsingCache(refEnv, azimuth, background, output, mime, canvasDimension);
         }catch(Exception ex){
             throw new PortrayalException(ex);
         }
@@ -195,11 +197,10 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @param canvasDimension : size of the wanted image
      * @param hints : canvas hints
      */
-    private void portrayUsingCache(final ReferencedEnvelope contextEnv, final Color background, 
+    private void portrayUsingCache(final ReferencedEnvelope contextEnv,final double azimuth, final Color background,
             final Object output, final String mime, final Dimension canvasDimension) 
             throws PortrayalException {
 
-        
         canvas.setSize(canvasDimension);
         canvas.setBackground(background);
         
@@ -210,6 +211,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }
 
         canvas.getController().setVisibleArea(contextEnv);
+        if(azimuth != 0){
+            canvas.getController().rotate( -Math.toRadians(azimuth) );
+        }
         canvas.repaint();
 
         final BufferedImage image = canvas.getSnapShot();

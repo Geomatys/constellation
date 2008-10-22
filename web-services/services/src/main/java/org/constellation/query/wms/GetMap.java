@@ -89,6 +89,11 @@ public class GetMap extends WMSQuery {
     private final MutableStyledLayerDescriptor sld;
 
     /**
+     * Azimuth, map orientation.
+     */
+    private final double azimuth;
+
+    /**
      * Exceptions format. Optional.
      */
     private final String exceptions;
@@ -128,7 +133,7 @@ public class GetMap extends WMSQuery {
                   final List<String> layers, final List<String> styles, final Double elevation,
                   final Date date, final MeasurementRange dimRange, final Dimension size)
     {
-        this(envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, null);
+        this(envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, 0, null);
     }
 
     /**
@@ -138,7 +143,7 @@ public class GetMap extends WMSQuery {
                   final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
-                  final Boolean transparent, final String exceptions)
+                  final Boolean transparent, double azimuth, final String exceptions)
     {
         super(version);
         this.envelope = envelope;
@@ -153,20 +158,27 @@ public class GetMap extends WMSQuery {
         this.background = background;
         this.transparent = transparent;
         this.exceptions = exceptions;
+        this.azimuth = azimuth % 360 ;
     }
 
     /**
      * Copy constructor for subclasses.
      */
     protected GetMap(final GetMap getMap) {
-        super(getMap.version);
-        this.envelope   = getMap.envelope;
-        this.format     = getMap.format;      this.layers      = getMap.layers;
-        this.styles     = getMap.styles;      this.sld         = getMap.sld;
-        this.elevation  = getMap.elevation;   this.time        = getMap.time;
-        this.dimRange   = getMap.dimRange;    this.size        = getMap.size;
-        this.background = getMap.background;  this.transparent = getMap.transparent;
-        this.exceptions = getMap.exceptions;
+        this(   getMap.envelope,
+                getMap.version,
+                getMap.format,
+                getMap.layers,
+                getMap.styles,
+                getMap.sld,
+                getMap.elevation,
+                getMap.time,
+                getMap.dimRange,
+                getMap.size,
+                getMap.background,
+                getMap.transparent,
+                getMap.azimuth,
+                getMap.exceptions);
     }
 
     /**
@@ -195,6 +207,13 @@ public class GetMap extends WMSQuery {
      */
     public Double getElevation() {
         return elevation;
+    }
+
+    /**
+     * Returns the map orientation in degree, azimuth.
+     */
+    public double getAzimuth(){
+        return azimuth;
     }
 
     /**
