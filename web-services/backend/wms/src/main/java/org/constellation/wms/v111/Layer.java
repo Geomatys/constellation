@@ -179,14 +179,19 @@ public class Layer extends AbstractLayer {
       */
      public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
              final LatLonBoundingBox latLonBoundingBox, final BoundingBox boundingBox, final Integer queryable,
-             final List<AbstractDimension> dimensions, final Style style) {
+             final List<AbstractDimension> dimensions, final List<Style> styles) {
          this.name                    = name;
          this.title                   = name;
          this._abstract               = _abstract;
          this.keywordList             = new KeywordList(new Keyword(keyword));
          this.boundingBox.add(boundingBox);
          this.queryable = queryable;
-         this.style.add(style);
+         this.style = new ArrayList<Style>();
+         if (styles != null) {
+            for (Style s: styles) {
+                this.style.add(s);
+            }
+         }
          
          this.srs = crs;
          

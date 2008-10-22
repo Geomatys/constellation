@@ -661,7 +661,8 @@ public class WMService extends WebService {
                     or = new org.constellation.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
                     org.constellation.wms.v111.LegendURL legendURL2 = new org.constellation.wms.v111.LegendURL("image/gif", or);
                     org.constellation.wms.v111.Style style          = new org.constellation.wms.v111.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
-
+                    List<org.constellation.wms.v111.Style> styles   = new ArrayList<org.constellation.wms.v111.Style>();
+                    styles.add(style);
                     outputLayer = new org.constellation.wms.v111.Layer(inputLayer.getName(),
                                                                 cleanSpecialCharacter(inputLayer.getRemarks()),
                                                                 cleanSpecialCharacter(inputLayer.getThematic()),
@@ -673,7 +674,7 @@ public class WMService extends WebService {
                                                                 outputBBox,
                                                                 1,
                                                                 dimensions,
-                                                                style);
+                                                                styles);
                 //version 1.3.0
                 } else {
 
@@ -699,7 +700,9 @@ public class WMService extends WebService {
                     or = new org.constellation.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
                     org.constellation.wms.v130.LegendURL legendURL2 = new org.constellation.wms.v130.LegendURL("image/gif", or);
                     org.constellation.wms.v130.Style style          = new org.constellation.wms.v130.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
-
+                    List<org.constellation.wms.v130.Style> styles   = new ArrayList<org.constellation.wms.v130.Style>();
+                    styles.add(style);
+                    
 
                     outputLayer = new org.constellation.wms.v130.Layer(inputLayer.getName(),
                                                                 cleanSpecialCharacter(inputLayer.getRemarks()),
@@ -712,7 +715,7 @@ public class WMService extends WebService {
                                                                 outputBBox,
                                                                 1,
                                                                 dimensions,
-                                                                style);
+                                                                styles);
 
                 }
                 layers.add(outputLayer);

@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -30,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
+import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WMSWebServiceException;
@@ -49,22 +52,20 @@ import org.constellation.ws.rs.WebService;
 @Singleton
 public class ConfigurationService extends WebService  {
 
-    /**
-     * The user directory where to store the configuration file on Unix platforms.
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
+    @Context
+    ContainerNotifierImpl cn;
 
-    /**
-     * The user directory where to store the configuration file on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+    private static Map<String, String> serviceDirectory = new HashMap<String, String>();
+    static {
+        serviceDirectory.put("CSW",      "csw_configuration");
+        serviceDirectory.put("SOS",      "sos_configuration");
+        serviceDirectory.put("MDSEARCH", "MDWeb_search");
+    }
     
-    
-   @Context 
-   ContainerNotifierImpl cn; 
-    
+    private static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
+            
     public ConfigurationService() {
-        super("Configuration", false, new ServiceVersion(Service.OTHER, "1.0.0"));
+        super("Configuration", false, version);
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration", "");
         } catch (JAXBException ex) {
@@ -104,10 +105,16 @@ public class ConfigurationService extends WebService  {
                 marshaller.marshal(refreshCascadedServers(refreshCS), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             
+            } else if (request.equalsIgnoreCase("UpdatePropertiesFile") || objectRequest instanceof UpdatePropertiesFileType) {
+                
+                UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
+                
+                marshaller.marshal(updatePropertiesFile(updateProp), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
                 
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, "Request", getCurrentVersion());
+                                                 OPERATION_NOT_SUPPORTED, "Request", version);
             }
         
         } catch (WebServiceException ex) {
@@ -138,6 +145,11 @@ public class ConfigurationService extends WebService  {
         
     }
     
+    /**
+     * Restart all the web-services.
+     * 
+     * @return an Acknowlegement if the restart succeed.
+     */
     private AcknowlegementType restartService() {
         LOGGER.info("restart requested");
         cn.reload();
@@ -147,14 +159,8 @@ public class ConfigurationService extends WebService  {
     private AcknowlegementType refreshIndex(boolean synchrone) throws OWSWebServiceException {
         LOGGER.info("refresh index requested");
         
-        File home = new File(System.getProperty("user.home"));
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-            home = new File(home, WINDOWS_DIRECTORY);
-        } else {
-            home = new File(home, UNIX_DIRECTORY);
-        }
-        
-        File cswConfigDir = new File(home, "csw_configuration");
+        File sicadeDir    = getSicadeDirectory(); 
+        File cswConfigDir = new File(sicadeDir, "csw_configuration");
         File indexDir     = new File(cswConfigDir, "index");
 
         if (indexDir.exists() && indexDir.isDirectory()) {
@@ -166,12 +172,12 @@ public class ConfigurationService extends WebService  {
             if (!succeed) {
                 throw new OWSWebServiceException("The service can't delete the index folder.",
                                                  NO_APPLICABLE_CODE,
-                                                 null, getCurrentVersion());
+                                                 null, version);
             }
         } else {
             throw new OWSWebServiceException("the index folder does not exist.",
                                                  NO_APPLICABLE_CODE,
-                                                 null, getCurrentVersion());
+                                                 null, version);
         }
         
         //then we restart the services
@@ -180,50 +186,14 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "CSW index succefully recreated");
     }
     
-    private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws OWSWebServiceException {
+    private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
-        File home = new File(System.getProperty("user.home"));
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-            home = new File(home, WINDOWS_DIRECTORY);
-        } else {
-            home = new File(home, UNIX_DIRECTORY);
-        }
-        
-        File cswConfigDir  = new File(home, "csw_configuration");
+        File sicadeDir     = getSicadeDirectory();
+        File cswConfigDir  = new File(sicadeDir, "csw_configuration");
         File cascadingFile = new File(cswConfigDir, "CSWCascading.properties");
         
-        Properties prop = new Properties();
-        if (cascadingFile.exists()) {
-            FileInputStream in = null;
-            try {
-                in = new FileInputStream(cascadingFile);
-                prop.load(in);
-                in.close();
-            
-            //this case must never happen
-            } catch (FileNotFoundException ex) {
-                LOGGER.severe("FileNotFound cascading properties file (no normal)");
-                throw new OWSWebServiceException("FileNotFound cascading properties file",
-                                                 NO_APPLICABLE_CODE,
-                                                 null, getCurrentVersion());
-            
-            }  catch (IOException ex) {
-                LOGGER.severe("unable to load the cascading properties file");
-                throw new OWSWebServiceException("unable to load the cascading properties file",
-                                                 NO_APPLICABLE_CODE,
-                                                 null, getCurrentVersion());
-            }
-        } else {
-            try {
-                cascadingFile.createNewFile();
-            } catch (IOException ex) {
-                LOGGER.severe("unable to create the cascading properties file");
-                throw new OWSWebServiceException("unable to create the cascading properties file",
-                                                 NO_APPLICABLE_CODE,
-                                                 null, getCurrentVersion());
-            }
-        }
+        Properties prop = getPropertiesFromFile(cascadingFile);
         
         if (!request.isAppend()) {
             prop.clear();
@@ -233,24 +203,7 @@ public class ConfigurationService extends WebService  {
             prop.put(servName, request.getCascadedServices().get(servName));
         }
         
-        try {
-            FileOutputStream out = new FileOutputStream(cascadingFile);
-            prop.store(out, "");
-            out.close();
-        
-        //must never happen    
-        } catch (FileNotFoundException ex) {
-            LOGGER.severe("FileNotFound cascading properties file (no normal)");
-            throw new OWSWebServiceException("FileNotFound cascading properties file",
-                                             NO_APPLICABLE_CODE,
-                                             null, getCurrentVersion());
-
-        } catch (IOException ex) {
-            LOGGER.severe("unable to store the cascading properties file");
-            throw new OWSWebServiceException("unable to store the cascading properties file",
-                                             NO_APPLICABLE_CODE,
-                                             null, getCurrentVersion());
-        }
+        storeProperties(prop, cascadingFile);
         
         //then we restart the services
         cn.reload();
@@ -258,18 +211,131 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
     }
     
-    
-    @Override
-    public int hashCode() {
-        return "configuration".hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+    private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws WebServiceException {
+        LOGGER.info("update properties file requested");
+        
+        String service  = request.getService();
+        String fileName = request.getFileName();
+        Map<String, String> newProperties = request.getProperties();
+        
+        if ( service == null) {
+            throw new OWSWebServiceException("You must specify the service parameter.",
+                                              MISSING_PARAMETER_VALUE,
+                                             "service", version);
+        } else if (!serviceDirectory.keySet().contains(service)) {
+            String msg = "Invalid value for the service parameter: " + service + '\n' +
+                         "accepted values are:";
+            for (String s: serviceDirectory.keySet()) {
+                msg = msg + s + ',';
+            }
+            throw new OWSWebServiceException(msg, MISSING_PARAMETER_VALUE,
+                                             "service", version);
+            
         }
-        return obj.hashCode() == this.hashCode();
+        
+        if (fileName == null) {
+             throw new OWSWebServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE,
+                                             "fileName", version);
+        }
+        
+        if (newProperties == null || newProperties.size() == 0) {
+             throw new OWSWebServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE,
+                                             "properties", version);
+        }
+        
+        File sicadeDir      = getSicadeDirectory();
+        File cswConfigDir   = new File(sicadeDir, serviceDirectory.get(service));
+        File propertiesFile = new File(cswConfigDir, fileName);
+        
+        Properties prop = new Properties();
+        if (propertiesFile.exists()) {
+            for (String key : newProperties.keySet()) {
+                prop.put(key, newProperties.get(key));
+            }
+        } else {
+            throw new OWSWebServiceException("The file does not exist: " + propertiesFile.getPath(),
+                                              NO_APPLICABLE_CODE, null, version);
+        }
+        
+        storeProperties(prop, propertiesFile);
+        
+        //then we restart the services
+        cn.reload();
+        
+        return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
     }
+    
+    /**
+     * Load the properties from a properies file. 
+     * 
+     * If the file does not exist it will be created and an empty Properties object will be return.
+     * 
+     * @param f a properties file.
+     * 
+     * @return a Properties Object.
+     */
+    private Properties getPropertiesFromFile(File f) throws WebServiceException {
+        if (f != null) {
+            Properties prop = new Properties();
+            if (f.exists()) {
 
+                FileInputStream in = null;
+                try {
+                    in = new FileInputStream(f);
+                    prop.load(in);
+                    in.close();
+
+                //this case must never happen
+                } catch (FileNotFoundException ex) {
+                    LOGGER.severe("FileNotFound " + f.getPath() + " properties file");
+                    throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
+                            NO_APPLICABLE_CODE,
+                            null, version);
+
+                } catch (IOException ex) {
+                    LOGGER.severe("unable to load the " + f.getPath() + " properties file");
+                    throw new OWSWebServiceException("unable to load the " + f.getPath() + " properties file",
+                            NO_APPLICABLE_CODE,
+                            null, version);
+                }
+            } else {
+                try {
+                    f.createNewFile();
+                } catch (IOException ex) {
+                    LOGGER.severe("unable to create the cascading properties file");
+                    throw new OWSWebServiceException("unable to create the cascading properties file",
+                            NO_APPLICABLE_CODE,
+                            null, version);
+                }
+            }
+            return prop;
+        } else {
+            throw new IllegalArgumentException(" the properties file can't be null");
+        }
+    }
+    
+    private void storeProperties(Properties prop, File f) throws WebServiceException {
+        if (prop == null || f == null) {
+            throw new IllegalArgumentException(" the properties or file can't be null");
+        } else {
+            try {
+                FileOutputStream out = new FileOutputStream(f);
+                prop.store(out, "");
+                out.close();
+
+            //must never happen    
+            } catch (FileNotFoundException ex) {
+                LOGGER.severe("FileNotFound " + f.getPath() + " properties file (no normal)");
+                throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
+                        NO_APPLICABLE_CODE,
+                        null, version);
+
+            } catch (IOException ex) {
+                LOGGER.severe("unable to store the " + f.getPath() + " properties file");
+                throw new OWSWebServiceException("unable to store the " + f.getPath() + "properties file",
+                        NO_APPLICABLE_CODE,
+                        null, version);
+            }
+        }
+    } 
 }

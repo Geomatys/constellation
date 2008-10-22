@@ -62,6 +62,14 @@ public class ObjectFactory {
     public AcknowlegementType createAcknowlegementType() {
         return new AcknowlegementType();
     }
+    
+    /**
+     * Create an instance of {@link WRSExtrinsicObjectType }
+     * 
+     */
+    public UpdatePropertiesFileType createUpdatePropertiesFileType() {
+        return new UpdatePropertiesFileType();
+    }
 
 
 }

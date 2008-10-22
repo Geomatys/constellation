@@ -312,18 +312,18 @@ public class SOSworker {
         Properties prop = new Properties();
         map    = new Properties();
         File f = null;
-        String env = System.getenv("CATALINA_HOME");
+        File env = getSicadeDirectory();
         logger.info("path to config file=" + env);
         boolean start = true;
         try {
             // we get the configuration file
-            f = new File(env + "/sos_configuration/config.properties");
+            f = new File(env, "/sos_configuration/config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
             in.close();
             
             // the file who record the map between phisycal ID and DB ID.
-            f = new File(env + "/sos_configuration/mapping.properties");
+            f = new File(env, "/sos_configuration/mapping.properties");
             in = new FileInputStream(f);
             map.load(in);
             in.close();
@@ -1842,8 +1842,9 @@ public class SOSworker {
                 value = result.getString(1);
                 logger.info("PhysicalId:" + value);
                 map.setProperty(value, dbId);
-                String env = System.getenv("CATALINA_HOME");
-                FileOutputStream out = new FileOutputStream(env + "/sos_configuration/mapping.properties");
+                File env         = getSicadeDirectory();
+                File mappingFile = new File(env, "/sos_configuration/mapping.properties");
+                FileOutputStream out = new FileOutputStream(mappingFile);
                 map.store(out, "");
                 out.close();
             } else {
@@ -2376,6 +2377,25 @@ public class SOSworker {
     public void setServiceURL(String serviceURL){
         this.serviceURL = serviceURL;
     }
+    
+     /**
+     * Return the ".sicade" directory.
+     *
+     * @return The ".sicade" directory containing .
+     */
+    public File getSicadeDirectory() {
+        File sicadeDirectory;
+        String home = System.getProperty("user.home");
+
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+             sicadeDirectory = new File(home, "Application Data\\Sicade");
+        } else {
+             sicadeDirectory = new File(home, ".sicade");
+        }
+        return sicadeDirectory;
+    }
+
+    
     
     public void close() {
         try {

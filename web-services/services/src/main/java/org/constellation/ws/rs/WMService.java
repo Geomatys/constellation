@@ -382,6 +382,7 @@ public class WMService extends WebService {
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion.toString()) :
                     null;
 
+                // we build The Style part
                 org.constellation.wms.v111.OnlineResource or =
                         new org.constellation.wms.v111.OnlineResource(legendUrlPng);
                 org.constellation.wms.v111.LegendURL legendURL1 =
@@ -390,9 +391,22 @@ public class WMService extends WebService {
                 or = new org.constellation.wms.v111.OnlineResource(legendUrlGif);
                 org.constellation.wms.v111.LegendURL legendURL2 =
                         new org.constellation.wms.v111.LegendURL(IMAGE_GIF, or);
-                org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
-                        "Style1", "default Style", null, null, null, legendURL1, legendURL2);
 
+                List<String> stylesName = layer.getFavoriteStyles();
+                List<org.constellation.wms.v111.Style> styles = new ArrayList<org.constellation.wms.v111.Style>();
+                if (stylesName != null && stylesName.size() != 0) {
+                    for (String styleName : stylesName) {
+                        org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
+                                styleName, styleName, null, null, null, legendURL1, legendURL2);
+                        styles.add(style);
+                    }
+                } else {
+                    org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
+                                "Style1", "defaultStyle", null, null, null, legendURL1, legendURL2);
+                    styles.add(style);
+                }
+                
+                //we build the complete layer object
                 outputLayer = new org.constellation.wms.v111.Layer(layerName,
                         cleanSpecialCharacter(layer.getRemarks()),
                         cleanSpecialCharacter(layer.getThematic()), crs,
@@ -400,7 +414,7 @@ public class WMService extends WebService {
                                               inputGeoBox.getSouthBoundLatitude(),
                                               inputGeoBox.getEastBoundLongitude(),
                                               inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, style);
+                        outputBBox, queryable, dimensions, styles);
             } else {
                 /*
                  * TODO
@@ -424,8 +438,20 @@ public class WMService extends WebService {
                 or = new org.constellation.wms.v130.OnlineResource(legendUrlGif);
                 org.constellation.wms.v130.LegendURL legendURL2 =
                         new org.constellation.wms.v130.LegendURL(IMAGE_GIF, or);
-                org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
+                
+                List<String> stylesName = layer.getFavoriteStyles();
+                List<org.constellation.wms.v130.Style> styles = new ArrayList<org.constellation.wms.v130.Style>();
+                if (stylesName != null && stylesName.size() != 0) {
+                    for (String styleName : stylesName) {
+                        org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
+                        styleName, styleName, null, null, null, legendURL1, legendURL2);
+                        styles.add(style);
+                    }
+                } else {
+                    org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
+                    styles.add(style);
+                }
 
                 outputLayer = new org.constellation.wms.v130.Layer(layerName,
                         cleanSpecialCharacter(layer.getRemarks()),
@@ -434,7 +460,7 @@ public class WMService extends WebService {
                                                     inputGeoBox.getSouthBoundLatitude(),
                                                     inputGeoBox.getEastBoundLongitude(),
                                                     inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, style);
+                        outputBBox, queryable, dimensions, styles);
             }
             layers.add(outputLayer);
         }
