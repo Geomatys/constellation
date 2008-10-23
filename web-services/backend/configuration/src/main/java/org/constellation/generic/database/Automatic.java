@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.geotools.util.Utilities;
 
 /**
@@ -32,6 +33,15 @@ import org.geotools.util.Utilities;
 @XmlRootElement(name = "automatic")
 public class Automatic {
     
+     @XmlTransient
+    public static final int DEFAULT = 0;
+    @XmlTransient
+    public static final int CSR     = 1;
+    @XmlTransient
+    public static final int CDI     = 2;
+    @XmlTransient
+    public static final int EDMED   = 3;
+            
     private BDD bdd;
     
     @XmlAttribute
@@ -49,6 +59,17 @@ public class Automatic {
 
     public String getFormat() {
         return format;
+    }
+    
+    public int getType() {
+        if (format.equals("cdi"))
+            return CDI;
+        else if (format.equals("csr"))
+            return CSR;
+        else if (format.equals("edmed"))
+            return EDMED;
+        else
+            return DEFAULT;
     }
     
     @Override

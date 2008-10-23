@@ -31,6 +31,8 @@ public class Queries {
 
     private QueryPropertyType main;
     
+    private Single single;
+    
     private MultiFixed multiFixed;
 
     public QueryPropertyType getMain() {
