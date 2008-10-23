@@ -69,7 +69,7 @@ public class PostGRIDContextBuilder {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            context.layers().add(createPostGridLayer());
+            context.layers().add(createPostGridLayer2());
 
 //            context.setCoordinateReferenceSystem(layer.getFeatureSource().getSchema().getCoordinateReferenceSystem());
 //            context.setTitle("DemoContext");

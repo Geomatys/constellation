@@ -31,17 +31,23 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.measure.unit.NonSI;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.TimeParser;
+import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.sld.MutableStyledLayerDescriptor;
@@ -53,6 +59,8 @@ import org.geotools.util.Version;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.crs.VerticalCRS;
 
 
 /**
@@ -185,24 +193,24 @@ public class QueryAdapter {
             }
             return new ImmutableEnvelope(envelope);
         }
-        final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
         if (envelope == null) {
             envelope = new GeneralEnvelope((tokens.countTokens() + 1) >> 1);
             envelope.setCoordinateReferenceSystem(crs);
             envelope.setToInfinite();
         }
         final double[] coordinates = new double[envelope.getDimension() * 2];
-        int index = 0;
-        while (tokens.hasMoreTokens()) {
+            int index = 0;
+            while (tokens.hasMoreTokens()) {
             final double value = toDouble(tokens.nextToken());
             if (index >= coordinates.length) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
-            }
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+                }
             coordinates[index++] = value;
-        }
+            }
         if ((index & 1) != 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1));
-        }
+            }
         // Fallthrough in every cases.
         switch (index) {
             default: {
@@ -210,7 +218,7 @@ public class QueryAdapter {
                     final double maximum = coordinates[--index];
                     final double minimum = coordinates[--index];
                     envelope.setRange(index >> 1, minimum, maximum);
-                }
+        }
             }
             case 4: envelope.setRange(1, coordinates[1], coordinates[3]);
             case 3:
@@ -233,6 +241,120 @@ public class QueryAdapter {
         }
         return new ImmutableEnvelope(envelope);
     }
+
+
+    /**
+     * Converts a string representing the bbox coordinates into a {@link GeneralEnvelope}.
+     *
+     * @param bbox Coordinates of the bounding box, seperated by comas.
+     * @param crs  The {@linkplain CoordinateReferenceSystem coordinate reference system} in
+     *             which the envelope is expressed. Should not be {@code null}.
+     * @return The enveloppe for the bounding box specified, or an
+     *         {@linkplain GeneralEnvelope#setToInfinite infinite envelope}
+     *         if the bbox is {@code null}.
+     */
+    public static ImmutableEnvelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs,
+                    final String strElevation, final String strTime, final Version wmsVersion)
+                    throws IllegalArgumentException, WMSWebServiceException {
+
+        final CoordinateReferenceSystem horizontalCRS = CRS.getHorizontalCRS(crs);
+        final VerticalCRS               verticalCRS;
+        final TemporalCRS               temporalCRS;
+        final double[] dimX = new double[]{Double.NaN,Double.NaN};
+        final double[] dimY = new double[]{Double.NaN,Double.NaN};
+        final double[] dimZ = new double[]{Double.NaN,Double.NaN};
+        final double[] dimT = new double[]{Double.NaN,Double.NaN};
+
+
+        //parse bbox -----------------------------------------------------------
+        if(bbox == null){
+            //set to infinity
+            dimX[0] = dimY[0] = Double.NEGATIVE_INFINITY;
+            dimX[1] = dimY[1] = Double.POSITIVE_INFINITY;
+        }else{
+            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+            final double[] values = new double[4];
+            int index = 0;
+            while (tokens.hasMoreTokens()) {
+                try{
+                    values[index] = toDouble(tokens.nextToken());
+                } catch (NumberFormatException n) {
+                    throw new WMSWebServiceException(n, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+                }
+                if (index >= 4) {
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+                }
+                index++;
+            }
+
+            if(index != 5){
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+            }
+
+            dimX[0] = values[0];
+            dimX[1] = values[2];
+            dimY[0] = values[1];
+            dimY[1] = values[3];
+        }
+
+        //parse elevation ------------------------------------------------------
+        if(strElevation != null){
+            final double elevation;
+            try{
+                elevation = QueryAdapter.toDouble(strElevation);
+            } catch (NumberFormatException n) {
+                throw new WMSWebServiceException(n, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+            }
+            dimZ[0] = dimZ[1] = elevation;
+
+            final VerticalCRS zCRS = CRS.getVerticalCRS(crs);
+            verticalCRS = (zCRS != null) ? zCRS : DefaultVerticalCRS.GEOIDAL_HEIGHT;
+
+        }else{
+            verticalCRS = null;
+        }
+
+        //parse temporal -------------------------------------------------------
+        if(strTime != null){
+            final Date date;
+            try {
+                date = QueryAdapter.toDate(strTime);
+            } catch (ParseException ex) {
+                throw new WMSWebServiceException(ex, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+            }
+
+            final TemporalCRS tCRS = CRS.getTemporalCRS(crs);
+            temporalCRS = (tCRS != null) ? tCRS : DefaultTemporalCRS.MODIFIED_JULIAN;
+
+            dimT[0] = dimT[1] = ((DefaultTemporalCRS)temporalCRS).toValue(date);
+
+        }else{
+            temporalCRS = null;
+        }
+
+        //create the 2/3/4 D BBox ----------------------------------------------
+        if(verticalCRS != null && temporalCRS != null){
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+                    new CoordinateReferenceSystem[]{ horizontalCRS,
+                                                     verticalCRS,
+                                                     temporalCRS });
+            return new ImmutableEnvelope(finalCRS, new double[][]{dimX,dimY,dimZ,dimT});
+        }else if(verticalCRS != null){
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+                    new CoordinateReferenceSystem[]{ horizontalCRS, verticalCRS });
+            return new ImmutableEnvelope(finalCRS, new double[][]{dimX,dimY,dimZ});
+        }else if(temporalCRS != null){
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+                    new CoordinateReferenceSystem[]{ horizontalCRS, temporalCRS });
+            return new ImmutableEnvelope(finalCRS, new double[][]{dimX,dimY,dimT});
+        }else{
+            return new ImmutableEnvelope(horizontalCRS, new double[][]{dimX,dimY});
+        }
+
+    }
+
+
+
 
     /**
      * Returns {@code 1} by default if the string passed is {@code null}, or the specified value

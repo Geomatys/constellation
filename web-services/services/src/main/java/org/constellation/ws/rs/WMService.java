@@ -996,6 +996,8 @@ public class WMService extends WebService {
         final ImmutableEnvelope env;
         try {
             env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
+            //TODO change to this method when renderer will support 4D BBox
+//            env = QueryAdapter.toEnvelope(strBBox, crs, strElevation, strTime,wmsVersion);
         } catch (IllegalArgumentException i) {
             throw new WMSWebServiceException(i, INVALID_PARAMETER_VALUE, wmsVersion);
         }
