@@ -314,6 +314,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     public static synchronized File writeInImage(Exception e, int width, int height, File output, String mime)
                     throws IOException{
         Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.WARNING, "Error image created : " + output,e);
+        final BufferedImage img = writeInImage(e, width, height);
+        writeImage(img, mime, output);
+        return output;
+    }
+
+    public static synchronized BufferedImage writeInImage(Exception e, int width, int height){
 
         final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g = img.createGraphics();
@@ -349,10 +355,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }
         g.dispose();
 
-
-        writeImage(img, mime, output);
-
-        return output;
+        return img;
     }
     
     public static CSTLPortrayalService getInstance(){

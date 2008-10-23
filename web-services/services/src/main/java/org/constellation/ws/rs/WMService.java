@@ -771,23 +771,15 @@ public class WMService extends WebService {
             image = CSTLPortrayalService.getInstance().portray(getMap);
         } catch (PortrayalException ex) {
             if(errorInImage) {
-                /*try {
-                    final Dimension dim = getMap.getSize();
-                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
-                } catch (IOException io) {
-                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-                }*/
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.writeInImage(ex, dim.width, dim.height);
             } else {
                 throw new WMSWebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
         } catch (WebServiceException ex) {
             if (errorInImage) {
-                /*try {
-                    final Dimension dim = getMap.getSize();
-                    //CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
-                } catch (IOException io) {
-                    throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-                }*/
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.writeInImage(ex, dim.width, dim.height);
             } else {
                 throw new WMSWebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
