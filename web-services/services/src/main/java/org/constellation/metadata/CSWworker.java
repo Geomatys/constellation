@@ -24,8 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -36,7 +34,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +49,6 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
 //Constellation dependencies
-import org.constellation.ebrim.v300.RegistryObjectType;
-import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.BriefRecordType;
@@ -90,7 +85,6 @@ import org.constellation.cat.csw.v202.SchemaComponentType;
 import org.constellation.cat.csw.v202.EchoedRequestType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.ogc.FilterCapabilities;
@@ -145,7 +139,6 @@ import org.mdweb.sql.v20.Writer20;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
-import org.opengis.metadata.identification.Identification;
 
 // PostgreSQL dependencies
 import org.postgresql.ds.PGSimpleDataSource;
@@ -1658,17 +1651,11 @@ public class CSWworker {
             obj = ((JAXBElement)obj).getValue();
         }
         
-        //we try to find a title for the from
-        String title = findName(obj);
-        if (title.equals("unknow title")) {
-            title = MDWriter.getAvailableTitle();
-        }
-        
         // we create a MDWeb form form the object
         Form f = null;
         try {
             long start_trans = System.currentTimeMillis();
-            f = MDWriter.getFormFromObject(obj, title);
+            f = MDWriter.getFormFromObject(obj);
             transTime = System.currentTimeMillis() - start_trans;
             
         } catch (IllegalArgumentException e) {
@@ -1695,126 +1682,6 @@ public class CSWworker {
             return true;
         }
         return false;
-    }
-    
-    /**
-     * This method try to find a title to this object.
-     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
-     * else we try to find a getName() method.
-     * 
-     * @param obj the object for wich we want a title
-     * 
-     * @return the founded title or "Unknow title"
-     */
-    private String findName(Object obj) {
-        
-        //here we try to get the title
-        AbstractSimpleLiteral titleSL = null;
-        String title = "unknow title";
-        if (obj instanceof RecordType) {
-            titleSL = ((RecordType) obj).getTitle();
-            if (titleSL == null) {
-                titleSL = ((RecordType) obj).getIdentifier();
-            }
-                               
-            if (titleSL == null) {
-                title = "unknow title";
-            } else {
-                if (titleSL.getContent().size() > 0)
-                    title = titleSL.getContent().get(0);
-            }
-                            
-        } else if (obj instanceof MetaDataImpl) {
-            Collection<Identification> idents = ((MetaDataImpl) obj).getIdentificationInfo();
-            if (idents.size() != 0) {
-                Identification ident = idents.iterator().next();
-                if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
-                    title = ident.getCitation().getTitle().toString();
-                } 
-            }
-        } else if (obj instanceof RegistryObjectType) {
-            InternationalStringType ident = ((RegistryObjectType) obj).getName();
-            if (ident != null && ident.getLocalizedString().size() > 0) {
-                title = ident.getLocalizedString().get(0).getValue();
-            } else {
-                title = ((RegistryObjectType) obj).getId();
-            } 
-        
-        } else if (obj instanceof org.constellation.ebrim.v250.RegistryObjectType) {
-            org.constellation.ebrim.v250.InternationalStringType ident = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getName();
-            if (ident != null && ident.getLocalizedString().size() > 0) {
-                title = ident.getLocalizedString().get(0).getValue();
-            } else {
-                title = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getId();
-            } 
-            
-        } else {
-            Method nameGetter = null;
-            String methodName = "";
-            int i = 0;
-            while (i < 3) {
-                try {
-                    switch (i) {
-                        case 0: methodName = "getTitle";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-                                 
-                        case 1: methodName = "getName";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-                                
-                        case 2: methodName = "getId";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-                    }
-                
-                
-                } catch (NoSuchMethodException ex) {
-                    logger.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
-                } catch (SecurityException ex) {
-                    logger.severe(" security exception while getting the title of the object.");
-                }
-                if (nameGetter != null) {
-                    i = 3;
-                } else {
-                    i++;
-                }
-            }
-            
-            if (nameGetter != null) {
-                try {
-                    Object objT = nameGetter.invoke(obj);
-                    if (objT instanceof String) {
-                        title = (String) obj;
-                    
-                    } else if (objT instanceof AbstractSimpleLiteral) {
-                        titleSL = (AbstractSimpleLiteral) objT;
-                        if (titleSL.getContent().size() > 0)
-                            title = titleSL.getContent().get(0);
-                        else title = "unknow title";
-                    
-                    } else {
-                        title = "unknow title";
-                    }
-                    
-                    if (title == null)
-                        title = "unknow title";
-                } catch (IllegalAccessException ex) {
-                    logger.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
-                                  "cause: " + ex.getMessage());
-                } catch (IllegalArgumentException ex) {
-                    logger.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (InvocationTargetException ex) {
-                    logger.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
-                                  "cause: " + ex.getMessage());
-                }
-            }
-            
-            if (title.equals("unknow title"))
-                logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
-        }
-        return title;
     }
     
     /**

@@ -31,8 +31,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.dublincore.AbstractSimpleLiteral;
+import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
+import org.geotools.metadata.iso.MetaDataImpl;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
@@ -47,6 +51,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
 import org.mdweb.sql.Reader;
 import org.mdweb.sql.v20.Writer20;
+import org.opengis.metadata.identification.Identification;
 
 /**
  *
@@ -129,9 +134,15 @@ public class MetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    public Form getFormFromObject(Object object, String title) throws SQLException {
+    public Form getFormFromObject(Object object) throws SQLException {
 
         if (object != null) {
+            //we try to find a title for the from
+            String title = findName(object);
+            if (title.equals("unknow title")) {
+                title = getAvailableTitle();
+            }
+            
             Date creationDate = new Date(System.currentTimeMillis());
             Form form = new Form(-1, MDCatalog, title, user, null, null, creationDate);
 
@@ -183,9 +194,129 @@ public class MetadataWriter {
     /**
      * Ask to the mdweb reader an available title for a form.
      */
-    public String getAvailableTitle() throws SQLException {
+    private String getAvailableTitle() throws SQLException {
         
         return MDReader.getAvailableTitle();
+    }
+    
+    /**
+     * This method try to find a title to this object.
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
+     * else we try to find a getName() method.
+     * 
+     * @param obj the object for wich we want a title
+     * 
+     * @return the founded title or "Unknow title"
+     */
+    private String findName(Object obj) {
+        
+        //here we try to get the title
+        AbstractSimpleLiteral titleSL = null;
+        String title = "unknow title";
+        if (obj instanceof RecordType) {
+            titleSL = ((RecordType) obj).getTitle();
+            if (titleSL == null) {
+                titleSL = ((RecordType) obj).getIdentifier();
+            }
+                               
+            if (titleSL == null) {
+                title = "unknow title";
+            } else {
+                if (titleSL.getContent().size() > 0)
+                    title = titleSL.getContent().get(0);
+            }
+                            
+        } else if (obj instanceof MetaDataImpl) {
+            Collection<Identification> idents = ((MetaDataImpl) obj).getIdentificationInfo();
+            if (idents.size() != 0) {
+                Identification ident = idents.iterator().next();
+                if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
+                    title = ident.getCitation().getTitle().toString();
+                } 
+            }
+        } else if (obj instanceof org.constellation.ebrim.v300.RegistryObjectType) {
+            InternationalStringType ident = ((org.constellation.ebrim.v300.RegistryObjectType) obj).getName();
+            if (ident != null && ident.getLocalizedString().size() > 0) {
+                title = ident.getLocalizedString().get(0).getValue();
+            } else {
+                title = ((RegistryObjectType) obj).getId();
+            } 
+        
+        } else if (obj instanceof org.constellation.ebrim.v250.RegistryObjectType) {
+            org.constellation.ebrim.v250.InternationalStringType ident = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getName();
+            if (ident != null && ident.getLocalizedString().size() > 0) {
+                title = ident.getLocalizedString().get(0).getValue();
+            } else {
+                title = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getId();
+            } 
+            
+        } else {
+            Method nameGetter = null;
+            String methodName = "";
+            int i = 0;
+            while (i < 3) {
+                try {
+                    switch (i) {
+                        case 0: methodName = "getTitle";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                                 
+                        case 1: methodName = "getName";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                                
+                        case 2: methodName = "getId";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                    }
+                
+                
+                } catch (NoSuchMethodException ex) {
+                    logger.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
+                } catch (SecurityException ex) {
+                    logger.severe(" security exception while getting the title of the object.");
+                }
+                if (nameGetter != null) {
+                    i = 3;
+                } else {
+                    i++;
+                }
+            }
+            
+            if (nameGetter != null) {
+                try {
+                    Object objT = nameGetter.invoke(obj);
+                    if (objT instanceof String) {
+                        title = (String) obj;
+                    
+                    } else if (objT instanceof AbstractSimpleLiteral) {
+                        titleSL = (AbstractSimpleLiteral) objT;
+                        if (titleSL.getContent().size() > 0)
+                            title = titleSL.getContent().get(0);
+                        else title = "unknow title";
+                    
+                    } else {
+                        title = "unknow title";
+                    }
+                    
+                    if (title == null)
+                        title = "unknow title";
+                } catch (IllegalAccessException ex) {
+                    logger.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
+                                  "cause: " + ex.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    logger.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (InvocationTargetException ex) {
+                    logger.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                                  "cause: " + ex.getMessage());
+                }
+            }
+            
+            if (title.equals("unknow title"))
+                logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
+        }
+        return title;
     }
     
     /**

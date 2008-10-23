@@ -193,7 +193,7 @@ public class ConfigurationService extends WebService  {
         File cswConfigDir  = new File(sicadeDir, "csw_configuration");
         File cascadingFile = new File(cswConfigDir, "CSWCascading.properties");
         
-        Properties prop = getPropertiesFromFile(cascadingFile);
+        Properties prop    = getPropertiesFromFile(cascadingFile);
         
         if (!request.isAppend()) {
             prop.clear();
@@ -247,7 +247,7 @@ public class ConfigurationService extends WebService  {
         File cswConfigDir   = new File(sicadeDir, serviceDirectory.get(service));
         File propertiesFile = new File(cswConfigDir, fileName);
         
-        Properties prop = new Properties();
+        Properties prop     = new Properties();
         if (propertiesFile.exists()) {
             for (String key : newProperties.keySet()) {
                 prop.put(key, newProperties.get(key));
@@ -262,7 +262,7 @@ public class ConfigurationService extends WebService  {
         //then we restart the services
         cn.reload();
         
-        return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
+        return new AcknowlegementType("success", "properties file sucessfully updated");
     }
     
     /**
