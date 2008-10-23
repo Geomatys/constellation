@@ -297,6 +297,31 @@ public class SOSworker {
      */
     private DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     
+    /**
+     * An SQL satetement finding the last sensor ID recorded
+     */
+    PreparedStatement newSensorIdStmt;
+    
+    /**
+     * An SQL statement finding the last Observation ID recorded
+     */
+    PreparedStatement newObservationIDStmt;
+    
+    /**
+     * An SQL statement verying if the specified observation already exist.
+     */
+    PreparedStatement observationExistStmt;
+    
+    /**
+     * An SQL statement get a sensorML value in the MDWeb database
+     */
+    PreparedStatement getValueStmt;
+    
+    /**
+     * An SQL statement get the minimal eventime for the observation offering
+     */
+    PreparedStatement getMinEventTimeOffering;
+    
     
     /**
      * Initialize the database connection.
@@ -391,6 +416,14 @@ public class SOSworker {
                 int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
                 int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
                 templateValidTime         = (h *  3600000) + (m * 60000);
+                
+                //we build the prepared Statement
+                newSensorIdStmt      = sensorMLConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
+                newObservationIDStmt = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
+                observationExistStmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+                getValueStmt         = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
+                getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+                
                 logger.info("SOS service running");
             }
         } else {
@@ -1515,14 +1548,11 @@ public class SOSworker {
      * Create a new identifier for an observation by searching in the O&M database.
      */
     private int getSensorId() throws SQLException {
-        PreparedStatement stmt = sensorMLConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
-        ResultSet res = stmt.executeQuery();
-        int id = -1;
+        ResultSet res = newSensorIdStmt.executeQuery();int id = -1;
         while (res.next()) {
             id = res.getInt(1);
         }
         res.close();
-        stmt.close();
         return (id + 1);
     }
     
@@ -1530,8 +1560,7 @@ public class SOSworker {
      * Create a new identifier for an observation by searching in the O&M database.
      */
     private String getObservationId() throws SQLException {
-        PreparedStatement stmt = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-        ResultSet res = stmt.executeQuery();
+        ResultSet res = newObservationIDStmt.executeQuery();
         int id = -1;
         while (res.next()) {
             id = res.getInt(1);
@@ -1539,14 +1568,12 @@ public class SOSworker {
         res.close();
         //there is a possibility that someone delete some observation manually.
         // so we must verify that this id is not already assigned. if it is we must find a free identifier
-        stmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
         do {
             id ++;
-            stmt.setString(1, observationIdBase + id);
-            res = stmt.executeQuery();
+            observationExistStmt.setString(1, observationIdBase + id);
+            res = observationExistStmt.executeQuery();
         } while (res.next());
         res.close();
-        stmt.close();
         return observationIdBase + id;
         
     }
@@ -1809,12 +1836,9 @@ public class SOSworker {
         boolean found          = false;
         boolean moreIdentifier = true;
         while (moreIdentifier && !found) {
-            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
-                                                                     " WHERE id_value=?" +
-                                                                     " AND form=?");
-            stmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-            stmt.setInt(2,    form.getId());
-            ResultSet result = stmt.executeQuery();
+            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
+            getValueStmt.setInt(2,    form.getId());
+            ResultSet result = getValueStmt.executeQuery();
             moreIdentifier   = result.next();
             if (moreIdentifier) {
                 String value = result.getString(1);
@@ -1823,7 +1847,6 @@ public class SOSworker {
                 } 
             }
             result.close();
-            stmt.close();
             i++;
         } 
         
@@ -1831,12 +1854,9 @@ public class SOSworker {
             logger.severe("There is no supervisor code in that SensorML file");
             return "";
         } else {
-            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
-                                                                     " WHERE id_value=?" +
-                                                                     " AND form=?");
-            stmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-            stmt.setInt(2,    form.getId());
-            ResultSet result = stmt.executeQuery();
+            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
+            getValueStmt.setInt(2,    form.getId());
+            ResultSet result = getValueStmt.executeQuery();
             String value = "";
             if (result.next()) {
                 value = result.getString(1);
@@ -1851,7 +1871,6 @@ public class SOSworker {
                 logger.severe("no value for supervisorcode identifier numero " + (i - 1));
             }
             result.close();
-            stmt.close();
             return value;
         }
     }
@@ -1884,12 +1903,9 @@ public class SOSworker {
         String coordinates = "";
         
         //we get the srs name
-        PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
-                                                                     " WHERE id_value=?" +
-                                                                     " AND form=?");
-        stmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
-        stmt.setInt(2,    form.getId());
-        ResultSet result = stmt.executeQuery();
+        getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
+        getValueStmt.setInt(2,    form.getId());
+        ResultSet result = getValueStmt.executeQuery();
         if (result.next()) {
             column = result.getString(1);
             if (column.indexOf(':') != -1) {
@@ -1903,9 +1919,9 @@ public class SOSworker {
         result.close();
         
         // we get the coordinates
-        stmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1");
-        stmt.setInt(2,    form.getId());
-        result = stmt.executeQuery();
+        getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1");
+        getValueStmt.setInt(2,    form.getId());
+        result = getValueStmt.executeQuery();
         if (result.next()) {
             
             coordinates = result.getString(1);
@@ -1915,7 +1931,6 @@ public class SOSworker {
             return;
         }
         result.close();
-        stmt.close();
         
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
@@ -1971,12 +1986,9 @@ public class SOSworker {
         boolean moreClassifier = true;
         while (moreClassifier) {
             
-            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
-                                                                         " WHERE id_value=?" +
-                                                                         " AND form=?");
-            stmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + i + ":name.1");
-            stmt.setInt(2,    form.getId());
-            ResultSet result = stmt.executeQuery();
+            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + i + ":name.1");
+            getValueStmt.setInt(2,    form.getId());
+            ResultSet result = getValueStmt.executeQuery();
             moreClassifier   = result.next();
             if (moreClassifier) {
                 String value = result.getString(1);
@@ -1987,7 +1999,6 @@ public class SOSworker {
                 } 
             }
             result.close();
-            stmt.close();
             i++;
         } 
         
@@ -1998,12 +2009,9 @@ public class SOSworker {
             // for each network we create (or update) an offering
             for (int j = 0; j < size + 1; j++) {
                 if (j != size) {
-                    PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
-                                                                                 " WHERE id_value=?" +
-                                                                                 " AND form=?");
-                    stmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
-                    stmt.setInt(2,    form.getId());
-                    ResultSet result = stmt.executeQuery();
+                    getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
+                    getValueStmt.setInt(2,    form.getId());
+                    ResultSet result = getValueStmt.executeQuery();
                 
                     if (result.next()) {
                         String offeringName = "offering-" + result.getString(1);
@@ -2105,7 +2113,6 @@ public class SOSworker {
                         logger.severe("no value for network classifier numero " + networksIndex[j]);
                     }
                     result.close();
-                    stmt.close();
                     
                 // we add the sensor to the global offering containing all the sensor    
                 } else {
@@ -2324,10 +2331,8 @@ public class SOSworker {
      */
     private String getMinimalEventTime() throws WebServiceException, SQLException {
         String ret = null;
-        PreparedStatement stmt = null;
         try {
-            stmt = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
-            ResultSet res = stmt.executeQuery();
+            ResultSet res = getMinEventTimeOffering.executeQuery();
             Timestamp t = null;
             while (res.next()) {
                 t = res.getTimestamp(1);
@@ -2337,12 +2342,9 @@ public class SOSworker {
                 ret = t.toString();
             } 
             res.close();
-            stmt.close();
         
         } catch (SQLException ex) {
            ex.printStackTrace();
-           if (stmt != null)
-                stmt.close();
            throw new OWSWebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE, null, version);
            
@@ -2399,6 +2401,12 @@ public class SOSworker {
     
     public void close() {
         try {
+            newSensorIdStmt.close();
+            newObservationIDStmt.close();
+            observationExistStmt.close();
+            getMinEventTimeOffering.close();
+            getValueStmt.close();
+            
             sensorMLConnection.close();
             sensorMLReader.dispose();
             sensorMLWriter.dispose();
