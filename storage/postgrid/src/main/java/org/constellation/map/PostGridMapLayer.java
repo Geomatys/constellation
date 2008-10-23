@@ -116,20 +116,20 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      */
     private final List<Date> times;
 
-    /**
-     * Connection to a PostGRID database.
-     */
-    private final Database db;
+//    /**
+//     * Connection to a PostGRID database.
+//     */
+//    private final Database db;
+//
+//    /**
+//     * Layer to consider.
+//     */
+//    private final Layer layer;
 
-    /**
-     * Layer to consider.
-     */
-    private final Layer layer;
-
-    /**
-     * grid coverage table.
-     */
-    private final GridCoverageTable table;
+//    /**
+//     * grid coverage table.
+//     */
+//    private final GridCoverageTable table;
 
     /**
      * postgrid reader
@@ -142,22 +142,22 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      * @param db The database connection.
      * @param layer The current layer.
      */
-    public PostGridMapLayer(final Database db, final Layer layer) {
+    public PostGridMapLayer(final PostGridReader reader) {
         super(createDefaultRasterStyle());
-        this.db = db;
-        this.layer = layer;
+//        this.db = db;
+//        this.layer = layer;
         this.times = new ArrayList<Date>();
-        setName(layer.getName());
+        setName(reader.getTable().getLayer().getName());
         
-        GridCoverageTable immutableTable = null;
-        try {
-            immutableTable = db.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
-        }
-        this.table = new GridCoverageTable(immutableTable);
-        this.table.setLayer(layer);
-        this.reader = new PostGridReader(table, getBounds());
+//        GridCoverageTable immutableTable = null;
+//        try {
+//            immutableTable = db.getTable(GridCoverageTable.class);
+//        } catch (NoSuchTableException ex) {
+//            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+//        }
+//        this.table = new GridCoverageTable(immutableTable);
+//        this.table.setLayer(layer);
+        this.reader = reader;
     }
 
     public Object prepare(final RenderingContext context) throws PortrayalException {
@@ -196,14 +196,14 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         final double w = renv.toRectangle2D().getWidth() /width;
         final double h = renv.toRectangle2D().getHeight() /height;
 
-        table.setTimeRange(getTime(), getTime());
-        table.setVerticalRange(elevation, elevation);
+//        table.setTimeRange(getTime(), getTime());
+//        table.setVerticalRange(elevation, elevation);
 
         final CoverageReadParam readParam = new CoverageReadParam(renv, new double[]{w,h});
 
         GridCoverage2D coverage = null;
         try{
-            coverage = reader.read(readParam);
+            coverage = reader.read(readParam,elevation,getTime(),null);
         }catch(Exception ex){
             throw new PortrayalException(ex);
         }
@@ -270,7 +270,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     final GridEnvelope range = new GeneralGridEnvelope(new Rectangle(width, height), 2);
                     final GridGeometry gridGeom = getGridGeometry(
                                 new GeneralEnvelope(env), 
-                                layer, 
+                                reader.getTable().getLayer(),
                                 range);
 
                     coverage = (GridCoverage2D) Operations.DEFAULT.resample(
@@ -357,8 +357,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         final RenderingContext2D context2D = (RenderingContext2D) context;
         final CoordinateReferenceSystem requestCRS = context2D.getObjectiveCRS();
 
-        table.setTimeRange(getTime(), getTime());
-        table.setVerticalRange(elevation, elevation);
+//        table.setTimeRange(getTime(), getTime());
+//        table.setVerticalRange(elevation, elevation);
 
         final GeneralEnvelope env = new GeneralEnvelope(context2D.getObjectiveBounds());
         env.setCoordinateReferenceSystem(context2D.getObjectiveCRS());
@@ -367,7 +367,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         
         GridCoverage2D coverage = null;
         try{
-            coverage = reader.read(readParam);
+            coverage = reader.read(readParam,elevation,getTime(),null);
         }catch(Exception ex){
             throw new PortrayalException(ex);
         }
@@ -433,7 +433,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     final GridEnvelope range = new GeneralGridEnvelope(context2D.getDisplayBounds(), 2);
                     final GridGeometry gridGeom = getGridGeometry(
                                 new GeneralEnvelope(env), 
-                                layer, 
+                                reader.getTable().getLayer(),
                                 range);
 
                     coverage = (GridCoverage2D) Operations.DEFAULT.resample(
@@ -518,7 +518,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         final GeographicBoundingBox bbox;
         try {
-            bbox = layer.getGeographicBoundingBox();
+            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
         } catch (CatalogException ex) {
             LOGGER.warning(ex.getLocalizedMessage());
             return new ReferencedEnvelope(crs);

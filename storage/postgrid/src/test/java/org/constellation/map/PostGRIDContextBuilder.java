@@ -69,7 +69,7 @@ public class PostGRIDContextBuilder {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            context.layers().add(createPostGridLayer2());
+            context.layers().add(createPostGridLayer());
 
 //            context.setCoordinateReferenceSystem(layer.getFeatureSource().getSchema().getCoordinateReferenceSystem());
 //            context.setTitle("DemoContext");
@@ -97,7 +97,9 @@ public class PostGRIDContextBuilder {
         selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
-        PostGridMapLayer layer = new PostGridMapLayer(database, selectedLayer);
+        final PostGridReader reader = new PostGridReader(database,selectedLayer);
+
+        PostGridMapLayer layer = new PostGridMapLayer(reader);
         layer.setStyle(createInterpolationStyle());
 //        layer.graphicBuilders().add(new GridMarkGraphicBuilder());
 
@@ -121,7 +123,9 @@ public class PostGRIDContextBuilder {
         selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
 
-        PostGridMapLayer2 layer = new PostGridMapLayer2(database, selectedLayer);
+        final PostGridReader reader = new PostGridReader(database,selectedLayer);
+
+        PostGridMapLayer2 layer = new PostGridMapLayer2(reader);
         layer.setStyle(createInterpolationStyle());
 //        layer.graphicBuilders().add(new GridMarkGraphicBuilder());
 

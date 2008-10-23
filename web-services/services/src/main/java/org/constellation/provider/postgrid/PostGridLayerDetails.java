@@ -38,6 +38,7 @@ import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
 import org.constellation.map.PostGridMapLayer;
+import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -82,15 +83,17 @@ import org.opengis.style.Symbolizer;
  * @author Cédric Briançon
  */
 class PostGridLayerDetails implements LayerDetails {
-    /**
-     * The database connection.
-     */
-    private final Database database;
+//    /**
+//     * The database connection.
+//     */
+//    private final Database database;
+//
+//    /**
+//     * Current layer to consider.
+//     */
+//    private final Layer layer;
 
-    /**
-     * Current layer to consider.
-     */
-    private final Layer layer;
+    private final PostGridReader reader;
 
     /**
      * Favorites styles associated with this layer.
@@ -104,9 +107,10 @@ class PostGridLayerDetails implements LayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    PostGridLayerDetails(final Database database, final Layer layer, final List<String> favorites) {
-        this.database = database;
-        this.layer = layer;
+    PostGridLayerDetails(final PostGridReader reader, final List<String> favorites) {
+//        this.database = database;
+//        this.layer = layer;
+        this.reader = reader;
 
         if (favorites == null) {
             this.favorites = Collections.emptyList();
@@ -143,12 +147,12 @@ class PostGridLayerDetails implements LayerDetails {
         final double h = renv.toRectangle2D().getHeight() / height;
         final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
 
-        GridCoverageTable table = null;
-        try {
-            table = database.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            throw new CatalogException(ex);
-        }
+        GridCoverageTable table = reader.getTable();
+//        try {
+//            table = database.getTable(GridCoverageTable.class);
+//        } catch (NoSuchTableException ex) {
+//            throw new CatalogException(ex);
+//        }
         table = new GridCoverageTable(table);
 
         table.setGeographicBoundingBox(bbox);
@@ -161,7 +165,7 @@ class PostGridLayerDetails implements LayerDetails {
         } else {
             table.setVerticalRange(null);
         }
-        table.setLayer(layer);
+//        table.setLayer(layer);
         GridCoverage2D coverage = null;
         try {
             coverage = table.getEntry().getCoverage(null);
@@ -210,7 +214,7 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public String getName() {
-        return layer.getName();
+        return reader.getTable().getLayer().getName();
     }
 
     /**
@@ -244,60 +248,60 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public boolean isQueryable(Service service) {
-        return layer.isQueryable(service);
+        return reader.getTable().getLayer().isQueryable(service);
     }
 
     /**
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        return layer.getGeographicBoundingBox();
+        return reader.getTable().getLayer().getGeographicBoundingBox();
     }
 
     /**
      * {@inheritDoc}
      */
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
-        return layer.getAvailableTimes();
+        return reader.getTable().getLayer().getAvailableTimes();
     }
 
     /**
      * {@inheritDoc}
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
-        return layer.getAvailableElevations();
+        return reader.getTable().getLayer().getAvailableElevations();
     }
 
     /**
      * {@inheritDoc}
      */
     public BufferedImage getLegendGraphic(final Dimension dimension) {
-        return layer.getLegend((dimension != null) ? dimension : LEGEND_SIZE);
+        return reader.getTable().getLayer().getLegend((dimension != null) ? dimension : LEGEND_SIZE);
     }
 
     /**
      * {@inheritDoc}
      */
     public MeasurementRange<?>[] getSampleValueRanges() {
-        return layer.getSampleValueRanges();
+        return reader.getTable().getLayer().getSampleValueRanges();
     }
 
     /**
      * {@inheritDoc}
      */
     public String getRemarks() {
-        return layer.getRemarks();
+        return reader.getTable().getLayer().getRemarks();
     }
 
     /**
      * {@inheritDoc}
      */
     public String getThematic() {
-        return layer.getThematic();
+        return reader.getTable().getLayer().getThematic();
     }
 
     private MapLayer createMapLayer(Object style, final Map<String, Object> params){
-        final PostGridMapLayer mapLayer = new PostGridMapLayer(database, layer);
+        final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
 
         if(style == null){
             //no style provided, try to get the favorite one

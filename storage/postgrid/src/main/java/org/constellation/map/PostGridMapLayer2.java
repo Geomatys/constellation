@@ -19,14 +19,9 @@ package org.constellation.map;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
-import org.constellation.coverage.catalog.GridCoverageTable;
-import org.constellation.coverage.catalog.Layer;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReader;
@@ -82,22 +77,7 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
      * List of available dates for a request.
      */
     private final List<Date> times;
-
-    /**
-     * Connection to a PostGRID database.
-     */
-    private final Database db;
-
-    /**
-     * Layer to consider.
-     */
-    private final Layer layer;
-    
-    /**
-     * grid coverage table.
-     */
-    private final GridCoverageTable table;
-    
+        
     /**
      * postgrid reader
      */
@@ -109,29 +89,18 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
      * @param db The database connection.
      * @param layer The current layer.
      */
-    public PostGridMapLayer2(final Database db, final Layer layer) {
+    public PostGridMapLayer2(final PostGridReader reader) {
         super(createDefaultRasterStyle());
-        this.db = db;
-        this.layer = layer;
         this.times = new ArrayList<Date>();
-        setName(layer.getName());
-        
-        GridCoverageTable immutableTable = null;
-        try {
-            immutableTable = db.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
-        }
-        this.table = new GridCoverageTable(immutableTable);
-        this.table.setLayer(layer);
-        this.reader = new PostGridReader(table, getBounds());
+        this.reader = reader;
+        setName(reader.getTable().getLayer().getName());
     }
 
     public ReferencedEnvelope getBounds() {
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         final GeographicBoundingBox bbox;
         try {
-            bbox = layer.getGeographicBoundingBox();
+            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
         } catch (CatalogException ex) {
             LOGGER.warning(ex.getLocalizedMessage());
             return new ReferencedEnvelope(crs);
@@ -196,12 +165,12 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
     }
 
     public Name getCoverageName() {
-        return new NameImpl(layer.getName());
+        return new NameImpl(reader.getTable().getLayer().getName());
     }
 
     public CoverageReader getCoverageReader() {
-        table.setTimeRange(getTime(), getTime());
-        table.setVerticalRange(elevation, elevation);
+        reader.getTable().setTimeRange(getTime(), getTime());
+        reader.getTable().setVerticalRange(elevation, elevation);
         return reader;
     }
 

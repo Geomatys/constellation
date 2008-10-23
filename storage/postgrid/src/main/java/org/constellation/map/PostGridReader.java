@@ -18,9 +18,18 @@ package org.constellation.map;
 
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
 
+import org.constellation.coverage.catalog.Layer;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReadParam;
 import org.geotools.coverage.io.CoverageReader;
@@ -31,6 +40,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -46,23 +56,56 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class PostGridReader implements CoverageReader{
     
+    private final Logger LOGGER = Logger.getLogger("org/constellation/map/PostGridReader");
+
     private final GridCoverageTable table;
-        
-    private final ReferencedEnvelope ref;
     
-    public PostGridReader(final GridCoverageTable table, final ReferencedEnvelope bounds){
+    public PostGridReader(final GridCoverageTable table){
         this.table = table;
-        this.ref = bounds;
     }
-    
-    public GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
+
+    public PostGridReader(final Database database, final Layer layer){
+        GridCoverageTable gridTable = null;
+        try {
+            gridTable = database.getTable(GridCoverageTable.class);
+        } catch (NoSuchTableException ex) {
+            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+        }
+        //create a mutable copy
+        this.table = new GridCoverageTable(gridTable);
+        this.table.setLayer(layer);
+    }
+
+    public GridCoverageTable getTable(){
+        return table;
+    }
+
+    public synchronized GridCoverage2D read(final CoverageReadParam param, final double elevation,
+            final Date time, final MeasurementRange dimRange)
+            throws FactoryException, TransformException, IOException{
+
+        table.setTimeRange(time, time);
+        table.setVerticalRange(elevation, elevation);
+
+        return read(param);
+    }
+
+
+    public synchronized GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
         
         if(param == null){
             
             //no parameters, return the complete image
             GridCoverage2D coverage = null;
             try {
-                coverage = table.getEntry().getCoverage(null);
+                CoverageReference ref = table.getEntry();
+                if(ref == null){
+                    //TODO sometimes the postgrid reader go a bit crazy and found no coveragreference
+                    //if so clear the cache and retry
+                    table.flush();
+                    ref = table.getEntry();
+                }
+                coverage = ref.getCoverage(null);
             } catch (Exception ex) {
             //TODO fix in postgrid
             //catch anything, looks like sometimes, postgrid throw an ArithmeticException
@@ -105,7 +148,14 @@ public class PostGridReader implements CoverageReader{
                 
         GridCoverage2D coverage = null;
         try {
-            coverage = table.getEntry().getCoverage(null);
+            CoverageReference ref = table.getEntry();
+            if(ref == null){
+                //TODO sometimes the postgrid reader go a bit crazy and found no coveragreference
+                //if so clear the cache and retry
+                table.flush();
+                ref = table.getEntry();
+            }
+            coverage = ref.getCoverage(null);
         } catch (Exception ex) {
             //TODO fix in postgrid
             //catch anything, looks like sometimes, postgrid throw an ArithmeticException
@@ -125,7 +175,19 @@ public class PostGridReader implements CoverageReader{
     }
 
     public ReferencedEnvelope getCoverageBounds() {
-        return ref;
+        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        final GeographicBoundingBox bbox;
+        try {
+            bbox = table.getLayer().getGeographicBoundingBox();
+        } catch (CatalogException ex) {
+            LOGGER.warning(ex.getLocalizedMessage());
+            return new ReferencedEnvelope(crs);
+        }
+        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
+                bbox.getEastBoundLongitude(),
+                bbox.getSouthBoundLatitude(),
+                bbox.getNorthBoundLatitude(),
+                crs);
     }
 
 }

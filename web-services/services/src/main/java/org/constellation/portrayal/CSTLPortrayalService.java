@@ -117,7 +117,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }
         
     }
-    
+
     /**
      * Makes the portray of a {@code GetMap} request.
      *
@@ -126,13 +126,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
      */
-    public synchronized void portray(final GetMap query, final File output)
+    public synchronized BufferedImage portray(final GetMap query)
                             throws PortrayalException, WebServiceException{
-        
-        if(query == null || output == null){
-            throw new NullPointerException("Query and output file cannot be null");
+
+        if(query == null){
+            throw new NullPointerException("Query cannot be null");
         }
-        
+
         final List<String> layers              = query.getLayers();
         final List<String> styles              = query.getStyles();
         final MutableStyledLayerDescriptor sld = query.getSld();
@@ -169,7 +169,6 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             builder.append("Azimuth => " + azimuth + "\n");
             builder.append("Mime => " + mime.toString() + "\n");
             builder.append("Dimension => " + canvasDimension.toString() + "\n");
-            builder.append("File => " + output.toString() + "\n");
             builder.append("BGColor => " + background + "\n");
             builder.append("Transparent => " + query.getTransparent() + "\n");
             System.out.println(builder.toString());
@@ -180,8 +179,32 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         //some strange behavior when deployed in web app, we sometimes catch runtimeException or
         //thread exceptions.
         try{
-            portrayUsingCache(refEnv, azimuth, background, output, mime, canvasDimension);
+            return portrayUsingCache(refEnv, azimuth, background, canvasDimension);
         }catch(Exception ex){
+            throw new PortrayalException(ex);
+        }
+    }
+
+    /**
+     * Makes the portray of a {@code GetMap} request.
+     *
+     * @param query A {@link GetMap} query.
+     * @param output The output file where to write the result of the {@link GetMap} request.
+     * @throws PortrayalException
+     * @throws WebServiceException if an error occurs during the creation of the map context
+     */
+    public synchronized void portray(final GetMap query, final File output)
+            throws PortrayalException, WebServiceException {
+
+        if (output == null) {
+            throw new NullPointerException("Output file can not be null");
+        }
+
+        final String mime = query.getFormat();
+        final BufferedImage image = portray(query);
+        try {
+            writeImage(image, mime, output);
+        } catch (IOException ex) {
             throw new PortrayalException(ex);
         }
     }
@@ -197,8 +220,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @param canvasDimension : size of the wanted image
      * @param hints : canvas hints
      */
-    private void portrayUsingCache(final ReferencedEnvelope contextEnv,final double azimuth, final Color background,
-            final Object output, final String mime, final Dimension canvasDimension) 
+    private BufferedImage portrayUsingCache(final ReferencedEnvelope contextEnv,
+            final double azimuth, final Color background, final Dimension canvasDimension)
             throws PortrayalException {
 
         canvas.setSize(canvasDimension);
@@ -221,15 +244,11 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         if(image == null){
             throw new PortrayalException("No image created by the canvas.");
         }
-        
-        try {
-            writeImage(image, mime, output);
-        } catch (IOException ex) {
-            throw new PortrayalException(ex);
-        }
-        
+
         //clear the layers to avoid potential memory leack;
         context.layers().clear();
+
+        return image;
     }
     
     private void updateContext(final List<String> layers, final WMSQueryVersion version,

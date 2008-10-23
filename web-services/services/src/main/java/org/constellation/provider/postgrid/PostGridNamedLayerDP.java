@@ -34,19 +34,23 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
+import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
+import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.configuration.LayerLinkReader;
 import org.constellation.ws.rs.WebService;
 
+import org.geotools.util.SoftValueHashMap;
 import org.xml.sax.SAXException;
 
 
@@ -63,6 +67,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
 
     private final Map<String,Layer> index = new HashMap<String,Layer>();
     private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
+    private final Map<String,PostGridReader> cache = new SoftValueHashMap<String, PostGridReader>(6);
 
     protected static final Database database;
 
@@ -220,10 +225,33 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
     /**
      * {@inheritDoc }
      */
-    public LayerDetails get(String key) {
-        final Layer layer = index.get(key);
-        return (layer != null) ?
-            new PostGridLayerDetails(database, layer, getFavoriteStyles(key)) : null;
+    public LayerDetails get(final String key) {
+        PostGridReader reader = null;
+        synchronized(cache){
+            reader = cache.get(key);
+
+            if(reader == null) {
+                //coverage reader is not in the cache, try to load it
+                final Layer layer = index.get(key);
+
+                if(layer == null) return null;
+
+                GridCoverageTable gridTable = null;
+                try {
+                    gridTable = database.getTable(GridCoverageTable.class);
+                } catch (NoSuchTableException ex) {
+                    LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+                }
+                //create a mutable copy
+                gridTable = new GridCoverageTable(gridTable);
+                gridTable.setLayer(layer);
+                reader = new PostGridReader(gridTable);
+                cache.put(key, reader);
+            }
+        }
+
+        return (reader != null) ?
+            new PostGridLayerDetails(reader, getFavoriteStyles(key)) : null;
     }
 
     /**
@@ -233,6 +261,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         synchronized(this){
             favorites.clear();
             index.clear();
+            cache.clear();
             visit();
         }
     }
@@ -242,8 +271,9 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
      */
     public void dispose() {
         synchronized(this){
-//            favorites.clear();
-//            index.clear();
+            favorites.clear();
+            index.clear();
+            cache.clear();
         }
     }
 
