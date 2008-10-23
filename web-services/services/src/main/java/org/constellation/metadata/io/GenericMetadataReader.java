@@ -22,7 +22,9 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.ows.v100.OWSWebServiceException;
+import org.constellation.coverage.web.WebServiceException;
+import org.constellation.generic.database.Automatic;
+import org.geotools.metadata.iso.MetaDataImpl;
 
 /**
  *
@@ -30,8 +32,14 @@ import org.constellation.ows.v100.OWSWebServiceException;
  */
 public class GenericMetadataReader extends MetadataReader {
     
-    public GenericMetadataReader() {
+    /**
+     * A configuration object used in Generic dtabase mode.
+     */
+    private Automatic genericConfiguration;
+    
+    public GenericMetadataReader(Automatic genericConfiguration) {
         super();
+        this.genericConfiguration = genericConfiguration;
     }
     
     /**
@@ -46,16 +54,27 @@ public class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      * @throws org.constellation.ows.v100.OWSWebServiceException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
         Object result = null;
         
         if (mode == ISO_19115) {
+            
+            result = getMetadataObject(identifier, type, elementName);
             
         } else if (mode == DUBLINCORE) {
             
         } else {
             throw new IllegalArgumentException("Unknow or unAuthorized standard mode: " + mode);
         }
+        return result;
+    }
+    
+    public MetaDataImpl getMetadataObject(String identifier, ElementSetType type, List<QName> elementName) {
+        
+        //TODO we verify that the identifier exists
+        MetaDataImpl result = new MetaDataImpl();
+        
+        
         return result;
     }
 }

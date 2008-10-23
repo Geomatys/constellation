@@ -15,7 +15,7 @@
           <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs     -->
           <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws    -->
  	  <!-- To enable  configuration  service add    packageName: org.constellation.configuration.ws    -->
-          <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.coverage.ws</param-value>
+          <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.coverage.ws;org.constellation.ws.rs.provider</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

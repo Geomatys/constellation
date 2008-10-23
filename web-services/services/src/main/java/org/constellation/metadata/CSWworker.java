@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -42,6 +43,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
+import javax.xml.bind.JAXBContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -127,11 +129,14 @@ import javax.xml.namespace.QName;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import org.geotools.resources.JDBC;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -239,6 +244,11 @@ public class CSWworker {
      * Used to map a prefix with a namespace URI.
      */
     private NamespacePrefixMapperImpl prefixMapper;
+    
+    /**
+     * A configuration object used in Generic database mode.
+     */
+    private Automatic genericConfiguration;
     
     /**
      * A list of the supported Type name 
@@ -349,7 +359,7 @@ public class CSWworker {
     public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) throws IOException {
         
         this.unmarshaller = unmarshaller;
-        this.marshaller   = marshaller; 
+        this.marshaller   = marshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
         cswFactory202     = new ObjectFactory();
         cswFactory200     = new org.constellation.cat.csw.v200.ObjectFactory();
@@ -410,39 +420,64 @@ public class CSWworker {
             if (databaseType != null && databaseType.equals("generic")) {
                 
                 profile = DISCOVERY;
-                
-                // TODO make it generic for any Database Type
-                PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
-                dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-                dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
-                dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
-                dataSourceMD.setUser(prop.getProperty("MDDBUser"));
-                dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
+                genericConfiguration = null;
                 try {
-                    MDConnection    = dataSourceMD.getConnection();
-                } catch (SQLException e) {
-                    MDConnection = null;
-                    logger.severe(e.getMessage());
-                }
-                if (MDConnection == null) {
-                    logger.severe("The CSW service is not working!" + '\n' + 
-                                  "cause: The web service can't connect to the generic metadata database!");
-                    isStarted = false;
-                } else {
-                 
-                    try {
-                        MDReader                = new GenericMetadataReader();
-                        index                   = new IndexLucene((GenericMetadataReader)MDReader, env);
-                        //in generic mode there is no transactionnal part.
-                        MDWriter                = null;
-                        catalogueHarvester      = null;
-                 
-                        logger.info("CSW service (Generic database) running");
-                    } catch (SQLException e) {
-                        logger.severe(e.getMessage());
-                        logger.severe("The CSW service is not working!" + '\n' + 
-                                  "cause: The web service can't connect to the generic metadata database!");
+                    JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
+                    Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
+                    File configFile = new File(env, "generic-configuration.xml");
+                    if (configFile.exists()) {
+                        genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
+                     
+                        BDD dbProperties = genericConfiguration.getBdd();
+                        if (dbProperties == null) {
+                            logger.severe("The CSW service is not working!" + '\n' +
+                                    "the generic configuration file does not contains a BDD object");
+                            isStarted = false;
+                        } else {
+
+                            JDBC.loadDriver(dbProperties.getClassName());
+                            try {
+                                MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
+                                                                           dbProperties.getUser(),
+                                                                           dbProperties.getPassword());
+                            } catch (SQLException e) {
+                                MDConnection = null;
+                                logger.severe(e.getMessage());
+                            }
+                            
+                            if (MDConnection == null) {
+                                logger.severe("The CSW service is not working!" + '\n' +
+                                        "cause: The web service can't connect to the generic metadata database!");
+                                isStarted = false;
+                            } else {
+
+                                try {
+                                    MDReader = new GenericMetadataReader(genericConfiguration);
+                                    index = new IndexLucene((GenericMetadataReader) MDReader, env);
+                                    
+                                    //in generic mode there is no transactionnal part.
+                                    MDWriter = null;
+                                    catalogueHarvester = null;
+
+                                    logger.info("CSW service (Generic database) running");
+                                } catch (SQLException e) {
+                                    logger.severe(e.getMessage());
+                                    logger.severe("The CSW service is not working!" + '\n' +
+                                            "cause: The web service can't connect to the generic metadata database!");
+                                }
+                            }
+                        }
+                
+                    } else {
+                        logger.severe("The CSW service is not working!" + '\n' +
+                                "the generic configuration file has not been found");
+                        isStarted = false;
                     }
+                    
+                } catch (JAXBException ex) {
+                    logger.severe("The CSW service is not working!" + '\n' +
+                                  "JAXBException while getting genric configuration");
+                    isStarted = false;
                 }
             
             // else we use the defaut database mode: MDWeb.

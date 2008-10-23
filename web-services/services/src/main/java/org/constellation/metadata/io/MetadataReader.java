@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.ows.v100.OWSWebServiceException;
+import org.constellation.coverage.web.WebServiceException;
 
 /**
  *
@@ -66,7 +66,7 @@ public abstract class MetadataReader {
      * @return An metadata object.
      * @throws java.sql.SQLException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException;
     
     
     public final void setVersion(ServiceVersion version) {

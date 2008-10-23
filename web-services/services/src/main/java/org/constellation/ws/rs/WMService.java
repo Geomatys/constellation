@@ -765,44 +765,35 @@ public class WMService extends WebService {
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
         final String format = getMap.getFormat();
-        final File imageFile;
+        
+        BufferedImage image = null;
         try {
-            imageFile = createTempFile("map", format);
-        } catch (IOException io) {
-            throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-        }
-
-        File errorFile = null;
-        try {
-            CSTLPortrayalService.getInstance().portray(getMap, imageFile);
+            image = CSTLPortrayalService.getInstance().portray(getMap);
         } catch (PortrayalException ex) {
             if(errorInImage) {
-                try {
-                    errorFile = createTempFile("map", format);
+                /*try {
                     final Dimension dim = getMap.getSize();
                     CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
                 } catch (IOException io) {
                     throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-                }
+                }*/
             } else {
                 throw new WMSWebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
         } catch (WebServiceException ex) {
             if (errorInImage) {
-                try {
-                    errorFile = createTempFile("map", format);
+                /*try {
                     final Dimension dim = getMap.getSize();
-                    CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
+                    //CSTLPortrayalService.writeInImage(ex, dim.width, dim.height, errorFile, format);
                 } catch (IOException io) {
                     throw new WMSWebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-                }
+                }*/
             } else {
                 throw new WMSWebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
         }
 
-        final File result = (errorFile != null) ? errorFile : imageFile;
-        return Response.ok(result, getMap.getFormat()).build();
+        return Response.ok(image, getMap.getFormat()).build();
     }
 
     /**
