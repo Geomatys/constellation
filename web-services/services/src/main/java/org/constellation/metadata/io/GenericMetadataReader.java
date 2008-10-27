@@ -38,6 +38,7 @@ import org.geotools.metadata.iso.IdentifierImpl;
 import static org.constellation.generic.database.Automatic.*;
 
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.metadata.iso.PortrayalCatalogueReferenceImpl;
 import org.geotools.metadata.iso.citation.AddressImpl;
 import org.geotools.metadata.iso.citation.CitationDateImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
@@ -801,6 +802,211 @@ public class GenericMetadataReader extends MetadataReader {
         result.setCharacterSet(CharacterSet.UTF_8);
         result.setHierarchyLevels(Arrays.asList(ScopeCode.SERIES));
         result.setHierarchyLevelNames(Arrays.asList("EDMED record"));
+        
+         /*
+         * contact parts
+         */
+        ResponsiblePartyImpl contact   = createContact(getVariables("var01"), Role.AUTHOR);
+        result.setContacts(Arrays.asList(contact));
+        
+        /*
+         * creation date TODO
+         */ 
+        
+        /*
+         * extension information TODO
+         */
+        
+        /**
+         * Data identification
+         */
+        DataIdentificationImpl dataIdentification = new DataIdentificationImpl();
+
+        CitationImpl citation = new CitationImpl();
+        citation.setTitle(new SimpleInternationalString(getVariable("var02")));
+        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var03"))));
+        CitationDateImpl revisionDate = createRevisionDate(getVariable("var04"));
+        citation.setDates(Arrays.asList(revisionDate));
+        contact = createContact(getVariables("var05"), Role.ORIGINATOR);
+        citation.setCitedResponsibleParties(Arrays.asList(contact));
+        dataIdentification.setCitation(citation);
+        
+        dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var06"))); 
+        dataIdentification.setPurpose(new SimpleInternationalString("var07"));
+        
+        List<ResponsiblePartyImpl> contacts = new ArrayList<ResponsiblePartyImpl>();
+        
+        contact = createContact(getVariables("var08"), Role.CUSTODIAN);
+        contacts.add(contact);
+        contact = createContact(getVariables("var10"), Role.POINT_OF_CONTACT);
+        contact.setIndividualName(getVariable("var09"));
+        contacts.add(contact);
+        
+        dataIdentification.setPointOfContacts(contacts);
+
+        /**
+         * keywords 
+         */
+        
+        List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
+        
+        // SEA AREAS
+        ResultSet res = getVariables("var11");
+        KeywordsImpl keyword = new KeywordsImpl();
+        List<InternationalString> kws = new ArrayList<InternationalString>();
+        while (res.next()) {
+            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        }
+        keyword.setKeywords(kws);
+        keyword.setType(KeywordType.PLACE);
+
+        citation = createKeywordCitation("SeaDataNet Sea Areas", "C16", "2007-03-01T12:00:00", "0");
+        keyword.setThesaurusName(citation);
+
+        keywords.add(keyword);
+        
+        //parameter
+        res = getVariables("var12");
+        keyword = new KeywordsImpl();
+        kws = new ArrayList<InternationalString>();
+        while (res.next()) {
+            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        }
+        keyword.setKeywords(kws);
+        keyword.setType(KeywordType.valueOf("parameter"));
+
+        citation = createKeywordCitation("BODC Parameter Discovery Vocabulary", "P021", "2007-09-25T02:00:02", "19");
+        keyword.setThesaurusName(citation);
+
+        keywords.add(keyword);
+        
+        // instrument
+        String key = getVariable("var13");
+        keyword = new KeywordsImpl();
+        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(key)));
+        keyword.setType(KeywordType.valueOf("instrument"));
+
+        citation = createKeywordCitation("SeaDataNet device categories", "L05", "2007-09-06T15:03:00", "1");
+        keyword.setThesaurusName(citation);
+
+        keywords.add(keyword);
+        
+        // projects
+        res = getVariables("var14");
+        keyword = new KeywordsImpl();
+        kws = new ArrayList<InternationalString>();
+        while (res.next()) {
+            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        }
+        keyword.setKeywords(kws);
+        keyword.setType(KeywordType.valueOf("projects"));
+
+        citation = createKeywordCitation("European Directory for Marine Environmental Research Projects", "EDMERP", null, null);
+        keyword.setThesaurusName(citation);
+
+        keywords.add(keyword);
+        dataIdentification.setDescriptiveKeywords(keywords);
+        
+        /*
+         * resource constraint
+         */  
+        res = getVariables("var15");
+        LegalConstraintsImpl constraint = new LegalConstraintsImpl();
+        while (res.next()) {
+            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(res.getString("TODO"))));
+        }
+        dataIdentification.setResourceConstraints(Arrays.asList(constraint));
+        
+        dataIdentification.setLanguage(Arrays.asList(Locale.ENGLISH));
+        dataIdentification.setTopicCategories(Arrays.asList(TopicCategory.OCEANS));
+        
+         /*
+         * Extents 
+         */
+        List<ExtentImpl> extents = new ArrayList<ExtentImpl>();
+        //temporal 
+        ExtentImpl extent = new ExtentImpl();
+        extent.setDescription(new SimpleInternationalString(getVariable("var16")));
+        
+        //temporal extent
+        TemporalExtentImpl tempExtent = new TemporalExtentImpl();
+        
+        try {
+            Date start = dateFormat.parse(getVariable("var17"));
+            tempExtent.setStartTime(start);
+            Date stop  = dateFormat.parse(getVariable("var18"));
+            tempExtent.setEndTime(stop);
+        } catch (ParseException ex) {
+            logger.severe("parse exception while parsing temporal extent date");
+        }
+        extent.setTemporalElements(Arrays.asList(tempExtent));
+        extents.add(extent);
+        
+        extent = new ExtentImpl();
+        List<GeographicExtentImpl> geoElements = new ArrayList<GeographicExtentImpl>();
+        //geographic areas
+        res = getVariables("var19");
+        while (res.next()) {
+            IdentifierImpl id  = new IdentifierImpl(res.getString("TODO"));
+            GeographicDescriptionImpl geoDesc = new GeographicDescriptionImpl();
+            geoElements.add(geoDesc);
+        }
+        
+        // geographic extent TODO multiple box
+        double west  = 0;double east  = 0;double south = 0;double north = 0;
+        try {
+            west  = Double.parseDouble(getVariable("var20"));
+            east  = Double.parseDouble(getVariable("var21"));
+            south = Double.parseDouble(getVariable("var22"));
+            north = Double.parseDouble(getVariable("var23"));
+        } catch (NumberFormatException ex) {
+            logger.severe("Number format exception while parsing boundingBox");
+        }
+        GeographicExtentImpl geoExtent = new GeographicBoundingBoxImpl(west, east, south, north);
+        geoElements.add(geoExtent);
+        extent.setGeographicElements(geoElements);
+        extents.add(extent);
+        
+        dataIdentification.setExtent(extents);
+        
+        result.setIdentificationInfo(Arrays.asList(dataIdentification));
+        
+        /**
+         * Distribution info
+         */
+        DistributionImpl distributionInfo = new DistributionImpl();
+        
+        //transfert options
+        DigitalTransferOptionsImpl digiTrans = new DigitalTransferOptionsImpl();
+        OnLineResourceImpl onlines = new OnLineResourceImpl();
+        try {
+            onlines.setLinkage(new URI(getVariable("var24")));
+        } catch (URISyntaxException ex) {
+            logger.severe("URI Syntax exception in contact online resource");
+        }
+        digiTrans.setOnLines(Arrays.asList(onlines));
+        distributionInfo.setTransferOptions(Arrays.asList(digiTrans));
+        result.setDistributionInfo(distributionInfo);
+        
+        /**
+         * Portayal catalogue info TODO mulitple
+         */
+        PortrayalCatalogueReferenceImpl portrayal = new PortrayalCatalogueReferenceImpl();
+        citation = new CitationImpl();
+        citation.setTitle(new SimpleInternationalString(getVariable("var25")));
+        CitationDateImpl publicationDate = createPublicationDate(getVariable("var26"));
+        citation.setDates(Arrays.asList(publicationDate));
+        ResponsiblePartyImpl author = new ResponsiblePartyImpl();
+        author.setIndividualName(getVariable("var27"));
+        author.setRole(Role.AUTHOR);
+        ResponsiblePartyImpl editor = new ResponsiblePartyImpl();
+        editor.setIndividualName(getVariable("var28"));
+        editor.setRole(Role.PUBLISHER);
+        
+        portrayal.setPortrayalCatalogueCitations(Arrays.asList(citation));
+        result.setPortrayalCatalogueInfo(Arrays.asList(portrayal));
+        
+        
         return result;
     }
     /**
@@ -876,6 +1082,25 @@ public class GenericMetadataReader extends MetadataReader {
             Date d = dateFormat.parse(date);
             revisionDate.setDate(d);
             revisionDate.setDateType(DateType.REVISION);
+        } catch (ParseException ex) {
+            logger.severe("parse exception while parsing revision date");
+            return null;
+        }
+        return revisionDate;
+    }
+    
+    /**
+     * Parse the specified date and return a CitationDate with the dateType code PUBLICATION.
+     * 
+     * @param date
+     * @return
+     */
+    private CitationDateImpl createPublicationDate(String date) {
+        CitationDateImpl revisionDate = new CitationDateImpl();
+        try {
+            Date d = dateFormat.parse(date);
+            revisionDate.setDate(d);
+            revisionDate.setDateType(DateType.PUBLICATION);
         } catch (ParseException ex) {
             logger.severe("parse exception while parsing revision date");
             return null;

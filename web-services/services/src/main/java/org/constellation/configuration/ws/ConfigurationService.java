@@ -56,6 +56,9 @@ import org.constellation.ws.rs.WebService;
 @Singleton
 public class ConfigurationService extends WebService  {
 
+    /**
+     * A container notifier allowing to dynamically reload all the active service.
+     */
     @Context
     ContainerNotifierImpl cn;
 
@@ -167,6 +170,13 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "services succefully restarted");
     }
     
+    /**
+     * Destroy the CSW index directory in order that it will be recreated.
+     * 
+     * @param synchrone
+     * @return
+     * @throws org.constellation.ows.v110.OWSWebServiceException
+     */
     private AcknowlegementType refreshIndex(boolean synchrone) throws OWSWebServiceException {
         LOGGER.info("refresh index requested");
         
@@ -197,6 +207,13 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "CSW index succefully recreated");
     }
     
+    /**
+     * Refresh the properties file used by the CSW service to store federated catalogues.
+     * 
+     * @param request
+     * @return
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
@@ -222,6 +239,13 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
     }
     
+    /**
+     * Update a properties file on the server file system.
+     * 
+     * @param request
+     * @return
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws WebServiceException {
         LOGGER.info("update properties file requested");
         
@@ -276,6 +300,12 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "properties file sucessfully updated");
     }
     
+    /**
+     * Receive a file and write it into the static file path.
+     * 
+     * @param in
+     * @return an acknowledgement indicating if the operation succeed or not.
+     */
     @PUT
     public AcknowlegementType uploadFile(InputStream in) {
         LOGGER.info("uploading");
