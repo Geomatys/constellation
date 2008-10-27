@@ -22,12 +22,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import org.constellation.configuration.AcknowlegementType;
@@ -63,6 +67,9 @@ public class ConfigurationService extends WebService  {
     }
     
     private static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
+     
+    private static final String FILE_UPLOAD_PATH = "test.zip";
+    
             
     public ConfigurationService() {
         super("Configuration", false, version);
@@ -112,6 +119,10 @@ public class ConfigurationService extends WebService  {
                 marshaller.marshal(updatePropertiesFile(updateProp), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
                 
+            } else if (request.equalsIgnoreCase("download")) {    
+                File f = downloadFile();
+                
+                return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, "Request", version);
@@ -265,6 +276,43 @@ public class ConfigurationService extends WebService  {
         return new AcknowlegementType("success", "properties file sucessfully updated");
     }
     
+    @PUT
+    public AcknowlegementType uploadFile(InputStream in) {
+        LOGGER.info("uploading");
+        try  {
+            byte[] buffer      = new byte[1024];
+            int size;
+            OutputStream out = new FileOutputStream(FILE_UPLOAD_PATH);
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(buffer, 0, size);
+            }
+            out.flush();
+            out.close();
+            in.close();
+        } catch (IOException ex) {
+            LOGGER.severe("IO exception while uploading file");
+            ex.printStackTrace();
+            return new AcknowlegementType("failed", "IO exception while performing upload");
+        }
+        return new AcknowlegementType("success", "the file has been successfully uploaded");
+    }
+    
+    /**
+     * Return a static file present on the server.
+     * 
+     * @return a file.
+     */
+    private File downloadFile() throws WebServiceException {
+        File f = new File(FILE_UPLOAD_PATH);
+        if (f.exists())
+            return f;
+        else
+            throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
+                            NO_APPLICABLE_CODE,
+                            null, version);
+    }
+    
+    
     /**
      * Load the properties from a properies file. 
      * 
@@ -314,6 +362,13 @@ public class ConfigurationService extends WebService  {
         }
     }
     
+    /**
+     * store an Properties object "prop" into the specified File
+     * 
+     * @param prop A properties Object.
+     * @param f    A file.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
     private void storeProperties(Properties prop, File f) throws WebServiceException {
         if (prop == null || f == null) {
             throw new IllegalArgumentException(" the properties or file can't be null");
