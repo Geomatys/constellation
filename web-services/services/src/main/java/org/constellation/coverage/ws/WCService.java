@@ -132,6 +132,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
+@Deprecated
 @Path("wcs")
 @Singleton
 public class WCService extends WebService {

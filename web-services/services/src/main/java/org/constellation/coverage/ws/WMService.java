@@ -93,6 +93,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
+@Deprecated
 @Path("wms")
 @Singleton
 public class WMService extends WebService {

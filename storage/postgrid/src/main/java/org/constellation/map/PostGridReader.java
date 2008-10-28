@@ -133,7 +133,7 @@ public class PostGridReader implements CoverageReader{
         if(!requestCRS.equals(crs)){
             //reproject requested enveloppe to dataCRS
             final MathTransform objToData = CRS.findMathTransform(
-                    requestEnvelope.getCoordinateReferenceSystem(), crs);
+                    requestEnvelope.getCoordinateReferenceSystem(), crs, true);
             requestEnvelope = CRS.transform(objToData, requestEnvelope);
             dataResolution = objToData.transform(dataResolution, dataResolution);
         }
