@@ -72,8 +72,6 @@ public class ConfigurationService extends WebService  {
     }
     
     private static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
-     
-    private static final String FILE_UPLOAD_PATH = "test.zip";
     
             
     public ConfigurationService() {
@@ -305,8 +303,11 @@ public class ConfigurationService extends WebService  {
     /**
      * Receive a file and write it into the static file path.
      * 
-     * @param in
+     * @param in The input stream.
      * @return an acknowledgement indicating if the operation succeed or not.
+     *
+     * @todo Not implemented. This is just a placeholder where we can customize the
+     *       download action for some users. Will probably be removed in a future version.
      */
     @PUT
     public AcknowlegementType uploadFile(InputStream in) {
@@ -314,14 +315,7 @@ public class ConfigurationService extends WebService  {
         try  {
             String layer = getParameter("layer", false);
             System.out.println("LAYER= " + layer);
-            byte[] buffer      = new byte[1024];
-            int size;
-            OutputStream out = new FileOutputStream(FILE_UPLOAD_PATH);
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                out.write(buffer, 0, size);
-            }
-            out.flush();
-            out.close();
+            // TODO: implement upload action here.
             in.close();
         } catch (WebServiceException ex) {
             //must never happen in normal case
@@ -339,15 +333,12 @@ public class ConfigurationService extends WebService  {
      * Return a static file present on the server.
      * 
      * @return a file.
+     *
+     * @todo Not implemented. This is just a placeholder where we can customize the
+     *       download action for some users. Will probably be removed in a future version.
      */
     private File downloadFile() throws WebServiceException {
-        File f = new File(FILE_UPLOAD_PATH);
-        if (f.exists())
-            return f;
-        else
-            throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
-                            NO_APPLICABLE_CODE,
-                            null, version);
+        throw new OWSWebServiceException("Not implemented", NO_APPLICABLE_CODE, null, version);
     }
     
     

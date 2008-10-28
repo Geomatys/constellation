@@ -153,6 +153,9 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
         if (input == null) {
             return null;
         }
+        if (input instanceof WritableGridCoverageEntry) {
+            return (WritableGridCoverageEntry) input;
+        }
         if (input instanceof Tile) {
             return table.createEntry((Tile) input);
         }
