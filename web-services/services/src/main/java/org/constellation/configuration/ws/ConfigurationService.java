@@ -28,6 +28,8 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -310,6 +312,8 @@ public class ConfigurationService extends WebService  {
     public AcknowlegementType uploadFile(InputStream in) {
         LOGGER.info("uploading");
         try  {
+            String layer = getParameter("layer", false);
+            System.out.println("LAYER= " + layer);
             byte[] buffer      = new byte[1024];
             int size;
             OutputStream out = new FileOutputStream(FILE_UPLOAD_PATH);
@@ -319,6 +323,10 @@ public class ConfigurationService extends WebService  {
             out.flush();
             out.close();
             in.close();
+        } catch (WebServiceException ex) {
+            //must never happen in normal case
+            LOGGER.severe("Webservice exception while get the layer parameter");
+            return new AcknowlegementType("failed", "Webservice exception while get the layer parameter");
         } catch (IOException ex) {
             LOGGER.severe("IO exception while uploading file");
             ex.printStackTrace();

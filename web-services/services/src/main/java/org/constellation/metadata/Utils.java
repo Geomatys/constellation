@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -303,5 +305,36 @@ public class Utils {
         }
         return result;
     }
+    
+    /*
+     * Encode the specified string with MD5 algorithm.
+     * 
+     * @param key :  the string to encode.
+     * @return the value (string) hexadecimal on 32 bits
+     */
+    public static String MD5encode(String key) {
+
+        byte[] uniqueKey = key.getBytes();
+        byte[] hash = null;
+        try {
+            // we get an object allowing to crypt the string
+            hash = MessageDigest.getInstance("MD5").digest(uniqueKey);
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new Error("no MD5 support in this VM");
+        }
+        StringBuffer hashString = new StringBuffer();
+        for (int i = 0; i < hash.length; ++i) {
+            String hex = Integer.toHexString(hash[i]);
+            if (hex.length() == 1) {
+                hashString.append('0');
+                hashString.append(hex.charAt(hex.length() - 1));
+            } else {
+                hashString.append(hex.substring(hex.length() - 2));
+            }
+        }
+        return hashString.toString();
+    }
+
 
 }
