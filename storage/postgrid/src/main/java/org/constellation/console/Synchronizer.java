@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
@@ -64,6 +65,7 @@ import org.geotools.util.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  */
 public class Synchronizer {
     /**
@@ -119,6 +121,33 @@ public class Synchronizer {
     private Synchronizer(final Properties properties, final Writer out) throws IOException {
         this(properties.getProperty("config-source", "config-source.xml"),
              properties.getProperty("config-target", "config-target.xml"), out);
+    }
+
+    /**
+     * Creates a synchronizer between two SQL connections.
+     *
+     * @param srcConnec A connection to the source database.
+     * @param dstConnec A connection to the destination database.
+     * @param out Where to print reports.
+     *
+     * @throws SQLException if a connection to the database fails.
+     */
+    public Synchronizer(final Connection srcConnec, final Connection dstConnec, final Writer out)
+                        throws SQLException
+    {
+        try {
+            source = new Database(srcConnec, null);
+            final Properties props = new Properties();
+            props.setProperty("ReadOnly", "false");
+            target = new Database(dstConnec, props);
+            this.out = out;
+        } catch (IOException io) {
+            /*
+             * Should not occurs, because this exception is thrown only when an error occurs
+             * in reading an XML configuration file, and here we directly have our connections.
+             */
+            throw new AssertionError(io);
+        }
     }
 
     /**
@@ -312,6 +341,18 @@ public class Synchronizer {
         sql = buffer.toString();
         final PreparedStatement targetStatement = target.getConnection().prepareStatement(sql);
         /*
+         * We do a select request on the table, in order to get the column types.
+         */
+        final PreparedStatement select = target.getConnection().prepareStatement("Select * from \"" + table + "\"");
+        final ResultSetMetaData rsMetadata = select.executeQuery().getMetaData();
+        final int nbColumns = rsMetadata.getColumnCount();
+        final int[] columnTypes = new int[nbColumns];
+        for (int i=0; i<nbColumns; i++) {
+            final int columnType = rsMetadata.getColumnType(i+1);
+            columnTypes[i] = columnType;
+        }
+        select.close();
+        /*
          * Read all records from the source table and check if a corresponding records exists
          * in the target table. If such record exists and have identical content, then nothing
          * is done. If the content is not identical, then a warning is printed.
@@ -323,7 +364,11 @@ public class Synchronizer {
                 for (int i=0; i<primaryKeyIndex.length; i++) {
                     final String value = sourceResultSet.getString(primaryKeyIndex[i]);
                     primaryKeyValues[i] = value;
-                    existing.setString(i+1, value);
+                    switch (columnTypes[i]) {
+                        case Types.SMALLINT : existing.setShort(i+1, Short.valueOf(value)); break;
+                        case Types.INTEGER  : existing.setInt(i+1, Integer.valueOf(value)); break;
+                        default: existing.setString(i+1, value);
+                    }
                 }
                 final ResultSet targetResultSet = existing.executeQuery();
                 if (sourceToTarget == null) {
@@ -473,7 +518,7 @@ public class Synchronizer {
      * @throws SQLException if an error occured while reading or writting in the database.
      * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void copy(final Map<String,String> tables, final boolean deleteBeforeInsert)
+    public void copy(final Map<String,String> tables, final boolean deleteBeforeInsert)
             throws SQLException, IOException
     {
         final String catalog = target.catalog;
