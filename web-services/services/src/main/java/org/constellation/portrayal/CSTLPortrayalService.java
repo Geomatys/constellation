@@ -181,7 +181,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         try{
             return portrayUsingCache(refEnv, azimuth, background, canvasDimension);
         }catch(Exception ex){
-            throw new PortrayalException(ex);
+            if(ex instanceof PortrayalException){
+                throw (PortrayalException)ex;
+            }else if( ex instanceof WebServiceException){
+                throw (WebServiceException) ex;
+            }else{
+                throw new PortrayalException(ex);
+            }
         }
     }
 
