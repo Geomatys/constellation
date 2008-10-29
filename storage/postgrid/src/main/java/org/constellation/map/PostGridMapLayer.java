@@ -61,7 +61,7 @@ import org.geotools.map.AbstractMapLayer;
 import org.geotools.map.DynamicMapLayer;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
-import org.geotools.map.MapLayerBuilder;
+import org.geotools.map.MapBuilder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
@@ -296,7 +296,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapLayerBuilder mapBuilder = new MapLayerBuilder();
+            final MapBuilder mapBuilder = new MapBuilder();
             final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
             RenderingContext2D context2D = (RenderingContext2D) context;
             //special graphic builder
@@ -464,7 +464,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapLayerBuilder mapBuilder = new MapLayerBuilder();
+            final MapBuilder mapBuilder = new MapBuilder();
             final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
             //special graphic builder
             final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
@@ -597,7 +597,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                                      
                     for(final CachedSymbolizer symbol : symbols){
                         if(symbol instanceof CachedRasterSymbolizer){
-                            J2Dtool.portray(coverage, (CachedRasterSymbolizer)symbol, renderingContext);
+                            J2Dtool.portray(coverage,null, (CachedRasterSymbolizer)symbol, renderingContext);
                         }
                     }
                     

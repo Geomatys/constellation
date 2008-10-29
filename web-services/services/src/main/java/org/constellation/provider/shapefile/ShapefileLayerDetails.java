@@ -30,7 +30,7 @@ import org.constellation.query.wms.WMSQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
-import org.geotools.map.MapLayerBuilder;
+import org.geotools.map.MapBuilder;
 import org.geotools.style.MutableStyle;
 
 import org.opengis.feature.simple.SimpleFeature;
@@ -79,16 +79,16 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
 
         if(style instanceof MutableStyle){
             //style is a commun SLD style
-            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+            layer = new MapBuilder().create(fs, (MutableStyle)style);
         }else if( style instanceof GraphicBuilder){
             //special graphic builder
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+            layer = new MapBuilder().create(fs, (MutableStyle)style);
             layer.graphicBuilders().add((GraphicBuilder) style);
         }else{
             //style is unknowed type, use a random style
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = new MapLayerBuilder().create(fs, (MutableStyle)style);
+            layer = new MapBuilder().create(fs, (MutableStyle)style);
         }
 
         if (params != null) {

@@ -22,12 +22,15 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
+import org.geotools.coverage.io.CoverageReader;
 import org.geotools.display.renderer.GridMarkGraphicBuilder;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.map.CoverageMapLayer;
 import org.geotools.map.DefaultMapContext;
+import org.geotools.map.ElevationModel;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.map.MapLayerBuilder;
+import org.geotools.map.MapBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
 import org.geotools.style.RandomStyleFactory;
@@ -59,22 +62,20 @@ import org.opengis.style.Symbolizer;
  */
 public class PostGRIDContextBuilder {
 
-    public static final MapLayerBuilder LAYER_BUILDER = new MapLayerBuilder();
+    public static final MapBuilder LAYER_BUILDER = new MapBuilder();
     public static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
     public static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
 
     public static MapContext buildPostGridContext() {
       
-        
         MapContext context = null;
         MapLayer layer = null;
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            context.layers().add(createPostGridLayer2());
-
-//            context.setCoordinateReferenceSystem(layer.getFeatureSource().getSchema().getCoordinateReferenceSystem());
-//            context.setTitle("DemoContext");
+            layer = createPostGridLayer();
+            addElevationModel(layer);
+            context.layers().add(layer);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -121,6 +122,7 @@ public class PostGRIDContextBuilder {
             System.out.println(lay.getName());
         }
 //        selectedLayer = layers.getEntry("SPOT5_Guyane_Panchro");
+//        selectedLayer = layers.getEntry("BlueMarble");
         selectedLayer = layers.getEntry("BlueMarble");
 //        selectedLayer = layers.getEntry("AO_Coriolis_(Temp)");
 //        selectedLayer = layers.getEntry("Mars3D_Gascogne_(UZ-VZ)");
@@ -279,6 +281,13 @@ public class PostGRIDContextBuilder {
         RasterSymbolizer symbol = SF.createRasterSymbolizer(opacity, selection, overlap, colorMap, enchance, relief, outline, uom, geom, name, desc);
 
         return SF.createStyle(symbol);
+    }
+
+    private static void addElevationModel(MapLayer layer) {
+//        final CoverageMapLayer gridLayer = (CoverageMapLayer) org.geotools.gui.swing.debug.ContextBuilder.buildMNTContext().layers().get(0);
+//        final CoverageReader reader = gridLayer.getCoverageReader();
+//        ElevationModel elevation = LAYER_BUILDER.createElevationModel(reader,null);
+//        layer.setElevationModel(elevation);
     }
     
 }
