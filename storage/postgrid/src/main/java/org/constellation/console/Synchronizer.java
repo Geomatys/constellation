@@ -266,7 +266,7 @@ public class Synchronizer {
         if (source.schema != null) {
             buffer.append(source.schema).append("\".\"");
         }
-        buffer.append(table).append('"');
+        buffer.append(table).append("\"");
         if (condition != null) {
             buffer.append(" WHERE ").append(condition);
         }
@@ -304,7 +304,7 @@ public class Synchronizer {
                     buffer.append(" AND ");
                 }
                 final String name = primaryKeys[i];
-                buffer.append(name).append("=?");
+                buffer.append("\"").append(name).append("\"=?");
                 primaryKeyIndex[i] = getColumnIndex(metadata, name);
             }
             sql = buffer.toString();
@@ -328,7 +328,7 @@ public class Synchronizer {
             if (i != 0) {
                 buffer.append(',');
             }
-            buffer.append('"').append(columns[i]).append('"');
+            buffer.append("\"").append(columns[i]).append("\"");
         }
         buffer.append(") VALUES (");
         for (int i=0; i<columns.length; i++) {
