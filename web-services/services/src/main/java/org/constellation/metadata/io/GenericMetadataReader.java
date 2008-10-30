@@ -20,6 +20,9 @@ package org.constellation.metadata.io;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -27,16 +30,24 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.Column;
+import org.constellation.generic.database.MultiFixed;
+import org.constellation.generic.database.Queries;
+import org.constellation.generic.database.Query;
+import org.constellation.generic.database.Single;
 import org.geotools.metadata.iso.IdentifierImpl;
 import static org.constellation.generic.database.Automatic.*;
 
+// Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.metadata.iso.PortrayalCatalogueReferenceImpl;
 import org.geotools.metadata.iso.citation.AddressImpl;
@@ -64,6 +75,8 @@ import org.geotools.metadata.iso.identification.KeywordsImpl;
 import org.geotools.metadata.iso.spatial.GeometricObjectsImpl;
 import org.geotools.metadata.iso.spatial.VectorSpatialRepresentationImpl;
 import org.geotools.util.SimpleInternationalString;
+
+//geoAPI dependencies
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -93,12 +106,130 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private Automatic genericConfiguration;
     
+    /**
+     * A date Formater.
+     */
     private DateFormat dateFormat;
     
+    /**
+     * A connection to the database.
+     */
+    private Connection connection;
     
-    public GenericMetadataReader(Automatic genericConfiguration) {
+    /**
+     * 
+     */
+    private Map<PreparedStatement, List<String>> singleStatements;
+    
+    /**
+     * 
+     */
+    private Map<PreparedStatement, List<String>> multipleStatements;
+    
+    /**
+     * 
+     */
+    private Map<String, String> singleValue;
+    
+    /**
+     * 
+     */
+    private Map<String, List<String>> multipleValue;
+    
+    /**
+     * Build a new Generic metadata reader and initialize the statement.
+     * @param genericConfiguration
+     */
+    public GenericMetadataReader(Automatic genericConfiguration, Connection connection) throws SQLException {
         super();
         this.genericConfiguration = genericConfiguration;
+        this.connection = connection;
+        initStatement();
+        singleValue   = new HashMap<String, String>();
+        multipleValue = new HashMap<String, List<String>>();
+    }
+    
+    public void initStatement() throws SQLException {
+        singleStatements   = new HashMap<PreparedStatement, List<String>>();
+        multipleStatements = new HashMap<PreparedStatement, List<String>>();
+        Queries queries = genericConfiguration.getQueries();
+        if (queries != null) {
+            Single single = queries.getSingle();
+            if (single != null) {
+                for (Query query : single.getQuery()) {
+                    List<String> varNames = new ArrayList<String>();
+                    if (query.getSelect() != null) {
+                        for (Column col : query.getSelect().getCol()) {
+                            varNames.add(col.getVar());
+                        }
+                    }
+                    PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
+                    singleStatements.put(stmt, varNames);
+                }
+            }
+            MultiFixed multi = queries.getMultiFixed();
+            if (multi != null) {
+                for (Query query : multi.getQuery()) {
+                    List<String> varNames = new ArrayList<String>();
+                    if (query.getSelect() != null) {
+                        for (Column col : query.getSelect().getCol()) {
+                            varNames.add(col.getVar());
+                        }
+                    }
+                    PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
+                    multipleStatements.put(stmt, varNames);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
+    private void loadData(String identifier) throws SQLException {
+        singleValue.clear();
+        multipleValue.clear();
+        System.out.println(singleStatements.size());
+        for (PreparedStatement stmt : singleStatements.keySet()) {
+            ParameterMetaData meta = stmt.getParameterMetaData();
+            int nbParam = meta.getParameterCount();
+            int i = 1;
+            while (i < nbParam + 1) {
+                stmt.setString(i, identifier);
+                i++;
+            }
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                for (String varName : singleStatements.get(stmt)) {
+                    singleValue.put(varName, result.getString(varName));
+                    System.out.println("put " + varName + " - " + result.getString(varName));
+                }
+            } else {
+                System.out.println("no result");
+            }
+            result.close();
+        }
+        
+        for (PreparedStatement stmt : multipleStatements.keySet()) {
+            ParameterMetaData meta = stmt.getParameterMetaData();
+            int nbParam = meta.getParameterCount();
+            int i = 1;
+            while (i < nbParam + 1) {
+                stmt.setString(i, identifier);
+                i++;
+            }
+            ResultSet result = stmt.executeQuery();
+            for (String varName : multipleStatements.get(stmt)) {
+                multipleValue.put(varName, new ArrayList<String>());
+            }
+            while (result.next()) {
+                for (String varName : multipleStatements.get(stmt)) {
+                    multipleValue.get(varName).add(result.getString(varName));
+               }
+            }
+            
+        }
     }
     
     /**
@@ -133,6 +264,7 @@ public class GenericMetadataReader extends MetadataReader {
         
         //TODO we verify that the identifier exists
         
+        loadData(identifier);
         switch (genericConfiguration.getType()) {
             
             case CDI: 
@@ -175,7 +307,7 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * contact parts
          */
-        ResponsibleParty contact   = createContact(getVariables("var01"), Role.AUTHOR);
+        ResponsibleParty contact   = createContact(getVariable("var01"), Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -211,14 +343,14 @@ public class GenericMetadataReader extends MetadataReader {
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var06"));
         citation.setDates(Arrays.asList(revisionDate));
         
-        contact   = createContact(getVariables("var07"), Role.ORIGINATOR);
+        contact   = createContact(getVariable("var07"), Role.ORIGINATOR);
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         
         dataIdentification.setCitation(citation);
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var08")));
         
-        contact   = createContact(getVariables("var09"), Role.CUSTODIAN);
+        contact   = createContact(getVariable("var09"), Role.CUSTODIAN);
         
         dataIdentification.setPointOfContacts(Arrays.asList(contact));
 
@@ -228,11 +360,11 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         //parameter
-        ResultSet res = getVariables("var10");
+        List<String> parameters = getVariables("var10");
         KeywordsImpl keyword = new KeywordsImpl();
         List<InternationalString> kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String parameter: parameters) {
+            kws.add(new SimpleInternationalString(parameter));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("parameter"));
@@ -265,11 +397,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
         //projects
-        res = getVariables("var13");
+        List<String> projects = getVariables("var13");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String project : projects) {
+            kws.add(new SimpleInternationalString(project));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("platform_class"));
@@ -284,10 +416,10 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * resource constraint
          */  
-        res = getVariables("var14");
+        List<String> resConsts = getVariables("var14");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
-        while (res.next()) {
-            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(res.getString("TODO"))));
+        for (String resConst : resConsts) {
+            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
         
@@ -384,19 +516,22 @@ public class GenericMetadataReader extends MetadataReader {
         //distributor
         DistributorImpl distributor       = new DistributorImpl();
         
-        contact   = createContact(getVariables("var36"), Role.DISTRIBUTOR);
+        contact   = createContact(getVariable("var36"), Role.DISTRIBUTOR);
         distributor.setDistributorContact(contact);
                 
         distributionInfo.setDistributors(Arrays.asList(distributor));
         
         //format
-        List<Format> formats = new ArrayList<Format>();
-        res = getVariables("var37", "var38");
-        while (res.next()) {
+        List<Format> formats  = new ArrayList<Format>();
+        List<String> names    = getVariables("var37");
+        List<String> versions = getVariables("var38");
+        int i = 0;
+        while (i < names.size() && i < versions.size()) {
             FormatImpl format = new FormatImpl();
-            format.setName(new SimpleInternationalString(res.getString("TODO")));
-            format.setVersion(new SimpleInternationalString(res.getString("TODO")));
+            format.setName(new SimpleInternationalString(names.get(i)));
+            format.setVersion(new SimpleInternationalString(versions.get(i)));
             formats.add(format);
+            i++;
         }
         distributionInfo.setDistributionFormats(formats);
         
@@ -448,7 +583,7 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * contact parts
          */
-        ResponsiblePartyImpl contact   = createContact(getVariables("var01"), Role.AUTHOR);
+        ResponsiblePartyImpl contact = createContact(getVariable("var01"), Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -474,23 +609,22 @@ public class GenericMetadataReader extends MetadataReader {
         List<ResponsibleParty> chiefs = new ArrayList<ResponsibleParty>();
         
         //first chief
-        contact   = createContact(getVariables("var05"), Role.ORIGINATOR);
+        contact   = createContact(getVariable("var05"), Role.ORIGINATOR);
         chiefs.add(contact);
         
         //second and other chief
-        ResultSet res = getVariables("var06");
-        while (res.next()) {
-            contact   = createContact(res, Role.POINT_OF_CONTACT);
+        List<String> secondChiefs = getVariables("var06");
+        for (String secondChief : secondChiefs) {
+            contact   = createContact(secondChief, Role.POINT_OF_CONTACT);
             chiefs.add(contact);
         }
         
         //labo
-        res = getVariables("var07");
-        while (res.next()) {
-            contact   = createContact(res, Role.ORIGINATOR);
+        List<String> laboratories = getVariables("var07");
+        for (String laboratory : laboratories) {
+            contact   = createContact(laboratory, Role.ORIGINATOR);
             chiefs.add(contact);
         }
-        
         
         citation.setCitedResponsibleParties(chiefs);
         dataIdentification.setCitation(citation);
@@ -574,11 +708,11 @@ public class GenericMetadataReader extends MetadataReader {
         keyword.setThesaurusName(citation);
         
         // projects
-        res = getVariables("var18");
+        List<String> projects = getVariables("var18");
         keyword = new KeywordsImpl();
         List<InternationalString> kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String project : projects) {
+            kws.add(new SimpleInternationalString(project));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("platform_class"));
@@ -589,11 +723,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
         // general oceans area
-        res = getVariables("var19");
+        List<String> oceansAreas = getVariables("var19");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String oceansArea : oceansAreas) {
+            kws.add(new SimpleInternationalString(oceansArea));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.PLACE);
@@ -604,11 +738,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
         // geographic coverage
-        res = getVariables("var20");
+        List<String> geoCoverages = getVariables("var20");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String geoCoverage : geoCoverages) {
+            kws.add(new SimpleInternationalString(geoCoverage));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("marsden_square"));
@@ -619,11 +753,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
          //parameter
-        res = getVariables("var20");
+        List<String> parameters = getVariables("var20");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String parameter : parameters){
+            kws.add(new SimpleInternationalString(parameter));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("parameter"));
@@ -649,10 +783,10 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * resource constraint
          */  
-        res = getVariables("var23");
+        List<String> resConsts = getVariables("var23");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
-        while (res.next()) {
-            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(res.getString("TODO"))));
+        for (String resConst: resConsts) {
+            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
         
@@ -679,9 +813,9 @@ public class GenericMetadataReader extends MetadataReader {
         
         List<GeographicExtentImpl> geoElements = new ArrayList<GeographicExtentImpl>();
         //geographic areas
-        res = getVariables("var26");
-        while (res.next()) {
-            IdentifierImpl id  = new IdentifierImpl(res.getString("TODO"));
+        List<String> geoAreas = getVariables("var26");
+        for (String geoArea: geoAreas) {
+            IdentifierImpl id  = new IdentifierImpl(geoArea);
             GeographicDescriptionImpl geoDesc = new GeographicDescriptionImpl();
             geoElements.add(geoDesc);
         }
@@ -715,7 +849,7 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setDates(Arrays.asList(revisionDate));
 
         //principal investigator
-        contact   = createContact(getVariables("var34"), Role.PRINCIPAL_INVESTIGATOR);
+        contact   = createContact(getVariable("var34"), Role.PRINCIPAL_INVESTIGATOR);
         contact.setIndividualName(getVariable("var33"));
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
@@ -752,7 +886,7 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setDates(Arrays.asList(revisionDate));
         
         //principal investigator
-        contact   = createContact(getVariables("var40"), Role.PRINCIPAL_INVESTIGATOR);
+        contact   = createContact(getVariable("var40"), Role.PRINCIPAL_INVESTIGATOR);
         contact.setIndividualName(getVariable("var39"));
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         
@@ -806,7 +940,7 @@ public class GenericMetadataReader extends MetadataReader {
          /*
          * contact parts
          */
-        ResponsiblePartyImpl contact   = createContact(getVariables("var01"), Role.AUTHOR);
+        ResponsiblePartyImpl contact   = createContact(getVariable("var01"), Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -827,7 +961,7 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var03"))));
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var04"));
         citation.setDates(Arrays.asList(revisionDate));
-        contact = createContact(getVariables("var05"), Role.ORIGINATOR);
+        contact = createContact(getVariable("var05"), Role.ORIGINATOR);
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
         
@@ -836,9 +970,9 @@ public class GenericMetadataReader extends MetadataReader {
         
         List<ResponsiblePartyImpl> contacts = new ArrayList<ResponsiblePartyImpl>();
         
-        contact = createContact(getVariables("var08"), Role.CUSTODIAN);
+        contact = createContact(getVariable("var08"), Role.CUSTODIAN);
         contacts.add(contact);
-        contact = createContact(getVariables("var10"), Role.POINT_OF_CONTACT);
+        contact = createContact(getVariable("var10"), Role.POINT_OF_CONTACT);
         contact.setIndividualName(getVariable("var09"));
         contacts.add(contact);
         
@@ -851,11 +985,11 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         // SEA AREAS
-        ResultSet res = getVariables("var11");
+        List<String> seaAreas = getVariables("var11");
         KeywordsImpl keyword = new KeywordsImpl();
         List<InternationalString> kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String seaArea : seaAreas) {
+            kws.add(new SimpleInternationalString(seaArea));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.PLACE);
@@ -866,11 +1000,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
         //parameter
-        res = getVariables("var12");
+        List<String> parameters = getVariables("var12");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String parameter : parameters) {
+            kws.add(new SimpleInternationalString(parameter));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("parameter"));
@@ -892,11 +1026,11 @@ public class GenericMetadataReader extends MetadataReader {
         keywords.add(keyword);
         
         // projects
-        res = getVariables("var14");
+        List<String> projects = getVariables("var14");
         keyword = new KeywordsImpl();
         kws = new ArrayList<InternationalString>();
-        while (res.next()) {
-            kws.add(new SimpleInternationalString(res.getString("TODO")));
+        for (String project : projects) {
+            kws.add(new SimpleInternationalString(project));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf("projects"));
@@ -910,10 +1044,10 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * resource constraint
          */  
-        res = getVariables("var15");
+        List<String> resConsts = getVariables("var15");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
-        while (res.next()) {
-            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(res.getString("TODO"))));
+        for (String resConst : resConsts) {
+            constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
         
@@ -945,9 +1079,9 @@ public class GenericMetadataReader extends MetadataReader {
         extent = new ExtentImpl();
         List<GeographicExtentImpl> geoElements = new ArrayList<GeographicExtentImpl>();
         //geographic areas
-        res = getVariables("var19");
-        while (res.next()) {
-            IdentifierImpl id  = new IdentifierImpl(res.getString("TODO"));
+        List<String> geoAreas = getVariables("var19");
+        for (String geoArea : geoAreas) {
+            IdentifierImpl id  = new IdentifierImpl(geoArea);
             GeographicDescriptionImpl geoDesc = new GeographicDescriptionImpl();
             geoElements.add(geoDesc);
         }
@@ -1010,37 +1144,39 @@ public class GenericMetadataReader extends MetadataReader {
         return result;
     }
     /**
-     * TODO 
+     * return a list of value for the specified variable name.
      * 
      * @param variables
      * @return
      */
-    private ResultSet getVariables(String... variables) {
-        return null;
+    private List<String> getVariables(String variable) {
+        return multipleValue.get(variable);
     }
     
     /**
-     * TODO
+     * return the value for the specified variable name.
      * 
      * @param variable
      * @return
      */
     private String getVariable(String variable) {
-        return null;
+        return singleValue.get(variable);
     }
     
     /**
      * Build a new Responsible party with the specified resultSet and Role.
+     * 
+     * TODO get from EDMO WS.
      * 
      * @param res
      * @param role
      * @return
      * @throws java.sql.SQLException
      */
-    private ResponsiblePartyImpl createContact(ResultSet res, Role role) throws SQLException {
+    private ResponsiblePartyImpl createContact(String contactID, Role role) throws SQLException {
         
         ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
-        contact.setOrganisationName(new SimpleInternationalString(res.getString("TODO")));
+        /*contact.setOrganisationName(new SimpleInternationalString(res.getString("TODO")));
         contact.setRole(role);
         
         ContactImpl contactInfo = new ContactImpl();
@@ -1066,7 +1202,7 @@ public class GenericMetadataReader extends MetadataReader {
             logger.severe("URI Syntax exception in contact online resource");
         }
         contactInfo.setOnLineResource(or);
-        contact.setContactInfo(contactInfo);
+        contact.setContactInfo(contactInfo);*/
         return contact;
     }
     

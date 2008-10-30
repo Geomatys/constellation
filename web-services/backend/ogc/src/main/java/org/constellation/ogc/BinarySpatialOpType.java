@@ -140,7 +140,7 @@ public class BinarySpatialOpType extends SpatialOpsType {
     }
     
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Verify that this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
@@ -164,13 +164,12 @@ public class BinarySpatialOpType extends SpatialOpsType {
             
             boolean abgeo = false;
             if (this.abstractGeometry != null && that.abstractGeometry != null) {
-                env = Utilities.equals(this.abstractGeometry.getValue(), that.abstractGeometry.getValue());
-            } else if (this.abstractGeometry == null && that.abstractGeometry == null)
-                env = true;
-            
-            return  pname            &&
-                    env              &&
-                    abgeo;
+                abgeo = Utilities.equals(this.abstractGeometry.getValue(), that.abstractGeometry.getValue());
+            } else if (this.abstractGeometry == null && that.abstractGeometry == null) {
+                abgeo = true;
+            }
+
+            return  pname && env && abgeo;
         }
         return false;
     }

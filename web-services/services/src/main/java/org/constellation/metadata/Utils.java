@@ -336,5 +336,19 @@ public class Utils {
         return hashString.toString();
     }
 
+     /**
+     * An utilities method which tansform a List of class in a Class[]
+     * 
+     * @param classes A java.util.List<Class>
+     */
+    public static Class[] toArray(List<Class> classes) {
+        Class[] result = new Class[classes.size()];
+        int i = 0;
+        for (Class classe : classes) {
+            result[i] = classe;
+            i++;
+        }
+        return result;
+    }
 
 }

@@ -17,10 +17,9 @@
 package org.constellation.ogc;
 
 // J2SE dependencies
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -32,7 +31,6 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 
 //Junit dependencies
 import org.junit.*;
@@ -153,10 +151,49 @@ public class FilterMarshallingTest {
         
         
         assertEquals(expResult.getSpatialOps().getValue(), result.getSpatialOps().getValue());
-        assertEquals(expResult.getSpatialOps().getValue(), result.getSpatialOps().getValue());
         assertEquals(expResult, result);
         
     }
+    
+    class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
+        /**
+         * if set this namespace will be the root of the document with no prefix.
+         */
+        private String rootNamespace;
+
+        public NamespacePrefixMapperImpl(String rootNamespace) {
+            super();
+            this.rootNamespace = rootNamespace;
+
+        }
+
+        /**
+         * Returns a preferred prefix for the given namespace URI.
+         */
+        public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+            String prefix = null;
+
+            if (rootNamespace != null && rootNamespace.equals(namespaceUri)) {
+                prefix = "";
+            } else if ("http://www.opengis.net/gml".equals(namespaceUri)) {
+                prefix = "gml";
+            } else if ("http://www.opengis.net/ogc".equals(namespaceUri)) {
+                prefix = "ogc";
+            } else if ("http://www.w3.org/1999/xlink".equals(namespaceUri)) {
+                prefix = "xlink";
+            }
+            return prefix;
+        }
+
+        /**
+         * Returns a list of namespace URIs that should be declared
+         * at the root element.
+         */
+        @Override
+        public String[] getPreDeclaredNamespaceUris() {
+            return new String[]{};
+        }
+    }
 }
 

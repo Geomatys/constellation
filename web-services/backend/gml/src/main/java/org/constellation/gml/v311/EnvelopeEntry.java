@@ -177,18 +177,18 @@ public class EnvelopeEntry extends Entry {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof EnvelopeEntry) {
             final EnvelopeEntry that = (EnvelopeEntry) object;
 
-            return Utilities.equals(this.axisLabels,          that.axisLabels)           &&
-                   Utilities.equals(this.coordinates,   that.coordinates)   &&
-                   Utilities.equals(this.id,          that.id) &&
-                   Utilities.equals(this.lowerCorner,    that.lowerCorner)    &&
-                   Utilities.equals(this.pos,           that.pos)           &&
-                   Utilities.equals(this.srsDimension,      that.srsDimension)      &&
-                   Utilities.equals(this.uomLabels,        that.uomLabels)        &&
-                   Utilities.equals(this.upperCorner,         that.upperCorner)         &&
-                   Utilities.equals(this.srsName,             that.srsName);
+            return Utilities.equals(this.axisLabels,      that.axisLabels)    &&
+                   Utilities.equals(this.coordinates,     that.coordinates)   &&
+                   Utilities.equals(this.id,              that.id)            &&
+                   Utilities.equals(this.lowerCorner,     that.lowerCorner)   &&
+                   Utilities.equals(this.pos,             that.pos)           &&
+                   Utilities.equals(this.srsDimension,    that.srsDimension)  &&
+                   Utilities.equals(this.uomLabels,       that.uomLabels)     &&
+                   Utilities.equals(this.upperCorner,     that.upperCorner)   &&
+                   Utilities.equals(this.srsName,         that.srsName);
         } 
         return false;
     }

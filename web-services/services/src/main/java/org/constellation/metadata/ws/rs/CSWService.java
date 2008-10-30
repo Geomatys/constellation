@@ -64,7 +64,6 @@ import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.wrs.v100.ExtrinsicObjectType;
-import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ogc.FilterType;
@@ -79,6 +78,7 @@ import org.constellation.coverage.web.Service;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.WebService;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -105,8 +105,26 @@ public class CSWService extends WebService {
     public CSWService() throws IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         try {
+            setXMLContext("", getAllClasses());
+        
+            worker = new CSWworker(unmarshaller, marshaller);
+            worker.setVersion(getCurrentVersion());
             
-            List<Class> classeList = new ArrayList<Class>();
+        } catch (JAXBException ex){
+            LOGGER.severe("The CSW service is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' + 
+                          " details: " + ex.toString());
+        }
+    }
+
+    /**
+     * Return the list of all the marshallable classes
+     * 
+     * @return
+     */
+    public Class[] getAllClasses() {
+        List<Class> classeList = new ArrayList<Class>();
             //ISO 19115 class
             classeList.add(MetaDataImpl.class);
             
@@ -172,20 +190,9 @@ public class CSWService extends WebService {
             
             
             
-            Class[] classes = toArray(classeList);
-            setXMLContext("", classes);
-        
-            worker = new CSWworker(unmarshaller, marshaller);
-            worker.setVersion(getCurrentVersion());
-            
-        } catch (JAXBException ex){
-            LOGGER.severe("The CSW service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' + 
-                          " details: " + ex.toString());
-        }
+           return Utils.toArray(classeList);
     }
-
+    
      /**
      * Treat the incomming request and call the right function.
      * 
@@ -822,21 +829,6 @@ public class CSWService extends WebService {
                                resourceFormat, 
                                handler, 
                                harvestInterval);
-    }
-    
-    /**
-     * An utilities method which tansform a List of class in a Class[]
-     * 
-     * @param classes A java.util.List<Class>
-     */
-    private Class[] toArray(List<Class> classes) {
-        Class[] result = new Class[classes.size()];
-        int i = 0;
-        for (Class classe : classes) {
-            result[i] = classe;
-            i++;
-        }
-        return result;
     }
     
     /**

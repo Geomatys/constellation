@@ -117,6 +117,38 @@ public class Query {
         return this.orderBy;
     }
     
+    /**
+     * Return an textual SQL query for a preparedStatement (contains '?').
+     * 
+     * @param query
+     * @return
+     */
+    public String buildSQLQuery() {
+        String mainQuery = "SELECT ";
+
+        for (Column col : select.getCol()) {
+            String varName = col.getVar();
+            if (varName.equals(":$"))
+                varName = "ID";
+            mainQuery += col.getSql() + " AS " + varName + ',';
+        }
+        mainQuery = mainQuery.substring(0, mainQuery.length() - 1);
+
+        mainQuery += " FROM " + from.get(0).getvalue();
+
+        if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
+            String sql = where.get(0).getvalue();
+            sql = sql.replace("':$'", "?");
+            mainQuery += " WHERE " + sql;
+        }
+        if (orderBy != null && orderBy.size() > 0 && orderBy.get(0) != null && !orderBy.get(0).getvalue().equals("")) {
+            String sql = orderBy.get(0).getvalue();
+            sql = sql.replace("':$'", "?");
+            mainQuery += " ORDER BY " + sql;
+        }
+        return mainQuery;    
+    }
+    
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[Query]");

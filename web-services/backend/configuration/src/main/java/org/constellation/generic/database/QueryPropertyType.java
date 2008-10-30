@@ -33,7 +33,7 @@ public class QueryPropertyType {
     
     @Override
     public String toString() {
-        return "[QueryPropertyType]: " + query;
+        return "[QueryPropertyType]: " + getQuery();
     }
     
     /**
@@ -47,7 +47,7 @@ public class QueryPropertyType {
         if (object instanceof QueryPropertyType) {
             final QueryPropertyType that = (QueryPropertyType) object;
 
-            return Utilities.equals(this.query, that.query);
+            return Utilities.equals(this.getQuery(), that.getQuery());
         }
         return false;
     }
@@ -55,7 +55,15 @@ public class QueryPropertyType {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + (this.query != null ? this.query.hashCode() : 0);
+        hash = 53 * hash + (this.getQuery() != null ? this.getQuery().hashCode() : 0);
         return hash;
+    }
+
+    public Query getQuery() {
+        return query;
+    }
+
+    public void setQuery(Query query) {
+        this.query = query;
     }
 }

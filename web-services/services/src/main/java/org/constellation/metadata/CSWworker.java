@@ -452,7 +452,7 @@ public class CSWworker {
                             } else {
 
                                 try {
-                                    MDReader = new GenericMetadataReader(genericConfiguration);
+                                    MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
                                     index = new IndexLucene((GenericMetadataReader) MDReader, env);
                                     
                                     //in generic mode there is no transactionnal part.

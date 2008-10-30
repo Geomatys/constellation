@@ -36,10 +36,10 @@ public class Column {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[Column]");
-        if (var != null)
-            s.append("var: ").append(var).append('\n');
-        if (sql != null)
-            s.append("sql:").append(sql).append('\n');
+        if (getVar() != null)
+            s.append("var: ").append(getVar()).append('\n');
+        if (getSql() != null)
+            s.append("sql:").append(getSql()).append('\n');
         return s.toString();
     }
     
@@ -54,8 +54,8 @@ public class Column {
         if (object instanceof Column) {
             final Column that = (Column) object;
 
-            return Utilities.equals(this.sql,   that.sql) &&
-                   Utilities.equals(this.var  ,   that.var);
+            return Utilities.equals(this.getSql(), that.getSql()) &&
+                   Utilities.equals(this.getVar(), that.getVar());
         }
         return false;
     }
@@ -63,8 +63,24 @@ public class Column {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 13 * hash + (this.var != null ? this.var.hashCode() : 0);
-        hash = 13 * hash + (this.sql != null ? this.sql.hashCode() : 0);
+        hash = 13 * hash + (this.getVar() != null ? this.getVar().hashCode() : 0);
+        hash = 13 * hash + (this.getSql() != null ? this.getSql().hashCode() : 0);
         return hash;
+    }
+
+    public String getVar() {
+        return var;
+    }
+
+    public void setVar(String var) {
+        this.var = var;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

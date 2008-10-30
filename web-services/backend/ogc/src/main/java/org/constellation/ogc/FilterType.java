@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 
@@ -280,4 +281,51 @@ public class FilterType implements Filter {
         }
     }
 
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof FilterType) {
+            final FilterType that = (FilterType) object;
+            
+            boolean comp = false;
+            if (this.comparisonOps != null && that.comparisonOps != null) {
+                comp = Utilities.equals(this.comparisonOps.getValue(), that.comparisonOps.getValue());
+            } else if (this.comparisonOps == null && that.comparisonOps == null)
+                comp = true;
+            
+            boolean log = false;
+            if (this.logicOps != null && that.logicOps != null) {
+                log = Utilities.equals(this.logicOps.getValue(), that.logicOps.getValue());
+            } else if (this.logicOps == null && that.logicOps == null)
+                log = true;
+            
+            boolean spa = false;
+            if (this.spatialOps != null && that.spatialOps != null) {
+                spa = Utilities.equals(this.spatialOps.getValue(), that.spatialOps.getValue());
+            } else if (this.spatialOps == null && that.spatialOps == null) {
+                spa = true;
+            }
+            /**
+             * TODO ID
+             */
+            
+            return  comp && spa && log;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.spatialOps != null ? this.spatialOps.hashCode() : 0);
+        hash = 29 * hash + (this.comparisonOps != null ? this.comparisonOps.hashCode() : 0);
+        hash = 29 * hash + (this.logicOps != null ? this.logicOps.hashCode() : 0);
+        hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

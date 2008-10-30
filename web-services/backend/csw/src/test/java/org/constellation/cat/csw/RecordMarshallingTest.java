@@ -18,6 +18,7 @@
 package org.constellation.cat.csw;
 
 // J2SE dependencies
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 
 //Junit dependencies
 import org.junit.*;
@@ -134,6 +134,13 @@ public class RecordMarshallingTest {
         "    </ows:WGS84BoundingBox>"                                               + '\n' +
         "</csw:Record>" + '\n';
     
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+        
         assertEquals(expResult, result);
         
         /*
@@ -286,6 +293,101 @@ public class RecordMarshallingTest {
         result2 = (org.constellation.cat.csw.v200.RecordType) jb.getValue();
         
         logger.info("result:" + result2.toString());
+    }
+    
+    class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
+
+        /**
+         * if set this namespace will be the root of the document with no prefix.
+         */
+        private String rootNamespace;
+
+        public NamespacePrefixMapperImpl(String rootNamespace) {
+            super();
+            this.rootNamespace = rootNamespace;
+
+        }
+
+        /**
+         * Returns a preferred prefix for the given namespace URI.
+         */
+        public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+            String prefix = null;
+
+            if (rootNamespace != null && rootNamespace.equals(namespaceUri)) {
+                prefix = "";
+            } else  if ("http://www.opengis.net/gml".equals(namespaceUri)) {
+                prefix = "gml";
+            } else if ("http://www.opengis.net/ogc".equals(namespaceUri)) {
+                prefix = "ogc";
+            } else if ("http://www.opengis.net/ows/1.1".equals(namespaceUri)) {
+                prefix = "ows";
+            } else if ("http://www.opengis.net/ows".equals(namespaceUri)) {
+                prefix = "ows";
+            } else if ("http://www.opengis.net/wms".equals(namespaceUri)) {
+                prefix = "wms";
+            } else if ("http://www.w3.org/1999/xlink".equals(namespaceUri)) {
+                prefix = "xlink";
+            } else if ("http://www.opengis.net/sld".equals(namespaceUri)) {
+                prefix = "sld";
+            } else if ("http://www.opengis.net/wcs".equals(namespaceUri)) {
+                prefix = "wcs";
+            } else if ("http://www.opengis.net/wcs/1.1.1".equals(namespaceUri)) {
+                prefix = "wcs";
+            } else if ("http://www.opengis.net/se".equals(namespaceUri)) {
+                prefix = "se";
+            } else if ("http://www.opengis.net/sos/1.0".equals(namespaceUri)) {
+                prefix = "sos";
+            } else if ("http://www.opengis.net/om/1.0".equals(namespaceUri)) {
+                prefix = "om";
+            } else if ("http://www.opengis.net/sensorML/1.0".equals(namespaceUri)) {
+                prefix = "sml";
+            } else if ("http://www.opengis.net/swe/1.0.1".equals(namespaceUri)) {
+                prefix = "swe";
+            } else if ("http://www.opengis.net/sa/1.0".equals(namespaceUri)) {
+                prefix = "sa";
+            } else if ("http://www.opengis.net/cat/csw/2.0.2".equals(namespaceUri)) {
+                prefix = "csw";
+            } else if ("http://purl.org/dc/elements/1.1/".equals(namespaceUri)) {
+                prefix = "dc";
+            } else if ("http://www.purl.org/dc/elements/1.1/".equals(namespaceUri)) {
+                prefix = "dc2";
+            } else if ("http://purl.org/dc/terms/".equals(namespaceUri)) {
+                prefix = "dct";
+            } else if ("http://www.purl.org/dc/terms/".equals(namespaceUri)) {
+                prefix = "dct2";
+            } else if ("http://www.isotc211.org/2005/gmd".equals(namespaceUri)) {
+                prefix = "gmd";
+            } else if ("http://www.isotc211.org/2005/gco".equals(namespaceUri)) {
+                prefix = "gco";
+            } else if ("http://www.isotc211.org/2005/srv".equals(namespaceUri)) {
+                prefix = "srv";
+            } else if ("http://www.isotc211.org/2005/gfc".equals(namespaceUri)) {
+                prefix = "gfc";
+            } else if ("http://www.w3.org/2001/XMLSchema-instance".equals(namespaceUri)) {
+                prefix = "xsi";
+            } else if ("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0".equals(namespaceUri)) {
+                prefix = "rim";
+            } else if ("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5".equals(namespaceUri)) {
+                prefix = "rim25";
+            } else if ("http://www.opengis.net/cat/wrs/1.0".equals(namespaceUri)) {
+                prefix = "wrs";
+            } else if ("http://www.opengis.net/cat/wrs".equals(namespaceUri)) {
+                prefix = "wrs09";
+            } else if ("http://www.cnig.gouv.fr/2005/fra".equals(namespaceUri)) {
+                prefix = "fra";
+            }
+            return prefix;
+        }
+
+        /**
+         * Returns a list of namespace URIs that should be declared
+         * at the root element.
+         */
+        @Override
+        public String[] getPreDeclaredNamespaceUris() {
+            return new String[]{};
+        }
     }
 
 }

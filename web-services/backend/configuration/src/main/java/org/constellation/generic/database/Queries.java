@@ -43,10 +43,19 @@ public class Queries {
         return multiFixed;
     }
     
+      public Single getSingle() {
+        return single;
+    }
+
+    public void setSingle(Single single) {
+        this.single = single;
+    }
+    
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[Queries]");
         s.append("main: ").append(main).append('\n');
+        s.append("Single:").append(single).append('\n');
         s.append("Multifixed:").append(multiFixed).append('\n');
         return s.toString();
     }
@@ -62,7 +71,8 @@ public class Queries {
         if (object instanceof Queries) {
             final Queries that = (Queries) object;
 
-            return Utilities.equals(this.main, that.main) &&
+            return Utilities.equals(this.main, that.main)     &&
+                   Utilities.equals(this.single, that.single) &&
                    Utilities.equals(this.multiFixed, that.multiFixed);
         }
         return false;
@@ -72,6 +82,7 @@ public class Queries {
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + (this.main != null ? this.main.hashCode() : 0);
+        hash = 53 * hash + (this.single != null ? this.single.hashCode() : 0);
         hash = 53 * hash + (this.multiFixed != null ? this.multiFixed.hashCode() : 0);
         return hash;
     }
