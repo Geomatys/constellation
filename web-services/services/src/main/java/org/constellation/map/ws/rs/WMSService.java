@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.rs;
+package org.constellation.map.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
 
@@ -83,6 +83,7 @@ import org.constellation.query.wms.WMSQueryVersion;
 import org.constellation.wms.AbstractHTTP;
 
 // Geotools dependencies
+import org.constellation.ws.rs.WebService;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -114,11 +115,11 @@ import static org.constellation.query.wms.WMSQuery.*;
  */
 @Path("wms")
 @Singleton
-public class WMService extends WebService {
+public class WMSService extends WebService {
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
-    public WMService() throws JAXBException, SQLException, IOException, NamingException {
+    public WMSService() throws JAXBException, SQLException, IOException, NamingException {
         super("WMS", new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_3_0.toString()),
                      new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_1_1.toString()));
 
