@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.xacml;
+package org.constellation.xacml.factory;
 
 import com.sun.xacml.ParsingException;
 import com.sun.xacml.UnknownIdentifierException;

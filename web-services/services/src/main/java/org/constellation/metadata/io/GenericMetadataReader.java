@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃƒÂ©veloppement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -27,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -34,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.constellation.cat.csw.v202.ElementSetType;
@@ -44,11 +49,17 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
+import org.constellation.generic.edmo.Organisation;
+import org.constellation.generic.edmo.Organisations;
+import org.constellation.generic.edmo.ws.EdmoWebservice;
+import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
+import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
 import static org.constellation.generic.database.Automatic.*;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.metadata.iso.MetadataExtensionInformationImpl;
 import org.geotools.metadata.iso.PortrayalCatalogueReferenceImpl;
 import org.geotools.metadata.iso.citation.AddressImpl;
 import org.geotools.metadata.iso.citation.CitationDateImpl;
@@ -91,11 +102,11 @@ import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.Datatype;
 
 /**
  * 
- * TODO regarder les cardinalité est mettre des null la ou 0-...
- * TODO getVariables
+ * TODO regarder les cardinalitÃƒÂ© est mettre des null la ou 0-...
  *
  * @author Guilhem Legal
  */
@@ -109,7 +120,12 @@ public class GenericMetadataReader extends MetadataReader {
     /**
      * A date Formater.
      */
-    private DateFormat dateFormat;
+    private static  List<DateFormat> dateFormats;
+    static {
+        dateFormats = new ArrayList<DateFormat>();
+        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
+    }
     
     /**
      * A connection to the database.
@@ -117,39 +133,57 @@ public class GenericMetadataReader extends MetadataReader {
     private Connection connection;
     
     /**
-     * 
+     * An unmarshaller used for getting EDMO data.
+     */
+    private Unmarshaller unmarshaller;
+    
+    /**
+     * A list of precompiled SQL request returning single value.
      */
     private Map<PreparedStatement, List<String>> singleStatements;
     
     /**
-     * 
+     * A list of precompiled SQL request returning multiple value.
      */
     private Map<PreparedStatement, List<String>> multipleStatements;
     
     /**
-     * 
+     * A Map of varName - value refreshed at every request.
      */
     private Map<String, String> singleValue;
     
     /**
-     * 
+     * * A Map of varName - list of value refreshed at every request.
      */
     private Map<String, List<String>> multipleValue;
     
     /**
+     * 
+     */
+    private Map<String, ResponsiblePartyImpl> contacts;
+    /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic genericConfiguration, Connection connection) throws SQLException {
+    public GenericMetadataReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
         super();
         this.genericConfiguration = genericConfiguration;
-        this.connection = connection;
+        this.connection     = connection;
         initStatement();
-        singleValue   = new HashMap<String, String>();
-        multipleValue = new HashMap<String, List<String>>();
+        singleValue         = new HashMap<String, String>();
+        multipleValue       = new HashMap<String, List<String>>();
+        contacts            = new HashMap<String, ResponsiblePartyImpl>();
+        JAXBContext context = JAXBContext.newInstance("org.constellation.generic.edmo");
+        unmarshaller        = context.createUnmarshaller();
+        List<String> contactID = new ArrayList<String>();
     }
     
-    public void initStatement() throws SQLException {
+    /**
+     * Initialize the prepared statement build from the configuration file.
+     * 
+     * @throws java.sql.SQLException
+     */
+    private void initStatement() throws SQLException {
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
         Queries queries = genericConfiguration.getQueries();
@@ -184,13 +218,64 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
+     * Retrieve a contact from the cache or from th EDMO WS if its hasn't yet been requested.
+     *  
+     * @param contactIdentifier
+     * @return
+     */
+    private ResponsiblePartyImpl getContact(String contactIdentifier) {
+        ResponsiblePartyImpl result = contacts.get(contactIdentifier);
+        if (result == null) {
+            result = loadContactFromEDMOWS(contactIdentifier);
+            if (result != null)
+                contacts.put(contactIdentifier, result);
+        } 
+        return result;
+    }
+            
+    /**
+     * Try to get a contact from EDMO WS and add it to the map of contact.
+     * 
+     * @param contactIdentifiers
+     */
+    private ResponsiblePartyImpl loadContactFromEDMOWS(String contactID) {
+        EdmoWebservice service = new EdmoWebservice();
+        EdmoWebserviceSoap port = service.getEdmoWebserviceSoap();
+        
+        // we call the web service EDMO
+        String result = port.wsEdmoGetDetail(contactID);
+        StringReader sr = new StringReader(result);
+        Object obj;
+        try {
+            obj = unmarshaller.unmarshal(sr);
+            if (obj instanceof Organisations) {
+                Organisations orgs = (Organisations) obj;
+                switch (orgs.getOrganisation().size()) {
+                    case 0:
+                        logger.severe("There is nor organisation for the specified code: " + contactID);
+                        break;
+                    case 1:
+                        logger.info("contact created for contact ID: " + contactID);
+                        return createContact(orgs.getOrganisation().get(0));
+                    default:
+                        logger.severe("There is more than one contact for the specified code: " + contactID);
+                        break;
+                }
+            }
+        } catch (JAXBException ex) {
+            logger.severe("JAXBException while getting contact from EDMO WS");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
     private void loadData(String identifier) throws SQLException {
         singleValue.clear();
         multipleValue.clear();
-        System.out.println(singleStatements.size());
         for (PreparedStatement stmt : singleStatements.keySet()) {
             ParameterMetaData meta = stmt.getParameterMetaData();
             int nbParam = meta.getParameterCount();
@@ -203,10 +288,9 @@ public class GenericMetadataReader extends MetadataReader {
             if (result.next()) {
                 for (String varName : singleStatements.get(stmt)) {
                     singleValue.put(varName, result.getString(varName));
-                    System.out.println("put " + varName + " - " + result.getString(varName));
                 }
             } else {
-                System.out.println("no result");
+                logger.info("no result");
             }
             result.close();
         }
@@ -307,7 +391,8 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * contact parts
          */
-        ResponsibleParty contact   = createContact(getVariable("var01"), Role.AUTHOR);
+        ResponsiblePartyImpl contact = getContact(getVariable("var01"));
+        contact.setRole(Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -328,9 +413,41 @@ public class GenericMetadataReader extends MetadataReader {
          */ 
         
         /*
-         * extension information TODO
+         * extension information
          */
-       
+        MetadataExtensionInformationImpl extensionInfo = new MetadataExtensionInformationImpl();
+        List<ExtendedElementInformationImpl> elements = new ArrayList<ExtendedElementInformationImpl>();
+        
+        //EDMO
+        ExtendedElementInformationImpl edmo =  createExtensionInfo("SDN:EDMO::");
+        elements.add(edmo);
+        
+        //L021
+        ExtendedElementInformationImpl L021 = createExtensionInfo("SDN:L021:1:");
+        elements.add(L021);
+        
+        //L031
+        ExtendedElementInformationImpl L031 = createExtensionInfo("SDN:L031:2:");
+        elements.add(L031);
+        
+        //L071
+        ExtendedElementInformationImpl L071 = createExtensionInfo("SDN:L071:1:");
+        elements.add(L071);
+        
+        //L081
+        ExtendedElementInformationImpl L081 = createExtensionInfo("SDN:L081:1:");
+        elements.add(L081);
+        
+        //L231
+        ExtendedElementInformationImpl L231 = createExtensionInfo("SDN:L231:3:");
+        elements.add(L231);
+        
+        //L241
+        ExtendedElementInformationImpl L241 = createExtensionInfo("SDN:L241:1:");
+        elements.add(L241);
+        extensionInfo.setExtendedElementInformation(elements);
+        
+        result.setMetadataExtensionInfo(Arrays.asList(extensionInfo));
         /*
          * Data indentification
          */ 
@@ -343,14 +460,20 @@ public class GenericMetadataReader extends MetadataReader {
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var06"));
         citation.setDates(Arrays.asList(revisionDate));
         
-        contact   = createContact(getVariable("var07"), Role.ORIGINATOR);
-        citation.setCitedResponsibleParties(Arrays.asList(contact));
+        List<ResponsiblePartyImpl> originators = new ArrayList<ResponsiblePartyImpl>();
+        for (String contactID : getVariables("var07")) {
+            contact = getContact(contactID);
+            contact.setRole(Role.ORIGINATOR);
+            originators.add(contact);
+        }
+        citation.setCitedResponsibleParties(originators);
         
         dataIdentification.setCitation(citation);
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var08")));
         
-        contact   = createContact(getVariable("var09"), Role.CUSTODIAN);
+        contact   = getContact(getVariable("var09"));
+        contact.setRole(Role.CUSTODIAN);
         
         dataIdentification.setPointOfContacts(Arrays.asList(contact));
 
@@ -464,40 +587,31 @@ public class GenericMetadataReader extends MetadataReader {
         dataIdentification.setTopicCategories(Arrays.asList(TopicCategory.OCEANS));
         
         /*
-         * Extent TODO multiple box
+         * Extent 
          */
         ExtentImpl extent = new ExtentImpl();
         
         // geographic extent
-        double west  = 0;double east  = 0;double south = 0;double north = 0;
-        try {
-            west  = Double.parseDouble(getVariable("var24"));
-            east  = Double.parseDouble(getVariable("var25"));
-            south = Double.parseDouble(getVariable("var26"));
-            north = Double.parseDouble(getVariable("var27"));
-        } catch (NumberFormatException ex) {
-            logger.severe("Number format exception while parsing boundingBox");
-        }
-        GeographicExtentImpl geoExtent = new GeographicBoundingBoxImpl(west, east, south, north);
-        extent.setGeographicElements(Arrays.asList(geoExtent));
+        extent.setGeographicElements(createGeographicExtent("var24", "var25", "var26", "var27"));
         
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
-        try {
-            Date start = dateFormat.parse(getVariable("var28"));
-            tempExtent.setStartTime(start);
-            Date stop  = dateFormat.parse(getVariable("var29"));
-            tempExtent.setEndTime(stop);
-        } catch (ParseException ex) {
-            logger.severe("parse exception while parsing temporal extent date");
-        }
-        extent.setTemporalElements(Arrays.asList(tempExtent));
+        Date start = parseDate(getVariable("var28"));
+        tempExtent.setStartTime(start);
+        Date stop  = parseDate(getVariable("var29"));
+        tempExtent.setEndTime(stop);
+        if (start == null || stop == null)
+            logger.severe("parse exception while parsing temporal extent date");extent.setTemporalElements(Arrays.asList(tempExtent));
         
         //vertical extent
         VerticalExtentImpl vertExtent = new VerticalExtentImpl();
         try{
-            vertExtent.setMinimumValue(Double.parseDouble(getVariable("var30")));
-            vertExtent.setMaximumValue(Double.parseDouble(getVariable("var31")));
+            String miv = getVariable("var30");
+            if (miv != null)
+                vertExtent.setMinimumValue(Double.parseDouble(miv));
+            String mav = getVariable("var31");
+            if (mav != null)
+                vertExtent.setMaximumValue(Double.parseDouble(mav));
         } catch (NumberFormatException ex) {
             logger.severe("Number format exception while parsing boundingBox");
         }
@@ -516,7 +630,8 @@ public class GenericMetadataReader extends MetadataReader {
         //distributor
         DistributorImpl distributor       = new DistributorImpl();
         
-        contact   = createContact(getVariable("var36"), Role.DISTRIBUTOR);
+        contact   = getContact(getVariable("var36"));
+        contact.setRole(Role.DISTRIBUTOR);
         distributor.setDistributorContact(contact);
                 
         distributionInfo.setDistributors(Arrays.asList(distributor));
@@ -583,7 +698,8 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * contact parts
          */
-        ResponsiblePartyImpl contact = createContact(getVariable("var01"), Role.AUTHOR);
+        ResponsiblePartyImpl contact = getContact(getVariable("var01"));
+        contact.setRole(Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -591,8 +707,31 @@ public class GenericMetadataReader extends MetadataReader {
          */ 
         
         /*
-         * extension information TODO
+         * extension information
          */
+        MetadataExtensionInformationImpl extensionInfo = new MetadataExtensionInformationImpl();
+        List<ExtendedElementInformationImpl> elements = new ArrayList<ExtendedElementInformationImpl>();
+        
+        
+        //EDMO
+        ExtendedElementInformationImpl edmo =  createExtensionInfo("SDN:EDMO::");
+        elements.add(edmo);
+        
+        //L081
+        ExtendedElementInformationImpl L081 = createExtensionInfo("SDN:L081:1:");
+        elements.add(L081);
+        
+        //L231
+        ExtendedElementInformationImpl L231 = createExtensionInfo("SDN:L231:3:");
+        elements.add(L231);
+        
+        //C77
+        ExtendedElementInformationImpl C77 = createExtensionInfo("SDN:C77:0:");
+        elements.add(C77);
+        
+        extensionInfo.setExtendedElementInformation(elements);
+        result.setMetadataExtensionInfo(Arrays.asList(extensionInfo));
+        
         
         List<DataIdentificationImpl> dataIdentifications = new ArrayList<DataIdentificationImpl>();
         /*
@@ -609,20 +748,23 @@ public class GenericMetadataReader extends MetadataReader {
         List<ResponsibleParty> chiefs = new ArrayList<ResponsibleParty>();
         
         //first chief
-        contact   = createContact(getVariable("var05"), Role.ORIGINATOR);
+        contact   = getContact(getVariable("var05"));
+        contact.setRole(Role.ORIGINATOR);
         chiefs.add(contact);
         
         //second and other chief
         List<String> secondChiefs = getVariables("var06");
         for (String secondChief : secondChiefs) {
-            contact   = createContact(secondChief, Role.POINT_OF_CONTACT);
+            contact   = getContact(secondChief);
+            contact.setRole(Role.POINT_OF_CONTACT);
             chiefs.add(contact);
         }
         
         //labo
         List<String> laboratories = getVariables("var07");
         for (String laboratory : laboratories) {
-            contact   = createContact(laboratory, Role.ORIGINATOR);
+            contact   = getContact(laboratory);
+            contact.setRole(Role.ORIGINATOR);
             chiefs.add(contact);
         }
         
@@ -801,14 +943,13 @@ public class GenericMetadataReader extends MetadataReader {
         
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
-        try {
-            Date start = dateFormat.parse(getVariable("var24"));
-            tempExtent.setStartTime(start);
-            Date stop  = dateFormat.parse(getVariable("var25"));
-            tempExtent.setEndTime(stop);
-        } catch (ParseException ex) {
+        Date start = parseDate(getVariable("var24"));
+        tempExtent.setStartTime(start);
+        Date stop  = parseDate(getVariable("var25"));
+        tempExtent.setEndTime(stop);
+        if (start == null || stop == null)
             logger.severe("parse exception while parsing temporal extent date");
-        }
+        
         extent.setTemporalElements(Arrays.asList(tempExtent));
         
         List<GeographicExtentImpl> geoElements = new ArrayList<GeographicExtentImpl>();
@@ -820,18 +961,8 @@ public class GenericMetadataReader extends MetadataReader {
             geoElements.add(geoDesc);
         }
         
-        // geographic extent TODO multiple box
-        double west  = 0;double east  = 0;double south = 0;double north = 0;
-        try {
-            west  = Double.parseDouble(getVariable("var27"));
-            east  = Double.parseDouble(getVariable("var28"));
-            south = Double.parseDouble(getVariable("var29"));
-            north = Double.parseDouble(getVariable("var30"));
-        } catch (NumberFormatException ex) {
-            logger.severe("Number format exception while parsing boundingBox");
-        }
-        GeographicExtentImpl geoExtent = new GeographicBoundingBoxImpl(west, east, south, north);
-        geoElements.add(geoExtent);
+        // geographic extent 
+        geoElements.addAll(createGeographicExtent("var27", "var28", "var29", "var30"));
         extent.setGeographicElements(geoElements);
         
         dataIdentification.setExtent(Arrays.asList(extent));
@@ -849,7 +980,8 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setDates(Arrays.asList(revisionDate));
 
         //principal investigator
-        contact   = createContact(getVariable("var34"), Role.PRINCIPAL_INVESTIGATOR);
+        contact   = getContact(getVariable("var34"));
+        contact.setRole(Role.PRINCIPAL_INVESTIGATOR);
         contact.setIndividualName(getVariable("var33"));
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
@@ -886,7 +1018,8 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setDates(Arrays.asList(revisionDate));
         
         //principal investigator
-        contact   = createContact(getVariable("var40"), Role.PRINCIPAL_INVESTIGATOR);
+        contact   = getContact(getVariable("var40"));
+        contact.setRole(Role.PRINCIPAL_INVESTIGATOR);
         contact.setIndividualName(getVariable("var39"));
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         
@@ -940,7 +1073,8 @@ public class GenericMetadataReader extends MetadataReader {
          /*
          * contact parts
          */
-        ResponsiblePartyImpl contact   = createContact(getVariable("var01"), Role.AUTHOR);
+        ResponsiblePartyImpl contact   = getContact(getVariable("var01"));
+        contact.setRole(Role.AUTHOR);
         result.setContacts(Arrays.asList(contact));
         
         /*
@@ -961,22 +1095,25 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var03"))));
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var04"));
         citation.setDates(Arrays.asList(revisionDate));
-        contact = createContact(getVariable("var05"), Role.ORIGINATOR);
+        contact = getContact(getVariable("var05"));
+        contact.setRole(Role.ORIGINATOR);
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var06"))); 
         dataIdentification.setPurpose(new SimpleInternationalString("var07"));
         
-        List<ResponsiblePartyImpl> contacts = new ArrayList<ResponsiblePartyImpl>();
+        List<ResponsiblePartyImpl> pointOfContacts = new ArrayList<ResponsiblePartyImpl>();
         
-        contact = createContact(getVariable("var08"), Role.CUSTODIAN);
-        contacts.add(contact);
-        contact = createContact(getVariable("var10"), Role.POINT_OF_CONTACT);
+        contact = getContact(getVariable("var08"));
+        contact.setRole(Role.CUSTODIAN);
+        pointOfContacts.add(contact);
+        contact = getContact(getVariable("var10"));
+        contact.setRole(Role.POINT_OF_CONTACT);
         contact.setIndividualName(getVariable("var09"));
-        contacts.add(contact);
+        pointOfContacts.add(contact);
         
-        dataIdentification.setPointOfContacts(contacts);
+        dataIdentification.setPointOfContacts(pointOfContacts);
 
         /**
          * keywords 
@@ -1064,15 +1201,12 @@ public class GenericMetadataReader extends MetadataReader {
         
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
-        
-        try {
-            Date start = dateFormat.parse(getVariable("var17"));
-            tempExtent.setStartTime(start);
-            Date stop  = dateFormat.parse(getVariable("var18"));
-            tempExtent.setEndTime(stop);
-        } catch (ParseException ex) {
+        Date start = parseDate(getVariable("var17"));
+        tempExtent.setStartTime(start);
+        Date stop  = parseDate(getVariable("var18"));
+        tempExtent.setEndTime(stop);
+        if (start == null || stop == null)
             logger.severe("parse exception while parsing temporal extent date");
-        }
         extent.setTemporalElements(Arrays.asList(tempExtent));
         extents.add(extent);
         
@@ -1086,18 +1220,8 @@ public class GenericMetadataReader extends MetadataReader {
             geoElements.add(geoDesc);
         }
         
-        // geographic extent TODO multiple box
-        double west  = 0;double east  = 0;double south = 0;double north = 0;
-        try {
-            west  = Double.parseDouble(getVariable("var20"));
-            east  = Double.parseDouble(getVariable("var21"));
-            south = Double.parseDouble(getVariable("var22"));
-            north = Double.parseDouble(getVariable("var23"));
-        } catch (NumberFormatException ex) {
-            logger.severe("Number format exception while parsing boundingBox");
-        }
-        GeographicExtentImpl geoExtent = new GeographicBoundingBoxImpl(west, east, south, north);
-        geoElements.add(geoExtent);
+        // geographic extent
+        geoElements.addAll(createGeographicExtent("var20", "var21", "var22", "var23"));
         extent.setGeographicElements(geoElements);
         extents.add(extent);
         
@@ -1164,47 +1288,46 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
-     * Build a new Responsible party with the specified resultSet and Role.
+     * Build a new Responsible party with the specified Organisation object retrieved from EDMO WS.
      * 
      * TODO get from EDMO WS.
      * 
-     * @param res
-     * @param role
+     * @param org
      * @return
      * @throws java.sql.SQLException
      */
-    private ResponsiblePartyImpl createContact(String contactID, Role role) throws SQLException {
+    private ResponsiblePartyImpl createContact(Organisation org) {
         
         ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
-        /*contact.setOrganisationName(new SimpleInternationalString(res.getString("TODO")));
-        contact.setRole(role);
+        contact.setOrganisationName(new SimpleInternationalString(org.getNative_name()));
         
         ContactImpl contactInfo = new ContactImpl();
         TelephoneImpl phone     = new TelephoneImpl();
         AddressImpl address     = new AddressImpl();
         OnLineResourceImpl or   = new OnLineResourceImpl();
                 
-        phone.setFacsimiles(Arrays.asList(res.getString("TODO")));
-        phone.setVoices(Arrays.asList(res.getString("TODO")));
+        phone.setFacsimiles(Arrays.asList(org.getFax()));
+        phone.setVoices(Arrays.asList(org.getPhone()));
         contactInfo.setPhone(phone);
         
-        address.setDeliveryPoints(Arrays.asList(res.getString("TODO")));
-        address.setCity(new SimpleInternationalString(res.getString("TODO")));
-        address.setAdministrativeArea(new SimpleInternationalString(res.getString("TODO")));
-        address.setPostalCode(res.getString("TODO"));
-        address.setCountry(new SimpleInternationalString(res.getString("TODO")));
-        address.setElectronicMailAddresses(Arrays.asList(res.getString("TODO")));
+        address.setDeliveryPoints(Arrays.asList(org.getAddress()));
+        address.setCity(new SimpleInternationalString(org.getCity()));
+        // TODO address.setAdministrativeArea(new SimpleInternationalString()); 
+        address.setPostalCode(org.getZipcode());
+        address.setCountry(new SimpleInternationalString(org.getC_country()));
+        address.setElectronicMailAddresses(Arrays.asList(org.getEmail()));
         contactInfo.setAddress(address);
         
         try {
-            or.setLinkage(new URI(res.getString("TODO")));
+            or.setLinkage(new URI(org.getWebsite()));
         } catch (URISyntaxException ex) {
             logger.severe("URI Syntax exception in contact online resource");
         }
         contactInfo.setOnLineResource(or);
-        contact.setContactInfo(contactInfo);*/
+        contact.setContactInfo(contactInfo);
         return contact;
     }
+    
     
     /**
      * Parse the specified date and return a CitationDate with the dateType code REVISION.
@@ -1214,14 +1337,11 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private CitationDateImpl createRevisionDate(String date) {
         CitationDateImpl revisionDate = new CitationDateImpl();
-        try {
-            Date d = dateFormat.parse(date);
+        revisionDate.setDateType(DateType.REVISION);
+        Date d = parseDate(date);
+        if (d != null)
             revisionDate.setDate(d);
-            revisionDate.setDateType(DateType.REVISION);
-        } catch (ParseException ex) {
-            logger.severe("parse exception while parsing revision date");
-            return null;
-        }
+        else logger.severe("revision date null: " + date);
         return revisionDate;
     }
     
@@ -1233,15 +1353,76 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private CitationDateImpl createPublicationDate(String date) {
         CitationDateImpl revisionDate = new CitationDateImpl();
-        try {
-            Date d = dateFormat.parse(date);
+        revisionDate.setDateType(DateType.PUBLICATION);
+        Date d = parseDate(date);
+        if (d != null)
             revisionDate.setDate(d);
-            revisionDate.setDateType(DateType.PUBLICATION);
-        } catch (ParseException ex) {
-            logger.severe("parse exception while parsing revision date");
-            return null;
-        }
+        else logger.severe("publication date null: " + date);
         return revisionDate;
+    }
+
+    /**
+     * 
+     */
+    private Date parseDate(String date) {
+        int i = 0;
+        while (i < dateFormats.size()) {
+            DateFormat dateFormat = dateFormats.get(i);
+            try {
+                Date d = dateFormat.parse(date);
+                return d;
+            } catch (ParseException ex) {
+                i++;
+            }
+        }
+        logger.severe("unable to parse the date: " + date);
+        return null;
+    }
+    
+    /**
+     * 
+     * @param westVar
+     * @param eastVar
+     * @param southVar
+     * @param northVar
+     * @return
+     */
+    private List<GeographicExtentImpl> createGeographicExtent(String westVar, String eastVar, String southVar, String northVar) {
+        List<GeographicExtentImpl> result = new ArrayList<GeographicExtentImpl>();
+        
+        List<String> w = getVariables(westVar);
+        List<String> e = getVariables(eastVar);
+        List<String> s = getVariables(southVar);
+        List<String> n = getVariables(northVar);
+        
+        if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
+            logger.severe("There is not he same number of geographique extent coordinates");
+            return result;
+        }
+        int size = w.size();
+        for (int i = 0; i < size; i++) {
+            double west = 0; double east = 0; double south = 0; double north = 0;
+            try {
+                if (w.get(i) != null) {
+                    west = Double.parseDouble(w.get(i));
+                }
+                if (e.get(i) != null) {
+                    east = Double.parseDouble(e.get(i));
+                }
+                if (s.get(i) != null) {
+                    south = Double.parseDouble(s.get(i));
+                }
+                if (n.get(i) != null) {
+                    north = Double.parseDouble(n.get(i));
+                }
+            } catch (NumberFormatException ex) {
+                logger.severe("Number format exception while parsing boundingBox: " + '\n' +
+                        "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
+            }
+            GeographicExtentImpl geo = new GeographicBoundingBoxImpl(west, east, south, north);
+            result.add(geo);
+        }
+        return result;
     }
     
     private CitationImpl createKeywordCitation(String title, String altTitle, String revDate, String editionNumber) {
@@ -1255,8 +1436,21 @@ public class GenericMetadataReader extends MetadataReader {
             revisionDate = new CitationDateImpl(null, DateType.REVISION); 
         }
         citation.setDates(Arrays.asList(revisionDate));
-        citation.setEdition(new SimpleInternationalString(editionNumber));
+        if (editionNumber != null)
+            citation.setEdition(new SimpleInternationalString(editionNumber));
         citation.setIdentifiers(Arrays.asList(new IdentifierImpl("http://www.seadatanet.org/urnurl/")));
         return citation;
     }
+    
+    private ExtendedElementInformationImpl createExtensionInfo(String name) {
+        ExtendedElementInformationImpl element = new ExtendedElementInformationImpl();
+        element.setName(name);
+        element.setDefinition(new SimpleInternationalString("http://www.seadatanet.org/urnurl/"));
+	element.setDataType(Datatype.CODE_LIST);		
+        element.setParentEntity(Arrays.asList("SeaDataNet"));
+        //TODO see for the source
+        
+        return element;
+    }
+            
 }

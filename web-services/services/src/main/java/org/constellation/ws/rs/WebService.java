@@ -325,7 +325,7 @@ public abstract class WebService {
      * @param classesName A list of JAXB annoted classes.
      * @param rootNamespace The main namespace for all the document.
      */
-    protected void setXMLContext(String rootNamespace, Class... classes) throws JAXBException {
+    protected void setXMLContext(String rootNamespace, Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
 
         JAXBContext jbcontext = JAXBContext.newInstance(classes);
