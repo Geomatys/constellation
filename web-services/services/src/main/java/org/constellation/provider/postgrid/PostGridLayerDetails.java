@@ -33,7 +33,6 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.Service;
@@ -83,16 +82,6 @@ import org.opengis.style.Symbolizer;
  * @author Cédric Briançon
  */
 class PostGridLayerDetails implements LayerDetails {
-//    /**
-//     * The database connection.
-//     */
-//    private final Database database;
-//
-//    /**
-//     * Current layer to consider.
-//     */
-//    private final Layer layer;
-
     private final PostGridReader reader;
 
     /**
@@ -108,8 +97,6 @@ class PostGridLayerDetails implements LayerDetails {
      * @param layer The layer to consider in the database.
      */
     PostGridLayerDetails(final PostGridReader reader, final List<String> favorites) {
-//        this.database = database;
-//        this.layer = layer;
         this.reader = reader;
 
         if (favorites == null) {
@@ -148,11 +135,6 @@ class PostGridLayerDetails implements LayerDetails {
         final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
 
         GridCoverageTable table = reader.getTable();
-//        try {
-//            table = database.getTable(GridCoverageTable.class);
-//        } catch (NoSuchTableException ex) {
-//            throw new CatalogException(ex);
-//        }
         table = new GridCoverageTable(table);
 
         table.setGeographicBoundingBox(bbox);
@@ -165,7 +147,6 @@ class PostGridLayerDetails implements LayerDetails {
         } else {
             table.setVerticalRange(null);
         }
-//        table.setLayer(layer);
         GridCoverage2D coverage = null;
         try {
             coverage = table.getEntry().getCoverage(null);
@@ -300,37 +281,37 @@ class PostGridLayerDetails implements LayerDetails {
         return reader.getTable().getLayer().getThematic();
     }
 
-    private MapLayer createMapLayer(Object style, final Map<String, Object> params){
+    private MapLayer createMapLayer(Object style, final Map<String, Object> params) {
         final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
 
-        if(style == null){
+        if (style == null) {
             //no style provided, try to get the favorite one
-            if(favorites.size() > 0){
+            if (favorites.size() > 0) {
                 //there are some favorites styles
                 style = favorites.get(0);
-            }else{
+            } else {
                 //no favorites defined, create a default one
                 style = RANDOM_FACTORY.createRasterStyle();
             }
         }
 
-        if(style instanceof String){
+        if (style instanceof String) {
             //the given style is a named style
             style = NamedStyleDP.getInstance().get((String)style);
-            if(style == null){
-                //somehting is wrong, the named style doesnt exist, create a default one
+            if (style == null) {
+                //something is wrong, the named style doesnt exist, create a default one
                 style = RANDOM_FACTORY.createRasterStyle();
             }
         }
 
-        if(style instanceof MutableStyle){
+        if (style instanceof MutableStyle) {
             //style is a commun SLD style
             mapLayer.setStyle((MutableStyle) style);
-        }else if( style instanceof GraphicBuilder){
+        } else if (style instanceof GraphicBuilder) {
             //special graphic builder
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
             mapLayer.graphicBuilders().add((GraphicBuilder) style);
-        }else{
+        } else {
             //style is unknowed type, use a random style
             mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
         }
@@ -350,10 +331,12 @@ class PostGridLayerDetails implements LayerDetails {
         return mapLayer;
     }
     
-    private MutableStyle toStyle(MeasurementRange dimRange){
+    private MutableStyle toStyle(final MeasurementRange dimRange) {
         final List<InterpolationPoint> values = new ArrayList<InterpolationPoint>();
-        values.add(STYLE_FACTORY.createInterpolationPoint(STYLE_FACTORY.colorExpression(Color.WHITE), dimRange.getMinimum()));
-        values.add(STYLE_FACTORY.createInterpolationPoint(STYLE_FACTORY.colorExpression(Color.BLUE), dimRange.getMaximum()));
+        values.add(STYLE_FACTORY.createInterpolationPoint(
+                        STYLE_FACTORY.colorExpression(Color.WHITE), dimRange.getMinimum()));
+        values.add(STYLE_FACTORY.createInterpolationPoint(
+                        STYLE_FACTORY.colorExpression(Color.BLUE), dimRange.getMaximum()));
         final Literal lookup = StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
         final Literal fallback = StyleConstants.DEFAULT_FALLBACK;
         final Function interpolateFunction = STYLE_FACTORY.createInterpolateFunction(
@@ -362,18 +345,19 @@ class PostGridLayerDetails implements LayerDetails {
         final ChannelSelection selection = STYLE_FACTORY.createChannelSelection(
                 STYLE_FACTORY.createSelectedChannelType("0", STYLE_FACTORY.literalExpression(1)));
 
-        Expression opacity = STYLE_FACTORY.literalExpression(1f);
-        OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
-        ColorMap colorMap = STYLE_FACTORY.createColorMap(interpolateFunction);
-        ContrastEnhancement enchance = StyleConstants.DEFAULT_CONTRAST_ENHANCEMENT;
-        ShadedRelief relief = StyleConstants.DEFAULT_SHADED_RELIEF;
-        Symbolizer outline = null; //createRealWorldLineSymbolizer();
-        Unit uom = NonSI.FOOT;
-        String geom = StyleConstants.DEFAULT_GEOM;
-        String name = "raster symbol name";
-        Description desc = StyleConstants.DEFAULT_DESCRIPTION;
+        final Expression opacity = STYLE_FACTORY.literalExpression(1f);
+        final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
+        final ColorMap colorMap = STYLE_FACTORY.createColorMap(interpolateFunction);
+        final ContrastEnhancement enhanced = StyleConstants.DEFAULT_CONTRAST_ENHANCEMENT;
+        final ShadedRelief relief = StyleConstants.DEFAULT_SHADED_RELIEF;
+        final Symbolizer outline = null; //createRealWorldLineSymbolizer();
+        final Unit uom = NonSI.FOOT;
+        final String geom = StyleConstants.DEFAULT_GEOM;
+        final String name = "raster symbol name";
+        final Description desc = StyleConstants.DEFAULT_DESCRIPTION;
 
-        RasterSymbolizer symbol = STYLE_FACTORY.createRasterSymbolizer(opacity, selection, overlap, colorMap, enchance, relief, outline, uom, geom, name, desc);
+        final RasterSymbolizer symbol = STYLE_FACTORY.createRasterSymbolizer(opacity, selection,
+                overlap, colorMap, enhanced, relief, outline, uom, geom, name, desc);
         
         return STYLE_FACTORY.createStyle(symbol);
     }
