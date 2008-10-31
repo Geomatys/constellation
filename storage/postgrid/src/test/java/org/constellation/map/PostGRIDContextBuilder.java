@@ -5,7 +5,6 @@
 package org.constellation.map;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,17 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.geotools.coverage.io.CoverageReader;
-import org.geotools.display.renderer.GridMarkGraphicBuilder;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.CoverageMapLayer;
 import org.geotools.map.DefaultMapContext;
@@ -40,8 +35,6 @@ import org.geotools.style.function.InterpolationPoint;
 import org.geotools.style.function.Method;
 import org.geotools.style.function.Mode;
 import org.geotools.style.function.ThreshholdsBelongTo;
-import org.geotools.style.sld.Specification.StyledLayerDescriptor;
-import org.geotools.style.sld.XMLUtilities;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
@@ -52,7 +45,6 @@ import org.opengis.style.ContrastMethod;
 import org.opengis.style.Description;
 import org.opengis.style.OverlapBehavior;
 import org.opengis.style.RasterSymbolizer;
-import org.opengis.style.SelectedChannelType;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 
@@ -73,7 +65,7 @@ public class PostGRIDContextBuilder {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            layer = createPostGridLayer();
+            layer = createPostGridLayer2();
             addElevationModel(layer);
             context.layers().add(layer);
         } catch (Exception ex) {
@@ -273,7 +265,7 @@ public class PostGRIDContextBuilder {
         ContrastEnhancement enchance = SF.createContrastEnhancement(ContrastMethod.NORMALIZE, SF.literalExpression(1f));
         ShadedRelief relief = StyleConstants.DEFAULT_SHADED_RELIEF;
         Symbolizer outline = null; //createRealWorldLineSymbolizer();
-        Unit uom = NonSI.FOOT;
+        Unit uom = NonSI.PIXEL;
         String geom = StyleConstants.DEFAULT_GEOM;
         String name = "raster symbol name";
         Description desc = StyleConstants.DEFAULT_DESCRIPTION;
@@ -284,10 +276,10 @@ public class PostGRIDContextBuilder {
     }
 
     private static void addElevationModel(MapLayer layer) {
-//        final CoverageMapLayer gridLayer = (CoverageMapLayer) org.geotools.gui.swing.debug.ContextBuilder.buildMNTContext().layers().get(0);
-//        final CoverageReader reader = gridLayer.getCoverageReader();
-//        ElevationModel elevation = LAYER_BUILDER.createElevationModel(reader,null);
-//        layer.setElevationModel(elevation);
+        final CoverageMapLayer gridLayer = (CoverageMapLayer) org.geotools.gui.swing.debug.ContextBuilder.buildMNTContext().layers().get(0);
+        final CoverageReader reader = gridLayer.getCoverageReader();
+        ElevationModel elevation = LAYER_BUILDER.createElevationModel(reader,null);
+        layer.setElevationModel(elevation);
     }
     
 }
