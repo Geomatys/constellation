@@ -47,7 +47,7 @@ import org.constellation.ows.OWSExceptionCode;
 import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -56,7 +56,7 @@ import org.constellation.ws.rs.WebService;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends WebService  {
+public class ConfigurationService extends OGCWebService  {
 
     /**
      * A container notifier allowing to dynamically reload all the active service.

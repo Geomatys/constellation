@@ -118,7 +118,7 @@ import org.constellation.wcs.v111.GridCrsType;
 
 // geoAPI dependencies
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // geoTools dependencies
@@ -135,7 +135,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 @Deprecated
 @Path("wcs")
 @Singleton
-public class WCService extends WebService {
+public class WCService extends OGCWebService {
 
     /**
      * A list of layer initialized a begining;
@@ -735,7 +735,7 @@ public class WCService extends WebService {
             if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
                 om = staticCapabilities.getOperationsMetadata();
                 //we update the url in the static part.
-                WebService.updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
+                OGCWebService.updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
             }
             responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
 

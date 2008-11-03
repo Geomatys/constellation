@@ -80,7 +80,7 @@ import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.ExceptionReport;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // geotools dependencies
@@ -93,7 +93,7 @@ import org.geotools.metadata.iso.MetaDataImpl;
  */
 @Path("csw")
 @Singleton
-public class CSWService extends WebService {
+public class CSWService extends OGCWebService {
     
     private CSWworker worker;
     

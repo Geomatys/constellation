@@ -36,7 +36,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -282,7 +282,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
             SAXException, IOException, NamingException
     {
 
-        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);
+        String configFile = OGCWebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;

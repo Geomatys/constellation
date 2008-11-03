@@ -39,7 +39,7 @@ import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.SectionsType;
@@ -59,7 +59,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
  */
 @Path("sos")
 @Singleton
-public class SOService extends WebService {
+public class SOService extends OGCWebService {
 
     private SOSworker worker;
     

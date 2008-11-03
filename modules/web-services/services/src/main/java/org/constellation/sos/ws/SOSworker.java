@@ -81,7 +81,7 @@ import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.FeaturePropertyType;
@@ -530,7 +530,7 @@ public class SOSworker {
                
                
                //we update the URL
-               WebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
+               OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
               
                
                //we update the parameter in operation metadata.

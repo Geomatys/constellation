@@ -47,7 +47,7 @@ import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.v110.OWSWebServiceException;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.xacml.CstlPDP;
 import org.constellation.xacml.PEP;
 import org.constellation.xacml.SecurityActions;
@@ -68,7 +68,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
  */
 @Path("pep")
 @Singleton
-public class GeoDRMService extends WebService {
+public class GeoDRMService extends OGCWebService {
 
     /**
      * A Policy Decision Point allowing to secure the access to the resources.

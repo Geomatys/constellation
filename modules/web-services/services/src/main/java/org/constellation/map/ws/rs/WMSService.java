@@ -81,7 +81,7 @@ import org.constellation.wms.AbstractProtocol;
 import org.constellation.wms.v111.LatLonBoundingBox;
 import org.constellation.wms.v130.OperationType;
 import org.constellation.wms.v130.EXGeographicBoundingBox;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -115,7 +115,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  */
 @Path("wms")
 @Singleton
-public class WMSService extends WebService {
+public class WMSService extends OGCWebService {
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */

@@ -48,7 +48,7 @@ import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.configuration.LayerLinkReader;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 
 import org.geotools.util.SoftValueHashMap;
 import org.xml.sax.SAXException;
@@ -312,7 +312,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
     private void extractLinks() {
         final String styleLinks;
         try {
-            styleLinks = WebService.getPropertyValue(JNDI_GROUP, KEY_POSTGRID_STYLES);
+            styleLinks = OGCWebService.getPropertyValue(JNDI_GROUP, KEY_POSTGRID_STYLES);
         } catch (NamingException ex) {
             return;
         }

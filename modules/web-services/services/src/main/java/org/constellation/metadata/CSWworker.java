@@ -101,7 +101,7 @@ import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.ows.v100.ServiceIdentification;
 import org.constellation.ows.v100.ServiceProvider;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ebrim.v300.IdentifiableType;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
@@ -602,7 +602,7 @@ public class CSWworker {
             
             //we update the URL
             if (om != null) {
-                WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
+                OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
                 
                 DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
                 if (cascadedCSW == null) {

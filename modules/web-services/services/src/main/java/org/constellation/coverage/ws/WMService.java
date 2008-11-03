@@ -71,7 +71,7 @@ import org.constellation.coverage.metadata.LayerMetadataTable;
 import org.constellation.coverage.metadata.PointOfContact;
 import org.constellation.coverage.metadata.PointOfContactTable;
 import org.constellation.coverage.metadata.SeriesMetadataTable;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.OGCWebService;
 
 //geotools dependencies
 import org.geotools.util.DateRange;
@@ -96,7 +96,7 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Deprecated
 @Path("wms")
 @Singleton
-public class WMService extends WebService {
+public class WMService extends OGCWebService {
     /**
      * A list of layer initialized a begining;
      */

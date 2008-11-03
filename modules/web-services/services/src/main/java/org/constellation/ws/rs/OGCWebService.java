@@ -105,7 +105,7 @@ import org.geotools.util.Version;
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
-public abstract class WebService {
+public abstract class OGCWebService {
     /**
      * Default logger for all web services.
      */
@@ -205,7 +205,7 @@ public abstract class WebService {
      * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String service, ServiceVersion... versions) {
+    public OGCWebService(String service, ServiceVersion... versions) {
         this.service = service;
 
         for (final ServiceVersion element : versions) {
@@ -228,7 +228,7 @@ public abstract class WebService {
      * @param secure The PDP is not initialized if secure id false.
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String service, boolean secure, ServiceVersion... versions) {
+    public OGCWebService(String service, boolean secure, ServiceVersion... versions) {
         this.service = service;
 
         for (final ServiceVersion element : versions) {
