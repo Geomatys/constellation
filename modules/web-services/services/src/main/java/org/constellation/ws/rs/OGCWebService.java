@@ -59,7 +59,7 @@ import org.geotools.util.Version;
 public abstract class OGCWebService extends WebService {
     
     /**
-     * The supported versions supportd by this web service.
+     * The supported versions supported by this web service.
      */
     private final List<ServiceVersion> versions = new ArrayList<ServiceVersion>();
 

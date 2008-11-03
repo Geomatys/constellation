@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.io.File;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,6 +54,7 @@ import org.constellation.generic.edmo.Organisation;
 import org.constellation.generic.edmo.Organisations;
 import org.constellation.generic.edmo.ws.EdmoWebservice;
 import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
+import org.constellation.generic.vocabulary.Vocabulary;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
 import static org.constellation.generic.database.Automatic.*;
@@ -158,9 +160,16 @@ public class GenericMetadataReader extends MetadataReader {
     private Map<String, List<String>> multipleValue;
     
     /**
-     * 
+     * A map of the already retrieved contact from EDMO WS.
      */
     private Map<String, ResponsiblePartyImpl> contacts;
+    
+    /**
+     * A map making the correspondance between parameter code and the real keyword value.
+     * this map is fill from a list of configuration file P021.xml, L05.xml, ..
+     */
+    private Map<String, Vocabulary> vocabularies;
+    
     /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
@@ -170,11 +179,12 @@ public class GenericMetadataReader extends MetadataReader {
         this.genericConfiguration = genericConfiguration;
         this.connection     = connection;
         initStatement();
-        singleValue         = new HashMap<String, String>();
-        multipleValue       = new HashMap<String, List<String>>();
-        contacts            = new HashMap<String, ResponsiblePartyImpl>();
-        JAXBContext context = JAXBContext.newInstance("org.constellation.generic.edmo");
-        unmarshaller        = context.createUnmarshaller();
+        singleValue            = new HashMap<String, String>();
+        multipleValue          = new HashMap<String, List<String>>();
+        contacts               = new HashMap<String, ResponsiblePartyImpl>();
+        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary");
+        unmarshaller           = context.createUnmarshaller();
+        vocabularies           = loadVocabulary("P021.xml", "L05.xml");
         List<String> contactID = new ArrayList<String>();
     }
     
@@ -218,6 +228,30 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
+     * Load a Map of code-value for the specified file path. 
+     */
+    public Map<String, Vocabulary> loadVocabulary(String... filePaths) {
+        Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
+        for (String filePath : filePaths) {
+            File f = new File(filePath);
+            Map<String, String> vocab = new HashMap<String, String>();
+            if (f.exists()) {
+                try {
+                    Vocabulary voca = (Vocabulary) unmarshaller.unmarshal(f);
+                    voca.fillMap();
+                    result.put(filePath.substring(0, filePath.lastIndexOf('.')), voca);
+                } catch (JAXBException ex) {
+                    logger.severe("Unable to unmarshall the vocabulary configuration file : " + filePath);
+                    ex.printStackTrace();
+                }
+            } else {
+                logger.severe("Vocabulary file : " + filePath + " can not be found");
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Retrieve a contact from the cache or from th EDMO WS if its hasn't yet been requested.
      *  
      * @param contactIdentifier
@@ -229,7 +263,9 @@ public class GenericMetadataReader extends MetadataReader {
             result = loadContactFromEDMOWS(contactIdentifier);
             if (result != null)
                 contacts.put(contactIdentifier, result);
-        } 
+        } else {
+            result = new ResponsiblePartyImpl(result);
+        }
         return result;
     }
             
@@ -394,7 +430,6 @@ public class GenericMetadataReader extends MetadataReader {
         ResponsiblePartyImpl author = getContact(getVariable("var01"));
         author.setRole(Role.AUTHOR);
         result.setContacts(Arrays.asList(author));
-        System.out.println("author: " + author);
         
         /*
          * creation date TODO
@@ -485,55 +520,38 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         //parameter
-        List<String> parameters = getVariables("var10");
-        KeywordsImpl keyword = new KeywordsImpl();
-        List<InternationalString> kws = new ArrayList<InternationalString>();
-        for (String parameter: parameters) {
-            kws.add(new SimpleInternationalString(parameter));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("parameter"));
-
-        citation = createKeywordCitation("BODC Parameter Discovery Vocabulary", "P021", "2007-09-25T02:00:02", "19");
-        keyword.setThesaurusName(citation);
-
+        KeywordsImpl keyword = createKeyword(getVariables("var10"), 
+                                             "parameter", 
+                                             "BODC Parameter Discovery Vocabulary", 
+                                             "P021", 
+                                             "2007-09-25T02:00:02", 
+                                             "19");
         keywords.add(keyword);
 
-        //instrument
-        String key = getVariable("var11");
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(key)));
-        keyword.setType(KeywordType.valueOf("instrument"));
-
-        citation = createKeywordCitation("SeaDataNet device categories", "L05", "2007-09-06T15:03:00", "1");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var11")),
+                                "instrument",
+                                "SeaDataNet device categories", 
+                                "L05", 
+                                "2007-09-06T15:03:00", 
+                                "1");
         keywords.add(keyword);
         
         //platform
-        key = getVariable("var12");
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(key)));
-        keyword.setType(KeywordType.valueOf("platform_class"));
-
-        citation = createKeywordCitation("SeaDataNet Platform Classes", "L061", "2007-01-13T06:42:58", "4");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var12")),
+                                "platform_class",
+                                "SeaDataNet Platform Classes", 
+                                "L061", 
+                                "2007-01-13T06:42:58", 
+                                "4");
         keywords.add(keyword);
         
         //projects
-        List<String> projects = getVariables("var13");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String project : projects) {
-            kws.add(new SimpleInternationalString(project));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("platform_class"));
-
-        citation = createKeywordCitation("European Directory of Marine Environmental Research Projects", "EDMERP", null, null);
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var13"),
+                                "project",
+                                "European Directory of Marine Environmental Research Projects", 
+                                "EDMERP", 
+                                null, 
+                                null);
         keywords.add(keyword);
         
         dataIdentification.setDescriptiveKeywords(keywords);
@@ -793,133 +811,102 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         //port of departure
-        KeywordsImpl keyword = new KeywordsImpl();
-        
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var12"))));
-        keyword.setType(KeywordType.valueOf("departure_place"));
-
-        citation = createKeywordCitation("Ports Gazetteer", "C381", "2007-09-20T02:00:02", "2");
-        keyword.setThesaurusName(citation);
-
+        KeywordsImpl keyword = createKeyword(Arrays.asList(getVariable("var12")),
+                                             "departure_place",
+                                             "Ports Gazetteer", 
+                                             "C381", 
+                                             "2007-09-20T02:00:02", 
+                                             "2");
         keywords.add(keyword);
 
         //port of arrival
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var13"))));
-        keyword.setType(KeywordType.valueOf("arrival_place"));
-
-        citation = createKeywordCitation("Ports Gazetteer", "C381", "2007-09-20T02:00:02", "2");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var13")),
+                                "arrival_place",
+                                "Ports Gazetteer", 
+                                "C381", 
+                                "2007-09-20T02:00:02", 
+                                "2");
         keywords.add(keyword);
         
         //country of departure
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var14"))));
-        keyword.setType(KeywordType.valueOf("departure_contry"));
-
-        citation = createKeywordCitation("International Standards Organisation countries", "C320", "2007-08-22T16:37:58", "1");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var14")),
+                                "departure_contry",
+                                "International Standards Organisation countries", 
+                                "C320", 
+                                "2007-08-22T16:37:58", 
+                                "1");
         keywords.add(keyword);
         
         // country of arrival
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var15"))));
-        keyword.setType(KeywordType.valueOf("arrival_country"));
-
-        citation =  createKeywordCitation("International Standards Organisation countries", "C320", "2007-08-22T16:37:58", "1");
-        keyword.setThesaurusName(citation);
-
+        keyword =  createKeyword(Arrays.asList(getVariable("var15")),
+                                 "arrival_country",
+                                 "International Standards Organisation countries", 
+                                 "C320", 
+                                 "2007-08-22T16:37:58", 
+                                 "1");
         keywords.add(keyword);
         
         // ship
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var16"))));
-        keyword.setType(KeywordType.valueOf("platform"));
-
-        citation = createKeywordCitation("SeaDataNet Cruise Summary Report ship metadata", "C174", "2007-05-14T15:45:00", "0");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var16")),
+                                "platform",
+                                "SeaDataNet Cruise Summary Report ship metadata", 
+                                "C174", 
+                                "2007-05-14T15:45:00", 
+                                "0");
         keywords.add(keyword);
         
         // platform class
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var17"))));
-        keyword.setType(KeywordType.valueOf("platform_class"));
-
-        citation = createKeywordCitation("SeaDataNet Platform Classes", "L061", "2007-01-13T06:42:58", "4");
-        keyword.setThesaurusName(citation);
+        keyword = createKeyword(Arrays.asList(getVariable("var17")),
+                                "platform_class",
+                                "SeaDataNet Platform Classes", 
+                                "L061", 
+                                "2007-01-13T06:42:58", 
+                                "4");
+        keywords.add(keyword);
         
         // projects
-        List<String> projects = getVariables("var18");
-        keyword = new KeywordsImpl();
-        List<InternationalString> kws = new ArrayList<InternationalString>();
-        for (String project : projects) {
-            kws.add(new SimpleInternationalString(project));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("platform_class"));
-
-        citation = createKeywordCitation("European Directory of Marine Environmental Research Projects", "EDMERP", null, null);
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var18"),
+                                "platform_class",
+                                "European Directory of Marine Environmental Research Projects", 
+                                "EDMERP", 
+                                null, 
+                                null);
         keywords.add(keyword);
         
         // general oceans area
-        List<String> oceansAreas = getVariables("var19");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String oceansArea : oceansAreas) {
-            kws.add(new SimpleInternationalString(oceansArea));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.PLACE);
-
-        citation = createKeywordCitation("SeaDataNet Sea Areas", "C16", "2007-03-01T12:00:00", "0");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var19"),
+                                "place",
+                                "SeaDataNet Sea Areas", 
+                                "C16", 
+                                "2007-03-01T12:00:00", 
+                                "0");
         keywords.add(keyword);
         
         // geographic coverage
-        List<String> geoCoverages = getVariables("var20");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String geoCoverage : geoCoverages) {
-            kws.add(new SimpleInternationalString(geoCoverage));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("marsden_square"));
-
-        citation = createKeywordCitation("Ten-degree Marsden Squares", "C371", "2007-08-03T02:00:02", "1");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var20"),
+                                "marsden_square",
+                                "Ten-degree Marsden Squares", 
+                                "C371", 
+                                "2007-08-03T02:00:02", 
+                                "1");
         keywords.add(keyword);
         
          //parameter
-        List<String> parameters = getVariables("var20");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String parameter : parameters){
-            kws.add(new SimpleInternationalString(parameter));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("parameter"));
-
-        citation = createKeywordCitation("BODC Parameter Discovery Vocabulary", "P021", "2007-09-25T02:00:02", "19");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var21"),
+                                "parameter",
+                                "BODC Parameter Discovery Vocabulary", 
+                                "P021", 
+                                "2007-09-25T02:00:02", 
+                                "19");
         keywords.add(keyword);
         
         // instrument
-        String key = getVariable("var21");
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(key)));
-        keyword.setType(KeywordType.valueOf("instrument"));
-
-        citation = createKeywordCitation("SeaDataNet device categories", "L05", "2007-03-01T08:16:13", "0");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var22")),
+                                "instrument",
+                                "SeaDataNet device categories", 
+                                "L05", 
+                                "2007-03-01T08:16:13", 
+                                "0");
         keywords.add(keyword);
 
         dataIdentification.setDescriptiveKeywords(keywords);
@@ -1029,13 +1016,14 @@ public class GenericMetadataReader extends MetadataReader {
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var41")));
         
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(getVariable("var42"))));
-        keyword.setType(KeywordType.valueOf("counting_unit"));
-
-        citation = createKeywordCitation("ROSCOP sample quantification units", "L181", "2007-06-29T13:23:00", "0");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var42")),
+                                "counting_unit",
+                                "ROSCOP sample quantification units", 
+                                "L181", 
+                                "2007-06-29T13:23:00", 
+                                "0");
+        dataIdentification.setDescriptiveKeywords(Arrays.asList(keyword));
+        
         aggregateInfo = new AggregateInformationImpl();
         aggregateInfo.setInitiativeType(InitiativeType.OPERATION);
         aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
@@ -1124,59 +1112,39 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         // SEA AREAS
-        List<String> seaAreas = getVariables("var11");
-        KeywordsImpl keyword = new KeywordsImpl();
-        List<InternationalString> kws = new ArrayList<InternationalString>();
-        for (String seaArea : seaAreas) {
-            kws.add(new SimpleInternationalString(seaArea));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.PLACE);
-
-        citation = createKeywordCitation("SeaDataNet Sea Areas", "C16", "2007-03-01T12:00:00", "0");
-        keyword.setThesaurusName(citation);
-
+        KeywordsImpl keyword = createKeyword(getVariables("var11"),
+                                             "place",
+                                             "SeaDataNet Sea Areas", 
+                                             "C16", 
+                                             "2007-03-01T12:00:00", 
+                                             "0");
         keywords.add(keyword);
         
         //parameter
-        List<String> parameters = getVariables("var12");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String parameter : parameters) {
-            kws.add(new SimpleInternationalString(parameter));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("parameter"));
-
-        citation = createKeywordCitation("BODC Parameter Discovery Vocabulary", "P021", "2007-09-25T02:00:02", "19");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var12"), 
+                               "parameter",
+                               "BODC Parameter Discovery Vocabulary",
+                               "P021",
+                               "2007-09-25T02:00:02",
+                               "19");
         keywords.add(keyword);
         
         // instrument
-        String key = getVariable("var13");
-        keyword = new KeywordsImpl();
-        keyword.setKeywords(Arrays.asList(new SimpleInternationalString(key)));
-        keyword.setType(KeywordType.valueOf("instrument"));
-
-        citation = createKeywordCitation("SeaDataNet device categories", "L05", "2007-09-06T15:03:00", "1");
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(Arrays.asList(getVariable("var13")),
+                               "instrument",  
+                               "SeaDataNet device categories", 
+                               "L05", 
+                               "2007-09-06T15:03:00", 
+                               "1");
         keywords.add(keyword);
         
         // projects
-        List<String> projects = getVariables("var14");
-        keyword = new KeywordsImpl();
-        kws = new ArrayList<InternationalString>();
-        for (String project : projects) {
-            kws.add(new SimpleInternationalString(project));
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf("projects"));
-
-        citation = createKeywordCitation("European Directory for Marine Environmental Research Projects", "EDMERP", null, null);
-        keyword.setThesaurusName(citation);
-
+        keyword = createKeyword(getVariables("var14"),
+                                "projects",
+                                "European Directory for Marine Environmental Research Projects",
+                                "EDMERP", 
+                                null, 
+                                null);
         keywords.add(keyword);
         dataIdentification.setDescriptiveKeywords(keywords);
         
@@ -1301,7 +1269,7 @@ public class GenericMetadataReader extends MetadataReader {
     private ResponsiblePartyImpl createContact(Organisation org) {
         
         ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
-        contact.setOrganisationName(new SimpleInternationalString(org.getNative_name()));
+        contact.setOrganisationName(new SimpleInternationalString(org.getName()));
         
         ContactImpl contactInfo = new ContactImpl();
         TelephoneImpl phone     = new TelephoneImpl();
@@ -1317,7 +1285,9 @@ public class GenericMetadataReader extends MetadataReader {
         // TODO address.setAdministrativeArea(new SimpleInternationalString()); 
         address.setPostalCode(org.getZipcode());
         address.setCountry(new SimpleInternationalString(org.getC_country()));
-        address.setElectronicMailAddresses(Arrays.asList(org.getEmail()));
+        if (org.getEmail() != null) {
+            address.setElectronicMailAddresses(Arrays.asList(org.getEmail()));
+        }
         contactInfo.setAddress(address);
         
         try {
@@ -1427,7 +1397,41 @@ public class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
-    private CitationImpl createKeywordCitation(String title, String altTitle, String revDate, String editionNumber) {
+    /**
+     * TODO recuperer les elements du thesaurus citation a partir d'uin objet vocabulary.
+     * 
+     * @param values
+     * @param keywordType
+     * @param title
+     * @param altTitle
+     * @param revDate
+     * @param editionNumber
+     * @param vocabulary
+     * @return
+     */
+    private KeywordsImpl createKeyword(List<String> values, String keywordType, String title, String altTitle,
+            String revDate, String editionNumber) {
+
+        //we try to get the vaocabulary Map.
+        Vocabulary voca = vocabularies.get(altTitle);
+        Map<String, String> vocaMap = null;
+        if (voca == null) {
+            logger.info("No voabulary found for code: " + altTitle);
+        } else {
+            vocaMap = voca.getMap();
+        }
+        
+        KeywordsImpl keyword = new KeywordsImpl();
+        List<InternationalString> kws = new ArrayList<InternationalString>();
+        for (String value: values) {
+            if (vocaMap != null)
+                value = vocaMap.get(value);
+            kws.add(new SimpleInternationalString(value));
+        }
+        keyword.setKeywords(kws);
+        keyword.setType(KeywordType.valueOf(keywordType));
+        
+        //we create the citation describing the vocabulary used
         CitationImpl citation = new CitationImpl();
         citation.setTitle(new SimpleInternationalString(title));
         citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(altTitle)));
@@ -1441,7 +1445,9 @@ public class GenericMetadataReader extends MetadataReader {
         if (editionNumber != null)
             citation.setEdition(new SimpleInternationalString(editionNumber));
         citation.setIdentifiers(Arrays.asList(new IdentifierImpl("http://www.seadatanet.org/urnurl/")));
-        return citation;
+        keyword.setThesaurusName(citation);
+        
+        return keyword;
     }
     
     private ExtendedElementInformationImpl createExtensionInfo(String name) {

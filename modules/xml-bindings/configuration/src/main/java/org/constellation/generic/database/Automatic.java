@@ -15,7 +15,6 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.constellation.generic.database;
 
 import javax.xml.bind.annotation.XmlAccessType;
