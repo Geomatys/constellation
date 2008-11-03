@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le DÃƒÂ©veloppement
+ *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -106,7 +106,7 @@ import org.opengis.metadata.Datatype;
 
 /**
  * 
- * TODO regarder les cardinalitÃƒÂ© est mettre des null la ou 0-...
+ * TODO regarder les cardinalité est mettre des null la ou 0-...
  *
  * @author Guilhem Legal
  */
@@ -391,9 +391,10 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * contact parts
          */
-        ResponsiblePartyImpl contact = getContact(getVariable("var01"));
-        contact.setRole(Role.AUTHOR);
-        result.setContacts(Arrays.asList(contact));
+        ResponsiblePartyImpl author = getContact(getVariable("var01"));
+        author.setRole(Role.AUTHOR);
+        result.setContacts(Arrays.asList(author));
+        System.out.println("author: " + author);
         
         /*
          * creation date TODO
@@ -448,6 +449,7 @@ public class GenericMetadataReader extends MetadataReader {
         extensionInfo.setExtendedElementInformation(elements);
         
         result.setMetadataExtensionInfo(Arrays.asList(extensionInfo));
+        
         /*
          * Data indentification
          */ 
@@ -462,9 +464,9 @@ public class GenericMetadataReader extends MetadataReader {
         
         List<ResponsiblePartyImpl> originators = new ArrayList<ResponsiblePartyImpl>();
         for (String contactID : getVariables("var07")) {
-            contact = getContact(contactID);
-            contact.setRole(Role.ORIGINATOR);
-            originators.add(contact);
+            ResponsiblePartyImpl originator  = getContact(contactID);
+            originator.setRole(Role.ORIGINATOR);
+            originators.add(originator);
         }
         citation.setCitedResponsibleParties(originators);
         
@@ -472,10 +474,10 @@ public class GenericMetadataReader extends MetadataReader {
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var08")));
         
-        contact   = getContact(getVariable("var09"));
-        contact.setRole(Role.CUSTODIAN);
+        ResponsiblePartyImpl custodian   = getContact(getVariable("var09"));
+        custodian.setRole(Role.CUSTODIAN);
         
-        dataIdentification.setPointOfContacts(Arrays.asList(contact));
+        dataIdentification.setPointOfContacts(Arrays.asList(custodian));
 
         /*
          * keywords
@@ -630,9 +632,9 @@ public class GenericMetadataReader extends MetadataReader {
         //distributor
         DistributorImpl distributor       = new DistributorImpl();
         
-        contact   = getContact(getVariable("var36"));
-        contact.setRole(Role.DISTRIBUTOR);
-        distributor.setDistributorContact(contact);
+        ResponsiblePartyImpl distributorContact   = getContact(getVariable("var36"));
+        distributorContact.setRole(Role.DISTRIBUTOR);
+        distributor.setDistributorContact(distributorContact);
                 
         distributionInfo.setDistributors(Arrays.asList(distributor));
         
