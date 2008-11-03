@@ -32,10 +32,12 @@ import java.net.URLConnection;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
@@ -83,7 +85,7 @@ public class GeoDRMService extends OGCWebService {
     private String SERVICEURL = "http://demo.geomatys.fr/constellation/WS/wms";
     
     public GeoDRMService() {
-        super("GeoDRM", false, new ServiceVersion(Service.OTHER, "1.0.0"));
+        super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
         try {
             initializePolicyDecisionPoint();
             setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.coverage.web", "");
@@ -365,5 +367,61 @@ public class GeoDRMService extends OGCWebService {
             return null;
         }
         return Response.ok(response, contentType).build();
+    }
+    
+     /**
+     * An temporary implementations of java.security.principal
+     */
+    public class PrincipalImpl implements Principal {
+
+        private String name;
+
+        public PrincipalImpl(String name) {
+            this.name = name;
+}
+
+        public String getName() {
+            return name;
+        }
+
+    }
+
+     /**
+     * An temporary implementations of java.security.acl.group
+     */
+    public class GroupImpl implements Group {
+
+        private Vector<Principal> vect = new Vector<Principal>();
+        private String roleName;
+
+        public GroupImpl(String roleName) {
+            this.roleName = roleName;
+        }
+
+        public boolean addMember(final Principal principal) {
+            return vect.add(principal);
+        }
+
+        public boolean isMember(Principal principal) {
+            return vect.contains(principal);
+        }
+
+        public Enumeration<? extends Principal> members() {
+            vect.add(new Principal() {
+
+                public String getName() {
+                    return roleName;
+                }
+            });
+            return vect.elements();
+        }
+
+        public boolean removeMember(Principal principal) {
+            return vect.remove(principal);
+        }
+
+        public String getName() {
+            return roleName;
+        }
     }
 }

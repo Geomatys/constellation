@@ -22,54 +22,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
-
-// jersey dependencies
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-
-// JAXB xml binding dependencies
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.UnmarshalException;
-
-// Constellation dependencies
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.ows.v110.OWSWebServiceException;
@@ -79,23 +39,7 @@ import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
-import org.constellation.ows.AbstractRequest;
 import org.constellation.ows.OWSExceptionCode;
-import org.constellation.query.wms.WMSQuery;
-import org.constellation.xacml.CstlPDP;
-import org.constellation.xacml.PEP;
-import org.constellation.xacml.SecurityActions;
-import org.constellation.xacml.XACMLConstants;
-import org.constellation.xacml.api.PolicyDecisionPoint;
-import org.constellation.xacml.api.PolicyLocator;
-import org.constellation.xacml.api.RequestContext;
-import org.constellation.xacml.api.XACMLPolicy;
-import org.constellation.xacml.factory.FactoryException;
-import org.constellation.xacml.factory.PolicyFactory;
-import org.constellation.xacml.locators.JBossPolicyLocator;
-import org.constellation.xacml.policy.PolicyType;
-
-// Geotools dependencies
 import org.geotools.util.Version;
 
 
@@ -105,22 +49,8 @@ import org.geotools.util.Version;
  * @author Guilhem Legal
  * @author Cédric Briançon
  */
-public abstract class OGCWebService {
-    /**
-     * Default logger for all web services.
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs");
-
-    /**
-     * The user directory where to store the configuration file on Unix platforms.
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
-
-    /**
-     * The user directory where to store the configuration file on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
-
+public abstract class OGCWebService extends WebService {
+    
     /**
      * The supported versions supportd by this web service.
      */
@@ -137,24 +67,9 @@ public abstract class OGCWebService {
     private final ServiceVersion sldVersion = new ServiceVersion(Service.WMS, "1.1.0");
 
      /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    protected Unmarshaller unmarshaller;
-
-    /**
-     * A JAXB marshaller used to transform the java object in XML String.
-     */
-    protected Marshaller marshaller;
-
-    /**
      * The name of the service (WMS, WCS,...)
      */
     private final String service;
-
-    /**
-     * Specifies if the process is running on a Glassfish application server.
-     */
-    protected static Boolean isGlassfish = null;
 
     /**
      * A map containing the Capabilities Object already load from file.
@@ -166,38 +81,10 @@ public abstract class OGCWebService {
      */
     private String serviceURL;
 
-    /**
-     * The http context containing the request parameter
-     */
-    @Context
-    protected UriInfo context;
-
-    /**
-     * A servlet context used for access deployed file
-     */
-    @Context
-    protected ServletContext servletContext;
-
-    /**
-     * The HTTP context used for get informations on the client which send the request.
-     */
-    @Context
-    protected HttpContext httpContext;
-
-    /**
+   /**
      * The last update sequence
      */
     private long lastUpdateSequence;
-
-    /**
-     * A Policy Decision Point allowing to secure the access to the resources.
-     */
-    private PolicyDecisionPoint PDP;
-
-    /**
-     * A Policy Enforcement Point allowing to secure the access to the resources.
-     */
-    private PEP pep;
 
     /**
      * Initialize the basic attribute of a web service.
@@ -206,6 +93,7 @@ public abstract class OGCWebService {
      * @param versions A list of the supported version of this service.
      */
     public OGCWebService(String service, ServiceVersion... versions) {
+        super(service);
         this.service = service;
 
         for (final ServiceVersion element : versions) {
@@ -217,199 +105,8 @@ public abstract class OGCWebService {
             this.currentVersion = this.versions.get(0);
         unmarshaller = null;
         serviceURL   = null;
-        ImageIO.scanForPlugins();
-        initializePolicyDecisionPoint();
     }
-    
-    /**
-     * Initialize the basic attribute of a web service.
-     *
-     * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
-     * @param secure The PDP is not initialized if secure id false.
-     * @param versions A list of the supported version of this service.
-     */
-    public OGCWebService(String service, boolean secure, ServiceVersion... versions) {
-        this.service = service;
-
-        for (final ServiceVersion element : versions) {
-            this.versions.add(element);
-        }
-        if (this.versions.size() == 0)
-             throw new IllegalArgumentException("A web service must have at least one version");
-        else
-            this.currentVersion = this.versions.get(0);
-        unmarshaller = null;
-        serviceURL   = null;
-        ImageIO.scanForPlugins();
-        if (secure)
-            initializePolicyDecisionPoint();
-    }
-
-    /**
-     * Initialize the policy Decision Point and load all the correspounding policy file.
-     */
-    private void initializePolicyDecisionPoint() {
-        //we create a new PDP
-        PDP = new CstlPDP();
-
-        //load the correspounding policy file
-        final String url = "org/constellation/xacml/" + service.toLowerCase() + "Policy.xml";
-        final InputStream is = SecurityActions.getResourceAsStream(url);
-        if (is == null) {
-            LOGGER.severe("unable to find the resource: " + url);
-            return;
-        }
-        Object p = null;
-        try {
-            JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.xacml.policy");
-            Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
-            p = policyUnmarshaller.unmarshal(is);
-        } catch (JAXBException e) {
-            LOGGER.severe("JAXB exception while unmarshalling policyFile " + service.toLowerCase() + "Policy.xml");
-        }
-
-        if (p instanceof JAXBElement) {
-            p = ((JAXBElement)p).getValue();
-        }
-
-        if (p == null) {
-            LOGGER.severe("the unmarshalled service policy is null.");
-            return;
-        } else if (!(p instanceof PolicyType)) {
-            LOGGER.severe("unknow unmarshalled type for service policy file:" + p.getClass());
-            return;
-        }
-        final PolicyType servicePolicy  = (PolicyType) p;
-
-        try {
-            final XACMLPolicy policy = PolicyFactory.createPolicy(servicePolicy);
-            final Set<XACMLPolicy> policies = new HashSet<XACMLPolicy>();
-            policies.add(policy);
-            PDP.setPolicies(policies);
-
-            //Add the basic locators also
-            final PolicyLocator policyLocator = new JBossPolicyLocator();
-            policyLocator.setPolicies(policies);
-
-            //Locators need to be given the policies
-            final Set<PolicyLocator> locators = new HashSet<PolicyLocator>();
-            locators.add(policyLocator);
-            PDP.setLocators(locators);
-
-            pep = new PEP(PDP);
-
-        } catch (FactoryException e) {
-            LOGGER.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
-        }
-        LOGGER.info("PDP succesfully initialized");
-    }
-
-    /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param packagesName A list of package containing JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     */
-    protected void setXMLContext(String packagesName, String rootNamespace) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
-                    " packages: " + packagesName);
-
-        JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
-        unmarshaller = jbcontext.createUnmarshaller();
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper(rootNamespace);
-    }
-
-    /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param classesName A list of JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     */
-    protected void setXMLContext(String rootNamespace, Class<?>... classes) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: classes version");
-
-        JAXBContext jbcontext = JAXBContext.newInstance(classes);
-        unmarshaller = jbcontext.createUnmarshaller();
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper(rootNamespace);
-    }
-
-    /**
-     * Extracts the value, for a parameter specified, from a query.
-     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
-     * Otherwise returns {@code null} in the case of an optional paramater not found.
-     *
-     * @param parameterName The name of the parameter.
-     * @param mandatory true if this parameter is mandatory, false if its optional.
-      *
-     * @return the parameter, or {@code null} if not specified and not mandatory.
-     * @throw WebServiceException
-     */
-    protected String getParameter(final String parameterName, final boolean mandatory)
-                                                            throws WebServiceException
-    {
-        final MultivaluedMap parameters = context.getQueryParameters();
-        final Set<String> keySet = parameters.keySet();
-        final Iterator<String> it = keySet.iterator();
-
-        boolean notFound = true;
-        String s = null;
-
-        while (notFound && it.hasNext()) {
-            s = it.next();
-            if (parameterName.equalsIgnoreCase(s)) {
-                notFound = false;
-                break;
-            }
-        }
-        if (notFound) {
-            if (mandatory) {
-                throwException("The parameter " + parameterName + " must be specified",
-                        "MISSING_PARAMETER_VALUE", parameterName);
-                // never reached
-                throw new AssertionError();
-            }
-            return null;
-        } else {
-            final String value = (String) ((LinkedList) parameters.get(s)).get(0);
-            if ((value == null || value.equals("")) && mandatory) {
-                /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
-                 * Nevertheless we do not know what to put in for raster, that's why for these
-                 * parameters we will just return the value, even if it is empty.
-                 *
-                 * According to the WMS standard, if STYLES="" is set, then the default style
-                 * should be applied.
-                 *
-                 * todo: fix the style parameter.
-                 */
-                if (parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLE) ||
-                    parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLES)) {
-                    return value;
-                }
-                throwException("The parameter " + parameterName + " should have a value",
-                        "INVALID_PARAMETER_VALUE", parameterName);
-                // never reached
-                throw new AssertionError();
-            } else {
-                return value;
-            }
-        }
-    }
-
-    /**
-     * Extract all The parameters from the query and write it in the console.
-     * It is a debug method.
-     *
-     */
-    protected void writeParameters() throws WebServiceException {
-        final MultivaluedMap parameters = context.getQueryParameters();
-        if (!parameters.isEmpty())
-            LOGGER.info(parameters.toString());
-    }
-
+   
     /**
      * Verify the base parameter or each request.
      *
@@ -471,46 +168,6 @@ public abstract class OGCWebService {
     }
 
     /**
-     * Extract The complex parameter encoded in XML from the query.
-     * If the parameter is mandatory and if it is null it throw an exception.
-     * else it return null.
-     *
-     * @param parameterName The name of the parameter.
-     * @param mandatory true if this parameter is mandatory, false if its optional.
-     *
-     * @return the parameter or null if not specified
-     * @throw WebServiceException
-     */
-    protected Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException {
-
-        try {
-            MultivaluedMap parameters = context.getQueryParameters();
-            LinkedList<String> list = (LinkedList) parameters.get(parameterName);
-            if (list == null) {
-                list = (LinkedList) parameters.get(parameterName.toLowerCase());
-                if (list == null) {
-                    if (!mandatory) {
-                        return null;
-                    } else {
-                        throwException("The parameter " + parameterName + " must be specified",
-                                       "MISSING_PARAMETER_VALUE", parameterName);
-                        //never reach
-                        return null;
-                    }
-                }
-            }
-            StringReader sr = new StringReader(list.get(0));
-            Object result = unmarshaller.unmarshal(sr);
-            return result;
-        } catch (JAXBException ex) {
-             throwException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                            ex, "INVALID_PARAMETER_VALUE", null);
-             //never reach
-             return null;
-        }
-    }
-
-    /**
      * Return the current version of the Web Service.
      *
      * @deprecated
@@ -533,149 +190,6 @@ public abstract class OGCWebService {
      */
     protected ServiceVersion getSldVersion() {
         return this.sldVersion;
-    }
-
-    /**
-     * Treat the incomming GET request.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @GET
-    public Response doGET() throws JAXBException  {
-        return allowRequest(null);
-    }
-
-    /**
-     * Treat the incomming POST request encoded in kvp.
-     * for each parameters in the request it fill the httpContext.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("application/x-www-form-urlencoded")
-    public Response doPOSTKvp(String request) throws JAXBException  {
-        final StringTokenizer tokens = new StringTokenizer(request, "&");
-        String log = "";
-        while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            String paramName  = token.substring(0, token.indexOf('='));
-            String paramValue = token.substring(token.indexOf('=')+ 1);
-            log += "put: " + paramName + "=" + paramValue + '\n';
-            context.getQueryParameters().add(paramName, paramValue);
-        }
-        LOGGER.info("request POST kvp: " + request + '\n' + log);
-        return allowRequest(null);
-    }
-
-    /**
-     * Treat the incomming POST request encoded in xml.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("*/xml")
-    public Response doPOSTXml(InputStream is) throws JAXBException  {
-        LOGGER.info("request POST xml: ");
-        if (unmarshaller != null) {
-            Object request = null;
-            try {
-                request = unmarshaller.unmarshal(is);
-            } catch (UnmarshalException e) {
-                LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-                StringWriter sw = launchException("The XML request is not valid", "INVALID_REQUEST");
-
-                return Response.ok(sw.toString(), "text/xml").build();
-            }
-
-            if (request != null && request instanceof AbstractRequest) {
-                AbstractRequest ar = (AbstractRequest) request;
-                context.getQueryParameters().add("VERSION", ar.getVersion());
-            }
-            return allowRequest(request);
-        } else {
-            return Response.ok("This service is not running", "text/plain").build();
-        }
-    }
-
-    /**
-     * Treat the incomming POST request encoded in text plain.
-     *
-     * @return an xml exception report.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("text/plain")
-    public Response doPOSTPlain(InputStream is) throws JAXBException  {
-        LOGGER.severe("request POST plain sending Exception");
-        StringWriter sw = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                          "INVALID_REQUEST");
-        return Response.ok(sw.toString(), "text/xml").build();
-    }
-
-    /**
-     * Decide if the user who send the request has access to this resource.
-     */
-    private Response allowRequest(Object objectRequest) throws JAXBException {
-        if (pep == null || PDP == null) {
-            return treatIncomingRequest(objectRequest);
-        }
-
-        try {
-            //we look for an authentified user
-            Group userGrp = getAuthentifiedUser();
-            Principal user = userGrp.members().nextElement();
-
-            if (objectRequest instanceof JAXBElement) {
-                objectRequest = ((JAXBElement) objectRequest).getValue();
-            }
-
-            // if the request is not an xml request we fill the request parameter.
-            String request = "";
-            if (objectRequest == null) {
-                request = (String) getParameter("REQUEST", true);
-            }
-
-            //we define the action
-            String action = request;
-            if (action.equals("") && objectRequest != null) {
-                action = objectRequest.getClass().getSimpleName();
-                action = action.replace("Type", "");
-            }
-            action = action.toLowerCase();
-
-            //we define the selected URI
-            String requestedURI = context.getBaseUri().toString() + service.toLowerCase();
-
-
-            LOGGER.finer("Request base URI=" + requestedURI + " user =" + userGrp.getName() + " action = " + action);
-            RequestContext decisionRequest = pep.createXACMLRequest(requestedURI, user, userGrp, action);
-            int decision = pep.getDecision(decisionRequest);
-
-            if (decision == XACMLConstants.DECISION_PERMIT) {
-                LOGGER.finer("request allowed");
-                return treatIncomingRequest(objectRequest);
-            } else if (decision == XACMLConstants.DECISION_DENY) {
-                StringWriter sw = launchException("You are not authorized to execute this request. " +
-                                                  "Please identify yourself first.", "NO_APPLICABLE_CODE");
-                return Response.ok(sw.toString(), "text/xml").build();
-            } else {
-                LOGGER.severe("Unable to take a decision for the request, we let pass");
-                return treatIncomingRequest(objectRequest);
-            }
-        } catch (WebServiceException ex) {
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(ex.getExceptionReport(), sw);
-            return Response.ok(sw.toString(), "text/xml").build();
-        }  catch (IOException ex) {
-            StringWriter sw = launchException("The service has throw an IO exception",  "NO_APPLICABLE_CODE");
-            return Response.ok(sw.toString(), "text/xml").build();
-        } catch (URISyntaxException ex) {
-            StringWriter sw = launchException("The service has throw an URI syntax exception",  "NO_APPLICABLE_CODE");
-            return Response.ok(sw.toString(), "text/xml").build();
-        }
     }
 
     /**
@@ -717,34 +231,7 @@ public abstract class OGCWebService {
         return sw;
     }
 
-    /**
-     * Temporary test method until we put in place an authentification process.
-     */
-    private Group getAuthentifiedUser() {
-        //for now we consider an user and is group as the same.
-        Principal anonymous    = new PrincipalImpl("anonymous");
-        Group     anonymousGrp = new GroupImpl("anonymous");
-        anonymousGrp.addMember(anonymous);
-
-        if (httpContext != null && httpContext.getRequest() != null) {
-            HttpRequestContext httpRequest = httpContext.getRequest();
-            Cookie authent = httpRequest.getCookies().get("authent");
-
-            Group identifiedGrp = null;
-            if (authent != null) {
-                if (authent.getValue().equals("admin:admin")) {
-                    Principal user = new PrincipalImpl("admin");
-                    identifiedGrp  = new GroupImpl("admin");
-                    identifiedGrp.addMember(user);
-                }
-            }
-            if (identifiedGrp == null) {
-                identifiedGrp = anonymousGrp;
-            }
-            return identifiedGrp;
-        }
-        return anonymousGrp;
-    }
+   
 
     /**
      * Returns the file where to read the capabilities document for each service.
@@ -811,108 +298,6 @@ public abstract class OGCWebService {
     }
 
     /**
-     * Return a file located in WEB-INF deployed directory.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    public File getFile(String fileName) {
-         File path;
-
-         //we try to get the deployed "WEB-INF" directory
-         String home = servletContext.getRealPath("WEB-INF");
-
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = getSicadeDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
-    }
-
-    /**
-     * Returns the context value for the key specified, or {@code null} if not found
-     * in this context.
-     *
-     * @param key The key to search in the context.
-     * @param context The context which to consider.
-     */
-    private static Object getContextProperty(final String key, final javax.naming.Context context) {
-        Object value = null;
-        try {
-            value = context.lookup(key);
-        } catch (NamingException n) {
-            // Do nothing, the key is not found in the context and the value is still null.
-        } finally {
-            return value;
-        }
-    }
-
-    /**
-     * Get the value for a property defines in the JNDI context chosen.
-     *
-     * @param propGroup If you use Glassfish, you have to specify the name of the resource that
-     *                  owns the property you wish to get. Otherwise you should specify {@code null}
-     * @param propName  The name of the property to get.
-     * @return The property value defines in the context, or {@code null} if no property of this name
-     *         is defined in the resource given in parameter.
-     * @throws NamingException if an error occurs while initializing the context, or if an empty value
-     *                         for propGroup has been passed while using a Glassfish application server.
-     */
-    public static String getPropertyValue(final String propGroup, final String propName) throws NamingException {
-        final InitialContext ctx = new InitialContext();
-        if (isGlassfish == null) {
-            isGlassfish = (System.getProperty("domain.name") != null) ? true : false;
-        }
-        if (isGlassfish) {
-            if (propGroup == null) {
-                throw new NamingException("The coverage property group is not specified.");
-            }
-            final Reference props = (Reference) getContextProperty(propGroup, ctx);
-            if (props == null) {
-                throw new NamingException("The coverage property group specified does not exist.");
-            }
-            final RefAddr permissionAddr = (RefAddr) props.get(propName);
-            if (permissionAddr != null) {
-                return (String) permissionAddr.getContent();
-            }
-            return null;
-        } else {
-            final javax.naming.Context envContext = (javax.naming.Context) ctx.lookup("java:/comp/env");
-            return (String) getContextProperty(propName, envContext);
-        }
-    }
-
-    /**
-     * Return the ".sicade" directory.
-     *
-     * @return The ".sicade" directory containing .
-     */
-    public File getSicadeDirectory() {
-        File sicadeDirectory;
-        String home = System.getProperty("user.home");
-
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
-        } else {
-             sicadeDirectory = new File(home, UNIX_DIRECTORY);
-        }
-        return sicadeDirectory;
-    }
-
-    /**
-     * Return the service url obtain by the first request made.
-     *
-     * @return the service url.
-     */
-    protected String getServiceURL() {
-        if (serviceURL == null) {
-            serviceURL = context.getBaseUri().toString();
-        }
-        return serviceURL;
-    }
-
-    /**
      * A utility method whitch replace the special character.
      *
      * @param s the string to clean.
@@ -926,17 +311,6 @@ public abstract class OGCWebService {
             s = s.replace('É', 'E');
         }
         return s;
-    }
-
-    /**
-     * Set the prefixMapper for the marshaller.
-     * The root namespace specified will have no prefix.
-     *
-     * @param rootNamespace The main namespace of all the produced XML document (xmlns = rootNamespace)
-     */
-    protected void setPrefixMapper(String rootNamespace) throws PropertyException {
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
 
     /**
@@ -1041,61 +415,5 @@ public abstract class OGCWebService {
      */
     public void setLastUpdateSequence(long lastUpdateSequence) {
         this.lastUpdateSequence = lastUpdateSequence;
-    }
-
-    /**
-     * An temporary implementations of java.security.principal
-     */
-    public class PrincipalImpl implements Principal {
-
-        private String name;
-
-        public PrincipalImpl(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-    }
-
-     /**
-     * An temporary implementations of java.security.acl.group
-     */
-    public class GroupImpl implements Group {
-
-        private Vector<Principal> vect = new Vector<Principal>();
-        private String roleName;
-
-        public GroupImpl(String roleName) {
-            this.roleName = roleName;
-        }
-
-        public boolean addMember(final Principal principal) {
-            return vect.add(principal);
-        }
-
-        public boolean isMember(Principal principal) {
-            return vect.contains(principal);
-        }
-
-        public Enumeration<? extends Principal> members() {
-            vect.add(new Principal() {
-
-                public String getName() {
-                    return roleName;
-                }
-            });
-            return vect.elements();
-        }
-
-        public boolean removeMember(Principal principal) {
-            return vect.remove(principal);
-        }
-
-        public String getName() {
-            return roleName;
-        }
     }
 }

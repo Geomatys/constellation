@@ -75,7 +75,7 @@ public class ConfigurationService extends OGCWebService  {
     
             
     public ConfigurationService() {
-        super("Configuration", false, version);
+        super("Configuration", version);
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration", "");
         } catch (JAXBException ex) {
