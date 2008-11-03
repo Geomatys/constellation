@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>xacml-security</artifactId>
   <packaging>jar</packaging>
-  <name>Constellation XACML security</name>
+  <name>XACML security library</name>
   <description>
     A JBoss implementation of XACML reviewed and designed for constellation.
   </description>

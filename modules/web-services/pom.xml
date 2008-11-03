@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>web-services</artifactId>
   <packaging>pom</packaging>
-  <name>Modules for Web Service</name>
+  <name>Modules for web services</name>
   <description>
     A group of standardized Web Services.
   </description>

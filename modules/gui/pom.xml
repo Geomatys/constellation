@@ -21,9 +21,9 @@
   <groupId>org.constellation</groupId>
   <artifactId>gui</artifactId>
   <packaging>pom</packaging>
-  <name>Module for Constellation Graphic User Interface</name>
+  <name>Modules for the web sites</name>
   <description>
-    Module holding the Constellation WAR and JSF interface.
+    Modules for the JSF based web interfaces.
   </description>
 
 

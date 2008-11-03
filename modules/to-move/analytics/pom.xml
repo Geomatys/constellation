@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>analytics</artifactId>
   <packaging>pom</packaging>
-  <name>Analytics</name>
+  <name>Modules for analytics</name>
   <description>
     todo fill this description.
   </description>

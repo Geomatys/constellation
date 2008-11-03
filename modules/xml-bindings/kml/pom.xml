@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>kml</artifactId>
   <packaging>jar</packaging>
-  <name>Keyhole Markup Language</name>
+  <name>Keyhole Markup Language binding</name>
   <description>
     An implementation of some version of the Keyhole Markup Language.
   </description>

@@ -21,7 +21,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>security</artifactId>
   <packaging>pom</packaging>
-  <name>Constellation Security management</name>
+  <name>Modules for security management libraries</name>
   <description>
     Object and methods to restrict and allow the access to constellation resources.
   </description>

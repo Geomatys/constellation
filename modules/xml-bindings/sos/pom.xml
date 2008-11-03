@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>sos</artifactId>
   <packaging>jar</packaging>
-  <name>Sensor Observation Service</name>
+  <name>Sensor Observation Service binding</name>
   <description>
     A Sensor Observation Service to collect, store and distribute sensor observations.
   </description>

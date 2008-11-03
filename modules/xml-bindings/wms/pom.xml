@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>wms</artifactId>
   <packaging>jar</packaging>
-  <name>Web Map Service</name>
+  <name>Web Map Service binding</name>
   <description>
     An implementation of the Web Map Service.
   </description>

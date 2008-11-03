@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>ogc</artifactId>
   <packaging>jar</packaging>
-  <name>OGC Filter</name>
+  <name>OGC Filter binding</name>
   <description>
     An implementation of some version of the ogc Filter.
   </description>

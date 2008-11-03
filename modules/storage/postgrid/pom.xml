@@ -21,7 +21,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>postgrid</artifactId>
   <packaging>jar</packaging>
-  <name>PostGrid database</name>
+  <name>PostGrid database storage</name>
   <description>
     PostgreSQL database schema and Java toolkit for 4-dimensional rasters.
   </description>

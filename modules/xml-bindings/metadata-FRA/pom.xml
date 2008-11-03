@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>metadata-FRA</artifactId>
   <packaging>jar</packaging>
-  <name>ISO 19115 French profile</name>
+  <name>ISO 19115 French profile binding</name>
   <description>
     An implementation of The french profile of ISO 19115.
   </description>

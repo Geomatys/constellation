@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>configuration</artifactId>
   <packaging>jar</packaging>
-  <name>Constellation configuration backend</name>
+  <name>Configuration bindings</name>
   <description>
     Some classes used for constellation administration and configuration by POST XML request.
   </description>

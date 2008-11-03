@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>se</artifactId>
   <packaging>jar</packaging>
-  <name>Symbolizer Encoding</name>
+  <name>Symbolizer Encoding binding</name>
   <description>
     An implementation of some version of the Symbolizer Encoding.
   </description>

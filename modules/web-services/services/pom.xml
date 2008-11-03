@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>services</artifactId>
   <packaging>jar</packaging>
-  <name>Web Services for Constellation</name>
+  <name>Web services</name>
   <description>
     An constellation of standardized OGC Web Services.
   </description>

@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>xacml</artifactId>
   <packaging>jar</packaging>
-  <name>GeoXACML Schema</name>
+  <name>XACML/GeoXACML binding</name>
   <description>
     An implementation of the GeoXACML 2.0 specification.
   </description>

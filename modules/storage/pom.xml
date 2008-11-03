@@ -21,7 +21,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>storage</artifactId>
   <packaging>pom</packaging>
-  <name>Storage management for Constellation</name>
+  <name>Modules for storage</name>
   <description>
     Object and methods to store postgrid or OnM datas in a database.
   </description>

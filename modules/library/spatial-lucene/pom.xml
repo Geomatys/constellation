@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>spatial-lucene</artifactId>
   <packaging>jar</packaging>
-  <name>Spatial Lucene index</name>
+  <name>Spatial Lucene indexing library</name>
   <description>
     A lucene Index module adding spatial filter.
   </description>

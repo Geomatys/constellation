@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>gml</artifactId>
   <packaging>jar</packaging>
-  <name>Geometry Markup Language</name>
+  <name>Geometry Markup Language binding</name>
   <description>
     An implementation of many version of the OGC standard GML.
   </description>

@@ -19,8 +19,8 @@
   <groupId>org.constellation</groupId>
   <artifactId>constellation</artifactId>
   <packaging>war</packaging>
-  <name>Constellation WAR and GUI</name>
-  <description>the WAR and GUI for Constellation.</description>
+  <name>Web sites GUI (and Constellation WAR)</name>
+  <description>The WAR and GUI for Constellation.</description>
   
    
  

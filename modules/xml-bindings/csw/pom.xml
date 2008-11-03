@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>csw</artifactId>
   <packaging>jar</packaging>
-  <name>Catalogue Web Service</name>
+  <name>Catalogue Web Service binding</name>
   <description>
     A Catalogue Web Service managing metadatas from geographic information.
   </description>

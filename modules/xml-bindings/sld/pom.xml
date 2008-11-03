@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>sld</artifactId>
   <packaging>jar</packaging>
-  <name>Styled Layer Descriptor</name>
+  <name>Styled Layer Descriptor binding</name>
   <description>
     An implementation of some version of the Styled Layer Descriptor.
   </description>

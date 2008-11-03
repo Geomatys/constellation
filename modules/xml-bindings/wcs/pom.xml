@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>wcs</artifactId>
   <packaging>jar</packaging>
-  <name>Web Coverage Service</name>
+  <name>Web Coverage Service binding</name>
   <description>
     An implementation of the Web Coverage Service.
   </description>

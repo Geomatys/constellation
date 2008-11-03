@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>ows</artifactId>
   <packaging>jar</packaging>
-  <name>OGC Web Service</name>
+  <name>OGC Web Service binding</name>
   <description>
     An implementation of some version of the OGC Web Service.
   </description>

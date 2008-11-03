@@ -20,7 +20,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>ebrim</artifactId>
   <packaging>jar</packaging>
-  <name>OASIS ebrim registry</name>
+  <name>OASIS ebrim registry binding</name>
   <description>
     The model for storing registry object ebrim.
   </description>

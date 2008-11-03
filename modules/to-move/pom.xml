@@ -16,7 +16,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>to-move</artifactId>
   <packaging>pom</packaging>
-  <name>Modules to move to GeoTidy/GT-working</name>
+  <name>Modules to move to Geotidy or Gt-working</name>
   <description>
     Storage for old modules.
   </description>
