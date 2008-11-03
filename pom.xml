@@ -25,7 +25,7 @@
     Continuum de fonctionner.
   -->
   <groupId>org.constellation</groupId>
-  <artifactId>constellation</artifactId>
+  <artifactId>constellation-sdi</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>Constellation</name>
@@ -628,13 +628,6 @@
     All Constellation modules.
   -->
   <modules>
-    <module>analytics</module>
-    <module>storage</module>
-    <module>web-services</module>
-    <module>gui</module>
-    <module>spatialLucene</module>
-    <module>security</module>
-    <!--module>widgets</module-->
-    <!--module>openoffice</module -->
+    <module>modules</module>
   </modules>
 </project>
