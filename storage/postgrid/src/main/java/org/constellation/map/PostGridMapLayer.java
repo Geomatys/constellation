@@ -32,9 +32,6 @@ import java.util.logging.Logger;
 
 import javax.media.jai.Interpolation;
 import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
-import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 
 import org.geotools.coverage.GridSampleDimension;
@@ -296,8 +293,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapBuilder mapBuilder = new MapBuilder();
-            final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
+            final MapBuilder mapBuilder = MapBuilder.getInstance();
+            final MapLayer coverageLayer = mapBuilder.createCoverageLayer(coverage, getStyle(), "name");
             RenderingContext2D context2D = (RenderingContext2D) context;
             //special graphic builder
             final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
@@ -464,8 +461,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapBuilder mapBuilder = new MapBuilder();
-            final MapLayer coverageLayer = mapBuilder.create(coverage, getStyle(), "name");
+            final MapBuilder mapBuilder = MapBuilder.getInstance();
+            final MapLayer coverageLayer = mapBuilder.createCoverageLayer(coverage, getStyle(), "name");
             //special graphic builder
             final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

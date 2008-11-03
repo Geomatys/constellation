@@ -46,7 +46,6 @@ import org.geotools.display.renderer.Go2rendererHints;
 import org.geotools.display.renderer.J2DRenderer;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -69,7 +68,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Johann Sorel (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
-    
+        
     /**
      * static instance, thread singleton.
      */
@@ -93,7 +92,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private CSTLPortrayalService(){
         canvas = new  BufferedImageCanvas2D(new Dimension(1,1),null);
         renderer = new J2DRenderer(canvas);
-        context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        context = MAP_BUILDER.createContext(DefaultGeographicCRS.WGS84);
         
         canvas.setRenderer(renderer);
         canvas.getController().setAutoRepaint(false);

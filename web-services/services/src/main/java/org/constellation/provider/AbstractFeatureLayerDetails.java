@@ -53,6 +53,7 @@ import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.MapBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
@@ -86,6 +87,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
+    protected static final MapBuilder MAP_BUILDER = MapBuilder.getInstance();
 
     protected final FeatureSource<SimpleFeatureType,SimpleFeature> fs;
     protected final List<String> favorites;

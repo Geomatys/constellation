@@ -21,7 +21,6 @@ import org.constellation.coverage.catalog.LayerTable;
 import org.geotools.coverage.io.CoverageReader;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.CoverageMapLayer;
-import org.geotools.map.DefaultMapContext;
 import org.geotools.map.ElevationModel;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -54,7 +53,7 @@ import org.opengis.style.Symbolizer;
  */
 public class PostGRIDContextBuilder {
 
-    public static final MapBuilder LAYER_BUILDER = new MapBuilder();
+    public static final MapBuilder MAP_BUILDER = MapBuilder.getInstance();
     public static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
     public static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
 
@@ -64,7 +63,7 @@ public class PostGRIDContextBuilder {
         MapLayer layer = null;
 
         try {
-            context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+            context = MAP_BUILDER.createContext(DefaultGeographicCRS.WGS84);
             layer = createPostGridLayer2();
             addElevationModel(layer);
             context.layers().add(layer);
@@ -276,10 +275,10 @@ public class PostGRIDContextBuilder {
     }
 
     private static void addElevationModel(MapLayer layer) {
-        final CoverageMapLayer gridLayer = (CoverageMapLayer) org.geotools.gui.swing.debug.ContextBuilder.buildMNTContext().layers().get(0);
-        final CoverageReader reader = gridLayer.getCoverageReader();
-        ElevationModel elevation = LAYER_BUILDER.createElevationModel(reader,null);
-        layer.setElevationModel(elevation);
+//        final CoverageMapLayer gridLayer = (CoverageMapLayer) org.geotools.gui.swing.debug.ContextBuilder.buildMNTContext().layers().get(0);
+//        final CoverageReader reader = gridLayer.getCoverageReader();
+//        ElevationModel elevation = MAP_BUILDER.createElevationModel(reader,null);
+//        layer.setElevationModel(elevation);
     }
     
 }

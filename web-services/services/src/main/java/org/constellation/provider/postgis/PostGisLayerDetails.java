@@ -79,16 +79,16 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
         if(style instanceof MutableStyle){
             //style is a commun SLD style
-            layer = new MapBuilder().create(fs, (MutableStyle)style);
+            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
         }else if( style instanceof GraphicBuilder){
             //special graphic builder
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = new MapBuilder().create(fs, (MutableStyle)style);
+            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
             layer.graphicBuilders().add((GraphicBuilder) style);
         }else{
             //style is unknowed type, use a random style
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = new MapBuilder().create(fs, (MutableStyle)style);
+            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
         }
 
         if (params != null) {
