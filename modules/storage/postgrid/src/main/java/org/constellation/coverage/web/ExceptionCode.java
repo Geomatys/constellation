@@ -44,81 +44,97 @@ public class ExceptionCode extends CodeList<ExceptionCode> {
 
     /**
      * Invalid format.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode INVALID_FORMAT = new ExceptionCode("INVALID_FORMAT");
     
     /**
      * Invalid request.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode INVALID_REQUEST = new ExceptionCode("INVALID_REQUEST");
 
     /**
      * Current update sequence.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode CURRENT_UPDATE_SEQUENCE = new ExceptionCode("CURRENT_UPDATE_SEQUENCE");
 
     /**
      * Invalid update sequence.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode INVALID_UPDATE_SEQUENCE = new ExceptionCode("INVALID_UPDATE_SEQUENCE");
 
     /**
      * Missing parameter value.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode MISSING_PARAMETER_VALUE = new ExceptionCode("MISSING_PARAMETER_VALUE");
 
     /**
      * Invalid parameter value.
+     * Used by WMS and WCS.
      */
     public static final ExceptionCode INVALID_PARAMETER_VALUE = new ExceptionCode("INVALID_PARAMETER_VALUE");
 
     /**
      * Operation not supported.
+     * Used by WMS.
      */
     public static final ExceptionCode OPERATION_NOT_SUPPORTED = new ExceptionCode("OPERATION_NOT_SUPPORTED");
 
     /**
      * Version negotiation failed.
+     * Used by WMS.
      */
     public static final ExceptionCode VERSION_NEGOTIATION_FAILED = new ExceptionCode("VERSION_NEGOTIATION_FAILED");
 
     /**
      * No applicable code.
+     * Used by WMS.
      */
     public static final ExceptionCode NO_APPLICABLE_CODE = new ExceptionCode("NO_APPLICABLE_CODE");
 
     /**
      * Invalid CRS.
+     * Used by WMS.
      */
     public static final ExceptionCode INVALID_CRS = new ExceptionCode("INVALID_CRS");
 
     /**
      * Layer not defined.
+     * Used by WMS.
      */
     public static final ExceptionCode LAYER_NOT_DEFINED = new ExceptionCode("LAYER_NOT_DEFINED");
 
     /**
      * Style not defined.
+     * Used by WMS.
      */
     public static final ExceptionCode STYLE_NOT_DEFINED = new ExceptionCode("STYLE_NOT_DEFINED");
 
     /**
      * Layer not queryable.
+     * Used by WMS.
      */
     public static final ExceptionCode LAYER_NOT_QUERYABLE = new ExceptionCode("LAYER_NOT_QUERYABLE");
 
     /**
      * Invalid point.
+     * Used by WMS.
      */
     public static final ExceptionCode INVALID_POINT = new ExceptionCode("INVALID_POINT");
 
     /**
      * Missing dimension value.
+     * Used by WMS.
      */
     public static final ExceptionCode MISSING_DIMENSION_VALUE = new ExceptionCode("MISSING_DIMENSION_VALUE");
 
     /**
      * Invalid dimension value.
+     * Used by WMS.
      */
     public static final ExceptionCode INVALID_DIMENSION_VALUE = new ExceptionCode("INVALID_DIMENSION_VALUE");
 
