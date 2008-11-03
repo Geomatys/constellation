@@ -61,7 +61,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>xacmlSecurity</module>
+    <module>xacml-security</module>
   </modules>
 
 </project>

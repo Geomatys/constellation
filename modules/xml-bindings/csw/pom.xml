@@ -95,7 +95,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation</groupId>
-      <artifactId>spatialLucene</artifactId>
+      <artifactId>spatial-lucene</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

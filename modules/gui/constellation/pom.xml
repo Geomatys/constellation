@@ -17,10 +17,10 @@
     Module description.
   -->
   <groupId>org.constellation</groupId>
-  <artifactId>postgrid-web</artifactId>
+  <artifactId>constellation</artifactId>
   <packaging>war</packaging>
-  <name>Postgrid web service</name>
-  <description>A Web Map Service producing maps of spatially referenced data dynamically from geographic information.</description>
+  <name>Constellation WAR and GUI</name>
+  <description>the WAR and GUI for Constellation.</description>
   
    
  

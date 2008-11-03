@@ -59,7 +59,8 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>csw</module>
+	<module>configuration</module>    
+	<module>csw</module>
     <module>gml</module>
     <module>kml</module>
     <module>ogc</module>
@@ -72,7 +73,6 @@
     <module>sos</module>
     <module>ebrim</module>
     <module>metadata-FRA</module>
-    <module>configuration</module>
   </modules>
 
 </project>

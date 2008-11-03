@@ -94,7 +94,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>postgrid-web</module>
+    <module>constellation</module>
   </modules>
 
 </project>
