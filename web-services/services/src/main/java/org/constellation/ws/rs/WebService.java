@@ -94,6 +94,8 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
 import org.constellation.xacml.policy.PolicyType;
+
+// Geotools dependencies
 import org.geotools.util.Version;
 
 
