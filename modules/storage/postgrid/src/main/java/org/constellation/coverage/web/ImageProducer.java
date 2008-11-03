@@ -102,7 +102,8 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
-import static org.constellation.coverage.wms.WMSExceptionCode.*;
+
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 
 /**
@@ -120,6 +121,7 @@ import static org.constellation.coverage.wms.WMSExceptionCode.*;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  * @author Sam Hiatt
+ * @author Cédric Briançon
  *
  * @todo Some table-related fields in this class, together with some caches, should move in a
  *       more global class and be shared for every instances connected to the same database.

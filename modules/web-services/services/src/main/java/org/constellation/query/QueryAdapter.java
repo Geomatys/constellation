@@ -31,14 +31,12 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.measure.unit.NonSI;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.TimeParser;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.geometry.GeneralEnvelope;
@@ -61,6 +59,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
+
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 
 /**
@@ -279,7 +279,7 @@ public class QueryAdapter {
                 try{
                     values[index] = toDouble(tokens.nextToken());
                 } catch (NumberFormatException n) {
-                    throw new WMSWebServiceException(n, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+                    throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, wmsVersion);
                 }
                 if (index >= 4) {
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
@@ -303,7 +303,7 @@ public class QueryAdapter {
             try{
                 elevation = QueryAdapter.toDouble(strElevation);
             } catch (NumberFormatException n) {
-                throw new WMSWebServiceException(n, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+                throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, wmsVersion);
             }
             dimZ[0] = dimZ[1] = elevation;
 
@@ -320,7 +320,7 @@ public class QueryAdapter {
             try {
                 date = QueryAdapter.toDate(strTime);
             } catch (ParseException ex) {
-                throw new WMSWebServiceException(ex, WMSExceptionCode.INVALID_PARAMETER_VALUE, wmsVersion);
+                throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, wmsVersion);
             }
 
             final TemporalCRS tCRS = CRS.getTemporalCRS(crs);

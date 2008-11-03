@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.coverage.wms;
+package org.constellation.coverage.web;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +26,11 @@ import org.opengis.util.CodeList;
  *
  * @author Guilhem Legal
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  *
  * @todo Rename as {@code ExceptionCode} and move to {@link org.opengis.webservice}.
  */
-public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
+public class ExceptionCode extends CodeList<ExceptionCode> {
     /**
      * For cross-version compatibility.
      */
@@ -39,87 +40,87 @@ public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
      * List of all enumerations of this type.
      * Must be declared before any enum declaration.
      */
-    private static final List<WMSExceptionCode> VALUES = new ArrayList<WMSExceptionCode>(16);
+    private static final List<ExceptionCode> VALUES = new ArrayList<ExceptionCode>(16);
 
     /**
      * Invalid format.
      */
-    public static final WMSExceptionCode INVALID_FORMAT = new WMSExceptionCode("INVALID_FORMAT");
+    public static final ExceptionCode INVALID_FORMAT = new ExceptionCode("INVALID_FORMAT");
     
     /**
      * Invalid request.
      */
-    public static final WMSExceptionCode INVALID_REQUEST = new WMSExceptionCode("INVALID_REQUEST");
+    public static final ExceptionCode INVALID_REQUEST = new ExceptionCode("INVALID_REQUEST");
 
     /**
      * Current update sequence.
      */
-    public static final WMSExceptionCode CURRENT_UPDATE_SEQUENCE = new WMSExceptionCode("CURRENT_UPDATE_SEQUENCE");
+    public static final ExceptionCode CURRENT_UPDATE_SEQUENCE = new ExceptionCode("CURRENT_UPDATE_SEQUENCE");
 
     /**
      * Invalid update sequence.
      */
-    public static final WMSExceptionCode INVALID_UPDATE_SEQUENCE = new WMSExceptionCode("INVALID_UPDATE_SEQUENCE");
+    public static final ExceptionCode INVALID_UPDATE_SEQUENCE = new ExceptionCode("INVALID_UPDATE_SEQUENCE");
 
     /**
      * Missing parameter value.
      */
-    public static final WMSExceptionCode MISSING_PARAMETER_VALUE = new WMSExceptionCode("MISSING_PARAMETER_VALUE");
+    public static final ExceptionCode MISSING_PARAMETER_VALUE = new ExceptionCode("MISSING_PARAMETER_VALUE");
 
     /**
      * Invalid parameter value.
      */
-    public static final WMSExceptionCode INVALID_PARAMETER_VALUE = new WMSExceptionCode("INVALID_PARAMETER_VALUE");
+    public static final ExceptionCode INVALID_PARAMETER_VALUE = new ExceptionCode("INVALID_PARAMETER_VALUE");
 
     /**
      * Operation not supported.
      */
-    public static final WMSExceptionCode OPERATION_NOT_SUPPORTED = new WMSExceptionCode("OPERATION_NOT_SUPPORTED");
+    public static final ExceptionCode OPERATION_NOT_SUPPORTED = new ExceptionCode("OPERATION_NOT_SUPPORTED");
 
     /**
      * Version negotiation failed.
      */
-    public static final WMSExceptionCode VERSION_NEGOTIATION_FAILED = new WMSExceptionCode("VERSION_NEGOTIATION_FAILED");
+    public static final ExceptionCode VERSION_NEGOTIATION_FAILED = new ExceptionCode("VERSION_NEGOTIATION_FAILED");
 
     /**
      * No applicable code.
      */
-    public static final WMSExceptionCode NO_APPLICABLE_CODE = new WMSExceptionCode("NO_APPLICABLE_CODE");
+    public static final ExceptionCode NO_APPLICABLE_CODE = new ExceptionCode("NO_APPLICABLE_CODE");
 
     /**
      * Invalid CRS.
      */
-    public static final WMSExceptionCode INVALID_CRS = new WMSExceptionCode("INVALID_CRS");
+    public static final ExceptionCode INVALID_CRS = new ExceptionCode("INVALID_CRS");
 
     /**
      * Layer not defined.
      */
-    public static final WMSExceptionCode LAYER_NOT_DEFINED = new WMSExceptionCode("LAYER_NOT_DEFINED");
+    public static final ExceptionCode LAYER_NOT_DEFINED = new ExceptionCode("LAYER_NOT_DEFINED");
 
     /**
      * Style not defined.
      */
-    public static final WMSExceptionCode STYLE_NOT_DEFINED = new WMSExceptionCode("STYLE_NOT_DEFINED");
+    public static final ExceptionCode STYLE_NOT_DEFINED = new ExceptionCode("STYLE_NOT_DEFINED");
 
     /**
      * Layer not queryable.
      */
-    public static final WMSExceptionCode LAYER_NOT_QUERYABLE = new WMSExceptionCode("LAYER_NOT_QUERYABLE");
+    public static final ExceptionCode LAYER_NOT_QUERYABLE = new ExceptionCode("LAYER_NOT_QUERYABLE");
 
     /**
      * Invalid point.
      */
-    public static final WMSExceptionCode INVALID_POINT = new WMSExceptionCode("INVALID_POINT");
+    public static final ExceptionCode INVALID_POINT = new ExceptionCode("INVALID_POINT");
 
     /**
      * Missing dimension value.
      */
-    public static final WMSExceptionCode MISSING_DIMENSION_VALUE = new WMSExceptionCode("MISSING_DIMENSION_VALUE");
+    public static final ExceptionCode MISSING_DIMENSION_VALUE = new ExceptionCode("MISSING_DIMENSION_VALUE");
 
     /**
      * Invalid dimension value.
      */
-    public static final WMSExceptionCode INVALID_DIMENSION_VALUE = new WMSExceptionCode("INVALID_DIMENSION_VALUE");
+    public static final ExceptionCode INVALID_DIMENSION_VALUE = new ExceptionCode("INVALID_DIMENSION_VALUE");
 
     /**
      * Constructs an enum with the given name. The new enum is
@@ -127,7 +128,7 @@ public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
      *
      * @param name The enum name. This name must not be in use by an other enum of this type.
      */
-    private WMSExceptionCode(final String name) {
+    private ExceptionCode(final String name) {
         super(name, VALUES);
     }
 
@@ -136,16 +137,16 @@ public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
      *
      * @return The list of codes declared in the current JVM.
      */
-    public static WMSExceptionCode[] values() {
+    public static ExceptionCode[] values() {
         synchronized (VALUES) {
-            return VALUES.toArray(new WMSExceptionCode[VALUES.size()]);
+            return VALUES.toArray(new ExceptionCode[VALUES.size()]);
         }
     }
 
     /**
      * Returns the list of exception codes.
      */
-    public WMSExceptionCode[] family() {
+    public ExceptionCode[] family() {
         return values();
     }
 
@@ -156,7 +157,7 @@ public class WMSExceptionCode extends CodeList<WMSExceptionCode> {
      * @param code The name of the code to fetch or to create.
      * @return A code matching the given name.
      */
-    public static WMSExceptionCode valueOf(String code) {
-        return valueOf(WMSExceptionCode.class, code);
+    public static ExceptionCode valueOf(String code) {
+        return valueOf(ExceptionCode.class, code);
     }
 }

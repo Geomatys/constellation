@@ -39,8 +39,8 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.wms.WMSExceptionCode;
-import static org.constellation.coverage.wms.WMSExceptionCode.*;
+
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 
 /**
@@ -59,6 +59,7 @@ import static org.constellation.coverage.wms.WMSExceptionCode.*;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  * @author Sam Hiatt
+ * @author Cédric Briançon
  *
  * @todo Some table-related fields in this class, together with some caches, should move in a
  *       more global class and be shared for every instances connected to the same database.
@@ -257,9 +258,9 @@ public class WebServiceWorker extends ImageProducer {
         try {
             queryCRS = getLayerTable(true).getSpatialReferenceSystem(code);
         } catch (SQLException e) {
-            throw new WMSWebServiceException(e, WMSExceptionCode.NO_APPLICABLE_CODE, version);
+            throw new WMSWebServiceException(e, NO_APPLICABLE_CODE, version);
         } catch (CatalogException e) {
-            throw new WMSWebServiceException(e, WMSExceptionCode.NO_APPLICABLE_CODE, version);
+            throw new WMSWebServiceException(e, NO_APPLICABLE_CODE, version);
         } catch (FactoryException e) {
             queryCRS = crs;
         }

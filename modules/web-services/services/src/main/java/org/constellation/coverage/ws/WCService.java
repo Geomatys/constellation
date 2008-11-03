@@ -61,7 +61,6 @@ import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.coverage.web.WebServiceWorker;
-import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -125,9 +124,13 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import static org.constellation.coverage.web.ExceptionCode.*;
+
 /**
  * WCS 1.1.1 / 1.0.0
  * web service implementing the operation getCoverage, describeCoverage and getCapabilities.
+ *
+ * @version $Id$
  *
  * @author Guilhem Legal
  * @author Cédric Briançon
@@ -351,9 +354,9 @@ public class WCService extends OGCWebService {
              */
             if (ex instanceof WMSWebServiceException && !this.getCurrentVersion().isOWS()) {
                 WMSWebServiceException wmsex = (WMSWebServiceException)ex;
-                if (!wmsex.getExceptionCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) &&
-                    !wmsex.getExceptionCode().equals(WMSExceptionCode.VERSION_NEGOTIATION_FAILED)&&
-                    !wmsex.getExceptionCode().equals(WMSExceptionCode.OPERATION_NOT_SUPPORTED)) {
+                if (!wmsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&&
+                    !wmsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     wmsex.printStackTrace();
                 }
                 StringWriter sw = new StringWriter();

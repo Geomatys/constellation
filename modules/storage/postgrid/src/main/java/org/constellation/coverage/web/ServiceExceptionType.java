@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-import org.constellation.coverage.wms.WMSExceptionCode;
 
 
 /**
@@ -41,6 +40,7 @@ import org.constellation.coverage.wms.WMSExceptionCode;
  *
  * @author Guilhem Legal
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ServiceExceptionType", propOrder = {"message"})
@@ -75,7 +75,7 @@ public final class ServiceExceptionType {
      * @param message The message of the exception.
      * @param code A standard code for exception (OWS).
      */
-    public ServiceExceptionType(final String message, final WMSExceptionCode code) {
+    public ServiceExceptionType(final String message, final ExceptionCode code) {
         this.message = message;
         this.code    = code.name();
     }
@@ -87,7 +87,7 @@ public final class ServiceExceptionType {
      * @param code A standard code for exception (OWS).
      * @param locator The method where the error occured.
      */
-    public ServiceExceptionType(final String value, final WMSExceptionCode code, final String locator) {
+    public ServiceExceptionType(final String value, final ExceptionCode code, final String locator) {
         this.message = value;
         this.code    = code.name();
         this.locator = locator;
@@ -103,8 +103,8 @@ public final class ServiceExceptionType {
     /**
      * Returns the exception code, or {@code null} if none.
      */
-    public WMSExceptionCode getCode() {
-        return WMSExceptionCode.valueOf(code);
+    public ExceptionCode getCode() {
+        return ExceptionCode.valueOf(code);
     }
 
     /**

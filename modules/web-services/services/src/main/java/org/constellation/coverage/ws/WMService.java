@@ -82,14 +82,16 @@ import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import static org.constellation.coverage.wms.WMSExceptionCode.*;
+import static org.constellation.coverage.web.ExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
+
 
 /**
  * WMS 1.3.0 / 1.1.1
  * web service implementing the operation getMap, getFeatureInfo and getCapabilities.
  *
- * @version
+ * @version $Id$
+ *
  * @author Guilhem Legal
  * @author Cédric Briançon
  */

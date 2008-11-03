@@ -20,19 +20,12 @@ import org.geotools.util.Version;
 
 
 /**
- * An error occuring in Web Map Service.
+ * An error occuring in Web Coverage Service.
  *
  * @version $Id$
- * @author Guilhem Legal
- * @author Martin Desruisseaux
  * @author Cédric Briançon
  */
-public class WMSWebServiceException extends WebServiceException {
-    /**
-     * For cross-version compatibility.
-     */
-    private static final long serialVersionUID = 169942429240747383L;
-
+public class WCSWebServiceException extends WebServiceException {
     /**
      * An OGC Web Service exception report.
      */
@@ -45,7 +38,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final String message, final ExceptionCode code, final Version version) {
+    public WCSWebServiceException(final String message, final ExceptionCode code, final Version version) {
         super(message);
         setExceptionReport(message, code, version);
     }
@@ -57,7 +50,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final Exception cause, final ExceptionCode code, final Version version) {
+    public WCSWebServiceException(final Exception cause, final ExceptionCode code, final Version version) {
         super(cause);
         setExceptionReport(cause.getLocalizedMessage(), code, version);
     }
@@ -70,7 +63,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final String message, final Exception cause,
+    public WCSWebServiceException(final String message, final Exception cause,
                                final ExceptionCode code, final Version version)
     {
         super(message, cause);

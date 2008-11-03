@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.coverage.wms.WMSExceptionCode;
+import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wms.GetMap;
@@ -266,7 +266,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             final LayerDetails details = LAYERDP.get(layerName);
             if (details == null) {
                 throw new WMSWebServiceException("Layer "+layerName+" could not be found.",
-                        WMSExceptionCode.LAYER_NOT_DEFINED, version);
+                        ExceptionCode.LAYER_NOT_DEFINED, version);
             }
             final Object style;
             if (sld != null) {

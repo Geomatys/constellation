@@ -101,7 +101,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import static org.constellation.coverage.wms.WMSExceptionCode.*;
+import static org.constellation.coverage.web.ExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
 
 

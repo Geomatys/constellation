@@ -17,6 +17,7 @@
  */
 package org.constellation.ws.rs;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,21 +31,27 @@ import java.util.Map;
 import java.util.Properties;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+
+// Constellation dependencies
+import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.coverage.wms.WMSExceptionCode;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
 import org.constellation.ows.OWSExceptionCode;
+import org.constellation.ows.v110.OWSWebServiceException;
+
+// Geotools dependencies
 import org.geotools.util.Version;
 
 
 /**
  * Main class for all web services.
+ *
+ * @version $Id$
  *
  * @author Guilhem Legal
  * @author Cédric Briançon
@@ -222,7 +229,7 @@ public abstract class OGCWebService extends WebService {
                                                                     getCurrentVersion());
             marshaller.marshal(wse.getExceptionReport(), sw);
         } else {
-            WMSExceptionCode code = WMSExceptionCode.valueOf(codeName);
+            ExceptionCode code = ExceptionCode.valueOf(codeName);
             WMSWebServiceException wse = new WMSWebServiceException(message,
                                                                     code,
                                                                     getCurrentVersion());
@@ -322,7 +329,7 @@ public abstract class OGCWebService extends WebService {
             code = transformCodeName(code);
             throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion());
         } else {
-            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
+            throw new WMSWebServiceException(message, ExceptionCode.valueOf(code), getCurrentVersion());
         }
     }
 
