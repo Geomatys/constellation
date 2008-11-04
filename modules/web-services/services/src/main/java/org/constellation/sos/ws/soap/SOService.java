@@ -123,7 +123,7 @@ public class SOService {
              
             return worker.getCapabilities(requestCapabilities);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         } catch (JAXBException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }
@@ -140,7 +140,7 @@ public class SOService {
             logger.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         }
     }
     
@@ -157,7 +157,7 @@ public class SOService {
             logger.info("received SOAP getObservation request");
             return worker.getObservation(requestObservation);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         }
     }
     
@@ -170,7 +170,7 @@ public class SOService {
             logger.info("received SOAP getResult request");
             return worker.getResult(requestResult);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         }
     }
     
@@ -187,7 +187,7 @@ public class SOService {
             logger.info("received SOAP registerSensor request");
             return worker.registerSensor(requestRegSensor);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         }
     }
     
@@ -203,7 +203,7 @@ public class SOService {
             logger.info("received SOAP insertObservation request");
             return worker.insertObservation(requestInsObs);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         }
     }
     

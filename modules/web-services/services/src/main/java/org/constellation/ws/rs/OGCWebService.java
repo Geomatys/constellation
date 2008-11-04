@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +34,9 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceExceptionReport;
+import org.constellation.coverage.web.ServiceExceptionType;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
@@ -46,6 +46,8 @@ import org.constellation.ows.v110.OWSWebServiceException;
 
 // Geotools dependencies
 import org.geotools.util.Version;
+
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 
 /**
@@ -126,8 +128,8 @@ public abstract class OGCWebService extends WebService {
     protected void verifyBaseParameter(int sld) throws WebServiceException {
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throwException("The parameter VERSION=" + sldVersion + " must be specified",
-                               "MISSING_PARAMETER_VALUE", "version");
+                throw new WebServiceException("The parameter VERSION=" + sldVersion + " must be specified",
+                               MISSING_PARAMETER_VALUE, null);
             } else {
                 return;
             }
@@ -142,15 +144,14 @@ public abstract class OGCWebService extends WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
-            throwException(message, "VERSION_NEGOTIATION_FAILED", null);
-
+            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED, null);
         } else {
             setCurrentVersion(inputVersion);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throwException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
-                               "VERSION_NEGOTIATION_FAILED", null);
+                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
+                               VERSION_NEGOTIATION_FAILED, null);
             }
         }
     }
@@ -160,24 +161,19 @@ public abstract class OGCWebService extends WebService {
      * if the version is not accepted we send an exception
      */
     protected void isSupportedVersion(String versionNumber) throws WebServiceException {
-
         if (getVersionFromNumber(versionNumber) == null) {
-
             String message = "The parameter ";
             for (ServiceVersion vers : versions) {
                 message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
-            throwException(message, "VERSION_NEGOTIATION_FAILED", null);
-
+            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED, null);
         }
     }
 
     /**
      * Return the current version of the Web Service.
-     *
-     * @deprecated
      */
     protected ServiceVersion getCurrentVersion() {
         return this.currentVersion;
@@ -185,8 +181,6 @@ public abstract class OGCWebService extends WebService {
 
     /**
      * Return the current version of the Web Service.
-     *
-     * @deprecated
      */
     protected void setCurrentVersion(String versionNumber) {
         currentVersion = getVersionFromNumber(versionNumber);
@@ -218,27 +212,17 @@ public abstract class OGCWebService extends WebService {
      * @param codeName
      * @return
      */
-    protected StringWriter launchException(String message, String codeName) throws JAXBException {
-        StringWriter sw = new StringWriter();
-
+    protected Object launchException(final String message, final String codeName, final String locator) {
         if (getCurrentVersion().isOWS()) {
-            OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            OWSWebServiceException wse = new OWSWebServiceException(message,
-                                                                    code,
-                                                                    null,
-                                                                    getCurrentVersion());
-            marshaller.marshal(wse.getExceptionReport(), sw);
+            final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+            final OWSWebServiceException wse = new OWSWebServiceException(message,
+                    code, locator, getCurrentVersion());
+            return wse.getExceptionReport();
         } else {
-            ExceptionCode code = ExceptionCode.valueOf(codeName);
-            WMSWebServiceException wse = new WMSWebServiceException(message,
-                                                                    code,
-                                                                    getCurrentVersion());
-            marshaller.marshal(wse.getExceptionReport(), sw);
+            final ExceptionCode code = ExceptionCode.valueOf(codeName);
+            return new ServiceExceptionReport(getCurrentVersion(), new ServiceExceptionType(message, code));
         }
-        return sw;
     }
-
-   
 
     /**
      * Returns the file where to read the capabilities document for each service.
@@ -321,26 +305,13 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     *  Throw a WebserviceException.
-     *  If the service and version applies to OWS specification it throw an OWSException.
-     */
-    protected void throwException(final String message, String code, String locator) throws WebServiceException {
-        if (getCurrentVersion().isOWS()) {
-            code = transformCodeName(code);
-            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion());
-        } else {
-            throw new WMSWebServiceException(message, ExceptionCode.valueOf(code), getCurrentVersion());
-        }
-    }
-
-    /**
      * Transform an exception code into the OWS specification.
      * Example : MISSING_PARAMETER_VALUE become MissingParameterValue.
      *
      * @param code
      * @return
      */
-    private String transformCodeName(String code) {
+    protected String transformCodeName(String code) {
         String result = "";
         final String prefix = code.charAt(0) + "";
         while (code.indexOf('_') != -1) {

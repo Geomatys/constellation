@@ -20,7 +20,6 @@ package org.constellation.ws.rs;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -30,6 +29,7 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.io.StringWriter;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -55,6 +55,7 @@ import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.AbstractRequest;
 import org.constellation.query.wms.WMSQuery;
 
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 /**
  * Main class for all web services.
@@ -195,10 +196,8 @@ public abstract class WebService {
         }
         if (notFound) {
             if (mandatory) {
-                throwException("The parameter " + parameterName + " must be specified",
-                        "MISSING_PARAMETER_VALUE", parameterName);
-                // never reached
-                throw new AssertionError();
+                throw new WebServiceException("The parameter " + parameterName + " must be specified",
+                        MISSING_PARAMETER_VALUE, null);
             }
             return null;
         } else {
@@ -217,10 +216,8 @@ public abstract class WebService {
                     parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLES)) {
                     return value;
                 }
-                throwException("The parameter " + parameterName + " should have a value",
-                        "INVALID_PARAMETER_VALUE", parameterName);
-                // never reached
-                throw new AssertionError();
+                throw new WebServiceException("The parameter " + parameterName + " should have a value",
+                        INVALID_PARAMETER_VALUE, null);
             } else {
                 return value;
             }
@@ -260,10 +257,9 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throwException("The parameter " + parameterName + " must be specified",
-                                       "MISSING_PARAMETER_VALUE", parameterName);
-                        //never reach
-                        return null;
+                        throw new WebServiceException("The parameter " + parameterName + " must be specified",
+                                       MISSING_PARAMETER_VALUE, null);
+
                     }
                 }
             }
@@ -271,10 +267,8 @@ public abstract class WebService {
             Object result = unmarshaller.unmarshal(sr);
             return result;
         } catch (JAXBException ex) {
-             throwException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                            ex, "INVALID_PARAMETER_VALUE", null);
-             //never reach
-             return null;
+             throw new WebServiceException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
+                            ex, INVALID_PARAMETER_VALUE, null);
         }
     }
 
@@ -328,9 +322,10 @@ public abstract class WebService {
                 request = unmarshaller.unmarshal(is);
             } catch (UnmarshalException e) {
                 LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-                StringWriter sw = launchException("The XML request is not valid", "INVALID_REQUEST");
-
-                return Response.ok(sw.toString(), "text/xml").build();
+                final StringWriter sw = new StringWriter();
+                final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
+                marshaller.marshal(obj, sw);
+                return Response.ok(sw, "text/xml").build();
             }
 
             if (request != null && request instanceof AbstractRequest) {
@@ -353,9 +348,9 @@ public abstract class WebService {
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         LOGGER.severe("request POST plain sending Exception");
-        StringWriter sw = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                          "INVALID_REQUEST");
-        return Response.ok(sw.toString(), "text/xml").build();
+        Object obj = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
+                                          INVALID_REQUEST.name(), null);
+        return Response.ok(obj, "text/xml").build();
     }
 
    
@@ -376,9 +371,10 @@ public abstract class WebService {
      *
      * @param message
      * @param codeName
+     * @param locator
      * @return
      */
-    protected abstract StringWriter launchException(String message, String codeName) throws JAXBException;
+    protected abstract Object launchException(String message, String codeName, String locator);
 
    /**
      * Return a file located in WEB-INF deployed directory.
@@ -492,10 +488,4 @@ public abstract class WebService {
         NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
-
-    /**
-     *  Throw a WebserviceException.
-     */
-    protected abstract void throwException(final String message, String code, String locator) throws WebServiceException;
-    
 }

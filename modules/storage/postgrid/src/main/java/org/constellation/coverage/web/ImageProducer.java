@@ -423,7 +423,7 @@ public abstract class ImageProducer {
         try {
             coverage = layer.getCoverage();
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         SpatioTemporalCoverage3D stCoverage = new SpatioTemporalCoverage3D(layer.getName(), coverage);
         Point2D point = new Point2D.Double(envelope.getMinimum(0), envelope.getMinimum(1));
@@ -488,11 +488,11 @@ public abstract class ImageProducer {
             transformer.transform(source, result);
             return file;
         } catch (TransformerException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         } catch (IOException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         } catch (ParserConfigurationException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
     }
 
@@ -521,7 +521,7 @@ public abstract class ImageProducer {
         if (globalLayerTable == null) try {
             globalLayerTable = database.getTable(LayerTable.class);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
         if (global) {
             return globalLayerTable;
@@ -546,9 +546,9 @@ public abstract class ImageProducer {
             final LayerTable table = getLayerTable(true);
             layerNames = Collections.unmodifiableSet(table.getIdentifiers());
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
         return layerNames;
     }
@@ -571,15 +571,15 @@ public abstract class ImageProducer {
             try {
                 layer = table.getEntry(token);
             } catch (NoSuchRecordException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
+                throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             } catch (SQLException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
             if (layer.getSeries().isEmpty() || !layer.isQueryable(version.getService())) {
-                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                        LAYER_NOT_DEFINED, version);
+                throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version, null);
             }
             layers.add(layer);
         }
@@ -601,17 +601,17 @@ public abstract class ImageProducer {
             try {
                 layer = table.getEntry(layerName);
             } catch (NoSuchRecordException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
+                throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             } catch (SQLException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
             if (layer == null || layer.getSeries().isEmpty() ||
                     (version != null && !layer.isQueryable(version.getService())))
             {
-                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                        LAYER_NOT_DEFINED, version);
+                throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version, null);
             }
             layers.add(layer);
         }
@@ -629,9 +629,9 @@ public abstract class ImageProducer {
             final LayerTable table = getLayerTable(true);
             return table.getEntries();
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
 
@@ -643,8 +643,8 @@ public abstract class ImageProducer {
      */
     public Layer getLayer() throws WebServiceException {
         if (layer == null) {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
-                    LAYER_NOT_DEFINED, version);
+            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
+                    LAYER_NOT_DEFINED, version, "layer");
         }
         Layer candidate;
         boolean change = false;
@@ -652,8 +652,8 @@ public abstract class ImageProducer {
             LayerTable table = getLayerTable(true);
             final Layer entry = table.getEntry(layer);
             if (entry.getSeries().isEmpty() || !entry.isQueryable(version.getService())) {
-                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                        LAYER_NOT_DEFINED, version);
+                throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version, null);
             }
             GeneralEnvelope queryEnvelope = envelope;
             if (queryCRS != null) try {
@@ -693,11 +693,11 @@ public abstract class ImageProducer {
                 }
             }
         } catch (NoSuchRecordException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
+            throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (change) {
             LOGGER.fine("LayerTable configuration changed.");
@@ -730,9 +730,9 @@ public abstract class ImageProducer {
         try {
             return getLayerTable(true).getSpatialReferenceSystem(code);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
 
@@ -790,7 +790,7 @@ public abstract class ImageProducer {
                             }
                         }
                     } catch (CatalogException exception) {
-                        throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+                        throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
                     }
                 }
                 // We know that gridToCRS is null, but we try to select constructors that accept
@@ -822,18 +822,18 @@ public abstract class ImageProducer {
         final Layer layer = getLayer();
         final CoverageReference ref;
         if (times.isEmpty()) {
-            throw new WMSWebServiceException("Must specify TIME.",
-                    INVALID_PARAMETER_VALUE, version);
+            throw new WebServiceException("Must specify TIME.",
+                    INVALID_PARAMETER_VALUE, version, "time");
         }
         try {
             ref = layer.getCoverageReference(getTime(), elevation);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (ref == null) {
             // TODO: provides a better message.
-            throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                    INVALID_PARAMETER_VALUE, version);
+            throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                    INVALID_PARAMETER_VALUE, version, null);
         }
         return ref;
     }
@@ -872,12 +872,12 @@ public abstract class ImageProducer {
         try {
             ref = layer.getCoverageReference(getTime(), elevation);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (ref == null) {
             // TODO: provides a better message.
-            throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                    INVALID_PARAMETER_VALUE, version);
+            throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                    INVALID_PARAMETER_VALUE, version, null);
         }
         GridCoverage2D coverage;
         try {
@@ -887,7 +887,7 @@ public abstract class ImageProducer {
             if (file == null) {
                 file = ref.getName();
             }
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, file),
+            throw new WebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, file),
                     exception, LAYER_NOT_QUERYABLE, version);
         }
         if (resample) {
@@ -993,8 +993,8 @@ public abstract class ImageProducer {
         } else if (DEFAULT_FORMAT != null) {
             return DEFAULT_FORMAT;
         } else {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, "format"),
-                    MISSING_PARAMETER_VALUE, version);
+            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, "format"),
+                    MISSING_PARAMETER_VALUE, version, "format");
         }
     }
 
@@ -1120,10 +1120,10 @@ public abstract class ImageProducer {
             }
         } catch (IOException exception) {
             disposeWriter();
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         disposeWriter();
-        throw new WMSWebServiceException(Errors.format(ErrorKeys.NO_IMAGE_WRITER), LAYER_NOT_QUERYABLE, version);
+        throw new WebServiceException(Errors.format(ErrorKeys.NO_IMAGE_WRITER), LAYER_NOT_QUERYABLE, version, null);
     }
 
     /**
@@ -1283,7 +1283,7 @@ public abstract class ImageProducer {
                 }
             }
         } catch (RasterFormatException ex) {
-            throw new WMSWebServiceException(ex, LAYER_NOT_QUERYABLE, version);
+            throw new WebServiceException(ex, LAYER_NOT_QUERYABLE, version);
         }
         /*
          * Retains the MIME type used, if it was not already a MIME type.
@@ -1320,13 +1320,13 @@ public abstract class ImageProducer {
                 try {
                     coordinate = gridToCRS.transform(coordinate, coordinate);
                 } catch (TransformException exception) {
-                    throw new WMSWebServiceException(exception, INVALID_POINT, version);
+                    throw new WebServiceException(exception, INVALID_POINT, version);
                 }
                 double[] values = null;
                 try {
                     values = getGridCoverage2D(false).evaluate(coordinate, values);
                 } catch (PointOutsideCoverageException exception) {
-                    throw new WMSWebServiceException(exception, INVALID_POINT, version);
+                    throw new WebServiceException(exception, INVALID_POINT, version);
                 }
                 if (values.length != 0) {
                     return values[0];
@@ -1376,9 +1376,9 @@ public abstract class ImageProducer {
         try {
             database.flush();
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
 

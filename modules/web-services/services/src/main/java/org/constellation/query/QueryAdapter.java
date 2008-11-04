@@ -34,8 +34,8 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.TimeParser;
-import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.query.wms.WMSQuery;
 
@@ -254,8 +254,8 @@ public class QueryAdapter {
      *         if the bbox is {@code null}.
      */
     public static ImmutableEnvelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs,
-                    final String strElevation, final String strTime, final Version wmsVersion)
-                    throws IllegalArgumentException, WMSWebServiceException {
+                    final String strElevation, final String strTime, final ServiceVersion version)
+                    throws IllegalArgumentException, WebServiceException {
 
         final CoordinateReferenceSystem horizontalCRS = CRS.getHorizontalCRS(crs);
         final VerticalCRS               verticalCRS;
@@ -279,7 +279,7 @@ public class QueryAdapter {
                 try{
                     values[index] = toDouble(tokens.nextToken());
                 } catch (NumberFormatException n) {
-                    throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, wmsVersion);
+                    throw new WebServiceException(n, INVALID_PARAMETER_VALUE, version);
                 }
                 if (index >= 4) {
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
@@ -303,7 +303,7 @@ public class QueryAdapter {
             try{
                 elevation = QueryAdapter.toDouble(strElevation);
             } catch (NumberFormatException n) {
-                throw new WMSWebServiceException(n, INVALID_PARAMETER_VALUE, wmsVersion);
+                throw new WebServiceException(n, INVALID_PARAMETER_VALUE, version);
             }
             dimZ[0] = dimZ[1] = elevation;
 
@@ -320,7 +320,7 @@ public class QueryAdapter {
             try {
                 date = QueryAdapter.toDate(strTime);
             } catch (ParseException ex) {
-                throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, wmsVersion);
+                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, version);
             }
 
             final TemporalCRS tCRS = CRS.getTemporalCRS(crs);

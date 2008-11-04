@@ -30,13 +30,6 @@ public class OWSWebServiceException extends WebServiceException {
      * An OWS Web Service exception report
      */
     private ExceptionReport exception;
-    
-    /**
-     * Empty constructor
-     */
-    OWSWebServiceException() {
-        super();
-    }
          
     /**
      * Build a new OWS 1.0.0 web service exception.
@@ -47,7 +40,7 @@ public class OWSWebServiceException extends WebServiceException {
      * @param v       The version.
      */
     public OWSWebServiceException(String message, OWSExceptionCode code, String locator, ServiceVersion v) {
-        super(message);
+        super(message, code, v);
         this.exception = new ExceptionReport(message, code.name(), locator, v);
     }
     
@@ -55,7 +48,7 @@ public class OWSWebServiceException extends WebServiceException {
      * Build an OWS v1.0.0 web service exception from an OWS v 1.1.0 exception
      */
     public OWSWebServiceException(org.constellation.ows.v110.OWSWebServiceException exc, ServiceVersion v) {
-        super("");
+        super(exc, exc.getExceptionCode(), v);
         this.exception = new ExceptionReport(exc.getMessage(), exc.getExceptionCode().name(), exc.getExceptionReport().getFirstLocator(), v);
     }
     
@@ -87,15 +80,4 @@ public class OWSWebServiceException extends WebServiceException {
         } 
         return locator;
     }
-    
-    /**
-     * Return the version number
-     */
-    public String getVersion() {
-        if (exception != null) {
-            return exception.getVersion();
-        }
-        return null;
-    }
-
 }

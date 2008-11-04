@@ -16,9 +16,6 @@
  */
 package org.constellation.coverage.web;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.catalog.CatalogException;
 import org.opengis.util.CodeList;
 
@@ -28,33 +25,70 @@ import org.opengis.util.CodeList;
  *
  * @version $Id$
  * @author Guihlem Legal
+ * @author Cédric Briançon
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "WebServiceException", namespace="http://wms.geomatys.fr/")
-public abstract class WebServiceException extends CatalogException {
+public class WebServiceException extends CatalogException {
     /**
-     * Creates an exception with no cause and no details message.
+     * The exceptioni code.
      */
-    public WebServiceException() {
-        super();
+    private final CodeList exceptionCode;
+
+    /**
+     * The service version.
+     */
+    private final ServiceVersion version;
+
+    /**
+     * The reason of the exception.
+     */
+    private final String locator;
+
+    /**
+     * Creates an exception with the specified details message.
+     *
+     * @param message The detail message.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
+     */
+    public WebServiceException(final String message, final CodeList exceptionCode,
+                               final ServiceVersion version)
+    {
+        super(message);
+        this.exceptionCode = exceptionCode;
+        this.version = version;
+        this.locator = null;
     }
 
     /**
      * Creates an exception with the specified details message.
      *
      * @param message The detail message.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
      */
-    public WebServiceException(final String message) {
+    public WebServiceException(final String message, final CodeList exceptionCode,
+                               final ServiceVersion version, final String locator)
+    {
         super(message);
+        this.exceptionCode = exceptionCode;
+        this.version = version;
+        this.locator = locator;
     }
 
     /**
-     * Creates an exception with the specified cause and no details message.
+     * Creates an exception with the specified details message and cause.
      *
-     * @param cause The cause for this exception.
+     * @param message The detail message.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
      */
-    public WebServiceException(Exception cause) {
+    public WebServiceException(final Exception cause, final CodeList exceptionCode,
+            final ServiceVersion version)
+    {
         super(cause);
+        this.exceptionCode = exceptionCode;
+        this.version = version;
+        locator = null;
     }
 
     /**
@@ -62,14 +96,27 @@ public abstract class WebServiceException extends CatalogException {
      *
      * @param message The detail message.
      * @param cause The cause for this exception.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
      */
-    public WebServiceException(String message, Exception cause) {
+    public WebServiceException(final String message, final Exception cause,
+                               final CodeList exceptionCode,  final ServiceVersion version)
+    {
         super(message, cause);
+        this.exceptionCode = exceptionCode;
+        this.version = version;
+        this.locator = null;
     }
 
-    public abstract CodeList getExceptionCode();
+    public CodeList getExceptionCode() {
+        return exceptionCode;
+    }
 
-    public abstract String getVersion();
-    
-    public abstract Object getExceptionReport();
+    public ServiceVersion getVersion() {
+        return version;
+    }
+
+    public String getLocator() {
+        return locator;
+    }
 }

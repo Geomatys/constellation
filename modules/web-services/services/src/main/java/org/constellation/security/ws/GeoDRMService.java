@@ -48,6 +48,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.xacml.CstlPDP;
@@ -259,19 +260,27 @@ public class GeoDRMService extends OGCWebService {
                 LOGGER.info("request allowed");
                 return sendRequest(objectRequest);
             } else {
-                StringWriter sw = launchException("You are not authorized to execute this request. " +
-                        "Please identify yourself first.", "NO_APPLICABLE_CODE");
+                final StringWriter sw = new StringWriter();
+                final Object obj = launchException("You are not authorized to execute this request. " +
+                        "Please identify yourself first.", "NO_APPLICABLE_CODE", null);
+                marshaller.marshal(obj, sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             } 
         } catch (WebServiceException ex) {
             StringWriter sw = new StringWriter();
-            marshaller.marshal(ex.getExceptionReport(), sw);
+            final String code = transformCodeName(ex.getExceptionCode().name());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
+            marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();
         }  catch (IOException ex) {
-            StringWriter sw = launchException("The service has throw an IO exception",  "NO_APPLICABLE_CODE");
+            StringWriter sw = new StringWriter();
+            Object obj = launchException("The service has throw an IO exception",  "NO_APPLICABLE_CODE", null);
+            marshaller.marshal(obj, sw);
             return Response.ok(sw.toString(), "text/xml").build();
         } catch (URISyntaxException ex) {
-            StringWriter sw = launchException("The service has throw an URI syntax exception",  "NO_APPLICABLE_CODE");
+            StringWriter sw = new StringWriter();
+            Object obj = launchException("The service has throw an URI syntax exception",  "NO_APPLICABLE_CODE", null);
+            marshaller.marshal(obj, sw);
             return Response.ok(sw.toString(), "text/xml").build();
         }
     }

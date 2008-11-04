@@ -30,13 +30,9 @@ public class OWSWebServiceException extends WebServiceException {
      * An OWS Web Service exception report
      */
     private ExceptionReport exception;
-    
-    OWSWebServiceException() {
-        super();
-    }
-            
+       
     public OWSWebServiceException(String message, OWSExceptionCode code, String locator, ServiceVersion v) {
-        super(message);
+        super(message, code, v, locator);
         this.exception = new ExceptionReport(message, code.name(), locator, v);
     }
     
@@ -56,15 +52,4 @@ public class OWSWebServiceException extends WebServiceException {
             return null;
         }
     }
-    
-    /**
-     * Return the version number
-     */
-    public String getVersion() {
-        if (exception != null) {
-            return exception.getVersion();
-        }
-        return null;
-    }
-
 }

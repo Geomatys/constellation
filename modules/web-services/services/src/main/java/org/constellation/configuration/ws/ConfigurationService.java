@@ -38,9 +38,9 @@ import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WMSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.OWSExceptionCode;
+import org.constellation.ows.v110.ExceptionReport;
 import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -129,28 +129,17 @@ public class ConfigurationService extends OGCWebService  {
             }
         
         } catch (WebServiceException ex) {
-
-            if (ex instanceof WMSWebServiceException) {
-                ex = new OWSWebServiceException(ex.getMessage(),
-                        OWSExceptionCode.valueOf(ex.getExceptionCode().name()),
-                        null,
-                        getVersionFromNumber(ex.getVersion()));
-            }
-            /* We don't print the stack trace:
-             * - if the user have forget a mandatory parameter.
-             * - if the version number is wrong.
-             */
-           
-            OWSWebServiceException owsex = (OWSWebServiceException) ex;
-            if (!owsex.getExceptionCode().equals(OWSExceptionCode.MISSING_PARAMETER_VALUE) &&
-                    !owsex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-                    !owsex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
-                owsex.printStackTrace();
+            final String code = transformCodeName(ex.getExceptionCode().name());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
+            if (!ex.getExceptionCode().equals(OWSExceptionCode.MISSING_PARAMETER_VALUE) &&
+                    !ex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED) &&
+                    !ex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
+                ex.printStackTrace();
             } else {
-                LOGGER.info(owsex.getMessage());
+                LOGGER.info(ex.getMessage());
             }
             StringWriter sw = new StringWriter();
-            marshaller.marshal(owsex.getExceptionReport(), sw);
+            marshaller.marshal(report, sw);
             return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
         
