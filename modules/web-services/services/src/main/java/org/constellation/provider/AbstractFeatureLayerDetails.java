@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -88,6 +88,11 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new GeographicBoundingBoxImpl(-180, 180, -77, +77);
     protected static final MapBuilder MAP_BUILDER = MapBuilder.getInstance();
+    /**
+     * Defines the number of pixels we want to add to the specified coordinates given by
+     * the GetFeatureInfo request.
+     */
+    protected static final int MARGIN = 4;
 
     protected final FeatureSource<SimpleFeatureType,SimpleFeature> fs;
     protected final List<String> favorites;
@@ -330,8 +335,8 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         // Pixel coordinates in the request.
         final int pixelUpX        = gfi.getX();
         final int pixelUpY        = gfi.getY();
-        final int pixelDownX      = pixelUpX + 1;
-        final int pixelDownY      = pixelUpY + 1;
+        final int pixelDownX      = pixelUpX + MARGIN;
+        final int pixelDownY      = pixelUpY + MARGIN;
         final Envelope envObj     = gfi.getEnvelope();
         final double widthEnv     = envObj.getSpan(0);
         final double heightEnv    = envObj.getSpan(1);

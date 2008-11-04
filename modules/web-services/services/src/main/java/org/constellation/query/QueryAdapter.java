@@ -37,7 +37,6 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.TimeParser;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -139,7 +138,7 @@ public class QueryAdapter {
             return null;
         }
         final String epsgTrimmed = epsg.trim();
-        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith(WMSQuery.UNDEFINED_CRS)) {
+        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith(Query.UNDEFINED_CRS)) {
             //TODO fix this
             //we should return the good EPSG 32662
             return DefaultGeographicCRS.WGS84;
