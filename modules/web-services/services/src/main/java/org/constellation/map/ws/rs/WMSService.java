@@ -747,14 +747,14 @@ public class WMSService extends OGCWebService {
         } catch (PortrayalException ex) {
             if(errorInImage) {
                 final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.writeInImage(ex, dim.width, dim.height);
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
             } else {
                 throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
         } catch (WebServiceException ex) {
             if (errorInImage) {
                 final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.writeInImage(ex, dim.width, dim.height);
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
             } else {
                 throw new WebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
