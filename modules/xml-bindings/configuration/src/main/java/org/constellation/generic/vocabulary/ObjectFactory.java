@@ -56,4 +56,12 @@ public class ObjectFactory {
     public Keyword createKeyword() {
         return new Keyword();
     }
+    
+    /**
+     * Create an instance of {@GeoObjTypCd GeoObjTypCd }
+     * 
+     */
+    public GeoObjTypCd createGeoObjTypCd() {
+        return new GeoObjTypCd();
+    }
 }

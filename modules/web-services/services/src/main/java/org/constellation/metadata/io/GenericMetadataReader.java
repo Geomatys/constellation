@@ -2,7 +2,6 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -108,7 +107,7 @@ import org.opengis.metadata.Datatype;
 
 /**
  * 
- * TODO regarder les cardinalité est mettre des null la ou 0-...
+ * TODO regarder les cardinalite est mettre des null la ou 0-...
  *
  * @author Guilhem Legal
  */
@@ -184,7 +183,7 @@ public class GenericMetadataReader extends MetadataReader {
         contacts               = new HashMap<String, ResponsiblePartyImpl>();
         JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary");
         unmarshaller           = context.createUnmarshaller();
-        vocabularies           = loadVocabulary("P021.xml", "L05.xml");
+        vocabularies           = loadVocabulary(new File("vocabulary"));
         List<String> contactID = new ArrayList<String>();
     }
     
@@ -228,25 +227,49 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
-     * Load a Map of code-value for the specified file path. 
+     * Load a Map of vocabulary from
      */
-    public Map<String, Vocabulary> loadVocabulary(String... filePaths) {
+    public Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
-        for (String filePath : filePaths) {
-            File f = new File(filePath);
-            Map<String, String> vocab = new HashMap<String, String>();
-            if (f.exists()) {
-                try {
-                    Vocabulary voca = (Vocabulary) unmarshaller.unmarshal(f);
-                    voca.fillMap();
-                    result.put(filePath.substring(0, filePath.lastIndexOf('.')), voca);
-                } catch (JAXBException ex) {
-                    logger.severe("Unable to unmarshall the vocabulary configuration file : " + filePath);
-                    ex.printStackTrace();
+        if (vocabDirectory.isDirectory()) {
+            for (File f : vocabDirectory.listFiles()) {
+                if (f.getName().startsWith("SDN.")) {
+                    try {
+                        Vocabulary voca = (Vocabulary) unmarshaller.unmarshal(f);
+                        voca.fillMap();
+                        String vocaName = f.getName();
+                        vocaName = vocaName.substring(vocaName.indexOf("SDN.") + 4);
+                        vocaName = vocaName.substring(0, vocaName.indexOf('.'));
+                        result.put(vocaName, voca);
+                        
+                        //info part (debug) 
+                        String report = "added vocabulary: " + vocaName + " with ";
+                        if (voca.getKeyword().size() != 0) {
+                            report += voca.getKeyword().size() + " keywords.";
+                        } else if (voca.getGeoObjTypCd().size() != 0) {
+                            report += voca.getGeoObjTypCd().size() + " geometric Object."; 
+                        } else if (voca.getResTitle().size() != 0) {
+                            report += voca.getResTitle().size() + " res title."; 
+                        } else if (voca.getAccessConsts().size() != 0) {
+                            report += voca.getAccessConsts().size() + " access constraints."; 
+                        } else if (voca.getFormatName().size() != 0) {
+                            report += voca.getFormatName().size() + " format name."; 
+                        } else {
+                            report += "0 entries";
+                        }
+                        logger.info(report);
+                                
+                        
+                    } catch (JAXBException ex) {
+                        logger.severe("Unable to unmarshall the vocabulary configuration file : " + f.getPath());
+                        ex.printStackTrace();
+                    }
+                } else {
+                    logger.severe("Vocabulary file : " + f.getPath() + " does not follow the pattern 'SDN.<vocabName>...'");
                 }
-            } else {
-                logger.severe("Vocabulary file : " + filePath + " can not be found");
             }
+        } else {
+            logger.severe("There is nor vocabulary directory: " + vocabDirectory.getPath());
         }
         return result;
     }
@@ -520,38 +543,18 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         //parameter
-        KeywordsImpl keyword = createKeyword(getVariables("var10"), 
-                                             "parameter", 
-                                             "BODC Parameter Discovery Vocabulary", 
-                                             "P021", 
-                                             "2007-09-25T02:00:02", 
-                                             "19");
+        KeywordsImpl keyword = createKeyword(getVariables("var10"), "parameter", "P021");
         keywords.add(keyword);
 
-        keyword = createKeyword(Arrays.asList(getVariable("var11")),
-                                "instrument",
-                                "SeaDataNet device categories", 
-                                "L05", 
-                                "2007-09-06T15:03:00", 
-                                "1");
+        keyword = createKeyword(Arrays.asList(getVariable("var11")), "instrument", "L05");
         keywords.add(keyword);
         
         //platform
-        keyword = createKeyword(Arrays.asList(getVariable("var12")),
-                                "platform_class",
-                                "SeaDataNet Platform Classes", 
-                                "L061", 
-                                "2007-01-13T06:42:58", 
-                                "4");
+        keyword = createKeyword(Arrays.asList(getVariable("var12")), "platform_class", "L061");
         keywords.add(keyword);
         
         //projects
-        keyword = createKeyword(getVariables("var13"),
-                                "project",
-                                "European Directory of Marine Environmental Research Projects", 
-                                "EDMERP", 
-                                null, 
-                                null);
+        keyword = createKeyword(getVariables("var13"), "project", "EDMERP");
         keywords.add(keyword);
         
         dataIdentification.setDescriptiveKeywords(keywords);
@@ -561,7 +564,14 @@ public class GenericMetadataReader extends MetadataReader {
          */  
         List<String> resConsts = getVariables("var14");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
+        Vocabulary voca = vocabularies.get("L081");
         for (String resConst : resConsts) {
+            if (voca != null) {
+                String mappedValue = voca.getMap().get(resConst);
+                if (mappedValue != null)
+                    resConst = mappedValue;
+            }
+                
             constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
@@ -633,7 +643,7 @@ public class GenericMetadataReader extends MetadataReader {
             if (mav != null)
                 vertExtent.setMaximumValue(Double.parseDouble(mav));
         } catch (NumberFormatException ex) {
-            logger.severe("Number format exception while parsing boundingBox");
+            logger.severe("Number format exception while parsing vertical extent min-max");
         }
         // TODO DefaultVerticalCRS verticalCRS = new DefaultVerticalCRS(key, arg1, arg2)
         extent.setVerticalElements(Arrays.asList(vertExtent));
@@ -661,9 +671,16 @@ public class GenericMetadataReader extends MetadataReader {
         List<String> names    = getVariables("var37");
         List<String> versions = getVariables("var38");
         int i = 0;
+        voca = vocabularies.get("L241");
         while (i < names.size() && i < versions.size()) {
             FormatImpl format = new FormatImpl();
-            format.setName(new SimpleInternationalString(names.get(i)));
+            String name = names.get(i);
+            if (voca != null) {
+                String mappedValue = voca.getMap().get(name);
+                if (mappedValue != null)
+                    name = mappedValue;
+            }
+            format.setName(new SimpleInternationalString(name));
             format.setVersion(new SimpleInternationalString(versions.get(i)));
             formats.add(format);
             i++;
@@ -811,102 +828,47 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         //port of departure
-        KeywordsImpl keyword = createKeyword(Arrays.asList(getVariable("var12")),
-                                             "departure_place",
-                                             "Ports Gazetteer", 
-                                             "C381", 
-                                             "2007-09-20T02:00:02", 
-                                             "2");
+        KeywordsImpl keyword = createKeyword(Arrays.asList(getVariable("var12")), "departure_place", "C381");
         keywords.add(keyword);
 
         //port of arrival
-        keyword = createKeyword(Arrays.asList(getVariable("var13")),
-                                "arrival_place",
-                                "Ports Gazetteer", 
-                                "C381", 
-                                "2007-09-20T02:00:02", 
-                                "2");
+        keyword = createKeyword(Arrays.asList(getVariable("var13")), "arrival_place", "C381");
         keywords.add(keyword);
         
         //country of departure
-        keyword = createKeyword(Arrays.asList(getVariable("var14")),
-                                "departure_contry",
-                                "International Standards Organisation countries", 
-                                "C320", 
-                                "2007-08-22T16:37:58", 
-                                "1");
+        keyword = createKeyword(Arrays.asList(getVariable("var14")), "departure_contry", "C320");
         keywords.add(keyword);
         
         // country of arrival
-        keyword =  createKeyword(Arrays.asList(getVariable("var15")),
-                                 "arrival_country",
-                                 "International Standards Organisation countries", 
-                                 "C320", 
-                                 "2007-08-22T16:37:58", 
-                                 "1");
+        keyword =  createKeyword(Arrays.asList(getVariable("var15")), "arrival_country", "C320");
         keywords.add(keyword);
         
         // ship
-        keyword = createKeyword(Arrays.asList(getVariable("var16")),
-                                "platform",
-                                "SeaDataNet Cruise Summary Report ship metadata", 
-                                "C174", 
-                                "2007-05-14T15:45:00", 
-                                "0");
+        keyword = createKeyword(Arrays.asList(getVariable("var16")), "platform", "C174");
         keywords.add(keyword);
         
         // platform class
-        keyword = createKeyword(Arrays.asList(getVariable("var17")),
-                                "platform_class",
-                                "SeaDataNet Platform Classes", 
-                                "L061", 
-                                "2007-01-13T06:42:58", 
-                                "4");
+        keyword = createKeyword(Arrays.asList(getVariable("var17")), "platform_class", "L061");
         keywords.add(keyword);
         
         // projects
-        keyword = createKeyword(getVariables("var18"),
-                                "platform_class",
-                                "European Directory of Marine Environmental Research Projects", 
-                                "EDMERP", 
-                                null, 
-                                null);
+        keyword = createKeyword(getVariables("var18"), "platform_class", "EDMERP");
         keywords.add(keyword);
         
         // general oceans area
-        keyword = createKeyword(getVariables("var19"),
-                                "place",
-                                "SeaDataNet Sea Areas", 
-                                "C16", 
-                                "2007-03-01T12:00:00", 
-                                "0");
+        keyword = createKeyword(getVariables("var19"), "place", "C16");
         keywords.add(keyword);
         
         // geographic coverage
-        keyword = createKeyword(getVariables("var20"),
-                                "marsden_square",
-                                "Ten-degree Marsden Squares", 
-                                "C371", 
-                                "2007-08-03T02:00:02", 
-                                "1");
+        keyword = createKeyword(getVariables("var20"), "marsden_square", "C371");
         keywords.add(keyword);
         
          //parameter
-        keyword = createKeyword(getVariables("var21"),
-                                "parameter",
-                                "BODC Parameter Discovery Vocabulary", 
-                                "P021", 
-                                "2007-09-25T02:00:02", 
-                                "19");
+        keyword = createKeyword(getVariables("var21"), "parameter", "P021");
         keywords.add(keyword);
         
         // instrument
-        keyword = createKeyword(Arrays.asList(getVariable("var22")),
-                                "instrument",
-                                "SeaDataNet device categories", 
-                                "L05", 
-                                "2007-03-01T08:16:13", 
-                                "0");
+        keyword = createKeyword(Arrays.asList(getVariable("var22")), "instrument", "L05");
         keywords.add(keyword);
 
         dataIdentification.setDescriptiveKeywords(keywords);
@@ -916,7 +878,13 @@ public class GenericMetadataReader extends MetadataReader {
          */  
         List<String> resConsts = getVariables("var23");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
-        for (String resConst: resConsts) {
+        Vocabulary voca = vocabularies.get("L081");
+        for (String resConst : resConsts) {
+            if (voca != null) {
+                String mappedValue = voca.getMap().get(resConst);
+                if (mappedValue != null)
+                    resConst = mappedValue;
+            }
             constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
@@ -1016,12 +984,7 @@ public class GenericMetadataReader extends MetadataReader {
         
         dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var41")));
         
-        keyword = createKeyword(Arrays.asList(getVariable("var42")),
-                                "counting_unit",
-                                "ROSCOP sample quantification units", 
-                                "L181", 
-                                "2007-06-29T13:23:00", 
-                                "0");
+        keyword = createKeyword(Arrays.asList(getVariable("var42")), "counting_unit", "L181");
         dataIdentification.setDescriptiveKeywords(Arrays.asList(keyword));
         
         aggregateInfo = new AggregateInformationImpl();
@@ -1112,39 +1075,19 @@ public class GenericMetadataReader extends MetadataReader {
         List<KeywordsImpl> keywords = new ArrayList<KeywordsImpl>();
         
         // SEA AREAS
-        KeywordsImpl keyword = createKeyword(getVariables("var11"),
-                                             "place",
-                                             "SeaDataNet Sea Areas", 
-                                             "C16", 
-                                             "2007-03-01T12:00:00", 
-                                             "0");
+        KeywordsImpl keyword = createKeyword(getVariables("var11"), "place", "C16");
         keywords.add(keyword);
         
         //parameter
-        keyword = createKeyword(getVariables("var12"), 
-                               "parameter",
-                               "BODC Parameter Discovery Vocabulary",
-                               "P021",
-                               "2007-09-25T02:00:02",
-                               "19");
+        keyword = createKeyword(getVariables("var12"), "parameter", "P021");
         keywords.add(keyword);
         
         // instrument
-        keyword = createKeyword(Arrays.asList(getVariable("var13")),
-                               "instrument",  
-                               "SeaDataNet device categories", 
-                               "L05", 
-                               "2007-09-06T15:03:00", 
-                               "1");
+        keyword = createKeyword(Arrays.asList(getVariable("var13")), "instrument", "L05");
         keywords.add(keyword);
         
         // projects
-        keyword = createKeyword(getVariables("var14"),
-                                "projects",
-                                "European Directory for Marine Environmental Research Projects",
-                                "EDMERP", 
-                                null, 
-                                null);
+        keyword = createKeyword(getVariables("var14"), "projects", "EDMERP");
         keywords.add(keyword);
         dataIdentification.setDescriptiveKeywords(keywords);
         
@@ -1153,7 +1096,13 @@ public class GenericMetadataReader extends MetadataReader {
          */  
         List<String> resConsts = getVariables("var15");
         LegalConstraintsImpl constraint = new LegalConstraintsImpl();
+        Vocabulary voca = vocabularies.get("L081");
         for (String resConst : resConsts) {
+            if (voca != null) {
+                String mappedValue = voca.getMap().get(resConst);
+                if (mappedValue != null)
+                    resConst = mappedValue;
+            }
             constraint.setAccessConstraints(Arrays.asList(Restriction.valueOf(resConst)));
         }
         dataIdentification.setResourceConstraints(Arrays.asList(constraint));
@@ -1409,14 +1358,13 @@ public class GenericMetadataReader extends MetadataReader {
      * @param vocabulary
      * @return
      */
-    private KeywordsImpl createKeyword(List<String> values, String keywordType, String title, String altTitle,
-            String revDate, String editionNumber) {
+    private KeywordsImpl createKeyword(List<String> values, String keywordType, String altTitle) {
 
         //we try to get the vaocabulary Map.
         Vocabulary voca = vocabularies.get(altTitle);
         Map<String, String> vocaMap = null;
         if (voca == null) {
-            logger.info("No voabulary found for code: " + altTitle);
+            logger.info("No vocabulary found for code: " + altTitle);
         } else {
             vocaMap = voca.getMap();
         }
@@ -1424,28 +1372,33 @@ public class GenericMetadataReader extends MetadataReader {
         KeywordsImpl keyword = new KeywordsImpl();
         List<InternationalString> kws = new ArrayList<InternationalString>();
         for (String value: values) {
-            if (vocaMap != null)
-                value = vocaMap.get(value);
+            if (vocaMap != null) {
+                String mappedValue = vocaMap.get(value);
+                if (mappedValue != null)
+                    value = mappedValue;
+            }
             kws.add(new SimpleInternationalString(value));
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf(keywordType));
         
         //we create the citation describing the vocabulary used
-        CitationImpl citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(title));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(altTitle)));
-        CitationDateImpl revisionDate;
-        if (revDate != null) {
-            revisionDate = createRevisionDate(revDate);
-        } else {
-            revisionDate = new CitationDateImpl(null, DateType.REVISION); 
+        if (voca != null) {
+            CitationImpl citation = new CitationImpl();
+            citation.setTitle(new SimpleInternationalString(voca.getTitle()));
+            citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(altTitle)));
+            CitationDateImpl revisionDate;
+            if (voca.getDate() != null && !voca.getDate().equals("")) {
+                revisionDate = createRevisionDate(voca.getDate());
+            } else {
+                revisionDate = new CitationDateImpl(null, DateType.REVISION); 
+            }
+            citation.setDates(Arrays.asList(revisionDate));
+            if (voca.getVersion() != null && !voca.getVersion().equals(""))
+                citation.setEdition(new SimpleInternationalString(voca.getVersion()));
+            citation.setIdentifiers(Arrays.asList(new IdentifierImpl("http://www.seadatanet.org/urnurl/")));
+            keyword.setThesaurusName(citation);
         }
-        citation.setDates(Arrays.asList(revisionDate));
-        if (editionNumber != null)
-            citation.setEdition(new SimpleInternationalString(editionNumber));
-        citation.setIdentifiers(Arrays.asList(new IdentifierImpl("http://www.seadatanet.org/urnurl/")));
-        keyword.setThesaurusName(citation);
         
         return keyword;
     }

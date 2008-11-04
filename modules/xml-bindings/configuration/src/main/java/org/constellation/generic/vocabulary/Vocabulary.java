@@ -16,6 +16,7 @@
  */
 package org.constellation.generic.vocabulary;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ public class Vocabulary {
      * The date of edition of the version.
      */
     @XmlAttribute
-    private Date date;
+    private String date;
     
     /**
      * The title of the vocabulary
@@ -62,6 +63,14 @@ public class Vocabulary {
     
     private List<Keyword> keyword;
     
+    private List<Keyword> resTitle;
+    
+    private List<GeoObjTypCd> GeoObjTypCd;
+    
+    private List<Keyword> accessConsts;
+    
+    private List<Keyword> formatName;
+    
     @XmlTransient
     private Map<String, String> map;
     
@@ -69,22 +78,55 @@ public class Vocabulary {
     public Vocabulary() {
     }
     
-    public Vocabulary(String list, String version, String title, Date date, List<Keyword> keyword) {
+    public Vocabulary(String list, String version, String title, String date, List<Keyword> keyword) {
         this.date    = date;
         this.keyword = keyword;
+        this.GeoObjTypCd = new ArrayList<GeoObjTypCd>();
         this.list    = list;
         this.version = version;
         this.title   = title;
         fillMap();
     }
     
+    public Vocabulary(String list, String version, String title, List<GeoObjTypCd> geoObjTypCd, String date) {
+        this.date        = date;
+        this.keyword     = new ArrayList<Keyword>();
+        this.GeoObjTypCd = geoObjTypCd;
+        this.list        = list;
+        this.version     = version;
+        this.title       = title;
+        fillMap();
+    }
+    
+    
     public void fillMap() {
         map = new HashMap<String, String>();
-        for (Keyword kw : keyword) {
-            String id = kw.getSDNIdent();
-            id = id.substring(id.lastIndexOf(':'));
-            getMap().put(id, kw.getValue());
+        if (getKeyword().size() != 0) {
+            for (Keyword kw : getKeyword()) {
+                String id = kw.getSDNIdent();
+                id = id.substring(id.lastIndexOf(':') + 1);
+                getMap().put(id, kw.getValue());
+            }
+        } else if (getAccessConsts().size() != 0) {
+            for (Keyword kw : getAccessConsts()) {
+                String id = kw.getSDNIdent();
+                id = id.substring(id.lastIndexOf(':') + 1);
+                getMap().put(id, kw.getValue());
+            }
+        } else if (getResTitle().size() != 0) {
+            for (Keyword kw : getResTitle()) {
+                String id = kw.getSDNIdent();
+                id = id.substring(id.lastIndexOf(':') + 1);
+                getMap().put(id, kw.getValue());
+            }
+        } else if (getFormatName().size() != 0) {
+            for (Keyword kw : getFormatName()) {
+                String id = kw.getSDNIdent();
+                id = id.substring(id.lastIndexOf(':') + 1);
+                getMap().put(id, kw.getValue());
+            }
         }
+        
     }
     
     public String getList() {
@@ -103,11 +145,11 @@ public class Vocabulary {
         this.version = version;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -120,6 +162,8 @@ public class Vocabulary {
     }
 
     public List<Keyword> getKeyword() {
+        if (keyword == null)
+            keyword = new ArrayList<Keyword>();
         return keyword;
     }
 
@@ -145,5 +189,29 @@ public class Vocabulary {
 
     public Map<String, String> getMap() {
         return map;
+    }
+
+    public List<GeoObjTypCd> getGeoObjTypCd() {
+        if (GeoObjTypCd == null)
+            GeoObjTypCd = new ArrayList<GeoObjTypCd>();
+        return GeoObjTypCd;
+    }
+
+    public List<Keyword> getResTitle() {
+        if (resTitle == null)
+            resTitle = new ArrayList<Keyword>();
+        return resTitle;
+    }
+
+    public List<Keyword> getAccessConsts() {
+        if (accessConsts == null)
+            accessConsts = new ArrayList<Keyword>();
+        return accessConsts;
+    }
+
+    public List<Keyword> getFormatName() {
+        if (formatName == null)
+            formatName = new ArrayList<Keyword>();
+        return formatName;
     }
 }

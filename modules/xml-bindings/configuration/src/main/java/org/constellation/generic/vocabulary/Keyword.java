@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.util.Utilities;
 
 /**
  *
@@ -63,5 +64,24 @@ public class Keyword {
 
     public void setValue(String value) {
         this.value = value;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj instanceof Keyword) {
+            Keyword that = (Keyword) obj;
+            return Utilities.equals(this.SDNIdent, that.SDNIdent) &&
+                   Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.SDNIdent != null ? this.SDNIdent.hashCode() : 0);
+        return hash;
     }
 }
