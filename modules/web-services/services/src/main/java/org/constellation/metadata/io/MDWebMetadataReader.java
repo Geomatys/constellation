@@ -42,10 +42,10 @@ import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.coverage.web.WebServiceException;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.BoundingBoxType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -197,7 +197,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, OWSWebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
         int id;
         String catalogCode = "";
         
@@ -212,7 +212,7 @@ public class MDWebMetadataReader extends MetadataReader {
             }
             
         } catch (NumberFormatException e) {
-             throw new OWSWebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id", version);
+             throw new WebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, version, "id");
         }
         
         alreadyRead.clear();

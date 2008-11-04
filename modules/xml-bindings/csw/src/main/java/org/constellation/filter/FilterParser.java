@@ -40,7 +40,6 @@ import org.constellation.ogc.ComparisonOpsType;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.LogicOpsType;
 import org.constellation.ogc.SpatialOpsType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -119,8 +118,8 @@ public abstract class FilterParser {
     public Line2D GMLlineToline2d(LineStringType GMLline) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
         String CRSName = GMLline.getSrsName();
         if (CRSName == null) {
-            throw new OWSWebServiceException("A CRS (coordinate Reference system) must be specified for the line.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("A CRS (coordinate Reference system) must be specified for the line.",
+                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
        
         CoordinatesType coord = GMLline.getCoordinates();
@@ -160,8 +159,8 @@ public abstract class FilterParser {
     public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
         String CRSName = GMLenvelope.getSrsName();
         if (CRSName == null) {
-            throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
+                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
        
         List<Double> lmin = GMLenvelope.getLowerCorner().getValue();
@@ -198,14 +197,14 @@ public abstract class FilterParser {
         String CRSName = GMLpoint.getSrsName();
 
         if (CRSName == null) {
-            throw new OWSWebServiceException("A GML point must specify Coordinate Reference System.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("A GML point must specify Coordinate Reference System.",
+                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
 
         //we get the coordinate of the point (if they are present)
         if (GMLpoint.getCoordinates() == null && GMLpoint.getPos() == null) {
-            throw new OWSWebServiceException("A GML point must specify coordinates or direct position.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("A GML point must specify coordinates or direct position.",
+                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
 
         final double[] coordinates = new double[2];
@@ -217,8 +216,8 @@ public abstract class FilterParser {
             while (tokens.hasMoreTokens()) {
                 final double value = parseDouble(tokens.nextToken());
                 if (index >= coordinates.length) {
-                    throw new OWSWebServiceException("This service support only 2D point.",
-                            INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                    throw new WebServiceException("This service support only 2D point.",
+                            INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                 }
                 coordinates[index++] = value;
             }
@@ -226,8 +225,8 @@ public abstract class FilterParser {
             coordinates[0] = GMLpoint.getPos().getValue().get(0);
             coordinates[0] = GMLpoint.getPos().getValue().get(1);
         } else {
-            throw new OWSWebServiceException("The GML pointis malformed.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("The GML pointis malformed.",
+                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
         GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
         CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
@@ -245,8 +244,8 @@ public abstract class FilterParser {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
-            throw new OWSWebServiceException("The value:" + value + " is not a valid double coordinate.",
-                                              INVALID_PARAMETER_VALUE, "Coordinates", version);
+            throw new WebServiceException("The value:" + value + " is not a valid double coordinate.",
+                                         INVALID_PARAMETER_VALUE, version, "Coordinates");
         }
     }
     

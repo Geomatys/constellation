@@ -95,7 +95,6 @@ import org.constellation.ogc.SortPropertyType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.DomainType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.SectionsType;
@@ -536,21 +535,21 @@ public class CSWworker {
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("CSW")) {
-                throw new OWSWebServiceException("service must be \"CSW\"!",
+                throw new WebServiceException("service must be \"CSW\"!",
                                                  INVALID_PARAMETER_VALUE,
-                                                 "service", version);
+                                                 version, "service");
             }
         } else {
-            throw new OWSWebServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, "service",
-                                             version);
+            throw new WebServiceException("Service must be specified!",
+                                             MISSING_PARAMETER_VALUE, 
+                                             version, "service");
         }
         AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("2.0.2")){
-                 throw new OWSWebServiceException("version available : 2.0.2",
-                                             VERSION_NEGOTIATION_FAILED, "acceptVersion",
-                                             version);
+                 throw new WebServiceException("version available : 2.0.2",
+                                             VERSION_NEGOTIATION_FAILED, 
+                                             version, "acceptVersion");
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
@@ -714,9 +713,9 @@ public class CSWworker {
             for (String s: ACCEPTED_OUTPUT_FORMATS) {
                 supportedFormat = supportedFormat  + s + '\n';
             } 
-            throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
+            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
                                              " supported ones are: " + '\n' + supportedFormat,
-                                             INVALID_PARAMETER_VALUE, "outputFormat", version);
+                                             INVALID_PARAMETER_VALUE, version, "outputFormat");
         }
         
         //we get the output schema and verify that we handle it
@@ -728,9 +727,9 @@ public class CSWworker {
                 for (String s: ACCEPTED_RESOURCE_TYPE) {
                     supportedOutput = supportedOutput  + s + '\n';
                 } 
-                throw new OWSWebServiceException("The server does not support this output schema: " + outputSchema + '\n' +
-                                                 " supported ones are: " + '\n' + supportedOutput,
-                                                  INVALID_PARAMETER_VALUE, "outputSchema", version);
+                throw new WebServiceException("The server does not support this output schema: " + outputSchema + '\n' +
+                                              " supported ones are: " + '\n' + supportedOutput,
+                                              INVALID_PARAMETER_VALUE, version, "outputSchema");
             }
         }
         
@@ -749,8 +748,8 @@ public class CSWworker {
             query = (QueryType)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
             if (typeNames == null || typeNames.size() == 0) {
-                throw new OWSWebServiceException("The query must specify at least typeName.",
-                                                 INVALID_PARAMETER_VALUE, "TypeNames", version);
+                throw new WebServiceException("The query must specify at least typeName.",
+                                              INVALID_PARAMETER_VALUE, version, "TypeNames");
             } else {
                 for (QName type:typeNames) {
                     prefixs.put(type.getPrefix(), type.getNamespaceURI());
@@ -767,9 +766,9 @@ public class CSWworker {
                         String typeName = "null";
                         if (type != null)
                             typeName = type.getLocalPart();
-                        throw new OWSWebServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
-                                                         "supported one are:" + '\n' + supportedTypeNames(),
-                                                         INVALID_PARAMETER_VALUE, "TypeNames", version);
+                        throw new WebServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
+                                                      "supported one are:" + '\n' + supportedTypeNames(),
+                                                      INVALID_PARAMETER_VALUE, version, "TypeNames");
                     }
                 }
                 // debugging part
@@ -786,8 +785,8 @@ public class CSWworker {
             }
             
         } else {
-            throw new OWSWebServiceException("The request must contains a query.",
-                                             INVALID_PARAMETER_VALUE, "Query", version);
+            throw new WebServiceException("The request must contains a query.",
+                                          INVALID_PARAMETER_VALUE, version, "Query");
         }
         
         // we get the element set type (BRIEF, SUMMARY OR FULL)
@@ -804,8 +803,8 @@ public class CSWworker {
         Integer maxRecord = request.getMaxRecords();
         Integer startPos  = request.getStartPosition();
         if (startPos <= 0) {
-            throw new OWSWebServiceException("The start position must be > 0.",
-                                             NO_APPLICABLE_CODE, "startPosition", version);
+            throw new WebServiceException("The start position must be > 0.",
+                                          NO_APPLICABLE_CODE, version, "startPosition");
         }
 
         List<String> results;
@@ -830,8 +829,8 @@ public class CSWworker {
             if (sortBy != null && sortBy.getSortProperty().size() > 0) {
                 SortPropertyType first = sortBy.getSortProperty().get(0);
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
-                    throw new OWSWebServiceException("A SortBy filter must specify a propertyName.",
-                                                     NO_APPLICABLE_CODE, null, version);
+                    throw new WebServiceException("A SortBy filter must specify a propertyName.",
+                                                  NO_APPLICABLE_CODE, version);
                 String propertyName = removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
             
                 Sort sortFilter;
@@ -926,8 +925,8 @@ public class CSWworker {
                        return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
                     
                     } catch(DatatypeConfigurationException ex) {
-                        throw new OWSWebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                         NO_APPLICABLE_CODE, null, version);
+                        throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                      NO_APPLICABLE_CODE, version);
                     }
                 }
                 
@@ -980,15 +979,15 @@ public class CSWworker {
                         return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
                     
                     } catch(DatatypeConfigurationException ex) {
-                        throw new OWSWebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                         NO_APPLICABLE_CODE, null, version);
+                        throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                      NO_APPLICABLE_CODE, version);
                     }
                 }
         
             }
         } catch (SQLException ex) {
-            throw new OWSWebServiceException("The service has throw an SQLException:" + ex.getMessage(),
-                                              NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an SQLException:" + ex.getMessage(),
+                                              NO_APPLICABLE_CODE, version);
         }
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), version.toString(), searchResults);
         logger.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
@@ -1000,21 +999,21 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws org.constellation.ows.v100.OWSWebServiceException
+     * @throws WebServiceException
      */
-    private List<String> executeLuceneQuery(SpatialQuery query) throws OWSWebServiceException {
+    private List<String> executeLuceneQuery(SpatialQuery query) throws WebServiceException {
         try {
             return index.doSearch(query);
         
         } catch (CorruptIndexException ex) {
-            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+                                             NO_APPLICABLE_CODE, version);
         } catch (IOException ex) {
-            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an IO exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, version);
         } catch (ParseException ex) {
-            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an Parse exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, version);
         }
     }
     
@@ -1023,21 +1022,21 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws org.constellation.ows.v100.OWSWebServiceException
+     * @throws WebServiceException
      */
-    private List<String> executeLuceneQuery(TermQuery query) throws OWSWebServiceException {
+    private List<String> executeLuceneQuery(TermQuery query) throws WebServiceException {
         try {
             return index.doSearch(query);
         
         } catch (CorruptIndexException ex) {
-            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+                                          NO_APPLICABLE_CODE, version);
         } catch (IOException ex) {
-            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an IO exception while making lucene request.",
+                                          NO_APPLICABLE_CODE, version);
         } catch (ParseException ex) {
-            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an Parse exception while making lucene request.",
+                                          NO_APPLICABLE_CODE, version);
         }
     }
     
@@ -1046,9 +1045,9 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws org.constellation.ows.v100.OWSWebServiceException
+     * @throws WebServiceException
      */
-    private List<String> executeSQLQuery(SQLQuery query) throws OWSWebServiceException {
+    private List<String> executeSQLQuery(SQLQuery query) throws WebServiceException {
         try {
             List<String> results = new ArrayList<String>();
             Statement stmt = MDConnection.createStatement();
@@ -1060,8 +1059,8 @@ public class CSWworker {
             stmt.close();
             return results;
         } catch (SQLException ex) {
-           throw new OWSWebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
-                                            "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE, null, version);
+           throw new WebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
+                                         "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE, version);
         }
     }
     
@@ -1085,9 +1084,9 @@ public class CSWworker {
             for (String s: ACCEPTED_OUTPUT_FORMATS) {
                 supportedFormat = supportedFormat  + s + '\n';
             } 
-            throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
-                                             " supported ones are: " + '\n' + supportedFormat,
-                                             INVALID_PARAMETER_VALUE, "outputFormat", version);
+            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
+                                          " supported ones are: " + '\n' + supportedFormat,
+                                          INVALID_PARAMETER_VALUE, version, "outputFormat");
         }
         
         
@@ -1102,14 +1101,14 @@ public class CSWworker {
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!ACCEPTED_RESOURCE_TYPE.contains(outputSchema)) {
-                throw new OWSWebServiceException("The server does not support this output schema: " + outputSchema,
-                                                  INVALID_PARAMETER_VALUE, "outputSchema", version);
+                throw new WebServiceException("The server does not support this output schema: " + outputSchema,
+                                                  INVALID_PARAMETER_VALUE, version, "outputSchema");
             }
         }
         
         if (request.getId().size() == 0)
-            throw new OWSWebServiceException("You must specify at least one identifier",
-                                              MISSING_PARAMETER_VALUE, "id", version);
+            throw new WebServiceException("You must specify at least one identifier",
+                                          MISSING_PARAMETER_VALUE, version, "id");
         
         //we begin to build the result
         GetRecordByIdResponseType response;
@@ -1141,8 +1140,8 @@ public class CSWworker {
                     }
                     
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id", version);
+                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                  NO_APPLICABLE_CODE, version, "id");
                 }
             }
             if (records.size() == 0) {
@@ -1175,8 +1174,8 @@ public class CSWworker {
                         logger.severe("the form " + id + " is not a ISO object");
                     }
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id", version);
+                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                  NO_APPLICABLE_CODE, version, "id");
                 }
            }
            if (records.size() == 0) {
@@ -1209,8 +1208,8 @@ public class CSWworker {
                         logger.severe("GFC object is null");
                     }
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id", version);
+                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                  NO_APPLICABLE_CODE, version, "id");
                 }
            }
            if (records.size() == 0) {
@@ -1243,8 +1242,8 @@ public class CSWworker {
                         logger.severe("The form " + id + " is not a EBRIM v3.0 object");
                     }
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id", version);
+                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                      NO_APPLICABLE_CODE, version, "id");
                 }
            }
            if (records.size() == 0) {
@@ -1280,8 +1279,8 @@ public class CSWworker {
                             logger.severe("The form " + id + " is not a EBRIM v2.5 object.");
                     }
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id", version);
+                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                  NO_APPLICABLE_CODE, version, "id");
                 }
            }
            if (records.size() == 0) {
@@ -1303,9 +1302,9 @@ public class CSWworker {
      * Launch a service exception with th specified list of unexisting ID.
      *  
      * @param unexistingID
-     * @throws org.constellation.ows.v100.OWSWebServiceException
+     * @throws WebServiceException
      */
-    private void throwUnexistingIdentifierException(List<String> unexistingID) throws OWSWebServiceException {
+    private void throwUnexistingIdentifierException(List<String> unexistingID) throws WebServiceException {
         String identifiers = "";
         for (String s : unexistingID) {
             identifiers = identifiers + s + ',';
@@ -1314,12 +1313,12 @@ public class CSWworker {
             identifiers.substring(0, identifiers.length() - 1);
         }
         if (identifiers.equals("")) {
-            throw new OWSWebServiceException("The record does not correspound to the specified outputSchema.",
-                                             INVALID_PARAMETER_VALUE, "outputSchema", version);
+            throw new WebServiceException("The record does not correspound to the specified outputSchema.",
+                                             INVALID_PARAMETER_VALUE, version, "outputSchema");
         } else {
 
-            throw new OWSWebServiceException("The identifiers " + identifiers + " does not exist",
-                                             INVALID_PARAMETER_VALUE, "id", version);
+            throw new WebServiceException("The identifiers " + identifiers + " does not exist",
+                                             INVALID_PARAMETER_VALUE, version, "id");
         }
     }
     
@@ -1346,9 +1345,9 @@ public class CSWworker {
                 for (String s: ACCEPTED_OUTPUT_FORMATS) {
                     supportedFormat = supportedFormat  + s + '\n';
                 } 
-                throw new OWSWebServiceException("The server does not support this output format: " + format + '\n' +
-                                                 " supported ones are: " + '\n' + supportedFormat,
-                                                  INVALID_PARAMETER_VALUE, "outputFormat", version);
+                throw new WebServiceException("The server does not support this output format: " + format + '\n' +
+                                              " supported ones are: " + '\n' + supportedFormat,
+                                              INVALID_PARAMETER_VALUE, version, "outputFormat");
             }
         
             // we initialize the type names
@@ -1364,9 +1363,9 @@ public class CSWworker {
             
             } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
                
-                throw new OWSWebServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
-                                                 " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
-                                                  INVALID_PARAMETER_VALUE, "schemaLanguage", version); 
+                throw new WebServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
+                                              " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
+                                              INVALID_PARAMETER_VALUE, version, "schemaLanguage"); 
             }
             
             List<SchemaComponentType> components = new ArrayList<SchemaComponentType>();
@@ -1407,14 +1406,14 @@ public class CSWworker {
             response  = new DescribeRecordResponseType(components);
             
         } catch (ParserConfigurationException ex) {
-            throw new OWSWebServiceException("Parser Configuration Exception while creating the DocumentBuilder",
-                                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("Parser Configuration Exception while creating the DocumentBuilder",
+                                          NO_APPLICABLE_CODE, version);
         } catch (IOException ex) {
-            throw new OWSWebServiceException("IO Exception when trying to access xsd file",
-                                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("IO Exception when trying to access xsd file",
+                                          NO_APPLICABLE_CODE, version);
         } catch (SAXException ex) {
-            throw new OWSWebServiceException("SAX Exception when trying to parse xsd file",
-                                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("SAX Exception when trying to parse xsd file",
+                                          NO_APPLICABLE_CODE, version);
         }
         logger.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return response;
@@ -1507,8 +1506,8 @@ public class CSWworker {
         
         // if the two parameter have been filled we launch an exception
         if (parameterName != null && propertyName != null) {
-            throw new OWSWebServiceException("One of propertyName or parameterName must be null",
-                                             INVALID_PARAMETER_VALUE, "parameterName", version);
+            throw new WebServiceException("One of propertyName or parameterName must be null",
+                                             INVALID_PARAMETER_VALUE, version, "parameterName");
         }
         
         if (parameterName != null) {
@@ -1533,16 +1532,16 @@ public class CSWworker {
                             DomainValuesType value  = new DomainValuesType(token, null, values, type); 
                             responseList.add(value);
                         } else {
-                            throw new OWSWebServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
-                                                             INVALID_PARAMETER_VALUE, "parameterName", version);
+                            throw new WebServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
+                                                          INVALID_PARAMETER_VALUE, version, "parameterName");
                         }
                     } else {
-                        throw new OWSWebServiceException("The operation " + operationName + " does not exist",
-                                                          INVALID_PARAMETER_VALUE, "parameterName", version);
+                        throw new WebServiceException("The operation " + operationName + " does not exist",
+                                                      INVALID_PARAMETER_VALUE, version, "parameterName");
                     }
                 } else {
-                    throw new OWSWebServiceException("ParameterName must be formed like this Operation.parameterName",
-                                                     INVALID_PARAMETER_VALUE, "parameterName", version);
+                    throw new WebServiceException("ParameterName must be formed like this Operation.parameterName",
+                                                     INVALID_PARAMETER_VALUE, version, "parameterName");
                 }
             }
         
@@ -1576,22 +1575,22 @@ public class CSWworker {
                             responseList.add(value);
                                 
                         } catch (SQLException e) {
-                            throw new OWSWebServiceException("The service has launch an SQL exeption:" + e.getMessage(),
-                                                             NO_APPLICABLE_CODE, null, version);
+                            throw new WebServiceException("The service has launch an SQL exeption:" + e.getMessage(),
+                                                          NO_APPLICABLE_CODE, version);
                         }
                     } else {
-                        throw new OWSWebServiceException("The property " + token + " is not queryable for now",
-                                                         INVALID_PARAMETER_VALUE, "propertyName", version);
+                        throw new WebServiceException("The property " + token + " is not queryable for now",
+                                                         INVALID_PARAMETER_VALUE, version, "propertyName");
                     }
                 } else {
-                    throw new OWSWebServiceException("The property " + token + " is not queryable",
-                                                     INVALID_PARAMETER_VALUE, "propertyName", version);
+                    throw new WebServiceException("The property " + token + " is not queryable",
+                                                     INVALID_PARAMETER_VALUE, version, "propertyName");
                 }
             }
         // if no parameter have been filled we launch an exception    
         } else {
-            throw new OWSWebServiceException("One of propertyName or parameterName must be filled",
-                                             MISSING_PARAMETER_VALUE, "parameterName, propertyName", version);
+            throw new WebServiceException("One of propertyName or parameterName must be filled",
+                                          MISSING_PARAMETER_VALUE, version, "parameterName, propertyName");
         }
         logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return new GetDomainResponseType(responseList);
@@ -1607,8 +1606,8 @@ public class CSWworker {
         logger.info("Transaction request processing" + '\n');
         
         if (profile == DISCOVERY) {
-            throw new OWSWebServiceException("This method is not supported by this mode of CSW",
-                                             OPERATION_NOT_SUPPORTED, "Request", version);
+            throw new WebServiceException("This method is not supported by this mode of CSW",
+                                          OPERATION_NOT_SUPPORTED, version, "Request");
         }
         
         long startTime = System.currentTimeMillis();
@@ -1632,8 +1631,8 @@ public class CSWworker {
                         
                         } catch (SQLException ex) {
                             ex.printStackTrace();
-                            throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
-                                                             NO_APPLICABLE_CODE, null, version);
+                            throw new WebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                                                          NO_APPLICABLE_CODE, version);
                         } catch (IllegalArgumentException e) {
                             logger.severe("already that title.");
                             totalUpdated++;
@@ -1641,14 +1640,14 @@ public class CSWworker {
                 }
             } else if (transaction instanceof DeleteType) {
                 DeleteType deleteRequest = (DeleteType)transaction;
-                throw new OWSWebServiceException("This kind of transaction (delete) is not yet supported by the service.",
-                                                  NO_APPLICABLE_CODE, "TransactionType", version);
+                throw new WebServiceException("This kind of transaction (delete) is not yet supported by the service.",
+                                                  NO_APPLICABLE_CODE, version, "TransactionType");
                 
                 
             } else if (transaction instanceof UpdateType) {
                 UpdateType updateRequest = (UpdateType)transaction;
-                throw new OWSWebServiceException("This kind of transaction (update) is not yet supported by the service.",
-                                                  NO_APPLICABLE_CODE, "TransactionType", version);
+                throw new WebServiceException("This kind of transaction (update) is not yet supported by the service.",
+                                              NO_APPLICABLE_CODE, version, "TransactionType");
             
                 
             } else {
@@ -1656,8 +1655,8 @@ public class CSWworker {
                 if (transaction != null) {
                     className = transaction.getClass().getName();
                 }
-                throw new OWSWebServiceException("This kind of transaction is not supported by the service: " + className,
-                                                  INVALID_PARAMETER_VALUE, "TransactionType", version);
+                throw new WebServiceException("This kind of transaction is not supported by the service: " + className,
+                                              INVALID_PARAMETER_VALUE, version, "TransactionType");
             }
             
         }
@@ -1694,9 +1693,9 @@ public class CSWworker {
             transTime = System.currentTimeMillis() - start_trans;
             
         } catch (IllegalArgumentException e) {
-             throw new OWSWebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
-                                              "cause: " + e.getMessage(),
-                                               NO_APPLICABLE_CODE, null, version);
+             throw new WebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
+                                           "cause: " + e.getMessage(),
+                                           NO_APPLICABLE_CODE, version);
         }
         
         // and we store it in the database
@@ -1728,8 +1727,8 @@ public class CSWworker {
     public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
         logger.info("Harvest request processing" + '\n');
         if (profile == DISCOVERY) {
-            throw new OWSWebServiceException("This method is not supported by this mode of CSW",
-                                             OPERATION_NOT_SUPPORTED, "Request", version);
+            throw new WebServiceException("This method is not supported by this mode of CSW",
+                                          OPERATION_NOT_SUPPORTED, version, "Request");
         }
         verifyBaseRequest(request);
         HarvestResponseType response;
@@ -1741,12 +1740,12 @@ public class CSWworker {
         //we verify the resource Type
         String resourceType = request.getResourceType();
         if (resourceType == null) {
-            throw new OWSWebServiceException("The resource type to harvest must be specified",
-                                             MISSING_PARAMETER_VALUE, "resourceType", version);
+            throw new WebServiceException("The resource type to harvest must be specified",
+                                          MISSING_PARAMETER_VALUE, version, "resourceType");
         } else {
             if (!ACCEPTED_RESOURCE_TYPE.contains(resourceType)) {
-                throw new OWSWebServiceException("This resource type is not allowed. ",
-                                             MISSING_PARAMETER_VALUE, "resourceType", version);
+                throw new WebServiceException("This resource type is not allowed. ",
+                                             MISSING_PARAMETER_VALUE, version, "resourceType");
             }
         }
         String sourceURL = request.getSource();
@@ -1778,8 +1777,8 @@ public class CSWworker {
 
                         Object harvested = unmarshaller.unmarshal(fileToHarvest);
                         if (harvested == null) {
-                            throw new OWSWebServiceException("The resource can not be parsed.",
-                                                              INVALID_PARAMETER_VALUE, "Source", version);
+                            throw new WebServiceException("The resource can not be parsed.",
+                                                          INVALID_PARAMETER_VALUE, version, "Source");
                         }
                     
                         logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
@@ -1802,17 +1801,17 @@ public class CSWworker {
                 }
                 
             } catch (SQLException ex) {
-                throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE, null, version);
+                throw new WebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                                              NO_APPLICABLE_CODE, version);
             } catch (JAXBException ex) {
-                throw new OWSWebServiceException("The resource can not be parsed: " + ex.getMessage(),
-                                                  INVALID_PARAMETER_VALUE, "Source", version);
+                throw new WebServiceException("The resource can not be parsed: " + ex.getMessage(),
+                                              INVALID_PARAMETER_VALUE, version, "Source");
             } catch (MalformedURLException ex) {
-                throw new OWSWebServiceException("The source URL is malformed",
-                                                  INVALID_PARAMETER_VALUE, "Source", version);
+                throw new WebServiceException("The source URL is malformed",
+                                              INVALID_PARAMETER_VALUE, version, "Source");
             } catch (IOException ex) {
-                throw new OWSWebServiceException("The service can't open the connection to the source",
-                                                  INVALID_PARAMETER_VALUE, "Source", version);
+                throw new WebServiceException("The service can't open the connection to the source",
+                                              INVALID_PARAMETER_VALUE, version, "Source");
             } 
             
         }
@@ -1831,8 +1830,8 @@ public class CSWworker {
         } else {
             AcknowledgementType acknowledgement = null;
             response = new HarvestResponseType(acknowledgement);
-            throw new OWSWebServiceException("This asynchronous mode for harvest is not yet supported by the service.",
-                                                  OPERATION_NOT_SUPPORTED, "ResponseHandler", version);
+            throw new WebServiceException("This asynchronous mode for harvest is not yet supported by the service.",
+                                          OPERATION_NOT_SUPPORTED, version, "ResponseHandler");
         }
         
         logger.info("Harvest operation finished");
@@ -1902,31 +1901,31 @@ public class CSWworker {
      */ 
     private void verifyBaseRequest(RequestBaseType request) throws WebServiceException {
         if (!isStarted) {
-            throw new OWSWebServiceException("The service is not running!",
-                                              NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service is not running!",
+                                          NO_APPLICABLE_CODE, version);
         }
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("CSW"))  {
-                    throw new OWSWebServiceException("service must be \"CSW\"!",
-                                                  INVALID_PARAMETER_VALUE, "service", version);
+                    throw new WebServiceException("service must be \"CSW\"!",
+                                                  INVALID_PARAMETER_VALUE, version, "service");
                 }
             } else {
-                throw new OWSWebServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, "service", version);
+                throw new WebServiceException("service must be specified!",
+                                              MISSING_PARAMETER_VALUE, version, "service");
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().equals("2.0.2")) {
-                    throw new OWSWebServiceException("version must be \"2.0.2\"!",
-                                                  VERSION_NEGOTIATION_FAILED, "version", version);
+                    throw new WebServiceException("version must be \"2.0.2\"!",
+                                                  VERSION_NEGOTIATION_FAILED, version, "version");
                 }
             } else {
-                throw new OWSWebServiceException("version must be specified!",
-                                              MISSING_PARAMETER_VALUE, "version", version);
+                throw new WebServiceException("version must be specified!",
+                                              MISSING_PARAMETER_VALUE, version, "version");
             }
          } else { 
-            throw new OWSWebServiceException("The request is null!",
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The request is null!",
+                                          NO_APPLICABLE_CODE, version);
          }  
         
     }

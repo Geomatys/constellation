@@ -204,7 +204,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         GridCoverage2D coverage;
         try {
             coverage = worker.getGridCoverage2D(false);
-        } catch (WMSWebServiceException e) {
+        } catch (WebServiceException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof IIOException) {
                 final String message = cause.getMessage();

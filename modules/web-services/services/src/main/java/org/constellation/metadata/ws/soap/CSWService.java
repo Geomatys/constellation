@@ -64,7 +64,6 @@ import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
-import org.constellation.ows.v100.OWSWebServiceException;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -146,8 +145,7 @@ public class CSWService {
             return worker.getCapabilities(requestCapabilities);
             
         } catch (WebServiceException ex) {
-            OWSWebServiceException oex = (OWSWebServiceException)ex; 
-            throw new SOAPServiceException(oex.getMessage(), oex.getExceptionCode().name(), oex.getVersion().toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
         } catch (JAXBException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }

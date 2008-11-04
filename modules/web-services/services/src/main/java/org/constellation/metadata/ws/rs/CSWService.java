@@ -72,7 +72,6 @@ import org.constellation.ogc.SortOrderType;
 import org.constellation.ogc.SortPropertyType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.coverage.web.Service;
 import org.constellation.ebrim.v250.RegistryObjectType;
@@ -235,8 +234,8 @@ public class CSWService extends OGCWebService {
                     try {
                         worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                     } catch(IOException e)   {
-                        throw new OWSWebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+                        throw new WebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
+                                                         INVALID_PARAMETER_VALUE, getCurrentVersion());
             
                     }
                 
@@ -310,8 +309,8 @@ public class CSWService extends OGCWebService {
                     try {
                         worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                     } catch(IOException e)   {
-                        throw new OWSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+                        throw new WebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
+                                                         INVALID_PARAMETER_VALUE, getCurrentVersion());
             
                     }
                     StringWriter sw = new StringWriter();
@@ -324,8 +323,8 @@ public class CSWService extends OGCWebService {
                     TransactionType t = (TransactionType)objectRequest;
                 
                     if (t == null) {
-                         throw new OWSWebServiceException("The Operation transaction is not available in KVP",
-                                                       OPERATION_NOT_SUPPORTED, "transaction", getCurrentVersion());
+                         throw new WebServiceException("The Operation transaction is not available in KVP",
+                                                       OPERATION_NOT_SUPPORTED, getCurrentVersion(),"transaction");
                     }
                 
                     StringWriter sw = new StringWriter();
@@ -356,12 +355,12 @@ public class CSWService extends OGCWebService {
                     else if (request.equals("") && objectRequest == null)
                         request = "undefined request";
                 
-                    throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                     INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
+                    throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "request");
                 }
             } else {
-                throw new OWSWebServiceException("The CSW service is not running",
-                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());
+                throw new WebServiceException("The CSW service is not running",
+                                              NO_APPLICABLE_CODE, getCurrentVersion());
             }
         
         } catch (WebServiceException ex) {
@@ -370,40 +369,21 @@ public class CSWService extends OGCWebService {
              * - if the version number is wrong.
              * - if the user have send a wrong request parameter
              */
-            if (ex instanceof OWSWebServiceException) {
-                OWSWebServiceException owsex = (OWSWebServiceException)ex;
-                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                    !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                    owsex.printStackTrace();
-                } else {
-                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
-                }
-                StringWriter sw = new StringWriter();    
-                if (marshaller != null) {
-                    marshaller.marshal(owsex.getExceptionReport(), sw);
-                    return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
-                } else {
-                   return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
-                }
-            //TODO remove this part
-            } else if (ex instanceof org.constellation.ows.v110.OWSWebServiceException) {
-                OWSWebServiceException owsex = new OWSWebServiceException((org.constellation.ows.v110.OWSWebServiceException)ex, getCurrentVersion());
-                
-                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                    !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                    owsex.printStackTrace();
-                } else {
-                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
-                }
-                StringWriter sw = new StringWriter();    
-                marshaller.marshal(owsex.getExceptionReport(), sw);
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                ex.printStackTrace();
+            } else {
+                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
+            }
+            StringWriter sw = new StringWriter();    
+            if (marshaller != null) {
+                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), ex.getVersion());   
+                marshaller.marshal(report, sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
-                throw new IllegalArgumentException("this service can't return WMS Exception");
+                return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
             }
         }
     }
@@ -438,8 +418,8 @@ public class CSWService extends OGCWebService {
                 if (SectionsType.getExistingSections().contains(token)){
                     requestedSections.add(token);
                 } else {
-                    throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                     INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
+                    throw new WebServiceException("The section " + token + " does not exist",
+                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "Sections");
                 }   
             }
         } else {
@@ -471,8 +451,8 @@ public class CSWService extends OGCWebService {
             try {
                 resultType = ResultType.fromValue(resultTypeName);
             } catch (IllegalArgumentException e){
-               throw new OWSWebServiceException("The resultType " + resultTypeName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, "ResultType", getCurrentVersion());        
+               throw new WebServiceException("The resultType " + resultTypeName + " does not exist",
+                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "ResultType");        
             }
         }
         
@@ -495,8 +475,8 @@ public class CSWService extends OGCWebService {
             try {
                 startPosition = new Integer(startPos);
             } catch (NumberFormatException e){
-               throw new OWSWebServiceException("The positif integer " + startPos + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "startPosition", getCurrentVersion());        
+               throw new WebServiceException("The positif integer " + startPos + " is malformed",
+                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "startPosition");        
             }
         } 
         
@@ -507,8 +487,8 @@ public class CSWService extends OGCWebService {
             try {
                 maxRecords = new Integer(maxRec);
             } catch (NumberFormatException e){
-               throw new OWSWebServiceException("The positif integer " + maxRec + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "maxRecords", getCurrentVersion());        
+               throw new WebServiceException("The positif integer " + maxRec + " is malformed",
+                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "maxRecords");        
             }
         } 
         
@@ -530,8 +510,8 @@ public class CSWService extends OGCWebService {
                     String url    = token.substring(token.indexOf('=') + 1);
                     namespaces.put(prefix, url);
                 } else {
-                     throw new OWSWebServiceException("The namespace " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                     throw new WebServiceException("The namespace " + token + " is malformed",
+                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
                 }
             }
         }
@@ -553,8 +533,8 @@ public class CSWService extends OGCWebService {
                 String localPart = token.substring(token.indexOf(':') + 1);
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
-                throw new OWSWebServiceException("The QName " + token + " is malformed",
-                        INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                throw new WebServiceException("The QName " + token + " is malformed",
+                        INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
             }
         }
         
@@ -565,8 +545,8 @@ public class CSWService extends OGCWebService {
                 elementSet = ElementSetType.fromValue(eSetName);
             
             } catch (IllegalArgumentException e){
-               throw new OWSWebServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, "ElementSetName", getCurrentVersion());        
+               throw new WebServiceException("The ElementSet Name " + eSetName + " does not exist",
+                                                INVALID_PARAMETER_VALUE, getCurrentVersion(), "ElementSetName");        
             }
         }
         
@@ -586,13 +566,13 @@ public class CSWService extends OGCWebService {
                     try {
                         orderType = SortOrderType.fromValue(order);
                     } catch (IllegalArgumentException e){
-                        throw new OWSWebServiceException("The SortOrder Name " + order + " does not exist",
-                                                         INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion());        
+                        throw new WebServiceException("The SortOrder Name " + order + " does not exist",
+                                                      INVALID_PARAMETER_VALUE, getCurrentVersion(), "SortBy");        
                     }
                     sorts.add(new SortPropertyType(propName, orderType));
                 } else {
-                     throw new OWSWebServiceException("The expression " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion());
+                     throw new WebServiceException("The expression " + token + " is malformed",
+                                                      INVALID_PARAMETER_VALUE, getCurrentVersion(), "SortBy");
                 }
             }
             sortBy = new SortByType(sorts);
@@ -616,8 +596,8 @@ public class CSWService extends OGCWebService {
                 constraint = new QueryConstraintType(new FilterType(), languageVersion);
                 
             } else {
-                throw new OWSWebServiceException("The constraint language " + constLanguage + " is not supported",
-                                                 INVALID_PARAMETER_VALUE, "ConstraintLanguage", getCurrentVersion());
+                throw new WebServiceException("The constraint language " + constLanguage + " is not supported",
+                                                 INVALID_PARAMETER_VALUE, getCurrentVersion(), "ConstraintLanguage");
             }
         }
         
@@ -638,8 +618,8 @@ public class CSWService extends OGCWebService {
                 try {
                     hopCount = Integer.parseInt(count);
                 } catch (NumberFormatException e){
-                    throw new OWSWebServiceException("The positif integer " + count + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "HopCount", getCurrentVersion());        
+                    throw new WebServiceException("The positif integer " + count + " is malformed",
+                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "HopCount");        
                 }
             }
             distribSearch = new DistributedSearchType(hopCount);
@@ -676,8 +656,8 @@ public class CSWService extends OGCWebService {
                 elementSet = ElementSetType.fromValue(eSetName);
             
             } catch (IllegalArgumentException e){
-               throw new OWSWebServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, "ElementSetName", getCurrentVersion());        
+               throw new WebServiceException("The ElementSet Name " + eSetName + " does not exist",
+                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "ElementSetName");        
             }
         }
         
@@ -738,8 +718,8 @@ public class CSWService extends OGCWebService {
                     String url    = token.substring(token.indexOf('=') + 1);
                     namespaces.put(prefix, url);
                 } else {
-                     throw new OWSWebServiceException("The namespace " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                     throw new WebServiceException("The namespace " + token + " is malformed",
+                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
                 }
                 
         }
@@ -761,8 +741,8 @@ public class CSWService extends OGCWebService {
                     String localPart = token.substring(token.indexOf(':') + 1);
                     typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
                 } else {
-                     throw new OWSWebServiceException("The QName " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                     throw new WebServiceException("The QName " + token + " is malformed",
+                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
                 }
         }
         
@@ -789,8 +769,8 @@ public class CSWService extends OGCWebService {
         
         String propertyName = getParameter("PROPERTYNAME", false);
         if (propertyName != null && parameterName != null) {
-            throw new OWSWebServiceException("One of propertyName or parameterName must be null",
-                                             INVALID_PARAMETER_VALUE, "parameterName", getCurrentVersion());
+            throw new WebServiceException("One of propertyName or parameterName must be null",
+                                          INVALID_PARAMETER_VALUE, getCurrentVersion(), "parameterName");
         }
        
         return new GetDomainType(service, version, propertyName, parameterName);
@@ -817,8 +797,8 @@ public class CSWService extends OGCWebService {
                 DatatypeFactory factory  = DatatypeFactory.newInstance();
                 harvestInterval          = factory.newDuration(interval) ;
             } catch (DatatypeConfigurationException ex) {
-                throw new OWSWebServiceException("The Duration " + interval + " is malformed",
-                                              INVALID_PARAMETER_VALUE, "HarvestInsterval", getCurrentVersion());
+                throw new WebServiceException("The Duration " + interval + " is malformed",
+                                              INVALID_PARAMETER_VALUE, getCurrentVersion(), "HarvestInsterval");
             }
         }
         

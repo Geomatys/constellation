@@ -42,7 +42,6 @@ import org.constellation.ogc.PropertyIsLikeType;
 import org.constellation.ogc.PropertyIsNullType;
 import org.constellation.ogc.SpatialOpsType;
 import org.constellation.ogc.UnaryLogicOpType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
@@ -104,11 +103,11 @@ public class SQLFilterParser extends FilterParser {
             return new SQLQuery("Select identifier, catalog from Form where catalog != 'MDATA");
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
-            throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("The query constraint must be in Filter or CQL but not both.",
+                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
-            throw new OWSWebServiceException("The query constraint must contain a Filter or a CQL query.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            throw new WebServiceException("The query constraint must contain a Filter or a CQL query.",
+                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
         }
         
         if (constraint.getCqlText() != null) {
@@ -117,12 +116,12 @@ public class SQLFilterParser extends FilterParser {
 
             } catch (JAXBException ex) {
                 ex.printStackTrace();
-                throw new OWSWebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, "QueryConstraint", version);
+                throw new WebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
+                                                 NO_APPLICABLE_CODE, version, "QueryConstraint");
             } catch (CQLException ex) {
-                throw new OWSWebServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
+                throw new WebServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
                                                  + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
         } else if (constraint.getFilter() != null) {
@@ -357,8 +356,8 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append(".path ='").append(transformSyntax(propertyName)).append("' AND ");
                 response.append('v').append(nbField).append("value LIKE '");
             } else {
-                throw new OWSWebServiceException("An operator propertyIsLike must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator propertyIsLike must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
             //we get the value of the field
@@ -380,8 +379,8 @@ public class SQLFilterParser extends FilterParser {
                 response.append(" AND v").append(nbField).append(".form=identifier ");
                 
             } else {
-                throw new OWSWebServiceException("An operator propertyIsLike must specified the literal value.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator propertyIsLike must specified the literal value.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
              PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
@@ -392,8 +391,8 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append(".value IS NULL ");
                 response.append(" AND v").append(nbField).append(".form=identifier ");
             } else {
-                throw new OWSWebServiceException("An operator propertyIsNull must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator propertyIsNull must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             
@@ -408,8 +407,8 @@ public class SQLFilterParser extends FilterParser {
             String operator           = JBComparisonOps.getName().getLocalPart(); 
             
             if (propertyName == null || literal == null) {
-                throw new OWSWebServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("A binary comparison operator must be constitued of a literal and a property name.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
                     response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -429,16 +428,16 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value >= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new OWSWebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
+                        throw new WebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
@@ -448,16 +447,16 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value > '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new OWSWebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
+                        throw new WebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
@@ -468,16 +467,16 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value < '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new OWSWebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
+                        throw new WebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
@@ -487,20 +486,20 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new OWSWebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value <= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                         throw new OWSWebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint", version);
+                         throw new WebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
+                                                          OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
                     }
                 } else {
-                    throw new OWSWebServiceException("Unkwnow comparison operator: " + operator,
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                    throw new WebServiceException("Unkwnow comparison operator: " + operator,
+                                                     INVALID_PARAMETER_VALUE, version, "QueryConstraint");
                 }
             }
         }
@@ -527,19 +526,19 @@ public class SQLFilterParser extends FilterParser {
             
             //we verify that all the parameters are specified
             if (propertyName == null) {
-                throw new OWSWebServiceException("An operator BBOX must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator BBOX must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } else if (!propertyName.contains("BoundingBox")) {
-                throw new OWSWebServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
-                throw new OWSWebServiceException("An operator BBOX must specified an envelope.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator BBOX must specified an envelope.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             if (CRSName == null) {
-                throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
             //we transform the EnvelopeEntry in GeneralEnvelope
@@ -552,14 +551,14 @@ public class SQLFilterParser extends FilterParser {
                 spatialfilter = new SpatialFilter(envelope, CRSName, SpatialFilter.BBOX);
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (FactoryException e) {
-                throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
         } else if (spatialOps instanceof DistanceBufferType) {
@@ -575,21 +574,21 @@ public class SQLFilterParser extends FilterParser {
             else if (operator.equals("Beyond"))
                 filterType = SpatialFilter.BEYOND;
             else
-                throw new OWSWebServiceException("Unknow DistanceBuffer operator.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Unknow DistanceBuffer operator.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
            
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
-                 throw new OWSWebServiceException("An distanceBuffer operator must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                 throw new WebServiceException("An distanceBuffer operator must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             if (units == null) {
-                 throw new OWSWebServiceException("An distanceBuffer operator must specified the ditance units.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                 throw new WebServiceException("An distanceBuffer operator must specified the ditance units.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             if (JBgeom == null || JBgeom.getValue() == null) {
-                 throw new OWSWebServiceException("An distanceBuffer operator must specified a geometric object.",
-                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                 throw new WebServiceException("An distanceBuffer operator must specified a geometric object.",
+                                                  INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
            
             Object geometry  = JBgeom.getValue(); 
@@ -616,14 +615,14 @@ public class SQLFilterParser extends FilterParser {
                 spatialfilter = new SpatialFilter(geometry, CRSName, filterType, distance, units);
                
             } catch (NoSuchAuthorityCodeException e) {
-                    throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                    throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                                                     INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (FactoryException e) {
-                    throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                    throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                     INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                    throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                      INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                    throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                                                      INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
            
         } else if (spatialOps instanceof BinarySpatialOpType) {
@@ -666,14 +665,14 @@ public class SQLFilterParser extends FilterParser {
             }
             
             if (propertyName == null && geometry == null) {
-                throw new OWSWebServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
             int filterType = SpatialFilter.valueOf(operator);
             if (filterType == -1) {
-                throw new OWSWebServiceException("Unknow FilterType: " + operator,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Unknow FilterType: " + operator,
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
             String CRSName = "undefined CRS";
@@ -700,14 +699,14 @@ public class SQLFilterParser extends FilterParser {
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (FactoryException e) {
-                throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
             }
             
         }

@@ -63,7 +63,6 @@ import org.constellation.ows.v100.DCP;
 import org.constellation.ows.v100.DomainType;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ows.v100.ExceptionType;
-import org.constellation.ows.v100.OWSWebServiceException;
 import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
@@ -249,8 +248,8 @@ public class CatalogueHarvester {
             getRecordRequest = fullGetRecordsRequestv200;
             
         } else {
-            throw new OWSWebServiceException("This service if it is one is not requestable by constellation",
-                                              OPERATION_NOT_SUPPORTED, "ResponseHandler", worker.getVersion());
+            throw new WebServiceException("This service if it is one is not requestable by constellation",
+                                          OPERATION_NOT_SUPPORTED, worker.getVersion(), "ResponseHandler");
         }
         
         getRecordRequest = analyseCapabilitiesDocument((CapabilitiesBaseType)distantCapabilities, getRecordRequest);
@@ -283,8 +282,8 @@ public class CatalogueHarvester {
         
                 // if the service respond with non xml or unstandardized response
                 if (harvested == null) {
-                    WebServiceException exe =new OWSWebServiceException("The distant service does not respond correctly.",
-                                                     NO_APPLICABLE_CODE, null, worker.getVersion());
+                    WebServiceException exe = new WebServiceException("The distant service does not respond correctly.",
+                                                     NO_APPLICABLE_CODE, worker.getVersion());
                     logger.severe("The distant service does not respond correctly");
                     distantException.add(exe);
                     moreResults = false;
@@ -385,16 +384,16 @@ public class CatalogueHarvester {
                                 msg = msg + s + '\n';
                         }
                     }
-                    WebServiceException exe = new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
-                                                                         NO_APPLICABLE_CODE, null, worker.getVersion());
+                    WebServiceException exe = new WebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                                                                      NO_APPLICABLE_CODE, worker.getVersion());
                     logger.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
                     distantException.add(exe);
                     moreResults = false;
                 
                 // if we obtain an object that we don't expect    
                 } else {
-                    throw new OWSWebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
-                                                 NO_APPLICABLE_CODE, null, worker.getVersion());
+                    throw new WebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
+                                                 NO_APPLICABLE_CODE, worker.getVersion());
                 }
                 
                 //if we don't have succeed we try without constraint part
@@ -683,8 +682,8 @@ public class CatalogueHarvester {
                     
                     worker.marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
-                    throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
-                                                     NO_APPLICABLE_CODE, null, worker.getVersion());
+                    throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                                                 NO_APPLICABLE_CODE, worker.getVersion());
                 }
                 String XMLRequest = sw.toString();
             
