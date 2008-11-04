@@ -49,7 +49,6 @@ import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.xacml.CstlPDP;
 import org.constellation.xacml.PEP;
@@ -291,7 +290,7 @@ public class GeoDRMService extends OGCWebService {
         return allowRequest(objectRequest);
     }
 
-    private Response sendRequest(Object objectRequest) throws OWSWebServiceException, MalformedURLException {
+    private Response sendRequest(Object objectRequest) throws WebServiceException, MalformedURLException {
         Object response = null;
         String contentType = "";
         try {
@@ -310,8 +309,8 @@ public class GeoDRMService extends OGCWebService {
                     
                     marshaller.marshal(objectRequest, sw);
                 } catch (JAXBException ex) {
-                    throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
-                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());
+                    throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE, getCurrentVersion());
                 }
                 String XMLRequest = sw.toString();
             

@@ -42,9 +42,9 @@ import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
 import org.constellation.ows.OWSExceptionCode;
-import org.constellation.ows.v110.OWSWebServiceException;
 
 // Geotools dependencies
+import org.constellation.ows.v110.ExceptionReport;
 import org.geotools.util.Version;
 
 import static org.constellation.coverage.web.ExceptionCode.*;
@@ -215,9 +215,8 @@ public abstract class OGCWebService extends WebService {
     protected Object launchException(final String message, final String codeName, final String locator) {
         if (getCurrentVersion().isOWS()) {
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            final OWSWebServiceException wse = new OWSWebServiceException(message,
-                    code, locator, getCurrentVersion());
-            return wse.getExceptionReport();
+            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getCurrentVersion());
+            return report;
         } else {
             final ExceptionCode code = ExceptionCode.valueOf(codeName);
             return new ServiceExceptionReport(getCurrentVersion(), new ServiceExceptionType(message, code));

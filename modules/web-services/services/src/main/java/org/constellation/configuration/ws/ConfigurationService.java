@@ -42,7 +42,6 @@ import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import static org.constellation.ows.OWSExceptionCode.*;
-import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -124,8 +123,8 @@ public class ConfigurationService extends OGCWebService  {
                 
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             } else {
-                throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, "Request", version);
+                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                                 OPERATION_NOT_SUPPORTED, version, "Request");
             }
         
         } catch (WebServiceException ex) {
@@ -161,9 +160,9 @@ public class ConfigurationService extends OGCWebService  {
      * 
      * @param synchrone
      * @return
-     * @throws org.constellation.ows.v110.OWSWebServiceException
+     * @throws WebServiceException
      */
-    private AcknowlegementType refreshIndex(boolean synchrone) throws OWSWebServiceException {
+    private AcknowlegementType refreshIndex(boolean synchrone) throws WebServiceException {
         LOGGER.info("refresh index requested");
         
         File sicadeDir    = getSicadeDirectory(); 
@@ -177,14 +176,10 @@ public class ConfigurationService extends OGCWebService  {
             boolean succeed =indexDir.delete();
             
             if (!succeed) {
-                throw new OWSWebServiceException("The service can't delete the index folder.",
-                                                 NO_APPLICABLE_CODE,
-                                                 null, version);
+                throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
             }
         } else {
-            throw new OWSWebServiceException("the index folder does not exist.",
-                                                 NO_APPLICABLE_CODE,
-                                                 null, version);
+            throw new WebServiceException("the index folder does not exist.", NO_APPLICABLE_CODE, version);
         }
         
         //then we restart the services
@@ -240,28 +235,25 @@ public class ConfigurationService extends OGCWebService  {
         Map<String, String> newProperties = request.getProperties();
         
         if ( service == null) {
-            throw new OWSWebServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE,
-                                             "service", version);
+            throw new WebServiceException("You must specify the service parameter.",
+                                              MISSING_PARAMETER_VALUE, version, "service");
         } else if (!serviceDirectory.keySet().contains(service)) {
             String msg = "Invalid value for the service parameter: " + service + '\n' +
                          "accepted values are:";
             for (String s: serviceDirectory.keySet()) {
                 msg = msg + s + ',';
             }
-            throw new OWSWebServiceException(msg, MISSING_PARAMETER_VALUE,
-                                             "service", version);
+            throw new WebServiceException(msg, MISSING_PARAMETER_VALUE, version, "service");
             
         }
         
         if (fileName == null) {
-             throw new OWSWebServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE,
-                                             "fileName", version);
+             throw new WebServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, version, "fileName");
         }
         
         if (newProperties == null || newProperties.size() == 0) {
-             throw new OWSWebServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE,
-                                             "properties", version);
+             throw new WebServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
+                     version, "properties");
         }
         
         File sicadeDir      = getSicadeDirectory();
@@ -274,8 +266,8 @@ public class ConfigurationService extends OGCWebService  {
                 prop.put(key, newProperties.get(key));
             }
         } else {
-            throw new OWSWebServiceException("The file does not exist: " + propertiesFile.getPath(),
-                                              NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The file does not exist: " + propertiesFile.getPath(),
+                                          NO_APPLICABLE_CODE, version);
         }
         
         storeProperties(prop, propertiesFile);
@@ -324,7 +316,7 @@ public class ConfigurationService extends OGCWebService  {
      *       download action for some users. Will probably be removed in a future version.
      */
     private File downloadFile() throws WebServiceException {
-        throw new OWSWebServiceException("Not implemented", NO_APPLICABLE_CODE, null, version);
+        throw new WebServiceException("Not implemented", NO_APPLICABLE_CODE, version);
     }
     
     
@@ -351,24 +343,21 @@ public class ConfigurationService extends OGCWebService  {
                 //this case must never happen
                 } catch (FileNotFoundException ex) {
                     LOGGER.severe("FileNotFound " + f.getPath() + " properties file");
-                    throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
-                            NO_APPLICABLE_CODE,
-                            null, version);
+                    throw new WebServiceException("FileNotFound " + f.getPath() + " properties file",
+                            NO_APPLICABLE_CODE, version);
 
                 } catch (IOException ex) {
                     LOGGER.severe("unable to load the " + f.getPath() + " properties file");
-                    throw new OWSWebServiceException("unable to load the " + f.getPath() + " properties file",
-                            NO_APPLICABLE_CODE,
-                            null, version);
+                    throw new WebServiceException("unable to load the " + f.getPath() + " properties file",
+                            NO_APPLICABLE_CODE, version);
                 }
             } else {
                 try {
                     f.createNewFile();
                 } catch (IOException ex) {
                     LOGGER.severe("unable to create the cascading properties file");
-                    throw new OWSWebServiceException("unable to create the cascading properties file",
-                            NO_APPLICABLE_CODE,
-                            null, version);
+                    throw new WebServiceException("unable to create the cascading properties file",
+                            NO_APPLICABLE_CODE, version);
                 }
             }
             return prop;
@@ -396,15 +385,13 @@ public class ConfigurationService extends OGCWebService  {
             //must never happen    
             } catch (FileNotFoundException ex) {
                 LOGGER.severe("FileNotFound " + f.getPath() + " properties file (no normal)");
-                throw new OWSWebServiceException("FileNotFound " + f.getPath() + " properties file",
-                        NO_APPLICABLE_CODE,
-                        null, version);
+                throw new WebServiceException("FileNotFound " + f.getPath() + " properties file",
+                        NO_APPLICABLE_CODE, version);
 
             } catch (IOException ex) {
                 LOGGER.severe("unable to store the " + f.getPath() + " properties file");
-                throw new OWSWebServiceException("unable to store the " + f.getPath() + "properties file",
-                        NO_APPLICABLE_CODE,
-                        null, version);
+                throw new WebServiceException("unable to store the " + f.getPath() + "properties file",
+                        NO_APPLICABLE_CODE, version);
             }
         }
     } 

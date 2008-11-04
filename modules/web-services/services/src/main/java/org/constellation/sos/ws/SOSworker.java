@@ -79,7 +79,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
@@ -455,21 +454,18 @@ public class SOSworker {
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("SOS")) {
-                throw new OWSWebServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE,
-                                                 "service", version);
+                throw new WebServiceException("service must be \"SOS\"!",
+                                                 INVALID_PARAMETER_VALUE, version, "service");
             }
         } else {
-            throw new OWSWebServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, "service",
-                                             version);
+            throw new WebServiceException("Service must be specified!",
+                                             MISSING_PARAMETER_VALUE, version, "service");
         }
         AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("1.0.0")){
-                 throw new OWSWebServiceException("version available : 1.0.0",
-                                             VERSION_NEGOTIATION_FAILED, "acceptVersion",
-                                             version);
+                 throw new WebServiceException("version available : 1.0.0",
+                                             VERSION_NEGOTIATION_FAILED, version, "acceptVersion");
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
@@ -482,9 +478,8 @@ public class SOSworker {
                 }
             }
             if (!found) {
-                throw new OWSWebServiceException("accepted format : text/xml, application/xml",
-                                                 INVALID_PARAMETER_VALUE, "acceptFormats",
-                                                 version);
+                throw new WebServiceException("accepted format : text/xml, application/xml",
+                                                 INVALID_PARAMETER_VALUE, version, "acceptFormats");
             }
             
         } else {
@@ -591,13 +586,13 @@ public class SOSworker {
             
         } catch (SQLException ex) {
            ex.printStackTrace();
-           throw new OWSWebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE, null, version);
+           throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE, version);
            
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         }
         return normalizeDocument(c);
         
@@ -617,17 +612,17 @@ public class SOSworker {
             //we verify that the output format is good.     
             if (requestDescSensor.getOutputFormat()!= null) {
                     if (!requestDescSensor.getOutputFormat().equalsIgnoreCase("text/xml;subtype=\"SensorML/1.0.0\"")) {
-                        throw new OWSWebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
-                                                         INVALID_PARAMETER_VALUE, "outputFormat", version);
+                        throw new WebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
+                                                         INVALID_PARAMETER_VALUE, version, "outputFormat");
                     }
             } else {
-                throw new OWSWebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
-                                                 MISSING_PARAMETER_VALUE, "outputFormat", version);
+                throw new WebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
+                                                 MISSING_PARAMETER_VALUE, version, "outputFormat");
             }
             //we transform the form into an XML string
             if (requestDescSensor.getProcedure() == null) {
-                throw new OWSWebServiceException("You must specify the sensor ID!",
-                                             MISSING_PARAMETER_VALUE, "procedure", version);
+                throw new WebServiceException("You must specify the sensor ID!",
+                                             MISSING_PARAMETER_VALUE, version, "procedure");
             }
             String sensorId = requestDescSensor.getProcedure();
             logger.info("sensorId received: " + sensorId);
@@ -646,16 +641,16 @@ public class SOSworker {
                 Form f = sensorMLReader.getForm(SMLCatalog, id);
 
                 if (f == null) {
-                    throw new OWSWebServiceException("this sensor is not registered in the database!",
-                                                  INVALID_PARAMETER_VALUE, "procedure", version);
+                    throw new WebServiceException("this sensor is not registered in the database!",
+                                                  INVALID_PARAMETER_VALUE, version, "procedure");
                 }
                 //we transform the form into an XML string
                 Writer XMLWriter = new Writer(sensorMLReader);
                 result = XMLWriter.writeForm(f);
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                throw new OWSWebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE, null, version);
+                throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE, version);
             }
 
             
@@ -677,12 +672,12 @@ public class SOSworker {
          //we verify that the output format is good.     
          if (requestObservation.getResponseFormat()!= null) {
             if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0.0\"")) {
-                throw new OWSWebServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat", 
-                                                 INVALID_PARAMETER_VALUE, "responseFormat", version);
+                throw new WebServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat", 
+                                                 INVALID_PARAMETER_VALUE, version, "responseFormat");
             }
          } else {
-            throw new OWSWebServiceException("Response format text/xml;subtype=\"om/1.0.0\" must be specify",
-                                             MISSING_PARAMETER_VALUE, "responseFormat", version);
+            throw new WebServiceException("Response format text/xml;subtype=\"om/1.0.0\" must be specify",
+                                          MISSING_PARAMETER_VALUE, version, "responseFormat");
          }
         
         //we get the mode of result
@@ -696,8 +691,8 @@ public class SOSworker {
                 try {
                     mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
                 } catch (IllegalArgumentException e) {
-                    throw new OWSWebServiceException(" the response Mode: " + requestObservation.getResponseMode() + " is not supported by the service (inline or template available)!",
-                                                     INVALID_PARAMETER_VALUE, "responseMode", version);
+                    throw new WebServiceException(" the response Mode: " + requestObservation.getResponseMode() + " is not supported by the service (inline or template available)!",
+                                                     INVALID_PARAMETER_VALUE, version, "responseMode");
                 }
             }
             StringBuilder SQLrequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
@@ -708,24 +703,24 @@ public class SOSworker {
                 SQLrequest.append(observationTemplateIdBase).append("%' AND ");
                 template = true;
             } else {
-                throw new OWSWebServiceException(" this response Mode is not supported by the service (inline or template available)!",
-                                                 OPERATION_NOT_SUPPORTED, "responseMode", version);
+                throw new WebServiceException("This response Mode is not supported by the service (inline or template available)!",
+                                                 OPERATION_NOT_SUPPORTED, version, "responseMode");
             }
             
             ObservationOfferingEntry off;
             //we verify that there is an offering 
             if (requestObservation.getOffering() == null) {
-                throw new OWSWebServiceException(" offering must be specify!",
-                                                 MISSING_PARAMETER_VALUE, "offering", version);
+                throw new WebServiceException("Offering must be specify!",
+                                                 MISSING_PARAMETER_VALUE, version, "offering");
             } else {
                 try {
                     off = offTable.getEntry(requestObservation.getOffering());
                 } catch (NoSuchRecordException ex) {
-                    throw new OWSWebServiceException("this offering is not registered in the service",
-                                                  INVALID_PARAMETER_VALUE, "offering", version);
+                    throw new WebServiceException("This offering is not registered in the service",
+                                                  INVALID_PARAMETER_VALUE, version, "offering");
                 } catch (CatalogException ex) {
-                  throw new OWSWebServiceException("Catalog exception while getting the offering",
-                                                  NO_APPLICABLE_CODE, "offering", version);
+                  throw new WebServiceException("Catalog exception while getting the offering",
+                                                  NO_APPLICABLE_CODE, version, "offering");
                 }
                 
             }
@@ -733,16 +728,16 @@ public class SOSworker {
             //we verify that the srsName (if there is one) is advertised in the offering
             if (requestObservation.getSrsName() != null) {
                 if (!off.getSrsName().contains(requestObservation.getSrsName())) {
-                    throw new OWSWebServiceException("This srs name is not advertised in the offering",
-                                                    INVALID_PARAMETER_VALUE, "srsName", version);
+                    throw new WebServiceException("This srs name is not advertised in the offering",
+                                                    INVALID_PARAMETER_VALUE, version, "srsName");
                 }
             }
             
             //we verify that the resultModel (if there is one) is advertised in the offering
             if (requestObservation.getResultModel() != null) {
                 if (!off.getResultModel().contains(requestObservation.getResultModel())) {
-                    throw new OWSWebServiceException("This result model is not advertised in the offering",
-                                                    INVALID_PARAMETER_VALUE, "resultModel", version);
+                    throw new WebServiceException("This result model is not advertised in the offering",
+                                                    INVALID_PARAMETER_VALUE, version, "resultModel");
                 }
             }
             
@@ -762,24 +757,24 @@ public class SOSworker {
                         try {
                             proc = getReferenceFromHRef(dbId); 
                         } catch (NoSuchRecordException ex) {
-                            throw new OWSWebServiceException(" this process is not registred in the table",
-                                                          INVALID_PARAMETER_VALUE, "procedure", version);
+                            throw new WebServiceException(" this process is not registred in the table",
+                                                          INVALID_PARAMETER_VALUE, version, "procedure");
                         } catch (CatalogException ex) {
-                            throw new OWSWebServiceException("Catalog exception while getting the procedure",
-                                                             NO_APPLICABLE_CODE, "offering", version);
+                            throw new WebServiceException("Catalog exception while getting the procedure",
+                                                             NO_APPLICABLE_CODE, version, "offering");
                         }
                      
                         if (!off.getProcedure().contains(proc)) {
-                           throw new OWSWebServiceException(" this process is not registred in the offering",
-                                                        INVALID_PARAMETER_VALUE, "procedure", version);
+                           throw new WebServiceException(" this process is not registred in the offering",
+                                                        INVALID_PARAMETER_VALUE, version, "procedure");
                         } else {
                             SQLrequest.append(" procedure='").append(dbId).append("' OR ");
                         }
                     } else {
                         //if there is only one proccess null we return error (we'll see)
                         if (procedures.size() == 1)
-                            throw new OWSWebServiceException("the process is null",
-                                                             INVALID_PARAMETER_VALUE, "procedure", version);
+                            throw new WebServiceException("the process is null",
+                                                             INVALID_PARAMETER_VALUE, version, "procedure");
                     }
                 }
             } else {
@@ -811,8 +806,8 @@ public class SOSworker {
                     } catch (NoSuchRecordException ex) {
                         //we let continue to look if it is a phenomenon (simple)
                     } catch (CatalogException ex){
-                        throw new OWSWebServiceException("Catalog exception while getting the phenomenon",
-                                                        NO_APPLICABLE_CODE, "observedProperty", version);
+                        throw new WebServiceException("Catalog exception while getting the phenomenon",
+                                                        NO_APPLICABLE_CODE, version, "observedProperty");
                     }
                      
                         
@@ -821,11 +816,11 @@ public class SOSworker {
                         try {
                             phen = (PhenomenonEntry) phenomenons.getEntry(s);
                         } catch (NoSuchRecordException ex) {
-                            throw new OWSWebServiceException(" this phenomenon " + s + " is not registred in the database!",
-                                                          INVALID_PARAMETER_VALUE, "observedProperty", version);
+                            throw new WebServiceException(" this phenomenon " + s + " is not registred in the database!",
+                                                          INVALID_PARAMETER_VALUE, version, "observedProperty");
                         } catch (CatalogException ex){
-                            throw new OWSWebServiceException("Catalog exception while getting the phenomenon",
-                                                             NO_APPLICABLE_CODE, "observedProperty", version);
+                            throw new WebServiceException("Catalog exception while getting the phenomenon",
+                                                             NO_APPLICABLE_CODE, version, "observedProperty");
                         }
                         if (phen != null) {
                             SQLrequest.append(" observed_property='").append(s).append("' OR ");
@@ -858,11 +853,11 @@ public class SOSworker {
                         try {
                             foiTable.getEntry(s);
                         } catch (NoSuchRecordException ex){
-                            throw new OWSWebServiceException("the feature of interest is not registered",
-                                                             INVALID_PARAMETER_VALUE, "featureOfInterest", version);
+                            throw new WebServiceException("the feature of interest is not registered",
+                                                             INVALID_PARAMETER_VALUE, version, "featureOfInterest");
                         } catch (CatalogException ex){
-                            throw new OWSWebServiceException("Catalog exception while getting the feature of interest",
-                                                             NO_APPLICABLE_CODE, "featureOfInterest", version);
+                            throw new WebServiceException("Catalog exception while getting the feature of interest",
+                                                             NO_APPLICABLE_CODE, version, "featureOfInterest");
                         }
                         SQLrequest.append("feature_of_interest_point='").append(s).append("' OR");
                     }
@@ -885,11 +880,11 @@ public class SOSworker {
                                 try {
                                     station = foiTable.getEntry(refStation.getHref());
                                 } catch (NoSuchTableException ex){
-                                    throw new OWSWebServiceException("the feature of interest is not registered",
-                                                                     INVALID_PARAMETER_VALUE, "", version);
+                                    throw new WebServiceException("the feature of interest is not registered",
+                                                                     INVALID_PARAMETER_VALUE, version);
                                 } catch (CatalogException ex){
-                                     throw new OWSWebServiceException("Catalog exception while getting the feature of interest",
-                                                                      NO_APPLICABLE_CODE, "observedProperty", version);
+                                     throw new WebServiceException("Catalog exception while getting the feature of interest",
+                                                                      NO_APPLICABLE_CODE, version, "observedProperty");
                         }
                                 if (station instanceof SamplingPointEntry) {
                                     SamplingPointEntry sp = (SamplingPointEntry) station;
@@ -913,12 +908,12 @@ public class SOSworker {
                             }
                         
                         } else {
-                            throw new OWSWebServiceException("the envelope is not build correctly",
-                                                         INVALID_PARAMETER_VALUE, "", version);
+                            throw new WebServiceException("the envelope is not build correctly",
+                                                         INVALID_PARAMETER_VALUE, version);
                         }
                     } else {
-                        throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
-                                                     OPERATION_NOT_SUPPORTED, "", version);
+                        throw new WebServiceException("This operation is not take in charge by the Web Service",
+                                                     OPERATION_NOT_SUPPORTED, version);
                     }
                 }
             
@@ -934,8 +929,8 @@ public class SOSworker {
                     String propertyName  = result.getPropertyIsLessThan().getPropertyName();
                     LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
                     if (literal == null || propertyName == null || propertyName.equals("")) {
-                        throw new OWSWebServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
-                                                      MISSING_PARAMETER_VALUE, "lessThan", version);
+                        throw new WebServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
+                                                      MISSING_PARAMETER_VALUE, version, "lessThan");
                     } 
                     
                         
@@ -944,8 +939,8 @@ public class SOSworker {
                     String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
                     LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
                     if (propertyName == null || propertyName.equals("") || literal == null) {
-                        throw new OWSWebServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
-                                                     MISSING_PARAMETER_VALUE, "greaterThan", version);
+                        throw new WebServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
+                                                     MISSING_PARAMETER_VALUE, version, "greaterThan");
                     } 
                     
                 } else if (result.getPropertyIsEqualTo() != null) {
@@ -953,21 +948,21 @@ public class SOSworker {
                     String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
                     LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
                     if (propertyName == null || propertyName.equals("") || literal == null) {
-                         throw new OWSWebServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
-                                                       MISSING_PARAMETER_VALUE, "propertyIsEqualTo", version);
+                         throw new WebServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
+                                                       MISSING_PARAMETER_VALUE, version, "propertyIsEqualTo");
                     } 
                     
                         
                 } else if (result.getPropertyIsLike() != null) {
-                    throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
-                                                  OPERATION_NOT_SUPPORTED, "propertyIsLike", version);
+                    throw new WebServiceException("This operation is not take in charge by the Web Service",
+                                                  OPERATION_NOT_SUPPORTED, version, "propertyIsLike");
 
                 } else if (result.getPropertyIsBetween() != null) {
                     
                     logger.info("PROP IS BETWEEN");
                     if (result.getPropertyIsBetween().getPropertyName() == null) {
-                        throw new OWSWebServiceException("To use the operation Between you must specify the propertyName and the litteral",
-                                                      MISSING_PARAMETER_VALUE, "propertyIsBetween", version);
+                        throw new WebServiceException("To use the operation Between you must specify the propertyName and the litteral",
+                                                      MISSING_PARAMETER_VALUE, version, "propertyIsBetween");
                     } 
                     String propertyName  = result.getPropertyIsBetween().getPropertyName();
                     
@@ -975,14 +970,14 @@ public class SOSworker {
                     LiteralType UpperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
                     
                     if (propertyName == null || propertyName.equals("") || LowerLiteral == null || UpperLiteral == null) {
-                            throw new OWSWebServiceException("This property name, lower and upper literal must be specify",
-                                                          INVALID_PARAMETER_VALUE, "result", version);
+                            throw new WebServiceException("This property name, lower and upper literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, version, "result");
                             
                     }
                 
                 } else {
-                    throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
-                                                  OPERATION_NOT_SUPPORTED, null, version);
+                    throw new WebServiceException("This operation is not take in charge by the Web Service",
+                                                  OPERATION_NOT_SUPPORTED, version);
                 }
             }
             logger.info("request:" + SQLrequest.toString());
@@ -1015,25 +1010,25 @@ public class SOSworker {
                     
                         //we stop the request if its too big
                         if (response.getMember().size() > maxObservationByRequest) {
-                            throw new OWSWebServiceException("Your request is to voluminous please add filter and try again",
-                                                          NO_APPLICABLE_CODE, null, version);
+                            throw new WebServiceException("Your request is to voluminous please add filter and try again",
+                                                          NO_APPLICABLE_CODE, version);
                         }
                     }
                 }
             } catch (CatalogException ex) {
-                  throw new OWSWebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE, "getObservation", version);
+                  throw new WebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE, version, "getObservation");
             }
             results.close();
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch (NoSuchTableException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a NoSuchTableException:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw a NoSuchTableException:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         }
         return normalizeDocument(response);
     }
@@ -1053,12 +1048,12 @@ public class SOSworker {
             String id = requestResult.getObservationTemplateId();
             template = templates.get(id);
             if (template == null) {
-                throw new OWSWebServiceException("this template does not exist or is no longer usable",
-                                              INVALID_PARAMETER_VALUE, "ObservationTemplateId", version);
+                throw new WebServiceException("this template does not exist or is no longer usable",
+                                              INVALID_PARAMETER_VALUE, version, "ObservationTemplateId");
             }
         } else {
-            throw new OWSWebServiceException("ObservationTemplateID must be specified",
-                                          MISSING_PARAMETER_VALUE, "ObservationTemplateId", version);
+            throw new WebServiceException("ObservationTemplateID must be specified",
+                                          MISSING_PARAMETER_VALUE, version, "ObservationTemplateId");
         }
         
         //we begin to create the sql request
@@ -1142,12 +1137,12 @@ public class SOSworker {
             response = new GetResultResponse(r);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("The service has throw an SQL exception in GetResult Operation",
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw an SQL exception in GetResult Operation",
+                                          NO_APPLICABLE_CODE, version);
         } catch (CatalogException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a Catalog Exception:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw a Catalog Exception:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         }
 
         logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
@@ -1355,15 +1350,15 @@ public class SOSworker {
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationEntry obs     = temp.getObservation();
             if(obs == null) {
-                throw new OWSWebServiceException("observation template must be specify",
+                throw new WebServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
-                                              "observationTemplate",
-                                              version);
+                                              version,
+                                              "observationTemplate");
             } else if (!obs.isComplete()) {
-                throw new OWSWebServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
+                throw new WebServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
                                               INVALID_PARAMETER_VALUE,
-                                              "observationTemplate",
-                                              version); 
+                                              version,
+                                              "observationTemplate"); 
             }
            
             //we decode the content
@@ -1413,40 +1408,39 @@ public class SOSworker {
                 addSensorToOffering(f, obs);
                      
             } else {
-                throw new OWSWebServiceException("error with the database, the service can't retrieve the observation Table",
-                                                 NO_APPLICABLE_CODE, null, version);
+                throw new WebServiceException("error with the database, the service can't retrieve the observation Table",
+                                                 NO_APPLICABLE_CODE, version);
            }
            success = true; 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE, version);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("The service cannot build the temporary file",
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service cannot build the temporary file",
+                                          NO_APPLICABLE_CODE, version);
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("the service has throw an IOException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch (ParserConfigurationException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("The service has throw a ParserException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw a ParserException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch (SAXException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("The service has throw a SAXException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw a SAXException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("The service has throw a CatalogException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw a CatalogException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch (MalFormedDocumentException ex) {
             ex.printStackTrace();
             logger.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new OWSWebServiceException("The SensorML Document is Malformed",
-                                          INVALID_PARAMETER_VALUE,
-                                          "sensorDescription", version);
+            throw new WebServiceException("The SensorML Document is Malformed",
+                                          INVALID_PARAMETER_VALUE, version, "sensorDescription");
         } finally {
             try {
                 if (!success && savePoint != null) {
@@ -1460,9 +1454,8 @@ public class SOSworker {
                 sensorMLConnection.setAutoCommit(true);
             } catch (SQLException e) {
                 e.printStackTrace();
-                throw new OWSWebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                               NO_APPLICABLE_CODE,
-                                              null,
                                               version);
             }
         }
@@ -1489,8 +1482,8 @@ public class SOSworker {
             if (sensorId.startsWith(sensorIdBase)) {
                 num = Integer.parseInt(sensorId.substring(sensorIdBase.length()));
             } else {
-                throw new OWSWebServiceException("The sensor identifier is not valid",
-                                             INVALID_PARAMETER_VALUE, "assignedSensorId", version);
+                throw new WebServiceException("The sensor identifier is not valid",
+                                             INVALID_PARAMETER_VALUE, version, "assignedSensorId");
             }
             ProcessEntry proc = new ProcessEntry(sensorId);
             
@@ -1502,8 +1495,8 @@ public class SOSworker {
                 logger.finer("samplingTime received: " + obs.getSamplingTime()); 
                 logger.finer("template received:" + '\n' + obs.toString());
             } else {
-                throw new OWSWebServiceException("The observation template must be specified",
-                                                 MISSING_PARAMETER_VALUE, "observationTemplate", version);
+                throw new WebServiceException("The observation template must be specified",
+                                                 MISSING_PARAMETER_VALUE, version, "observationTemplate");
             }
                 
             //we record the observation in the O&M database
@@ -1521,23 +1514,23 @@ public class SOSworker {
                         id = obsTable.getIdentifier(obs);
                         logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                     } else {
-                        throw new OWSWebServiceException("The observation sampling time and the result must be specify",
-                                                      MISSING_PARAMETER_VALUE, "samplingTime", version);
+                        throw new WebServiceException("The observation sampling time and the result must be specify",
+                                                      MISSING_PARAMETER_VALUE, version, "samplingTime");
                     }
                 } else {
-                    throw new OWSWebServiceException(" The observation doesn't match with the template of the sensor",
-                                                  INVALID_PARAMETER_VALUE, "samplingTime", version);
+                    throw new WebServiceException(" The observation doesn't match with the template of the sensor",
+                                                  INVALID_PARAMETER_VALUE, version, "samplingTime");
                 }
             } 
             
         } catch( SQLException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("The service has throw a SQLException:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw a SQLException:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         } catch( CatalogException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("The service has throw a CatalogException:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The service has throw a CatalogException:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE, version);
         }
          
         return new InsertObservationResponse(id);
@@ -1639,8 +1632,8 @@ public class SOSworker {
                             templateTime = ti;
                         }
                     } else {
-                        throw new OWSWebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
+                        throw new WebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
                     }
                 
                 // The operation Time before    
@@ -1667,8 +1660,8 @@ public class SOSworker {
                         }
                         
                     } else {
-                        throw new OWSWebServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
+                        throw new WebServiceException("TM_Before operation require timeInstant!",
+                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
                     }
                     
                 // The operation Time after    
@@ -1698,8 +1691,8 @@ public class SOSworker {
                             templateTime = new TimePeriodType(ti.getTimePosition());
                         }
                     } else {
-                       throw new OWSWebServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, "eventTime", version);
+                       throw new WebServiceException("TM_After operation require timeInstant!",
+                                                     INVALID_PARAMETER_VALUE, version, "eventTime");
                     }
                     
                 // The time during operation    
@@ -1739,16 +1732,16 @@ public class SOSworker {
                             templateTime = tp;
                         }
                     } else {
-                        throw new OWSWebServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
+                        throw new WebServiceException("TM_During operation require TimePeriod!",
+                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
-                    throw new OWSWebServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
-                                                  OPERATION_NOT_SUPPORTED, null, version);
+                    throw new WebServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
+                                                  OPERATION_NOT_SUPPORTED, version);
                 } else {
-                    throw new OWSWebServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
-                                                  OPERATION_NOT_SUPPORTED, null, version);
+                    throw new WebServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
+                                                  OPERATION_NOT_SUPPORTED, version);
                 }
             }
         } else {
@@ -1778,9 +1771,9 @@ public class SOSworker {
                  return t.toString();
                  
              } catch(IllegalArgumentException e) {
-                throw new OWSWebServiceException("Unable to parse the value: " + value + '\n' +
+                throw new WebServiceException("Unable to parse the value: " + value + '\n' +
                                                  "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
-                                                 INVALID_PARAMETER_VALUE, "eventTime", version);
+                                                 INVALID_PARAMETER_VALUE, version, "eventTime");
              }
           } else {
             String locator;
@@ -1788,8 +1781,8 @@ public class SOSworker {
                 locator = "Timeposition";
             else
                 locator = "TimePosition value";
-            throw new OWSWebServiceException("bad format of time, " + locator + " mustn't be null",
-                                              MISSING_PARAMETER_VALUE, "eventTime", version);
+            throw new  WebServiceException("bad format of time, " + locator + " mustn't be null",
+                                              MISSING_PARAMETER_VALUE, version, "eventTime");
           }
     }
     
@@ -1800,25 +1793,25 @@ public class SOSworker {
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("SOS"))  {
-                    throw new OWSWebServiceException("service must be \"SOS\"!",
-                                                  INVALID_PARAMETER_VALUE, "service", version);
+                    throw new WebServiceException("service must be \"SOS\"!",
+                                                  INVALID_PARAMETER_VALUE, version, "service");
                 }
             } else {
-                throw new OWSWebServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, "service", version);
+                throw new WebServiceException("service must be specified!",
+                                              MISSING_PARAMETER_VALUE, version, "service");
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().equals("1.0.0")) {
-                    throw new OWSWebServiceException("version must be \"1.0.0\"!",
-                                                  VERSION_NEGOTIATION_FAILED, null, version);
+                    throw new WebServiceException("version must be \"1.0.0\"!",
+                                                  VERSION_NEGOTIATION_FAILED, version);
                 }
             } else {
-                throw new OWSWebServiceException("version must be specified!",
-                                              MISSING_PARAMETER_VALUE, "version", version);
+                throw new WebServiceException("version must be specified!",
+                                              MISSING_PARAMETER_VALUE, version, "version");
             }
          } else { 
-            throw new OWSWebServiceException("The request is null!",
-                                          NO_APPLICABLE_CODE, null, version);
+            throw new WebServiceException("The request is null!",
+                                          NO_APPLICABLE_CODE, version);
          }  
         
     }
@@ -1958,8 +1951,8 @@ public class SOSworker {
                 logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
             }
         } else {
-            throw new OWSWebServiceException("This CRS " + column + " is not supported",
-                                              INVALID_PARAMETER_VALUE, null, version);
+            throw new WebServiceException("This CRS " + column + " is not supported",
+                                          INVALID_PARAMETER_VALUE, version);
         }
         logger.info(request);
         if (insert) {
@@ -2345,8 +2338,8 @@ public class SOSworker {
         
         } catch (SQLException ex) {
            ex.printStackTrace();
-           throw new OWSWebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE, null, version);
+           throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE, version);
            
         } 
         return ret;

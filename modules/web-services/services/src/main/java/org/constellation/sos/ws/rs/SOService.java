@@ -35,13 +35,13 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
-import org.constellation.ows.v110.OWSWebServiceException;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
+import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ows.v110.SectionsType;
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.DescribeSensor;
@@ -86,8 +86,8 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
-                    throw new OWSWebServiceException("The operation GetObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion());
+                    throw new WebServiceException("The operation GetObservation is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, getCurrentVersion(), "GetObservation");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
@@ -97,8 +97,8 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
-                    throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion());
+                    throw new WebServiceException("The operation DescribeSensor is only requestable in XML",
+                                                  OPERATION_NOT_SUPPORTED, getCurrentVersion(), "DescribeSensor");
                 }
         
                 return Response.ok(worker.describeSensor(ds), "text/xml").build();
@@ -106,8 +106,8 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
                 InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
-                    throw new OWSWebServiceException("The operation InsertObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "InsertObservation", getCurrentVersion());
+                    throw new WebServiceException("The operation InsertObservation is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, getCurrentVersion(), "InsertObservation");
                 }
         
                 return Response.ok(worker.insertObservation(is), "text/xml").build();
@@ -115,8 +115,8 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
                 GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
-                    throw new OWSWebServiceException("The operation GetResult is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetResult", getCurrentVersion());
+                    throw new WebServiceException("The operation GetResult is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, getCurrentVersion(), "GetResult");
                 }
         
                 return Response.ok(worker.getResult(gr), "text/xml").build();
@@ -124,8 +124,8 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
                 RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
-                    throw new OWSWebServiceException("The operation RegisterSensor is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "RegisterSensor", getCurrentVersion());
+                    throw new WebServiceException("The operation RegisterSensor is only requestable in XML",
+                                                  OPERATION_NOT_SUPPORTED, getCurrentVersion(), "RegisterSensor");
                 }
         
                 return Response.ok(worker.registerSensor(rs), "text/xml").build();
@@ -134,8 +134,8 @@ public class SOService extends OGCWebService {
                 try {
                     worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                 } catch (IOException ex) {
-                    throw new OWSWebServiceException("Unable to find change.properties",
-                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());  
+                    throw new WebServiceException("Unable to find change.properties",
+                                                     NO_APPLICABLE_CODE, getCurrentVersion());  
                 }
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
@@ -152,8 +152,8 @@ public class SOService extends OGCWebService {
                 return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
             } else {
-                throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
+                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                                 INVALID_PARAMETER_VALUE, getCurrentVersion(), "request");
             }
              
          } catch (WebServiceException ex) {
@@ -161,22 +161,18 @@ public class SOService extends OGCWebService {
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
              */
-            if (ex instanceof OWSWebServiceException) {
-                OWSWebServiceException owsex = (OWSWebServiceException)ex;
-                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                    !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                    owsex.printStackTrace();
-                } else {
-                    LOGGER.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
-                }
-                StringWriter sw = new StringWriter();    
-                marshaller.marshal(owsex.getExceptionReport(), sw);
-                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                ex.printStackTrace();
             } else {
-                throw new IllegalArgumentException("this service can't return WMS Exception");
+                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
             }
+            StringWriter sw = new StringWriter(); 
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), ex.getVersion());   
+            marshaller.marshal(report, sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
     }
     
@@ -209,8 +205,8 @@ public class SOService extends OGCWebService {
                 if (SectionsType.getExistingSections("1.1.1").contains(token)){
                     requestedSections.add(token);
                 } else {
-                    throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                     INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
+                    throw new WebServiceException("The section " + token + " does not exist",
+                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "Sections");
                 }   
             }
         } else {
