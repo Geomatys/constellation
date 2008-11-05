@@ -32,7 +32,7 @@ public class CSWQueryable {
     /**
      * The queryable element from ISO 19115 and their path id.
      */
-    protected static Map<String, List<String>> ISO_QUERYABLE;
+    public static Map<String, List<String>> ISO_QUERYABLE;
     static {
         ISO_QUERYABLE      = new HashMap<String, List<String>>();
         List<String> paths;
@@ -216,7 +216,7 @@ public class CSWQueryable {
     /**
      * The queryable element from DublinCore and their path id.
      */
-    protected static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
+    public static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
     static {
         DUBLIN_CORE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
@@ -389,7 +389,7 @@ public class CSWQueryable {
      * The queryable element from ebrim and their path id.
      */
     @Deprecated
-    protected static Map<String, List<String>> EBRIM_QUERYABLE;
+    public static Map<String, List<String>> EBRIM_QUERYABLE;
     static {
         EBRIM_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;

@@ -10,12 +10,11 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-	  <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs   -->
-          <!-- To disable WMS            service remove packageName: org.constellation.map.ws.rs        -->
-          <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs        -->
-          <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws      -->
- 	  <!-- To enable  configuration  service add    packageName: org.constellation.configuration.ws -->
- 	  <!-- To enable  new WMS        service add    packageName: org.constellation.ws.rs;org.constellation.ws.rs.provider -->
+	     <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
+         <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
+         <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
+		 <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
+ 	     <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
           <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -27,6 +26,7 @@
     
     <!-- SOAP servlet for constellation web service for Tomcat  --> 
     
+	<!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
     <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener>
@@ -42,10 +42,27 @@
         <url-pattern>/SOService</url-pattern>
     </servlet-mapping-->
 
-    <!-- To enable SOAP service in glassfish remove the property  'metadata-complete="true"' in the web-app tag -->
+    <!-- to enable the CSW service SOAP (in tomcat) uncomment the following servlet -->
+    <!--listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>CSWService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        </servlet>
+    <servlet>
+    
+    <servlet-mapping>
+        <servlet-name>CSWService</servlet-name>
+        <url-pattern>/CSWService</url-pattern>
+    </servlet-mapping-->
+
+    <!-- To enable SOAP service in glassfish remove the property  'metadata-complete="true"' in the web-app tag (at the top of this document)-->
      
 
     <!-- Servlet for constellation JSF interface -->
+
     <!-- filters for tomahawk and sandbox -->
     <filter>
         <filter-name>MyFacesExtensionsFilter</filter-name>

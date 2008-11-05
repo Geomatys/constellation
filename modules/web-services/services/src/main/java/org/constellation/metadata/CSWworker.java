@@ -130,6 +130,8 @@ import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.index.GenericIndex;
+import org.constellation.metadata.index.MDWebIndex;
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
@@ -452,7 +454,7 @@ public class CSWworker {
 
                                 try {
                                     MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
-                                    index = new IndexLucene((GenericMetadataReader) MDReader, env);
+                                    index = new GenericIndex((GenericMetadataReader)MDReader, env);
                                     
                                     //in generic mode there is no transactionnal part.
                                     MDWriter = null;
@@ -506,7 +508,7 @@ public class CSWworker {
                     try {
                         Reader20 databaseReader = new Reader20(Standard.ISO_19115,  MDConnection);
                         Writer20 databaseWriter = new Writer20(MDConnection);
-                        index                   = new IndexLucene(databaseReader, env);
+                        index                   = new MDWebIndex(databaseReader, env);
                         MDReader                = new MDWebMetadataReader(databaseReader);
                         MDWriter                = new MetadataWriter(databaseReader, databaseWriter);
                         catalogueHarvester      = new CatalogueHarvester(this);
