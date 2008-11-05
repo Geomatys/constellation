@@ -729,7 +729,7 @@ public class WMSService extends OGCWebService {
      * @return The map requested, or an error.
      * @throws WebServiceException
      */
-    private Response getMap(final WMSQuery query) throws WebServiceException {
+    private synchronized Response getMap(final WMSQuery query) throws WebServiceException {
         //verifyBaseParameter(0);
         if (!(query instanceof GetMap)) {
             throw new WebServiceException("Invalid request found, should be GetMap.",
