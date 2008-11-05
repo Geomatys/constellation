@@ -131,6 +131,7 @@ import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.GenericIndex;
+import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.index.MDWebIndex;
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;

@@ -17,26 +17,38 @@
 
 package org.constellation.metadata.index;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+// apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
-import org.constellation.metadata.IndexLucene;
+
+// constellation dependencies
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
-import org.geotools.metadata.iso.MetaDataImpl;
-import org.opengis.util.InternationalString;
 import static org.constellation.metadata.CSWQueryable.*;
+
+// geotools dependencies
+import org.geotools.metadata.iso.MetaDataImpl;
+
+// geoAPI dependencies
+import org.opengis.util.InternationalString;
+
 
 /**
  * A Lucene Index Handler for a generic Database.
@@ -48,6 +60,8 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * The Reader of this lucene index (generic DB mode).
      */
     private final GenericMetadataReader genericReader;
+    
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * Creates a new Lucene Index with the specified generic database reader.
@@ -275,9 +289,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
                     pathID            = fullPathID.substring(0, separator);
                     conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
                     conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
-                    logger.finer("pathID           : " + pathID            + '\n' +
-                                 "conditionalPathID: " + conditionalPathID + '\n' +
-                                 "conditionalValue : " + conditionalValue); 
+                    logger.info("pathID           : " + pathID            + '\n' +
+                                "conditionalPathID: " + conditionalPathID + '\n' +
+                                "conditionalValue : " + conditionalValue); 
                 } else {
                     pathID = fullPathID;
                 }
@@ -319,13 +333,20 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
     private String getValuesFromPath(String pathID, Object metadata) {
         String result = "";
         if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
+            // we remove the prefix path part 
             pathID = pathID.substring(22);
+            
+            //for each part of the path we execute a (many) getter
             while (!pathID.equals("")) {
                 String attributeName;
-                if (pathID.indexOf(':') != -1)
+                if (pathID.indexOf(':') != -1) {
                     attributeName = pathID.substring(0, pathID.indexOf(':'));
-                else
+                    pathID = pathID.substring(pathID.indexOf(':') + 1);
+                } else {
                     attributeName = pathID;
+                    pathID = "";
+                }
+                
                 if (metadata instanceof Collection) {
                     List<Object> tmp = new ArrayList<Object>();
                     for (Object subMeta: (Collection)metadata) {
@@ -341,11 +362,6 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
                     metadata = tmp;
                 } else {
                     metadata = getAttributeValue(metadata, attributeName);
-                }
-                if (pathID.indexOf(':') != -1) {
-                    pathID = pathID.substring(pathID.indexOf(':') + 1);
-                } else {
-                    pathID = "";
                 }
             } 
             
@@ -381,6 +397,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             result = result.substring(0, result.length() - 1);
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
+        
+        } else if (obj instanceof Date) {
+            result = dateFormat.format((Date)obj);
             
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
@@ -397,8 +416,44 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * @param metadata
      * @return
      */
-    private String getConditionalValuesFromPath(String pathID, String conditionalPathID, String conditionalValue, MetaDataImpl metadata) {
-        return "";
+    private String getConditionalValuesFromPath(String pathID, String conditionalPathID, String conditionalValue, Object metadata) {
+        String result = "";
+        if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
+             // we remove the prefix path part 
+            pathID = pathID.substring(22);
+            
+            //for each part of the path we execute a (many) getter
+            while (!pathID.equals("")) {
+                String attributeName;
+                if (pathID.indexOf(':') != -1) {
+                    attributeName = pathID.substring(0, pathID.indexOf(':'));
+                    pathID        = pathID.substring(pathID.indexOf(':') + 1);
+                } else {
+                    attributeName = pathID;
+                    pathID = "";
+                }
+                
+                if (metadata instanceof Collection) {
+                    List<Object> tmp = new ArrayList<Object>();
+                    for (Object subMeta: (Collection)metadata) {
+                        Object obj = getAttributeValue(subMeta, attributeName);
+                        if (obj instanceof Collection) {
+                            for (Object o : (Collection)obj) {
+                                if (o != null) tmp.add(o);
+                            }
+                        } else {
+                            if (obj != null) tmp.add(obj);
+                        }
+                    }
+                    metadata = tmp;
+                } else {
+                    metadata = getAttributeValue(metadata, attributeName);
+                }
+            } 
+            
+            result = getStringValue(metadata);
+        }
+        return result;
     }
     
     /**

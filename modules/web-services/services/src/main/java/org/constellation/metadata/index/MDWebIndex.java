@@ -34,8 +34,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
-import org.constellation.metadata.IndexLucene;
 import static org.constellation.metadata.CSWQueryable.*;
+
 // MDweb dependencies
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
