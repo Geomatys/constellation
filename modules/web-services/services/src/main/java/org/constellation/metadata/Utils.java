@@ -350,5 +350,30 @@ public class Utils {
         }
         return result;
     }
+    
+    /**
+     * Delete a directory and all its sub-file/directory.
+     * 
+     * @param directory a file.
+     * @return
+     */
+    public static boolean deleteDirectory(File directory) {
+        if (directory == null)
+            return false;
+        if (!directory.exists())
+            return false;
+        
+        if (directory.isDirectory()) {
+            for (File f : directory.listFiles()) {
+                if (f.isDirectory()) {
+                    deleteDirectory(directory);
+                } else {
+                    f.delete();
+                }
+            }
+        } 
+        return directory.delete();
+        
+    }
 
 }

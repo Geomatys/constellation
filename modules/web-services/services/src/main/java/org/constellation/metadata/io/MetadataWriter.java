@@ -36,6 +36,7 @@ import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
+import org.constellation.metadata.Utils;
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -62,7 +63,7 @@ public class MetadataWriter {
     /**
      * A debugging logger.
      */
-    private Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
     
     /**
      * A MDWeb catalogs where write the form.
@@ -172,7 +173,7 @@ public class MetadataWriter {
             // unkow types
             } else {
                 String msg = "Can't register ths kind of object:" + object.getClass().getName();
-                logger.severe(msg);
+                LOGGER.severe(msg);
                 throw new IllegalArgumentException(msg);
             }
             Classe rootClasse = getClasseFromObject(object);
@@ -182,11 +183,11 @@ public class MetadataWriter {
                 addValueFromObject(form, object, rootPath, null);
                 return form;
             } else {
-                logger.severe("unable to find the root class:" + object.getClass().getSimpleName());
+                LOGGER.severe("unable to find the root class:" + object.getClass().getSimpleName());
                 return null;
             }
         } else {
-            logger.severe("unable to create form object is null");
+            LOGGER.severe("unable to create form object is null");
             return null;
         }
     }
@@ -272,9 +273,9 @@ public class MetadataWriter {
                 
                 
                 } catch (NoSuchMethodException ex) {
-                    logger.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
+                    LOGGER.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
                 } catch (SecurityException ex) {
-                    logger.severe(" security exception while getting the title of the object.");
+                    LOGGER.severe(" security exception while getting the title of the object.");
                 }
                 if (nameGetter != null) {
                     i = 3;
@@ -302,19 +303,19 @@ public class MetadataWriter {
                     if (title == null)
                         title = "unknow title";
                 } catch (IllegalAccessException ex) {
-                    logger.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
+                    LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
                                   "cause: " + ex.getMessage());
                 } catch (IllegalArgumentException ex) {
-                    logger.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                    LOGGER.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
                                   "cause: " + ex.getMessage());
                 } catch (InvocationTargetException ex) {
-                    logger.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                    LOGGER.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
                                   "cause: " + ex.getMessage());
                 }
             }
             
             if (title.equals("unknow title"))
-                logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
+                LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
         }
         return title;
     }
@@ -388,7 +389,7 @@ public class MetadataWriter {
                         codelistElement = getElementNameFromEnum(object);
                         
                     } else {
-                        logger.severe (object.getClass().getName() + " is not a codelist!");
+                        LOGGER.severe (object.getClass().getName() + " is not a codelist!");
                         codelistElement = null;
                     }
                 }
@@ -402,7 +403,7 @@ public class MetadataWriter {
                     for (Property p: classe.getProperties()) {
                         values += p.getName() +'\n';
                     }
-                    logger.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
+                    LOGGER.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
                                   "allowed values are: " + '\n' +  values);
                 }
             }
@@ -414,19 +415,19 @@ public class MetadataWriter {
             }
             
             TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
-            logger.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
+            LOGGER.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
             LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
-            logger.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
+            LOGGER.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.
         } else {
         
             Value value = new Value(path, form, ordinal, classe, parentValue);
-            logger.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            LOGGER.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             //we add this object to the listed of already write element
             alreadyWrite.put(object, value);
             
@@ -451,10 +452,10 @@ public class MetadataWriter {
                             } 
                     
                         } catch (IllegalAccessException e) {
-                            logger.severe("The class is not accessible");
+                            LOGGER.severe("The class is not accessible");
                             return;
                         } catch (java.lang.reflect.InvocationTargetException e) {
-                            logger.severe("Exception throw in the invokated getter: " + getter.toGenericString() + '\n' +
+                            LOGGER.severe("Exception throw in the invokated getter: " + getter.toGenericString() + '\n' +
                                           "Cause: " + e.getMessage());
                             return;
                         }   
@@ -462,7 +463,7 @@ public class MetadataWriter {
                 }
                 classe = classe.getSuperClass();
                 if (classe != null) {
-                    logger.finer("searching in superclasse " + classe.getName());
+                    LOGGER.finer("searching in superclasse " + classe.getName());
                 }
             } while (classe != null);
         }
@@ -479,16 +480,16 @@ public class MetadataWriter {
             Method getValue = enumeration.getClass().getDeclaredMethod("value");
             value = (String) getValue.invoke(enumeration);
         } catch (IllegalAccessException ex) {
-            logger.severe("The class is not accessible");
+            LOGGER.severe("The class is not accessible");
         } catch (IllegalArgumentException ex) {
-            logger.severe("IllegalArguement exeption in value()");
+            LOGGER.severe("IllegalArguement exeption in value()");
         } catch (InvocationTargetException ex) {
-            logger.severe("Exception throw in the invokated getter value() " + '\n' +
+            LOGGER.severe("Exception throw in the invokated getter value() " + '\n' +
                        "Cause: " + ex.getMessage());
         } catch (NoSuchMethodException ex) {
-           logger.severe("no such method value() in " + enumeration.getClass().getSimpleName());
+           LOGGER.severe("no such method value() in " + enumeration.getClass().getSimpleName());
         } catch (SecurityException ex) {
-           logger.severe("security Exception while getting the codelistElement in value() method");
+           LOGGER.severe("security Exception while getting the codelistElement in value() method");
         }
         return value;
     }
@@ -501,8 +502,8 @@ public class MetadataWriter {
      * 
      * @return a setter to this attribute.
      */
-    private Method getGetterFromName(String propertyName, Class rootClass) {
-        logger.finer("search for a getter in " + rootClass.getName() + " of name :" + propertyName);
+    public static Method getGetterFromName(String propertyName, Class rootClass) {
+        Logger.getLogger(propertyName).finer("search for a getter in " + rootClass.getName() + " of name :" + propertyName);
         
         //special case and corrections
         if (propertyName.equals("beginPosition")) {
@@ -520,7 +521,7 @@ public class MetadataWriter {
             propertyName = "geographicElement";
         }
         
-        String methodName = "get" + firstToUpper(propertyName);
+        String methodName = "get" + Utils.firstToUpper(propertyName);
         int occurenceType = 0;
         
         while (occurenceType < 4) {
@@ -551,7 +552,7 @@ public class MetadataWriter {
                    
                 }
                 if (getter != null) {
-                    logger.finer("getter found: " + getter.toGenericString());
+                    LOGGER.finer("getter found: " + getter.toGenericString());
                 }
                 return getter;
 
@@ -560,23 +561,23 @@ public class MetadataWriter {
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.finer("The getter " + methodName + "() does not exist");
+                        LOGGER.finer("The getter " + methodName + "() does not exist");
                         occurenceType = 1;
                         break;
                     }
 
                     case 1: {
-                        logger.finer("The getter " + methodName + "s() does not exist");
+                        LOGGER.finer("The getter " + methodName + "s() does not exist");
                         occurenceType = 2;
                         break;
                     }
                     case 2: {
-                        logger.finer("The getter " + methodName + "es() does not exist");
+                        LOGGER.finer("The getter " + methodName + "es() does not exist");
                         occurenceType = 3;
                         break;
                     }
                     case 3: {
-                        logger.finer("The getter " + methodName + "es() does not exist");
+                        LOGGER.finer("The getter " + methodName + "es() does not exist");
                         occurenceType = 4;
                         break;
                     }
@@ -585,23 +586,8 @@ public class MetadataWriter {
                 }
             }
         }
-        logger.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
+        LOGGER.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
         return null;
-    }
-    
-     /**
-     * Return a string with the first character to upper casse.
-     * example : firstToUpper("hello") return "Hello".
-     * 
-     * @param s the string to modifiy
-     * 
-     * @return a string with the first character to upper casse.
-     */
-    private String firstToUpper(String s) {
-        String first = s.substring(0, 1);
-        String result = s.substring(1);
-        result = first.toUpperCase() + result;
-        return result;
     }
     
     /**
@@ -645,7 +631,7 @@ public class MetadataWriter {
             
             className   = object.getClass().getSimpleName();
             packageName = object.getClass().getPackage().getName();
-            logger.finer("searche for classe " + className);
+            LOGGER.finer("searche for classe " + className);
             
         } else {
             return null;
@@ -741,10 +727,10 @@ public class MetadataWriter {
             int nameType = 0;
             while (nameType < 11) {
                 
-                logger.finer("searching: " + standard.getName() + ":" + name);
+                LOGGER.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
                 if (result != null) {
-                    logger.info("class found:" + standard.getName() + ":" + name);
+                    LOGGER.info("class found:" + standard.getName() + ":" + name);
                     classBinding.put(object.getClass(), result);
                     return result;
                 } 
@@ -829,7 +815,7 @@ public class MetadataWriter {
             }
         
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
-        logger.severe("class no found: " + className + " in the following standards: " + availableStandardLabel);
+        LOGGER.severe("class no found: " + className + " in the following standards: " + availableStandardLabel);
         return null;
     }
     

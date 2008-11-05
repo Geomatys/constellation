@@ -20,11 +20,14 @@ package org.constellation.metadata;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Lucene dependencies
@@ -51,6 +54,8 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // MDWeb dependencies
 import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.metadata.io.MetadataWriter;
+import org.geotools.metadata.iso.MetaDataImpl;
 import org.mdweb.lucene.AbstractIndex;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -121,52 +126,29 @@ public class IndexLucene extends AbstractIndex {
         classeMap     = null;
         genericReader = null;
         
-        // we get the configuration file
-        File f = new File(configDirectory, "index");
+        //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
+        File preGeneratedIndexDirectory = new File(configDirectory, "nextIndex");
         
-        setFileDirectory(f);
+        // we get the current index directory
+        File currentIndexDirectory = new File(configDirectory, "index");
+        setFileDirectory(currentIndexDirectory);
         
-        //if the index File exists we don't need to index the documents again.
-        if(!getFileDirectory().exists()) {
-            logger.info("Creating lucene index for the first time...");
-            long time = System.currentTimeMillis();
-            IndexWriter writer;
-            int nbCatalogs = 0;
-            int nbForms    = 0; 
-            try {
-                writer = new IndexWriter(getFileDirectory(), analyzer, true);
-                
-                // getting the objects list and index avery item in the IndexWriter.
-                List<Catalog> cats = reader.getCatalogs();
-                nbCatalogs = cats.size();
-                List<Form> results = reader.getAllForm(cats);
-                logger.info("end read all form");
-                nbForms    =  results.size();
-                for (Form form : results) {
-                    indexDocument(writer, form);
-                }
-                writer.optimize();
-                writer.close();
-                
-            } catch (CorruptIndexException ex) {
-                logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            } catch (LockObtainFailedException ex) {
-                logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                logger.severe("IOException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
-                        "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
+        if (preGeneratedIndexDirectory.exists()) {
+            switchIndexDir(preGeneratedIndexDirectory, currentIndexDirectory);
+            logger.info("using pre-created index.");
+            
         } else {
-            logger.info("Index already created");
+            //if the index File exists we don't need to index the documents again.
+            if(!currentIndexDirectory.exists()) {
+                createMDwebIndex();
+            } else {
+                logger.info("Index already created.");
+            }
         }
     }
     
     /**
-     * Creates a new Lucene Index with the specified MDweb reader.
+     * Creates a new Lucene Index with the specified generic database reader.
      * 
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
@@ -179,44 +161,24 @@ public class IndexLucene extends AbstractIndex {
         classeMap     = null;
         MDWebReader   = null;
         
-        // we get the configuration file
-        File f = new File(configDirectory, "index");
+        //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
+        File preGeneratedIndexDirectory = new File(configDirectory, "nextIndex");
         
-        setFileDirectory(f);
+        // we get the current index directory
+        File currentIndexDirectory = new File(configDirectory, "index");
+        setFileDirectory(currentIndexDirectory);
         
-        //if the index File exists we don't need to index the documents again.
-        if(!getFileDirectory().exists()) {
-            logger.info("Creating lucene index for the first time...");
-            long time = System.currentTimeMillis();
-            IndexWriter writer;
-            int nbEntries  = 0; 
-            try {
-                writer = new IndexWriter(getFileDirectory(), analyzer, true);
-                
-                // TODO getting the objects list and index avery item in the IndexWriter.
-                List<String> ids = null;//reader.getAllForm(cats);
-                logger.info("end read all entries");
-                nbEntries    =  ids.size();
-                for (Object entry : ids) {
-                    indexDocument(writer, entry);
-                }
-                writer.optimize();
-                writer.close();
-                
-            } catch (CorruptIndexException ex) {
-                logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            } catch (LockObtainFailedException ex) {
-                logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                logger.severe("IOException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
-                        " documents indexed: " + nbEntries);
+        if (preGeneratedIndexDirectory.exists()) {
+            switchIndexDir(preGeneratedIndexDirectory, currentIndexDirectory);
+            logger.info("using pre-created index.");
+            
         } else {
-            logger.info("Index already created");
+            //if the index File exists we don't need to index the documents again.
+            if(!currentIndexDirectory.exists()) {
+                createGenericIndex();
+            } else {
+                logger.info("Index already created.");
+            }
         }
     }
     
@@ -285,6 +247,94 @@ public class IndexLucene extends AbstractIndex {
     }
     
     /**
+     * Create a new Index from the MDweb database.
+     * 
+     * @throws java.sql.SQLException
+     */
+    private void createMDwebIndex() throws SQLException {
+        logger.info("Creating lucene index for MDWeb database please wait...");
+        
+        long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbCatalogs = 0;
+        int nbForms = 0;
+        try {
+            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+
+            // getting the objects list and index avery item in the IndexWriter.
+            List<Catalog> cats = MDWebReader.getCatalogs();
+            nbCatalogs = cats.size();
+            List<Form> results = MDWebReader.getAllForm(cats);
+            logger.info("all form read in " + (System.currentTimeMillis() - time) + " ms.");
+            nbForms = results.size();
+            for (Form form : results) {
+                indexDocument(writer, form);
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (LockObtainFailedException ex) {
+            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+                "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
+    }
+    
+    /** 
+     * Create a new Index from a generic database.
+     * 
+     * @throws java.sql.SQLException
+     */
+    private void createGenericIndex() throws SQLException {
+        logger.info("Creating lucene index for Generic database please wait...");
+        long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbEntries = 0;
+        try {
+            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+
+            // TODO getting the objects list and index avery item in the IndexWriter.
+            List<MetaDataImpl> ids = genericReader.getAllEntries();
+            logger.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
+            nbEntries = ids.size();
+            for (Object entry : ids) {
+                indexDocument(writer, entry);
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (LockObtainFailedException ex) {
+            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+                " documents indexed: " + nbEntries);
+    }
+
+    /**
+     * Replace the precedent index directory by another pre-generated.
+     */
+    private void switchIndexDir(File preGeneratedDirectory, File indexDirectory) {
+        if (indexDirectory.exists()) {
+            Utils.deleteDirectory(indexDirectory);
+        }
+        preGeneratedDirectory.renameTo(indexDirectory);
+    }
+    
+    /**
      * This method add to index of lucene a new document based on Form object.
      * (implements AbstractIndex.indexDocument() )
      * object must be a Form.
@@ -301,7 +351,7 @@ public class IndexLucene extends AbstractIndex {
         }
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(r));
+            writer.addDocument(createDocumentFromForm(r));
             logger.finer("Form: " + r.getTitle() + " indexed");
             
         } catch (SQLException ex) {
@@ -324,18 +374,26 @@ public class IndexLucene extends AbstractIndex {
      * @param object A MDweb formular.
      */
     public void indexDocument(Object object) {
-        Form r;
-        if (object instanceof Form) {
-            r = (Form) object;
-        } else {
-            throw new IllegalArgumentException("Unexpected type, supported one is: org.mdweb.model.storage.Form");
-        }
         try {
             IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, true);
             
+        if (object instanceof Form) {
+            Form form = (Form) object;
             //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(r));
-            logger.info("Form: " + r.getTitle() + " indexed");
+            writer.addDocument(createDocumentFromForm(form));
+            logger.info("Form: " + form.getTitle() + " indexed");
+        
+        } else if (object instanceof MetaDataImpl) {
+            MetaDataImpl meta = (MetaDataImpl) object;
+            //adding the document in a specific model. in this case we use a MDwebDocument.
+            writer.addDocument(createDocumentFromMetadata(meta));
+            logger.info("Form: " + meta.getFileIdentifier() + " indexed");
+            
+        } else {
+            throw new IllegalArgumentException("Unexpected type, supported one are: " + '\n' +
+                                               "org.mdweb.model.storage.Form"         + '\n' +
+                                               "org.geotools.metadata.iso.MetaDataImpl");
+        }
             writer.optimize();
             writer.close();
             
@@ -395,7 +453,7 @@ public class IndexLucene extends AbstractIndex {
                         conditionalPath = pathMap.get(conditionalPathID);
                 }
                 List<Value> values;
-                if (conditionalPath != null) {
+                if (conditionalPath == null) {
                     values = form.getValueFromPath(path);
                 } else {
                     values = new ArrayList<Value>();
@@ -457,13 +515,193 @@ public class IndexLucene extends AbstractIndex {
         return response.toString();
     }
     
+    /**
+     * Return a string description for the specified terms
+     * 
+     * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
+     * @param form An getools metadata from whitch we extract the values correspounding to the specified term.
+     * 
+     * @return A string concataining the differents values correspounding to the specified term, coma separated.
+     */
+    private String getValues(String term, MetaDataImpl metadata, Map<String,List<String>> queryable) throws SQLException {
+        StringBuilder response  = new StringBuilder("");
+        List<String> paths = queryable.get(term);
+        
+        if (paths != null) {
+            for (String fullPathID: paths) {
+                String pathID;
+                String conditionalPathID = null;
+                String conditionalValue  = null;
+                
+                // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
+                int separator = fullPathID.indexOf('#'); 
+                if (separator != -1) {
+                    pathID            = fullPathID.substring(0, separator);
+                    conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+                    conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
+                    logger.finer("pathID           : " + pathID            + '\n' +
+                                 "conditionalPathID: " + conditionalPathID + '\n' +
+                                 "conditionalValue : " + conditionalValue); 
+                } else {
+                    pathID = fullPathID;
+                }
+                
+                if (conditionalPathID == null) {
+                    response.append(getValuesFromPath(pathID, metadata)).append(',');
+                } else {
+                    response.append(getConditionalValuesFromPath(pathID, conditionalPathID, conditionalValue, metadata)).append(',');
+                }
+            }
+        }
+        if (response.toString().equals("")) {
+            response.append("null");
+        } else {
+            // we remove the last ','
+            response.delete(response.length() - 1, response.length()); 
+        }
+        return response.toString();
+    }
+   
+    private String getValuesFromPath(String pathID, Object metadata) {
+        String result = "";
+        if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
+            pathID = pathID.substring(22);
+            while (pathID.indexOf(':') != -1) {
+                String attributeName = pathID.substring(0, pathID.indexOf(':'));
+                metadata = getAttributeValue(metadata, attributeName);
+            } 
+        }
+        return result;
+    }
+    
+    private String getConditionalValuesFromPath(String pathID, String conditionalPathID, String conditionalValue, MetaDataImpl metadata) {
+        return "";
+    }
+    
+    private Object getAttributeValue(Object object, String attributeName) {
+        Object result = null;
+        try {
+
+            Method getter = MetadataWriter.getGetterFromName(attributeName, object.getClass());
+            result = getter.invoke(object);
+        } catch (IllegalAccessException ex) {
+            logger.severe("The class is not accessible: " + object.getClass().getSimpleName());
+            ex.printStackTrace();
+        } catch (IllegalArgumentException ex) {
+            logger.severe("bad argument while accesing the attribute " + attributeName + " in class " +  object.getClass().getSimpleName());
+            ex.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            logger.severe("invocation target exception while accesing the attribute " + attributeName + " in class " +  object.getClass().getSimpleName());
+            ex.printStackTrace();
+        }
+        return result;
+    }
+    
+    /**
+    * Makes a document for a geotools MetaData Object.
+    * 
+    * @param metadata.
+    * @return A Lucene document.
+    */
+    private Document createDocumentFromMetadata(MetaDataImpl metadata) throws SQLException {
+        
+        // make a new, empty document
+        Document doc = new Document();
+        
+        doc.add(new Field("id",      metadata.getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
+        //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.TOKENIZED));
+        
+        logger.info("indexing ISO 19119 MD_Metadata");
+        //TODO add ANyText
+        for (String term : ISO_QUERYABLE.keySet()) {
+            doc.add(new Field(term, getValues(term, metadata, ISO_QUERYABLE), Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field(term + "_sort", getValues(term, metadata, ISO_QUERYABLE), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        }
+
+        //we add the geometry parts
+        String coord = "null";
+        try {
+            coord = getValues("WestBoundLongitude", metadata, ISO_QUERYABLE);
+            double minx = Double.parseDouble(coord);
+
+            coord = getValues("EastBoundLongitude", metadata, ISO_QUERYABLE);
+            double maxx = Double.parseDouble(coord);
+
+            coord = getValues("NorthBoundLatitude", metadata, ISO_QUERYABLE);
+            double maxy = Double.parseDouble(coord);
+
+            coord = getValues("SouthBoundLatitude", metadata, ISO_QUERYABLE);
+            double miny = Double.parseDouble(coord);
+
+            addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+
+        } catch (NumberFormatException e) {
+            if (!coord.equals("null")) {
+                logger.severe("unable to spatially index form: " + metadata.getFileIdentifier() + '\n' +
+                        "cause:  unable to parse double: " + coord);
+            }
+        }
+            
+         // All metadata types must be compatible with dublinCore.
+        
+        StringBuilder anyText = new StringBuilder();
+        for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+                
+            String values = getValues(term,  metadata, DUBLIN_CORE_QUERYABLE);
+            if (!values.equals("null")) {
+                logger.info("put " + term + " values: " + values);
+                anyText.append(values).append(" ");
+            }
+            if (term.equals("date") || term.equals("modified")) {
+                values = values.replaceAll("-","");
+            }
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
+        }
+            
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
+            
+        //we add the geometry parts
+        coord = "null";
+        try {
+            coord = getValues("WestBoundLongitude", metadata, DUBLIN_CORE_QUERYABLE);
+            double minx = Double.parseDouble(coord);
+                
+            coord = getValues("EastBoundLongitude", metadata, DUBLIN_CORE_QUERYABLE);
+            double maxx = Double.parseDouble(coord);
+            
+            coord = getValues("NorthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
+            double maxy = Double.parseDouble(coord);
+            
+            coord = getValues("SouthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
+            double miny = Double.parseDouble(coord);
+                
+            coord = getValues("SouthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
+            
+            String crs = getValues("CRS", metadata, DUBLIN_CORE_QUERYABLE);
+                
+            addBoundingBox(doc, minx, maxx, miny, maxy, crs);
+            
+        } catch (NumberFormatException e) {
+            if (!coord.equals("null"))
+                logger.severe("unable to spatially index metadata: " + metadata.getFileIdentifier() + '\n' +
+                              "cause:  unable to parse double: " + coord);
+        }
+        
+        // add a default meta field to make searching all documents easy 
+	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
+        
+        return doc;
+    }
+    
    /**
     * Makes a document for a MDWeb formular.
     * 
     * @param Form An MDweb formular to index.
     * @return A Lucene document.
     */
-    private Document createDocument(Form form) throws SQLException {
+    private Document createDocumentFromForm(Form form) throws SQLException {
         
         // make a new, empty document
         Document doc = new Document();

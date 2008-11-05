@@ -26,6 +26,7 @@ import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -229,7 +230,7 @@ public class GenericMetadataReader extends MetadataReader {
     /**
      * Load a Map of vocabulary from
      */
-    public Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
+    private Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
         if (vocabDirectory.isDirectory()) {
             for (File f : vocabDirectory.listFiles()) {
@@ -385,7 +386,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @return A metadata Object (dublin core Record / geotools metadata)
      * 
      * @throws java.sql.SQLException
-     * @throws org.constellation.ows.v100.OWSWebServiceException
+     * @throws WebServiceException
      */
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
         Object result = null;
@@ -1412,6 +1413,30 @@ public class GenericMetadataReader extends MetadataReader {
         //TODO see for the source
         
         return element;
+    }
+    
+    /**
+     * Return all the entries from the database.
+     * 
+     * @return
+     * @throws java.sql.SQLException
+     */
+    public List<MetaDataImpl> getAllEntries() throws SQLException {
+        List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
+        Statement stmt = connection.createStatement();
+        if (genericConfiguration.getQueries() != null           &&
+            genericConfiguration.getQueries().getMain() != null &&
+            genericConfiguration.getQueries().getMain().getQuery() != null) {
+            Query mainQuery = genericConfiguration.getQueries().getMain().getQuery();
+            ResultSet res = stmt.executeQuery(mainQuery.buildSQLQuery());
+            while (res.next()) {
+                result.add(getMetadataObject(res.getString(1), ElementSetType.FULL, null));
+            }
+            
+        } else {
+            logger.severe("The configuration file is malformed, unable to reach the main query");
+        }
+        return result;
     }
             
 }
