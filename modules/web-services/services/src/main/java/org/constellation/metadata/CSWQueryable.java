@@ -348,7 +348,7 @@ public class CSWQueryable {
         DUBLIN_CORE_QUERYABLE.put("language", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title");
         paths.add("Catalog Web Service:Record:relation:content");
         DUBLIN_CORE_QUERYABLE.put("relation", paths);
         

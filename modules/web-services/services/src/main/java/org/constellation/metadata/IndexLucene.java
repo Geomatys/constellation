@@ -24,10 +24,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Lucene dependencies
@@ -71,6 +71,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
 
 // Constellation dependencies
+import org.opengis.util.InternationalString;
 import static org.constellation.metadata.CSWQueryable.*;
 
 
@@ -150,7 +151,7 @@ public class IndexLucene extends AbstractIndex {
     /**
      * Creates a new Lucene Index with the specified generic database reader.
      * 
-     * @param reader An mdweb reader for read the metadata database.
+     * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
     public IndexLucene(GenericMetadataReader reader, File configDirectory) throws SQLException {
@@ -343,16 +344,26 @@ public class IndexLucene extends AbstractIndex {
      * @param object A MDweb formular.
      */
     public void indexDocument(IndexWriter writer, Object object) {
-        Form r;
-        if (object instanceof Form) {
-            r = (Form) object;
-        } else {
-            throw new IllegalArgumentException("Unexpected type, supported one is: org.mdweb.model.storage.Form");
-        }
         try {
-            //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocumentFromForm(r));
-            logger.finer("Form: " + r.getTitle() + " indexed");
+            if (object instanceof Form) {
+                //adding the document in a specific model. in this case we use a MDwebDocument.
+                Form f = (Form) object;
+                writer.addDocument(createDocumentFromForm(f));
+                logger.finer("Form: " + f.getTitle() + " indexed");
+                
+            } else if (object instanceof MetaDataImpl) {
+                MetaDataImpl meta = (MetaDataImpl) object;
+                //adding the document in a specific model. in this case we use a MDwebDocument.
+                writer.addDocument(createDocumentFromMetadata(meta));
+                logger.info("Metadata: " + meta.getFileIdentifier() + " indexed");
+
+            } else {
+               throw new IllegalArgumentException("Unexpected type, supported one are: " + '\n' +
+                                                   "org.mdweb.model.storage.Form"         + '\n' +
+                                                   "org.geotools.metadata.iso.MetaDataImpl");
+            }
+        
+            
             
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
@@ -387,7 +398,7 @@ public class IndexLucene extends AbstractIndex {
             MetaDataImpl meta = (MetaDataImpl) object;
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocumentFromMetadata(meta));
-            logger.info("Form: " + meta.getFileIdentifier() + " indexed");
+            logger.info("Metadata: " + meta.getFileIdentifier() + " indexed");
             
         } else {
             throw new IllegalArgumentException("Unexpected type, supported one are: " + '\n' +
@@ -547,7 +558,9 @@ public class IndexLucene extends AbstractIndex {
                 }
                 
                 if (conditionalPathID == null) {
-                    response.append(getValuesFromPath(pathID, metadata)).append(',');
+                    String value = getValuesFromPath(pathID, metadata);
+                    if (value != null && !value.equals(""))
+                        response.append(value).append(',');
                 } else {
                     response.append(getConditionalValuesFromPath(pathID, conditionalPathID, conditionalValue, metadata)).append(',');
                 }
@@ -566,10 +579,64 @@ public class IndexLucene extends AbstractIndex {
         String result = "";
         if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
             pathID = pathID.substring(22);
-            while (pathID.indexOf(':') != -1) {
-                String attributeName = pathID.substring(0, pathID.indexOf(':'));
-                metadata = getAttributeValue(metadata, attributeName);
+            while (!pathID.equals("")) {
+                String attributeName;
+                if (pathID.indexOf(':') != -1)
+                    attributeName = pathID.substring(0, pathID.indexOf(':'));
+                else
+                    attributeName = pathID;
+                if (metadata instanceof Collection) {
+                    List<Object> tmp = new ArrayList<Object>();
+                    for (Object subMeta: (Collection)metadata) {
+                        Object obj = getAttributeValue(subMeta, attributeName);
+                        if (obj instanceof Collection) {
+                            for (Object o : (Collection)obj) {
+                                if (o != null) tmp.add(o);
+                            }
+                        } else {
+                            if (obj != null) tmp.add(obj);
+                        }
+                    }
+                    metadata = tmp;
+                } else {
+                    metadata = getAttributeValue(metadata, attributeName);
+                }
+                if (pathID.indexOf(':') != -1) {
+                    pathID = pathID.substring(pathID.indexOf(':') + 1);
+                } else {
+                    pathID = "";
+                }
             } 
+            
+            result = getStringValue(metadata);
+        }
+        return result;
+    }
+    
+    private String getStringValue(Object obj) {
+        String result = "";
+        if (obj == null) {
+            return result;
+        } else if (obj instanceof String) {
+            result = (String) obj;
+        } else if (obj instanceof InternationalString) {
+            InternationalString is = (InternationalString) obj;
+            result = is.toString();
+        } else if (obj instanceof Double) {
+            result = obj + "";
+        } else if (obj instanceof java.util.Locale) {
+            result = ((java.util.Locale)obj).getISO3Language();
+        } else if (obj instanceof Collection) {
+            for (Object o : (Collection) obj) {
+                result = result + getStringValue(o) + ',';
+            }
+            if (result.indexOf(',') != -1)
+            result = result.substring(0, result.length() - 1);
+        } else if (obj instanceof org.opengis.util.CodeList) {
+            result = ((org.opengis.util.CodeList)obj).name();
+            
+        } else {
+            throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
         }
         return result;
     }
@@ -583,7 +650,8 @@ public class IndexLucene extends AbstractIndex {
         try {
 
             Method getter = MetadataWriter.getGetterFromName(attributeName, object.getClass());
-            result = getter.invoke(object);
+            if (getter != null)
+                result = getter.invoke(object);
         } catch (IllegalAccessException ex) {
             logger.severe("The class is not accessible: " + object.getClass().getSimpleName());
             ex.printStackTrace();
