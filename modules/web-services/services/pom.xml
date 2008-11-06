@@ -177,6 +177,10 @@
       <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
+        <groupId>ojdbc</groupId>
+	    <artifactId>ojdbc</artifactId>
+	</dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-go2</artifactId>
     </dependency>

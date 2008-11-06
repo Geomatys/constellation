@@ -43,7 +43,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
-import javax.xml.bind.JAXBContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -87,7 +86,10 @@ import org.constellation.cat.csw.v202.SchemaComponentType;
 import org.constellation.cat.csw.v202.EchoedRequestType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
+import org.constellation.filter.SQLFilterParser;
+import org.constellation.filter.SQLQuery;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.ogc.FilterCapabilities;
 import org.constellation.ogc.SortByType;
@@ -102,6 +104,16 @@ import org.constellation.ows.v100.ServiceIdentification;
 import org.constellation.ows.v100.ServiceProvider;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ebrim.v300.IdentifiableType;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.metadata.index.GenericIndex;
+import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.MDWebIndex;
+import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.metadata.io.MDWebMetadataReader;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -115,8 +127,10 @@ import org.apache.lucene.search.Sort;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.resources.JDBC;
 
 // JAXB dependencies
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -125,20 +139,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
-import org.constellation.filter.FilterParser;
-import org.constellation.filter.SQLFilterParser;
-import org.constellation.filter.SQLQuery;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.metadata.index.GenericIndex;
-import org.constellation.metadata.index.IndexLucene;
-import org.constellation.metadata.index.MDWebIndex;
-import org.constellation.metadata.io.GenericMetadataReader;
-import org.constellation.metadata.io.MDWebMetadataReader;
-import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.geotools.resources.JDBC;
+import org.constellation.ws.rs.WebService;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -248,11 +249,6 @@ public class CSWworker {
     private NamespacePrefixMapperImpl prefixMapper;
     
     /**
-     * A configuration object used in Generic database mode.
-     */
-    private Automatic genericConfiguration;
-    
-    /**
      * A list of the supported Type name 
      */
     private final static List<QName> SUPPORTED_TYPE_NAME;
@@ -356,7 +352,6 @@ public class CSWworker {
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      * @throws java.io.IOException
-     * @throws java.sql.SQLException
      */
     public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) throws IOException {
         
@@ -368,21 +363,17 @@ public class CSWworker {
         Properties prop   = new Properties();
         Properties cascad = new Properties();
         File f            = null;
-        String home       = System.getProperty("user.home");
-        File env          = new File(home, ".sicade/csw_configuration/");
-        logger.info("Path to config file=" + env);
+        File configDir    = new File(WebService.getSicadeDirectory(), "csw_configuration/");
+        logger.info("Path to config directory: " + configDir);
         isStarted = true;
         try {
             // we get the configuration file
-            f = new File(env, "config.properties");
+            f = new File(configDir, "config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
             in.close();
             
         } catch (FileNotFoundException e) {
-            if (f != null) {
-                logger.severe(f.getPath());
-            }
             logger.severe("The CSW service is not working!"                       + '\n' + 
                           "cause: The service can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
@@ -392,7 +383,7 @@ public class CSWworker {
         cascadedCSWservers = new ArrayList<String>();
         try {
             // we get the cascading configuration file
-            f = new File(env, "CSWCascading.properties");
+            f = new File(configDir, "CSWCascading.properties");
             FileInputStream in = new FileInputStream(f);
             cascad.load(in);
             in.close();
@@ -422,13 +413,12 @@ public class CSWworker {
             if (databaseType != null && databaseType.equals("generic")) {
                 
                 profile = DISCOVERY;
-                genericConfiguration = null;
                 try {
                     JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
                     Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
-                    File configFile = new File(env, "generic-configuration.xml");
+                    File configFile = new File(configDir, "generic-configuration.xml");
                     if (configFile.exists()) {
-                        genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
+                        Automatic genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
                      
                         BDD dbProperties = genericConfiguration.getBdd();
                         if (dbProperties == null) {
@@ -455,7 +445,7 @@ public class CSWworker {
 
                                 try {
                                     MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
-                                    index = new GenericIndex((GenericMetadataReader)MDReader, env);
+                                    index = new GenericIndex((GenericMetadataReader)MDReader, configDir);
                                     
                                     //in generic mode there is no transactionnal part.
                                     MDWriter = null;
@@ -509,7 +499,7 @@ public class CSWworker {
                     try {
                         Reader20 databaseReader = new Reader20(Standard.ISO_19115,  MDConnection);
                         Writer20 databaseWriter = new Writer20(MDConnection);
-                        index                   = new MDWebIndex(databaseReader, env);
+                        index                   = new MDWebIndex(databaseReader, configDir);
                         MDReader                = new MDWebMetadataReader(databaseReader);
                         MDWriter                = new MetadataWriter(databaseReader, databaseWriter);
                         catalogueHarvester      = new CatalogueHarvester(this);

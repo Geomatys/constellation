@@ -356,6 +356,11 @@
         <artifactId>xercesImpl</artifactId>
         <version>2.7.1</version>
       </dependency>
+	  <dependency>
+        <groupId>ojdbc</groupId>
+	    <artifactId>ojdbc</artifactId>
+	    <version>14</version>
+	  </dependency>
     </dependencies>
   </dependencyManagement>
 

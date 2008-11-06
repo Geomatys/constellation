@@ -64,7 +64,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     /**
-     * Creates a new Lucene Index with the specified generic database reader.
+     * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
@@ -76,12 +76,22 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             createIndex();
     }
     
+     /**
+     * Creates a new Lucene Index with the specified generic database reader.
+     * 
+     * @param reader A generic reader for read the metadata database.
+     */
+    public GenericIndex(GenericMetadataReader reader) throws SQLException {
+        super();
+        genericReader = reader;
+    }
+    
     /** 
      * Create a new Index from a generic database.
      * 
      * @throws java.sql.SQLException
      */
-    protected void createIndex() throws SQLException {
+    public void createIndex() throws SQLException {
         logger.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -219,7 +229,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
                 
             String values = getValues(term,  metadata, DUBLIN_CORE_QUERYABLE);
             if (!values.equals("null")) {
-                logger.info("put " + term + " values: " + values);
+                logger.finer("put " + term + " values: " + values);
                 anyText.append(values).append(" ");
             }
             if (term.equals("date") || term.equals("modified")) {

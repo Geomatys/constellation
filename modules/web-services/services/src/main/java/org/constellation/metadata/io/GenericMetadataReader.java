@@ -55,6 +55,7 @@ import org.constellation.generic.edmo.Organisations;
 import org.constellation.generic.edmo.ws.EdmoWebservice;
 import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
 import org.constellation.generic.vocabulary.Vocabulary;
+import org.constellation.ws.rs.WebService;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
 import static org.constellation.generic.database.Automatic.*;
@@ -184,7 +185,8 @@ public class GenericMetadataReader extends MetadataReader {
         contacts               = new HashMap<String, ResponsiblePartyImpl>();
         JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary");
         unmarshaller           = context.createUnmarshaller();
-        vocabularies           = loadVocabulary(new File("vocabulary"));
+        File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
+        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"));
         List<String> contactID = new ArrayList<String>();
     }
     
@@ -228,7 +230,7 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
-     * Load a Map of vocabulary from
+     * Load a Map of vocabulary from the specified directory
      */
     private Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
@@ -258,7 +260,7 @@ public class GenericMetadataReader extends MetadataReader {
                         } else {
                             report += "0 entries";
                         }
-                        logger.info(report);
+                        logger.finer(report);
                                 
                         
                     } catch (JAXBException ex) {

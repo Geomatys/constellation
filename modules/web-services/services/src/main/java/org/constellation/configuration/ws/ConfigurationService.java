@@ -24,6 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -32,18 +35,26 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.metadata.index.GenericIndex;
+import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
+import org.geotools.resources.JDBC;
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -58,8 +69,17 @@ public class ConfigurationService extends OGCWebService  {
      * A container notifier allowing to dynamically reload all the active service.
      */
     @Context
-    ContainerNotifierImpl cn;
+    private ContainerNotifierImpl cn;
+    
+    /**
+     * A lucene Index used to pre-build a CSW index.
+     */
+    private IndexLucene indexer;
+    
+    private File cswConfigDir;
 
+    private boolean CSWFunctionEnabled;
+    
     private static Map<String, String> serviceDirectory = new HashMap<String, String>();
     static {
         serviceDirectory.put("CSW",      "csw_configuration");
@@ -74,9 +94,66 @@ public class ConfigurationService extends OGCWebService  {
         super("Configuration", version);
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration", "");
+            
+            File sicadeDir    = getSicadeDirectory();
+            cswConfigDir = new File(sicadeDir, "csw_configuration");
+            File f         = null ;
+            try {
+                // we get the CSW configuration file
+                f                  = new File(cswConfigDir, "config.properties");
+                FileInputStream in = new FileInputStream(f);
+                Properties prop    = new Properties();
+                prop.load(in);
+                in.close();
+                
+                String databaseType = prop.getProperty("DBType");
+                
+                // if The database is unknow to the service we use the generic metadata reader.
+                if (databaseType != null && databaseType.equals("generic")) {
+                    JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
+                    Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
+                    File configFile = new File(cswConfigDir, "generic-configuration.xml");
+                    if (configFile.exists()) {
+                        Automatic genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
+                        BDD dbProperties = genericConfiguration.getBdd();
+                        if (dbProperties == null) {
+                            LOGGER.warning("the generic configuration file does not contains a BDD object. specific CSW operation will not be available.");
+                            CSWFunctionEnabled = false;
+                        } else {
+                            JDBC.loadDriver(dbProperties.getClassName());
+                            try {
+                                Connection MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
+                                                                           dbProperties.getUser(),
+                                                                           dbProperties.getPassword());
+                            
+                                GenericMetadataReader MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
+                                indexer = new GenericIndex(MDReader);
+                                CSWFunctionEnabled = true;
+                            } catch (SQLException e){
+                                LOGGER.warning("SQLException while connecting to the CSW database, specific CSW operation will not be available." + '\n' +
+                                               "cause: " + e.getMessage());
+                                CSWFunctionEnabled = false;
+                            }
+                        }
+                    } else {
+                        LOGGER.warning("No generic database configuration file have been found, specific CSW operation will not be available.");
+                        CSWFunctionEnabled = false;
+                    }
+                }
+
+            } catch (FileNotFoundException e) {
+                LOGGER.warning("No CSW configuration has been found, specific CSW operation will not be available." + '\n' +
+                               "cause: " + e.getMessage());
+                CSWFunctionEnabled = false;
+            } catch (IOException e) {
+                LOGGER.warning("The CSW configuration file can not be read, specific CSW operation will not be available." + '\n' +
+                               "cause: " + e.getMessage());
+                CSWFunctionEnabled = false;
+            }
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");
             ex.printStackTrace();
+            CSWFunctionEnabled = false;
         }
         LOGGER.info("Configuration service runing");
     }
@@ -99,9 +176,9 @@ public class ConfigurationService extends OGCWebService  {
                 
             } else if (request.equalsIgnoreCase("refreshIndex")) {
             
-                boolean synchrone = Boolean.parseBoolean((String) getParameter("SYNCHRONE", false));
+                boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                 
-                marshaller.marshal(refreshIndex(synchrone), sw);
+                marshaller.marshal(refreshIndex(asynchrone), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             
             } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
@@ -150,7 +227,7 @@ public class ConfigurationService extends OGCWebService  {
      * @return an Acknowlegement if the restart succeed.
      */
     private AcknowlegementType restartService() {
-        LOGGER.info("restart requested");
+        LOGGER.info("\n restart requested \n");
         cn.reload();
         return new AcknowlegementType("success", "services succefully restarted");
     }
@@ -158,33 +235,58 @@ public class ConfigurationService extends OGCWebService  {
     /**
      * Destroy the CSW index directory in order that it will be recreated.
      * 
-     * @param synchrone
+     * @param asynchrone
      * @return
      * @throws WebServiceException
      */
-    private AcknowlegementType refreshIndex(boolean synchrone) throws WebServiceException {
+    private AcknowlegementType refreshIndex(boolean asynchrone) throws WebServiceException {
         LOGGER.info("refresh index requested");
         
-        File sicadeDir    = getSicadeDirectory(); 
-        File cswConfigDir = new File(sicadeDir, "csw_configuration");
-        File indexDir     = new File(cswConfigDir, "index");
+        if (!asynchrone) {
+            File indexDir     = new File(cswConfigDir, "index");
 
-        if (indexDir.exists() && indexDir.isDirectory()) {
-            for (File f: indexDir.listFiles()) {
-                f.delete();
-            }
-            boolean succeed =indexDir.delete();
+            if (indexDir.exists() && indexDir.isDirectory()) {
+                for (File f: indexDir.listFiles()) {
+                    f.delete();
+                }
+                boolean succeed = indexDir.delete();
             
-            if (!succeed) {
-                throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
+                if (!succeed) {
+                    throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
+                }
+            } else if (indexDir.exists() && !indexDir.isDirectory()){
+                indexDir.delete();
             }
+            
+            //then we restart the services
+            cn.reload();
+            
         } else {
-            throw new WebServiceException("the index folder does not exist.", NO_APPLICABLE_CODE, version);
+            if (CSWFunctionEnabled) {
+                File indexDir     = new File(cswConfigDir, "nextIndex");
+
+                if (indexDir.exists() && indexDir.isDirectory()) {
+                    for (File f: indexDir.listFiles()) {
+                        f.delete();
+                    }
+                    boolean succeed = indexDir.delete();
+
+                    if (!succeed) {
+                        throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
+                    }
+                } else if (indexDir.exists() && !indexDir.isDirectory()){
+                    indexDir.delete();
+                }
+                indexer.setFileDirectory(indexDir);
+                try  {
+                    indexer.createIndex();
+                } catch (SQLException ex) {
+                    throw new WebServiceException("SQLException while creating the index.", NO_APPLICABLE_CODE, version);
+                }
+            } else {
+                throw new WebServiceException("This CSW function is not enabled.", NO_APPLICABLE_CODE, version);
+            }
         }
-        
-        //then we restart the services
-        cn.reload();
-            
         return new AcknowlegementType("success", "CSW index succefully recreated");
     }
     
@@ -198,8 +300,6 @@ public class ConfigurationService extends OGCWebService  {
     private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
-        File sicadeDir     = getSicadeDirectory();
-        File cswConfigDir  = new File(sicadeDir, "csw_configuration");
         File cascadingFile = new File(cswConfigDir, "CSWCascading.properties");
         
         Properties prop    = getPropertiesFromFile(cascadingFile);
@@ -213,9 +313,6 @@ public class ConfigurationService extends OGCWebService  {
         }
         
         storeProperties(prop, cascadingFile);
-        
-        //then we restart the services
-        cn.reload();
         
         return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
     }
@@ -257,8 +354,8 @@ public class ConfigurationService extends OGCWebService  {
         }
         
         File sicadeDir      = getSicadeDirectory();
-        File cswConfigDir   = new File(sicadeDir, serviceDirectory.get(service));
-        File propertiesFile = new File(cswConfigDir, fileName);
+        File configDir   = new File(sicadeDir, serviceDirectory.get(service));
+        File propertiesFile = new File(configDir, fileName);
         
         Properties prop     = new Properties();
         if (propertiesFile.exists()) {
@@ -271,9 +368,6 @@ public class ConfigurationService extends OGCWebService  {
         }
         
         storeProperties(prop, propertiesFile);
-        
-        //then we restart the services
-        cn.reload();
         
         return new AcknowlegementType("success", "properties file sucessfully updated");
     }

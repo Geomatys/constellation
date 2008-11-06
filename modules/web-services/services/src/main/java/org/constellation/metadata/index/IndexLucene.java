@@ -80,7 +80,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * 
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public IndexLucene(File configDirectory) throws SQLException {
+    public IndexLucene(File configDirectory) {
         
         analyzer      = new StandardAnalyzer();
         
@@ -106,12 +106,19 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
         }
     }
     
+    /**
+     * Creates a new Lucene Index.
+     */
+    public IndexLucene() {
+        analyzer      = new StandardAnalyzer();
+    }
+    
     /** 
      * Create a new Index.
      * 
      * @throws java.sql.SQLException
      */
-    protected abstract void createIndex() throws SQLException;
+    public abstract void createIndex() throws SQLException;
 
     /**
      * Replace the precedent index directory by another pre-generated.

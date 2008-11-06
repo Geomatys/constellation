@@ -382,7 +382,7 @@ public abstract class WebService {
      * @param fileName The name of the file requested.
      * @return The specified file.
      */
-    public File getFile(String fileName) {
+    protected File getFile(String fileName) {
          File path;
 
          //we try to get the deployed "WEB-INF" directory
@@ -454,7 +454,7 @@ public abstract class WebService {
      *
      * @return The ".sicade" directory containing .
      */
-    public File getSicadeDirectory() {
+    public static File getSicadeDirectory() {
         File sicadeDirectory;
         String home = System.getProperty("user.home");
 
