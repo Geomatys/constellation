@@ -145,7 +145,7 @@ public class WCSService extends OGCWebService {
 
                 //this wcs does not implement "store" mechanism
                 String store = getParameter(KEY_STORE, false);
-                if (store!= null && store.equals("true")) {
+                if (store!= null && store.trim().equalsIgnoreCase("true")) {
                     throw new WebServiceException("The service does not implement the store mechanism",
                                    NO_APPLICABLE_CODE, getCurrentVersion(), "store");
                 }
@@ -176,7 +176,6 @@ public class WCSService extends OGCWebService {
             {
                 AbstractGetCoverage gc = (AbstractGetCoverage)objectRequest;
                 verifyBaseParameter(0);
-                LOGGER.info("wcs version :" + getCurrentVersion().toString());
                 /*
                  * if the parameters have been send by GET or POST kvp,
                  * we build a request object with this parameter.
@@ -286,7 +285,6 @@ public class WCSService extends OGCWebService {
      * Build a new DescribeCoverage request from a kvp request
      */
     private AbstractGetCoverage createNewGetCoverageRequest() throws WebServiceException {
-        LOGGER.info("wcs version :" + getCurrentVersion().toString());
         String width  = getParameter(KEY_WIDTH,  false);
         String height = getParameter(KEY_HEIGHT, false);
         String depth  = getParameter(KEY_DEPTH,  false);
@@ -719,8 +717,6 @@ public class WCSService extends OGCWebService {
      * Web service operation
      */
     public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException, WebServiceException {
-        LOGGER.info("getCoverage request processing");
-        
         String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new WebServiceException("The parameter version must be specified",
@@ -730,7 +726,6 @@ public class WCSService extends OGCWebService {
            setCurrentVersion(inputVersion);
         }
 
-        LOGGER.info("wcs version in getCoverage :" + getCurrentVersion().toString());
         final String format, coverage;
         final GeneralEnvelope objEnv;
         final CoordinateReferenceSystem crs;
