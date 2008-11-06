@@ -324,7 +324,9 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return sldFact.create(RANDOM_FACTORY.createDefaultVectorStyle(fs), dimension);
     }
 
-    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException {
+    public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
+            final Double elevation, final Date time) throws CatalogException, IOException
+    {
         return null;
     }
 

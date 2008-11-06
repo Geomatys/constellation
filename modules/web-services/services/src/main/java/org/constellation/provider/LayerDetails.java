@@ -38,6 +38,7 @@ import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
 
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -71,10 +72,16 @@ public interface LayerDetails {
     /**
      * Returns the coverage requested.
      *
+     * @param envelope The {@link Envelope} to request. Should  not be {@code null}.
+     * @param dimension A {@link Dimension} for the image. Should  not be {@code null}.
+     * @param elevation The elevation to request, in the case of nD data.
+     * @param time The date for the data, in the case of temporal data.
+     *
      * @throws org.constellation.catalog.CatalogException
      * @throws java.io.IOException
      */
-    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException;
+    public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
+            final Double elevation, final Date time) throws CatalogException, IOException;
 
     /**
      * Returns a list of favorites styles associated to this layer.

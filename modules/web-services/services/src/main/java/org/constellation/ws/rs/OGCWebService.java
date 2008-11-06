@@ -18,6 +18,7 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,9 +26,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
@@ -390,5 +396,54 @@ public abstract class OGCWebService extends WebService {
      */
     public void setLastUpdateSequence(long lastUpdateSequence) {
         this.lastUpdateSequence = lastUpdateSequence;
+    }
+
+    /**
+     * Check if the provided object is an instance of one of the given classes.
+     */
+    private static synchronized boolean isValidType(final Class<?>[] validTypes,
+                                                    final Object type)
+    {
+        for (final Class<?> t : validTypes) {
+            if (t.isInstance(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Write an {@linkplain RenderedImage image} into an output stream, using the mime
+     * type specified.
+     *
+     * @param image The image to write into an output stream.
+     * @param mime Mime-type of the output
+     * @param output Output stream containing the image.
+     * @throws IOException if a writing error occurs.
+     */
+    public static synchronized void writeImage(final RenderedImage image,
+            final String mime, Object output) throws IOException
+    {
+        if(image == null) throw new NullPointerException("Image can not be null");
+        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
+        while (writers.hasNext()) {
+            final ImageWriter writer = writers.next();
+            final ImageWriterSpi spi = writer.getOriginatingProvider();
+            if (spi.canEncodeImage(image)) {
+                ImageOutputStream stream = null;
+                if (!isValidType(spi.getOutputTypes(), output)) {
+                    stream = ImageIO.createImageOutputStream(output);
+                    output = stream;
+                }
+                writer.setOutput(output);
+                writer.write(image);
+                writer.dispose();
+                if (stream != null) {
+                    stream.close();
+                }
+                return;
+            }
+        }
+        throw new IOException("Unknowed image type");
     }
 }

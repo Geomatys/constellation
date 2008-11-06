@@ -307,6 +307,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @param output The output file where to write the result of the {@link GetMap} request.
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
+     *
+     * @deprecated
      */
     public synchronized void portray(final GetMap query, final File output)
             throws PortrayalException, WebServiceException {

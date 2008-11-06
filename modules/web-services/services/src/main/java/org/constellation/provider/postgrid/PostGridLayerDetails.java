@@ -109,10 +109,12 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public GridCoverage2D getCoverage(final GetFeatureInfo gfi) throws CatalogException, IOException {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
-        final int width = gfi.getSize().width;
-        final int height = gfi.getSize().height;
+    public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
+            final Double elevation, final Date time) throws CatalogException, IOException
+    {
+        final ReferencedEnvelope objEnv = new ReferencedEnvelope(envelope);
+        final int width = dimension.width;
+        final int height = dimension.height;
         final Envelope genv;
         try {
             genv = CRS.transform(objEnv, DefaultGeographicCRS.WGS84);
@@ -139,11 +141,9 @@ class PostGridLayerDetails implements LayerDetails {
 
         table.setGeographicBoundingBox(bbox);
         table.setPreferredResolution(resolution);
-        final Date date = gfi.getTime();
-        table.setTimeRange(date, date);
-        final Double elev = gfi.getElevation();
-        if (elev != null) {
-            table.setVerticalRange(elev, elev);
+        table.setTimeRange(time, time);
+        if (elevation != null) {
+            table.setVerticalRange(elevation, elevation);
         } else {
             table.setVerticalRange(null);
         }
@@ -160,11 +160,11 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
-        final GridCoverage2D coverage = getCoverage(gfi);
-
         final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
         final int width  = gfi.getSize().width;
         final int height = gfi.getSize().height;
+        final GridCoverage2D coverage = getCoverage(objEnv, new Dimension(width, height),
+                gfi.getElevation(), gfi.getTime());
         // Pixel coordinates in the request.
         final int pixelUpX        = gfi.getX();
         final int pixelUpY        = gfi.getY();

@@ -42,10 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
+import java.util.logging.Level;
 import javax.measure.unit.Unit;
 import javax.naming.NamingException;
 import javax.ws.rs.Path;
@@ -99,6 +96,7 @@ import org.geotools.util.MeasurementRange;
 //Geoapi dependencies
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -177,15 +175,17 @@ public class WMSService extends OGCWebService {
         } catch (WebServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
                     new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
-           StringWriter sw = new StringWriter();
-           marshaller.marshal(report, sw);
-           return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build(); 
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build();
         } catch (NumberFormatException n) {
-           final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
+            final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
-           StringWriter sw = new StringWriter();
-           marshaller.marshal(report, sw);
-           return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build(); 
+            LOGGER.log(Level.INFO, n.getLocalizedMessage(), n);
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
     }
 
@@ -590,14 +590,16 @@ public class WMSService extends OGCWebService {
                    .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
                    .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
                    .append("\n");
+            final Envelope objEnv = info.getEnvelope();
+            final Date time = info.getTime();
+            final Double elevation = info.getElevation();
             for (String layer : layers) {
                 final String layerNameCorrected = layer.replaceAll("\\W", "");
                 builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
                        .append("\t\t<").append(layerNameCorrected).append("_feature").append(">\n");
                        
                 final LayerDetails layerPostgrid = dp.get(layer);
-                final CoordinateReferenceSystem crs =
-                        info.getEnvelope().getCoordinateReferenceSystem();
+                final CoordinateReferenceSystem crs = objEnv.getCoordinateReferenceSystem();
                 builder.append("\t\t\t<gml:boundedBy>").append("\n");
                 String crsName;
                 try {
@@ -618,8 +620,8 @@ public class WMSService extends OGCWebService {
                 builder.append("\t\t\t</gml:boundedBy>").append("\n");
                 builder.append("\t\t\t<x>").append(pos.getOrdinate(0)).append("</x>").append("\n")
                        .append("\t\t\t<y>").append(pos.getOrdinate(1)).append("</y>").append("\n");
-                if (info.getTime() != null) {
-                    builder.append("\t\t\t<time>").append(info.getTime()).append("</time>")
+                if (time != null) {
+                    builder.append("\t\t\t<time>").append(time).append("</time>")
                            .append("\n");
                 } else {
                     SortedSet<Date> dates = null;
@@ -635,8 +637,8 @@ public class WMSService extends OGCWebService {
                                .append("</time>").append("\n");
                     }
                 }
-                if (info.getElevation() != null) {
-                    builder.append("\t\t\t<elevation>").append(info.getElevation())
+                if (elevation != null) {
+                    builder.append("\t\t\t<elevation>").append(elevation)
                            .append("</elevation>").append("\n");
                 } else {
                     SortedSet<Number> elevs = null;
@@ -652,7 +654,7 @@ public class WMSService extends OGCWebService {
                 }
                 final GridCoverage2D coverage;
                 try {
-                    coverage = layerPostgrid.getCoverage(info);
+                    coverage = layerPostgrid.getCoverage(objEnv, new Dimension(info.getSize()), elevation, time);
                 } catch (CatalogException cat) {
                     throw new WebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
                 } catch (IOException io) {
@@ -760,21 +762,7 @@ public class WMSService extends OGCWebService {
             }
         }
 
-        return Response.ok(image, getMap.getFormat()).build();
-    }
-
-    /**
-     * Check if the provided object is an instance of one of the given classes.
-     */
-    private static synchronized boolean isValidType(final Class<?>[] validTypes,
-                                                    final Object type)
-    {
-        for (final Class<?> t : validTypes) {
-            if (t.isInstance(type)) {
-                return true;
-            }
-        }
-        return false;
+        return Response.ok(image, format).build();
     }
 
     /**
@@ -885,10 +873,10 @@ public class WMSService extends OGCWebService {
      * @throws org.constellation.coverage.web.WebServiceException
      */
     private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {
-        final String strLayer  = getParameter( KEY_LAYER,  true );
-        final String strFormat = getParameter( KEY_FORMAT, true );
-        final String strWidth  = getParameter( KEY_WIDTH, false );
-        final String strHeight = getParameter( KEY_HEIGHT, false);
+        final String strLayer  = getParameter(KEY_LAYER,  true );
+        final String strFormat = getParameter(KEY_FORMAT, true );
+        final String strWidth  = getParameter(KEY_WIDTH,  false);
+        final String strHeight = getParameter(KEY_HEIGHT, false);
         final String format;
         try {
             format = QueryAdapter.toFormat(strFormat);
@@ -1057,40 +1045,5 @@ public class WMSService extends OGCWebService {
         f.deleteOnExit();
 
         return f;
-    }
-
-    /**
-     * Write an {@linkplain BufferedImage image} into an output stream, using the mime
-     * type specified.
-     *
-     * @param image The image to write into an output stream.
-     * @param mime Mime-type of the output
-     * @param output Output stream containing the image.
-     * @throws java.io.IOException if a writing error occurs.
-     */
-    private static synchronized void writeImage(final BufferedImage image,
-            final String mime, Object output) throws IOException
-    {
-        if(image == null) throw new NullPointerException("Image can not be null");
-        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
-        while (writers.hasNext()) {
-            final ImageWriter writer = writers.next();
-            final ImageWriterSpi spi = writer.getOriginatingProvider();
-            if (spi.canEncodeImage(image)) {
-                ImageOutputStream stream = null;
-                if (!isValidType(spi.getOutputTypes(), output)) {
-                    stream = ImageIO.createImageOutputStream(output);
-                    output = stream;
-                }
-                writer.setOutput(output);
-                writer.write(image);
-                writer.dispose();
-                if (stream != null) {
-                    stream.close();
-                }
-                return;
-            }
-        }
-        throw new IOException("Unknowed image type");
     }
 }

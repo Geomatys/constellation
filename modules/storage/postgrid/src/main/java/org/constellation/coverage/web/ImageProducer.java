@@ -1013,6 +1013,8 @@ public abstract class ImageProducer {
      *
      * @return The legend image as a file.
      * @throws WebServiceException if an error occured while processing the legend.
+     *
+     * @deprecated
      */
     public File getLegendFile() throws WebServiceException {
         final ImageRequest request = getImageRequest(ImageType.LEGEND);

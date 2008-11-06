@@ -88,8 +88,12 @@ public abstract class WCSQuery extends Query {
     /** Parameter used in getCoverage 1.1.1 */
     public static final String KEY_RANGESUBSET = "RANGESUBSET";
 
-    /** Parameter used in getCoverage */
+    /** Format value used in getCoverage */
     public static final String MATRIX = "MATRIX";
+    /** Format value used in getCoverage */
+    public static final String GEOTIFF = "GEOTIFF";
+    /** Format value used in getCoverage */
+    public static final String NETCDF = "NETCDF";
 
     /**
      * {@inheritDoc}

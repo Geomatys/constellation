@@ -25,17 +25,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
+import java.util.logging.Level;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -44,15 +40,12 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.catalog.Layer;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceExceptionReport;
 import org.constellation.coverage.web.ServiceExceptionType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
-import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -65,7 +58,6 @@ import org.constellation.ows.AbstractGetCapabilities;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;
-import org.constellation.ows.v110.KeywordsType;
 import org.constellation.ows.v110.LanguageStringType;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ows.v110.WGS84BoundingBoxType;
@@ -78,44 +70,33 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.wcs.AbstractDescribeCoverage;
 import org.constellation.wcs.AbstractGetCoverage;
-import org.constellation.wcs.v111.RangeType;
 import org.constellation.wcs.v111.Capabilities;
 import org.constellation.wcs.v100.ContentMetadata;
 import org.constellation.wcs.v111.Contents;
-import org.constellation.wcs.v111.CoverageDescriptionType;
-import org.constellation.wcs.v111.CoverageDescriptions;
-import org.constellation.wcs.v100.CoverageDescription;
-import org.constellation.wcs.v111.CoverageDomainType;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
-import org.constellation.wcs.v100.CoverageOfferingType;
 import org.constellation.wcs.v111.CoverageSummaryType;
 import org.constellation.wcs.v100.WCSCapabilityType.Request;
 import org.constellation.wcs.v100.DCPTypeType;
 import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
 import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
-import org.constellation.wcs.v100.DomainSetType;
-import org.constellation.wcs.v111.FieldType;
-import org.constellation.wcs.v111.InterpolationMethodType;
-import org.constellation.wcs.v111.InterpolationMethods;
-import org.constellation.wcs.v100.Keywords;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
-import org.constellation.wcs.v100.RangeSet;
-import org.constellation.wcs.v100.RangeSetType;
 import org.constellation.wcs.v100.SpatialSubsetType;
-import org.constellation.wcs.v100.SupportedCRSsType;
-import org.constellation.wcs.v100.SupportedFormatsType;
-import org.constellation.wcs.v100.SupportedInterpolationsType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;
 import org.constellation.wcs.v111.GridCrsType;
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
 import org.constellation.ws.rs.OGCWebService;
 
 // GeoAPI dependencies
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.constellation.coverage.web.ExceptionCode.*;
 import static org.constellation.query.wcs.WCSQuery.*;
 
@@ -195,6 +176,7 @@ public class WCSService extends OGCWebService {
             {
                 AbstractGetCoverage gc = (AbstractGetCoverage)objectRequest;
                 verifyBaseParameter(0);
+                LOGGER.info("wcs version :" + getCurrentVersion().toString());
                 /*
                  * if the parameters have been send by GET or POST kvp,
                  * we build a request object with this parameter.
@@ -218,6 +200,7 @@ public class WCSService extends OGCWebService {
                         new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
             }
 
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
@@ -295,7 +278,7 @@ public class WCSService extends OGCWebService {
      * Build a new DescribeCoverage request from a kvp request
      */
     private AbstractGetCoverage createNewGetCoverageRequest() throws WebServiceException {
-
+        LOGGER.info("wcs version :" + getCurrentVersion().toString());
         String width  = getParameter(KEY_WIDTH,  false);
         String height = getParameter(KEY_HEIGHT, false);
         String depth  = getParameter(KEY_DEPTH,  false);
@@ -739,8 +722,12 @@ public class WCSService extends OGCWebService {
            setCurrentVersion(inputVersion);
         }
 
+        LOGGER.info("wcs version in getCoverage :" + getCurrentVersion().toString());
         final String format, coverage;
-        String crs = null, bbox = null, time = null , interpolation = null, exceptions;
+        final GeneralEnvelope objEnv;
+        final CoordinateReferenceSystem crs;
+        
+        String time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
@@ -779,14 +766,17 @@ public class WCSService extends OGCWebService {
             if (boundingBox != null && boundingBox.getLowerCorner() != null &&
                 boundingBox.getUpperCorner() != null     &&
                 boundingBox.getLowerCorner().size() == 2 &&
-                boundingBox.getUpperCorner().size() == 2) {
-
-
-                crs  = boundingBox.getCrs();
-                bbox = boundingBox.getLowerCorner().get(0) + "," +
-                       boundingBox.getLowerCorner().get(1) + "," +
-                       boundingBox.getUpperCorner().get(0) + "," +
-                       boundingBox.getUpperCorner().get(1);
+                boundingBox.getUpperCorner().size() == 2)
+            {
+                final String crsName = boundingBox.getCrs();
+                try {
+                    crs  = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
+                } catch (FactoryException ex) {
+                    throw new WebServiceException(ex, INVALID_CRS, getCurrentVersion());
+                }
+                objEnv = new GeneralEnvelope(crs);
+                objEnv.setRange(0, boundingBox.getLowerCorner().get(0), boundingBox.getUpperCorner().get(0));
+                objEnv.setRange(1, boundingBox.getLowerCorner().get(1), boundingBox.getUpperCorner().get(1));
             } else {
                 throw new WebServiceException("The BoundingBox is not well-formed",
                                INVALID_PARAMETER_VALUE, getCurrentVersion(), "boundingbox");
@@ -874,7 +864,7 @@ public class WCSService extends OGCWebService {
                                MISSING_PARAMETER_VALUE, getCurrentVersion(), "format");
             }
 
-            GridCrsType grid = output.getGridCRS();
+            final GridCrsType grid = output.getGridCRS();
             if (grid != null) {
                 gridBaseCrs = grid.getGridBaseCRS();
                 gridType = grid.getGridType();
@@ -900,20 +890,20 @@ public class WCSService extends OGCWebService {
                 gridOffsets = "1.0,0.0,0.0,1.0"; // = null;
                 gridOrigin  = "0.0,0.0";
             }
-            exceptions    = getParameter(KEY_EXCEPTIONS, false);
+            exceptions = getParameter(KEY_EXCEPTIONS, false);
 
         } else {
 
             // parameter for 1.0.0 version
             org.constellation.wcs.v100.GetCoverage request = (org.constellation.wcs.v100.GetCoverage)abstractRequest;
             if (request.getOutput().getFormat()!= null) {
-                format    = request.getOutput().getFormat().getValue();
+                format = request.getOutput().getFormat().getValue();
             } else {
                 throw new WebServiceException("The parameters FORMAT have to be specified",
                                                  MISSING_PARAMETER_VALUE, getCurrentVersion(), "format");
             }
 
-            coverage      = request.getSourceCoverage();
+            coverage = request.getSourceCoverage();
             if (coverage == null) {
                 throw new WebServiceException("The parameters SOURCECOVERAGE have to be specified",
                                                  MISSING_PARAMETER_VALUE, getCurrentVersion(), "sourceCoverage");
@@ -921,7 +911,7 @@ public class WCSService extends OGCWebService {
             if (request.getInterpolationMethod() != null) {
                 interpolation = request.getInterpolationMethod().value();
             }
-            exceptions    = getParameter(KEY_EXCEPTIONS, false);
+            exceptions = getParameter(KEY_EXCEPTIONS, false);
             if (request.getOutput().getCrs() != null){
                 responseCRS   = request.getOutput().getCrs().getValue();
             }
@@ -935,16 +925,17 @@ public class WCSService extends OGCWebService {
                     }
                 }
             }
-            SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
-            EnvelopeEntry env = spatial.getEnvelope();
-            crs               = env.getSrsName();
-            //TODO remplacer les param dans webServiceWorker
-            if (env.getPos().size() > 1) {
-                bbox  = env.getPos().get(0).getValue().get(0).toString() + ',';
-                bbox += env.getPos().get(1).getValue().get(0).toString() + ',';
-                bbox += env.getPos().get(0).getValue().get(1).toString() + ',';
-                bbox += env.getPos().get(1).getValue().get(1).toString();
+            final SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
+            final EnvelopeEntry env = spatial.getEnvelope();
+            final String crsName = env.getSrsName();
+            try {
+                crs = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
+            } catch (FactoryException ex) {
+                throw new WebServiceException(ex, INVALID_CRS, getCurrentVersion());
             }
+            objEnv = new GeneralEnvelope(crs);
+            objEnv.setRange(0, env.getPos().get(0).getValue().get(0), env.getPos().get(0).getValue().get(1));
+            objEnv.setRange(1, env.getPos().get(1).getValue().get(0), env.getPos().get(1).getValue().get(1));
 
             if (temporalSubset == null && env.getPos().size() == 0) {
                         throw new WebServiceException("The parameters BBOX or TIME have to be specified",
@@ -954,7 +945,7 @@ public class WCSService extends OGCWebService {
              *  have to be fill. If not they can be replace by resx and resy
              * (resz for 3D grid)
              */
-            GridType grid = spatial.getGrid();
+            final GridType grid = spatial.getGrid();
             if (grid instanceof RectifiedGridType){
                 resx = getParameter(KEY_RESX,  false);
                 resy = getParameter(KEY_RESY,  false);
@@ -980,9 +971,22 @@ public class WCSService extends OGCWebService {
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
 
-        if (format.trim().equalsIgnoreCase(MATRIX)) {
-            // TODO: Use the old method in ImageProducer / WebServiceWorker to get the matrix value.
-            throw new UnsupportedOperationException();
+        if (format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(NETCDF) ||
+            format.equalsIgnoreCase(GEOTIFF))
+        {
+            final NamedLayerDP dp = NamedLayerDP.getInstance();
+            final LayerDetails layer = dp.get(coverage);
+            final ImageOutputStream outputStream;
+            try {
+                final GridCoverage2D gridCov = layer.getCoverage(objEnv, new Dimension(), null, null);
+                outputStream = ImageIO.createImageOutputStream(null);
+                writeImage(gridCov.getRenderedImage(), format, outputStream);
+            } catch (IOException ex) {
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+            } catch (CatalogException ex) {
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+            }
+            return Response.ok(outputStream, format).build();
         } else {
             // We are in the case of an image format requested.
             BufferedImage image = null;
@@ -1229,8 +1233,7 @@ public class WCSService extends OGCWebService {
         StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
         return sw.toString();
-*/
-        /*} catch (CatalogException exception) {
+        } catch (CatalogException exception) {
             throw new WebServiceException(exception.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
         }*/
     }
