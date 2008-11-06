@@ -24,6 +24,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,11 +34,15 @@ import java.util.logging.Logger;
 
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.coverage.web.ExceptionCode;
+import org.constellation.coverage.web.Service;
+import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
+import org.constellation.query.wcs.WCSQuery;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
-import org.constellation.query.wms.WMSQueryVersion;
+import org.constellation.wcs.AbstractGetCoverage;
 
 import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.exception.PortrayalException;
@@ -47,6 +52,7 @@ import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.sld.MutableLayer;
 import org.geotools.sld.MutableLayerStyle;
@@ -57,7 +63,12 @@ import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+
+import static org.constellation.coverage.web.ExceptionCode.*;
 
 
 /**
@@ -116,19 +127,119 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         
     }
 
+    public synchronized BufferedImage portray(final AbstractGetCoverage query)
+            throws PortrayalException, WebServiceException
+    {
+        if (query == null) {
+            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
+                    " is not well used here.");
+        }
+        final List<String> layers = new ArrayList<String>();
+        final ServiceVersion version;
+        final Map<String, Object> params = new HashMap<String, Object>();
+        final ReferencedEnvelope refEnv;
+        final Dimension dimension;
+        if (query instanceof org.constellation.wcs.v100.GetCoverage) {
+            final org.constellation.wcs.v100.GetCoverage query100 = (org.constellation.wcs.v100.GetCoverage) query;
+            layers.add(query100.getSourceCoverage());
+            version = new ServiceVersion(Service.WCS, query100.getVersion());
+            // Decode the CRS.
+            String crsCode = query100.getOutput().getCrs().getValue();
+            if (!crsCode.contains(":")) {
+                crsCode = "EPSG:" + crsCode;
+            }
+            final CoordinateReferenceSystem crs;
+            try {
+                crs = CRS.decode(crsCode);
+            } catch (NoSuchAuthorityCodeException ex) {
+                throw new WebServiceException(ex, INVALID_CRS, version);
+            } catch (FactoryException ex) {
+                throw new WebServiceException(ex, INVALID_CRS, version);
+            }
+            // Calculate the bbox.
+            final DirectPositionType lowerCorner = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getLowerCorner();
+            final DirectPositionType upperCorner = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getUpperCorner();
+            final List<Double> lowerCornerCoords = lowerCorner.getValue();
+            final List<Double> upperCornerCoords = upperCorner.getValue();
+            refEnv = new ReferencedEnvelope(lowerCornerCoords.get(0), lowerCornerCoords.get(1),
+                                            upperCornerCoords.get(0), upperCornerCoords.get(1), crs);
+            // Additionnal parameters.
+            if (query100.getDomainSubset().getTemporalSubSet() != null &&
+                query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().size() > 0)
+            {
+                params.put(WCSQuery.KEY_TIME, query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().get(0));
+            }
+            if (lowerCorner.getDimension() > 2) {
+                params.put(WMSQuery.KEY_ELEVATION, lowerCornerCoords.get(2));
+            }
+            dimension = new Dimension(query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue(),
+                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue());
+        } else {
+            final org.constellation.wcs.v111.GetCoverage query111 = (org.constellation.wcs.v111.GetCoverage) query;
+            layers.add(query111.getIdentifier().getValue());
+            version = new ServiceVersion(Service.WCS, query111.getVersion());
+            // Decode the CRS.
+            String crsCode = query111.getOutput().getGridCRS().getSrsName().getValue();
+            if (!crsCode.contains(":")) {
+                crsCode = "EPSG:" + crsCode;
+            }
+            final CoordinateReferenceSystem crs;
+            try {
+                crs = CRS.decode(crsCode);
+            } catch (NoSuchAuthorityCodeException ex) {
+                throw new WebServiceException(ex, INVALID_CRS, version);
+            } catch (FactoryException ex) {
+                throw new WebServiceException(ex, INVALID_CRS, version);
+            }
+            // Calculate the bbox.
+            final List<Double> lowerCornerCoords = query111.getDomainSubset().getBoundingBox().getValue().getLowerCorner();
+            final List<Double> upperCornerCoords = query111.getDomainSubset().getBoundingBox().getValue().getUpperCorner();
+            refEnv = new ReferencedEnvelope(lowerCornerCoords.get(0), lowerCornerCoords.get(1),
+                                            upperCornerCoords.get(0), upperCornerCoords.get(1), crs);
+            // Additionnal parameters.
+            if (query111.getDomainSubset().getTemporalSubset() != null &&
+                query111.getDomainSubset().getTemporalSubset().getTimePositionOrTimePeriod().size() > 0)
+            {
+                params.put(WCSQuery.KEY_TIME, query111.getDomainSubset().getTemporalSubset().getTimePositionOrTimePeriod().get(0));
+            }
+            if (query111.getDomainSubset().getBoundingBox().getValue().getDimensions().intValue() > 2) {
+                params.put(WMSQuery.KEY_ELEVATION, lowerCornerCoords.get(2));
+            }
+            dimension = new Dimension((int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(0)),
+                    (int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(1)));
+        }
+        updateContext(layers, version, null, null, params);
+        //TODO horrible TRY CATCH to remove when the renderer will have a fine
+        //error handeling. This catch doesnt happen in normal case, but because of
+        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
+        //thread exceptions.
+        try {
+            return portrayUsingCache(refEnv, 0, null, dimension);
+        } catch (Exception ex) {
+            if (ex instanceof PortrayalException) {
+                throw (PortrayalException)ex;
+            } else if(ex instanceof WebServiceException) {
+                throw (WebServiceException) ex;
+            } else {
+                throw new PortrayalException(ex);
+            }
+        }
+    }
+
     /**
      * Makes the portray of a {@code GetMap} request.
      *
-     * @param query A {@link GetMap} query.
-     * @param output The output file where to write the result of the {@link GetMap} request.
+     * @param query A {@link GetMap} query. Should not be {@code null}.
+     *
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
      */
     public synchronized BufferedImage portray(final GetMap query)
-                            throws PortrayalException, WebServiceException{
-
-        if(query == null){
-            throw new NullPointerException("Query cannot be null");
+                            throws PortrayalException, WebServiceException
+    {
+        if (query == null) {
+            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
+                    " is not well used here.");
         }
 
         final List<String> layers              = query.getLayers();
@@ -137,7 +248,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         final Envelope contextEnv              = query.getEnvelope();
         final ReferencedEnvelope refEnv        = new ReferencedEnvelope(contextEnv);
         final String mime                      = query.getFormat();
-        final WMSQueryVersion version          = query.getVersion();
+        final ServiceVersion version           = query.getVersion();
         final Double elevation                 = query.getElevation();
         final Date time                        = query.getTime();
         final MeasurementRange dimRange        = query.getDimRange();
@@ -255,7 +366,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         return image;
     }
     
-    private void updateContext(final List<String> layers, final WMSQueryVersion version,
+    private void updateContext(final List<String> layers, final ServiceVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
                                     throws PortrayalException, WebServiceException {

@@ -26,6 +26,7 @@ import org.constellation.coverage.web.ServiceVersion;
  * @version $Id$
  * @author Cédric Briançon
  */
+@Deprecated
 public class WMSQueryVersion extends ServiceVersion {
     /**
      * Key for the WMS request in version {@code 1.1.1}.

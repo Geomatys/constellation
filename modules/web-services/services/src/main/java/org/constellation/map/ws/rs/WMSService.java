@@ -941,7 +941,7 @@ public class WMSService extends OGCWebService {
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
-        final String strAzimuth      = getParameter(KEY_DIM_AZIMUTH,    false);
+        final String strAzimuth      = getParameter(KEY_AZIMUTH,    false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null) 
                 && (wmsVersion.equals(WMSQueryVersion.WMS_1_1_1))) ? false : fromGetMap);
 

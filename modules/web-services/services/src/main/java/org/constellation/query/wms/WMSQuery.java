@@ -100,7 +100,7 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getMap */
     public static final String KEY_DIM_RANGE = "DIM_RANGE";
     /** Parameter used in getMap */
-    public static final String KEY_DIM_AZIMUTH = "DIM_AZIMUTH";
+    public static final String KEY_AZIMUTH = "AZIMUTH";
 
     protected final WMSQueryVersion version;
 
