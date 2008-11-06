@@ -199,8 +199,16 @@ public class WCSService extends OGCWebService {
                 report = new ServiceExceptionReport(getCurrentVersion(),
                         new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
             }
-
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+            {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            } else {
+                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
+            }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
