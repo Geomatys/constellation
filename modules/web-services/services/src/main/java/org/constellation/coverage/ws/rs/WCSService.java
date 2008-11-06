@@ -379,7 +379,7 @@ public class WCSService extends OGCWebService {
 
             // temporal subset
             org.constellation.wcs.v111.TimeSequenceType temporal = null;
-            String timeParameter = getParameter("timeSequence", false);
+            String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
             if (timeParameter != null) {
                 if (timeParameter.indexOf('/') == -1) {
                     temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
@@ -387,7 +387,6 @@ public class WCSService extends OGCWebService {
                     throw new WebServiceException("The service does not handle TimePeriod" ,
                                    INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
-
             }
 
             /*
@@ -425,7 +424,7 @@ public class WCSService extends OGCWebService {
 
              //range subset.
              org.constellation.wcs.v111.RangeSubsetType  range = null;
-             String rangeSubset = getParameter("RangeSubset", false);
+             String rangeSubset = getParameter(KEY_RANGESUBSET, false);
              if (rangeSubset != null) {
                 //for now we don't handle Axis Identifiers
                 if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
@@ -452,11 +451,11 @@ public class WCSService extends OGCWebService {
             }
 
 
-            String gridType = getParameter("GridType", false);
+            String gridType = getParameter(KEY_GRIDTYPE, false);
             if (gridType == null) {
                 gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
             }
-            String gridOrigin = getParameter("GridOrigin", false);
+            String gridOrigin = getParameter(KEY_GRIDORIGIN, false);
             if (gridOrigin == null) {
                 gridOrigin = "0.0,0.0";
             }
@@ -468,7 +467,7 @@ public class WCSService extends OGCWebService {
                 origin.add(value);
             }
 
-            String gridOffsets = getParameter("GridOffsets", false);
+            String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
             List<Double> offset = new ArrayList<Double>();
             if (gridOffsets != null) {
                 tokens = new StringTokenizer(gridOffsets, ",;");
@@ -477,14 +476,14 @@ public class WCSService extends OGCWebService {
                     offset.add(value);
                 }
             }
-            String gridCS = getParameter("GridCS", false);
+            String gridCS = getParameter(KEY_GRIDCS, false);
             if (gridCS == null) {
                 gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
             }
 
             //output
             final CodeType codeCRS = new CodeType(crs);
-            final GridCrsType grid = new GridCrsType(codeCRS, getParameter("GridBaseCRS", false), gridType,
+            final GridCrsType grid = new GridCrsType(codeCRS, getParameter(KEY_GRIDBASECRS, false), gridType,
                     origin, offset, gridCS, "");
             org.constellation.wcs.v111.OutputType output = new org.constellation.wcs.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
 
@@ -957,9 +956,9 @@ public class WCSService extends OGCWebService {
              */
             GridType grid = spatial.getGrid();
             if (grid instanceof RectifiedGridType){
-                resx = getParameter("resx",  false);
-                resy = getParameter("resy",  false);
-                resz = getParameter("resz",  false);
+                resx = getParameter(KEY_RESX,  false);
+                resy = getParameter(KEY_RESY,  false);
+                resz = getParameter(KEY_RESY,  false);
 
             } else {
                 GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();

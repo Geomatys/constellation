@@ -228,8 +228,6 @@ public abstract class OGCWebService extends WebService {
      * If no such file is found, then this method returns {@code null}.
      *
      * @return The capabilities Object, or {@code null} if none.
-     *
-     * @deprecated
      */
     public Object getCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
         return getCapabilitiesObject(getCurrentVersion());

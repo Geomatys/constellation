@@ -52,6 +52,8 @@ public abstract class WCSQuery extends Query {
     public static final String KEY_SECTION = "SECTION";
     /** Parameter used in getCoverage 1.0.0 */ 
     public static final String KEY_TIME = "TIME";
+    /** Parameter used in getCoverage 1.1.1 */ 
+    public static final String KEY_TIMESEQUENCE = "TIMESEQUENCE";
     /** Parameter used in getCoverage 1.0.0 */ 
     public static final String KEY_BBOX = "BBOX";
     /** Parameter used in getCoverage 1.0.0 and 1.1.1 */ 
@@ -72,8 +74,19 @@ public abstract class WCSQuery extends Query {
     public static final String KEY_RESZ = "RESZ";
     /** Parameter used in getCoverage */
     public static final String KEY_INTERPOLATION = "INTERPOLATION";
-    /** Parameter used in getCoverage */
-    public static final String KEY_AZIMUTH = "AZIMUTH";
+
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_GRIDCS = "GRIDCS";
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_GRIDOFFSETS = "GRIDOFFSETS";
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_GRIDORIGIN = "GRIDORIGIN";
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_GRIDTYPE = "GRIDTYPE";
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_GRIDBASECRS = "GRIDBASECRS";
+    /** Parameter used in getCoverage 1.1.1 */
+    public static final String KEY_RANGESUBSET = "RANGESUBSET";
 
     /** Parameter used in getCoverage */
     public static final String MATRIX = "MATRIX";
