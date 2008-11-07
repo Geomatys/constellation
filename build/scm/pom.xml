@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of "build" module from Constellation project.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.constellation</groupId>
+    <artifactId>build</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>org.constellation</groupId>
+  <artifactId>scm</artifactId>
+  <packaging>pom</packaging>
+  <name>Control managment plugin for Constellation</name>
+  <description>
+    A floor to scripts that handle massive refactoring of source code.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+  </modules>
+
+</project>
