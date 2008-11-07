@@ -729,9 +729,10 @@ public class WCSService extends OGCWebService {
         final String format, coverage;
         final GeneralEnvelope objEnv;
         final CoordinateReferenceSystem crs;
+        final int width, height;
         
         String time = null , interpolation = null, exceptions;
-        String width = null, height = null, depth = null;
+        String depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
         String responseCRS = null;
@@ -768,8 +769,8 @@ public class WCSService extends OGCWebService {
             }
             if (boundingBox != null && boundingBox.getLowerCorner() != null &&
                 boundingBox.getUpperCorner() != null     &&
-                boundingBox.getLowerCorner().size() == 2 &&
-                boundingBox.getUpperCorner().size() == 2)
+                boundingBox.getLowerCorner().size() >= 2 &&
+                boundingBox.getUpperCorner().size() >= 2)
             {
                 final String crsName = boundingBox.getCrs();
                 try {
@@ -893,6 +894,11 @@ public class WCSService extends OGCWebService {
                 gridOffsets = "1.0,0.0,0.0,1.0"; // = null;
                 gridOrigin  = "0.0,0.0";
             }
+            /* TODO: get the width and height parameter from the calculation using the grid origin, the size
+             * of the envelope and the grid offsets.
+             */
+            width = Integer. parseInt(getParameter(KEY_WIDTH, false));
+            height = Integer.parseInt(getParameter(KEY_HEIGHT, false));
             exceptions = getParameter(KEY_EXCEPTIONS, false);
 
         } else {
@@ -952,13 +958,16 @@ public class WCSService extends OGCWebService {
             if (grid instanceof RectifiedGridType){
                 resx = getParameter(KEY_RESX,  false);
                 resy = getParameter(KEY_RESY,  false);
-                resz = getParameter(KEY_RESY,  false);
+                resz = getParameter(KEY_RESZ,  false);
 
+                width = Integer.parseInt(resx);
+                height = Integer.parseInt(resy);
             } else {
                 GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();
                 if (gridEnv.getHigh().size() > 0) {
-                    width         = gridEnv.getHigh().get(0).toString();
-                    height        = gridEnv.getHigh().get(1).toString();
+                    width         = gridEnv.getHigh().get(0).intValue();
+                    height        = gridEnv.getHigh().get(1).intValue();
+                    
                     if (gridEnv.getHigh().size() == 3) {
                         depth     = gridEnv.getHigh().get(2).toString();
                     }
@@ -996,16 +1005,14 @@ public class WCSService extends OGCWebService {
             try {
                 image = CSTLPortrayalService.getInstance().portray(abstractRequest);
             } catch (PortrayalException ex) {
-                if (exceptions != null && exceptions.equals(EXCEPTIONS_INIMAGE)) {
-                    final Dimension dim = new Dimension(Integer.parseInt(width), Integer.parseInt(height));
-                    image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+                if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
+                    image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
                 } else {
                     throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
                 }
             } catch (WebServiceException ex) {
-                if (exceptions != null && exceptions.equals(EXCEPTIONS_INIMAGE)) {
-                    final Dimension dim = new Dimension(Integer.parseInt(width), Integer.parseInt(height));
-                    image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+                if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
+                    image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
                 } else {
                     throw new WebServiceException(ex, LAYER_NOT_DEFINED, getCurrentVersion());
                 }

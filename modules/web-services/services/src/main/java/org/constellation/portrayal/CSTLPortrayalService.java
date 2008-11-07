@@ -176,8 +176,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             if (envEntry.getPos().get(0).getValue().size() > 2) {
                 params.put(WMSQuery.KEY_ELEVATION, positions.get(2).getValue().get(0));
             }
-            final int width = query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue();
-            final int height = query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue();
+            final int width = 
+                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue() -
+                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue();
+            final int height =
+                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(1).intValue() -
+                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(1).intValue();
             dimension = new Dimension(width, height);
         } else {
             final org.constellation.wcs.v111.GetCoverage query111 = (org.constellation.wcs.v111.GetCoverage) query;
@@ -213,6 +217,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             if (query111.getDomainSubset().getBoundingBox().getValue().getDimensions().intValue() > 2) {
                 params.put(WMSQuery.KEY_ELEVATION, lowerCornerCoords.get(2));
             }
+            // TODO: do the good calculation with grid origin, grid offset and the envelope size.
             dimension = new Dimension((int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(0)),
                     (int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(1)));
         }
