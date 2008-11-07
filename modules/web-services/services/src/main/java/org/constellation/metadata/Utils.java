@@ -27,12 +27,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -82,6 +84,73 @@ public class Utils {
         return result;
     }
     
+    /**
+     * Returns a Date object from an ISO-8601 representation string. (String defined with pattern yyyy-MM-dd'T'HH:mm:ss.SSSZ or yyyy-MM-dd).
+     * @param dateString
+     * @return
+     */
+    public static Date getDateFromString(String dateString) throws ParseException {
+        final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+        final String DATE_FORMAT2 = "yyyy-MM-dd";
+        final String DATE_FORMAT3 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+        final SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
+        final SimpleDateFormat sdf2 = new java.text.SimpleDateFormat(DATE_FORMAT2);
+        final SimpleDateFormat sdf3 = new java.text.SimpleDateFormat(DATE_FORMAT3);
+
+        if (dateString.contains("T")) {
+            String timezoneStr;
+            int index = dateString.lastIndexOf("+");
+            if (index == -1) {
+                index = dateString.lastIndexOf("-");
+            }
+            if (index > dateString.indexOf("T")) {
+                timezoneStr = dateString.substring(index + 1);
+
+                if (timezoneStr.contains(":")) {
+                    //e.g : 1985-04-12T10:15:30+04:00
+                    timezoneStr = timezoneStr.replace(":", "");
+                    dateString = dateString.substring(0, index + 1).concat(timezoneStr);
+                } else if (timezoneStr.length() == 2) {
+                    //e.g : 1985-04-12T10:15:30-04
+                    dateString = dateString.concat("00");
+                }
+            } else if (dateString.endsWith("Z")) {
+                //e.g : 1985-04-12T10:15:30Z
+                dateString = dateString.substring(0, dateString.length() - 1).concat("+0000");
+            }
+            final String timezone = getTimeZone(dateString);
+            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+
+            if (dateString.contains(".")) {
+                return sdf3.parse(dateString);
+            }
+            return sdf.parse(dateString);
+        }
+        if (dateString.contains("-")) {
+            return sdf2.parse(dateString);
+        }
+        return null;
+    }
+    
+    /**
+     * This method extract the timezone from a date string.
+     * @param dateString
+     * @return
+     */
+    public static String getTimeZone(final String dateString) {
+        if (dateString.endsWith("Z")) {
+            return "GMT+" + 0;
+        }
+        int index = dateString.lastIndexOf("+");
+        if (index == -1) {
+            index = dateString.lastIndexOf("-");
+        }
+        if (index > dateString.indexOf("T")) {
+            return "GMT" + dateString.substring(index);
+        }
+        return TimeZone.getDefault().getID();
+    }
+    
      /**
      * Return a Date by parsing different kind of date format.
      * 
@@ -104,7 +173,7 @@ public class Utils {
         POOL.put("octobre",   "10");
         POOL.put("novembre",  "11");
         POOL.put("décembre",  "12");
-        
+
         Map<String, String> POOLcase = new HashMap<String, String>();
         POOLcase.put("Janvier",   "01");
         POOLcase.put("Février",   "02");
@@ -118,67 +187,83 @@ public class Utils {
         POOLcase.put("Octobre",   "10");
         POOLcase.put("Novembre",  "11");
         POOLcase.put("Décembre",  "12");
-        
+
         String year;
         String month;
         String day;
-        Date tmp = dateFormat.parse("1900" + "-" + "01" + "-" + "01");
-        if (date != null){
-            if(date.contains("/")){
-                
-                day   = date.substring(0, date.indexOf("/"));
-                date  = date.substring(date.indexOf("/")+1);
-                month = date.substring(0, date.indexOf("/"));
-                year  = date.substring(date.indexOf("/")+1);
-                                
-                tmp   = dateFormat.parse(year + "-" + month + "-" + day);
-            } else if ( getOccurence(date, " ") == 2 ) {
-                if (! date.contains("?")){
-                               
-                    day    = date.substring(0, date.indexOf(" "));
-                    date   = date.substring(date.indexOf(" ")+1);
-                    month  = POOL.get(date.substring(0, date.indexOf(" ")));
-                    year   = date.substring(date.indexOf(" ")+1);
+        Date tmp = getDateFromString("1900" + "-" + "01" + "-" + "01");
+        if (date != null) {
+            if (date.contains("/")) {
+                if (getOccurence(date, "/") == 2) {
+                    day = date.substring(0, date.indexOf("/"));
+                    date = date.substring(date.indexOf("/") + 1);
+                    month = date.substring(0, date.indexOf("/"));
+                    year = date.substring(date.indexOf("/") + 1);
 
-                    tmp    = dateFormat.parse(year + "-" + month + "-" + day);
-                } else tmp = dateFormat.parse("01" + "-" + "01" + "-" + "2000");
-                
-            } else if ( getOccurence(date, " ") == 1 ) {
-                
+                    tmp = getDateFromString(year + "-" + month + "-" + day);
+                } else {
+                    if (getOccurence(date, "/") == 1) {
+                        month = date.substring(0, date.indexOf("/"));
+                        year = date.substring(date.indexOf("/") + 1);
+                        tmp = getDateFromString(year + "-" + month + "-" + "01");
+                    }
+                }
+            } else if (getOccurence(date, " ") == 2) {
+                if (!date.contains("?")) {
+
+                    day = date.substring(0, date.indexOf(" "));
+                    date = date.substring(date.indexOf(" ") + 1);
+                    month = POOL.get(date.substring(0, date.indexOf(" ")));
+                    year = date.substring(date.indexOf(" ") + 1);
+
+                    tmp = getDateFromString(year + "-" + month + "-" + day);
+                } else {
+                    tmp = getDateFromString("2000" + "-" + "01" + "-" + "01");
+                }
+            } else if (getOccurence(date, " ") == 1) {
+                try {
+                    Date d = getDateFromString(date);
+                    return new Date(d.getTime());
+                } catch (ParseException ex) {
+                }
                 month = POOLcase.get(date.substring(0, date.indexOf(" ")));
-                year  = date.substring(date.indexOf(" ") + 1);   
-                tmp   = dateFormat.parse(year + "-" + month + "-01");
-                
-            } else if ( getOccurence(date, "-") == 1 ) {
-                
+                year = date.substring(date.indexOf(" ") + 1);
+                tmp = getDateFromString(year + "-" + month + "-" + "01");
+
+
+            } else if (getOccurence(date, "-") == 1) {
+
                 month = date.substring(0, date.indexOf("-"));
-                year  = date.substring(date.indexOf("-")+1);
-                                
-                tmp   = dateFormat.parse(year + "-" + month + "-01");
-                
-            } else if ( getOccurence(date, "-") == 2 ) {
-                
+                year = date.substring(date.indexOf("-") + 1);
+
+                tmp = getDateFromString(year + "-" + month + "-" + "01");
+
+            } else if (getOccurence(date, "-") == 2) {
+
                 //if date is in format yyyy-mm-dd
-                if (date.substring(0, date.indexOf("-")).length()==4){
-                    year  = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
+                if (date.substring(0, date.indexOf("-")).length() == 4) {
+                    year = date.substring(0, date.indexOf("-"));
+                    date = date.substring(date.indexOf("-") + 1); //mm-ddZ
                     month = date.substring(0, date.indexOf("-"));
-                    day   = date.substring(date.indexOf("-")+1);
-                    
-                    tmp   = dateFormat.parse(year + "-" + month + "-" + day);
-                }
-                else{
-                    day   = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
+                    date = date.substring(date.indexOf("-") + 1); // ddZ
+                    if (date.contains("Z")) {
+                        date = date.substring(0, date.indexOf("Z"));
+                    }
+                    day = date;
+
+                    tmp = getDateFromString(year + "-" + month + "-" + day);
+                } else {
+                    day = date.substring(0, date.indexOf("-"));
+                    date = date.substring(date.indexOf("-") + 1);
                     month = date.substring(0, date.indexOf("-"));
-                    year  = date.substring(date.indexOf("-")+1);
-                    
-                    tmp =  dateFormat.parse(year + "-" + month + "-" + day);
+                    year = date.substring(date.indexOf("-") + 1);
+
+                    tmp = getDateFromString(year + "-" + month + "-" + day);
                 }
-                
+
             } else {
                 year = date;
-                tmp  =  dateFormat.parse(year + "-01-01");
+                tmp = getDateFromString(year + "-" + "01" + "-" + "01");
             }
         }
         return tmp;
