@@ -297,7 +297,7 @@ public class MDWebIndex extends IndexLucene<Form> {
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }
         
-            //we add the geometry parts
+           //we add the geometry parts
             String coord = "null";
             try {
                 coord = getValues("WestBoundLongitude", form, ISO_QUERYABLE, -1);
@@ -416,6 +416,10 @@ public class MDWebIndex extends IndexLucene<Form> {
         StringBuilder response  = new StringBuilder("");
         List<String> paths = queryable.get(term);
         
+        if (term.equals("Type") && form.getProfile() != null) {
+            response.append(form.getProfile().getName()); 
+        }
+            
         if (paths != null) {
             for (String fullPathID: paths) {
                 Path path;

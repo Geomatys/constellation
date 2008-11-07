@@ -88,7 +88,7 @@ public class ConfigurationService extends OGCWebService  {
     static {
         serviceDirectory.put("CSW",      "csw_configuration");
         serviceDirectory.put("SOS",      "sos_configuration");
-        serviceDirectory.put("MDSEARCH", "MDWeb_search");
+        serviceDirectory.put("MDSEARCH", "mdweb/search");
     }
     
     private static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");

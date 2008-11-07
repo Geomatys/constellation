@@ -911,7 +911,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
                         logger.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         if (isMeta) {
-                            metaMap.put(attribName, param);
+                              metaMap.put(attribName, param);
                         } else {
                             Method setter = getSetterFromName(attribName, param.getClass(), classe);
                             if (setter != null)
@@ -946,6 +946,10 @@ public class MDWebMetadataReader extends MetadataReader {
                                 logger.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                                 tryAgain = false;
                         }
+                    } catch (ClassCastException ex) {
+                        logger.severe("Exception while putting in geotools metadata: " + '\n' +
+                                      "cause: " + ex.getMessage());
+                        tryAgain = false;
                     }
                 }
                 if (wasMeta == true)
