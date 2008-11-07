@@ -38,6 +38,7 @@ import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.Utils;
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
@@ -137,6 +138,7 @@ public class MetadataWriter {
      */
     public Form getFormFromObject(Object object) throws SQLException {
 
+        
         if (object != null) {
             //we try to find a title for the from
             String title = findName(object);
@@ -145,8 +147,6 @@ public class MetadataWriter {
             }
             
             Date creationDate = new Date(System.currentTimeMillis());
-            Form form = new Form(-1, MDCatalog, title, user, null, null, creationDate);
-
             String className = object.getClass().getSimpleName();
             
             // ISO 19115 types
@@ -176,6 +176,13 @@ public class MetadataWriter {
                 LOGGER.severe(msg);
                 throw new IllegalArgumentException(msg);
             }
+            
+            Profile defaultProfile = null;
+            if  (className.equals("MetaDataImpl")) {
+                defaultProfile = MDReader.getProfile("ISO_19115");
+            }
+            Form form = new Form(-1, MDCatalog, title, user, null, defaultProfile, creationDate);
+            
             Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
                 alreadyWrite.clear();

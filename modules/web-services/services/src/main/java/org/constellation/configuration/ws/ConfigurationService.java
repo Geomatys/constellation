@@ -48,6 +48,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.MDWebIndex;
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
@@ -55,6 +56,9 @@ import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
 import org.geotools.resources.JDBC;
+import org.mdweb.model.schemas.Standard;
+import org.mdweb.sql.v20.Reader20;
+import org.postgresql.ds.PGSimpleDataSource;
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -110,6 +114,7 @@ public class ConfigurationService extends OGCWebService  {
                 
                 // if The database is unknow to the service we use the generic metadata reader.
                 if (databaseType != null && databaseType.equals("generic")) {
+                    
                     JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
                     Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
                     File configFile = new File(cswConfigDir, "generic-configuration.xml");
@@ -139,6 +144,24 @@ public class ConfigurationService extends OGCWebService  {
                         LOGGER.warning("No generic database configuration file have been found, specific CSW operation will not be available.");
                         CSWFunctionEnabled = false;
                     }
+                } else {
+                    PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
+                    dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
+                    dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
+                    dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
+                    dataSourceMD.setUser(prop.getProperty("MDDBUser"));
+                    dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
+                    try {
+                        Connection MDConnection    = dataSourceMD.getConnection();
+                        Reader20 reader = new Reader20(Standard.ISO_19115, MDConnection);
+                        indexer = new MDWebIndex(reader);
+                        CSWFunctionEnabled = true;
+                    } catch (SQLException e) {
+                        LOGGER.warning("SQLException while connecting to the CSW database, specific CSW operation will not be available." + '\n' +
+                                       "cause: " + e.getMessage());
+                        CSWFunctionEnabled = false;
+                    }
+                    
                 }
 
             } catch (FileNotFoundException e) {

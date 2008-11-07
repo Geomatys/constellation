@@ -24,6 +24,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
@@ -569,7 +570,10 @@ public class SpatialFilter extends Filter {
             result = new GeneralEnvelope(min, max);
         
         } catch (IllegalArgumentException e) {
-            String s = doc.getField("name").stringValue();
+            String s = "unknow";
+            Field f = doc.getField("Title");
+            if (f != null)
+                s = f.stringValue();
         
             logger.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
                           "cause: " + e.getMessage());

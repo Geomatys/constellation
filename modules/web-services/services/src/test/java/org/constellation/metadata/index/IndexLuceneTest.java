@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.index;
 
 // J2SE dependencies
 import java.io.File;
@@ -87,7 +87,7 @@ public class IndexLuceneTest {
         File configDirectory = new File("config-test");
         configDirectory.mkdir();
         
-        indexLucene = new IndexLucene(forms, classes, paths, configDirectory);
+        indexLucene = new MDWebIndex(forms, classes, paths, configDirectory);
     }
 
     @After

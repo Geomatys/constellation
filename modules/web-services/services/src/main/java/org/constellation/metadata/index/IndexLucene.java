@@ -36,6 +36,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -172,8 +173,10 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
         Searcher searcher   = new IndexSearcher(ireader);
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
-        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 )
+        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ) {
             parser.setAllowLeadingWildcard(true);
+            BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+        }
         
         Query query   = parser.parse(spatialQuery.getQuery());
         Filter f      = spatialQuery.getSpatialFilter();
