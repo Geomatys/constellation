@@ -158,8 +158,9 @@ public class WMSService extends OGCWebService {
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 query = adaptGetLegendGraphic();
-                final String mimeType = getParameter(KEY_FORMAT, true);
-                return Response.ok(getLegendGraphic(query), mimeType).build();
+                return getLegendGraphic(query);
+//                final String mimeType = getParameter(KEY_FORMAT, true);
+//                return Response.ok(getLegendGraphic(query), mimeType).build();
             }
             final String version = (String) getParameter(KEY_VERSION, false);
             final WMSQueryVersion queryVersion;
@@ -701,7 +702,7 @@ public class WMSService extends OGCWebService {
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private File getLegendGraphic(final WMSQuery query) throws WebServiceException,
+    private Response getLegendGraphic(final WMSQuery query) throws WebServiceException,
                                                                             JAXBException
     {
         if (!(query instanceof GetLegendGraphic)) {
@@ -721,14 +722,8 @@ public class WMSService extends OGCWebService {
         final Dimension dims = new Dimension(width, height);
         final BufferedImage image = layer.getLegendGraphic(dims);
         final String mimeType = legendRequest.getFormat();
-        try {
-            final File legendFile = createTempFile("legend", mimeType);
-            legendFile.deleteOnExit();
-            writeImage(image, mimeType, legendFile);
-            return legendFile;
-        } catch (IOException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE, version);
-        }
+        
+        return Response.ok(image, mimeType).build();
     }
 
     /**
