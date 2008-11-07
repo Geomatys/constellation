@@ -10,12 +10,13 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-	     <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
-         <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
-         <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
-		 <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
- 	     <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
-          <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider</param-value>
+             <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
+             <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
+             <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
+             <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
+             <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
+             <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
+          <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider;org.constellation.coverage.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

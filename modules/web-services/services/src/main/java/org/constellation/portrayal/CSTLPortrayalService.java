@@ -37,6 +37,7 @@ import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wcs.WCSQuery;
@@ -45,6 +46,7 @@ import org.constellation.query.wms.WMSQuery;
 import org.constellation.wcs.AbstractGetCoverage;
 
 import org.geotools.display.canvas.BufferedImageCanvas2D;
+import org.geotools.display.canvas.CanvasController2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.Go2rendererHints;
 import org.geotools.display.renderer.J2DRenderer;
@@ -76,6 +78,7 @@ import static org.constellation.coverage.web.ExceptionCode.*;
  * to reconize Named layers and styles from constellation data providers.
  *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
         
@@ -145,6 +148,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             version = new ServiceVersion(Service.WCS, query100.getVersion());
             // Decode the CRS.
             String crsCode = query100.getOutput().getCrs().getValue();
+            if (crsCode == null) {
+                crsCode = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getSrsName();
+            }
             if (!crsCode.contains(":")) {
                 crsCode = "EPSG:" + crsCode;
             }
@@ -157,29 +163,31 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                 throw new WebServiceException(ex, INVALID_CRS, version);
             }
             // Calculate the bbox.
-            final DirectPositionType lowerCorner = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getLowerCorner();
-            final DirectPositionType upperCorner = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getUpperCorner();
-            final List<Double> lowerCornerCoords = lowerCorner.getValue();
-            final List<Double> upperCornerCoords = upperCorner.getValue();
-            refEnv = new ReferencedEnvelope(lowerCornerCoords.get(0), lowerCornerCoords.get(1),
-                                            upperCornerCoords.get(0), upperCornerCoords.get(1), crs);
+            final EnvelopeEntry envEntry = query100.getDomainSubset().getSpatialSubSet().getEnvelope();
+            final List<DirectPositionType> positions = envEntry.getPos();
+            refEnv = new ReferencedEnvelope(positions.get(0).getValue().get(0), positions.get(0).getValue().get(1),
+                                            positions.get(1).getValue().get(0), positions.get(1).getValue().get(1), crs);
             // Additionnal parameters.
             if (query100.getDomainSubset().getTemporalSubSet() != null &&
                 query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().size() > 0)
             {
                 params.put(WCSQuery.KEY_TIME, query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().get(0));
             }
-            if (lowerCorner.getDimension() > 2) {
-                params.put(WMSQuery.KEY_ELEVATION, lowerCornerCoords.get(2));
+            if (envEntry.getPos().get(0).getValue().size() > 2) {
+                params.put(WMSQuery.KEY_ELEVATION, positions.get(2).getValue().get(0));
             }
-            dimension = new Dimension(query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue(),
-                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue());
+            final int width = query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue();
+            final int height = query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue();
+            dimension = new Dimension(width, height);
         } else {
             final org.constellation.wcs.v111.GetCoverage query111 = (org.constellation.wcs.v111.GetCoverage) query;
             layers.add(query111.getIdentifier().getValue());
             version = new ServiceVersion(Service.WCS, query111.getVersion());
             // Decode the CRS.
             String crsCode = query111.getOutput().getGridCRS().getSrsName().getValue();
+            if (crsCode == null) {
+                crsCode = query111.getDomainSubset().getBoundingBox().getValue().getCrs();
+            }
             if (!crsCode.contains(":")) {
                 crsCode = "EPSG:" + crsCode;
             }
@@ -330,35 +338,35 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * Portray a MapContext and outpur it in the given
      * stream.
      *
-     * @param context : Mapcontext to render
-     * @param contextEnv : MapArea to render
-     * @param output : output srteam or file or url
-     * @param mime : mime output type
-     * @param canvasDimension : size of the wanted image
-     * @param hints : canvas hints
+     * @param contextEnv MapArea to render
+     * @param azimuth The azimuth to apply for the rendering (rotation).
+     * @param backgroung The {@link Color} to apply for background.
+     * @param canvasDimension The {@link Dimension} of the wanted image.
+     *
+     * @throws PortrayalException
      */
-    private BufferedImage portrayUsingCache(final ReferencedEnvelope contextEnv,
-            final double azimuth, final Color background, final Dimension canvasDimension)
-            throws PortrayalException {
-
+    private BufferedImage portrayUsingCache(final ReferencedEnvelope contextEnv, final double azimuth,
+            final Color background, final Dimension canvasDimension) throws PortrayalException
+    {
         canvas.setSize(canvasDimension);
         canvas.setBackground(background);
         
+        final CanvasController2D canvasController = canvas.getController();
         try {
-            canvas.getController().setObjectiveCRS(contextEnv.getCoordinateReferenceSystem());
+            canvasController.setObjectiveCRS(contextEnv.getCoordinateReferenceSystem());
         } catch (TransformException ex) {
             throw new PortrayalException(ex);
         }
 
-        canvas.getController().setVisibleArea(contextEnv);
-        if(azimuth != 0){
-            canvas.getController().rotate( -Math.toRadians(azimuth) );
+        canvasController.setVisibleArea(contextEnv);
+        if (azimuth != 0) {
+            canvasController.rotate( -Math.toRadians(azimuth) );
         }
         canvas.repaint();
 
         final BufferedImage image = canvas.getSnapShot();
 
-        if(image == null){
+        if (image == null) {
             throw new PortrayalException("No image created by the canvas.");
         }
 
@@ -371,8 +379,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private void updateContext(final List<String> layers, final ServiceVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
-                                    throws PortrayalException, WebServiceException {
-
+                                    throws PortrayalException, WebServiceException
+    {
         for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
             final LayerDetails details = LAYERDP.get(layerName);
@@ -384,7 +392,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             if (sld != null) {
                 //try to use the provided SLD
                 style = extractStyle(layerName,sld);
-            } else if (styles.size() > index) {
+            } else if (styles != null && styles.size() > index) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 style = styles.get(index);
@@ -392,13 +400,12 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                 //no defined styles, use the favorite one, let the layer get it himself.
                 style = null;
             }
-            final MapLayer layer = details.getMapLayer(style,params);
+            final MapLayer layer = details.getMapLayer(style, params);
             if (layer == null) {
                 throw new PortrayalException("Map layer "+layerName+" could not be created");
             }
             context.layers().add(layer);
         }
-
     }
 
     private Object extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
