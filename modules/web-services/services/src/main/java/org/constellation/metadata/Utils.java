@@ -222,7 +222,7 @@ public class Utils {
                 }
             } else if (getOccurence(date, " ") == 1) {
                 try {
-                    Date d = getDateFromString(date);
+                    Date d = dateFormat.parse(date);
                     return new Date(d.getTime());
                 } catch (ParseException ex) {
                 }
