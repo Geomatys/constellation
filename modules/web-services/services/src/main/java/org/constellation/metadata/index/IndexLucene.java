@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -83,7 +83,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      */
     public IndexLucene(File configDirectory) {
         
-        analyzer      = new StandardAnalyzer();
+        analyzer      = new WhitespaceAnalyzer();
         
         //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
         File preGeneratedIndexDirectory = new File(configDirectory, "nextIndex");
@@ -111,7 +111,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * Creates a new Lucene Index.
      */
     public IndexLucene() {
-        analyzer      = new StandardAnalyzer();
+        analyzer      = new WhitespaceAnalyzer();
     }
     
     /** 

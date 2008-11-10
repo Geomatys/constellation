@@ -916,9 +916,12 @@ public class CSWService extends OGCWebService {
         return ExtClasses;
     }
     
+    /**
+     * This method is not yet called. TODO find a way to call it at app server undeployement.
+     */
     @PreDestroy
     public void destroy() {
-        System.out.println("destroyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+        LOGGER.info("destroying CSW service");
     }
 
 }
