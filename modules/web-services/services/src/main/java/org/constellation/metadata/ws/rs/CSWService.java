@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -915,5 +916,9 @@ public class CSWService extends OGCWebService {
         return ExtClasses;
     }
     
+    @PreDestroy
+    public void destroy() {
+        System.out.println("destroyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+    }
 
 }

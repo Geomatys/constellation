@@ -416,7 +416,7 @@ public class MDWebIndex extends IndexLucene<Form> {
         StringBuilder response  = new StringBuilder("");
         List<String> paths = queryable.get(term);
         
-        if (term.equals("Type") && form.getProfile() != null) {
+        if (term.equalsIgnoreCase("Type") && form.getProfile() != null) {
             response.append(form.getProfile().getName()); 
         }
             

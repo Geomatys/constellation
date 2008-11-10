@@ -736,7 +736,12 @@ public class MDWebMetadataReader extends MetadataReader {
                             logger.severe("unknow codelist type");
                             return null;
                         }
-                        result = method.invoke(null, element.getName());
+                        if (method != null && element != null) {
+                            result = method.invoke(null, element.getName());
+                        } else {
+                            logger.severe("Unable to invoke the method: " + temp + " on the class : " + classe.getName() + "(#" + textValue + ")");
+                            return null;
+                        }
                         return result;
                     } catch (NumberFormatException e) {
                         logger.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
