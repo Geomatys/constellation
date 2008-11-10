@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.Series;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
@@ -121,6 +123,11 @@ public interface LayerDetails {
      * @see Layer#getName
      */
     public String getName();
+
+    /**
+     * @see Layer#getSeries
+     */
+    public Set<Series> getSeries();
 
     /**
      * Returns the coordinates of the requested pixel in the image, expressed in the

@@ -25,10 +25,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -40,12 +47,14 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Series;
 import org.constellation.coverage.web.ExceptionCode;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceExceptionReport;
 import org.constellation.coverage.web.ServiceExceptionType;
 import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -60,6 +69,7 @@ import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.LanguageStringType;
 import org.constellation.ows.v100.ExceptionReport;
+import org.constellation.ows.v110.KeywordsType;
 import org.constellation.ows.v110.WGS84BoundingBoxType;
 import org.constellation.ows.v110.OperationsMetadata;
 import org.constellation.ows.v110.SectionsType;
@@ -72,18 +82,34 @@ import org.constellation.wcs.AbstractDescribeCoverage;
 import org.constellation.wcs.AbstractGetCoverage;
 import org.constellation.wcs.v111.Capabilities;
 import org.constellation.wcs.v100.ContentMetadata;
+import org.constellation.wcs.v100.CoverageDescription;
 import org.constellation.wcs.v111.Contents;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
+import org.constellation.wcs.v100.CoverageOfferingType;
 import org.constellation.wcs.v111.CoverageSummaryType;
 import org.constellation.wcs.v100.WCSCapabilityType.Request;
 import org.constellation.wcs.v100.DCPTypeType;
 import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
 import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
+import org.constellation.wcs.v100.DomainSetType;
+import org.constellation.wcs.v100.Keywords;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
+import org.constellation.wcs.v100.RangeSet;
+import org.constellation.wcs.v100.RangeSetType;
 import org.constellation.wcs.v100.SpatialSubsetType;
+import org.constellation.wcs.v100.SupportedCRSsType;
+import org.constellation.wcs.v100.SupportedFormatsType;
+import org.constellation.wcs.v100.SupportedInterpolationsType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;
+import org.constellation.wcs.v111.CoverageDescriptionType;
+import org.constellation.wcs.v111.CoverageDescriptions;
+import org.constellation.wcs.v111.CoverageDomainType;
+import org.constellation.wcs.v111.FieldType;
 import org.constellation.wcs.v111.GridCrsType;
+import org.constellation.wcs.v111.InterpolationMethodType;
+import org.constellation.wcs.v111.InterpolationMethods;
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
+import org.constellation.wcs.v111.RangeType;
 import org.constellation.ws.rs.OGCWebService;
 
 // GeoAPI dependencies
@@ -1026,9 +1052,9 @@ public class WCSService extends OGCWebService {
      * Web service operation
      */
     public String describeCoverage(AbstractDescribeCoverage abstractRequest) throws JAXBException, WebServiceException {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
         // TODO: fix it
-        /*LOGGER.info("describeCoverage request processing");
+        LOGGER.info("describeCoverage request processing");
 
         //we begin by extract the base attribute
         String inputVersion = abstractRequest.getVersion();
@@ -1048,98 +1074,105 @@ public class WCSService extends OGCWebService {
                 throw new WebServiceException("The parameter COVERAGE must be specified.",
                         MISSING_PARAMETER_VALUE, getCurrentVersion(), "coverage");
             }
-            List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
-
+            final NamedLayerDP dp = NamedLayerDP.getInstance();
+            final LayerDetails layer = dp.get(request.getCoverage().get(0));
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-            for (Layer layer: layers) {
-                if (layer.getSeries().size() == 0) {
-                    throw new WebServiceException("The coverage " + layer.getName() + " is not defined.",
-                            LAYER_NOT_DEFINED, getCurrentVersion());
-                }
-
-                GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-                LonLatEnvelopeType               llenvelope = null;
-                if(inputGeoBox != null) {
-                    String crs = "WGS84(DD)";
-                    List<Double> pos1 = new ArrayList<Double>();
-                    pos1.add(inputGeoBox.getWestBoundLongitude());
-                    pos1.add(inputGeoBox.getSouthBoundLatitude());
-
-                    List<Double> pos2 = new ArrayList<Double>();
-                    pos2.add(inputGeoBox.getEastBoundLongitude());
-                    pos2.add(inputGeoBox.getNorthBoundLatitude());
-
-                    List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-                    pos.add(new DirectPositionType(pos1));
-                    pos.add(new DirectPositionType(pos2));
-                    llenvelope = new LonLatEnvelopeType(pos, crs);
-                }
-                Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
-
-                //Spatial metadata
-                org.constellation.wcs.v100.SpatialDomainType spatialDomain = new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
-
-                // temporal metadata
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                List<Object> times = new ArrayList<Object>();
-                SortedSet<Date> dates = layer.getAvailableTimes();
-                for (Date d:dates){
-                        times.add(new TimePositionType(df.format(d)));
-                }
-                org.constellation.wcs.v100.TimeSequenceType temporalDomain = new org.constellation.wcs.v100.TimeSequenceType(times);
-
-                DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
-
-                //TODO complete
-                RangeSetType  rangeSetT  = new RangeSetType(null,
-                                                           layer.getName(),
-                                                           layer.getName(),
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           null);
-                RangeSet rangeSet        = new RangeSet(rangeSetT);
-                //supported CRS
-                SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
-
-                // supported formats
-                Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
-                formats.add(new CodeListType("matrix"));
-                formats.add(new CodeListType("jpeg"));
-                formats.add(new CodeListType("png"));
-                formats.add(new CodeListType("gif"));
-                formats.add(new CodeListType("bmp"));
-                String nativeFormat = "unknow";
-                Iterator<Series> it = layer.getSeries().iterator();
-                if (it.hasNext()) {
-                    Series s = it.next();
-                    nativeFormat = s.getFormat().getImageFormat();
-                }
-                SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
-
-                //supported interpolations
-                List<org.constellation.wcs.v100.InterpolationMethod> interpolations = new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
-                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
-                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
-                interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
-                SupportedInterpolationsType supInt = new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
-
-                //we build the coverage offering for this layer/coverage
-                CoverageOfferingType coverage = new CoverageOfferingType(null,
-                                                                         layer.getName(),
-                                                                         layer.getName(),
-                                                                         cleanSpecialCharacter(layer.getRemarks()),
-                                                                         llenvelope,
-                                                                         keywords,
-                                                                         domainSet,
-                                                                         rangeSet,
-                                                                         supCRS,
-                                                                         supForm,
-                                                                         supInt);
-
-                coverages.add(coverage);
+            if (layer.getSeries().size() == 0) {
+                throw new WebServiceException("The coverage " + layer.getName() + " is not defined.",
+                        LAYER_NOT_DEFINED, getCurrentVersion());
             }
+            final GeographicBoundingBox inputGeoBox;
+            try {
+                inputGeoBox = layer.getGeographicBoundingBox();
+            } catch (CatalogException ex) {
+                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+            LonLatEnvelopeType llenvelope = null;
+            if (inputGeoBox != null) {
+                String crs = "WGS84(DD)";
+                List<Double> pos1 = new ArrayList<Double>();
+                pos1.add(inputGeoBox.getWestBoundLongitude());
+                pos1.add(inputGeoBox.getSouthBoundLatitude());
+
+                List<Double> pos2 = new ArrayList<Double>();
+                pos2.add(inputGeoBox.getEastBoundLongitude());
+                pos2.add(inputGeoBox.getNorthBoundLatitude());
+
+                List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                pos.add(new DirectPositionType(pos1));
+                pos.add(new DirectPositionType(pos2));
+                llenvelope = new LonLatEnvelopeType(pos, crs);
+            }
+            Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
+
+            //Spatial metadata
+            org.constellation.wcs.v100.SpatialDomainType spatialDomain = new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
+
+            // temporal metadata
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            List<Object> times = new ArrayList<Object>();
+            final SortedSet<Date> dates;
+            try {
+               dates = layer.getAvailableTimes();
+            } catch (CatalogException ex) {
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+            }
+            for (Date d : dates) {
+                times.add(new TimePositionType(df.format(d)));
+            }
+            org.constellation.wcs.v100.TimeSequenceType temporalDomain = new org.constellation.wcs.v100.TimeSequenceType(times);
+
+            DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
+
+            //TODO complete
+            RangeSetType rangeSetT = new RangeSetType(null,
+                    layer.getName(),
+                    layer.getName(),
+                    null,
+                    null,
+                    null,
+                    null);
+            RangeSet rangeSet = new RangeSet(rangeSetT);
+            //supported CRS
+            SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
+
+            // supported formats
+            Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
+            formats.add(new CodeListType("matrix"));
+            formats.add(new CodeListType("jpeg"));
+            formats.add(new CodeListType("png"));
+            formats.add(new CodeListType("gif"));
+            formats.add(new CodeListType("bmp"));
+            String nativeFormat = "unknow";
+            Iterator<Series> it = layer.getSeries().iterator();
+            if (it.hasNext()) {
+                Series s = it.next();
+                nativeFormat = s.getFormat().getImageFormat();
+            }
+            SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
+
+            //supported interpolations
+            List<org.constellation.wcs.v100.InterpolationMethod> interpolations = new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
+            interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
+            interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
+            interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+            SupportedInterpolationsType supInt = new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+
+            //we build the coverage offering for this layer/coverage
+            CoverageOfferingType coverage = new CoverageOfferingType(null,
+                    layer.getName(),
+                    layer.getName(),
+                    cleanSpecialCharacter(layer.getRemarks()),
+                    llenvelope,
+                    keywords,
+                    domainSet,
+                    rangeSet,
+                    supCRS,
+                    supForm,
+                    supInt);
+
+            coverages.add(coverage);
             response = new CoverageDescription(coverages, "1.0.0");
 
         // describeCoverage version 1.1.1
@@ -1149,93 +1182,102 @@ public class WCSService extends OGCWebService {
                 throw new WebServiceException("The parameter IDENTIFIER must be specified",
                         MISSING_PARAMETER_VALUE, getCurrentVersion(), "identifier");
             }
-            List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
+            final NamedLayerDP dp = NamedLayerDP.getInstance();
+            final LayerDetails layer = dp.get(request.getIdentifier().get(0));
 
             org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
-            for (Layer layer: layers) {
-                if (layer.getSeries().size() == 0) {
-                    throw new WebServiceException("the coverage " + layer.getName() +
-                            " is not defined", LAYER_NOT_DEFINED, getCurrentVersion());
-                }
-                GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-                List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
-                if(inputGeoBox != null) {
-                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
-                                                         inputGeoBox.getWestBoundLongitude(),
-                                                         inputGeoBox.getSouthBoundLatitude(),
-                                                         inputGeoBox.getEastBoundLongitude(),
-                                                         inputGeoBox.getNorthBoundLatitude());
-                    bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
-
-                    String crs = "EPSG:4326";
-                    BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
-                                                         inputGeoBox.getWestBoundLongitude(),
-                                                         inputGeoBox.getSouthBoundLatitude(),
-                                                         inputGeoBox.getEastBoundLongitude(),
-                                                         inputGeoBox.getNorthBoundLatitude());
-
-                    bboxs.add(owsFactory.createBoundingBox(outputBBox2));
-                }
-
-                //general metadata
-                List<LanguageStringType> title   = new ArrayList<LanguageStringType>();
-                title.add(new LanguageStringType(layer.getName()));
-                List<LanguageStringType> _abstract   = new ArrayList<LanguageStringType>();
-                _abstract.add(new LanguageStringType(cleanSpecialCharacter(layer.getRemarks())));
-                List<KeywordsType> keywords = new ArrayList<KeywordsType>();
-                keywords.add(new KeywordsType(new LanguageStringType("WCS"),
-                                              new LanguageStringType(layer.getName())
-                                              ));
-
-                // spatial metadata
-                org.constellation.wcs.v111.SpatialDomainType spatial = new org.constellation.wcs.v111.SpatialDomainType(bboxs);
-
-                // temporal metadata
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                List<Object> times = new ArrayList<Object>();
-                SortedSet<Date> dates = layer.getAvailableTimes();
-                for (Date d:dates){
-                        times.add(new TimePositionType(df.format(d)));
-                }
-                org.constellation.wcs.v111.TimeSequenceType temporalDomain = new org.constellation.wcs.v111.TimeSequenceType(times);
-
-                CoverageDomainType domain       = new CoverageDomainType(spatial, temporalDomain);
-
-                //supported interpolations
-                List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
-                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
-                intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-                InterpolationMethods interpolations = new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-                RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()),
-                                                              null,
-                                                              new org.constellation.ows.v110.CodeType("0.0"),
-                                                              interpolations));
-
-                //supported CRS
-                List<String> supportedCRS = new ArrayList<String>();
-                supportedCRS.add("EPSG:4326");
-
-                //supported formats
-                List<String> supportedFormat = new ArrayList<String>();
-                supportedFormat.add("application/matrix");
-                supportedFormat.add("image/png");
-                supportedFormat.add("image/jpeg");
-                supportedFormat.add("image/bmp");
-                supportedFormat.add("image/gif");
-                CoverageDescriptionType coverage = new CoverageDescriptionType(title,
-                                                                               _abstract,
-                                                                               keywords,
-                                                                               layer.getName(),
-                                                                               domain,
-                                                                               range,
-                                                                               supportedCRS,
-                                                                               supportedFormat);
-
-                coverages.add(coverage);
+            if (layer.getSeries().size() == 0) {
+                throw new WebServiceException("the coverage " + layer.getName() +
+                        " is not defined", LAYER_NOT_DEFINED, getCurrentVersion());
             }
+            final GeographicBoundingBox inputGeoBox;
+            try {
+                inputGeoBox = layer.getGeographicBoundingBox();
+            } catch (CatalogException ex) {
+                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+            List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+            if (inputGeoBox != null) {
+                WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+                bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
+
+                String crs = "EPSG:4326";
+                BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+
+                bboxs.add(owsFactory.createBoundingBox(outputBBox2));
+            }
+
+            //general metadata
+            List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+            title.add(new LanguageStringType(layer.getName()));
+            List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();
+            _abstract.add(new LanguageStringType(cleanSpecialCharacter(layer.getRemarks())));
+            List<KeywordsType> keywords = new ArrayList<KeywordsType>();
+            keywords.add(new KeywordsType(new LanguageStringType("WCS"),
+                    new LanguageStringType(layer.getName())));
+
+            // spatial metadata
+            org.constellation.wcs.v111.SpatialDomainType spatial = new org.constellation.wcs.v111.SpatialDomainType(bboxs);
+
+            // temporal metadata
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            List<Object> times = new ArrayList<Object>();
+            final SortedSet<Date> dates;
+            try {
+               dates = layer.getAvailableTimes();
+            } catch (CatalogException ex) {
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+            }
+            for (Date d : dates) {
+                times.add(new TimePositionType(df.format(d)));
+            }
+            org.constellation.wcs.v111.TimeSequenceType temporalDomain = new org.constellation.wcs.v111.TimeSequenceType(times);
+
+            CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
+
+            //supported interpolations
+            List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
+            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
+            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
+            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+            InterpolationMethods interpolations = new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+            RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()),
+                    null,
+                    new org.constellation.ows.v110.CodeType("0.0"),
+                    interpolations));
+
+            //supported CRS
+            List<String> supportedCRS = new ArrayList<String>();
+            supportedCRS.add("EPSG:4326");
+
+            //supported formats
+            List<String> supportedFormat = new ArrayList<String>();
+            supportedFormat.add("application/matrix");
+            supportedFormat.add("image/png");
+            supportedFormat.add("image/jpeg");
+            supportedFormat.add("image/bmp");
+            supportedFormat.add("image/gif");
+            CoverageDescriptionType coverage = new CoverageDescriptionType(title,
+                    _abstract,
+                    keywords,
+                    layer.getName(),
+                    domain,
+                    range,
+                    supportedCRS,
+                    supportedFormat);
+
+            coverages.add(coverage);
+
             response = new CoverageDescriptions(coverages);
         }
 
@@ -1243,9 +1285,6 @@ public class WCSService extends OGCWebService {
         StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
         return sw.toString();
-        } catch (CatalogException exception) {
-            throw new WebServiceException(exception.getMessage(), NO_APPLICABLE_CODE, getCurrentVersion());
-        }*/
     }
 
     /**

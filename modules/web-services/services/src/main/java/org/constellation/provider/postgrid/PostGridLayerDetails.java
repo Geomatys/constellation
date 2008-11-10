@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import javax.measure.unit.NonSI;
@@ -35,6 +36,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.catalog.Series;
 import org.constellation.coverage.web.Service;
 import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
@@ -270,6 +272,13 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    public Set<Series> getSeries() {
+        return reader.getTable().getLayer().getSeries();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getRemarks() {
         return reader.getTable().getLayer().getRemarks();
     }
@@ -361,5 +370,4 @@ class PostGridLayerDetails implements LayerDetails {
         
         return STYLE_FACTORY.createStyle(symbol);
     }
-    
 }

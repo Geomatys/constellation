@@ -30,12 +30,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
+import org.constellation.coverage.catalog.Series;
 import org.constellation.coverage.web.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
@@ -403,6 +405,13 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         }
         featureIt.close();
         return requestedFeatures;
+    }
+
+    /**
+     * Should not have been called in this implementation.
+     */
+    public Set<Series> getSeries() {
+        throw new UnsupportedOperationException();
     }
 
     /**
