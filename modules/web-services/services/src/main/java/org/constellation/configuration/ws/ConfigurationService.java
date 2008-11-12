@@ -58,6 +58,7 @@ import org.constellation.ws.rs.OGCWebService;
 import org.geotools.resources.JDBC;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.sql.v20.Reader20;
+import org.mdweb.utils.GlobalUtils;
 import org.postgresql.ds.PGSimpleDataSource;
 
 /**
@@ -200,8 +201,9 @@ public class ConfigurationService extends OGCWebService  {
             } else if (request.equalsIgnoreCase("refreshIndex")) {
             
                 boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
+                String service     = getParameter("SERVICE", false);
                 
-                marshaller.marshal(refreshIndex(asynchrone), sw);
+                marshaller.marshal(refreshIndex(asynchrone, service), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             
             } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
@@ -262,31 +264,16 @@ public class ConfigurationService extends OGCWebService  {
      * @return
      * @throws WebServiceException
      */
-    private AcknowlegementType refreshIndex(boolean asynchrone) throws WebServiceException {
+    private AcknowlegementType refreshIndex(boolean asynchrone, String service) throws WebServiceException {
         LOGGER.info("refresh index requested");
-        
-        if (!asynchrone) {
-            File indexDir     = new File(cswConfigDir, "index");
-
-            if (indexDir.exists() && indexDir.isDirectory()) {
-                for (File f: indexDir.listFiles()) {
-                    f.delete();
-                }
-                boolean succeed = indexDir.delete();
-            
-                if (!succeed) {
-                    throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
-                }
-            } else if (indexDir.exists() && !indexDir.isDirectory()){
-                indexDir.delete();
-            }
-            
-            //then we restart the services
-            cn.reload();
-            
+        String msg;
+        if (service != null && service.equals("MDSEARCH")) {
+            GlobalUtils.resetLuceneIndex();
+            msg = "MDWeb search index succefully deleted";
         } else {
-            if (CSWFunctionEnabled) {
-                File indexDir     = new File(cswConfigDir, "nextIndex");
+            
+            if (!asynchrone) {
+                File indexDir     = new File(cswConfigDir, "index");
 
                 if (indexDir.exists() && indexDir.isDirectory()) {
                     for (File f: indexDir.listFiles()) {
@@ -295,22 +282,44 @@ public class ConfigurationService extends OGCWebService  {
                     boolean succeed = indexDir.delete();
 
                     if (!succeed) {
-                        throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
+                        throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
                     }
                 } else if (indexDir.exists() && !indexDir.isDirectory()){
                     indexDir.delete();
                 }
-                indexer.setFileDirectory(indexDir);
-                try  {
-                    indexer.createIndex();
-                } catch (SQLException ex) {
-                    throw new WebServiceException("SQLException while creating the index.", NO_APPLICABLE_CODE, version);
-                }
+
+                //then we restart the services
+                cn.reload();
+
             } else {
-                throw new WebServiceException("This CSW function is not enabled.", NO_APPLICABLE_CODE, version);
+                if (CSWFunctionEnabled) {
+                    File indexDir     = new File(cswConfigDir, "nextIndex");
+
+                    if (indexDir.exists() && indexDir.isDirectory()) {
+                        for (File f: indexDir.listFiles()) {
+                            f.delete();
+                        }
+                        boolean succeed = indexDir.delete();
+
+                        if (!succeed) {
+                            throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
+                        }
+                    } else if (indexDir.exists() && !indexDir.isDirectory()){
+                        indexDir.delete();
+                    }
+                    indexer.setFileDirectory(indexDir);
+                    try  {
+                        indexer.createIndex();
+                    } catch (SQLException ex) {
+                        throw new WebServiceException("SQLException while creating the index.", NO_APPLICABLE_CODE, version);
+                    }
+                } else {
+                    throw new WebServiceException("This CSW function is not enabled.", NO_APPLICABLE_CODE, version);
+                }
             }
+            msg = "CSW index succefully recreated";
         }
-        return new AcknowlegementType("success", "CSW index succefully recreated");
+        return new AcknowlegementType("success", msg);
     }
     
     /**
