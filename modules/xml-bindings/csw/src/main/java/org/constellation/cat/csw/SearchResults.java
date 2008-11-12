@@ -14,10 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.cat.csw;
 
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
@@ -25,13 +25,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * @author Mehdi Sidhoum
  */
 public interface SearchResults {
-    
+
     /**
      * Gets the value of the abstractRecord property.
      * 
      */
     public List<? extends Object> getAbstractRecord();
-    
+
     /**
      * Gets the value of the any property.
      * (unModifiable)
@@ -47,7 +47,7 @@ public interface SearchResults {
     /**
      * Sets the value of the resultSetId property.
      * 
-    */
+     */
     public void setResultSetId(String value);
 
     /**
@@ -73,7 +73,7 @@ public interface SearchResults {
      * 
      */
     public int getNumberOfRecordsMatched();
-    
+
     /**
      * Sets the value of the numberOfRecordsMatched property.
      * 
@@ -115,5 +115,4 @@ public interface SearchResults {
      * 
      */
     public void setExpires(XMLGregorianCalendar value);
-
 }

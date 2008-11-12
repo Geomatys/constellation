@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.SummaryRecord;
+import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
@@ -75,7 +77,7 @@ import org.constellation.ows.v100.WGS84BoundingBoxType;
     "spatial",
     "boundingBox"
 })
-public class SummaryRecordType extends AbstractRecordType {
+public class SummaryRecordType extends AbstractRecordType implements SummaryRecord {
 
     @XmlElementRef(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
     private List<JAXBElement<SimpleLiteral>> identifier;

@@ -21,5 +21,5 @@ package org.constellation.cat.csw;
  * @author Mehdi Sidhoum
  */
 public interface AbstractRecord {
-
+    
 }
