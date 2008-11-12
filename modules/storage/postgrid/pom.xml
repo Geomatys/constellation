@@ -165,7 +165,8 @@
           <includes>
             <include>**/*Suite.java</include>
           </includes>
-        </configuration>
+          <skipTests>true</skipTests>
+         </configuration>
       </plugin>
     </plugins>
   </build>
