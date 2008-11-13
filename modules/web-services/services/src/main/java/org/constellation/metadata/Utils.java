@@ -117,6 +117,9 @@ public class Utils {
             } else if (dateString.endsWith("Z")) {
                 //e.g : 1985-04-12T10:15:30Z
                 dateString = dateString.substring(0, dateString.length() - 1).concat("+0000");
+            }else {
+                //e.g : 1985-04-12T10:15:30
+                dateString = dateString + "+0000";
             }
             final String timezone = getTimeZone(dateString);
             sdf.setTimeZone(TimeZone.getTimeZone(timezone));
@@ -150,7 +153,7 @@ public class Utils {
         }
         return TimeZone.getDefault().getID();
     }
-    
+       
      /**
      * Return a Date by parsing different kind of date format.
      * 
