@@ -18,7 +18,7 @@ package org.constellation.coverage.web;
 
 
 /**
- * Type kind of service provided by {@link WebServiceWorker}.
+ * Type kind of service.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -40,7 +40,7 @@ public enum Service {
     CSW,
 
     /**
-     * Observation Web service.
+     * Open Web service.
      */
     OWS,
 
@@ -50,12 +50,12 @@ public enum Service {
     SOS,
 
     /**
-     * GetFeatureInfo WMS request.
+     * GetFeatureInfo WMS request, part of Web Map Service.
      */
     GETINFO,
 
     /**
-     * any other Service.
+     * Any other Service.
      */
     OTHER
 }
