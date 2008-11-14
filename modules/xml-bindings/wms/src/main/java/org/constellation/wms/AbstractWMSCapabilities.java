@@ -16,14 +16,16 @@
  */
 package org.constellation.wms;
 
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import org.constellation.wms.v111.WMT_MS_Capabilities;
+import org.constellation.wms.v130.WMSCapabilities;
 
 /**
  * Abstract main class which describe a capabilities document  for all version of WMS.
  * 
  * @author Guilhem Legal
  */
-@XmlTransient
+@XmlSeeAlso({WMT_MS_Capabilities.class, WMSCapabilities.class})
 public abstract class AbstractWMSCapabilities {
 
      /**

@@ -18,16 +18,12 @@ package org.constellation.wms.v111;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.wms.AbstractDimension;
@@ -40,7 +36,7 @@ import org.constellation.wms.AbstractLayer;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "Layer", propOrder = {
     "name",
     "title",
     "_abstract",
@@ -60,7 +56,6 @@ import org.constellation.wms.AbstractLayer;
     "scaleHint",
     "layer"
 })
-@XmlRootElement(name = "Layer")
 public class Layer extends AbstractLayer {
 
     @XmlElement(name = "Name")

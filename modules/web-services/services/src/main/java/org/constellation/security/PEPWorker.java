@@ -16,21 +16,23 @@
  */
 package org.constellation.security;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.coverage.web.Service;
 import org.constellation.coverage.web.ServiceVersion;
 
 
 /**
+ * Worker for a PEP (Policy Enforcement Point) which do the link between a client and
+ * a webservice.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -57,15 +59,25 @@ public class PEPWorker {
     private final ServiceVersion version;
 
     /**
-     * 
+     * The unmarshaller used to parse XML files, and to get the matching object.
      */
-    public PEPWorker() {
+    public final Unmarshaller unmarshaller;
+
+    /**
+     * Creates a PEP that creates a request on the service, according to the request of the
+     * client.
+     *
+     * @param unmarshaller The unmarshaller to use to parse the client response.
+     */
+    public PEPWorker(final Unmarshaller unmarshaller) {
+        this.unmarshaller = unmarshaller;
         props = new Properties();
         final File env = getSicadeDirectory();
         final File propFile = new File(env, "pep.properties");
         // TODO: use a JNDI resource if the .sicade file is not used.
         if (!propFile.exists()) {
-            LOGGER.severe("Config file \"pep.properties\" not found in the .sicade directory.");
+            LOGGER.severe("Config file \"pep.properties\" not found in the .sicade directory.\n" +
+                          "Now using the default configuration (localhost:8080/constellation/WS/wms");
             this.serviceURL = "http://localhost:8080/constellation/WS/wms";
             this.version = new ServiceVersion(Service.WMS, "1.1.1");
         } else {
@@ -90,35 +102,39 @@ public class PEPWorker {
         }
     }
 
-    public void getCapabilities() throws IOException {
+    /**
+     * Generates a {GetCapabilities} request, send it to the webservice and returns the result.
+     *
+     * @return An {@link InputStream} that contains the result of a {@code GetCapabilities} request.
+     * @throws IOException if an error occurs when doing the request on the webservice.
+     */
+    public InputStream getCapabilities() throws IOException {
         final StringBuilder builder = new StringBuilder();
         builder.append(serviceURL);
         if (!serviceURL.endsWith("?")) {
             builder.append("?");
         }
-        builder.append("REQUEST=GetCapabilities&service=").append(version.getService().name());
+        builder.append("REQUEST=GetCapabilities&SERVICE=").append(version.getService().name());
         if (version != null) {
-            builder.append("&version=").append(version.toString());
+            builder.append("&VERSION=").append(version.toString());
         }
         final URL source = new URL(builder.toString());
         final URLConnection connection = source.openConnection();
         connection.setDoOutput(false);
         connection.setRequestProperty("Content-Type","text/xml");
-        final InputStreamReader input = new InputStreamReader(connection.getInputStream());
-        final BufferedReader reader = new BufferedReader(input);
-        final StringBuilder sw = new StringBuilder();
-        String line;
-        while ((line=reader.readLine()) != null) {
-            sw.append(line).append("\n");
-        }
-        reader.close();
-        System.out.println(sw.toString());
+        return connection.getInputStream();
     }
 
+    /**
+     * Returns the webservice url.
+     */
     public String getServiceUrl() {
         return serviceURL;
     }
 
+    /**
+     * Returns a {@link ServiceVersion} of the requested webservice.
+     */
     public ServiceVersion getServiceVersion() {
         return version;
     }

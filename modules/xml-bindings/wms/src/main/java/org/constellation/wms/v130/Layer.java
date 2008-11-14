@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.wms.AbstractDimension;
@@ -75,7 +74,7 @@ import org.constellation.wms.AbstractLayer;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "Layer", propOrder = {
     "name",
     "title",
     "_abstract",
@@ -95,7 +94,6 @@ import org.constellation.wms.AbstractLayer;
     "maxScaleDenominator",
     "layer"
 })
-@XmlRootElement(name = "Layer")
 public class Layer extends AbstractLayer {
 
     @XmlElement(name = "Name")

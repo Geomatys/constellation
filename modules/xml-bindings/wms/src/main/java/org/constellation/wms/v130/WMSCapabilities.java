@@ -50,7 +50,7 @@ import org.constellation.wms.AbstractWMSCapabilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "WMS_Capabilities", propOrder = {
     "service",
     "capability"
 })
