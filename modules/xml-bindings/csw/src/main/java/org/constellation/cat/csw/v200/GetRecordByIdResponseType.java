@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.GetRecordByIdResponse;
 
 
 /**
@@ -55,7 +56,7 @@ import javax.xml.bind.annotation.XmlType;
     "abstractRecord",
     "any"
 })
-public class GetRecordByIdResponseType {
+public class GetRecordByIdResponseType implements GetRecordByIdResponse {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private JAXBElement<? extends AbstractRecordType> abstractRecord;

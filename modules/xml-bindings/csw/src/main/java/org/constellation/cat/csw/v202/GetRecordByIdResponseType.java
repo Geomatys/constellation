@@ -14,6 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.cat.csw.v202;
 
 import java.util.ArrayList;
@@ -26,8 +27,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.metadata.iso.MetaDataImpl;
-
+import org.constellation.cat.csw.GetRecordByIdResponse;
 
 /**
  * Returns a representation of the matching entry. If there is no 
@@ -59,8 +59,8 @@ import org.geotools.metadata.iso.MetaDataImpl;
     "abstractRecord",
     "any"
 })
-@XmlRootElement(name="GetRecordByIdResponse")
-public class GetRecordByIdResponseType {
+@XmlRootElement(name = "GetRecordByIdResponse")
+public class GetRecordByIdResponseType implements GetRecordByIdResponse {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
@@ -71,9 +71,8 @@ public class GetRecordByIdResponseType {
      * An empty constructor used by JAXB
      */
     GetRecordByIdResponseType() {
-        
     }
-    
+
     /**
      * Build a new response to a getRecordById request.
      * one of the two list mustn't be null
@@ -83,10 +82,9 @@ public class GetRecordByIdResponseType {
             throw new IllegalArgumentException("only one of abstractRecords or others mustn't be null");
         }
         this.abstractRecord = abstractRecords;
-        this.any            = others;
+        this.any = others;
     }
-    
-       
+
     /**
      * Gets the value of the abstractRecord property.
      * (unmodifiable) 
@@ -108,26 +106,25 @@ public class GetRecordByIdResponseType {
         }
         return Collections.unmodifiableList(any);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (abstractRecord!= null && abstractRecord.size() != 0) {
+        if (abstractRecord != null && abstractRecord.size() != 0) {
             s.append("records:").append('\n');
-            for (JAXBElement<? extends AbstractRecordType> jb: abstractRecord) {
+            for (JAXBElement<? extends AbstractRecordType> jb : abstractRecord) {
                 s.append(jb.getValue().toString()).append('\n');
             }
         }
-        
-        
-        if (any!= null && any.size() != 0) {
+
+
+        if (any != null && any.size() != 0) {
             s.append("anys:").append('\n');
-            for (Object obj: any) {
+            for (Object obj : any) {
                 s.append(obj.toString()).append('\n');
             }
         }
-        
+
         return s.toString();
     }
-
 }
