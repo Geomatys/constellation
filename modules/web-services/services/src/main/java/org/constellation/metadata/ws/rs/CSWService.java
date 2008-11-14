@@ -711,7 +711,8 @@ public class CSWService extends OGCWebService {
          // we get the namespaces.
         String namespace               = getParameter("NAMESPACE", false);
         Map<String, String> namespaces = new HashMap<String, String>();
-        StringTokenizer tokens = new StringTokenizer(namespace, ",;");
+        if (namespace != null) {
+            StringTokenizer tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf('=') != -1) {
@@ -722,18 +723,18 @@ public class CSWService extends OGCWebService {
                      throw new WebServiceException("The namespace " + token + " is malformed",
                                                    INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
                 }
-                
+            }
         }
-        
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
         if (namespaces.size() == 0) {
             namespaces.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
+            namespaces.put("gmd", "http://www.isotc211.org/2005/gmd");
         }
         
         String names   = getParameter("TYPENAMES", true);
         List<QName> typeNames = new ArrayList<QName>();
-        tokens = new StringTokenizer(names, ",;");
+        StringTokenizer tokens = new StringTokenizer(names, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 

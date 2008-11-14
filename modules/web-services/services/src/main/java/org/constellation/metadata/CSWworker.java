@@ -480,7 +480,12 @@ public class CSWworker {
                 
                 PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
                 dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-                dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
+                try {
+                    dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort"))); 
+                } catch (NumberFormatException ex) {
+                    logger.severe("unable to parse an integer for the database port using default: 5432");
+                    dataSourceMD.setPortNumber(5432); 
+                }
                 dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
                 dataSourceMD.setUser(prop.getProperty("MDDBUser"));
                 dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));

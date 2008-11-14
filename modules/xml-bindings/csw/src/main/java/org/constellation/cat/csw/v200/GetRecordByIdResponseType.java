@@ -16,9 +16,13 @@
  */
 package org.constellation.cat.csw.v200;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 
@@ -48,12 +52,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "GetRecordByIdResponseType", propOrder = {
-    "abstractRecord"
+    "abstractRecord",
+    "any"
 })
 public class GetRecordByIdResponseType {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
     private JAXBElement<? extends AbstractRecordType> abstractRecord;
+    @XmlAnyElement(lax = true)
+    private List<? extends Object> any;
 
     /**
      * Gets the value of the abstractRecord property.
@@ -71,4 +78,14 @@ public class GetRecordByIdResponseType {
         this.abstractRecord = ((JAXBElement<? extends AbstractRecordType> ) value);
     }
 
+    /**
+     * Gets the value of the any property.
+     * (unmodifiable)
+     */
+    public List<Object> getAny() {
+        if (any == null) {
+            any = new ArrayList<Object>();
+        }
+        return Collections.unmodifiableList(any);
+    }
 }
