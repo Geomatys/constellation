@@ -45,7 +45,14 @@ import javax.xml.bind.annotation.XmlType;
  * @auhor Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "UserDefinedSymbolization", propOrder = {
+    "supportSLD",
+    "userLayer",
+    "userStyle",
+    "remoteWFS",
+    "inlineFeature",
+    "remoteWCS"
+})
 public class UserDefinedSymbolization {
 
     @XmlAttribute(name = "SupportSLD")
