@@ -20,9 +20,14 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -41,6 +46,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * A set of utilitie methods.
@@ -462,6 +470,81 @@ public class Utils {
         } 
         return directory.delete();
         
+    }
+    
+    /**
+     * Clean a list of String by removing all the white space, tabulation and carriage in all the strings.
+     * 
+     * @param list
+     * @return
+     */
+    public static List<String> cleanStrings(List<String> list) {
+        List<String> result = new ArrayList<String>();
+        for (String s : list) {
+            //we remove the bad character before the real value
+           s = s.replace(" ", "");
+           s = s.replace("\t", "");
+           s = s.replace("\n", "");
+           result.add(s);
+        }
+        return result;
+    }
+    
+    /**
+    * Replace all the <ns**:localPart and </ns**:localPart by <prefix:localPart and </prefix:localPart
+    * 
+    * @param s
+    * @param localPart
+    * @return
+    */ 
+    public static String replacePrefix(String s, String localPart, String prefix) {
+
+        return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
+    }
+    
+    /**
+     * Return an marshallable Object from an url
+     */
+    public static Object getUrlContent(String URL, Unmarshaller unmarshaller) throws MalformedURLException, IOException {
+        URL source         = new URL(URL);
+        URLConnection conec = source.openConnection();
+        Object response = null;
+        
+        try {
+        
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(new String(buffer, 0, size));
+            }
+
+            //we convert the brut String value into UTF-8 encoding
+            String brutString = out.toString();
+
+            //we need to replace % character by "percent because they are reserved char for url encoding
+            brutString = brutString.replaceAll("%", "percent");
+            String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
+
+            
+            
+            try {
+                response = unmarshaller.unmarshal(new StringReader(decodedString));
+                if (response != null && response instanceof JAXBElement) {
+                    response = ((JAXBElement) response).getValue();
+                }
+            } catch (JAXBException ex) {
+                Logger.getAnonymousLogger().severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                        "cause: " + ex.getMessage());
+            }
+        } catch (IOException ex) {
+            Logger.getAnonymousLogger().severe("The Distant service have made an error");
+            return null;
+        }
+        return response;
     }
 
 }

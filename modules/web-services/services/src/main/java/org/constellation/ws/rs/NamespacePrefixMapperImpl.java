@@ -162,6 +162,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.cnig.gouv.fr/2005/fra".equals(namespaceUri) )
             prefix = "fra";
         
+        else if( "http://www.w3.org/2004/02/skos/core#".equals(namespaceUri) )
+            prefix = "skos";
+        
+        else if( "http://www.w3.org/1999/02/22-rdf-syntax-ns#".equals(namespaceUri) )
+            prefix = "rdf";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

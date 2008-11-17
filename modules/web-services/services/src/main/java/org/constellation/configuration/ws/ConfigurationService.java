@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -46,6 +47,7 @@ import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.Utils;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.index.MDWebIndex;
@@ -98,7 +100,7 @@ public class ConfigurationService extends OGCWebService  {
     public ConfigurationService() {
         super("Configuration", version);
         try {
-            setXMLContext("org.constellation.ows.v110:org.constellation.configuration", "");
+            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:org.constellation.skos", "");
             
             File sicadeDir    = getSicadeDirectory();
             cswConfigDir = new File(sicadeDir, "csw_configuration");
@@ -224,7 +226,12 @@ public class ConfigurationService extends OGCWebService  {
                 File f = downloadFile();
                 
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
-            } else {
+            
+            } else if (request.equalsIgnoreCase("updateVocabularies")) {    
+                                
+                return Response.ok(updateVocabularies(),"text/xml").build(); 
+            }
+            else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, version, "Request");
             }
@@ -520,5 +527,44 @@ public class ConfigurationService extends OGCWebService  {
                         NO_APPLICABLE_CODE, version);
             }
         }
-    } 
+    }
+    
+     /**
+     * Update all the vocabularies skos files.
+     */
+    private AcknowlegementType updateVocabularies() throws WebServiceException {
+        File vocabularyDir = new File(cswConfigDir, "vocabulary");
+        if (!vocabularyDir.exists()) {
+            vocabularyDir.mkdir();
+        }
+        
+        String url = "http://vocab.ndg.nerc.ac.uk/list/P021/current";
+        try {
+
+            Object vocab = Utils.getUrlContent(url, unmarshaller);
+            File f       = new File(vocabularyDir, "P021.rdf");
+            marshaller.marshal(vocab, f);
+            
+            url = "http://vocab.ndg.nerc.ac.uk/list/L061/current";
+            vocab = Utils.getUrlContent(url, unmarshaller);
+            f     = new File(vocabularyDir, "L061.rdf");
+            marshaller.marshal(vocab, f);
+            
+            url = "http://vocab.ndg.nerc.ac.uk/list/L05/current";
+            vocab = Utils.getUrlContent(url, unmarshaller);
+            f     = new File(vocabularyDir, "L05.rdf");
+            marshaller.marshal(vocab, f);
+            
+            
+        } catch (JAXBException ex) {
+            LOGGER.severe("JAXBException while marshalling the vocabulary: " + url);
+            throw new WebServiceException("JAXBException while marshalling the vocabulary: " + url, NO_APPLICABLE_CODE, version);
+        } catch (MalformedURLException ex) {
+            LOGGER.severe("The url: " + url + " is malformed");
+        } catch (IOException ex) {
+            LOGGER.severe("IO exception while contacting the URL:" + url);
+            throw new WebServiceException("IO exception while contacting the URL:" + url, NO_APPLICABLE_CODE, version);
+        }
+        return new AcknowlegementType("success", "the vocabularies has been succefully updated");
+    }
 }

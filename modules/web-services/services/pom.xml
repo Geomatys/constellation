@@ -150,6 +150,11 @@
       <artifactId>configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation</groupId>
+      <artifactId>skos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- web service-->
     <dependency>
       <groupId>com.sun.jersey</groupId>

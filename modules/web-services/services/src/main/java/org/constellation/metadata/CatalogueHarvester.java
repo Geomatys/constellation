@@ -157,7 +157,7 @@ public class CatalogueHarvester {
     /**
      * Initialize The object request to harvest distant CSW
      */
-    public void initializeRequest() {
+    private void initializeRequest() {
         
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
@@ -510,7 +510,7 @@ public class CatalogueHarvester {
             
             if (outputDomain != null) {
                 List<String> availableOutputSchema = new ArrayList<String>();
-                availableOutputSchema              = cleanStrings(outputDomain.getValue());
+                availableOutputSchema              = Utils.cleanStrings(outputDomain.getValue());
                 String defaultValue                = outputDomain.getDefaultValue(); 
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
@@ -638,18 +638,6 @@ public class CatalogueHarvester {
         }
     }
     
-    private List<String> cleanStrings(List<String> list) {
-        List<String> result = new ArrayList<String>();
-        for (String s : list) {
-            //we remove the bad character before the real value
-           s = s.replace(" ", "");
-           s = s.replace("\t", "");
-           s = s.replace("\n", "");
-           result.add(s);
-        }
-        return result;
-    }
-    
     /**
      * Send a request to another CSW service.
      * 
@@ -759,25 +747,13 @@ public class CatalogueHarvester {
      * @param s An xml piece before unmarshaling.
      * @return
      */
-    public String restoreGoodNamespace(String s) {
+    private String restoreGoodNamespace(String s) {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
        s = s.replace("http://schemas.opengis.net/iso19115full", "http://www.isotc211.org/2005/gmd");
        s = s.replace("http://metadata.dgiwg.org/smXML", "http://www.isotc211.org/2005/gmd");
-       s = replacePrefix(s, "CharacterString", "gco");
+       s = Utils.replacePrefix(s, "CharacterString", "gco");
        return s;
    } 
-   
-   /**
-    * Replace all the <ns**:localPart and </ns**:localPart by <prefix:localPart and </prefix:localPart
-    * 
-    * @param s
-    * @param localPart
-    * @return
-    */ 
-    public static String replacePrefix(String s, String localPart, String prefix) {
-
-        return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
-    }
    
     /**
      * return The namespace URI for the specified prefix end version.
@@ -828,6 +804,7 @@ public class CatalogueHarvester {
     }
     
     /**
+     * Transfer The request to all the servers specified in distributedServers.
      * 
      * @return
      */

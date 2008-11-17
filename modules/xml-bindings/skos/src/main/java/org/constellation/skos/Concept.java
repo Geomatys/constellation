@@ -57,13 +57,13 @@ public class Concept {
     private String definition;
     
     @XmlElement(namespace="http://purl.org/dc/elements/1.1/")
-    private Date date;
+    private String date;
     
     public Concept() {
         
     }
 
-    public Concept(String about, String externalID, String prefLabel, String altLabel, String definition, Date date) {
+    public Concept(String about, String externalID, String prefLabel, String altLabel, String definition, String date) {
         this.about      = about;
         this.altLabel   = altLabel;
         this.date       = date;
@@ -112,11 +112,11 @@ public class Concept {
         this.definition = definition;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
     
