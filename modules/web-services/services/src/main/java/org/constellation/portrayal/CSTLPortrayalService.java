@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import org.constellation.wcs.AbstractGetCoverage;
 
 import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.canvas.CanvasController2D;
+import org.geotools.display.canvas.control.FailOnErrorMonitor;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.Go2rendererHints;
 import org.geotools.display.renderer.J2DRenderer;
@@ -82,6 +84,8 @@ import static org.constellation.coverage.web.ExceptionCode.*;
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
         
+    private static final Logger LOGGER = Logger.getLogger("org/constellation/portrayal/CSTLPortrayalService");
+    
     /**
      * static instance, thread singleton.
      */
@@ -97,6 +101,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      */
     private final NamedLayerDP LAYERDP = NamedLayerDP.getInstance();
     
+    private final ReportMonitor monitor = new ReportMonitor();
+        
     private final BufferedImageCanvas2D canvas;
     private final J2DRenderer renderer;
     private final MapContext context;
@@ -114,11 +120,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         canvas.setRenderingHint(Go2rendererHints.KEY_MULTI_THREAD, Go2rendererHints.MULTI_THREAD_OFF);
         
         //we specifically say to not repect X/Y proportions
-        try {
-            canvas.getController().setAxisProportions(Double.NaN);
-        } catch (PortrayalException ex) {
-            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        canvas.getController().setAxisProportions(Double.NaN);
         
         try {
             renderer.setContext(context);
@@ -355,6 +357,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     {
         canvas.setSize(canvasDimension);
         canvas.setBackground(background);
+        canvas.seMonitor(monitor);
         
         final CanvasController2D canvasController = canvas.getController();
         try {
@@ -363,12 +366,27 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             throw new PortrayalException(ex);
         }
 
-        canvasController.setVisibleArea(contextEnv);
-        if (azimuth != 0) {
-            canvasController.rotate( -Math.toRadians(azimuth) );
+        try{
+            canvasController.setVisibleArea(contextEnv);
+            if (azimuth != 0) {
+                canvasController.rotate( -Math.toRadians(azimuth) );
+            }
+        }catch(NoninvertibleTransformException ex){
+            throw new PortrayalException(ex);
         }
         canvas.repaint();
 
+        //check if errors occured during rendering
+        final Exception ex = monitor.getLastException();
+        if(ex != null){
+            //something goes wrong while rendering, send the error
+            if(ex instanceof PortrayalException){
+                throw (PortrayalException)ex;
+            }else{
+                throw new PortrayalException(ex);
+            }
+        }
+                
         final BufferedImage image = canvas.getSnapShot();
 
         if (image == null) {
@@ -489,6 +507,34 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     
     public static CSTLPortrayalService getInstance(){
         return instances.get();
+    }
+    
+    private class ReportMonitor extends FailOnErrorMonitor{
+
+        private Exception lastError = null;
+        
+        public Exception getLastException(){
+            return lastError;
+        }
+        
+        @Override
+        public void renderingStarted() {
+            lastError = null;
+            super.renderingStarted();
+        }
+
+        @Override
+        public void exceptionOccured(Exception ex, Level level) {
+            lastError = ex;
+            //request stop rendering
+            stopRendering();
+            //log the error
+            LOGGER.log(level,"", ex);
+        }
+        
+        
+        
+        
     }
     
 }
