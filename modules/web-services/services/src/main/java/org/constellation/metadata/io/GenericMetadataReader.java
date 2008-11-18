@@ -54,7 +54,9 @@ import org.constellation.generic.edmo.Organisation;
 import org.constellation.generic.edmo.Organisations;
 import org.constellation.generic.edmo.ws.EdmoWebservice;
 import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
+import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.vocabulary.Vocabulary;
+import org.constellation.skos.RDF;
 import org.constellation.ws.rs.WebService;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
@@ -183,7 +185,8 @@ public class GenericMetadataReader extends MetadataReader {
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         contacts               = new HashMap<String, ResponsiblePartyImpl>();
-        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary");
+        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary:" +
+                                                         "org.constellation.generic.nerc:org.constellation.skos");
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
         vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"));
@@ -236,30 +239,28 @@ public class GenericMetadataReader extends MetadataReader {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
         if (vocabDirectory.isDirectory()) {
             for (File f : vocabDirectory.listFiles()) {
-                if (f.getName().startsWith("SDN.")) {
+                if (f.getName().startsWith("SDN.") && f.getName().endsWith(".xml")) {
                     try {
-                        Vocabulary voca = (Vocabulary) unmarshaller.unmarshal(f);
-                        voca.fillMap();
+                        CodeTableType ct = (CodeTableType) unmarshaller.unmarshal(f);
+                        Vocabulary voca = new Vocabulary(ct.getListVersion(), ct.getListLongName(), ct.getListLastMod());
                         String vocaName = f.getName();
                         vocaName = vocaName.substring(vocaName.indexOf("SDN.") + 4);
                         vocaName = vocaName.substring(0, vocaName.indexOf('.'));
+                        
+                        File skosFile = new File(f.getPath().replace("xml", "rdf"));
+                        if (skosFile.exists()) {
+                            RDF rdf = (RDF) unmarshaller.unmarshal(skosFile);
+                            rdf.fillMap();
+                            voca.setMap(rdf.getMap());
+                        } else {
+                            logger.severe("no skos file found for vocabulary: " + vocaName);
+                        }
+                        
                         result.put(vocaName, voca);
                         
                         //info part (debug) 
                         String report = "added vocabulary: " + vocaName + " with ";
-                        if (voca.getKeyword().size() != 0) {
-                            report += voca.getKeyword().size() + " keywords.";
-                        } else if (voca.getGeoObjTypCd().size() != 0) {
-                            report += voca.getGeoObjTypCd().size() + " geometric Object."; 
-                        } else if (voca.getResTitle().size() != 0) {
-                            report += voca.getResTitle().size() + " res title."; 
-                        } else if (voca.getAccessConsts().size() != 0) {
-                            report += voca.getAccessConsts().size() + " access constraints."; 
-                        } else if (voca.getFormatName().size() != 0) {
-                            report += voca.getFormatName().size() + " format name."; 
-                        } else {
-                            report += "0 entries";
-                        }
+                        report += voca.getMap().size() + " entries";
                         logger.finer(report);
                                 
                         
@@ -267,7 +268,7 @@ public class GenericMetadataReader extends MetadataReader {
                         logger.severe("Unable to unmarshall the vocabulary configuration file : " + f.getPath());
                         ex.printStackTrace();
                     }
-                } else {
+                } else if (!f.getName().endsWith(".rdf")){
                     logger.severe("Vocabulary file : " + f.getPath() + " does not follow the pattern 'SDN.<vocabName>...'");
                 }
             }

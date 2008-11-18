@@ -17,7 +17,6 @@
 package org.constellation.generic.vocabulary;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +75,16 @@ public class Vocabulary {
     
 
     public Vocabulary() {
+    }
+    
+    public Vocabulary(String version, String title, String date) {
+        this.date        = date;
+        this.keyword     = new ArrayList<Keyword>();
+        this.formatName  = new ArrayList<Keyword>();
+        this.GeoObjTypCd = new ArrayList<GeoObjTypCd>();
+        this.list        = null;
+        this.version     = version;
+        this.title       = title;
     }
     
     public Vocabulary(String list, String version, String title, String date, List<Keyword> keyword) {
@@ -188,7 +197,13 @@ public class Vocabulary {
     }
 
     public Map<String, String> getMap() {
+        if (map == null)
+            map = new HashMap<String, String>();
         return map;
+    }
+    
+    public void setMap(Map<String, String> map) {
+        this.map = map;
     }
 
     public List<GeoObjTypCd> getGeoObjTypCd() {

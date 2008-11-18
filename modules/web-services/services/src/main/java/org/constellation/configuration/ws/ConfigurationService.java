@@ -47,6 +47,8 @@ import org.constellation.coverage.web.ServiceVersion;
 import org.constellation.coverage.web.WebServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.generic.nerc.CodeTableType;
+import org.constellation.generic.nerc.WhatsListsResponse;
 import org.constellation.metadata.Utils;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
@@ -100,7 +102,8 @@ public class ConfigurationService extends OGCWebService  {
     public ConfigurationService() {
         super("Configuration", version);
         try {
-            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:org.constellation.skos", "");
+            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:" +
+                           "org.constellation.skos:org.constellation.generic.nerc", "");
             
             File sicadeDir    = getSicadeDirectory();
             cswConfigDir = new File(sicadeDir, "csw_configuration");
@@ -537,25 +540,61 @@ public class ConfigurationService extends OGCWebService  {
         if (!vocabularyDir.exists()) {
             vocabularyDir.mkdir();
         }
+        //  we get the Skos and description file for each used list
+        saveVocabularyFile("P021", vocabularyDir);
+        saveVocabularyFile("L061", vocabularyDir);
+        saveVocabularyFile("L05",  vocabularyDir);
         
-        String url = "http://vocab.ndg.nerc.ac.uk/list/P021/current";
+        return new AcknowlegementType("success", "the vocabularies has been succefully updated");
+    }
+    
+    /**
+     * 
+     * @param listNumber
+     * @param directory
+     * @return
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    private CodeTableType getVocabularyDetails(String listNumber) throws WebServiceException {
+        String url = "http://vocab.ndg.nerc.ac.uk/axis2/services/vocab/whatLists?categoryKey=http://vocab.ndg.nerc.ac.uk/term/C980/current/CL12";
+        CodeTableType result = null;
         try {
-
+            
+            Object obj = Utils.getUrlContent(url, unmarshaller);
+            if (obj instanceof WhatsListsResponse) {
+                WhatsListsResponse listDetails = (WhatsListsResponse) obj;
+                result = listDetails.getCodeTableFromKey(listNumber);
+            }
+        
+        } catch (MalformedURLException ex) {
+            LOGGER.severe("The url: " + url + " is malformed");
+        } catch (IOException ex) {
+            LOGGER.severe("IO exception while contacting the URL:" + url);
+            throw new WebServiceException("IO exception while contacting the URL:" + url, NO_APPLICABLE_CODE, version);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @param listNumber
+     */
+    private void saveVocabularyFile(String listNumber, File directory) throws WebServiceException {
+        CodeTableType VocaDescription = getVocabularyDetails(listNumber);
+        String filePrefix = "SDN.";
+        String url = "http://vocab.ndg.nerc.ac.uk/list/" + listNumber + "/current";
+        try {
+            if (VocaDescription != null) {
+                File f = new File(directory, filePrefix + listNumber + ".xml");
+                marshaller.marshal(VocaDescription, f);
+            } else {
+                LOGGER.severe("no description for vocabulary: " + listNumber + " has been found");
+            }
+            
             Object vocab = Utils.getUrlContent(url, unmarshaller);
-            File f       = new File(vocabularyDir, "P021.rdf");
+            File f = new File(directory, filePrefix + listNumber + ".rdf");
             marshaller.marshal(vocab, f);
-            
-            url = "http://vocab.ndg.nerc.ac.uk/list/L061/current";
-            vocab = Utils.getUrlContent(url, unmarshaller);
-            f     = new File(vocabularyDir, "L061.rdf");
-            marshaller.marshal(vocab, f);
-            
-            url = "http://vocab.ndg.nerc.ac.uk/list/L05/current";
-            vocab = Utils.getUrlContent(url, unmarshaller);
-            f     = new File(vocabularyDir, "L05.rdf");
-            marshaller.marshal(vocab, f);
-            
-            
+        
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBException while marshalling the vocabulary: " + url);
             throw new WebServiceException("JAXBException while marshalling the vocabulary: " + url, NO_APPLICABLE_CODE, version);
@@ -565,6 +604,5 @@ public class ConfigurationService extends OGCWebService  {
             LOGGER.severe("IO exception while contacting the URL:" + url);
             throw new WebServiceException("IO exception while contacting the URL:" + url, NO_APPLICABLE_CODE, version);
         }
-        return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }
 }
