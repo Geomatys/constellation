@@ -118,15 +118,15 @@ public class CSWQueryable {
         ISO_QUERYABLE.put("AlternateTitle",   paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=3");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=revision");
         ISO_QUERYABLE.put("RevisionDate",  paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=1");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=creation");
         ISO_QUERYABLE.put("CreationDate",  paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=2");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=publication");
         ISO_QUERYABLE.put("PublicationDate",  paths);
       
         paths = new ArrayList<String>();
@@ -232,7 +232,7 @@ public class CSWQueryable {
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
        paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=6");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=originator");
         paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
         
@@ -254,12 +254,12 @@ public class CSWQueryable {
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=10");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=publisher");
         paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=11");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=author");
         paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
         

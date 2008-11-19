@@ -292,28 +292,28 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
         if (paths != null) {
             for (String fullPathID: paths) {
                 String pathID;
-                String conditionalPathID = null;
-                String conditionalValue  = null;
+                String conditionalAttribute = null;
+                String conditionalValue     = null;
                 
                 // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
                 int separator = fullPathID.indexOf('#'); 
                 if (separator != -1) {
-                    pathID            = fullPathID.substring(0, separator);
-                    conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
-                    conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
-                    logger.info("pathID           : " + pathID            + '\n' +
-                                "conditionalPathID: " + conditionalPathID + '\n' +
-                                "conditionalValue : " + conditionalValue); 
+                    pathID               = fullPathID.substring(0, separator);
+                    conditionalAttribute = fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+                    conditionalValue     = fullPathID.substring(fullPathID.indexOf('=') + 1);
+                    logger.finer("pathID              : " + pathID               + '\n' +
+                                 "conditionalAttribute: " + conditionalAttribute + '\n' +
+                                 "conditionalValue    : " + conditionalValue); 
                 } else {
                     pathID = fullPathID;
                 }
                 
-                if (conditionalPathID == null) {
+                if (conditionalAttribute == null) {
                     String value = getValuesFromPath(pathID, metadata);
                     if (value != null && !value.equals(""))
                         response.append(value).append(',');
                 } else {
-                    response.append(getConditionalValuesFromPath(pathID, conditionalPathID, conditionalValue, metadata)).append(',');
+                    response.append(getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata)).append(',');
                 }
             }
         }
@@ -361,7 +361,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
                 
                 if (metadata instanceof Collection) {
                     List<Object> tmp = new ArrayList<Object>();
-                    for (Object subMeta: (Collection)metadata) {
+                    for (Object subMeta: (Collection) metadata) {
                         Object obj = getAttributeValue(subMeta, attributeName);
                         if (obj instanceof Collection) {
                             for (Object o : (Collection)obj) {
@@ -391,7 +391,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
     private String getStringValue(Object obj) {
         String result = "";
         if (obj == null) {
-            return result;
+            return "null";
         } else if (obj instanceof String) {
             result = (String) obj;
         } else if (obj instanceof InternationalString) {
@@ -407,6 +407,8 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             }
             if (result.indexOf(',') != -1)
             result = result.substring(0, result.length() - 1);
+            if (result.length() == 0)
+                result = "null";
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
         
@@ -428,7 +430,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * @param metadata
      * @return
      */
-    private String getConditionalValuesFromPath(String pathID, String conditionalPathID, String conditionalValue, Object metadata) {
+    private String getConditionalValuesFromPath(String pathID, String conditionalAttribute, String conditionalValue, Object metadata) {
         String result = "";
         if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
              // we remove the prefix path part 
@@ -447,25 +449,57 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
                 
                 if (metadata instanceof Collection) {
                     List<Object> tmp = new ArrayList<Object>();
-                    for (Object subMeta: (Collection)metadata) {
-                        Object obj = getAttributeValue(subMeta, attributeName);
-                        if (obj instanceof Collection) {
-                            for (Object o : (Collection)obj) {
-                                if (o != null) tmp.add(o);
+                    if (pathID.equals("")) {
+                        for (Object subMeta: (Collection)metadata) {
+                            if (matchCondition(subMeta, conditionalAttribute, conditionalValue)) {
+                                tmp.add(getAttributeValue(subMeta, attributeName));
+                            } 
+                        }
+                    } else {
+                        for (Object subMeta: (Collection)metadata) {
+                            Object obj = getAttributeValue(subMeta, attributeName);
+                            if (obj instanceof Collection) {
+                                for (Object o : (Collection)obj) {
+                                    if (o != null) tmp.add(o);
+                                }
+                            } else {
+                                if (obj != null) tmp.add(obj);
                             }
-                        } else {
-                            if (obj != null) tmp.add(obj);
                         }
                     }
-                    metadata = tmp;
+                    
+                    if (tmp.size() == 1) metadata = tmp.get(0); 
+                    else metadata = tmp;
+                    
                 } else {
-                    metadata = getAttributeValue(metadata, attributeName);
+                    if (pathID.equals("")) {
+                        if (matchCondition(metadata, conditionalAttribute, conditionalValue)) {
+                            metadata = getAttributeValue(metadata, attributeName);
+                        } else {
+                            metadata = null;
+                        }
+                        
+                    } else metadata = getAttributeValue(metadata, attributeName);
                 }
             } 
-            
             result = getStringValue(metadata);
         }
         return result;
+    }
+    
+    /**
+     * 
+     * @param metadata
+     * @param conditionalAttribute
+     * @param conditionalValue
+     * @return
+     */
+    public boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
+        Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
+        logger.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
+                     "conditionalValue: " + conditionalValue               + '\n' +
+                     "match? " +conditionalValue.equals(getStringValue(conditionalObj)));
+        return conditionalValue.equalsIgnoreCase(getStringValue(conditionalObj));
     }
     
     /**
