@@ -27,10 +27,17 @@ import java.util.List;
 import java.util.Map;
 
 // apache Lucene dependencies
+import org.apache.lucene.analysis.standard.ParseException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -511,5 +518,32 @@ public class MDWebIndex extends IndexLucene<Form> {
             response.delete(response.length() - 1, response.length()); 
         }
         return response.toString();
+    }
+    
+    /**
+     * This method proceed a lucene search and returns a list of ID.
+     *
+     * @param query A simple Term query.
+     * 
+     * @return      A List of id.
+     */
+    public List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
+        
+        TermQuery query = new TermQuery(new Term("identifier_sort", id));
+        List<String> results = new ArrayList<String>();
+        
+        IndexReader ireader = IndexReader.open(getFileDirectory());
+        Searcher searcher   = new IndexSearcher(ireader);
+        logger.info("TermQuery: " + query.toString());
+        Hits hits = searcher.search(query);
+        
+        for (int i = 0; i < hits.length(); i ++) {
+            results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
+        }
+        ireader.close();
+        searcher.close();
+        logger.info(results.size() + " total matching documents");
+        
+        return results;
     }
 }

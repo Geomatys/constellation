@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -491,5 +493,19 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             ex.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * In generic index we don't need to perform a lucene query for the identifier.
+     * 
+     * @param id
+     * @return
+     * @throws org.apache.lucene.index.CorruptIndexException
+     * @throws java.io.IOException
+     * @throws org.apache.lucene.queryParser.ParseException
+     */
+    @Override
+    public List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
+        return Arrays.asList(id);
     }
 }

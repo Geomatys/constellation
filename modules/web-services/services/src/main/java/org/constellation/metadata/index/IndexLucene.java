@@ -262,24 +262,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * 
      * @return      A List of id.
      */
-    public List<String> doSearch(TermQuery query) throws CorruptIndexException, IOException, ParseException {
-        
-        List<String> results = new ArrayList<String>();
-        
-        IndexReader ireader = IndexReader.open(getFileDirectory());
-        Searcher searcher   = new IndexSearcher(ireader);
-        logger.info("TermQuery:" + query.toString());
-        Hits hits = searcher.search(query);
-        
-        for (int i = 0; i < hits.length(); i ++) {
-            results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
-        }
-        ireader.close();
-        searcher.close();
-        logger.info(results.size() + " total matching documents");
-        
-        return results;
-    }
+    public abstract List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
     
     /**
      * Add a boundingBox geometry to the specified Document.

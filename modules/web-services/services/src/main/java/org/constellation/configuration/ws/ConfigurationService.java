@@ -541,9 +541,14 @@ public class ConfigurationService extends OGCWebService  {
             vocabularyDir.mkdir();
         }
         //  we get the Skos and description file for each used list
-        saveVocabularyFile("P021", vocabularyDir);
-        saveVocabularyFile("L061", vocabularyDir);
-        saveVocabularyFile("L05",  vocabularyDir);
+        saveVocabularyFile("P021",   vocabularyDir);
+        saveVocabularyFile("L061",   vocabularyDir);
+        saveVocabularyFile("C77",    vocabularyDir);
+        saveVocabularyFile("EDMERP", vocabularyDir);
+        saveVocabularyFile("L05",    vocabularyDir);
+        saveVocabularyFile("L021",   vocabularyDir);
+        saveVocabularyFile("L081",   vocabularyDir);
+        saveVocabularyFile("L241",   vocabularyDir);
         
         return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }
@@ -592,8 +597,12 @@ public class ConfigurationService extends OGCWebService  {
             }
             
             Object vocab = Utils.getUrlContent(url, unmarshaller);
-            File f = new File(directory, filePrefix + listNumber + ".rdf");
-            marshaller.marshal(vocab, f);
+            if (vocab != null) {
+                File f = new File(directory, filePrefix + listNumber + ".rdf");
+                marshaller.marshal(vocab, f);
+            } else {
+                LOGGER.severe("no skos file have been found for :" + listNumber);
+            }
         
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBException while marshalling the vocabulary: " + url);

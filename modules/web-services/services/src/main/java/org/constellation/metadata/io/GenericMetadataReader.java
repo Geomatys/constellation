@@ -18,7 +18,6 @@
 package org.constellation.metadata.io;
 
 import java.io.File;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -51,9 +50,7 @@ import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
 import org.constellation.generic.edmo.Organisation;
-import org.constellation.generic.edmo.Organisations;
 import org.constellation.generic.edmo.ws.EdmoWebservice;
-import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
 import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.vocabulary.Vocabulary;
 import org.constellation.skos.RDF;
@@ -212,7 +209,9 @@ public class GenericMetadataReader extends MetadataReader {
                             varNames.add(col.getVar());
                         }
                     }
-                    PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
+                    String textQuery = query.buildSQLQuery();
+                    logger.finer("new Single query: " + textQuery);
+                    PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
             }
@@ -238,6 +237,9 @@ public class GenericMetadataReader extends MetadataReader {
     private Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
         if (vocabDirectory.isDirectory()) {
+            if (vocabDirectory.listFiles().length == 0) {
+                logger.severe("the vocabulary folder is empty :" + vocabDirectory.getPath());
+            }
             for (File f : vocabDirectory.listFiles()) {
                 if (f.getName().startsWith("SDN.") && f.getName().endsWith(".xml")) {
                     try {
@@ -303,7 +305,7 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private ResponsiblePartyImpl loadContactFromEDMOWS(String contactID) {
         EdmoWebservice service = new EdmoWebservice();
-        EdmoWebserviceSoap port = service.getEdmoWebserviceSoap();
+        /*EdmoWebserviceSoap port = service.getEdmoWebserviceSoap();
         
         // we call the web service EDMO
         String result = port.wsEdmoGetDetail(contactID);
@@ -328,7 +330,7 @@ public class GenericMetadataReader extends MetadataReader {
         } catch (JAXBException ex) {
             logger.severe("JAXBException while getting contact from EDMO WS");
             ex.printStackTrace();
-        }
+        }*/
         return null;
     }
     
@@ -336,44 +338,69 @@ public class GenericMetadataReader extends MetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier) throws SQLException {
+    private void loadData(String identifier) {
+        logger.info("identifier= " +identifier + " |");
         singleValue.clear();
         multipleValue.clear();
         for (PreparedStatement stmt : singleStatements.keySet()) {
-            ParameterMetaData meta = stmt.getParameterMetaData();
-            int nbParam = meta.getParameterCount();
-            int i = 1;
-            while (i < nbParam + 1) {
-                stmt.setString(i, identifier);
-                i++;
-            }
-            ResultSet result = stmt.executeQuery();
-            if (result.next()) {
-                for (String varName : singleStatements.get(stmt)) {
-                    singleValue.put(varName, result.getString(varName));
+            try {
+                ParameterMetaData meta = stmt.getParameterMetaData();
+                int nbParam = meta.getParameterCount();
+                int i = 1;
+                while (i < nbParam + 1) {
+                    stmt.setString(i, identifier);
+                    i++;
                 }
-            } else {
-                logger.info("no result");
+                ResultSet result = stmt.executeQuery();
+                if (result.next()) {
+                    for (String varName : singleStatements.get(stmt)) {
+                        singleValue.put(varName, result.getString(varName));
+                    }
+                } else {
+                    logger.info("no result");
+                }
+                result.close();
+            } catch (SQLException ex) {
+                String varlist = "";
+                for (String s : singleStatements.get(stmt)) {
+                    varlist += s + ',';
+                }
+                logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
+                              "for variable: " + varlist);
+                
             }
-            result.close();
         }
         
         for (PreparedStatement stmt : multipleStatements.keySet()) {
-            ParameterMetaData meta = stmt.getParameterMetaData();
-            int nbParam = meta.getParameterCount();
-            int i = 1;
-            while (i < nbParam + 1) {
-                stmt.setString(i, identifier);
-                i++;
-            }
-            ResultSet result = stmt.executeQuery();
-            for (String varName : multipleStatements.get(stmt)) {
-                multipleValue.put(varName, new ArrayList<String>());
-            }
-            while (result.next()) {
+            try {
+                ParameterMetaData meta = stmt.getParameterMetaData();
+                int nbParam = meta.getParameterCount();
+                int i = 1;
+                while (i < nbParam + 1) {
+                    stmt.setString(i, identifier);
+                    i++;
+                }
+                ResultSet result = stmt.executeQuery();
                 for (String varName : multipleStatements.get(stmt)) {
-                    multipleValue.get(varName).add(result.getString(varName));
-               }
+                    multipleValue.put(varName, new ArrayList<String>());
+                }
+                while (result.next()) {
+                    for (String varName : multipleStatements.get(stmt)) {
+                        multipleValue.get(varName).add(result.getString(varName));
+                    }
+                }
+            } catch (SQLException ex) {
+                String varlist = "";
+                List<String> varList = singleStatements.get(stmt);
+                if (varList != null) {
+                    for (String s : varList) {
+                        varlist += s + ',';
+                    }
+                } else {
+                  varlist = "no variables"; 
+                }
+                logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
+                              "for variable: " + varlist);
             }
             
         }
@@ -406,7 +433,7 @@ public class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
-    private MetaDataImpl getMetadataObject(String identifier, ElementSetType type, List<QName> elementName) throws SQLException {
+    private MetaDataImpl getMetadataObject(String identifier, ElementSetType type, List<QName> elementName) {
         MetaDataImpl result = null;
         
         //TODO we verify that the identifier exists
@@ -439,7 +466,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    private MetaDataImpl getCDIMetadata(String identifier) throws SQLException {
+    private MetaDataImpl getCDIMetadata(String identifier) {
         
         MetaDataImpl result     = new MetaDataImpl();
         
@@ -455,7 +482,8 @@ public class GenericMetadataReader extends MetadataReader {
          * contact parts
          */
         ResponsiblePartyImpl author = getContact(getVariable("var01"));
-        author.setRole(Role.AUTHOR);
+        if (author != null)
+            author.setRole(Role.AUTHOR);
         result.setContacts(Arrays.asList(author));
         
         /*
@@ -518,8 +546,8 @@ public class GenericMetadataReader extends MetadataReader {
         DataIdentificationImpl dataIdentification = new DataIdentificationImpl();
         
         CitationImpl citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var04")));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var05"))));
+        citation.setTitle(getInternationalStringVariable("var04"));
+        citation.setAlternateTitles(Arrays.asList(getInternationalStringVariable("var05")));
         
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var06"));
         citation.setDates(Arrays.asList(revisionDate));
@@ -527,17 +555,20 @@ public class GenericMetadataReader extends MetadataReader {
         List<ResponsiblePartyImpl> originators = new ArrayList<ResponsiblePartyImpl>();
         for (String contactID : getVariables("var07")) {
             ResponsiblePartyImpl originator  = getContact(contactID);
-            originator.setRole(Role.ORIGINATOR);
-            originators.add(originator);
+            if (originator != null) {
+                originator.setRole(Role.ORIGINATOR);
+                originators.add(originator);
+            }
         }
         citation.setCitedResponsibleParties(originators);
         
         dataIdentification.setCitation(citation);
         
-        dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var08")));
+        dataIdentification.setAbstract(getInternationalStringVariable("var08"));
         
         ResponsiblePartyImpl custodian   = getContact(getVariable("var09"));
-        custodian.setRole(Role.CUSTODIAN);
+        if (custodian != null)
+            custodian.setRole(Role.CUSTODIAN);
         
         dataIdentification.setPointOfContacts(Arrays.asList(custodian));
 
@@ -588,8 +619,8 @@ public class GenericMetadataReader extends MetadataReader {
         //cruise
         AggregateInformationImpl aggregateInfo = new AggregateInformationImpl();
         citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var15")));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var16"))));
+        citation.setTitle(getInternationalStringVariable("var15"));
+        citation.setAlternateTitles(Arrays.asList(getInternationalStringVariable("var16")));
         revisionDate = createRevisionDate(getVariable("var17"));
         citation.setDates(Arrays.asList(revisionDate));
         aggregateInfo.setAggregateDataSetName(citation);
@@ -600,8 +631,8 @@ public class GenericMetadataReader extends MetadataReader {
         //station
         aggregateInfo = new AggregateInformationImpl();
         citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var18")));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var19"))));
+        citation.setTitle(getInternationalStringVariable("var18"));
+        citation.setAlternateTitles(Arrays.asList(getInternationalStringVariable("var19")));
         revisionDate = createRevisionDate(getVariable("var20"));
         citation.setDates(Arrays.asList(revisionDate));
         aggregateInfo.setAggregateDataSetName(citation);
@@ -665,7 +696,8 @@ public class GenericMetadataReader extends MetadataReader {
         DistributorImpl distributor       = new DistributorImpl();
         
         ResponsiblePartyImpl distributorContact   = getContact(getVariable("var36"));
-        distributorContact.setRole(Role.DISTRIBUTOR);
+        if (distributorContact != null)
+            distributorContact.setRole(Role.DISTRIBUTOR);
         distributor.setDistributorContact(distributorContact);
                 
         distributionInfo.setDistributors(Arrays.asList(distributor));
@@ -674,27 +706,35 @@ public class GenericMetadataReader extends MetadataReader {
         List<Format> formats  = new ArrayList<Format>();
         List<String> names    = getVariables("var37");
         List<String> versions = getVariables("var38");
-        int i = 0;
-        voca = vocabularies.get("L241");
-        while (i < names.size() && i < versions.size()) {
-            FormatImpl format = new FormatImpl();
-            String name = names.get(i);
-            if (voca != null) {
-                String mappedValue = voca.getMap().get(name);
-                if (mappedValue != null)
-                    name = mappedValue;
+        if (names == null || versions == null) {
+            logger.severe("Distribution formats elements are null.");
+        } else {
+            int i = 0;
+            voca = vocabularies.get("L241");
+            while (i < names.size() && i < versions.size()) {
+                FormatImpl format = new FormatImpl();
+                String name = names.get(i);
+                if (voca != null) {
+                    String mappedValue = voca.getMap().get(name);
+                    if (mappedValue != null)
+                        name = mappedValue;
+                }
+                format.setName(new SimpleInternationalString(name));
+                format.setVersion(new SimpleInternationalString(versions.get(i)));
+                formats.add(format);
+                i++;
             }
-            format.setName(new SimpleInternationalString(name));
-            format.setVersion(new SimpleInternationalString(versions.get(i)));
-            formats.add(format);
-            i++;
         }
         distributionInfo.setDistributionFormats(formats);
         
         //transfert options
         DigitalTransferOptionsImpl digiTrans = new DigitalTransferOptionsImpl();
         try {
-            digiTrans.setTransferSize(Double.parseDouble(getVariable("var39")));
+            String size = getVariable("var39");
+            if (size != null)
+                digiTrans.setTransferSize(Double.parseDouble(size));
+            else
+                logger.severe("Transfer size is null");
         } catch (NumberFormatException ex) {
             logger.severe("Number format exception while parsing transfer size");
         }
@@ -704,7 +744,7 @@ public class GenericMetadataReader extends MetadataReader {
         } catch (URISyntaxException ex) {
             logger.severe("URI Syntax exception in contact online resource");
         }
-        onlines.setDescription(new SimpleInternationalString(getVariable("var41")));
+        onlines.setDescription(getInternationalStringVariable("var41"));
         onlines.setFunction(OnLineFunction.DOWNLOAD);
         digiTrans.setOnLines(Arrays.asList(onlines));
         
@@ -723,7 +763,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    private MetaDataImpl getCSRMetadata(String identifier) throws SQLException {
+    private MetaDataImpl getCSRMetadata(String identifier) {
         
         MetaDataImpl result     = new MetaDataImpl();
         
@@ -781,8 +821,8 @@ public class GenericMetadataReader extends MetadataReader {
         DataIdentificationImpl dataIdentification = new DataIdentificationImpl();
         
         CitationImpl citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var02")));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var03"))));
+        citation.setTitle(getInternationalStringVariable("var02"));
+        citation.setAlternateTitles(Arrays.asList(getInternationalStringVariable("var03")));
         
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var04"));
         citation.setDates(Arrays.asList(revisionDate));
@@ -812,7 +852,7 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setCitedResponsibleParties(chiefs);
         dataIdentification.setCitation(citation);
         
-        dataIdentification.setPurpose(new SimpleInternationalString(getVariable("var08")));
+        dataIdentification.setPurpose(getInternationalStringVariable("var08"));
         
         BrowseGraphicImpl graphOverview = new BrowseGraphicImpl();
         try {
@@ -821,7 +861,7 @@ public class GenericMetadataReader extends MetadataReader {
             logger.severe("URI Syntax exception in graph overview");
         }
         
-        graphOverview.setFileDescription(new SimpleInternationalString(getVariable("var10")));
+        graphOverview.setFileDescription(getInternationalStringVariable("var10"));
         graphOverview.setFileType(getVariable("var11"));
         
         dataIdentification.setGraphicOverviews(Arrays.asList(graphOverview));
@@ -935,7 +975,7 @@ public class GenericMetadataReader extends MetadataReader {
         dataIdentification = new DataIdentificationImpl();
         
         citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var31")));
+        citation.setTitle(getInternationalStringVariable("var31"));
         
         revisionDate = createRevisionDate(getVariable("var32"));
         citation.setDates(Arrays.asList(revisionDate));
@@ -947,7 +987,7 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
         
-        dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var35")));
+        dataIdentification.setAbstract(getInternationalStringVariable("var35"));
         
         /*
          * Aggregate info
@@ -973,7 +1013,7 @@ public class GenericMetadataReader extends MetadataReader {
         dataIdentification = new DataIdentificationImpl();
         
         citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var37")));
+        citation.setTitle(getInternationalStringVariable("var37"));
         
         revisionDate = createRevisionDate(getVariable("var38"));
         citation.setDates(Arrays.asList(revisionDate));
@@ -986,7 +1026,7 @@ public class GenericMetadataReader extends MetadataReader {
         
         dataIdentification.setCitation(citation);
         
-        dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var41")));
+        dataIdentification.setAbstract(getInternationalStringVariable("var41"));
         
         keyword = createKeyword(Arrays.asList(getVariable("var42")), "counting_unit", "L181");
         dataIdentification.setDescriptiveKeywords(Arrays.asList(keyword));
@@ -1000,7 +1040,7 @@ public class GenericMetadataReader extends MetadataReader {
         dataIdentification.setLanguage(Arrays.asList(Locale.ENGLISH));
         dataIdentification.setTopicCategories(Arrays.asList(TopicCategory.OCEANS));
         
-        dataIdentification.setSupplementalInformation(new SimpleInternationalString(getVariable("var13")));
+        dataIdentification.setSupplementalInformation(getInternationalStringVariable("var13"));
         result.setIdentificationInfo(dataIdentifications);
         
         
@@ -1015,7 +1055,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    private MetaDataImpl getEDMEDMetadata(String identifier) throws SQLException {
+    private MetaDataImpl getEDMEDMetadata(String identifier)  {
         MetaDataImpl result     = new MetaDataImpl();
         
         /*
@@ -1048,8 +1088,8 @@ public class GenericMetadataReader extends MetadataReader {
         DataIdentificationImpl dataIdentification = new DataIdentificationImpl();
 
         CitationImpl citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var02")));
-        citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(getVariable("var03"))));
+        citation.setTitle(getInternationalStringVariable("var02"));
+        citation.setAlternateTitles(Arrays.asList(getInternationalStringVariable("var03")));
         CitationDateImpl revisionDate = createRevisionDate(getVariable("var04"));
         citation.setDates(Arrays.asList(revisionDate));
         contact = getContact(getVariable("var05"));
@@ -1057,8 +1097,8 @@ public class GenericMetadataReader extends MetadataReader {
         citation.setCitedResponsibleParties(Arrays.asList(contact));
         dataIdentification.setCitation(citation);
         
-        dataIdentification.setAbstract(new SimpleInternationalString(getVariable("var06"))); 
-        dataIdentification.setPurpose(new SimpleInternationalString("var07"));
+        dataIdentification.setAbstract(getInternationalStringVariable("var06")); 
+        dataIdentification.setPurpose(getInternationalStringVariable("var07"));
         
         List<ResponsiblePartyImpl> pointOfContacts = new ArrayList<ResponsiblePartyImpl>();
         
@@ -1120,7 +1160,7 @@ public class GenericMetadataReader extends MetadataReader {
         List<ExtentImpl> extents = new ArrayList<ExtentImpl>();
         //temporal 
         ExtentImpl extent = new ExtentImpl();
-        extent.setDescription(new SimpleInternationalString(getVariable("var16")));
+        extent.setDescription(getInternationalStringVariable("var16"));
         
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
@@ -1174,7 +1214,7 @@ public class GenericMetadataReader extends MetadataReader {
          */
         PortrayalCatalogueReferenceImpl portrayal = new PortrayalCatalogueReferenceImpl();
         citation = new CitationImpl();
-        citation.setTitle(new SimpleInternationalString(getVariable("var25")));
+        citation.setTitle(getInternationalStringVariable("var25"));
         CitationDateImpl publicationDate = createPublicationDate(getVariable("var26"));
         citation.setDates(Arrays.asList(publicationDate));
         ResponsiblePartyImpl author = new ResponsiblePartyImpl();
@@ -1208,6 +1248,17 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private String getVariable(String variable) {
         return singleValue.get(variable);
+    }
+    
+    /**
+     * Avoid the IllegalArgumentException when the variable value is null.
+     * 
+     */
+    private InternationalString getInternationalStringVariable(String variable) {
+        String value = getVariable(variable);
+        if (value != null)
+            return new SimpleInternationalString(value);
+        else return null;
     }
     
     /**
@@ -1290,6 +1341,8 @@ public class GenericMetadataReader extends MetadataReader {
      * 
      */
     private Date parseDate(String date) {
+        if (date == null)
+            return null;
         int i = 0;
         while (i < dateFormats.size()) {
             DateFormat dateFormat = dateFormats.get(i);
@@ -1319,9 +1372,12 @@ public class GenericMetadataReader extends MetadataReader {
         List<String> e = getVariables(eastVar);
         List<String> s = getVariables(southVar);
         List<String> n = getVariables(northVar);
-        
+        if (w == null || e == null || s == null || n == null) {
+            logger.severe("One or more extent coordinates are null");
+            return result;
+        }
         if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            logger.severe("There is not he same number of geographique extent coordinates");
+            logger.severe("There is not the same number of geographic extent coordinates");
             return result;
         }
         int size = w.size();
@@ -1381,7 +1437,11 @@ public class GenericMetadataReader extends MetadataReader {
                 if (mappedValue != null)
                     value = mappedValue;
             }
-            kws.add(new SimpleInternationalString(value));
+            if (value != null) {
+                kws.add(new SimpleInternationalString(value));
+            } else {
+                logger.severe("keywords value null");
+            }
         }
         keyword.setKeywords(kws);
         keyword.setType(KeywordType.valueOf(keywordType));

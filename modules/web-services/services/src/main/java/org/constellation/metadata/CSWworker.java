@@ -119,10 +119,8 @@ import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // Apache Lucene dependencies
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.Sort;
 
 //geotools dependencies
@@ -432,6 +430,8 @@ public class CSWworker {
                                 MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
                                                                            dbProperties.getUser(),
                                                                            dbProperties.getPassword());
+                                System.out.println("maj=" + DriverManager.getDriver(dbProperties.getConnectURL()).getMajorVersion());
+                                System.out.println("min=" + DriverManager.getDriver(dbProperties.getConnectURL()).getMinorVersion());
                             } catch (SQLException e) {
                                 MDConnection = null;
                                 logger.severe(e.getMessage());
@@ -1022,9 +1022,9 @@ public class CSWworker {
      * @return
      * @throws WebServiceException
      */
-    private List<String> executeLuceneQuery(TermQuery query) throws WebServiceException {
+    private List<String> executeIdentifierQuery(String id) throws WebServiceException {
         try {
-            return index.doSearch(query);
+            return index.identifierQuery(id);
         
         } catch (CorruptIndexException ex) {
             throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
@@ -1118,7 +1118,7 @@ public class CSWworker {
             for (String id:request.getId()) {
                 
                 //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                List<String> ids = executeIdentifierQuery(id);
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1154,7 +1154,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                List<String> ids = executeIdentifierQuery(id);
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1188,7 +1188,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                List<String> ids = executeIdentifierQuery(id);
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1222,7 +1222,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                List<String> ids = executeIdentifierQuery(id);
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
@@ -1256,7 +1256,7 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeLuceneQuery(new TermQuery(new Term("identifier_sort", id)));
+                List<String> ids = executeIdentifierQuery(id);
                 if (ids.size() > 0) {
                     id = ids.get(0);
                 } else {
