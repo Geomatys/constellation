@@ -502,8 +502,9 @@ public class GenericMetadataReader extends MetadataReader {
         result.setContacts(Arrays.asList(author));
         
         /*
-         * creation date TODO
+         * creation date 
          */ 
+        result.setDateStamp(new Date());
         
         /*
          * Spatial representation info
@@ -799,8 +800,9 @@ public class GenericMetadataReader extends MetadataReader {
         result.setContacts(Arrays.asList(contact));
         
         /*
-         * creation date TODO
+         * creation date
          */ 
+        result.setDateStamp(new Date());
         
         /*
          * extension information
@@ -1090,8 +1092,9 @@ public class GenericMetadataReader extends MetadataReader {
         result.setContacts(Arrays.asList(contact));
         
         /*
-         * creation date TODO
+         * creation date
          */ 
+        result.setDateStamp(new Date());
         
         /*
          * extension information TODO
