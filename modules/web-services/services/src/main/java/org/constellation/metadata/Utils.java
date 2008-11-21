@@ -349,10 +349,15 @@ public class Utils {
                 result.addAll(scanDirectory(f, filePackageName));
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
-            URI jarUri = URI.create(u.getSchemeSpecificPart());
-            String jarFile = jarUri.getPath();
-            jarFile = jarFile.substring(0, jarFile.indexOf('!'));
-            result.addAll(scanJar(new File(jarFile), filePackageName));
+            try {
+                URI jarUri = URI.create(u.getSchemeSpecificPart());
+                String jarFile = jarUri.getPath();
+                jarFile = jarFile.substring(0, jarFile.indexOf('!'));
+                result.addAll(scanJar(new File(jarFile), filePackageName));
+              
+            } catch (IllegalArgumentException ex) {
+                Logger.getAnonymousLogger().warning("unable to scan jar file: " +u.getSchemeSpecificPart());
+            }
         }
         return result; 
     }

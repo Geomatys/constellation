@@ -88,8 +88,13 @@ import org.geotools.metadata.iso.identification.AggregateInformationImpl;
 import org.geotools.metadata.iso.identification.BrowseGraphicImpl;
 import org.geotools.metadata.iso.identification.DataIdentificationImpl;
 import org.geotools.metadata.iso.identification.KeywordsImpl;
+import org.geotools.metadata.iso.identification.ResolutionImpl;
 import org.geotools.metadata.iso.spatial.GeometricObjectsImpl;
 import org.geotools.metadata.iso.spatial.VectorSpatialRepresentationImpl;
+import org.geotools.metadata.note.Anchors;
+import org.geotools.temporal.object.DefaultPeriod;
+import org.geotools.temporal.object.DefaultInstant;
+import org.geotools.temporal.object.DefaultPosition;
 import org.geotools.util.SimpleInternationalString;
 
 //geoAPI dependencies
@@ -189,7 +194,27 @@ public class GenericMetadataReader extends MetadataReader {
                                                          "org.constellation.generic.nerc:org.constellation.skos");
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
-        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"));
+        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), true);
+        List<String> contactID = new ArrayList<String>();
+    }
+    
+    /**
+     * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
+     * @param genericConfiguration
+     */
+    public GenericMetadataReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+        super();
+        this.genericConfiguration = genericConfiguration;
+        this.connection     = connection;
+        initStatement();
+        singleValue            = new HashMap<String, String>();
+        multipleValue          = new HashMap<String, List<String>>();
+        contacts               = new HashMap<String, ResponsiblePartyImpl>();
+        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary:" +
+                                                         "org.constellation.generic.nerc:org.constellation.skos");
+        unmarshaller           = context.createUnmarshaller();
+        File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
+        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), fillAnchor);
         List<String> contactID = new ArrayList<String>();
     }
     
@@ -237,7 +262,7 @@ public class GenericMetadataReader extends MetadataReader {
     /**
      * Load a Map of vocabulary from the specified directory
      */
-    private Map<String, Vocabulary> loadVocabulary(File vocabDirectory) {
+    private Map<String, Vocabulary> loadVocabulary(File vocabDirectory, boolean fillAnchor) {
         Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
         if (vocabDirectory.isDirectory()) {
             if (vocabDirectory.listFiles().length == 0) {
@@ -256,8 +281,9 @@ public class GenericMetadataReader extends MetadataReader {
                             File skosFile = new File(f.getPath().replace("xml", "rdf"));
                             if (skosFile.exists()) {
                                 RDF rdf = (RDF) unmarshaller.unmarshal(skosFile);
-                                rdf.fillMap();
-                                voca.setMap(rdf.getMap());
+                                if (fillAnchor)
+                                    rdf.fillAnchors();
+                                voca.setMap(rdf.getShortMap());
                             } else {
                                 logger.severe("no skos file found for vocabulary file : " + f.getName());
                             }
@@ -280,7 +306,7 @@ public class GenericMetadataReader extends MetadataReader {
                              //info part (debug) 
                             String report = "added vocabulary: " + vocaName + " with ";
                             report += voca.getMap().size() + " entries";
-                            logger.info(report);
+                            logger.finer(report);
                         }
                     } catch (JAXBException ex) {
                         logger.severe("Unable to unmarshall the vocabulary configuration file : " + f.getPath());
@@ -661,7 +687,16 @@ public class GenericMetadataReader extends MetadataReader {
         /*
          * data scale TODO
          */
-        //dataIdentification.set ????
+        String scale = getVariable("var21");
+        if (scale != null) {
+            try {
+                ResolutionImpl resolution = new ResolutionImpl();
+                resolution.setDistance(Double.parseDouble(scale));
+                dataIdentification.setSpatialResolutions(Arrays.asList(resolution));
+            }  catch (NumberFormatException ex) {
+                logger.severe("parse exception while parsing scale");
+            }
+        }
         
         //static part        
         dataIdentification.setLanguage(Arrays.asList(Locale.ENGLISH));
@@ -678,11 +713,17 @@ public class GenericMetadataReader extends MetadataReader {
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
         Date start = parseDate(getVariable("var28"));
-        tempExtent.setStartTime(start);
         Date stop  = parseDate(getVariable("var29"));
-        tempExtent.setEndTime(stop);
-        if (start == null || stop == null)
-            logger.severe("parse exception while parsing temporal extent date");extent.setTemporalElements(Arrays.asList(tempExtent));
+        
+        if (start != null && stop != null) {
+            DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
+            DefaultInstant end   = new DefaultInstant(new DefaultPosition(stop));
+            DefaultPeriod period = new DefaultPeriod(begin, end);
+            tempExtent.setExtent(period);
+            extent.setTemporalElements(Arrays.asList(tempExtent));
+        } else {
+            logger.severe("parse exception while parsing temporal extent date");
+        }
         
         //vertical extent
         VerticalExtentImpl vertExtent = new VerticalExtentImpl();
@@ -962,13 +1003,19 @@ public class GenericMetadataReader extends MetadataReader {
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
         Date start = parseDate(getVariable("var24"));
-        tempExtent.setStartTime(start);
         Date stop  = parseDate(getVariable("var25"));
-        tempExtent.setEndTime(stop);
-        if (start == null || stop == null)
+
+        if (start != null && stop != null) {
+            DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
+            DefaultInstant end   = new DefaultInstant(new DefaultPosition(stop));
+            DefaultPeriod period = new DefaultPeriod(begin, end);
+            tempExtent.setExtent(period);
+            extent.setTemporalElements(Arrays.asList(tempExtent));
+        } else {
             logger.severe("parse exception while parsing temporal extent date");
+        }
         
-        extent.setTemporalElements(Arrays.asList(tempExtent));
+        
         
         List<GeographicExtentImpl> geoElements = new ArrayList<GeographicExtentImpl>();
         //geographic areas
@@ -1183,12 +1230,17 @@ public class GenericMetadataReader extends MetadataReader {
         //temporal extent
         TemporalExtentImpl tempExtent = new TemporalExtentImpl();
         Date start = parseDate(getVariable("var17"));
-        tempExtent.setStartTime(start);
         Date stop  = parseDate(getVariable("var18"));
-        tempExtent.setEndTime(stop);
-        if (start == null || stop == null)
+        
+        if (start != null && stop != null) {
+            DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
+            DefaultInstant end   = new DefaultInstant(new DefaultPosition(stop));
+            DefaultPeriod period = new DefaultPeriod(begin, end);
+            tempExtent.setExtent(period);
+            extent.setTemporalElements(Arrays.asList(tempExtent));
+        } else {
             logger.severe("parse exception while parsing temporal extent date");
-        extent.setTemporalElements(Arrays.asList(tempExtent));
+        }
         extents.add(extent);
         
         extent = new ExtentImpl();
@@ -1289,10 +1341,14 @@ public class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      */
     private ResponsiblePartyImpl createContact(Organisation org) {
-        
         ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
         contact.setOrganisationName(new SimpleInternationalString(org.getName()));
-        
+        try {
+            URI uri = new URI("SDN:EDMO::" + org.getN_code());
+            Anchors.create(org.getName(), uri); 
+        } catch (URISyntaxException ex) {
+            logger.severe("URI syntax exeption while adding contact code.");
+        }
         ContactImpl contactInfo = new ContactImpl();
         TelephoneImpl phone     = new TelephoneImpl();
         AddressImpl address     = new AddressImpl();

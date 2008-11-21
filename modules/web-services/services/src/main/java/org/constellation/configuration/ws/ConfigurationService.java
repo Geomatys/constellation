@@ -59,6 +59,7 @@ import org.constellation.ows.v110.ExceptionReport;
 import static org.constellation.ows.OWSExceptionCode.*;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
+import org.geotools.metadata.note.Anchors;
 import org.geotools.resources.JDBC;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.sql.v20.Reader20;
@@ -137,7 +138,7 @@ public class ConfigurationService extends OGCWebService  {
                                                                            dbProperties.getUser(),
                                                                            dbProperties.getPassword());
                             
-                                GenericMetadataReader MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
+                                GenericMetadataReader MDReader = new GenericMetadataReader(genericConfiguration, MDConnection , false);
                                 indexer = new GenericIndex(MDReader);
                                 CSWFunctionEnabled = true;
                             } catch (SQLException e){
@@ -263,6 +264,7 @@ public class ConfigurationService extends OGCWebService  {
      */
     private AcknowlegementType restartService() {
         LOGGER.info("\n restart requested \n");
+        Anchors.clear();
         cn.reload();
         return new AcknowlegementType("success", "services succefully restarted");
     }
@@ -299,6 +301,7 @@ public class ConfigurationService extends OGCWebService  {
                 }
 
                 //then we restart the services
+                Anchors.clear();
                 cn.reload();
 
             } else {
@@ -542,6 +545,7 @@ public class ConfigurationService extends OGCWebService  {
         }
         //  we get the Skos and description file for each used list
         saveVocabularyFile("P021",   vocabularyDir);
+        saveVocabularyFile("L031",   vocabularyDir);
         saveVocabularyFile("L061",   vocabularyDir);
         saveVocabularyFile("C77",    vocabularyDir);
         saveVocabularyFile("EDMERP", vocabularyDir);
@@ -549,6 +553,7 @@ public class ConfigurationService extends OGCWebService  {
         saveVocabularyFile("L021",   vocabularyDir);
         saveVocabularyFile("L081",   vocabularyDir);
         saveVocabularyFile("L241",   vocabularyDir);
+        saveVocabularyFile("L231",   vocabularyDir);
         
         return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }

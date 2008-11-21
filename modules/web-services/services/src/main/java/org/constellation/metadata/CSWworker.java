@@ -430,8 +430,6 @@ public class CSWworker {
                                 MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
                                                                            dbProperties.getUser(),
                                                                            dbProperties.getPassword());
-                                System.out.println("maj=" + DriverManager.getDriver(dbProperties.getConnectURL()).getMajorVersion());
-                                System.out.println("min=" + DriverManager.getDriver(dbProperties.getConnectURL()).getMinorVersion());
                             } catch (SQLException e) {
                                 MDConnection = null;
                                 logger.severe(e.getMessage());

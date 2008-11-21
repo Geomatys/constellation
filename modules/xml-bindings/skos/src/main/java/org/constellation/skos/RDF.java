@@ -17,15 +17,18 @@
 
 package org.constellation.skos;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.geotools.metadata.note.Anchors;
 
 /**
  *
@@ -38,9 +41,6 @@ public class RDF {
     @XmlElement(name="Concept", namespace = "http://www.w3.org/2004/02/skos/core#")
     private List<Concept> concept;
 
-    @XmlTransient
-    private Map<String, String> map;
-    
     public RDF() {
         concept = new ArrayList<Concept>();
     }
@@ -69,19 +69,30 @@ public class RDF {
         return sb.toString();
     }
 
-    public Map<String, String> getMap() {
-        return map;
-    }
-
-    public void fillMap() {
-        map = new HashMap<String, String>();
+    public Map<String, String> getShortMap() {
+        Map<String, String> map = new HashMap<String, String>();
         if (getConcept().size() != 0) {
             for (Concept c : getConcept()) {
                 String id = c.getExternalID();
                 id = id.substring(id.lastIndexOf(':') + 1);
-                getMap().put(id, c.getPrefLabel());
+                map.put(id, c.getPrefLabel());
+            }
+        } 
+        return map;
+    }
+    
+    public void fillAnchors() {
+        if (getConcept().size() != 0) {
+            for (Concept c : getConcept()) {
+                try {
+                    URI uri = new URI(c.getExternalID());
+                    Anchors.create(c.getPrefLabel() , uri);
+                } catch (URISyntaxException ex) {
+                    Logger.getAnonymousLogger().severe("Unable to create an URI from: " + c.getExternalID());
+                }
+               
             }
         } 
     }
-
+    
 }

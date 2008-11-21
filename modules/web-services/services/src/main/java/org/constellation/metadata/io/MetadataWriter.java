@@ -115,6 +115,10 @@ public class MetadataWriter {
     public MetadataWriter(Reader MDReader, Writer20 MDWriter) throws SQLException {
         
         MDCatalog         = MDReader.getCatalog("CSWCat");
+        if (MDCatalog == null) {
+            MDCatalog = new Catalog("CSWCat", "CSW Data Catalog");
+            MDWriter.writeCatalog(MDCatalog);
+        }
         user              = MDReader.getUser("admin");
         this.MDReader     = MDReader;  
         this.MDWriter     = MDWriter;
