@@ -410,6 +410,12 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
                 s.append("name=").append(jb.getName()).append(" value=").append(jb.getValue().toString()).append('\n');
             }
         }
+        if (distributor != null) {
+            s.append("distributor: ").append(distributor).append('\n');
+        }
+        if (creator != null) {
+            s.append("creator: ").append(creator).append('\n');
+        }
         if (language != null) {
             s.append("language: ").append(language).append('\n');
         }

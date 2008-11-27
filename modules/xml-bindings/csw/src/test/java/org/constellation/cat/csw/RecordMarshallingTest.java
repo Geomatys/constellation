@@ -168,7 +168,10 @@ public class RecordMarshallingTest {
         "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
         "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
         "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
-        "    <dc:date>2007-12-01</dc:date>"                                         + '\n' +        
+        "    <dc:format>binary</dc:format>"                                         + '\n' +        
+        "    <dc:date>2007-12-01</dc:date>"                                         + '\n' +  
+        "    <dc:publisher>geomatys</dc:publisher>"                                 + '\n' +           
+        "    <dc:creator>geomatys</dc:creator>"                                 + '\n' +               
         "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
         "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
         "    <dct:spatial>northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;</dct:spatial>" + '\n' +
@@ -192,31 +195,39 @@ public class RecordMarshallingTest {
         subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
         subject.add(new SimpleLiteral("oceans elevation 2"));
         
-        SimpleLiteral modified   = new SimpleLiteral("2007-11-15 21:26:49");
-        SimpleLiteral date       = new SimpleLiteral("2007-12-01");
-        SimpleLiteral Abstract   = new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.");
-        SimpleLiteral references = new SimpleLiteral("http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml");
-        SimpleLiteral spatial    = new SimpleLiteral("northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;");
+        SimpleLiteral modified    = new SimpleLiteral("2007-11-15 21:26:49");
+        SimpleLiteral date        = new SimpleLiteral("2007-12-01");
+        SimpleLiteral Abstract    = new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.");
+        SimpleLiteral references  = new SimpleLiteral("http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml");
+        SimpleLiteral spatial     = new SimpleLiteral("northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;");
+        SimpleLiteral format      = new SimpleLiteral("binary");
+        SimpleLiteral distributor = new SimpleLiteral("geomatys");
+        SimpleLiteral creator = new SimpleLiteral("geomatys");
         
         List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
         bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
         
-        RecordType expResult = new RecordType(id, title, type, subject, null, modified, date, Abstract, bbox, null, null, null, spatial, references);
+        RecordType expResult = new RecordType(id, title, type, subject, format, modified, date, Abstract, bbox, creator, distributor, null, spatial, references);
         
-        logger.info("DATE " +expResult.getDate() + " - " + result.getDate());
+        logger.finer("DATE " +expResult.getDate() + " - " + result.getDate());
         assertEquals(expResult.getDate(), result.getDate());
+
+        logger.finer("ABSTRACT " +expResult.getAbstract() + " - " + result.getAbstract());
+        assertEquals(expResult.getAbstract(), result.getAbstract());
         
+        logger.finer("SPATIAL " +expResult.getSpatial() + " - " + result.getSpatial());
+        assertEquals(expResult.getSpatial(), result.getSpatial());
+        
+        logger.finer("BBOXES " +expResult.getBoundingBox() + " - " + result.getBoundingBox());
+        assertEquals(expResult.getBoundingBox().get(0).getValue(), result.getBoundingBox().get(0).getValue());
+        
+                
         logger.finer("RESULT: " + result.toString());
         logger.finer("");
         logger.finer("EXPRESULT: " + expResult.toString());
         logger.finer("-----------------------------------------------------------");
         assertEquals(expResult, result);
         
-        logger.info("ABSTRACT " +expResult.getAbstract() + " - " + result.getAbstract());
-        assertEquals(expResult.getAbstract(), result.getAbstract());
-        
-        logger.info("SPATIAL " +expResult.getSpatial() + " - " + result.getSpatial());
-        assertEquals(expResult.getSpatial(), result.getSpatial());
         
         /*
          * Test Unmarshalling csw Record v2.0.0 with http://purl... DC namespace

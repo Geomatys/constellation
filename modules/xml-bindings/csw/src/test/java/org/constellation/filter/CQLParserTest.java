@@ -794,11 +794,11 @@ public class CQLParserTest {
         assertEquals(chainFilter.getChain().size(),       2);
         
         //we verify each filter
-        SpatialFilter f1 = (SpatialFilter) chainFilter.getChain().get(0);
+        SpatialFilter f1 = (SpatialFilter) chainFilter.getChain().get(1);
         assertEquals(f1.getFilterType(), SpatialFilter.INTERSECT);
         assertTrue(f1.getGeometry() instanceof GeneralEnvelope);
         
-        SerialChainFilter cf2 = (SerialChainFilter) chainFilter.getChain().get(1);
+        SerialChainFilter cf2 = (SerialChainFilter) chainFilter.getChain().get(0);
         assertEquals(cf2.getActionType().length,  1);
         assertEquals(cf2.getActionType()[0],      SerialChainFilter.OR);
         assertEquals(cf2.getChain().size(),       2);
@@ -826,11 +826,11 @@ public class CQLParserTest {
         spaQuery = filterParser.getLuceneQuery(filter);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(metafile:doc)");
-        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
+        assertEquals(spaQuery.getSubQueries().size(), 1);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SerialChainFilter);
-        chainFilter = (SerialChainFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSubQueries().get(0).getSpatialFilter() instanceof SerialChainFilter);
+        chainFilter = (SerialChainFilter) spaQuery.getSubQueries().get(0).getSpatialFilter();
 
         assertEquals(chainFilter.getActionType().length,  1);
         assertEquals(chainFilter.getActionType()[0],      SerialChainFilter.AND);
