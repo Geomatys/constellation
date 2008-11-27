@@ -2195,6 +2195,7 @@ public class SOSworker {
                     }
                 }
             }
+        offTable.flush();
     }
     
     /**
