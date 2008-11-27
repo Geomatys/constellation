@@ -17,6 +17,7 @@
 package org.constellation.cat.csw.v202;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -93,7 +94,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     private List<SimpleLiteral> subject;
     
     @XmlElement(name = "format", namespace = "http://purl.org/dc/elements/1.1/")
-    private SimpleLiteral format;
+    private List<SimpleLiteral> format;
     
     @XmlElement(name = "language", namespace = "http://purl.org/dc/elements/1.1/")
     private SimpleLiteral language;
@@ -102,7 +103,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     private SimpleLiteral distributor;
     
     @XmlElement(name = "creator", namespace = "http://purl.org/dc/elements/1.1/")
-    private SimpleLiteral creator;
+    private List<SimpleLiteral> creator;
     
     @XmlElementRef(name = "DC-element", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
     private List<JAXBElement<SimpleLiteral>> dcElement;
@@ -114,7 +115,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     private SimpleLiteral date;
     
     @XmlElement(name = "abstract", namespace = "http://purl.org/dc/terms/")
-    private SimpleLiteral _abstract;
+    private List<SimpleLiteral> _abstract;
     
     @XmlElement(name = "spatial", namespace = "http://purl.org/dc/terms/")
     private SimpleLiteral spatial;
@@ -133,6 +134,30 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
             List<SimpleLiteral> subjects, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral date, SimpleLiteral _abstract,
             SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language, SimpleLiteral spatial, 
+            SimpleLiteral references) {
+        
+        this.identifier = identifier;
+        this.title      = title;
+        this.type       = type;
+        this.format     = Arrays.asList(format);
+        this.date       = date;
+        
+        this.dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
+        
+        this.subject     = subjects;
+        this.creator     = Arrays.asList(creator);
+        this.distributor = distributor;
+        this.language    = language;
+        this.modified    = modified;
+        this._abstract   = Arrays.asList(_abstract);
+        this.spatial     = spatial;
+        this.references  = references;
+        
+    }
+    
+    public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
+            List<SimpleLiteral> subjects, List<SimpleLiteral> format, SimpleLiteral modified, SimpleLiteral date, List<SimpleLiteral> _abstract,
+            List<SimpleLiteral> creator, SimpleLiteral distributor, SimpleLiteral language, SimpleLiteral spatial, 
             SimpleLiteral references) {
         
         this.identifier = identifier;
@@ -208,10 +233,14 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
     
     public void setFormat(SimpleLiteral format) {
+        this.format = Arrays.asList(format);
+    }
+    
+    public void setFormat(List<SimpleLiteral> format) {
         this.format = format;
     }
     
-    public SimpleLiteral getFormat() {
+    public List<SimpleLiteral> getFormat() {
         return format;
     }
     
@@ -232,18 +261,26 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
     
     public void setAbstract(SimpleLiteral _abstract) {
+        this._abstract = Arrays.asList(_abstract);
+    }
+    
+    public void setAbstract(List<SimpleLiteral> _abstract) {
         this._abstract =_abstract;
     }
     
-    public SimpleLiteral getAbstract() {
+    public List<SimpleLiteral> getAbstract() {
         return _abstract;
     }
     
     public void setCreator(SimpleLiteral creator) {
+        this.creator = Arrays.asList(creator);
+    }
+    
+    public void setCreator(List<SimpleLiteral> creator) {
         this.creator = creator;
     }
     
-    public SimpleLiteral getCreator() {
+    public List<SimpleLiteral> getCreator() {
         return creator;
     }
     

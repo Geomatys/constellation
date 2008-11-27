@@ -111,6 +111,36 @@ public class RecordType extends DCMIRecordType implements Record, Settable {
     }
     
     /**
+     * Build a new Record TODO add contributor, source , spatial, right, relation
+     */
+    public RecordType(SimpleLiteral identifier, 
+                      SimpleLiteral title, 
+                      SimpleLiteral type, 
+                      List<SimpleLiteral> subject, 
+                      List<SimpleLiteral> formats, 
+                      SimpleLiteral modified,
+                      SimpleLiteral date,
+                      List<SimpleLiteral> _abstract,
+                      List<BoundingBoxType> bboxes, 
+                      List<SimpleLiteral> creator, 
+                      SimpleLiteral distributor, 
+                      SimpleLiteral language, 
+                      SimpleLiteral spatial,
+                      SimpleLiteral references) {
+        
+        super(identifier, title,type, subject, formats, modified, date, _abstract, creator, distributor, language, spatial, references);
+        
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+        
+    }
+    
+    /**
      * Gets the value of the anyText property.
      * (unmodifiable)
      */

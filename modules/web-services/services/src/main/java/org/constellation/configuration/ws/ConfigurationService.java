@@ -554,6 +554,13 @@ public class ConfigurationService extends OGCWebService  {
         saveVocabularyFile("L081",   vocabularyDir);
         saveVocabularyFile("L241",   vocabularyDir);
         saveVocabularyFile("L231",   vocabularyDir);
+        saveVocabularyFile("C381",   vocabularyDir);
+        saveVocabularyFile("C320",   vocabularyDir);
+        saveVocabularyFile("C174",   vocabularyDir);
+        saveVocabularyFile("C16",    vocabularyDir);
+        saveVocabularyFile("C371",   vocabularyDir);
+        saveVocabularyFile("L181",   vocabularyDir);
+        saveVocabularyFile("C16",    vocabularyDir);
         
         return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }

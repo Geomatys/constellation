@@ -38,15 +38,15 @@ public interface DCMIRecord extends AbstractRecord {
     
     public AbstractSimpleLiteral getType();
     
-    public List<? extends Object> getSubject();
+    public List<? extends AbstractSimpleLiteral> getSubject();
     
-    public AbstractSimpleLiteral getFormat();
+    public List<? extends AbstractSimpleLiteral> getFormat();
     
     public AbstractSimpleLiteral getModified();
     
-    public AbstractSimpleLiteral getAbstract();
+    public List< ? extends AbstractSimpleLiteral> getAbstract();
     
-    public AbstractSimpleLiteral getCreator();
+    public List<? extends AbstractSimpleLiteral> getCreator();
     
     public AbstractSimpleLiteral getDistributor();
     

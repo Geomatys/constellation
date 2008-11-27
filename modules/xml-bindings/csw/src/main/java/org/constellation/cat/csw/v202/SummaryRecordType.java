@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.SummaryRecord;
-import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
@@ -146,6 +145,49 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         this._abstract = new ArrayList<SimpleLiteral>();
         if (_abstract != null)
             this._abstract.add(_abstract);
+        
+        
+    }
+    
+    /**
+     * Build a new Summary record TODO add relation and spatial
+     */
+    public SummaryRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes,
+            List<SimpleLiteral> subject, List<SimpleLiteral> formats, SimpleLiteral modified, List<SimpleLiteral> _abstract){
+        
+        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        if (identifier == null)
+            identifier = new SimpleLiteral();
+        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        
+        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        if (title == null)
+            title = new SimpleLiteral();
+        this.title.add(dublinFactory.createTitle(title));
+        
+        this.type = type;
+        
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else if (bbox != null)
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+        this.subject = subject;
+        
+        this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
+        if (format != null){
+            for (SimpleLiteral forma: formats)
+                if (forma != null)
+                    this.format.add(dublinFactory.createFormat(forma));
+        }
+        
+        this.modified = new ArrayList<SimpleLiteral>();
+        if (modified != null)
+            this.modified.add(modified);
+        
+        this._abstract = _abstract;
         
         
     }

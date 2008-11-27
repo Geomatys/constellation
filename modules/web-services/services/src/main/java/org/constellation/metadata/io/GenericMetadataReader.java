@@ -42,8 +42,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.coverage.web.WebServiceException;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
@@ -56,6 +61,7 @@ import org.constellation.generic.edmo.ws.EdmoWebservice;
 import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
 import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.vocabulary.Vocabulary;
+import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.skos.RDF;
 import org.constellation.ws.rs.WebService;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
@@ -462,11 +468,9 @@ public class GenericMetadataReader extends MetadataReader {
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
         Object result = null;
         
-        if (mode == ISO_19115) {
+        if (mode == ISO_19115 || mode == DUBLINCORE) {
             
-            result = getMetadataObject(identifier, type, elementName);
-            
-        } else if (mode == DUBLINCORE) {
+            result = getMetadataObject(identifier, type, elementName, mode);
             
         } else {
             throw new IllegalArgumentException("Unknow or unAuthorized standard mode: " + mode);
@@ -474,31 +478,290 @@ public class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
-    private MetaDataImpl getMetadataObject(String identifier, ElementSetType type, List<QName> elementName) {
-        MetaDataImpl result = null;
+    private Object getMetadataObject(String identifier, ElementSetType type, List<QName> elementName, int mode) {
+        Object result = null;
         
         //TODO we verify that the identifier exists
-        
         loadData(identifier);
-        switch (genericConfiguration.getType()) {
-            
-            case CDI: 
-                result = getCDIMetadata(identifier);
-                break;
-                
-            case CSR: 
-                result = getCSRMetadata(identifier);
-                break;
-                
-            case EDMED: 
-                result = getEDMEDMetadata(identifier);
-                break;
-            
-        }
         
+        if (mode == ISO_19115) {
+            
+            switch (genericConfiguration.getType()) {
+
+                case CDI: 
+                    result = getCDIMetadata(identifier);
+                    break;
+
+                case CSR: 
+                    result = getCSRMetadata(identifier);
+                    break;
+
+                case EDMED: 
+                    result = getEDMEDMetadata(identifier);
+                    break;
+            }
+        } else {
+            switch (genericConfiguration.getType()) {
+
+                case CDI: 
+                    result = getCDIDC(identifier, type, elementName);
+                    break;
+
+                case CSR: 
+                    result = getCSRDC(identifier, type, elementName);
+                    break;
+
+                case EDMED: 
+                    result = getEDMEDDC(identifier, type, elementName);
+                    break;
+            }
+        }
         return result;
     }
 
+    /**
+     * Extract a metadata from a CDI database.
+     * 
+     * @param identifier
+     * 
+     * @return
+     * @throws java.sql.SQLException
+     */
+    private AbstractRecordType getCDIDC(String identifier, ElementSetType type, List<QName> elementName) {
+        SimpleLiteral ident    = new SimpleLiteral(identifier);
+        SimpleLiteral title    = new SimpleLiteral(getVariable("var04"));
+        SimpleLiteral dataType = new SimpleLiteral("dataset");
+        List<BoundingBoxType> bboxes = createBoundingBoxes("var24", "var25", "var26", "var27");
+        if (type.equals(ElementSetType.BRIEF))
+            return new BriefRecordType(ident, title, dataType, bboxes);
+        
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        //topic category
+        subject.add(new SimpleLiteral("oceans"));
+        
+         //parameter
+        for (String k : getKeywordsValue(getVariables("var10"), "P021"))
+            subject.add(new SimpleLiteral(k));
+
+        //instrument
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var11")), "L05"))
+            subject.add(new SimpleLiteral(k));
+        
+        //platform
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var12")), "L061"))
+            subject.add(new SimpleLiteral(k));
+        
+        //projects
+        for (String k : getKeywordsValue(getVariables("var13"), "EDMERP"))
+            subject.add(new SimpleLiteral(k));
+        
+        List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+        for (String s : getVariables("var37")) {
+            formats.add(new SimpleLiteral(s));
+        }
+        SimpleLiteral modified = new SimpleLiteral(dateFormats.get(0).format(new Date()));
+        
+        List<SimpleLiteral> _abstract = Arrays.asList(new SimpleLiteral(getVariable("var08")));
+        
+        if (type.equals(ElementSetType.SUMMARY))
+            return new SummaryRecordType(ident, title, dataType, bboxes, subject, formats, modified, _abstract);
+        
+        List<SimpleLiteral> creators = new ArrayList<SimpleLiteral>();
+        for (String contactID : getVariables("var07")) {
+            ResponsiblePartyImpl originator  = getContact(contactID);
+            if (originator != null) {
+                InternationalString s = originator.getOrganisationName();
+                if (s != null)
+                    creators.add(new SimpleLiteral(s.toString()));
+            }
+        }
+        
+        SimpleLiteral distributor = null;
+        ResponsiblePartyImpl distrib  = getContact(getVariable("var36"));
+        if (distrib != null) {
+            InternationalString s = distrib.getOrganisationName();
+            if (s != null) {
+                distributor = new SimpleLiteral(s.toString());
+            }
+        }
+       
+        SimpleLiteral language = new SimpleLiteral("en");
+        
+        
+        return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
+        
+    }
+    
+    /**
+     * Extract a metadata from a CSR database.
+     * 
+     * @param identifier
+     * 
+     * @return
+     * @throws java.sql.SQLException
+     */
+    private AbstractRecordType getCSRDC(String identifier, ElementSetType type, List<QName> elementName) {
+        
+        SimpleLiteral ident    = new SimpleLiteral(identifier);
+        SimpleLiteral title    = new SimpleLiteral(getVariable("var02"));
+        SimpleLiteral dataType = new SimpleLiteral("series");
+        List<BoundingBoxType> bboxes = createBoundingBoxes("var27", "var28", "var29", "var30");
+        if (type.equals(ElementSetType.BRIEF))
+            return new BriefRecordType(ident, title, dataType, bboxes);
+        
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        //topic category
+        subject.add(new SimpleLiteral("oceans"));
+        
+        //port of departure
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var12")), "C381"))
+            subject.add(new SimpleLiteral(k));
+
+        //port of arrival
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var13")), "C381"))
+            subject.add(new SimpleLiteral(k));
+        
+        //country of departure
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var14")), "C320"))
+            subject.add(new SimpleLiteral(k));
+        
+        // country of arrival
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var15")), "C320"))
+            subject.add(new SimpleLiteral(k));
+        
+        // ship
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var16")), "C174"))
+            subject.add(new SimpleLiteral(k));
+       
+        // platform class
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var17")), "L061"))
+            subject.add(new SimpleLiteral(k));
+               
+        // projects
+        for (String k : getKeywordsValue(getVariables("var18"), "EDMERP"))
+            subject.add(new SimpleLiteral(k));
+        
+        // general oceans area
+        for (String k : getKeywordsValue(getVariables("var19"), "C16"))
+            subject.add(new SimpleLiteral(k));
+        
+        // geographic coverage
+        for (String k : getKeywordsValue(getVariables("var20"), "C371"))
+            subject.add(new SimpleLiteral(k));
+        
+         //parameter
+        for (String k : getKeywordsValue(getVariables("var21"), "P021"))
+            subject.add(new SimpleLiteral(k));
+        
+        // instrument
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var22")), "L05"))
+            subject.add(new SimpleLiteral(k));
+        
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var42")), "L181"))
+            subject.add(new SimpleLiteral(k));
+        
+        // No formats in CSR
+        List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+        
+        SimpleLiteral modified = new SimpleLiteral(dateFormats.get(0).format(new Date()));
+        
+        List<SimpleLiteral> _abstract = new ArrayList<SimpleLiteral>();
+        _abstract.add(new SimpleLiteral(getVariable("var35")));
+        _abstract.add(new SimpleLiteral(getVariable("var41")));
+        
+        if (type.equals(ElementSetType.SUMMARY))
+            return new SummaryRecordType(ident, title, dataType, bboxes, subject, formats, modified, _abstract);
+        
+        List<SimpleLiteral> creators = new ArrayList<SimpleLiteral>();
+        for (String contactID : getVariables("var07")) {
+            ResponsiblePartyImpl originator  = getContact(contactID);
+            if (originator != null) {
+                InternationalString s = originator.getOrganisationName();
+                if (s != null)
+                    creators.add(new SimpleLiteral(s.toString()));
+            }
+        }
+        
+        //no distribution info in CSR
+        SimpleLiteral distributor = null;
+       
+        SimpleLiteral language = new SimpleLiteral("en");
+        
+        return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
+        
+    }
+    
+    /**
+     * Extract a metadata from a CSR database.
+     * 
+     * @param identifier
+     * 
+     * @return
+     * @throws java.sql.SQLException
+     */
+    private AbstractRecordType getEDMEDDC(String identifier, ElementSetType type, List<QName> elementName) {
+        SimpleLiteral ident    = new SimpleLiteral(identifier);
+        SimpleLiteral title    = new SimpleLiteral(getVariable("var02"));
+        SimpleLiteral dataType = new SimpleLiteral("series");
+        List<BoundingBoxType> bboxes = createBoundingBoxes("var20", "var21", "var22", "var23");
+        if (type.equals(ElementSetType.BRIEF))
+            return new BriefRecordType(ident, title, dataType, bboxes);
+        
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        //topic category
+        subject.add(new SimpleLiteral("oceans"));
+        
+        // SEA AREAS
+        for (String k : getKeywordsValue(getVariables("var11"), "C16"))
+            subject.add(new SimpleLiteral(k));
+        
+        //parameter
+        for (String k : getKeywordsValue(getVariables("var12"), "P021"))
+            subject.add(new SimpleLiteral(k));
+        
+        // instrument
+        for (String k : getKeywordsValue(Arrays.asList(getVariable("var13")), "L05"))
+            subject.add(new SimpleLiteral(k));
+        
+        // projects
+        for (String k : getKeywordsValue(getVariables("var14"), "EDMERP"))
+            subject.add(new SimpleLiteral(k));
+        
+        // No formats in EDMED
+        List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+        
+        SimpleLiteral modified = new SimpleLiteral(dateFormats.get(0).format(new Date()));
+        
+        List<SimpleLiteral> _abstract = Arrays.asList(new SimpleLiteral(getVariable("var06")));
+        
+        if (type.equals(ElementSetType.SUMMARY))
+            return new SummaryRecordType(ident, title, dataType, bboxes, subject, formats, modified, _abstract);
+        
+        List<SimpleLiteral> creators = new ArrayList<SimpleLiteral>();
+        ResponsiblePartyImpl originator  = getContact(getVariable("var05"));
+        if (originator != null) {
+            InternationalString s = originator.getOrganisationName();
+            if (s != null)
+                creators.add(new SimpleLiteral(s.toString()));
+        }
+        
+        
+        SimpleLiteral distributor = null;
+        ResponsiblePartyImpl distrib  = getContact(getVariable("var28"));
+        if (distrib != null) {
+            InternationalString s = distrib.getOrganisationName();
+            if (s != null) {
+                distributor = new SimpleLiteral(s.toString());
+            }
+        }
+       
+        SimpleLiteral language = new SimpleLiteral("en");
+        
+        
+        return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
+        
+    }
+    
     /**
      * Extract a metadata from a CDI database.
      * 
@@ -888,7 +1151,7 @@ public class GenericMetadataReader extends MetadataReader {
         
         //first chief
         contact   = getContact(getVariable("var05"));
-        contact.setRole(Role.ORIGINATOR);
+        contact.setRole(Role.POINT_OF_CONTACT);
         chiefs.add(contact);
         
         //second and other chief
@@ -1334,8 +1597,6 @@ public class GenericMetadataReader extends MetadataReader {
     /**
      * Build a new Responsible party with the specified Organisation object retrieved from EDMO WS.
      * 
-     * TODO get from EDMO WS.
-     * 
      * @param org
      * @return
      * @throws java.sql.SQLException
@@ -1481,6 +1742,86 @@ public class GenericMetadataReader extends MetadataReader {
     }
     
     /**
+     * 
+     * @param westVar
+     * @param eastVar
+     * @param southVar
+     * @param northVar
+     * @return
+     */
+    private List<BoundingBoxType> createBoundingBoxes(String westVar, String eastVar, String southVar, String northVar) {
+        List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
+        
+        List<String> w = getVariables(westVar);
+        List<String> e = getVariables(eastVar);
+        List<String> s = getVariables(southVar);
+        List<String> n = getVariables(northVar);
+        if (w == null || e == null || s == null || n == null) {
+            logger.severe("One or more BBOX coordinates are null");
+            return result;
+        }
+        if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
+            logger.severe("There is not the same number of geographic BBOX coordinates");
+            return result;
+        }
+        int size = w.size();
+        for (int i = 0; i < size; i++) {
+            double west = 0; double east = 0; double south = 0; double north = 0;
+            try {
+                if (w.get(i) != null) {
+                    west = Double.parseDouble(w.get(i));
+                }
+                if (e.get(i) != null) {
+                    east = Double.parseDouble(e.get(i));
+                }
+                if (s.get(i) != null) {
+                    south = Double.parseDouble(s.get(i));
+                }
+                if (n.get(i) != null) {
+                    north = Double.parseDouble(n.get(i));
+                }
+            } catch (NumberFormatException ex) {
+                logger.severe("Number format exception while parsing boundingBox: " + '\n' +
+                        "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
+            }
+            //TODO CRS
+            BoundingBoxType bbox = new BoundingBoxType("EPSG:4326", west, south, east, north);
+            result.add(bbox);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     */
+    private List<String> getKeywordsValue(List<String> values, String altTitle) {
+        
+        //we try to get the vocabulary Map.
+        Vocabulary voca = vocabularies.get(altTitle);
+        Map<String, String> vocaMap = null;
+        if (voca == null) {
+            logger.info("No vocabulary found for code: " + altTitle);
+        } else {
+            vocaMap = voca.getMap();
+        }
+        
+        List<String> result = new ArrayList<String>();
+        for (String value: values) {
+            if (vocaMap != null) {
+                String mappedValue = vocaMap.get(value);
+                if (mappedValue != null)
+                    value = mappedValue;
+            }
+            if (value != null) {
+                result.add(value);
+            } else {
+                logger.severe("keywords value null");
+            }
+        }
+        return result;
+    }
+    
+    /**
      * TODO recuperer les elements du thesaurus citation a partir d'uin objet vocabulary.
      * 
      * @param values
@@ -1494,7 +1835,7 @@ public class GenericMetadataReader extends MetadataReader {
      */
     private KeywordsImpl createKeyword(List<String> values, String keywordType, String altTitle) {
 
-        //we try to get the vaocabulary Map.
+        //we try to get the vocabulary Map.
         Vocabulary voca = vocabularies.get(altTitle);
         Map<String, String> vocaMap = null;
         if (voca == null) {
@@ -1567,7 +1908,7 @@ public class GenericMetadataReader extends MetadataReader {
             Query mainQuery = genericConfiguration.getQueries().getMain().getQuery();
             ResultSet res = stmt.executeQuery(mainQuery.buildSQLQuery());
             while (res.next()) {
-                result.add(getMetadataObject(res.getString(1), ElementSetType.FULL, null));
+                result.add((MetaDataImpl)getMetadataObject(res.getString(1), ElementSetType.FULL, null, ISO_19115));
             }
             
         } else {

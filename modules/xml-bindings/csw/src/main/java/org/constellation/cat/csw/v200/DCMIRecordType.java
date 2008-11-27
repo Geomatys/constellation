@@ -17,6 +17,7 @@
 package org.constellation.cat.csw.v200;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -109,7 +110,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         @XmlElementRef(name = "format", namespace = "http://purl.org/dc/elements/1.1/",     type = JAXBElement.class),
         @XmlElementRef(name = "format", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
     })
-    private JAXBElement<SimpleLiteral> format;
+    private List<JAXBElement<SimpleLiteral>> format;
     
     @XmlElementRefs({
         @XmlElementRef(name = "language", namespace = "http://purl.org/dc/elements/1.1/",     type = JAXBElement.class),
@@ -127,7 +128,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         @XmlElementRef(name = "creator", namespace = "http://purl.org/dc/elements/1.1/",     type = JAXBElement.class),
         @XmlElementRef(name = "creator", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
     })
-    private JAXBElement<SimpleLiteral> creator;
+    private List<JAXBElement<SimpleLiteral>> creator;
     
     @XmlElementRefs({
         @XmlElementRef(name = "DC-element", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class),
@@ -145,7 +146,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         @XmlElementRef(name = "abstract", namespace = "http://purl.org/dc/terms/",     type = JAXBElement.class),
         @XmlElementRef(name = "abstract", namespace = "http://www.purl.org/dc/terms/", type = JAXBElement.class)
     })
-    private JAXBElement<SimpleLiteral> _abstract;
+    private List<JAXBElement<SimpleLiteral>> _abstract;
     
     @XmlElementRefs({
         @XmlElementRef(name = "spatial", namespace = "http://purl.org/dc/terms/",     type = JAXBElement.class),
@@ -177,20 +178,21 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         this.identifier = dublinFactory.createIdentifier(identifier);
         this.title      = dublinFactory.createTitle(title);
         this.type       = dublinFactory.createType(type);
-        this.format     = dublinFactory.createFormat(format);
+        this.format     = Arrays.asList(dublinFactory.createFormat(format));
         
-        this.dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.dcElement  = new ArrayList<JAXBElement<SimpleLiteral>>();
         
-        this.subject = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.subject    = new ArrayList<JAXBElement<SimpleLiteral>>();
         for (SimpleLiteral sub: subjects) {
             this.subject.add(dublinFactory.createSubject(sub));
         }
         
-        this.creator     = dublinFactory.createCreator(creator);
+        this.creator     = Arrays.asList(dublinFactory.createCreator(creator));
+        
         this.distributor = dublinFactory.createPublisher(distributor);
         this.language    = dublinFactory.createLanguage(language);
         this.modified    = dublinTermFactory.createModified(modified);
-        this._abstract   = dublinTermFactory.createAbstract(_abstract);
+        this._abstract   = Arrays.asList(dublinTermFactory.createAbstract(_abstract));
         this.spatial     = dublinTermFactory.createSpatial(spatial);
         this.references  = dublinTermFactory.createReferences(references);
         
@@ -262,13 +264,24 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
     
     public void setFormat(SimpleLiteral format) {
-        this.format = dublinFactory.createFormat(format);
+        this.format = Arrays.asList(dublinFactory.createFormat(format));
     }
     
-    public AbstractSimpleLiteral getFormat() {
-        if (format != null)
-            return format.getValue();
-        return null;
+    public void setFormat(List<SimpleLiteral> format) {
+        this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
+        for (SimpleLiteral c : format) {
+            this.format.add(dublinFactory.createFormat(c));
+        }
+    }
+    
+    public List<? extends AbstractSimpleLiteral> getFormat() {
+        List<AbstractSimpleLiteral> response = new ArrayList<AbstractSimpleLiteral>();
+        if (format != null) {
+            for(JAXBElement<SimpleLiteral> jb: format) {
+                response.add(jb.getValue());
+            }
+        }
+        return response;
     }
     
     public void setModified(SimpleLiteral modified) {
@@ -282,23 +295,45 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
     
     public void setAbstract(SimpleLiteral _abstract) {
-        this._abstract = dublinTermFactory.createAbstract(_abstract);
+        this._abstract = Arrays.asList(dublinTermFactory.createAbstract(_abstract));
     }
     
-    public AbstractSimpleLiteral getAbstract() {
-        if (_abstract != null)
-            return _abstract.getValue();
-        return null;
+    public void setAbstract(List<SimpleLiteral> _abstract) {
+       this._abstract = new ArrayList<JAXBElement<SimpleLiteral>>();
+       for (SimpleLiteral c : _abstract) {
+            this._abstract.add(dublinTermFactory.createAbstract(c));
+       }
+    }
+    
+    public List<AbstractSimpleLiteral> getAbstract() {
+        List<AbstractSimpleLiteral> response = new ArrayList<AbstractSimpleLiteral>();
+        if (_abstract != null) {
+            for(JAXBElement<SimpleLiteral> jb: _abstract) {
+                response.add(jb.getValue());
+            }
+        }
+        return response;
     }
     
     public void setCreator(SimpleLiteral creator) {
-        this.creator = dublinFactory.createCreator(creator);
+        this.creator = Arrays.asList(dublinFactory.createCreator(creator));
     }
     
-    public AbstractSimpleLiteral getCreator() {
-        if (creator != null)
-            return creator.getValue();
-        return null;
+    public void setCreator(List<SimpleLiteral> creator) {
+        this.creator = new ArrayList<JAXBElement<SimpleLiteral>>();
+        for (SimpleLiteral c : creator) {
+            this.creator.add(dublinFactory.createCreator(c));
+        }
+    }
+    
+    public List<AbstractSimpleLiteral> getCreator() {
+       List<AbstractSimpleLiteral> response = new ArrayList<AbstractSimpleLiteral>();
+        if (creator != null) {
+            for(JAXBElement<SimpleLiteral> jb: creator) {
+                response.add(jb.getValue());
+            }
+        }
+        return response;
     }
     
     public void setDistributor(SimpleLiteral distributor) {
@@ -458,8 +493,11 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         if (type != null && type.getValue() != null) {
             s.append("type: ").append(type.getValue()).append('\n');
         }
-        if (format != null && format.getValue() != null) {
-            s.append("format: ").append(format.getValue()).append('\n');
+        if (format != null){
+            s.append("format: ").append('\n');
+            for (JAXBElement<SimpleLiteral> sl: format) {
+                s.append(sl.getValue()).append('\n');
+            }
         }
         if (subject != null) {
             s.append("subjects: ").append('\n');
@@ -478,8 +516,11 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         if (modified != null && modified.getValue() != null) {
             s.append("modified: ").append(modified).append('\n');
         }
-        if (_abstract != null && _abstract.getValue() != null) {
-            s.append("abstract: ").append(_abstract.getValue()).append('\n');
+        if (_abstract != null) {
+            s.append("abstract: ").append('\n');
+            for (JAXBElement<SimpleLiteral> sl: _abstract) {
+                s.append(sl.getValue()).append('\n');
+            }
         }
         if (spatial != null && spatial.getValue() != null) {
             s.append("spatial: ").append(spatial.getValue()).append('\n');
