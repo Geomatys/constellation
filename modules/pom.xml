@@ -56,11 +56,11 @@
   <!-- =========================================================== -->
   <modules>
     <module>gui</module>
-	<module>library</module>
+    <module>library</module>
     <module>storage</module>
-	<module>web-services</module>
-	<module>xml-bindings</module>
-	<!--module>to-move</module-->
+    <module>web-services</module>
+    <module>xml-bindings</module>
+    <!--module>to-move</module-->
   </modules>
 
 </project>

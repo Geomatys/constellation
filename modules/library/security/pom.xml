@@ -18,7 +18,7 @@
   <!--
     Description du module.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.library</groupId>
   <artifactId>security</artifactId>
   <packaging>pom</packaging>
   <name>Modules for security management libraries</name>

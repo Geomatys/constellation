@@ -17,7 +17,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>csw</artifactId>
   <packaging>jar</packaging>
   <name>Catalogue Web Service binding</name>
@@ -79,22 +79,22 @@
       <artifactId>gt-main</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.library</groupId>
       <artifactId>spatial-lucene</artifactId>
       <version>${project.version}</version>
     </dependency>

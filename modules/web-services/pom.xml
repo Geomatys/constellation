@@ -59,7 +59,10 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>services</module>
+    <!--module>base</module>
+    <module>configuration</module-->
+    <module>ogc-services</module>
+    <!--module>secure</module-->
   </modules>
 
 </project>

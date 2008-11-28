@@ -35,8 +35,7 @@
         <servlet-name>SOService</servlet-name>
         <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-        </servlet>
-    <servlet>
+    </servlet>
     
     <servlet-mapping>
         <servlet-name>SOService</servlet-name>
@@ -51,8 +50,7 @@
         <servlet-name>CSWService</servlet-name>
         <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-        </servlet>
-    <servlet>
+    </servlet>
     
     <servlet-mapping>
         <servlet-name>CSWService</servlet-name>
@@ -60,7 +58,19 @@
     </servlet-mapping-->
 
     <!-- To enable SOAP service in glassfish remove the property  'metadata-complete="true"' in the web-app tag (at the top of this document)-->
-     
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>PEPService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>PEPService</servlet-name>
+        <url-pattern>/PEPService</url-pattern>
+    </servlet-mapping>
 
     <!-- Servlet for constellation JSF interface -->
 

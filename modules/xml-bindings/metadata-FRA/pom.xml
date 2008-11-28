@@ -17,7 +17,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>metadata-FRA</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19115 French profile binding</name>

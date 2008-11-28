@@ -18,7 +18,7 @@
   <!--
     Description du module.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.storage</groupId>
   <artifactId>observation</artifactId>
   <packaging>jar</packaging>
   <name>Observation and Measurement storage</name>
@@ -108,12 +108,12 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>gml</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -18,7 +18,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.storage</groupId>
   <artifactId>postgrid</artifactId>
   <packaging>jar</packaging>
   <name>PostGrid database storage</name>

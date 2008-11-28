@@ -56,7 +56,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>security</module>
-	<module>spatial-lucene</module>
+    <module>spatial-lucene</module>
   </modules>
 
 </project>

@@ -68,7 +68,7 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>observations</artifactId>
       <version>${project.version}</version>
     </dependency>

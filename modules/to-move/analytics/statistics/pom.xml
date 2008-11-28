@@ -53,7 +53,7 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>observation</artifactId>
       <version>${project.version}</version>
     </dependency>

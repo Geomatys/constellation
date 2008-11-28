@@ -16,7 +16,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.gui</groupId>
   <artifactId>constellation</artifactId>
   <packaging>war</packaging>
   <name>Web sites GUI (and Constellation WAR)</name>
@@ -60,13 +60,13 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
-      <artifactId>services</artifactId>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>ogc-services</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

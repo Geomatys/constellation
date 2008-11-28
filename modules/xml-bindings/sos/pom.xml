@@ -17,7 +17,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>sos</artifactId>
   <packaging>jar</packaging>
   <name>Sensor Observation Service binding</name>
@@ -71,17 +71,17 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation</groupId>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>observation</artifactId>
       <version>${project.version}</version>
     </dependency>

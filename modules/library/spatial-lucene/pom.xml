@@ -17,7 +17,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.library</groupId>
   <artifactId>spatial-lucene</artifactId>
   <packaging>jar</packaging>
   <name>Spatial Lucene indexing library</name>
