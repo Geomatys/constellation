@@ -32,8 +32,25 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
+import javax.xml.namespace.QName;
+import org.constellation.cat.csw.v202.AbstractQueryType;
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.ElementSetNameType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
+import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.ObjectFactory;
+import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.v202.ResultType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.ogc.FilterType;
+import org.constellation.ogc.NotType;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyNameType;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
 
@@ -55,6 +72,21 @@ public class RecordMarshallingTest {
     private Unmarshaller recordUnmarshaller200;
     private Marshaller   recordMarshaller200;
    
+     /**
+     * A JAXB factory to csw object version 2.0.2
+     */
+    protected final ObjectFactory cswFactory202 = new ObjectFactory();;
+    
+    /**
+     * A JAXB factory to csw object version 2.0.0 
+     */
+    protected final org.constellation.cat.csw.v200.ObjectFactory cswFactory200 = new org.constellation.cat.csw.v200.ObjectFactory();
+    
+    /**
+     * a QName for csw:Record type
+     */
+    private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -143,9 +175,6 @@ public class RecordMarshallingTest {
         
         assertEquals(expResult, result);
         
-        /*
-         * Test marshalling csw Record v2.0.2
-         */
     }
     
     /**
@@ -265,7 +294,7 @@ public class RecordMarshallingTest {
         jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
         org.constellation.cat.csw.v200.RecordType result2 = (org.constellation.cat.csw.v200.RecordType) jb.getValue();
         
-        logger.info("result:" + result2.toString());
+        logger.finer("result:" + result2.toString());
         
          /*
          * Test Unmarshalling csw Record v2.0.0 with http://www.purl... DC namespace
@@ -303,8 +332,184 @@ public class RecordMarshallingTest {
         jb = (JAXBElement) recordUnmarshaller200.unmarshal(sr);
         result2 = (org.constellation.cat.csw.v200.RecordType) jb.getValue();
         
-        logger.info("result:" + result2.toString());
+        logger.finer("result:" + result2.toString());
     }
+    
+    /**
+     * Test simple Record Marshalling. 
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getRecordByIdResponseMarshalingTest() throws Exception {
+        
+         /*
+         * Test marshalling csw getRecordByIdResponse v2.0.2
+         */
+        
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+        
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+        
+        SimpleLiteral modified   = new SimpleLiteral("2007-11-15 21:26:49");
+        SimpleLiteral Abstract   = new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.");
+        SimpleLiteral references = new SimpleLiteral("http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml");
+        SimpleLiteral spatial    = new SimpleLiteral("northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;");
+        
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+        
+        RecordType record           = new RecordType(id, title, type, subject, null, modified, null, Abstract, bbox, null, null, null, spatial, references);
+        BriefRecordType briefRecord = new BriefRecordType(id, title, type, bbox);
+        SummaryRecordType sumRecord = new SummaryRecordType(id, title, type, bbox, subject, null, modified, Abstract);
+        
+        List<AbstractRecordType> records = new ArrayList<AbstractRecordType>(); 
+        records.add(record);
+        records.add(briefRecord);
+        records.add(sumRecord);
+        GetRecordByIdResponse response = new GetRecordByIdResponseType(records, null);
+        
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(response, sw);
+        
+        String result = sw.toString();
+        
+        
+        String expResult = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:GetRecordByIdResponse xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <csw:Record>"                                                              + '\n' +
+        "        <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "        <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "        <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "        <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "        <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "        <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "        <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "        <dct:references>http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml</dct:references>" + '\n' +
+        "        <dct:spatial>northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;</dct:spatial>" + '\n' +
+        "        <ows:WGS84BoundingBox dimensions=\"2\">"                               + '\n' +
+        "            <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"        + '\n' +
+        "            <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"        + '\n' +
+        "        </ows:WGS84BoundingBox>"                                               + '\n' +
+        "    </csw:Record>"                                                             + '\n' +
+        "    <csw:BriefRecord>"                                                         + '\n' +
+        "        <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "        <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "        <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "        <ows:WGS84BoundingBox dimensions=\"2\">"                               + '\n' +
+        "            <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"        + '\n' +
+        "            <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"        + '\n' +
+        "        </ows:WGS84BoundingBox>"                                               + '\n' +
+        "    </csw:BriefRecord>"                                                        + '\n' +
+        "    <csw:SummaryRecord>"                                                              + '\n' +
+        "        <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "        <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "        <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "        <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "        <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "        <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "        <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "        <ows:WGS84BoundingBox dimensions=\"2\">"                               + '\n' +
+        "            <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"        + '\n' +
+        "            <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"        + '\n' +
+        "        </ows:WGS84BoundingBox>"                                               + '\n' +
+        "    </csw:SummaryRecord>"                                                             + '\n' +
+        "</csw:GetRecordByIdResponse>" + '\n';
+        
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+        
+        logger.finer("RESULT:" + '\n' + result);
+        logger.finer("EXPRESULT:" + '\n' + expResult);
+        assertEquals(expResult, result);
+        
+ 
+    }
+    
+    /**
+     * Test simple Record Marshalling. 
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getRecordsMarshalingTest() throws Exception {
+        
+         /*
+         * Test marshalling csw getRecordByIdResponse v2.0.2
+         */
+        
+        /*
+         * we build the first filter : < dublinCore:Title IS LIKE '*' >
+         */ 
+        List<QName> typeNames  = new ArrayList<QName>();
+        PropertyNameType pname = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
+        NotType n              = new NotType(pil);
+        FilterType filter1     = new FilterType(n);
+        
+        /*
+         * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
+         */
+        typeNames          = new ArrayList<QName>();
+        pname              = new PropertyNameType("title");
+        pil                = new PropertyIsLikeType(pname, "something", null, null, null);
+        n                  = new NotType(pil);
+        FilterType filter2 = new FilterType(n);
+        
+        QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
+        typeNames.add(_Record_QNAME);
+        QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
+        
+        GetRecordsType getRecordsRequest = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
+         
+        
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(getRecordsRequest, sw);
+        
+        String result = sw.toString();
+        
+        
+        String expResult = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:GetRecords xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <csw:Query typeNames=\"csw:Record\">" + '\n' +
+        "        <csw:ElementSetName>full</csw:ElementSetName>"                         + '\n' +
+        "        <csw:Constraint version=\"1.1.0\">"                                    + '\n' +
+        "            <ogc:Filter>"                                                      + '\n' +
+        "                <ogc:Not>"                                                     + '\n' +
+        "                    <ogc:PropertyIsLike wildCard=\"*\" singleChar=\"?\" escapeChar=\"\\\">"    + '\n' +
+        "                        <ogc:PropertyName>dc:Title</ogc:PropertyName>"         + '\n' +
+        "                        <ogc:Literal>something?</ogc:Literal>"                 + '\n' +
+        "                    </ogc:PropertyIsLike>"                                     + '\n' +
+        "                </ogc:Not>"                                                    + '\n' +
+        "            </ogc:Filter>"                                                     + '\n' +
+        "        </csw:Constraint>"                                                     + '\n' +
+        "    </csw:Query>"                                                              + '\n' +
+        "</csw:GetRecords>" + '\n';
+        
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+        
+        logger.info("RESULT:" + '\n' + result);
+        logger.info("EXPRESULT:" + '\n' + expResult);
+        assertEquals(expResult, result);
+        
+ 
+    }
+    
     
     class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
@@ -400,5 +605,4 @@ public class RecordMarshallingTest {
             return new String[]{};
         }
     }
-
 }

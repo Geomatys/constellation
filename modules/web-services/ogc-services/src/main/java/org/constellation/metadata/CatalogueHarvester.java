@@ -34,12 +34,11 @@ import java.util.logging.Logger;
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import javax.xml.namespace.QName;
 import org.constellation.cat.csw.GetRecordsRequest;
 import org.constellation.cat.csw.v200.GetCapabilitiesType;
-import org.constellation.cat.csw.v202.AbstractQueryType;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.ElementSetNameType;
@@ -67,7 +66,6 @@ import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
 import org.constellation.ows.v100.SectionsType;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -128,11 +126,6 @@ public class CatalogueHarvester {
     private final CSWworker worker;
     
     /**
-     * A prefix mapper
-     */
-    private NamespacePrefixMapperImpl prefixMapper;
-    
-    /**
      * A flag indicating that we are harvesting a CSW special case 1
      */
     private boolean specialCase1 = false;
@@ -148,9 +141,7 @@ public class CatalogueHarvester {
      * @param worker
      */
     public CatalogueHarvester(CSWworker worker) {
-        
         this.worker = worker;
-        prefixMapper = new NamespacePrefixMapperImpl("");
         initializeRequest();
     }
     
@@ -182,8 +173,7 @@ public class CatalogueHarvester {
         QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(_Record_QNAME);
         QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
-        JAXBElement<? extends AbstractQueryType> jbQuery =  worker.cswFactory202.createQuery(query);
-        fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery, null);
+        fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
@@ -193,8 +183,7 @@ public class CatalogueHarvester {
         org.constellation.cat.csw.v200.QueryType query2 = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
                                                                                          new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                                          constraint2); 
-        JAXBElement<? extends org.constellation.cat.csw.v200.AbstractQueryType> jbQuery2 =  worker.cswFactory200.createQuery(query2);
-        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw", 1, 20, jbQuery2, null);
+        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw", 1, 20, query2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
@@ -204,8 +193,7 @@ public class CatalogueHarvester {
         query2             = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
                                                                    new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
                                                                    constraint2); 
-        jbQuery2 =  worker.cswFactory200.createQuery(query2);
-        fullGetRecordsRequestv200_Special1 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, jbQuery2, null);
+        fullGetRecordsRequestv200_Special1 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, query2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)

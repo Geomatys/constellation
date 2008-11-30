@@ -97,8 +97,6 @@ public class CSWService extends OGCWebService {
     
     private CSWworker worker;
     
-    private ObjectFactory cswFactory = new ObjectFactory();
-    
     /**
      * Build a new Restfull CSW service.
      */
@@ -637,7 +635,7 @@ public class CSWService extends OGCWebService {
                                   outputSchema,
                                   startPosition,
                                   maxRecords,
-                                  cswFactory.createQuery(query),
+                                  query,
                                   distribSearch);
             
     }

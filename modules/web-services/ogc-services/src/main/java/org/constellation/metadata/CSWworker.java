@@ -50,7 +50,6 @@ import org.w3c.dom.Document;
 //Constellation dependencies
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.AcknowledgementType;
-import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DeleteType;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
@@ -69,13 +68,10 @@ import org.constellation.cat.csw.v202.HarvestResponseType;
 import org.constellation.cat.csw.v202.HarvestType;
 import org.constellation.cat.csw.v202.InsertType;
 import org.constellation.cat.csw.v202.ListOfValuesType;
-import org.constellation.cat.csw.v202.ObjectFactory;
 import org.constellation.cat.csw.v202.QueryType;
-import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.RequestBaseType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
-import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionSummaryType;
 import org.constellation.cat.csw.v202.TransactionType;
@@ -188,16 +184,6 @@ public class CSWworker {
      * An Form creator from the MDWeb database.
      */
     private MetadataWriter MDWriter;
-    
-    /**
-     * A JAXB factory to csw object version 2.0.2
-     */
-    protected final ObjectFactory cswFactory202;
-    
-    /**
-     * A JAXB factory to csw object version 2.0.0 
-     */
-    protected final org.constellation.cat.csw.v200.ObjectFactory cswFactory200;
     
     /**
      * The current MIME type of return
@@ -354,8 +340,6 @@ public class CSWworker {
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
-        cswFactory202     = new ObjectFactory();
-        cswFactory200     = new org.constellation.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         Properties cascad = new Properties();
         File f            = null;
@@ -1110,7 +1094,7 @@ public class CSWworker {
         
         //we build dublin core object
         if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
-            List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
+            List<AbstractRecordType> records = new ArrayList<AbstractRecordType>(); 
             for (String id:request.getId()) {
                 
                 //we verify if  the identifier of the metadata exist
@@ -1123,14 +1107,8 @@ public class CSWworker {
                 //we get the metadata object
                 try {
                     Object o = MDReader.getMetadata(id, DUBLINCORE, set, null);
-                    if (o instanceof BriefRecordType) {
-                        records.add(cswFactory202.createBriefRecord((BriefRecordType)o));
-                    } else if (o instanceof SummaryRecordType) {
-                        records.add(cswFactory202.createSummaryRecord((SummaryRecordType)o));
-                    } else if (o instanceof RecordType) {
-                        records.add(cswFactory202.createRecord((RecordType)o));
-                    }
-                    
+                    if (o instanceof AbstractRecordType) 
+                        records.add((AbstractRecordType)o);
                 } catch (SQLException e) {
                     throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
                                                   NO_APPLICABLE_CODE, version, "id");
@@ -1139,7 +1117,6 @@ public class CSWworker {
             if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
             }
-        
             response = new GetRecordByIdResponseType(records, null);
             
         //we build ISO 19139 object    

@@ -63,7 +63,7 @@ import org.constellation.cat.csw.GetRecordByIdResponse;
 public class GetRecordByIdResponseType implements GetRecordByIdResponse {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
-    private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
+    private List<? extends AbstractRecordType> abstractRecord;
     @XmlAnyElement(lax = true)
     private List<? extends Object> any;
 
@@ -77,7 +77,7 @@ public class GetRecordByIdResponseType implements GetRecordByIdResponse {
      * Build a new response to a getRecordById request.
      * one of the two list mustn't be null
      */
-    public GetRecordByIdResponseType(List<JAXBElement<? extends AbstractRecordType>> abstractRecords, List<? extends Object> others) {
+    public GetRecordByIdResponseType(List<? extends AbstractRecordType> abstractRecords, List<? extends Object> others) {
         if (abstractRecords != null && others != null) {
             throw new IllegalArgumentException("only one of abstractRecords or others mustn't be null");
         }
@@ -89,9 +89,9 @@ public class GetRecordByIdResponseType implements GetRecordByIdResponse {
      * Gets the value of the abstractRecord property.
      * (unmodifiable) 
      */
-    public List<JAXBElement<? extends AbstractRecordType>> getAbstractRecord() {
+    public List<? extends AbstractRecordType> getAbstractRecord() {
         if (abstractRecord == null) {
-            abstractRecord = new ArrayList<JAXBElement<? extends AbstractRecordType>>();
+            abstractRecord = new ArrayList<AbstractRecordType>();
         }
         return Collections.unmodifiableList(abstractRecord);
     }
@@ -112,8 +112,8 @@ public class GetRecordByIdResponseType implements GetRecordByIdResponse {
         StringBuilder s = new StringBuilder();
         if (abstractRecord != null && abstractRecord.size() != 0) {
             s.append("records:").append('\n');
-            for (JAXBElement<? extends AbstractRecordType> jb : abstractRecord) {
-                s.append(jb.getValue().toString()).append('\n');
+            for (AbstractRecordType ar : abstractRecord) {
+                s.append(ar.toString()).append('\n');
             }
         }
 

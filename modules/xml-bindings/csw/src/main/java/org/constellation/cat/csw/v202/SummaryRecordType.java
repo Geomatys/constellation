@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.SummaryRecord;
 import org.constellation.ows.v100.BoundingBoxType;
@@ -76,6 +77,7 @@ import org.constellation.ows.v100.WGS84BoundingBoxType;
     "spatial",
     "boundingBox"
 })
+@XmlRootElement(name = "SummaryRecord")
 public class SummaryRecordType extends AbstractRecordType implements SummaryRecord {
 
     @XmlElementRef(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)

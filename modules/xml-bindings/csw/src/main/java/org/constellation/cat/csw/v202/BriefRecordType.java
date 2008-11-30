@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
@@ -65,6 +66,7 @@ import org.constellation.ows.v100.WGS84BoundingBoxType;
     "type",
     "boundingBox"
 })
+@XmlRootElement(name = "BriefRecord")
 public class BriefRecordType extends AbstractRecordType {
 
     @XmlElementRef(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)

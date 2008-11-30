@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.constellation.ogc.SortByType;
@@ -68,6 +69,7 @@ import org.constellation.ogc.SortByType;
     "constraint",
     "sortBy"
 })
+@XmlRootElement(name = "Query")        
 public class QueryType extends AbstractQueryType {
 
     @XmlElement(name = "ElementSetName", defaultValue = "summary")

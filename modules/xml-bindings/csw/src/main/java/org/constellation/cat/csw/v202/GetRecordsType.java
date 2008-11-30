@@ -85,7 +85,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     @XmlSchemaType(name = "anyURI")
     private List<String> responseHandler;
     @XmlElementRef(name = "AbstractQuery", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractQueryType> abstractQuery;
+    private AbstractQueryType abstractQuery;
     @XmlAnyElement(lax = true)
     private Object any;
     @XmlAttribute
@@ -120,7 +120,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      */
     public GetRecordsType(String service, String version, ResultType resultType,
             String requestId, String outputFormat, String outputSchema, Integer startPosition,
-            Integer maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
+            Integer maxRecords, AbstractQueryType abstractQuery,
             DistributedSearchType distributedSearch) {
 
         super(service, version);
@@ -156,29 +156,17 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      * Gets the value of the abstractQuery property.
      */
     public AbstractQueryType getAbstractQuery() {
-        if (abstractQuery!= null) {
-            return abstractQuery.getValue();
-        }
-        return null;
+        return abstractQuery;
     }
 
-    /**
-     * Sets the value of the abstractQuery property.
-     * 
-     */
-    public void setAbstractQuery(JAXBElement<? extends AbstractQueryType> value) {
-        this.abstractQuery = ((JAXBElement<? extends AbstractQueryType>) value);
-    }
-    
     /**
      * Sets the value of the abstractQuery property.
      * 
      */
     public void setAbstractQuery(AbstractQueryType value) {
-        if (value instanceof QueryType)
-            this.abstractQuery = factory.createQuery((QueryType)value);
+        this.abstractQuery = value;
     }
-
+    
     /**
      * Gets the value of the any property.
      */
@@ -289,24 +277,15 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     }
 
     public void setTypeNames(List<QName> typenames) {
-        if (abstractQuery != null && abstractQuery.getValue() != null) {
-            AbstractQueryType query = abstractQuery.getValue();
-            query.setTypeNames(typenames);
-        }
+        abstractQuery.setTypeNames(typenames);
     }
 
     public void removeConstraint() {
-        if (abstractQuery != null && abstractQuery.getValue() != null) {
-            AbstractQueryType query = abstractQuery.getValue();
-            query.setConstraint(null);
-        }
+        abstractQuery.setConstraint(null);
     }
 
     public void setCQLConstraint(String CQLQuery) {
-        if (abstractQuery != null && abstractQuery.getValue() != null) {
-            AbstractQueryType query = abstractQuery.getValue();
-            query.setConstraint(new QueryConstraintType(CQLQuery, "1.1.0"));
-        }
+        abstractQuery.setConstraint(new QueryConstraintType(CQLQuery, "1.1.0"));
     }
     
     /**
@@ -314,9 +293,6 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      * @param filter FilterType
      */
     public void setFilterConstraint(FilterType filter) {
-        if (abstractQuery != null && abstractQuery.getValue() != null) {
-                AbstractQueryType query = abstractQuery.getValue();
-                query.setConstraint(new QueryConstraintType(filter, "1.1.0"));
-        } 
+        abstractQuery.setConstraint(new QueryConstraintType(filter, "1.1.0"));
     }
 }
