@@ -18,8 +18,6 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.sql.SQLException;
@@ -27,7 +25,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +62,9 @@ import org.opengis.util.CodeList;
 
 
 /**
- * Read The forms in the metadata database and instanciate them into geotools object.
+ * A database Reader designed for an MDweb database.
+ * 
+ * It read The mdweb forms into the database and instanciate them into geotools object.
  * When an object have been read it is stored in cache.
  * 
  * @author Guilhem legal
@@ -166,12 +165,12 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param MDReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(Reader MDReader) throws SQLException {
-        super();
+        super(true);
         this.MDReader        = MDReader;
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
         this.geotoolsPackage = Utils.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
-                                                "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
+                                           "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
                                                 "org.constellation.metadata.fra");
         this.opengisPackage  = Utils.searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
@@ -219,7 +218,7 @@ public class MDWebMetadataReader extends MetadataReader {
         Catalog catalog = MDReader.getCatalog(catalogCode);
         
         //we look for cached object
-        Object result = metadatas.get(identifier);
+        Object result = getFromCache(identifier);
         if (mode == ISO_19115 || mode == EBRIM) {
             
             if (result == null) {
@@ -428,36 +427,26 @@ public class MDWebMetadataReader extends MetadataReader {
         // for an element name mode    
         } else {
             RecordType result = new RecordType();
-            Class recordClass = RecordType.class;
             for (QName qn : elementName) {
 
                 String getterName = "get" + Utils.firstToUpper(qn.getLocalPart());
                 String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
                 try {
-                    Method getter = recordClass.getMethod(getterName);
-                    Object param = getter.invoke(fullResult);
+                    Method getter = Utils.getMethod(getterName, RecordType.class);
+                    Object param  = Utils.invokeMethod(getter, fullResult);
 
                     Method setter = null;
                     if (param != null) {
-                        setter = recordClass.getMethod(setterName, param.getClass());
+                        setter = Utils.getMethod(setterName, RecordType.class, param.getClass());
                     }
 
                     if (setter != null) {
-                        setter.invoke(result, param);
+                        Utils.invokeMethod(setter, result, param);
                     }
 
-                } catch (IllegalAccessException ex) {
-                    logger.info("Illegal Access exception while invoking the method " + getterName + " in the classe RecordType");
                 } catch (IllegalArgumentException ex) {
                     logger.info("illegal argument exception while invoking the method " + getterName + " in the classe RecordType");
-                } catch (InvocationTargetException ex) {
-                    logger.info("Invocation Target exception while invoking the method " + getterName + " in the classe RecordType");
-                } catch (NoSuchMethodException ex) {
-                    logger.info("The method " + getterName + " does not exists in the classe RecordType");
-                } catch (SecurityException ex) {
-                    logger.info("Security exception while getting the method " + getterName + " in the classe RecordType");
                 }
-
             }
             return result;
         }
@@ -550,7 +539,7 @@ public class MDWebMetadataReader extends MetadataReader {
             
             //we put the full object in the already read metadatas.
             if (result != null) {
-                metadatas.put(identifier, result);
+               addInCache(identifier, result);
             }
             return result;
         
@@ -601,7 +590,7 @@ public class MDWebMetadataReader extends MetadataReader {
         // for an element name mode    
         } else {
             Class recordClass = result.getClass();
-            Object filtredResult = newInstance(recordClass);
+            Object filtredResult = Utils.newInstance(recordClass);
 
             for (QName qn : elementName) {
 
@@ -609,8 +598,8 @@ public class MDWebMetadataReader extends MetadataReader {
                 String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
                 String currentMethodName = getterName + "()";
                 try {
-                    Method getter = recordClass.getMethod(getterName);
-                    Object param = getter.invoke(result);
+                    Method getter = Utils.getMethod(getterName, recordClass);
+                    Object param = Utils.invokeMethod(getter, result);
 
                     Method setter = null;
                     if (param != null) {
@@ -619,64 +608,20 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (paramClass.equals(ArrayList.class)) {
                             paramClass = List.class;
                         }
-                        setter = recordClass.getMethod(setterName, paramClass);
+                        setter = Utils.getMethod(setterName, recordClass, paramClass);
                     }
-
                     if (setter != null) {
-                        setter.invoke(filtredResult, param);
+                        Utils.invokeMethod(setter, filtredResult, param);
                     }
 
-                } catch (IllegalAccessException ex) {
-                    logger.severe("Illegal Access exception while invoking the method " + currentMethodName + " in the classe RecordType!");
                 } catch (IllegalArgumentException ex) {
                     logger.severe("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType!");
-                } catch (InvocationTargetException ex) {
-                    logger.severe("Invocation Target exception while invoking the method " + currentMethodName + " in the classe RecordType!");
-                } catch (NoSuchMethodException ex) {
-                    logger.severe("The method " + currentMethodName + " does not exists in the classe RecordType!");
-                } catch (SecurityException ex) {
-                    logger.severe("Security exception while getting the method " + currentMethodName + " in the classe RecordType!");
                 }
-
             }
             return filtredResult;
         }
     }
     
-    /**
-     * Call the empty constructor on the specified class and return the result.
-     * 
-     * @param classe
-     * @return
-     */
-    private Object newInstance(Class classe) {
-        try {
-            if (classe == null)
-                return null;
-            
-            Constructor constructor = classe.getConstructor();
-            logger.finer("constructor:" + '\n' + constructor.toGenericString());
-            
-            //we execute the constructor
-            Object result = constructor.newInstance();
-            return result;
-            
-        } catch (InstantiationException ex) {
-            logger.severe("the service can't instanciate the class: " + classe.getName() + "()");
-        } catch (IllegalAccessException ex) {
-            logger.severe("The service can't access the constructor in class: " + classe.getName());
-        } catch (IllegalArgumentException ex) {
-            logger.severe("Illegal Argument in empty constructor for class: " + classe.getName());
-        } catch (InvocationTargetException ex) {
-           logger.severe("invocation target exception in empty constructor for class: " + classe.getName());
-        } catch (NoSuchMethodException ex) {
-           logger.severe("No such empty constructor in class: " + classe.getName());
-        } catch (SecurityException ex) {
-            logger.severe("Security exception while instanciating class: " + classe.getName());
-        }
-        return null;
-    }
-
     /**
      * Return an geotools object from a MDWeb value (this value can be see as a tree).
      * This method build the value and all is attribute recursivly.
@@ -727,17 +672,16 @@ public class MDWebMetadataReader extends MetadataReader {
                     
                         Method method;
                         if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class))) {
-                            temp = "valueOf";
-                            method = classe.getMethod("valueOf", String.class);
+                            method = Utils.getMethod("valueOf", classe, String.class);
                         } else if (classe.isEnum()) {
                             temp = "fromValue";
-                            method = classe.getMethod("fromValue", String.class);
+                            method = Utils.getMethod("fromValue", classe, String.class);
                         } else {
                             logger.severe("unknow codelist type");
                             return null;
                         }
                         if (method != null && element != null) {
-                            result = method.invoke(null, element.getName());
+                            result = Utils.invokeMethod(method, null, element.getName());
                         } else {
                             logger.severe("Unable to invoke the method: " + temp + " on the class : " + classe.getName() + "(#" + textValue + ")");
                             return null;
@@ -751,22 +695,15 @@ public class MDWebMetadataReader extends MetadataReader {
                 // if the value is a date we call the static method parse 
                 // instead of a constructor (temporary patch: createDate method)  
                 } else if (classe.equals(Date.class)) {
-                    /*Method method = DateFormat.class.getMethod("parse", String.class);
-                    result = method.invoke(dateFormat, textValue);*/
                     return Utils.createDate(textValue, dateFormat);
 
                 // else we use a String constructor    
                 } else {
-                    temp = "String";
-                    // we try to get a constructor(String)
-                    Constructor constructor = classe.getConstructor(String.class);
-                    logger.finer("constructor:" + '\n' + constructor.toGenericString());
-                    
                     //we execute the constructor
-                    result = constructor.newInstance(textValue);
+                    result = Utils.newInstance(classe, textValue);
                     
                     //fix a bug in MDWeb with the value attribute TODO remove
-                    if (!asMoreChild(form, value)) {
+                    if (!form.asMoreChild(value)) {
                         return result;
                     } 
                 }
@@ -789,7 +726,6 @@ public class MDWebMetadataReader extends MetadataReader {
                  * and no setters so we must call the normal constructor.
                  */
                 if (classe.getSimpleName().equals("LocalName")) {
-                    Constructor constructor = classe.getConstructor(CharSequence.class);
                     TextValue child = null;
                     
                     //We search the child of the localName
@@ -800,8 +736,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     }
                     if (child != null) {
                         CharSequence cs = child.getValue();
-                        result = constructor.newInstance(cs);
-                        return result;
+                        return Utils.newInstance(classe, cs);
                     } else {
                         logger.severe("The localName is mal-formed");
                         return null;
@@ -812,65 +747,36 @@ public class MDWebMetadataReader extends MetadataReader {
                  * and no setters so we must call the normal constructor.
                  */    
                 } else if (classe.getSimpleName().equals("QName")) {
-                    Constructor constructor = classe.getConstructor(String.class, String.class);
-                    TextValue localPart    = null;
-                    TextValue namespaceURI = null;
+                    String localPart    = null;
+                    String namespaceURI = null;
                     
                     //We search the children of the QName
                     for (Value childValue : form.getValues()) {
                         if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
                             if (childValue.getPath().getName().equals("localPart"))
-                                localPart = (TextValue) childValue;
+                                localPart = ((TextValue)childValue).getValue();
                             else  if (childValue.getPath().getName().equals("namespaceURI"))
-                                namespaceURI = (TextValue) childValue;
+                                namespaceURI = ((TextValue)childValue).getValue();
                         }
                     }
                     if (localPart != null && namespaceURI != null) {
-                        result = constructor.newInstance(namespaceURI.getValue(), localPart.getValue());
+                        result = Utils.newInstance(classe, namespaceURI, localPart);
                         return result;
                     } else {
                         logger.severe("The QName is mal-formed");
                         return null;
                     }
-                    
                 }
-                
                 /**
                  * normal case
                  * we get the empty constructor
                  */ 
-                Constructor constructor = classe.getConstructor();
-                logger.finer("constructor:" + '\n' + constructor.toGenericString());
-                //we execute the constructor
-                result = constructor.newInstance();
+                result = Utils.newInstance(classe);
                 alreadyRead.put(value, result);
             }
 
-        } catch (NoSuchMethodException e) {
-            if (temp.equals("valueOf")) {
-                logger.severe("The class " + classe.getName() + " does not have a method valueOf(String code)");
-            } else {
-                logger.severe("The class " + classe.getName() + " does not have a constructor(" + temp + ")");
-            }
-            return null;
-        } catch (InstantiationException e) {
-            logger.severe("The class is abstract or is an interface");
-            return null;
-        } catch (IllegalAccessException e) {
-            logger.severe("The class is not accessible");
-            return null;
         } catch (ParseException e) {
             logger.severe("The date cannot be parsed ");
-            return null;
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            if (temp.equals("valueOf")) {
-                logger.severe("Exception throw in the invokated method: " + classe.getName() + ".valueOf(String code) " + '\n' + 
-                              "cause:" + e.getTargetException().getMessage());
-            } else {
-                logger.severe("Exception throw in the invokated constructor: " + classe.getName() + "(" + temp + ")" + '\n' + 
-                              "cause:" + e.getTargetException().getMessage());
-            }
-
             return null;
         }
 
@@ -918,9 +824,9 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (isMeta) {
                               metaMap.put(attribName, param);
                         } else {
-                            Method setter = getSetterFromName(attribName, param.getClass(), classe);
+                            Method setter = Utils.getSetterFromName(attribName, param.getClass(), classe);
                             if (setter != null)
-                                invokeSetter(setter, result, param);
+                                Utils.invokeMethod(setter, result, param);
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {
@@ -962,51 +868,6 @@ public class MDWebMetadataReader extends MetadataReader {
             }
         }
         return result;
-    }
-
-    /**
-     * Return true if the textValue have child (MDWeb bug)
-     */
-    private boolean asMoreChild(Form f, Value v) {
-        String pathId = v.getPath().getId();
-        
-        for (Value childValue : f.getValues()) {
-
-            Path path = childValue.getPath();
-            Path parent = path.getParent();
-            if (parent != null && parent.getId().equals(pathId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Invoke a setter with the specified parameter in the specified object.
-     * If the setter is null nothing happen.
-     * 
-     * @param setter     The method to invoke
-     * @param object     The object on witch the method is invoked.
-     * @param parameter  The parameter of the method.
-     */
-    private void invokeSetter(Method setter, Object object, Object parameter) {
-        String baseMessage = "unable to invoke setter: "; 
-        try {
-            if (setter != null)
-                setter.invoke(object, parameter); 
-            else
-                logger.severe(baseMessage + "The setter is null");
-
-        } catch (IllegalAccessException ex) {
-            logger.severe(baseMessage + "The class is not accessible");
-
-        } catch (IllegalArgumentException ex) {
-            logger.severe(baseMessage + "The argument does not match with the setter");
-
-        } catch (InvocationTargetException ex) {
-            logger.severe(baseMessage + "Exception throw in the invokated setter");
-        }
-
     }
 
     /**
@@ -1176,149 +1037,6 @@ public class MDWebMetadataReader extends MetadataReader {
             logger.severe("class no found: " + classNameSave);
             classeNotFound.add(classNameSave);
         }
-        return null;
-    }
-
-    /**
-     * Return a setter Method for the specified attribute (propertyName) of the type "classe"
-     * in the class rootClass.
-     * 
-     * @param propertyName The attribute name.
-     * @param classe       The attribute type.  
-     * @param rootClass    The class whitch owe this attribute
-     * 
-     * @return a setter to this attribute.
-     */
-    private Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
-        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
-        
-        //special case
-        if (propertyName.equals("beginPosition")) {
-            propertyName = "begining";
-        } else if (propertyName.equals("endPosition")) {
-            propertyName = "ending";
-        } 
-        
-        String methodName = "set" + Utils.firstToUpper(propertyName);
-        int occurenceType = 0;
-        
-        //TODO look all interfaces
-        Class interfacee = null;
-        if (classe.getInterfaces().length != 0) {
-            interfacee = classe.getInterfaces()[0];
-        }
-        
-        Class argumentSuperClass     = classe;
-        Class argumentSuperInterface = null;
-        if (argumentSuperClass.getInterfaces().length > 0) {
-            argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
-        }
-        
-
-        while (occurenceType < 7) {
-            
-            try {
-                Method setter = null;
-                switch (occurenceType) {
-
-                    case 0: {
-                        setter = rootClass.getMethod(methodName, classe);
-                        break;
-                    }
-                    case 1: {
-                        if (classe.equals(Integer.class)) {
-                            setter = rootClass.getMethod(methodName, long.class);
-                            break;
-                        } else {
-                            occurenceType = 2;
-                        }
-                    }
-                    case 2: {
-                        setter = rootClass.getMethod(methodName, interfacee);
-                        break;
-                    }
-                    case 3: {
-                        setter = rootClass.getMethod(methodName, Collection.class);
-                        break;
-                    }
-                    case 4: {
-                        setter = rootClass.getMethod(methodName + "s", Collection.class);
-                        break;
-                    }
-                    case 5: {
-                        setter = rootClass.getMethod(methodName , argumentSuperClass);
-                        break;
-                    }
-                    case 6: {
-                        setter = rootClass.getMethod(methodName , argumentSuperInterface);
-                        break;
-                    }
-                }
-                logger.finer("setter found: " + setter.toGenericString());
-                return setter;
-
-            } catch (NoSuchMethodException e) {
-
-                /**
-                 * This switch is for debugging purpose
-                 */
-                switch (occurenceType) {
-
-                    case 0: {
-                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
-                        occurenceType = 1;
-                        break;
-                    }
-
-                    case 1: {
-                        logger.finer("The setter " + methodName + "(long) does not exist");
-                        occurenceType = 2;
-                        break;
-                    }
-                    
-                    case 2: {
-                        if (interfacee != null) {
-                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
-                        }
-                        occurenceType = 3;
-                        break;
-                    }
-
-                    case 3: {
-                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
-                        occurenceType = 4;
-                        break;
-                    }
-                    case 4: {
-                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
-                        occurenceType = 5;
-                        break;
-                    }
-                    case 5: {
-                        if (argumentSuperClass != null) {
-                            logger.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
-                            argumentSuperClass     = argumentSuperClass.getSuperclass();
-                            occurenceType = 5;
-                            
-                        } else {
-                            occurenceType = 6;
-                        }
-                        break;
-                    }
-                    case 6: {
-                        if (argumentSuperInterface != null) {
-                            logger.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
-                        }
-                        occurenceType = 7;
-                        break;
-                    }
-                    default:
-                        occurenceType = 7;
-                }
-            }
-        }
-        logger.severe("No setter have been found for attribute " + propertyName + 
-                      " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
     }
 }

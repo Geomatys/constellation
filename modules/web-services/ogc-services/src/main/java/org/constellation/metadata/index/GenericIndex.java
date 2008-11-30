@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -36,8 +35,14 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -539,7 +544,26 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * @throws org.apache.lucene.queryParser.ParseException
      */
     @Override
-    public List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
-        return Arrays.asList(id);
+    public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
+        TermQuery query = new TermQuery(new Term("identifier_sort", id));
+        List<String> results = new ArrayList<String>();
+        
+        IndexReader ireader = IndexReader.open(getFileDirectory());
+        Searcher searcher   = new IndexSearcher(ireader);
+        logger.info("TermQuery: " + query.toString());
+        Hits hits = searcher.search(query);
+        
+        for (int i = 0; i < hits.length(); i ++) {
+            results.add(hits.doc(i).get("id"));
+        }
+        ireader.close();
+        searcher.close();
+        if (results.size() > 1)
+            logger.warning("multiple record in lucene index for identifier: " + id);
+        
+        if (results.size() > 0)
+            return results.get(0);
+        else 
+            return null;
     }
 }

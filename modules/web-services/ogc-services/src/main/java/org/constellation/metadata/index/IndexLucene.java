@@ -55,7 +55,7 @@ import org.constellation.metadata.Utils;
 
 /**
  *
- * @author Guilehm Legal
+ * @author Guilhem Legal
  */
 public abstract class IndexLucene<E> extends AbstractIndex<E> {
 
@@ -256,13 +256,14 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
     } 
     
     /**
-     * This method proceed a lucene search and returns a list of ID.
+     * This method proceed a lucene search and to verify that the identifier exist.
+     * If it exist it return the database ID.
      *
-     * @param query A simple Term query.
+     * @param query A simple Term query on "indentifier field".
      * 
-     * @return      A List of id.
+     * @return A database id.
      */
-    public abstract List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
+    public abstract String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
     
     /**
      * Add a boundingBox geometry to the specified Document.

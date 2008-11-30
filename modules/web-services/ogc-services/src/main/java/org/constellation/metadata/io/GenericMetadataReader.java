@@ -121,6 +121,7 @@ import org.opengis.util.InternationalString;
 import org.opengis.metadata.Datatype;
 
 /**
+ * A database Reader using a generic configuration to request an unknown database.
  * 
  * TODO regarder les cardinalite est mettre des null la ou 0-...
  *
@@ -189,7 +190,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @param genericConfiguration
      */
     public GenericMetadataReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
-        super();
+        super(false);
         this.genericConfiguration = genericConfiguration;
         this.connection     = connection;
         initStatement();
@@ -209,7 +210,7 @@ public class GenericMetadataReader extends MetadataReader {
      * @param genericConfiguration
      */
     public GenericMetadataReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
-        super();
+        super(false);
         this.genericConfiguration = genericConfiguration;
         this.connection     = connection;
         initStatement();

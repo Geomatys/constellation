@@ -27,8 +27,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -1014,13 +1012,13 @@ public class CSWworker {
     }
     
     /**
-     * Execute a Lucene spatial query and return the result as a List of form identifier (form_ID:CatalogCode)
+     * Execute a Lucene spatial query and return the result as a database identifier.
      * 
      * @param query
      * @return
      * @throws WebServiceException
      */
-    private List<String> executeIdentifierQuery(String id) throws WebServiceException {
+    private String executeIdentifierQuery(String id) throws WebServiceException {
         try {
             return index.identifierQuery(id);
         
@@ -1115,13 +1113,11 @@ public class CSWworker {
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
                 
-                //we get the form ID and catalog code
-                List<String> ids = executeIdentifierQuery(id);
-                if (ids.size() > 0) {
-                    id = ids.get(0);
-                } else {
+                //we verify if  the identifier of the metadata exist
+                id = executeIdentifierQuery(id);
+                if (id == null){
                     unexistingID.add(id);
-                    logger.severe("unexisting id:" + id);
+                    logger.severe("unexisting metadata id: " + id);
                     continue;
                 }
                 //we get the metadata object
@@ -1152,12 +1148,10 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeIdentifierQuery(id);
-                if (ids.size() > 0) {
-                    id = ids.get(0);
-                } else {
+                id = executeIdentifierQuery(id);
+                if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting id:" + id);
+                    logger.severe("unexisting metadata id:" + id);
                     continue;
                 }
                 
@@ -1186,10 +1180,8 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeIdentifierQuery(id);
-                if (ids.size() > 0) {
-                    id = ids.get(0);
-                } else {
+                id = executeIdentifierQuery(id);
+                if (id == null) {
                     unexistingID.add(id);
                     logger.severe("unexisting id:" + id);
                     continue;
@@ -1220,12 +1212,10 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeIdentifierQuery(id);
-                if (ids.size() > 0) {
-                    id = ids.get(0);
-                } else {
+                id = executeIdentifierQuery(id);
+                if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting id:" + id);
+                    logger.severe("unexisting metadata id: " + id);
                     continue;
                 }
                 
@@ -1254,10 +1244,8 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
-                List<String> ids = executeIdentifierQuery(id);
-                if (ids.size() > 0) {
-                    id = ids.get(0);
-                } else {
+                id = executeIdentifierQuery(id);
+                if (id == null) {
                     unexistingID.add(id);
                     logger.severe("unexisting id:" + id);
                     continue;
@@ -1370,7 +1358,7 @@ public class CSWworker {
 
             if (typeNames.contains(_Record_QNAME)) {
 
-                InputStream in = getResourceAsStream("org/constellation/metadata/record.xsd");
+                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/record.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1378,21 +1366,21 @@ public class CSWworker {
             
             if (typeNames.contains(_Metadata_QNAME)) {
 
-                InputStream in = getResourceAsStream("org/constellation/metadata/metadata.xsd");
+                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/metadata.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
             if (containsOneOfEbrim30(typeNames)) {
-                InputStream in = getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
+                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
             if (containsOneOfEbrim25(typeNames)) {
-                InputStream in = getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
+                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1947,24 +1935,4 @@ public class CSWworker {
         }
         return s;
     }
-
-    /**
-     * Obtain the Thread Context ClassLoader.
-     */
-    public static ClassLoader getContextClassLoader() {
-        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-            public ClassLoader run() {
-                return Thread.currentThread().getContextClassLoader();
-            }
-        });
-    }
-    
-    /**
-     * Return an input stream of the specified resource. 
-     */
-    public static InputStream getResourceAsStream(String url) {
-        ClassLoader cl = getContextClassLoader();
-        return cl.getResourceAsStream(url);
-    }
-    
 }

@@ -49,28 +49,65 @@ public abstract class MetadataReader {
     protected ServiceVersion version;
     
     /**
+     * A flag indicating if the cache mecanism is enabled or not.
+     */
+    private final boolean isCacheEnabled;
+    
+    /**
      * A map containing the metadata already extract from the database.
      */
-    protected final Map<String, Object> metadatas;
+    private final Map<String, Object> metadatas = new HashMap<String, Object>();
     
-    public MetadataReader() {
-        this.metadatas = new HashMap<String, Object>();
+    public MetadataReader(boolean isCacheEnabled) {
+        this.isCacheEnabled = isCacheEnabled;
     }
     
     /**
      * Return a metadata object from the specified identifier.
-     * if is not already in cache it read it from the MDWeb database.
      * 
-     * @param identifier The form identifier with the pattern : Form_ID:
+     * @param identifier The metadata identifier.
+     * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
+     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
-     * @return An metadata object.
+     * @return A marshallable metadata object.
      * @throws java.sql.SQLException
      */
     public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException;
     
+    /**
+     * Add a metadata to the cache.
+     * @param identifier The metadata identifier.
+     * @param metadata The object to put in cache.
+     */
+    protected void addInCache(String identifier,  Object metadata) {
+        if (isCacheEnabled)
+            metadatas.put(identifier, metadata);
+    }
     
+    /**
+     * Return a metadata from the cache if it present.
+     * 
+     * @param identifier The metadata identifier.
+     */
+    protected Object getFromCache(String identifier) {
+        return metadatas.get(identifier);
+    }
+    
+    /**
+     * Set the version of the service (For execption report).
+     * 
+     * @param version
+     */
     public final void setVersion(ServiceVersion version) {
         this.version = version;
+    }
+    
+    /**
+     * Return true is the cache mecanism is enbled.
+     */
+    public boolean isCacheEnabled() {
+        return isCacheEnabled;
     }
 
 }

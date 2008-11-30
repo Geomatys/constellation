@@ -23,17 +23,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -551,5 +557,408 @@ public class Utils {
         }
         return response;
     }
+    
+    /**
+     * Call the empty constructor on the specified class and return the result.
+     * 
+     * @param classe
+     * @return
+     */
+    public static Object newInstance(Class classe) {
+        try {
+            if (classe == null)
+                return null;
+            
+            Constructor constructor = classe.getConstructor();
+            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
+            
+            //we execute the constructor
+            Object result = constructor.newInstance();
+            return result;
+            
+        } catch (InstantiationException ex) {
+            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "()");
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe("Illegal Argument in empty constructor for class: " + classe.getName());
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe("invocation target exception in empty constructor for class: " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().severe("No such empty constructor in class: " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+        }
+        return null;
+    }
+    
+    /**
+     * Call the constructor(String) on the specified class and return the result.
+     * 
+     * @param classe
+     * @return
+     */
+    public static Object newInstance(Class classe, String parameter) {
+        try {
+            if (classe == null)
+                return null;
+            
+            Constructor constructor = classe.getConstructor(String.class);
+            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
+            
+            //we execute the constructor
+            Object result = constructor.newInstance(parameter);
+            return result;
+            
+        } catch (InstantiationException ex) {
+            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(string)");
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe("Illegal Argument in string constructor for class: " + classe.getName());
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe("invocation target exception in string constructor for class: " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().severe("No such string constructor in class: " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+        }
+        return null;
+    }
+    
+    /**
+     * Call the constructor(String) on the specified class and return the result.
+     * 
+     * @param classe
+     * @return
+     */
+    public static Object newInstance(Class classe, String parameter1, String parameter2) {
+        try {
+            if (classe == null)
+                return null;
+            
+            Constructor constructor = classe.getConstructor(String.class, String.class);
+            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
+            
+            //we execute the constructor
+            Object result = constructor.newInstance(parameter1, parameter2);
+            return result;
+            
+        } catch (InstantiationException ex) {
+            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(string, string)");
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe("Illegal Argument in double string constructor for class: " + classe.getName());
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe("invocation target exception in double string constructor for class: " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().severe("No such double string constructor in class: " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+        }
+        return null;
+    }
+    
+    /**
+     * Call the constructor(charSequence) on the specified class and return the result.
+     * 
+     * @param classe
+     * @return
+     */
+    public static Object newInstance(Class classe, CharSequence parameter) {
+        try {
+            if (classe == null)
+                return null;
+            
+            Constructor constructor = classe.getConstructor(CharSequence.class);
+            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
+            
+            //we execute the constructor
+            Object result = constructor.newInstance(parameter);
+            return result;
+            
+        } catch (InstantiationException ex) {
+            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(CharSequence)");
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe("invocation target exception in CharSequence constructor for class: " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().severe("No such CharSequence constructor in class: " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+        }
+        return null;
+    }
+    
+    /**
+     * Invoke a method with the specified parameter in the specified object.
+     * 
+     * @param method     The method to invoke
+     * @param object     The object on witch the method is invoked.
+     * @param parameter  The parameter of the method.
+     */
+    public static Object invokeMethod(Method method, Object object) {
+        Object result = null;
+        String baseMessage = "unable to invoke setter: "; 
+        try {
+            if (method != null) {
+                result = method.invoke(object);
+            } else {
+                Logger.getAnonymousLogger().severe(baseMessage + "The setter is null");
+            }
 
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "The class is not accessible");
+
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "The argument does not match with the method");
+
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "Exception throw in the invokated method");
+        }
+        return result;
+    }
+    
+    /**
+     * Invoke a method with the specified parameter in the specified object.
+     * 
+     * @param method     The method to invoke
+     * @param object     The object on witch the method is invoked.
+     * @param parameter  The parameter of the method.
+     */
+    public static Object invokeMethod(Method method, Object object, Object parameter) {
+        Object result = null;
+        String baseMessage = "unable to invoke setter: "; 
+        try {
+            if (method != null) {
+                result = method.invoke(object, parameter);
+            } else {
+                Logger.getAnonymousLogger().severe(baseMessage + "The setter is null");
+            }
+
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "The class is not accessible");
+
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "The argument does not match with the method");
+
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe(baseMessage + "Exception throw in the invokated method");
+        }
+        return result;
+    }
+    
+    /**
+      * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * in the class rootClass.
+     * 
+     * @param propertyName The attribute name.
+     * @param classe       The attribute type.  
+     * @param rootClass    The class whitch owe this attribute
+     * 
+     * @return a setter to this attribute.
+     */
+    public static Method getMethod(String propertyName, Class classe) {
+        Method method = null;
+        try {
+            method = classe.getMethod(propertyName);
+
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().info("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().info("The method " + propertyName + " does not exists in the classe " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().info("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+        }
+        return method;
+    }
+    
+    /**
+      * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * in the class rootClass.
+     * 
+     * @param propertyName The attribute name.
+     * @param classe       The attribute type.  
+     * @param rootClass    The class whitch owe this attribute
+     * 
+     * @return a setter to this attribute.
+     */
+    public static Method getMethod(String propertyName, Class classe, Class parameterClass) {
+        Method method = null;
+        try {
+            method = classe.getMethod(propertyName, parameterClass);
+
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().info("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            Logger.getAnonymousLogger().info("The method " + propertyName + " does not exists in the classe " + classe.getName());
+        } catch (SecurityException ex) {
+            Logger.getAnonymousLogger().info("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+        }
+        return method;
+    }
+
+    
+    /**
+     * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * in the class rootClass.
+     * 
+     * @param propertyName The attribute name.
+     * @param classe       The attribute type.  
+     * @param rootClass    The class whitch owe this attribute
+     * 
+     * @return a setter to this attribute.
+     */
+    public static Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
+        Logger.getAnonymousLogger().finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        
+        //special case
+        if (propertyName.equals("beginPosition")) {
+            propertyName = "begining";
+        } else if (propertyName.equals("endPosition")) {
+            propertyName = "ending";
+        } 
+        
+        String methodName = "set" + Utils.firstToUpper(propertyName);
+        int occurenceType = 0;
+        
+        //TODO look all interfaces
+        Class interfacee = null;
+        if (classe.getInterfaces().length != 0) {
+            interfacee = classe.getInterfaces()[0];
+        }
+        
+        Class argumentSuperClass     = classe;
+        Class argumentSuperInterface = null;
+        if (argumentSuperClass.getInterfaces().length > 0) {
+            argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
+        }
+        
+
+        while (occurenceType < 7) {
+            
+            try {
+                Method setter = null;
+                switch (occurenceType) {
+
+                    case 0: {
+                        setter = rootClass.getMethod(methodName, classe);
+                        break;
+                    }
+                    case 1: {
+                        if (classe.equals(Integer.class)) {
+                            setter = rootClass.getMethod(methodName, long.class);
+                            break;
+                        } else {
+                            occurenceType = 2;
+                        }
+                    }
+                    case 2: {
+                        setter = rootClass.getMethod(methodName, interfacee);
+                        break;
+                    }
+                    case 3: {
+                        setter = rootClass.getMethod(methodName, Collection.class);
+                        break;
+                    }
+                    case 4: {
+                        setter = rootClass.getMethod(methodName + "s", Collection.class);
+                        break;
+                    }
+                    case 5: {
+                        setter = rootClass.getMethod(methodName , argumentSuperClass);
+                        break;
+                    }
+                    case 6: {
+                        setter = rootClass.getMethod(methodName , argumentSuperInterface);
+                        break;
+                    }
+                }
+                Logger.getAnonymousLogger().finer("setter found: " + setter.toGenericString());
+                return setter;
+
+            } catch (NoSuchMethodException e) {
+
+                /**
+                 * This switch is for debugging purpose
+                 */
+                switch (occurenceType) {
+
+                    case 0: {
+                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        occurenceType = 1;
+                        break;
+                    }
+                    case 1: {
+                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(long) does not exist");
+                        occurenceType = 2;
+                        break;
+                    }
+                    case 2: {
+                        if (interfacee != null) {
+                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                        }
+                        occurenceType = 3;
+                        break;
+                    }
+                    case 3: {
+                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        occurenceType = 4;
+                        break;
+                    }
+                    case 4: {
+                        Logger.getAnonymousLogger().finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        occurenceType = 5;
+                        break;
+                    }
+                    case 5: {
+                        if (argumentSuperClass != null) {
+                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
+                            argumentSuperClass     = argumentSuperClass.getSuperclass();
+                            occurenceType = 5;
+                            
+                        } else {
+                            occurenceType = 6;
+                        }
+                        break;
+                    }
+                    case 6: {
+                        if (argumentSuperInterface != null) {
+                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
+                        }
+                        occurenceType = 7;
+                        break;
+                    }
+                    default:
+                        occurenceType = 7;
+                }
+            }
+        }
+        Logger.getAnonymousLogger().severe("No setter have been found for attribute " + propertyName + 
+                      " of type " + classe.getName() + " in the class " + rootClass.getName());
+        return null;
+    }
+    
+    /**
+     * Obtain the Thread Context ClassLoader.
+     */
+    public static ClassLoader getContextClassLoader() {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
+        });
+    }
+    
+    /**
+     * Return an input stream of the specified resource. 
+     */
+    public static InputStream getResourceAsStream(String url) {
+        ClassLoader cl = getContextClassLoader();
+        return cl.getResourceAsStream(url);
+    }
 }

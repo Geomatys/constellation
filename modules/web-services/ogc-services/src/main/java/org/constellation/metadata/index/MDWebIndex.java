@@ -77,7 +77,7 @@ public class MDWebIndex extends IndexLucene<Form> {
     /**
      * A Map containing some classes (used when reader is null)
      */
-    private final  Map<String, Classe> classeMap;
+    private final Map<String, Classe> classeMap;
     
      /**
      * Creates a new Lucene Index into the specified directory with the specified MDweb reader.
@@ -527,7 +527,7 @@ public class MDWebIndex extends IndexLucene<Form> {
      * 
      * @return      A List of id.
      */
-    public List<String> identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
+    public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
         
         TermQuery query = new TermQuery(new Term("identifier_sort", id));
         List<String> results = new ArrayList<String>();
@@ -542,8 +542,12 @@ public class MDWebIndex extends IndexLucene<Form> {
         }
         ireader.close();
         searcher.close();
-        logger.info(results.size() + " total matching documents");
+        if (results.size() > 1)
+            logger.warning("multiple record in lucene index for identifier: " + id);
         
-        return results;
+        if (results.size() > 0)
+            return results.get(0);
+        else 
+            return null;
     }
 }
