@@ -55,8 +55,6 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(org.constellation.coverage.model  .DistributionTableTest        .class);
         addTestSuite(org.constellation.coverage.model  .DescriptorTableTest          .class);
         addTestSuite(org.constellation.coverage.model  .IntegrationTest              .class);
-        addTestSuite(org.constellation.coverage.web    .TimeParserTest               .class);
-        addTestSuite(org.constellation.coverage.web    .WebServiceWorkerTest         .class);
 
         addTestSuite(org.constellation.catalog.DatabaseTest.Close.class); // Must be last
     }

@@ -26,8 +26,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
 
 // JUnit dependencies
 import org.constellation.ogc.FilterType;
