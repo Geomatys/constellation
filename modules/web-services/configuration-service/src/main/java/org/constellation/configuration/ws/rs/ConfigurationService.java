@@ -61,14 +61,15 @@ import org.constellation.metadata.io.CDIReader;
 import org.constellation.metadata.io.CSRReader;
 import org.constellation.metadata.io.EDMEDReader;
 import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.ws.rs.OGCWebService;
 
 // geotools dependencies
+import org.constellation.ws.rs.WebService;
 import org.geotools.metadata.note.Anchors;
 import org.geotools.resources.JDBC;
 
@@ -91,7 +92,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends OGCWebService  {
+public class ConfigurationService extends WebService  {
 
     /**
      * A container notifier allowing to dynamically reload all the active service.
@@ -119,7 +120,7 @@ public class ConfigurationService extends OGCWebService  {
     
             
     public ConfigurationService() {
-        super("Configuration", version);
+        super("Configuration");
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration:" +
                            "org.constellation.skos:org.constellation.generic.nerc", "");
@@ -274,7 +275,7 @@ public class ConfigurationService extends OGCWebService  {
         
         } catch (WebServiceException ex) {
             final String code = transformCodeName(ex.getExceptionCode().name());
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), ex.getVersion());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                     !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
@@ -288,7 +289,20 @@ public class ConfigurationService extends OGCWebService  {
         }
         
     }
-    
+
+    /**
+     * build an service Exception and marshall it into a StringWriter
+     *
+     * @param message
+     * @param codeName
+     * @return
+     */
+    protected Object launchException(final String message, final String codeName, final String locator) {
+        final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, new ServiceVersion(Service.OTHER, "1.0"));
+        return report;
+    }
+
     /**
      * Restart all the web-services.
      * 

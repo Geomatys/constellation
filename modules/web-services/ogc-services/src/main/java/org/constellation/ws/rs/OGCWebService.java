@@ -292,43 +292,6 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     * A utility method whitch replace the special character.
-     *
-     * @param s the string to clean.
-     * @return a String without special character.
-     */
-    protected String cleanSpecialCharacter(String s) {
-        if (s != null) {
-            s = s.replace('é', 'e');
-            s = s.replace('è', 'e');
-            s = s.replace('à', 'a');
-            s = s.replace('É', 'E');
-        }
-        return s;
-    }
-
-    /**
-     * Transform an exception code into the OWS specification.
-     * Example : MISSING_PARAMETER_VALUE become MissingParameterValue.
-     *
-     * @param code
-     * @return
-     */
-    protected String transformCodeName(String code) {
-        String result = "";
-        final String prefix = code.charAt(0) + "";
-        while (code.indexOf('_') != -1) {
-            final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
-            result += tmp.replace(tmp.charAt(0), prefix.charAt(0));
-            code = code.substring(code.indexOf('_') + 1, code.length());
-            //System.out.println(code);
-        }
-        code = code.toLowerCase();
-        result += code.replace(code.charAt(0), prefix.charAt(0));
-        return result;
-    }
-
-    /**
      * Return a Version Object from the version number.
      * if the version number is not correct return the default version.
      *
