@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -78,4 +79,18 @@ public class SortByType {
         return Collections.unmodifiableList(sortProperty);
     }
 
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SortByType) {
+            final SortByType that = (SortByType) object;
+            return Utilities.equals(this.sortProperty,  that.sortProperty);
+        }
+        return false;
+    }
 }

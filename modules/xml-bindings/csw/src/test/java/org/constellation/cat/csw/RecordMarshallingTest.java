@@ -33,7 +33,6 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import javax.xml.namespace.QName;
-import org.constellation.cat.csw.v202.AbstractQueryType;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
@@ -480,7 +479,7 @@ public class RecordMarshallingTest {
         
         String expResult = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
-        "<csw:GetRecords xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "<csw:GetRecords maxRecords=\"20\" startPosition=\"1\" outputSchema=\"http://www.opengis.net/cat/csw/2.0.2\" outputFormat=\"application/xml\" resultType=\"results\" version=\"2.0.2\" service=\"CSW\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
         "    <csw:Query typeNames=\"csw:Record\">" + '\n' +
         "        <csw:ElementSetName>full</csw:ElementSetName>"                         + '\n' +
         "        <csw:Constraint version=\"1.1.0\">"                                    + '\n' +
@@ -495,7 +494,7 @@ public class RecordMarshallingTest {
         "        </csw:Constraint>"                                                     + '\n' +
         "    </csw:Query>"                                                              + '\n' +
         "</csw:GetRecords>" + '\n';
-        
+        logger.info("RESULT:" + '\n' + result);
         //we remove the 2 first line because the xlmns are not always in the same order.
         expResult = expResult.substring(expResult.indexOf('\n') + 1);
         expResult = expResult.substring(expResult.indexOf('\n') + 1);
@@ -503,8 +502,8 @@ public class RecordMarshallingTest {
         result = result.substring(result.indexOf('\n') + 1);
         result = result.substring(result.indexOf('\n') + 1);
         
-        logger.info("RESULT:" + '\n' + result);
-        logger.info("EXPRESULT:" + '\n' + expResult);
+        logger.finer("RESULT:" + '\n' + result);
+        logger.finer("EXPRESULT:" + '\n' + expResult);
         assertEquals(expResult, result);
         
  
@@ -524,7 +523,7 @@ public class RecordMarshallingTest {
         
         String xml = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
-        "<csw:GetRecords xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "<csw:GetRecords maxRecords=\"20\" startPosition=\"1\" outputSchema=\"http://www.opengis.net/cat/csw/2.0.2\" outputFormat=\"application/xml\" resultType=\"results\" version=\"2.0.2\" service=\"CSW\"  xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
         "    <csw:Query typeNames=\"csw:Record\">" + '\n' +
         "        <csw:ElementSetName>full</csw:ElementSetName>"                         + '\n' +
         "        <csw:Constraint version=\"1.1.0\">"                                    + '\n' +

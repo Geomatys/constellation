@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -115,6 +116,30 @@ public class ElementSetNameType {
      */
     public void setTypeNames(List<QName> typeNames) {
         this.typeNames = typeNames;
+    }
+    
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ElementSetNameType) {
+            final ElementSetNameType that = (ElementSetNameType) object;
+            return Utilities.equals(this.typeNames,  that.typeNames)   &&
+                   Utilities.equals(this.value,  that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 43 * hash + (this.typeNames != null ? this.typeNames.hashCode() : 0);
+        return hash;
     }
 
 }

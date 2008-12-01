@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ogc.FilterType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -130,5 +131,31 @@ public class QueryConstraintType {
      */
     public void setVersion(String value) {
         this.version = value;
+    }
+    
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof QueryConstraintType) {
+            final QueryConstraintType that = (QueryConstraintType) object;
+            return Utilities.equals(this.cqlText,  that.cqlText)   &&
+                   Utilities.equals(this.filter,  that.filter)   &&
+                   Utilities.equals(this.version,  that.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 61 * hash + (this.filter != null ? this.filter.hashCode() : 0);
+        hash = 61 * hash + (this.cqlText != null ? this.cqlText.hashCode() : 0);
+        hash = 61 * hash + (this.version != null ? this.version.hashCode() : 0);
+        return hash;
     }
 }

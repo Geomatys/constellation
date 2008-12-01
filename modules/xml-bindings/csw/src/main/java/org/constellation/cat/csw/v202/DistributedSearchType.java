@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -76,5 +77,27 @@ public class DistributedSearchType {
         } else {
             return hopCount;
         }
+    }
+    
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DistributedSearchType) {
+            DistributedSearchType that = (DistributedSearchType) object;
+            return Utilities.equals(this.hopCount,  that.hopCount);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.hopCount != null ? this.hopCount.hashCode() : 0);
+        return hash;
     }
 }

@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
@@ -99,5 +100,29 @@ public class SortPropertyType implements SortBy {
             return SortOrder.DESCENDING;
         else
             return SortOrder.ASCENDING;
+    }
+    
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SortPropertyType) {
+            final SortPropertyType that = (SortPropertyType) object;
+            return Utilities.equals(this.propertyName,  that.propertyName)   &&
+                   Utilities.equals(this.sortOrder,  that.sortOrder);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 17 * hash + (this.propertyName != null ? this.propertyName.hashCode() : 0);
+        hash = 17 * hash + (this.sortOrder != null ? this.sortOrder.hashCode() : 0);
+        return hash;
     }
 }
