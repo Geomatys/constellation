@@ -158,4 +158,20 @@ public class QueryConstraintType {
         hash = 61 * hash + (this.version != null ? this.version.hashCode() : 0);
         return hash;
     }
+    
+     @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[GetRecordsType]").append('\n');
+        
+        if (filter != null) {
+            s.append("filter: ").append(filter).append('\n');
+        }
+        if (cqlText != null) {
+            s.append("cqlText: ").append(cqlText).append('\n');
+        }
+        if (version != null) {
+            s.append("version: ").append(version).append('\n');
+        }
+        return s.toString();
+    }
 }

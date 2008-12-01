@@ -247,6 +247,28 @@ public class QueryType extends AbstractQueryType {
         hash = 23 * hash + (this.typeNames != null ? this.typeNames.hashCode() : 0);
         return hash;
     }
+    
+     @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[QueryType]").append('\n');
+        
+        if (elementName != null) {
+            s.append("elementName: ").append(elementName).append('\n');
+        }
+        if (elementSetName != null) {
+            s.append("elementSetName: ").append(elementSetName).append('\n');
+        }
+        if (constraint != null) {
+            s.append("constraint: ").append(constraint).append('\n');
+        }
+        if (sortBy != null) {
+            s.append("sortBy: ").append(sortBy).append('\n');
+        }
+        if (typeNames != null) {
+            s.append("typeNames: ").append(typeNames).append('\n');
+        }
+        return s.toString();
+    }
    
 
 }

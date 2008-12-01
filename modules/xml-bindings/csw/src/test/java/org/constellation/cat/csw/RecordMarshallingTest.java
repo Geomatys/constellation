@@ -494,7 +494,8 @@ public class RecordMarshallingTest {
         "        </csw:Constraint>"                                                     + '\n' +
         "    </csw:Query>"                                                              + '\n' +
         "</csw:GetRecords>" + '\n';
-        logger.info("RESULT:" + '\n' + result);
+        logger.finer("RESULT:" + '\n' + result);
+        
         //we remove the 2 first line because the xlmns are not always in the same order.
         expResult = expResult.substring(expResult.indexOf('\n') + 1);
         expResult = expResult.substring(expResult.indexOf('\n') + 1);
@@ -571,6 +572,12 @@ public class RecordMarshallingTest {
         
         logger.info("RESULT:" + '\n' + result);
         logger.info("EXPRESULT:" + '\n' + expResult);
+        GetRecordsType gres = (GetRecordsType)result;
+        QueryType expQT = (QueryType) expResult.getAbstractQuery();
+        QueryType resQT = (QueryType) gres.getAbstractQuery();
+        assertEquals(expQT.getConstraint().getFilter(), resQT.getConstraint().getFilter());
+        assertEquals(expQT.getConstraint(), resQT.getConstraint());
+        assertEquals(expResult.getAbstractQuery(), gres.getAbstractQuery());
         assertEquals(expResult, result);
         
  
