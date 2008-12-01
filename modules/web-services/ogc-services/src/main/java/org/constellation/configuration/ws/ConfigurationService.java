@@ -16,7 +16,7 @@
  */
 package org.constellation.configuration.ws;
 
-import com.sun.jersey.spi.resource.Singleton;
+// J2SE dependencies
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,14 +31,21 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+// Jersey dependencies
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import com.sun.jersey.spi.resource.Singleton;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
@@ -53,17 +60,27 @@ import org.constellation.metadata.Utils;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.index.MDWebIndex;
+import org.constellation.metadata.io.CDIReader;
+import org.constellation.metadata.io.CSRReader;
+import org.constellation.metadata.io.EDMEDReader;
 import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.generic.database.Automatic.*;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
+
+// geotools dependencies
 import org.geotools.metadata.note.Anchors;
 import org.geotools.resources.JDBC;
+
+// model dependencies
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.sql.v20.Reader20;
 import org.mdweb.utils.GlobalUtils;
+
+// postgres dependencies
 import org.postgresql.ds.PGSimpleDataSource;
 
 /**
@@ -138,7 +155,21 @@ public class ConfigurationService extends OGCWebService  {
                                                                            dbProperties.getUser(),
                                                                            dbProperties.getPassword());
                             
-                                GenericMetadataReader MDReader = new GenericMetadataReader(genericConfiguration, MDConnection , false);
+                                GenericMetadataReader MDReader = null;
+                                switch (genericConfiguration.getType()) {
+                                        case CDI: 
+                                            MDReader = new CDIReader(genericConfiguration, MDConnection, false);
+                                            break;
+                                        case CSR:
+                                            MDReader = new CSRReader(genericConfiguration, MDConnection, false);
+                                            break;
+                                        case EDMED:
+                                            MDReader = new EDMEDReader(genericConfiguration, MDConnection, false);
+                                            break;
+                                        default: 
+                                            LOGGER.severe("specific CSW operation will not be available!" + '\n' +
+                                            "cause: Unknow generic database type!");
+                                    }                                           
                                 indexer = new GenericIndex(MDReader);
                                 CSWFunctionEnabled = true;
                             } catch (SQLException e){
@@ -279,7 +310,7 @@ public class ConfigurationService extends OGCWebService  {
     private AcknowlegementType refreshIndex(boolean asynchrone, String service) throws WebServiceException {
         LOGGER.info("refresh index requested");
         String msg;
-        if (service != null && service.equals("MDSEARCH")) {
+        if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
             GlobalUtils.resetLuceneIndex();
             msg = "MDWeb search index succefully deleted";
         } else {
@@ -561,6 +592,7 @@ public class ConfigurationService extends OGCWebService  {
         saveVocabularyFile("C371",   vocabularyDir);
         saveVocabularyFile("L181",   vocabularyDir);
         saveVocabularyFile("C16",    vocabularyDir);
+        saveVocabularyFile("L101",    vocabularyDir);
         
         return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }

@@ -48,6 +48,10 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
 //Constellation dependencies
+import org.constellation.metadata.io.CDIReader;
+import org.constellation.metadata.io.CSRReader;
+import org.constellation.metadata.io.EDMEDReader;
+import org.constellation.ws.rs.WebService;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.Capabilities;
@@ -111,6 +115,7 @@ import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.generic.database.Automatic.*;
 
 // Apache Lucene dependencies
 import org.apache.lucene.index.CorruptIndexException;
@@ -131,7 +136,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 //mdweb model dependencies
-import org.constellation.ws.rs.WebService;
 import org.mdweb.model.schemas.Standard; 
 import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
@@ -424,7 +428,23 @@ public class CSWworker {
                             } else {
 
                                 try {
-                                    MDReader = new GenericMetadataReader(genericConfiguration, MDConnection);
+                                     switch (genericConfiguration.getType()) {
+                                        case CDI: 
+                                            MDReader = new CDIReader(genericConfiguration, MDConnection);
+                                            break;
+                                        case CSR:
+                                            MDReader = new CSRReader(genericConfiguration, MDConnection);
+                                            break;
+                                        case EDMED:
+                                            MDReader = new EDMEDReader(genericConfiguration, MDConnection);
+                                            break;
+                                        default: 
+                                            logger.severe("The CSW service is not working!" + '\n' +
+                                            "cause: Unknow generic database type!");
+                                            isStarted = false;
+                                            return;
+                                    }
+                                    
                                     index = new GenericIndex((GenericMetadataReader)MDReader, configDir);
                                     
                                     //in generic mode there is no transactionnal part.
@@ -436,6 +456,7 @@ public class CSWworker {
                                     logger.severe(e.getMessage());
                                     logger.severe("The CSW service is not working!" + '\n' +
                                             "cause: The web service can't connect to the generic metadata database!");
+                                    isStarted = false;
                                 }
                             }
                         }
@@ -494,6 +515,7 @@ public class CSWworker {
                         logger.severe(e.getMessage());
                         logger.severe("The CSW service is not working!" + '\n' + 
                                   "cause: The web service can't connect to the MDWeb metadata database!");
+                        isStarted = false;
                     }
                 }
             }
