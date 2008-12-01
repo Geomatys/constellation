@@ -234,7 +234,7 @@ public class ObjectFactory {
     public QueryConstraintType createQueryConstraintType() {
         return new QueryConstraintType();
     }
-
+    
     /**
      * Create an instance of {@link GetDomainType }
      * 
@@ -401,11 +401,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryType }{@code >}}
      * 
-     */
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Query", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractQuery")
     public JAXBElement<QueryType> createQuery(QueryType value) {
         return new JAXBElement<QueryType>(_Query_QNAME, QueryType.class, null, value);
-    }
+    }*/
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RecordType }{@code >}}

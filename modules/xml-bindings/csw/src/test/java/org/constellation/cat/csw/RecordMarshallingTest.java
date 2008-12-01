@@ -510,6 +510,73 @@ public class RecordMarshallingTest {
  
     }
     
+    /**
+     * Test simple Record Marshalling. 
+     * 
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getRecordsUnMarshalingTest() throws Exception {
+        
+         /*
+         * Test unmarshalling csw getRecordByIdResponse v2.0.2
+         */
+        
+        String xml = 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:GetRecords xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <csw:Query typeNames=\"csw:Record\">" + '\n' +
+        "        <csw:ElementSetName>full</csw:ElementSetName>"                         + '\n' +
+        "        <csw:Constraint version=\"1.1.0\">"                                    + '\n' +
+        "            <ogc:Filter>"                                                      + '\n' +
+        "                <ogc:Not>"                                                     + '\n' +
+        "                    <ogc:PropertyIsLike wildCard=\"*\" singleChar=\"?\" escapeChar=\"\\\">"    + '\n' +
+        "                        <ogc:PropertyName>dc:Title</ogc:PropertyName>"         + '\n' +
+        "                        <ogc:Literal>something?</ogc:Literal>"                 + '\n' +
+        "                    </ogc:PropertyIsLike>"                                     + '\n' +
+        "                </ogc:Not>"                                                    + '\n' +
+        "            </ogc:Filter>"                                                     + '\n' +
+        "        </csw:Constraint>"                                                     + '\n' +
+        "    </csw:Query>"                                                              + '\n' +
+        "</csw:GetRecords>" + '\n';
+        
+        StringReader sr = new StringReader(xml);
+        
+        Object result = recordUnmarshaller202.unmarshal(sr);
+        
+        /*
+         * we build the first filter : < dublinCore:Title IS LIKE '*' >
+         */ 
+        List<QName> typeNames  = new ArrayList<QName>();
+        PropertyNameType pname = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
+        NotType n              = new NotType(pil);
+        FilterType filter1     = new FilterType(n);
+        
+        /*
+         * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
+         */
+        typeNames          = new ArrayList<QName>();
+        pname              = new PropertyNameType("title");
+        pil                = new PropertyIsLikeType(pname, "something", null, null, null);
+        n                  = new NotType(pil);
+        FilterType filter2 = new FilterType(n);
+        
+        QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
+        typeNames.add(_Record_QNAME);
+        QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
+        
+        GetRecordsType expResult = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
+         
+        
+        
+        logger.info("RESULT:" + '\n' + result);
+        logger.info("EXPRESULT:" + '\n' + expResult);
+        assertEquals(expResult, result);
+        
+ 
+    }
+    
     
     class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
