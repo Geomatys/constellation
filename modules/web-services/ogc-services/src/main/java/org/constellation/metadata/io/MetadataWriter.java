@@ -37,6 +37,9 @@ import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.Utils;
+import org.constellation.metadata.index.IndexLucene;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
@@ -54,6 +57,7 @@ import org.mdweb.model.users.User;
 import org.mdweb.sql.Reader;
 import org.mdweb.sql.v20.Writer20;
 import org.opengis.metadata.identification.Identification;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -108,11 +112,21 @@ public class MetadataWriter {
     private Map<Object, Value> alreadyWrite;
     
     /**
+     * The current version of the csw
+     */
+    private ServiceVersion version;
+    
+    /**
+     * An indexer lucene to add object into the index.
+     */
+    private final IndexLucene index;
+    
+    /**
      * Build a new metadata writer.
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MetadataWriter(Reader MDReader, Writer20 MDWriter) throws SQLException {
+    public MetadataWriter(Reader MDReader, Writer20 MDWriter, IndexLucene index, ServiceVersion version) throws SQLException {
         
         MDCatalog         = MDReader.getCatalog("CSWCat");
         if (MDCatalog == null) {
@@ -122,18 +136,13 @@ public class MetadataWriter {
         user              = MDReader.getUser("admin");
         this.MDReader     = MDReader;  
         this.MDWriter     = MDWriter;
+        this.index        = index;
+        this.version      = version;
         this.dateFormat   = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding = new HashMap<Class, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
-    /**
-     * Write an MDWeb form into the database
-     */
-    public void writeForm(Form f) throws SQLException {
-        
-        MDWriter.writeForm(f, false);
-    }
     /**
      * Return an MDWeb formular from an object.
      * 
@@ -861,5 +870,53 @@ public class MetadataWriter {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Record an object in the metadata database.
+     * 
+     * @param obj The object to store in the database.
+     * @return true if the storage succeed, false else.
+     */
+    public boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
+        // profiling operation
+        long start     = System.currentTimeMillis();
+        long transTime = 0;
+        long writeTime = 0;
+        
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        
+        // we create a MDWeb form form the object
+        Form f = null;
+        try {
+            long start_trans = System.currentTimeMillis();
+            f = getFormFromObject(obj);
+            transTime = System.currentTimeMillis() - start_trans;
+            
+        } catch (IllegalArgumentException e) {
+             throw new WebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
+                                           "cause: " + e.getMessage(),NO_APPLICABLE_CODE, version);
+        }
+        
+        // and we store it in the database
+        if (f != null) {
+            try {
+                long startWrite = System.currentTimeMillis();
+                MDWriter.writeForm(f, false);
+                writeTime = System.currentTimeMillis() - startWrite;
+            } catch (IllegalArgumentException e) {
+                //TODO restore catching at this point
+                throw e;
+                //return false;
+            }
+            
+            long time = System.currentTimeMillis() - start; 
+            LOGGER.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
+            index.indexDocument(f);
+            return true;
+        }
+        return false;
     }
 }

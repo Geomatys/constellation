@@ -34,6 +34,8 @@ import java.util.logging.Logger;
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -50,6 +52,7 @@ import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.NotType;
@@ -66,6 +69,7 @@ import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
 import org.constellation.ows.v100.SectionsType;
+import org.constellation.ws.ServiceVersion;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -121,9 +125,19 @@ public class CatalogueHarvester {
     private final static QName _Dataset_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
     
     /**
-     * The CSW worker which owe this ctalogue harvester.
+     * A Marshaller to send request to another CSW services.
      */
-    private final CSWworker worker;
+    private final Marshaller marshaller;
+    
+    /**
+     * A unMarshaller to get object from harvested resource.
+     */
+    protected final Unmarshaller unmarshaller;
+    
+    /**
+     * The version of the CSW service
+     */
+    private ServiceVersion version;
     
     /**
      * A flag indicating that we are harvesting a CSW special case 1
@@ -136,12 +150,20 @@ public class CatalogueHarvester {
     private boolean specialCase2 = false;
     
     /**
+     * A writer for the database
+     */
+    private final MetadataWriter metadataWriter;
+    
+    /**
      * Build a new catalogue harvester.
      * 
      * @param worker
      */
-    public CatalogueHarvester(CSWworker worker) {
-        this.worker = worker;
+    public CatalogueHarvester(Marshaller marshaller, Unmarshaller unmarshaller, MetadataWriter metadataWriter, ServiceVersion version) {
+        this.marshaller     = marshaller;
+        this.unmarshaller   = unmarshaller;
+        this.metadataWriter = metadataWriter;
+        this.version        = version;
         initializeRequest();
     }
     
@@ -237,7 +259,7 @@ public class CatalogueHarvester {
             
         } else {
             throw new WebServiceException("This service if it is one is not requestable by constellation",
-                                          OPERATION_NOT_SUPPORTED, worker.getVersion(), "ResponseHandler");
+                                          OPERATION_NOT_SUPPORTED, version, "ResponseHandler");
         }
         
         getRecordRequest = analyseCapabilitiesDocument((CapabilitiesBaseType)distantCapabilities, getRecordRequest);
@@ -271,7 +293,7 @@ public class CatalogueHarvester {
                 // if the service respond with non xml or unstandardized response
                 if (harvested == null) {
                     WebServiceException exe = new WebServiceException("The distant service does not respond correctly.",
-                                                     NO_APPLICABLE_CODE, worker.getVersion());
+                                                     NO_APPLICABLE_CODE, version);
                     logger.severe("The distant service does not respond correctly");
                     distantException.add(exe);
                     moreResults = false;
@@ -289,7 +311,7 @@ public class CatalogueHarvester {
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (worker.storeMetadata(record))
+                            if (metadataWriter.storeMetadata(record))
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
@@ -305,7 +327,7 @@ public class CatalogueHarvester {
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (worker.storeMetadata(otherRecord))
+                            if (metadataWriter.storeMetadata(otherRecord))
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
@@ -333,7 +355,7 @@ public class CatalogueHarvester {
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (worker.storeMetadata(record))
+                            if (metadataWriter.storeMetadata(record))
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
@@ -347,7 +369,7 @@ public class CatalogueHarvester {
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (worker.storeMetadata(otherRecord))
+                            if (metadataWriter.storeMetadata(otherRecord))
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
@@ -373,7 +395,7 @@ public class CatalogueHarvester {
                         }
                     }
                     WebServiceException exe = new WebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
-                                                                      NO_APPLICABLE_CODE, worker.getVersion());
+                                                                      NO_APPLICABLE_CODE, version);
                     logger.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
                     distantException.add(exe);
                     moreResults = false;
@@ -381,7 +403,7 @@ public class CatalogueHarvester {
                 // if we obtain an object that we don't expect    
                 } else {
                     throw new WebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
-                                                 NO_APPLICABLE_CODE, worker.getVersion());
+                                                 NO_APPLICABLE_CODE, version);
                 }
                 
                 //if we don't have succeed we try without constraint part
@@ -656,10 +678,10 @@ public class CatalogueHarvester {
                 StringWriter sw = new StringWriter();
                 try {
                     
-                    worker.marshaller.marshal(request, sw);
+                    marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
                     throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, worker.getVersion());
+                                                 NO_APPLICABLE_CODE, version);
                 }
                 String XMLRequest = sw.toString();
             
@@ -713,7 +735,7 @@ public class CatalogueHarvester {
             }
         
             try {
-                harvested = worker.unmarshaller.unmarshal(new StringReader(decodedString));
+                harvested = unmarshaller.unmarshal(new StringReader(decodedString));
                 if (harvested != null && harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }

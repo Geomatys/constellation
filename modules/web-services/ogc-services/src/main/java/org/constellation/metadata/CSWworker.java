@@ -128,7 +128,6 @@ import org.geotools.resources.JDBC;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -137,7 +136,6 @@ import javax.xml.namespace.QName;
 
 //mdweb model dependencies
 import org.mdweb.model.schemas.Standard; 
-import org.mdweb.model.storage.Form; 
 import org.mdweb.sql.v20.Reader20; 
 import org.mdweb.sql.v20.Writer20;
 
@@ -197,12 +195,7 @@ public class CSWworker {
     /**
      * A unMarshaller to get object from harvested resource.
      */
-    protected final Unmarshaller unmarshaller;
-    
-    /**
-     * A Marshaller to send request to another CSW services.
-     */
-    protected final Marshaller marshaller;
+    private final Unmarshaller unmarshaller;
     
     /**
      * A lucene index to make quick search on the metadatas.
@@ -342,7 +335,6 @@ public class CSWworker {
     public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) {
         
         this.unmarshaller = unmarshaller;
-        this.marshaller   = marshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
         Properties prop   = new Properties();
         File f            = null;
@@ -370,7 +362,7 @@ public class CSWworker {
         
         //we create a connection to the metadata database
         if (isStarted) {
-            CSWProfile dbType = Utils.getServiceProfile(prop.getProperty("DBType"));
+            CSWProfile dbType = getServiceProfile(prop.getProperty("DBType"));
             
             switch (dbType) {
                 
@@ -450,7 +442,7 @@ public class CSWworker {
 
                     } catch (JAXBException ex) {
                         logger.severe("The CSW service is not working!" + '\n' +
-                                      "JAXBException while getting genric configuration");
+                                      "JAXBException while getting generic configuration");
                         isStarted = false;
                     }
                     break;
@@ -489,8 +481,8 @@ public class CSWworker {
                             Writer20 databaseWriter = new Writer20(MDConnection);
                             index                   = new MDWebIndex(databaseReader, configDir);
                             MDReader                = new MDWebMetadataReader(databaseReader);
-                            MDWriter                = new MetadataWriter(databaseReader, databaseWriter);
-                            catalogueHarvester      = new CatalogueHarvester(this);
+                            MDWriter                = new MetadataWriter(databaseReader, databaseWriter, index, version);
+                            catalogueHarvester      = new CatalogueHarvester(marshaller, unmarshaller, MDWriter, version);
 
                             logger.info("CSW service (MDweb database) running");
                         } catch (SQLException e) {
@@ -1623,7 +1615,7 @@ public class CSWworker {
                 for(Object record: insertRequest.getAny()) {
                     
                         try {
-                            storeMetadata(record);
+                            MDWriter.storeMetadata(record);
                             totalInserted++;
                         
                         } catch (SQLException ex) {
@@ -1664,55 +1656,6 @@ public class CSWworker {
         TransactionResponseType response = new TransactionResponseType(summary, null, version.toString());
         logger.info("Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
         return response;
-    }
-    
-    /**
-     * Record an object in the metadata database.
-     * 
-     * @param obj The object to store in the database.
-     * @return true if the storage succeed, false else.
-     */
-    protected boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
-        // profiling operation
-        long start     = System.currentTimeMillis();
-        long transTime = 0;
-        long writeTime = 0;
-        
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement)obj).getValue();
-        }
-        
-        // we create a MDWeb form form the object
-        Form f = null;
-        try {
-            long start_trans = System.currentTimeMillis();
-            f = MDWriter.getFormFromObject(obj);
-            transTime = System.currentTimeMillis() - start_trans;
-            
-        } catch (IllegalArgumentException e) {
-             throw new WebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
-                                           "cause: " + e.getMessage(),
-                                           NO_APPLICABLE_CODE, version);
-        }
-        
-        // and we store it in the database
-        if (f != null) {
-            try {
-                long startWrite = System.currentTimeMillis();
-                MDWriter.writeForm(f);
-                writeTime = System.currentTimeMillis() - startWrite;
-            } catch (IllegalArgumentException e) {
-                //TODO restore catching at this point
-                throw e;
-                //return false;
-            }
-            
-            long time = System.currentTimeMillis() - start; 
-            logger.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
-            index.indexDocument(f);
-            return true;
-        }
-        return false;
     }
     
     /**
@@ -1782,7 +1725,7 @@ public class CSWworker {
                         
                         // ugly patch TODO handle update in mdweb
                         try {
-                            if (storeMetadata(harvested))
+                            if (MDWriter.storeMetadata(harvested))
                                 totalInserted++;
                         } catch( IllegalArgumentException e) {
                             totalUpdated++;
@@ -1947,5 +1890,22 @@ public class CSWworker {
             s = s.substring(i + 1, s.length());
         }
         return s;
+    }
+    
+        /**
+     * Return An CSWProfile from a string
+     * @param profileName
+     * @return
+     */
+    private CSWProfile getServiceProfile(String profileName) {
+        if (profileName != null) {
+            if (profileName.equalsIgnoreCase("generic"))
+                return CSWProfile.GENERIC;
+            else if (profileName.equalsIgnoreCase("fileSystem"))            
+                return CSWProfile.FILESYSTEM;
+        }
+        //default
+        return CSWProfile.MDWEB;
+        
     }
 }

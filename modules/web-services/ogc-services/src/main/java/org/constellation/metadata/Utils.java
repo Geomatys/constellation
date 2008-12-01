@@ -961,21 +961,4 @@ public class Utils {
         ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
-    
-    /**
-     * Return An CSWProfile from a string
-     * @param profileName
-     * @return
-     */
-    public static CSWProfile getServiceProfile(String profileName) {
-        if (profileName != null) {
-            if (profileName.equalsIgnoreCase("generic"))
-                return CSWProfile.GENERIC;
-            else if (profileName.equalsIgnoreCase("fileSystem"))            
-                return CSWProfile.FILESYSTEM;
-        }
-        //default
-        return CSWProfile.MDWEB;
-        
-    }
 }

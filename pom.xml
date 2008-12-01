@@ -154,7 +154,7 @@
       <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-server</artifactId>
-        <version>1.0</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
@@ -352,20 +352,21 @@
         <version>2.5.1-final-20040804</version>
       </dependency>
       <dependency>
-        <groupId>postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>8.1-407.jdbc3</version>
-      </dependency>
-      <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
         <version>2.7.1</version>
       </dependency>
-	  <dependency>
+      <!-- database driver -->
+      <dependency>
         <groupId>ojdbc</groupId>
-	    <artifactId>ojdbc</artifactId>
-	    <version>14</version>
-	  </dependency>
+	<artifactId>ojdbc</artifactId>
+	<version>14</version>
+      </dependency>
+      <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>8.1-407.jdbc3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

@@ -20,6 +20,7 @@ package org.constellation.sos.ws.soap;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.ws.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.Service;
@@ -30,7 +31,7 @@ import org.constellation.ws.Service;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SOServiceException", namespace="http://soap.webservice.sos.constellation.org/")
-public class SOServiceException extends Exception {
+public class SOServiceException extends WebServiceException {
     
     /**
      * An OGC Web Service exception report
