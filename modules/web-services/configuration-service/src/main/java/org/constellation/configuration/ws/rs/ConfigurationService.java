@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.configuration.ws;
+package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
