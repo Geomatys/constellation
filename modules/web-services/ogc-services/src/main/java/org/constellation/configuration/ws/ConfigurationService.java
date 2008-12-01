@@ -49,9 +49,6 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.nerc.CodeTableType;
@@ -64,10 +61,10 @@ import org.constellation.metadata.io.CDIReader;
 import org.constellation.metadata.io.CSRReader;
 import org.constellation.metadata.io.EDMEDReader;
 import org.constellation.metadata.io.GenericMetadataReader;
-import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
-import static org.constellation.ows.OWSExceptionCode.*;
-import static org.constellation.generic.database.Automatic.*;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -82,6 +79,10 @@ import org.mdweb.utils.GlobalUtils;
 
 // postgres dependencies
 import org.postgresql.ds.PGSimpleDataSource;
+
+import static org.constellation.generic.database.Automatic.*;
+import static org.constellation.ows.OWSExceptionCode.*;
+
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -274,9 +275,9 @@ public class ConfigurationService extends OGCWebService  {
         } catch (WebServiceException ex) {
             final String code = transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
-            if (!ex.getExceptionCode().equals(OWSExceptionCode.MISSING_PARAMETER_VALUE) &&
-                    !ex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-                    !ex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                    !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                    !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                 ex.printStackTrace();
             } else {
                 LOGGER.info(ex.getMessage());

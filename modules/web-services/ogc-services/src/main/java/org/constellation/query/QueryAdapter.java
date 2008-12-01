@@ -34,9 +34,9 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.catalog.Layer;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.TimeParser;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.TimeParser;
+import org.constellation.ws.WebServiceException;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -59,7 +59,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 
-import static org.constellation.coverage.web.ExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 
 
 /**

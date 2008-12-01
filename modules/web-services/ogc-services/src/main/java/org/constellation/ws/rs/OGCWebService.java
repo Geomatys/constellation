@@ -38,12 +38,12 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
-import org.constellation.coverage.web.ExceptionCode;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceExceptionReport;
-import org.constellation.coverage.web.ServiceExceptionType;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceExceptionReport;
+import org.constellation.ws.ServiceExceptionType;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
@@ -53,7 +53,7 @@ import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.geotools.util.Version;
 
-import static org.constellation.coverage.web.ExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 
 
 /**

@@ -14,9 +14,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.coverage.web;
+package org.constellation.ws;
 
-import org.constellation.catalog.CatalogException;
 import org.opengis.util.CodeList;
 
 
@@ -27,7 +26,7 @@ import org.opengis.util.CodeList;
  * @author Guihlem Legal
  * @author Cédric Briançon
  */
-public class WebServiceException extends CatalogException {
+public class WebServiceException extends Exception {
     /**
      * The exceptioni code.
      */

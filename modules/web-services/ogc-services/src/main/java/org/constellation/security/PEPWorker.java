@@ -26,8 +26,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
 
 
 /**

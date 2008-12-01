@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>xml-bindings</artifactId>
+    <artifactId>web-services</artifactId>
     <version>0.3-SNAPSHOT</version>
   </parent>
 
@@ -17,12 +17,12 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>se</artifactId>
+  <groupId>org.constellation.web-services</groupId>
+  <artifactId>configuration-service</artifactId>
   <packaging>jar</packaging>
-  <name>Symbolizer Encoding binding</name>
+  <name>Configuration web service</name>
   <description>
-    An implementation of some version of the Symbolizer Encoding.
+    Configuration web service.
   </description>
 
 
@@ -53,8 +53,18 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
-
 
 
   <!--
@@ -63,21 +73,8 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ogc</artifactId>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>ogc-services</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

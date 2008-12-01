@@ -21,7 +21,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.constellation.catalog.Element;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 
 
 /**

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>xml-bindings</artifactId>
+    <artifactId>web-services</artifactId>
     <version>0.3-SNAPSHOT</version>
   </parent>
 
@@ -17,12 +17,12 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>se</artifactId>
+  <groupId>org.constellation.web-services</groupId>
+  <artifactId>base</artifactId>
   <packaging>jar</packaging>
-  <name>Symbolizer Encoding binding</name>
+  <name>Common implementations of web services</name>
   <description>
-    An implementation of some version of the Symbolizer Encoding.
+    Common classes used by different web services.
   </description>
 
 
@@ -53,8 +53,18 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
-
 
 
   <!--
@@ -62,6 +72,14 @@
     dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
   -->
   <dependencies>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-metadata</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
@@ -71,14 +89,20 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-     <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ogc</artifactId>
-      <version>${project.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>jaxws-rt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.ws</groupId>
+      <artifactId>jaxws-api</artifactId>
     </dependency>
   </dependencies>
 

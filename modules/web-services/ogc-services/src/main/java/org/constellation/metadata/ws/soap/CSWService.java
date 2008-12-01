@@ -59,9 +59,9 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
 

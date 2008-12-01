@@ -14,33 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.coverage.web;
-
+package org.constellation.ws;
 
 /**
- * Manages {@link WebServiceWorker} on remote JMX.
- *
- * @version $Id$
+ * A class who permit to get the version parameter on each request.
+ * 
  * @author Guilhem Legal
  */
-public interface WebServiceManagerMBean {
-    /**
-     * Returns the number of workers.
-     */
-    int workerCount();
+public abstract class AbstractRequest {
 
-    /**
-     * Flush the cache content.
-     */
-    void flush();
-    
-    /**
-     * Scan the plugin used by the jvm.
-     */
-    void scanPlugin();
-    
-    /**
-     *  Display the current wcs formats accepted.
-     */
-    String acceptedFormats();
+    public abstract String getVersion();
 }

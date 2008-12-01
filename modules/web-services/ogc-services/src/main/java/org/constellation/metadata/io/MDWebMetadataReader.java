@@ -39,7 +39,7 @@ import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.WebServiceException;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.BoundingBoxType;

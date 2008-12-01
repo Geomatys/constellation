@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
 
 import org.geotools.util.Utilities;
 import org.constellation.catalog.Entry;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 

@@ -34,7 +34,6 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.sql.DataSource;
-import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.catalog.CatalogException;

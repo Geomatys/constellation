@@ -39,9 +39,9 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.DescribeSensor;

@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.constellation.coverage.web.WebServiceException;
-import org.constellation.coverage.web.ExceptionCode;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ws.WebServiceException;
+import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.provider.LayerDetails;
@@ -72,7 +72,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import static org.constellation.coverage.web.ExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 
 
 /**

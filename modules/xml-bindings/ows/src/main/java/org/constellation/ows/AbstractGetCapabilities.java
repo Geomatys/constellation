@@ -16,6 +16,8 @@
  */
 package org.constellation.ows;
 
+import org.constellation.ws.AbstractRequest;
+
 /**
  *  Super abstract type for all the different versions of GetCapabilities request.
  *

@@ -50,7 +50,7 @@ import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.WebServiceException;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.NotType;
 import org.constellation.ogc.PropertyIsLikeType;

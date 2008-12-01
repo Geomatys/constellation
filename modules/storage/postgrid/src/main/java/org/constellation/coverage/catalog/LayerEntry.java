@@ -49,7 +49,7 @@ import org.constellation.catalog.Entry;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ServerException;
 import org.constellation.coverage.model.Model;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 

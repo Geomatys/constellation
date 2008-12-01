@@ -16,7 +16,7 @@
  */
 package org.constellation.query;
 
-import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ws.ServiceVersion;
 
 
 /**

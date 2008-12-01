@@ -33,7 +33,7 @@ import org.geotools.util.DateRange;
 import org.constellation.catalog.Element;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Model;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 
 
 /**

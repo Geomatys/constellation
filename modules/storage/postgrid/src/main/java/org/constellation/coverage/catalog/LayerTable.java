@@ -27,7 +27,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.constellation.catalog.Database;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.constellation.catalog.BoundedSingletonTable;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.catalog.CatalogException;

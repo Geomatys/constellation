@@ -16,8 +16,8 @@
  */
 package org.constellation.query.wms;
 
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceVersion;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceVersion;
 
 
 /**

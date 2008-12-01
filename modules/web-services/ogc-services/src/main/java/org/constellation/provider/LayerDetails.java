@@ -28,7 +28,7 @@ import java.util.SortedSet;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.coverage.grid.GridCoverage2D;

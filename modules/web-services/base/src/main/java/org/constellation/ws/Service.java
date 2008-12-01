@@ -14,14 +14,48 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ows;
+package org.constellation.ws;
+
 
 /**
- * A class who permit to get the version parameter on each request.
- * 
- * @author Guilhem Legal
+ * Type kind of service.
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
-public abstract class AbstractRequest {
+public enum Service {
+    /**
+     * Web Map Service.
+     */
+    WMS,
 
-    public abstract String getVersion();
+    /**
+     * Web Coverage Service.
+     */
+    WCS,
+
+    /**
+     * Catalog Service-Web.
+     */
+    CSW,
+
+    /**
+     * Open Web service.
+     */
+    OWS,
+
+    /**
+     * Sensor Observation Service.
+     */
+    SOS,
+
+    /**
+     * GetFeatureInfo WMS request, part of Web Map Service.
+     */
+    GETINFO,
+
+    /**
+     * Any other Service.
+     */
+    OTHER
 }

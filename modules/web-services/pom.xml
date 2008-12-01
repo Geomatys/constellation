@@ -59,8 +59,8 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <!--module>base</module>
-    <module>configuration</module-->
+    <module>base</module>
+    <module>configuration-service</module>
     <module>ogc-services</module>
     <!--module>secure</module-->
   </modules>

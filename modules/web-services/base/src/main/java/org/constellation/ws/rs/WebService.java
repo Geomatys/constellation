@@ -51,11 +51,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
-import org.constellation.coverage.web.WebServiceException;
-import org.constellation.ows.AbstractRequest;
-import org.constellation.query.wms.WMSQuery;
+import org.constellation.ws.WebServiceException;
+import org.constellation.ws.AbstractRequest;
 
-import static org.constellation.coverage.web.ExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 
 /**
  * Main class for all web services.
@@ -212,8 +211,8 @@ public abstract class WebService {
                  *
                  * todo: fix the style parameter.
                  */
-                if (parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLE) ||
-                    parameterName.equalsIgnoreCase(WMSQuery.KEY_STYLES)) {
+                if (parameterName.equalsIgnoreCase("STYLE") ||
+                    parameterName.equalsIgnoreCase("STYLES")) {
                     return value;
                 }
                 throw new WebServiceException("The parameter " + parameterName + " should have a value",

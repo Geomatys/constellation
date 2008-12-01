@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.constellation.coverage.web.ExpressionType;
+import org.constellation.ogc.ExpressionType;
 import org.constellation.gml.v311.AbstractGeometryType;
 import org.constellation.gml.v311.CoordinatesType;
 import org.constellation.gml.v311.DirectPositionType;

@@ -31,7 +31,7 @@ import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
 

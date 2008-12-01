@@ -16,7 +16,7 @@
  */
 package org.constellation.wcs;
 
-import org.constellation.ows.AbstractRequest;
+import org.constellation.ws.AbstractRequest;
 
 /**
  *  Super abstract type for all the different versions of GetCoverage request.

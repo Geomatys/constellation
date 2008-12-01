@@ -21,8 +21,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.Service;
 
 /**
  *

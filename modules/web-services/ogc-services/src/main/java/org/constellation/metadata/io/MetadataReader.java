@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 
 /**
  *

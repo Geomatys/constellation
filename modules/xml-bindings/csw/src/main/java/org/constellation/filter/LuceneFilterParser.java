@@ -30,9 +30,8 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
-import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
 import org.constellation.gml.v311.PointType;

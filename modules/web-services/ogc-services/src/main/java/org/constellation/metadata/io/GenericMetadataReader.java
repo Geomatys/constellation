@@ -43,7 +43,7 @@ import javax.xml.namespace.QName;
 
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.WebServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
@@ -61,7 +61,6 @@ import org.constellation.skos.RDF;
 import org.constellation.ws.rs.WebService;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
-import static org.constellation.generic.database.Automatic.*;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;

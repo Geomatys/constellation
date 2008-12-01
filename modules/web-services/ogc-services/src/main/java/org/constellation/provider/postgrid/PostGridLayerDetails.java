@@ -37,7 +37,7 @@ import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.coverage.web.Service;
+import org.constellation.ws.Service;
 import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;

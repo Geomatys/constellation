@@ -20,8 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.coverage.web.WebServiceException;
-import static org.constellation.metadata.io.MetadataReader.*;
+import org.constellation.ws.WebServiceException;
 
 /**
  *

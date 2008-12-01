@@ -48,12 +48,11 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.coverage.web.ExceptionCode;
-import org.constellation.coverage.web.Service;
-import org.constellation.coverage.web.ServiceExceptionReport;
-import org.constellation.coverage.web.ServiceExceptionType;
-import org.constellation.coverage.web.ServiceVersion;
-import org.constellation.coverage.web.WebServiceException;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceExceptionReport;
+import org.constellation.ws.ServiceExceptionType;
+import org.constellation.ws.ServiceVersion;
+import org.constellation.ws.WebServiceException;
 import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -110,6 +109,7 @@ import org.constellation.wcs.v111.InterpolationMethodType;
 import org.constellation.wcs.v111.InterpolationMethods;
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
 import org.constellation.wcs.v111.RangeType;
+import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.rs.OGCWebService;
 
 // GeoAPI dependencies
@@ -123,7 +123,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import static org.constellation.coverage.web.ExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.wcs.WCSQuery.*;
 
 
