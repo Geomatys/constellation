@@ -58,7 +58,7 @@
     </servlet-mapping-->
 
     <!-- To enable SOAP service in glassfish remove the property  'metadata-complete="true"' in the web-app tag (at the top of this document)-->
-    <listener>
+    <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener>
     <servlet>
@@ -70,7 +70,7 @@
     <servlet-mapping>
         <servlet-name>PEPService</servlet-name>
         <url-pattern>/PEPService</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping-->
 
     <!-- Servlet for constellation JSF interface -->
 
