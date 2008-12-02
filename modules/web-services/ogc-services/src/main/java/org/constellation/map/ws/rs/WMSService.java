@@ -66,7 +66,6 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.query.wms.WMSQuery;
 import org.constellation.query.wms.WMSQueryVersion;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.wms.AbstractWMSCapabilities;
@@ -138,29 +137,22 @@ public class WMSService extends OGCWebService {
      * @throw JAXBException
      */
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        WMSQuery query = null;
         try {
             final String request = (String) getParameter(KEY_REQUEST, true);
             LOGGER.info("New request: " + request);
             writeParameters();
 
             if (GETMAP.equalsIgnoreCase(request)) {
-                query = adaptGetMap(true);
-                return getMap(query);
+                return getMap(adaptGetMap(true));
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                query = adaptGetFeatureInfo();
-                return getFeatureInfo(query);
+                return getFeatureInfo(adaptGetFeatureInfo());
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                query = adaptGetCapabilities();
-                return getCapabilities(query);
+                return getCapabilities(adaptGetCapabilities());
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
-                query = adaptGetLegendGraphic();
-                return getLegendGraphic(query);
-//                final String mimeType = getParameter(KEY_FORMAT, true);
-//                return Response.ok(getLegendGraphic(query), mimeType).build();
+                return getLegendGraphic(adaptGetLegendGraphic());
             }
             final String version = (String) getParameter(KEY_VERSION, false);
             final WMSQueryVersion queryVersion;
@@ -201,23 +193,16 @@ public class WMSService extends OGCWebService {
     /**
      * Describe the capabilities and the layers available of this service.
      *
-     * @param query The {@linkplain WMSQuery wms query}.
+     * @param getCapab The {@linkplain GetCapabilities get capabilities} request.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
      * @throws WebServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Response getCapabilities(final WMSQuery query) throws WebServiceException,
+    private Response getCapabilities(final GetCapabilities getCapab) throws WebServiceException,
                                                                   JAXBException
     {
-        //we begin by extracting the mandatory attribute
-        if (!(query instanceof GetCapabilities)) {
-            throw new WebServiceException("Invalid request found, should be GetCapabilities.",
-                    INVALID_REQUEST, query.getVersion(), "request");
-        }
-        final GetCapabilities capabRequest = (GetCapabilities) query;
-        //and the the optional attribute
-        final WMSQueryVersion queryVersion = capabRequest.getVersion();
+        final WMSQueryVersion queryVersion = getCapab.getVersion();
         String format = getParameter(KEY_FORMAT, false);
         if (format == null || !(format.equalsIgnoreCase(TEXT_XML) ||
                 format.equalsIgnoreCase(APP_WMS_XML) || format.equalsIgnoreCase(APP_XML)))
@@ -472,21 +457,17 @@ public class WMSService extends OGCWebService {
     /**
      * Return the value of a point in a map.
      *
+     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
      * @return text, HTML , XML or GML code.
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private Response getFeatureInfo(final WMSQuery query)
+    private Response getFeatureInfo(final GetFeatureInfo gfi)
                           throws WebServiceException, JAXBException
     {
-        if (!(query instanceof GetFeatureInfo)) {
-            throw new WebServiceException("Invalid request found, should be GetFeatureInfo.",
-                    INVALID_REQUEST, query.getVersion(), "request");
-        }
-        final GetFeatureInfo info = (GetFeatureInfo) query;
-        final WMSQueryVersion queryVersion = info.getVersion();
+        final WMSQueryVersion queryVersion = gfi.getVersion();
 
-        String infoFormat = info.getInfoFormat();
+        String infoFormat = gfi.getInfoFormat();
         if (infoFormat != null) {
             if(!(infoFormat.equalsIgnoreCase(TEXT_PLAIN) || infoFormat.equalsIgnoreCase(TEXT_HTML) ||
                  infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
@@ -500,7 +481,7 @@ public class WMSService extends OGCWebService {
             infoFormat = TEXT_PLAIN;
         }
         final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final List<String> layers = info.getQueryLayers();
+        final List<String> layers = gfi.getQueryLayers();
         final int size = layers.size();
         /* Now proceed to the calculation of the values, and use the toString method to store them.
          * This map will store couples of <layerName, List<values>> obtained by the getInformationAt() method.
@@ -515,7 +496,7 @@ public class WMSService extends OGCWebService {
             }
             final Object currentValue;
             try {
-                currentValue = layer.getInformationAt(info);
+                currentValue = layer.getInformationAt(gfi);
             } catch (CatalogException cat) {
                 throw new WebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
             } catch (IOException io) {
@@ -527,8 +508,8 @@ public class WMSService extends OGCWebService {
             } else {
                 final List<SimpleFeature> features = (List<SimpleFeature>) currentValue;
                 // Defines how many features we will take in the list of results.
-                final int featuresSize = (info.getFeatureCount() > features.size()) ?
-                                          features.size() : info.getFeatureCount();
+                final int featuresSize = (gfi.getFeatureCount() > features.size()) ?
+                                          features.size() : gfi.getFeatureCount();
                 // Fill the list of values with features found.
                 for (int i=0; i<featuresSize; i++) {
                     final SimpleFeature feature = features.get(i);
@@ -599,9 +580,9 @@ public class WMSService extends OGCWebService {
                    .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
                    .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
                    .append("\n");
-            final Envelope objEnv = info.getEnvelope();
-            final Date time = info.getTime();
-            final Double elevation = info.getElevation();
+            final Envelope objEnv = gfi.getEnvelope();
+            final Date time = gfi.getTime();
+            final Double elevation = gfi.getElevation();
             for (String layer : layers) {
                 final String layerNameCorrected = layer.replaceAll("\\W", "");
                 builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
@@ -621,7 +602,7 @@ public class WMSService extends OGCWebService {
                 }
                 builder.append("\t\t\t\t<gml:Box srsName=\"").append(crsName).append("\">\n");
                 builder.append("\t\t\t\t\t<gml:coordinates>");
-                final GeneralDirectPosition pos = layerPostgrid.getPixelCoordinates(info);
+                final GeneralDirectPosition pos = layerPostgrid.getPixelCoordinates(gfi);
                 builder.append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1)).append(" ")
                        .append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1));
                 builder.append("</gml:coordinates>").append("\n");
@@ -663,7 +644,7 @@ public class WMSService extends OGCWebService {
                 }
                 final GridCoverage2D coverage;
                 try {
-                    coverage = layerPostgrid.getCoverage(objEnv, new Dimension(info.getSize()), elevation, time);
+                    coverage = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
                 } catch (CatalogException cat) {
                     throw new WebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
                 } catch (IOException io) {
@@ -696,32 +677,27 @@ public class WMSService extends OGCWebService {
     /**
      * Return the legend graphic for the current layer.
      *
-     * @param query The {@linkplain WMSQuery wms query}.
+     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
      *
      * @throws org.constellation.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private Response getLegendGraphic(final WMSQuery query) throws WebServiceException,
+    private Response getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException,
                                                                             JAXBException
     {
-        if (!(query instanceof GetLegendGraphic)) {
-            throw new WebServiceException("Invalid request found, should be GetLegendGraphic.",
-                    INVALID_REQUEST, query.getVersion(), "request");
-        }
-        final WMSQueryVersion version = query.getVersion();
-        final GetLegendGraphic legendRequest = (GetLegendGraphic) query;
+        final WMSQueryVersion version = getLegend.getVersion();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final LayerDetails layer = dp.get(legendRequest.getLayer());
+        final LayerDetails layer = dp.get(getLegend.getLayer());
         if (layer == null) {
             throw new WebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
                     version, "layer");
         }
-        final int width  = legendRequest.getWidth();
-        final int height = legendRequest.getHeight();
+        final int width  = getLegend.getWidth();
+        final int height = getLegend.getHeight();
         final Dimension dims = new Dimension(width, height);
         final BufferedImage image = layer.getLegendGraphic(dims);
-        final String mimeType = legendRequest.getFormat();
+        final String mimeType = getLegend.getFormat();
         
         return Response.ok(image, mimeType).build();
     }
@@ -730,17 +706,11 @@ public class WMSService extends OGCWebService {
      * Return a map for the specified parameters in the query: works with
      * the new GO2 Renderer.
      *
-     * @param query The {@linkplain WMSQuery wms query}.
+     * @param getMap The {@linkplain GetMap get map} request.
      * @return The map requested, or an error.
      * @throws WebServiceException
      */
-    private synchronized Response getMap(final WMSQuery query) throws WebServiceException {
-        //verifyBaseParameter(0);
-        if (!(query instanceof GetMap)) {
-            throw new WebServiceException("Invalid request found, should be GetMap.",
-                    INVALID_REQUEST, query.getVersion(), "request");
-        }
-        final GetMap getMap = (GetMap) query;
+    private synchronized Response getMap(final GetMap getMap) throws WebServiceException {
         final WMSQueryVersion queryVersion = getMap.getVersion();
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
