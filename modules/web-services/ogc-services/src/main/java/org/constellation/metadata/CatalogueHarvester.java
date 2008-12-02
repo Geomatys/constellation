@@ -155,14 +155,23 @@ public class CatalogueHarvester {
     private final MetadataWriter metadataWriter;
     
     /**
-     * Build a new catalogue harvester.
-     * 
-     * @param worker
+     * Build a new catalogue harvester with the write part.
      */
     public CatalogueHarvester(Marshaller marshaller, Unmarshaller unmarshaller, MetadataWriter metadataWriter, ServiceVersion version) {
         this.marshaller     = marshaller;
         this.unmarshaller   = unmarshaller;
         this.metadataWriter = metadataWriter;
+        this.version        = version;
+        initializeRequest();
+    }
+    
+    /**
+     * Build a new catalogue harvester with the write part.
+     */
+    public CatalogueHarvester(Marshaller marshaller, Unmarshaller unmarshaller, ServiceVersion version) {
+        this.marshaller     = marshaller;
+        this.unmarshaller   = unmarshaller;
+        this.metadataWriter = null;
         this.version        = version;
         initializeRequest();
     }
@@ -237,6 +246,10 @@ public class CatalogueHarvester {
      * @return the number of inserted Record.
      */
     protected int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
+        
+        if (metadataWriter == null)
+            throw new WebServiceException("The Service can not write into the database",
+                                          OPERATION_NOT_SUPPORTED, version, "Harvest");
         
         //first we make a getCapabilities(GET) request to see what service version we have
         Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW", null);
@@ -442,7 +455,7 @@ public class CatalogueHarvester {
     /**
      *  Analyse a capabilities Document and update the specified GetRecords request at the same time.
      */
-    public GetRecordsRequest analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
+    private GetRecordsRequest analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
         String distantVersion = "2.0.2";
         StringBuilder report = new StringBuilder();
 
@@ -872,32 +885,6 @@ public class CatalogueHarvester {
         }
         
         return new DistributedResults(matched, additionalResults);
-        
-    }
-    
-    public class DistributedResults {
-        
-        /**
-         * The number of records matched on all distributed servers.
-         */
-        public int nbMatched;
-        
-        /**
-         * The merged list of records.
-         */
-        public List<Object> additionalResults;
-        
-        public DistributedResults() {
-            this.nbMatched         = 0;
-            this.additionalResults = new ArrayList<Object>(); 
-        }
-        
-        public DistributedResults(int nbMatched, List<Object> additionalResults) {
-            this.nbMatched         = nbMatched;
-            this.additionalResults = additionalResults; 
-        }
-        
-        
         
     }
 }

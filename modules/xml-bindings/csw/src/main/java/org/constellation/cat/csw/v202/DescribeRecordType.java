@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.AbstractCswRequest;
 
 
 /**
@@ -62,7 +63,7 @@ import javax.xml.namespace.QName;
     "typeName"
 })
 @XmlRootElement(name = "DescribeRecord")
-public class DescribeRecordType extends RequestBaseType {
+public class DescribeRecordType extends RequestBaseType implements AbstractCswRequest {
 
     @XmlElement(name = "TypeName")
     private List<QName> typeName;
@@ -114,6 +115,13 @@ public class DescribeRecordType extends RequestBaseType {
      */
     public String getOutputFormat() {
         return outputFormat;
+    }
+    
+    /**
+     * Gets the value of the outputFormat property.
+     */
+    public void setOutputFormat(String outputFormat) {
+        this.outputFormat = outputFormat;
     }
 
     /**

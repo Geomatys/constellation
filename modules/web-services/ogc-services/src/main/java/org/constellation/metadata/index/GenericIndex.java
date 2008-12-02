@@ -52,6 +52,7 @@ import static org.constellation.metadata.CSWQueryable.*;
 
 // geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.temporal.object.DefaultInstant;
 
 // geoAPI dependencies
 import org.opengis.util.InternationalString;
@@ -417,6 +418,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
         
+        } else if (obj instanceof DefaultInstant) {
+            result = obj.toString();
+            
         } else if (obj instanceof Date) {
             result = dateFormat.format((Date)obj);
             
@@ -565,5 +569,10 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             return results.get(0);
         else 
             return null;
+    }
+
+    @Override
+    public String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException {
+        return doc.get("id");
     }
 }

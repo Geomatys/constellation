@@ -380,6 +380,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param identifier
      */
     private void loadData(String identifier) {
+        logger.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
         for (PreparedStatement stmt : singleStatements.keySet()) {

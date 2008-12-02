@@ -196,8 +196,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
             Hits hits = searcher.search(query, f, sort);
         
             for (int i = 0; i < hits.length(); i ++) {
-            
-                results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
+                results.add(getMatchingID(hits.doc(i)));
             }
         
         // for a OR we need to perform many request 
@@ -206,11 +205,11 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
             Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), sort);
             
             for (int i = 0; i < hits1.length(); i++) {
-                results.add(hits1.doc(i).get("id") + ':' + hits1.doc(i).get("catalog"));
+                results.add(getMatchingID(hits1.doc(i)));
             }
             
             for (int i = 0; i < hits2.length(); i++) {
-                String id = hits2.doc(i).get("id") + ':' + hits2.doc(i).get("catalog");
+                String id = getMatchingID(hits2.doc(i));
                 if (!results.contains(id)) {
                     results.add(id);
                 }
@@ -222,12 +221,12 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
             
             List<String> unWanteds = new ArrayList<String>();
             for (int i = 0; i < hits1.length(); i++) {
-                unWanteds.add(hits1.doc(i).get("id") + ':' + hits1.doc(i).get("catalog"));
+                unWanteds.add(getMatchingID(hits1.doc(i)));
             }
             
             Hits hits2 = searcher.search(simpleQuery, sort);
             for (int i = 0; i < hits2.length(); i++) {
-                String id = hits2.doc(i).get("id") + ':' + hits2.doc(i).get("catalog");
+                String id = getMatchingID(hits2.doc(i)); 
                 if (!unWanteds.contains(id)) {
                     results.add(id);
                 }
@@ -264,6 +263,15 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * @return A database id.
      */
     public abstract String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
+    
+    /**
+     * This method return the database ID of a matching Document
+     *
+     * @param doc A matching document. 
+     * 
+     * @return A database id.
+     */
+    public abstract String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException;
     
     /**
      * Add a boundingBox geometry to the specified Document.

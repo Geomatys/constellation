@@ -961,4 +961,16 @@ public class Utils {
         ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
+    
+    /**
+     * Remove the prefix on propertyName.
+     * example : removePrefix(csw:GetRecords) return "GetRecords".
+     */
+    public static String removePrefix(String s) {
+        int i = s.indexOf(':');
+        if ( i != -1) {
+            s = s.substring(i + 1, s.length());
+        }
+        return s;
+    }
 }

@@ -112,6 +112,7 @@ import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import org.constellation.cat.csw.AbstractCswRequest;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -380,7 +381,7 @@ public class CSWworker {
                             BDD dbProperties = genericConfiguration.getBdd();
                             if (dbProperties == null) {
                                 logger.severe("The CSW service is not working!" + '\n' +
-                                        "the generic configuration file does not contains a BDD object");
+                                        "cause: The generic configuration file does not contains a BDD object");
                                 isStarted = false;
                             } else {
 
@@ -413,7 +414,7 @@ public class CSWworker {
                                                 break;
                                             default: 
                                                 logger.severe("The CSW service is not working!" + '\n' +
-                                                "cause: Unknow generic database type!");
+                                                              "cause: Unknow generic database type!");
                                                 isStarted = false;
                                                 return;
                                         }
@@ -436,13 +437,13 @@ public class CSWworker {
 
                         } else {
                             logger.severe("The CSW service is not working!" + '\n' +
-                                    "the generic configuration file has not been found");
+                                    "cause: The generic configuration file has not been found");
                             isStarted = false;
                         }
 
                     } catch (JAXBException ex) {
                         logger.severe("The CSW service is not working!" + '\n' +
-                                      "JAXBException while getting generic configuration");
+                                      "cause: JAXBException while getting generic configuration");
                         isStarted = false;
                     }
                     break;
@@ -501,7 +502,7 @@ public class CSWworker {
     }
     
     /**
-     * 
+     * Load the federated CSW server from a properties file.
      */
     public void loadCascadedService(File configDirectory) {
         cascadedCSWservers = new ArrayList<String>();
@@ -711,18 +712,7 @@ public class CSWworker {
         String ID = request.getRequestId();
         
         // we initialize the output format of the response
-        String format = request.getOutputFormat();
-        if (format != null && isSupportedFormat(format)) {
-            outputFormat = format;
-        } else if (format != null && !isSupportedFormat(format)) {
-            String supportedFormat = "";
-            for (String s: ACCEPTED_OUTPUT_FORMATS) {
-                supportedFormat = supportedFormat  + s + '\n';
-            } 
-            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
-                                             " supported ones are: " + '\n' + supportedFormat,
-                                             INVALID_PARAMETER_VALUE, version, "outputFormat");
-        }
+        initializeOutputFormat(request);
         
         //we get the output schema and verify that we handle it
         String outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
@@ -837,7 +827,7 @@ public class CSWworker {
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
                     throw new WebServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE, version);
-                String propertyName = removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+                String propertyName = Utils.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
             
                 Sort sortFilter;
                 if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
@@ -856,19 +846,20 @@ public class CSWworker {
         }
         
         //we look for distributed queries
-        CatalogueHarvester.DistributedResults distributedResults = catalogueHarvester.new DistributedResults();
-        if (request.getDistributedSearch() != null) {
-            int distributedStartPosition;
-            int distributedMaxRecord;
-            if (startPos > results.size()) {
-                distributedStartPosition = startPos - results.size();
-                distributedMaxRecord     = maxRecord;
-            } else {
-                distributedStartPosition = 1;
-                distributedMaxRecord     = maxRecord - results.size();
-            }
-            
+        DistributedResults distributedResults = new DistributedResults();
+        if (catalogueHarvester != null) {
+            if (request.getDistributedSearch() != null) {
+                int distributedStartPosition;
+                int distributedMaxRecord;
+                if (startPos > results.size()) {
+                    distributedStartPosition = startPos - results.size();
+                    distributedMaxRecord     = maxRecord;
+                } else {
+                    distributedStartPosition = 1;
+                    distributedMaxRecord     = maxRecord - results.size();
+                }
             distributedResults = catalogueHarvester.transferGetRecordsRequest(request, cascadedCSWservers, distributedStartPosition, distributedMaxRecord);
+            }
         }
         
         int nextRecord   = startPos + maxRecord;
@@ -1082,18 +1073,7 @@ public class CSWworker {
         verifyBaseRequest(request);
         
         // we initialize the output format of the response
-        String format = request.getOutputFormat();
-        if (format != null && isSupportedFormat(format)) {
-            outputFormat = format;
-        } else if (format != null && !isSupportedFormat(format)) {
-            String supportedFormat = "";
-            for (String s: ACCEPTED_OUTPUT_FORMATS) {
-                supportedFormat = supportedFormat  + s + '\n';
-            } 
-            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
-                                          " supported ones are: " + '\n' + supportedFormat,
-                                          INVALID_PARAMETER_VALUE, version, "outputFormat");
-        }
+        initializeOutputFormat(request);
         
         
         // we get the level of the record to return (Brief, summary, full)
@@ -1326,18 +1306,7 @@ public class CSWworker {
             verifyBaseRequest(request);
             
             // we initialize the output format of the response
-            String format = request.getOutputFormat();
-            if (format != null && isSupportedFormat(format)) {
-                outputFormat = format;
-            } else if (format != null && !isSupportedFormat(format)) {
-                String supportedFormat = "";
-                for (String s: ACCEPTED_OUTPUT_FORMATS) {
-                    supportedFormat = supportedFormat  + s + '\n';
-                } 
-                throw new WebServiceException("The server does not support this output format: " + format + '\n' +
-                                              " supported ones are: " + '\n' + supportedFormat,
-                                              INVALID_PARAMETER_VALUE, version, "outputFormat");
-            }
+            initializeOutputFormat(request);
         
             // we initialize the type names
             List<QName> typeNames = request.getTypeName();
@@ -1882,17 +1851,6 @@ public class CSWworker {
     }
     
     /**
-     * Remove the prefix on propertyName.
-     */
-    private String removePrefix(String s) {
-        int i = s.indexOf(':');
-        if ( i != -1) {
-            s = s.substring(i + 1, s.length());
-        }
-        return s;
-    }
-    
-        /**
      * Return An CSWProfile from a string
      * @param profileName
      * @return
@@ -1907,5 +1865,29 @@ public class CSWworker {
         //default
         return CSWProfile.MDWEB;
         
+    }
+    
+    /**
+     * Initialize the outputFormat (MIME type) of the response.
+     * if the format is not supported it throws a WebService Exception.
+     * 
+     * @param request
+     * @throws org.constellation.ws.WebServiceException
+     */
+    private void initializeOutputFormat(AbstractCswRequest request) throws WebServiceException {
+        
+        // we initialize the output format of the response
+        String format = request.getOutputFormat();
+        if (format != null && isSupportedFormat(format)) {
+            outputFormat = format;
+        } else if (format != null && !isSupportedFormat(format)) {
+            String supportedFormat = "";
+            for (String s: ACCEPTED_OUTPUT_FORMATS) {
+                supportedFormat = supportedFormat  + s + '\n';
+            } 
+            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
+                                             " supported ones are: " + '\n' + supportedFormat,
+                                             INVALID_PARAMETER_VALUE, version, "outputFormat");
+        }
     }
 }

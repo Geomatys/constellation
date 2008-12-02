@@ -25,7 +25,7 @@ import org.constellation.ogc.FilterType;
  * An interface containing the common methods to the different version of the operation GetRecords.
  * 
  */
-public interface GetRecordsRequest  {
+public interface GetRecordsRequest extends AbstractCswRequest {
 
     
     /**
@@ -39,18 +39,6 @@ public interface GetRecordsRequest  {
      */
     public void setRequestId(String value);
 
-    /**
-     * Gets the value of the outputFormat property.
-     * 
-     */
-    public String getOutputFormat();
-
-    /**
-     * Sets the value of the outputFormat property.
-     * 
-     */
-    public void setOutputFormat(String value);
-    
     /**
      * Gets the value of the outputSchema property.
      */

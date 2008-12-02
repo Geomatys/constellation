@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.AbstractCswRequest;
 
 
 /**
@@ -63,7 +64,7 @@ import javax.xml.bind.annotation.XmlType;
     "id",
     "elementSetName"
 })
-public class GetRecordByIdType extends RequestBaseType {
+public class GetRecordByIdType extends RequestBaseType implements AbstractCswRequest {
 
     @XmlElement(name = "Id", required = true)
     @XmlSchemaType(name = "anyURI")
@@ -118,6 +119,13 @@ public class GetRecordByIdType extends RequestBaseType {
      */
     public String getOutputFormat() {
         return outputFormat;
+    }
+    
+    /**
+     * Gets the value of the outputFormat property.
+     */
+    public void setOutputFormat(String outputFormat) {
+        this.outputFormat = outputFormat;
     }
 
     /**

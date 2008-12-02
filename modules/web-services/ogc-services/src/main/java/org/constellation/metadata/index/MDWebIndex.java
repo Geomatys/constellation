@@ -550,4 +550,9 @@ public class MDWebIndex extends IndexLucene<Form> {
         else 
             return null;
     }
+
+    @Override
+    public String getMatchingID(Document doc) throws CorruptIndexException, IOException, org.apache.lucene.queryParser.ParseException {
+        return doc.get("id") + ':' + doc.get("catalog");
+    }
 }
