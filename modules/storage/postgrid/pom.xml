@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Configuration of "postgrid" module from Constellation project.
+  Configuration for the "postgrid" module from Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -80,8 +80,8 @@
 
 
   <!--
-    Dépendances requises pour la compilation. Ces dépendances seront incluses
-    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
     <dependency>
@@ -123,8 +123,8 @@
     </dependency>
 
     <!--
-      Les dépendances suivantes ne sont requises (en principe) que pour le Java 5.
-      Elles contiennent des classes qui sont incluses dans le Java 6 standard.
+      Following dependencies are not required (in principle) but for Java 5.
+      They contain classes that are included into the Java 6 standard.
     -->
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -132,11 +132,12 @@
     </dependency>
 
     <!--
-      Dépendances requises pour l'exécution, mais pas pour la compilation. Elles seront incluses
-      dans la liste de JAR que Maven placera dans le répertoire "target/binaries", mais aucune
-      dépendances explicites vers ces libraires ne sera faite dans le code source. Certaines de
-      ces dépendances sont optionnelles. Par exemple on choisira typiquement un pilote JDBC pour
-      PostgreSQL ou pour Derby, mais pas les deux en même temps.
+      Repositories where to find dependencies. A directory http://*.maven.org/
+      is implicit. One can find the necessary dependencies for Maven itself, and
+      some usual dependencies as the JDBC driver for PostgreSQL. The directory
+      "Geotools" contains JARs of Geotools as well as some needed dependencies
+      for Geotools but not published on the Maven repository, for example the
+      UCAR library for the reading of NetCDF files.
     -->
     <dependency>
       <groupId>postgresql</groupId>

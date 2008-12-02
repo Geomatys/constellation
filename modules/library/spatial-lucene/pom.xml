@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "wms" module from Constellation project.
+  Configuration of "spatial-lucence" module from Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -47,8 +47,8 @@
 
 
   <!--
-    Dépendances requises pour la compilation. Ces dépendances seront incluses
-    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
      <dependency>

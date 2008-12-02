@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "wms" module from Constellation project.
+  Configuration of "sec-services" module from Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,9 +18,9 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>secure</artifactId>
+  <artifactId>sec-services</artifactId>
   <packaging>jar</packaging>
-  <name>Security web service</name>
+  <name>Security web services</name>
   <description>
     Security module of Constellation for web services.
   </description>
@@ -68,8 +68,8 @@
 
 
   <!--
-    Dépendances requises pour la compilation. Ces dépendances seront incluses
-    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+    Required dependencies for building. These dependencies will be included
+    in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
     <dependency>

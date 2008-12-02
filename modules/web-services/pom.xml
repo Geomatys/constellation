@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "wms" module from Constellation project.
+  Configuration of "web-services" module from Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -62,7 +62,7 @@
     <module>base</module>
     <module>configuration-service</module>
     <module>ogc-services</module>
-    <!--module>secure</module-->
+    <module>sec-services</module>
   </modules>
 
 </project>
