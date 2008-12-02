@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.AbstractCswRequest;
 
 
 /**
@@ -60,7 +61,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "DescribeRecordType", propOrder = {
     "typeName"
 })
-public class DescribeRecordType extends RequestBaseType {
+public class DescribeRecordType extends RequestBaseType implements AbstractCswRequest {
 
     @XmlElement(name = "TypeName")
     private List<TypeNameType> typeName;

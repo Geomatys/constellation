@@ -19,6 +19,8 @@
 package org.constellation.metadata;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -45,6 +47,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -972,5 +975,49 @@ public class Utils {
             s = s.substring(i + 1, s.length());
         }
         return s;
+    }
+    
+    /**
+     * Load the properties from a properies file. 
+     * 
+     * If the file does not exist it will be created and an empty Properties object will be return.
+     * 
+     * @param f a properties file.
+     * 
+     * @return a Properties Object.
+     */
+    public static Properties getPropertiesFromFile(File f) throws  IOException {
+        if (f != null) {
+            Properties prop = new Properties();
+            if (f.exists()) {
+                FileInputStream in = null;
+                in = new FileInputStream(f);
+                prop.load(in);
+                in.close();
+            } else {
+                f.createNewFile();
+            }
+            return prop;
+        } else {
+            throw new IllegalArgumentException(" the properties file can't be null");
+        }
+    }
+    
+    /**
+     * store an Properties object "prop" into the specified File
+     * 
+     * @param prop A properties Object.
+     * @param f    A file.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    public static void storeProperties(Properties prop, File f) throws IOException {
+        if (prop == null || f == null) {
+            throw new IllegalArgumentException(" the properties or file can't be null");
+        } else {
+          
+                FileOutputStream out = new FileOutputStream(f);
+                prop.store(out, "");
+                out.close();
+        }
     }
 }

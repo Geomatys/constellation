@@ -18,16 +18,9 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -41,49 +34,23 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-// constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.generic.nerc.CodeTableType;
-import org.constellation.generic.nerc.WhatsListsResponse;
+import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.metadata.Utils;
-import org.constellation.metadata.index.GenericIndex;
-import org.constellation.metadata.index.IndexLucene;
-import org.constellation.metadata.index.MDWebIndex;
-import org.constellation.metadata.io.CDIReader;
-import org.constellation.metadata.io.CSRReader;
-import org.constellation.metadata.io.EDMEDReader;
-import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
-import org.constellation.ws.rs.ContainerNotifierImpl;
-
-// geotools dependencies
 import org.constellation.ws.rs.WebService;
-import org.geotools.metadata.note.Anchors;
-import org.geotools.resources.JDBC;
-
-// model dependencies
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.sql.v20.Reader20;
-import org.mdweb.utils.GlobalUtils;
-
-// postgres dependencies
-import org.postgresql.ds.PGSimpleDataSource;
-
-import static org.constellation.generic.database.Automatic.*;
+import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
+// geotools dependencies
+import org.geotools.metadata.note.Anchors;
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -100,23 +67,18 @@ public class ConfigurationService extends WebService  {
     @Context
     private ContainerNotifierImpl cn;
     
-    /**
-     * A lucene Index used to pre-build a CSW index.
-     */
-    private IndexLucene indexer;
+    private CSWconfigurer cswConfigurer;
     
-    private File cswConfigDir;
-
     private boolean CSWFunctionEnabled;
     
-    private static Map<String, String> serviceDirectory = new HashMap<String, String>();
+    public final static Map<String, File> serviceDirectory = new HashMap<String, File>();
     static {
-        serviceDirectory.put("CSW",      "csw_configuration");
-        serviceDirectory.put("SOS",      "sos_configuration");
-        serviceDirectory.put("MDSEARCH", "mdweb/search");
+        serviceDirectory.put("CSW",      new File(getSicadeDirectory(), "csw_configuration"));
+        serviceDirectory.put("SOS",      new File(getSicadeDirectory(), "sos_configuration"));
+        serviceDirectory.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
     }
     
-    private static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
+    public static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
     
             
     public ConfigurationService() {
@@ -124,98 +86,14 @@ public class ConfigurationService extends WebService  {
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration:" +
                            "org.constellation.skos:org.constellation.generic.nerc", "");
-            
-            File sicadeDir    = getSicadeDirectory();
-            cswConfigDir = new File(sicadeDir, "csw_configuration");
-            File f         = null ;
-            try {
-                // we get the CSW configuration file
-                f                  = new File(cswConfigDir, "config.properties");
-                FileInputStream in = new FileInputStream(f);
-                Properties prop    = new Properties();
-                prop.load(in);
-                in.close();
-                
-                String databaseType = prop.getProperty("DBType");
-                
-                // if The database is unknow to the service we use the generic metadata reader.
-                if (databaseType != null && databaseType.equals("generic")) {
-                    
-                    JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
-                    Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
-                    File configFile = new File(cswConfigDir, "generic-configuration.xml");
-                    if (configFile.exists()) {
-                        Automatic genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
-                        BDD dbProperties = genericConfiguration.getBdd();
-                        if (dbProperties == null) {
-                            LOGGER.warning("the generic configuration file does not contains a BDD object. specific CSW operation will not be available.");
-                            CSWFunctionEnabled = false;
-                        } else {
-                            JDBC.loadDriver(dbProperties.getClassName());
-                            try {
-                                Connection MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
-                                                                           dbProperties.getUser(),
-                                                                           dbProperties.getPassword());
-                            
-                                GenericMetadataReader MDReader = null;
-                                switch (genericConfiguration.getType()) {
-                                        case CDI: 
-                                            MDReader = new CDIReader(genericConfiguration, MDConnection, false);
-                                            break;
-                                        case CSR:
-                                            MDReader = new CSRReader(genericConfiguration, MDConnection, false);
-                                            break;
-                                        case EDMED:
-                                            MDReader = new EDMEDReader(genericConfiguration, MDConnection, false);
-                                            break;
-                                        default: 
-                                            LOGGER.severe("specific CSW operation will not be available!" + '\n' +
-                                            "cause: Unknow generic database type!");
-                                    }                                           
-                                indexer = new GenericIndex(MDReader);
-                                CSWFunctionEnabled = true;
-                            } catch (SQLException e){
-                                LOGGER.warning("SQLException while connecting to the CSW database, specific CSW operation will not be available." + '\n' +
-                                               "cause: " + e.getMessage());
-                                CSWFunctionEnabled = false;
-                            }
-                        }
-                    } else {
-                        LOGGER.warning("No generic database configuration file have been found, specific CSW operation will not be available.");
-                        CSWFunctionEnabled = false;
-                    }
-                } else {
-                    PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
-                    dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-                    dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
-                    dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
-                    dataSourceMD.setUser(prop.getProperty("MDDBUser"));
-                    dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-                    try {
-                        Connection MDConnection    = dataSourceMD.getConnection();
-                        Reader20 reader = new Reader20(Standard.ISO_19115, MDConnection);
-                        indexer = new MDWebIndex(reader);
-                        CSWFunctionEnabled = true;
-                    } catch (SQLException e) {
-                        LOGGER.warning("SQLException while connecting to the CSW database, specific CSW operation will not be available." + '\n' +
-                                       "cause: " + e.getMessage());
-                        CSWFunctionEnabled = false;
-                    }
-                    
-                }
-
-            } catch (FileNotFoundException e) {
-                LOGGER.warning("No CSW configuration has been found, specific CSW operation will not be available." + '\n' +
-                               "cause: " + e.getMessage());
-                CSWFunctionEnabled = false;
-            } catch (IOException e) {
-                LOGGER.warning("The CSW configuration file can not be read, specific CSW operation will not be available." + '\n' +
-                               "cause: " + e.getMessage());
-                CSWFunctionEnabled = false;
-            }
+            cswConfigurer      = new CSWconfigurer(marshaller, unmarshaller, cn);
+            CSWFunctionEnabled = true;
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");
             ex.printStackTrace();
+            CSWFunctionEnabled = false;
+        } catch (ConfigurationException ex) {
+            LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
             CSWFunctionEnabled = false;
         }
         LOGGER.info("Configuration service runing");
@@ -237,21 +115,6 @@ public class ConfigurationService extends WebService  {
                 marshaller.marshal(restartService(), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
                 
-            } else if (request.equalsIgnoreCase("refreshIndex")) {
-            
-                boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
-                String service     = getParameter("SERVICE", false);
-                
-                marshaller.marshal(refreshIndex(asynchrone, service), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
-            
-            } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
-                
-                CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
-                
-                marshaller.marshal(refreshCascadedServers(refreshCS), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
-            
             } else if (request.equalsIgnoreCase("UpdatePropertiesFile") || objectRequest instanceof UpdatePropertiesFileType) {
                 
                 UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
@@ -264,9 +127,32 @@ public class ConfigurationService extends WebService  {
                 
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             
+            /**
+             *  CSW specific operation
+             */
+            } else if (request.equalsIgnoreCase("refreshIndex")) {
+            
+                if (CSWFunctionEnabled) {
+                    boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
+                    String service     = getParameter("SERVICE", false);
+                
+                    marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service), sw);
+                    return Response.ok(sw.toString(), "text/xml").build();
+                } else {
+                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                }
+            
+            } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
+                
+                CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
+                
+                marshaller.marshal(cswConfigurer.refreshCascadedServers(refreshCS), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
+            
             } else if (request.equalsIgnoreCase("updateVocabularies")) {    
                                 
-                return Response.ok(updateVocabularies(),"text/xml").build(); 
+                return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build(); 
             }
             else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
@@ -316,99 +202,6 @@ public class ConfigurationService extends WebService  {
     }
     
     /**
-     * Destroy the CSW index directory in order that it will be recreated.
-     * 
-     * @param asynchrone
-     * @return
-     * @throws WebServiceException
-     */
-    private AcknowlegementType refreshIndex(boolean asynchrone, String service) throws WebServiceException {
-        LOGGER.info("refresh index requested");
-        String msg;
-        if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
-            GlobalUtils.resetLuceneIndex();
-            msg = "MDWeb search index succefully deleted";
-        } else {
-            
-            if (!asynchrone) {
-                File indexDir     = new File(cswConfigDir, "index");
-
-                if (indexDir.exists() && indexDir.isDirectory()) {
-                    for (File f: indexDir.listFiles()) {
-                        f.delete();
-                    }
-                    boolean succeed = indexDir.delete();
-
-                    if (!succeed) {
-                        throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
-                    }
-                } else if (indexDir.exists() && !indexDir.isDirectory()){
-                    indexDir.delete();
-                }
-
-                //then we restart the services
-                Anchors.clear();
-                cn.reload();
-
-            } else {
-                if (CSWFunctionEnabled) {
-                    File indexDir     = new File(cswConfigDir, "nextIndex");
-
-                    if (indexDir.exists() && indexDir.isDirectory()) {
-                        for (File f: indexDir.listFiles()) {
-                            f.delete();
-                        }
-                        boolean succeed = indexDir.delete();
-
-                        if (!succeed) {
-                            throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
-                        }
-                    } else if (indexDir.exists() && !indexDir.isDirectory()){
-                        indexDir.delete();
-                    }
-                    indexer.setFileDirectory(indexDir);
-                    try  {
-                        indexer.createIndex();
-                    } catch (SQLException ex) {
-                        throw new WebServiceException("SQLException while creating the index.", NO_APPLICABLE_CODE, version);
-                    }
-                } else {
-                    throw new WebServiceException("This CSW function is not enabled.", NO_APPLICABLE_CODE, version);
-                }
-            }
-            msg = "CSW index succefully recreated";
-        }
-        return new AcknowlegementType("success", msg);
-    }
-    
-    /**
-     * Refresh the properties file used by the CSW service to store federated catalogues.
-     * 
-     * @param request
-     * @return
-     * @throws org.constellation.coverage.web.WebServiceException
-     */
-    private AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
-        LOGGER.info("refresh cascaded servers requested");
-        
-        File cascadingFile = new File(cswConfigDir, "CSWCascading.properties");
-        
-        Properties prop    = getPropertiesFromFile(cascadingFile);
-        
-        if (!request.isAppend()) {
-            prop.clear();
-        }
-        
-        for (String servName : request.getCascadedServices().keySet()) {
-            prop.put(servName, request.getCascadedServices().get(servName));
-        }
-        
-        storeProperties(prop, cascadingFile);
-        
-        return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
-    }
-    
-    /**
      * Update a properties file on the server file system.
      * 
      * @param request
@@ -444,8 +237,7 @@ public class ConfigurationService extends WebService  {
                      version, "properties");
         }
         
-        File sicadeDir      = getSicadeDirectory();
-        File configDir   = new File(sicadeDir, serviceDirectory.get(service));
+        File configDir   = serviceDirectory.get(service);
         File propertiesFile = new File(configDir, fileName);
         
         Properties prop     = new Properties();
@@ -457,8 +249,12 @@ public class ConfigurationService extends WebService  {
             throw new WebServiceException("The file does not exist: " + propertiesFile.getPath(),
                                           NO_APPLICABLE_CODE, version);
         }
-        
-        storeProperties(prop, propertiesFile);
+        try {
+            Utils.storeProperties(prop, propertiesFile);
+        } catch (IOException ex) {
+            throw new WebServiceException("IOException xhile trying to store the properties files.",
+                                          NO_APPLICABLE_CODE, version);
+        }
         
         return new AcknowlegementType("success", "properties file sucessfully updated");
     }
@@ -502,175 +298,5 @@ public class ConfigurationService extends WebService  {
      */
     private File downloadFile() throws WebServiceException {
         throw new WebServiceException("Not implemented", NO_APPLICABLE_CODE, version);
-    }
-    
-    
-    /**
-     * Load the properties from a properies file. 
-     * 
-     * If the file does not exist it will be created and an empty Properties object will be return.
-     * 
-     * @param f a properties file.
-     * 
-     * @return a Properties Object.
-     */
-    private Properties getPropertiesFromFile(File f) throws WebServiceException {
-        if (f != null) {
-            Properties prop = new Properties();
-            if (f.exists()) {
-
-                FileInputStream in = null;
-                try {
-                    in = new FileInputStream(f);
-                    prop.load(in);
-                    in.close();
-
-                //this case must never happen
-                } catch (FileNotFoundException ex) {
-                    LOGGER.severe("FileNotFound " + f.getPath() + " properties file");
-                    throw new WebServiceException("FileNotFound " + f.getPath() + " properties file",
-                            NO_APPLICABLE_CODE, version);
-
-                } catch (IOException ex) {
-                    LOGGER.severe("unable to load the " + f.getPath() + " properties file");
-                    throw new WebServiceException("unable to load the " + f.getPath() + " properties file",
-                            NO_APPLICABLE_CODE, version);
-                }
-            } else {
-                try {
-                    f.createNewFile();
-                } catch (IOException ex) {
-                    LOGGER.severe("unable to create the cascading properties file");
-                    throw new WebServiceException("unable to create the cascading properties file",
-                            NO_APPLICABLE_CODE, version);
-                }
-            }
-            return prop;
-        } else {
-            throw new IllegalArgumentException(" the properties file can't be null");
-        }
-    }
-    
-    /**
-     * store an Properties object "prop" into the specified File
-     * 
-     * @param prop A properties Object.
-     * @param f    A file.
-     * @throws org.constellation.coverage.web.WebServiceException
-     */
-    private void storeProperties(Properties prop, File f) throws WebServiceException {
-        if (prop == null || f == null) {
-            throw new IllegalArgumentException(" the properties or file can't be null");
-        } else {
-            try {
-                FileOutputStream out = new FileOutputStream(f);
-                prop.store(out, "");
-                out.close();
-
-            //must never happen    
-            } catch (FileNotFoundException ex) {
-                LOGGER.severe("FileNotFound " + f.getPath() + " properties file (no normal)");
-                throw new WebServiceException("FileNotFound " + f.getPath() + " properties file",
-                        NO_APPLICABLE_CODE, version);
-
-            } catch (IOException ex) {
-                LOGGER.severe("unable to store the " + f.getPath() + " properties file");
-                throw new WebServiceException("unable to store the " + f.getPath() + "properties file",
-                        NO_APPLICABLE_CODE, version);
-            }
-        }
-    }
-    
-     /**
-     * Update all the vocabularies skos files.
-     */
-    private AcknowlegementType updateVocabularies() throws WebServiceException {
-        File vocabularyDir = new File(cswConfigDir, "vocabulary");
-        if (!vocabularyDir.exists()) {
-            vocabularyDir.mkdir();
-        }
-        //  we get the Skos and description file for each used list
-        saveVocabularyFile("P021",   vocabularyDir);
-        saveVocabularyFile("L031",   vocabularyDir);
-        saveVocabularyFile("L061",   vocabularyDir);
-        saveVocabularyFile("C77",    vocabularyDir);
-        saveVocabularyFile("EDMERP", vocabularyDir);
-        saveVocabularyFile("L05",    vocabularyDir);
-        saveVocabularyFile("L021",   vocabularyDir);
-        saveVocabularyFile("L081",   vocabularyDir);
-        saveVocabularyFile("L241",   vocabularyDir);
-        saveVocabularyFile("L231",   vocabularyDir);
-        saveVocabularyFile("C381",   vocabularyDir);
-        saveVocabularyFile("C320",   vocabularyDir);
-        saveVocabularyFile("C174",   vocabularyDir);
-        saveVocabularyFile("C16",    vocabularyDir);
-        saveVocabularyFile("C371",   vocabularyDir);
-        saveVocabularyFile("L181",   vocabularyDir);
-        saveVocabularyFile("C16",    vocabularyDir);
-        saveVocabularyFile("L101",    vocabularyDir);
-        
-        return new AcknowlegementType("success", "the vocabularies has been succefully updated");
-    }
-    
-    /**
-     * 
-     * @param listNumber
-     * @param directory
-     * @return
-     * @throws org.constellation.coverage.web.WebServiceException
-     */
-    private CodeTableType getVocabularyDetails(String listNumber) throws WebServiceException {
-        String url = "http://vocab.ndg.nerc.ac.uk/axis2/services/vocab/whatLists?categoryKey=http://vocab.ndg.nerc.ac.uk/term/C980/current/CL12";
-        CodeTableType result = null;
-        try {
-            
-            Object obj = Utils.getUrlContent(url, unmarshaller);
-            if (obj instanceof WhatsListsResponse) {
-                WhatsListsResponse listDetails = (WhatsListsResponse) obj;
-                result = listDetails.getCodeTableFromKey(listNumber);
-            }
-        
-        } catch (MalformedURLException ex) {
-            LOGGER.severe("The url: " + url + " is malformed");
-        } catch (IOException ex) {
-            LOGGER.severe("IO exception while contacting the URL:" + url);
-            throw new WebServiceException("IO exception while contacting the URL:" + url, NO_APPLICABLE_CODE, version);
-        }
-        return result;
-    }
-    
-    /**
-     * 
-     * @param listNumber
-     */
-    private void saveVocabularyFile(String listNumber, File directory) throws WebServiceException {
-        CodeTableType VocaDescription = getVocabularyDetails(listNumber);
-        String filePrefix = "SDN.";
-        String url = "http://vocab.ndg.nerc.ac.uk/list/" + listNumber + "/current";
-        try {
-            if (VocaDescription != null) {
-                File f = new File(directory, filePrefix + listNumber + ".xml");
-                marshaller.marshal(VocaDescription, f);
-            } else {
-                LOGGER.severe("no description for vocabulary: " + listNumber + " has been found");
-            }
-            
-            Object vocab = Utils.getUrlContent(url, unmarshaller);
-            if (vocab != null) {
-                File f = new File(directory, filePrefix + listNumber + ".rdf");
-                marshaller.marshal(vocab, f);
-            } else {
-                LOGGER.severe("no skos file have been found for :" + listNumber);
-            }
-        
-        } catch (JAXBException ex) {
-            LOGGER.severe("JAXBException while marshalling the vocabulary: " + url);
-            throw new WebServiceException("JAXBException while marshalling the vocabulary: " + url, NO_APPLICABLE_CODE, version);
-        } catch (MalformedURLException ex) {
-            LOGGER.severe("The url: " + url + " is malformed");
-        } catch (IOException ex) {
-            LOGGER.severe("IO exception while contacting the URL:" + url);
-            throw new WebServiceException("IO exception while contacting the URL:" + url, NO_APPLICABLE_CODE, version);
-        }
     }
 }
