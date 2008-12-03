@@ -20,6 +20,7 @@ package org.constellation.metadata.index;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
+import org.mdweb.sql.v20.Reader20;
 
 /**
  * A Lucene index handler for an MDWeb Database.
@@ -85,9 +87,9 @@ public class MDWebIndex extends IndexLucene<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndex(Reader reader, File configDirectory) throws SQLException {
+    public MDWebIndex(Connection MDConnection, File configDirectory) throws SQLException {
         super(configDirectory);
-        MDWebReader   = reader;
+        MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
         pathMap       = null;
         classeMap     = null;
         if (create)
@@ -99,9 +101,9 @@ public class MDWebIndex extends IndexLucene<Form> {
      * 
      * @param reader An mdweb reader for read the metadata database.
      */
-    public MDWebIndex(Reader reader) throws SQLException {
+    public MDWebIndex(Connection MDConnection) throws SQLException {
         super();
-        MDWebReader   = reader;
+        MDWebReader   = new Reader20(Standard.ISO_19115, MDConnection);
         pathMap       = null;
         classeMap     = null;
     }

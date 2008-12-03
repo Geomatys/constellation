@@ -20,7 +20,6 @@ package org.constellation.metadata.index;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -46,8 +45,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.constellation.metadata.Utils;
 import org.constellation.metadata.io.GenericMetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotools dependencies
@@ -520,21 +519,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      */
     private Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
-        try {
-
-            Method getter = MetadataWriter.getGetterFromName(attributeName, object.getClass());
-            if (getter != null)
-                result = getter.invoke(object);
-        } catch (IllegalAccessException ex) {
-            logger.severe("The class is not accessible: " + object.getClass().getSimpleName());
-            ex.printStackTrace();
-        } catch (IllegalArgumentException ex) {
-            logger.severe("bad argument while accesing the attribute " + attributeName + " in class " +  object.getClass().getSimpleName());
-            ex.printStackTrace();
-        } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception while accesing the attribute " + attributeName + " in class " +  object.getClass().getSimpleName());
-            ex.printStackTrace();
-        }
+        Method getter = Utils.getGetterFromName(attributeName, object.getClass());
+        if (getter != null)
+            result = Utils.invokeMethod(getter, object);
         return result;
     }
 

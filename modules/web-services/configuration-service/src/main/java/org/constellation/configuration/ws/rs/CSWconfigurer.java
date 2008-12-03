@@ -55,8 +55,8 @@ import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.geotools.metadata.note.Anchors;
 import org.geotools.resources.JDBC;
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.sql.v20.Reader20;
+
+// MDWeb dependencies
 import org.mdweb.utils.GlobalUtils;
 
 // postgres dependencies
@@ -160,9 +160,7 @@ public class CSWconfigurer {
                 dataSourceMD.setUser(prop.getProperty("MDDBUser"));
                 dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
                 try {
-                    Connection MDConnection = dataSourceMD.getConnection();
-                    Reader20 reader = new Reader20(Standard.ISO_19115, MDConnection);
-                    indexer = new MDWebIndex(reader);
+                    indexer = new MDWebIndex(dataSourceMD.getConnection());
                 } catch (SQLException e) {
                     throw new ConfigurationException("SQLException while connecting to the CSW database.", e.getMessage());
                 }

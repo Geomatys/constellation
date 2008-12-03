@@ -110,6 +110,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.cat.csw.AbstractCswRequest;
+import org.constellation.metadata.io.MDWebMetadataWriter;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -132,10 +133,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
-//mdweb model dependencies
-import org.mdweb.model.schemas.Standard; 
-import org.mdweb.sql.v20.Reader20; 
-import org.mdweb.sql.v20.Writer20;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
@@ -467,11 +464,9 @@ public class CSWworker {
                     } else {
 
                         try {
-                            Reader20 databaseReader = new Reader20(Standard.ISO_19115,  MDConnection);
-                            Writer20 databaseWriter = new Writer20(MDConnection);
-                            index                   = new MDWebIndex(databaseReader, configDir);
+                            index                   = new MDWebIndex(MDConnection, configDir);
                             MDReader                = new MDWebMetadataReader(MDConnection);
-                            MDWriter                = new MetadataWriter(databaseReader, databaseWriter, index);
+                            MDWriter                = new MDWebMetadataWriter(MDConnection, index);
                             catalogueHarvester      = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
 
                             logger.info("CSW service (MDweb database) running");

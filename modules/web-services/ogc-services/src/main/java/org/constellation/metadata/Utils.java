@@ -811,6 +811,101 @@ public class Utils {
         return method;
     }
 
+    /**
+     * Return a getter Method for the specified attribute (propertyName) 
+     * 
+     * @param propertyName The attribute name.
+     * @param rootClass    The class whitch owe this attribute
+     * 
+     * @return a setter to this attribute.
+     */
+    public static Method getGetterFromName(String propertyName, Class rootClass) {
+        Logger.getLogger(propertyName).finer("search for a getter in " + rootClass.getName() + " of name :" + propertyName);
+        
+        //special case and corrections
+        if (propertyName.equals("beginPosition")) {
+            propertyName = "begining";
+        } else if (propertyName.equals("endPosition")) {
+            propertyName = "ending";
+        } else if (propertyName.equals("onlineResource")) {
+            propertyName = "onLineResource";
+        } else if (propertyName.equals("dataSetURI")) {
+            propertyName = "dataSetUri";
+        } else if (propertyName.equals("extentTypeCode")) {
+            propertyName = "inclusion";    
+        // TODO remove when this issue will be fix in MDWeb    
+        } else if (propertyName.indexOf("geographicElement") != -1) {
+            propertyName = "geographicElement";
+        }
+        
+        String methodName = "get" + Utils.firstToUpper(propertyName);
+        int occurenceType = 0;
+        
+        while (occurenceType < 4) {
+
+            try {
+                Method getter = null;
+                switch (occurenceType) {
+
+                    case 0: {
+                        getter = rootClass.getMethod(methodName);
+                        break;
+                    }
+                    case 1: {
+                        getter = rootClass.getMethod(methodName + "s");
+                        break;
+                    }
+                    case 2: {
+                        getter = rootClass.getMethod(methodName + "es");
+                        break;
+                    }
+                    case 3: {
+                        if (methodName.endsWith("y")) {
+                            methodName = methodName.substring(0, methodName.length() - 1) + 'i';
+                        }
+                        getter = rootClass.getMethod(methodName + "es");
+                        break;
+                    }
+                   
+                }
+                if (getter != null) {
+                    Logger.getAnonymousLogger().finer("getter found: " + getter.toGenericString());
+                }
+                return getter;
+
+            } catch (NoSuchMethodException e) {
+
+                switch (occurenceType) {
+
+                    case 0: {
+                        Logger.getAnonymousLogger().finer("The getter " + methodName + "() does not exist");
+                        occurenceType = 1;
+                        break;
+                    }
+
+                    case 1: {
+                        Logger.getAnonymousLogger().finer("The getter " + methodName + "s() does not exist");
+                        occurenceType = 2;
+                        break;
+                    }
+                    case 2: {
+                        Logger.getAnonymousLogger().finer("The getter " + methodName + "es() does not exist");
+                        occurenceType = 3;
+                        break;
+                    }
+                    case 3: {
+                        Logger.getAnonymousLogger().finer("The getter " + methodName + "es() does not exist");
+                        occurenceType = 4;
+                        break;
+                    }
+                    default:
+                        occurenceType = 5;
+                }
+            }
+        }
+        Logger.getAnonymousLogger().severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
+        return null;
+    }
     
     /**
      * Return a setter Method for the specified attribute (propertyName) of the type "classe"
@@ -950,6 +1045,31 @@ public class Utils {
         Logger.getAnonymousLogger().severe("No setter have been found for attribute " + propertyName + 
                       " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
+    }
+    
+    /**
+     * 
+     * @param enumeration
+     * @return
+     */
+    public static String getElementNameFromEnum(Object enumeration) {
+        String value = "";
+        try {
+            Method getValue = enumeration.getClass().getDeclaredMethod("value");
+            value = (String) getValue.invoke(enumeration);
+        } catch (IllegalAccessException ex) {
+            Logger.getAnonymousLogger().severe("The class is not accessible");
+        } catch (IllegalArgumentException ex) {
+            Logger.getAnonymousLogger().severe("IllegalArguement exeption in value()");
+        } catch (InvocationTargetException ex) {
+            Logger.getAnonymousLogger().severe("Exception throw in the invokated getter value() " + '\n' +
+                       "Cause: " + ex.getMessage());
+        } catch (NoSuchMethodException ex) {
+           Logger.getAnonymousLogger().severe("no such method value() in " + enumeration.getClass().getSimpleName());
+        } catch (SecurityException ex) {
+           Logger.getAnonymousLogger().severe("security Exception while getting the codelistElement in value() method");
+        }
+        return value;
     }
     
     /**
