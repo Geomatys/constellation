@@ -1182,7 +1182,7 @@ public class Utils {
         throw new IOException("Unknowed image type");
     }
     
-        /**
+    /**
      * Check if the provided object is an instance of one of the given classes.
      */
     private static synchronized boolean isValidType(final Class<?>[] validTypes,
