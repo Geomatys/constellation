@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
@@ -433,8 +434,8 @@ public class GeoDRMService extends OGCWebService {
         }
     }
 
-    @Override
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
         LOGGER.info("destroying GeoDRM service");
     }
 }

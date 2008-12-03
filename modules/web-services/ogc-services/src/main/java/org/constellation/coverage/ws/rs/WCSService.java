@@ -37,6 +37,7 @@ import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.naming.NamingException;
@@ -1324,8 +1325,8 @@ public class WCSService extends OGCWebService {
     /**
      * TODO
      */
-    @Override
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
         LOGGER.info("Destroying WCS service");
     }
 }

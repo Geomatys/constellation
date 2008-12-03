@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
+import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
@@ -303,8 +304,8 @@ public class ConfigurationService extends WebService  {
     /**
      * Free the resource and close the connection at undeploying time.
      */
-    @Override
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
         LOGGER.info("destroying Configuration Service");
         cswConfigurer.destroy();
     }

@@ -558,8 +558,10 @@ public class MDWebIndex extends IndexLucene<Form> {
 
     @Override
     public void destroy() {
-        pathMap.clear();
-        classeMap.clear();
+        if (pathMap != null)
+            pathMap.clear();
+        if (classeMap != null)
+            classeMap.clear();
         try {
             MDWebReader.close();
         } catch (SQLException ex) {

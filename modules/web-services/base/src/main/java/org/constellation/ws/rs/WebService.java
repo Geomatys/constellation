@@ -369,8 +369,7 @@ public abstract class WebService {
     /**
      * This method is called at undeploy time
      */
-    @PreDestroy
-    protected abstract void destroy();
+    public abstract void destroy();
     
     /**
      * build an service Exception and marshall it into a StringWriter

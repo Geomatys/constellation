@@ -26,10 +26,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.ws.Service;
-import org.constellation.ws.ServiceVersion;
-
-// JUnit dependencies
 import org.constellation.ogc.FilterType;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -56,7 +52,7 @@ public class SQLFilterParserTest {
 
     @Before
     public void setUp() throws Exception {
-        filterParser = new SQLFilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
+        filterParser = new SQLFilterParser();
         JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterUnmarshaller = jbcontext.createUnmarshaller();
     }

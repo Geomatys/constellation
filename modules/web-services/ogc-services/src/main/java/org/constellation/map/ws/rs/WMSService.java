@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import javax.annotation.PreDestroy;
 import javax.measure.unit.Unit;
 import javax.naming.NamingException;
 import javax.ws.rs.Path;
@@ -989,8 +990,8 @@ public class WMSService extends OGCWebService {
     /**
      * TODO.
      */
-    @Override
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
         LOGGER.info("destroying WMS service");
     }
 }

@@ -26,8 +26,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies 
-import org.constellation.ws.Service;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
@@ -63,7 +61,7 @@ public class CQLParserTest {
 
     @Before
     public void setUp() throws Exception {
-        filterParser = new LuceneFilterParser(new ServiceVersion(Service.OWS, "2.0.2"));
+        filterParser = new LuceneFilterParser();
         JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
         filterUnmarshaller = jbcontext.createUnmarshaller();
     }

@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
 
 // geotools dependencies
@@ -225,8 +226,8 @@ public class SOService extends OGCWebService {
     /**
      * TODO
      */
-    @Override
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
        LOGGER.info("Destroying SOS service");
     }
 }

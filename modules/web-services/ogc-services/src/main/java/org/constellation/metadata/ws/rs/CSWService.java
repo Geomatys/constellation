@@ -918,7 +918,8 @@ public class CSWService extends OGCWebService {
     /**
      * Destroy all the resource and close the connection when the web application is undeployed.
      */
-    protected void destroy() {
+    @PreDestroy
+    public void destroy() {
         LOGGER.info("destroying CSW service");
         worker.destroy();
     }
