@@ -58,7 +58,6 @@ import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.GetRecordsType;
 import org.constellation.cat.csw.v202.HarvestResponseType;
 import org.constellation.cat.csw.v202.HarvestType;
-import org.constellation.cat.csw.v202.ObjectFactory;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
@@ -104,9 +103,7 @@ public class CSWService extends OGCWebService {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         try {
             setXMLContext("", getAllClasses());
-        
             worker = new CSWworker(unmarshaller, marshaller);
-            worker.setVersion(getCurrentVersion());
             
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
@@ -121,7 +118,7 @@ public class CSWService extends OGCWebService {
      * 
      * @return
      */
-    public Class[] getAllClasses() {
+    private Class[] getAllClasses() {
         List<Class> classeList = new ArrayList<Class>();
             //ISO 19115 class
             classeList.add(MetaDataImpl.class);
@@ -378,7 +375,10 @@ public class CSWService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();    
             if (marshaller != null) {
-                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), ex.getVersion());   
+                ServiceVersion version = ex.getVersion();
+                if (version == null)
+                    version = getCurrentVersion();
+                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
                 marshaller.marshal(report, sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
@@ -916,11 +916,11 @@ public class CSWService extends OGCWebService {
     }
     
     /**
-     * This method is not yet called. TODO find a way to call it at app server undeployement.
+     * Destroy all the resource and close the connection when the web application is undeployed.
      */
-    @PreDestroy
-    public void destroy() {
+    protected void destroy() {
         LOGGER.info("destroying CSW service");
+        worker.destroy();
     }
 
 }

@@ -575,4 +575,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
     public String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException {
         return doc.get("id");
     }
+
+    @Override
+    public void destroy() {
+        genericReader.destroy();
+    }
 }

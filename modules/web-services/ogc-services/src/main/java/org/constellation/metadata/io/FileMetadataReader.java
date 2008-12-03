@@ -19,6 +19,7 @@ package org.constellation.metadata.io;
 import java.sql.SQLException;
 import java.util.List;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.ws.WebServiceException;
 
@@ -50,6 +51,21 @@ public class FileMetadataReader extends MetadataReader {
 
     private Object getObjectFromFile(String identifier) {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void destroy() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
@@ -79,13 +78,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class LuceneFilterParser extends FilterParser {
     
     /**
-     * Build a new FilterParser with the specified version.
-     */
-    public LuceneFilterParser(final ServiceVersion version) {
-        super(version);
-    }
-    
-    /**
      * Build a lucene request from the specified constraint
      * 
      * @param constraint a constraint expressed in CQL or FilterType
@@ -99,10 +91,10 @@ public class LuceneFilterParser extends FilterParser {
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new WebServiceException("The query constraint must be in Filter or CQL but not both.",
-                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
         } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
             throw new WebServiceException("The query constraint must contain a Filter or a CQL query.",
-                                         INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                         INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
         
         if (constraint.getCqlText() != null) {
@@ -112,11 +104,11 @@ public class LuceneFilterParser extends FilterParser {
             } catch (JAXBException ex) {
                 ex.printStackTrace();
                 throw new WebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
-                                             NO_APPLICABLE_CODE, version, "QueryConstraint");
+                                             NO_APPLICABLE_CODE, "QueryConstraint");
             } catch (CQLException ex) {
                 throw new WebServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
                                                  + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
         } else if (constraint.getFilter() != null) {
@@ -322,7 +314,7 @@ public class LuceneFilterParser extends FilterParser {
                 response.append(removePrefix(propertyName)).append(':');
             } else {
                 throw new WebServiceException("An operator propertyIsLike must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             //we get the value of the field
@@ -344,7 +336,7 @@ public class LuceneFilterParser extends FilterParser {
                 
             } else {
                 throw new WebServiceException("An operator propertyIsLike must specified the literal value.",
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
              PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
@@ -354,7 +346,7 @@ public class LuceneFilterParser extends FilterParser {
                 response.append(removePrefix(pin.getPropertyName().getContent())).append(':').append("null");
             } else {
                 throw new WebServiceException("An operator propertyIsNull must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             
@@ -370,7 +362,7 @@ public class LuceneFilterParser extends FilterParser {
             
             if (propertyName == null || literal == null) {
                 throw new WebServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
                     response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
@@ -388,14 +380,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
                     } else {
                         throw new WebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
+                                                      OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
@@ -406,14 +398,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                         INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                         INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
                     } else {
                         throw new WebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
+                                                      OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
@@ -425,14 +417,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
                     } else {
                         throw new WebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
+                                                      OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
@@ -443,18 +435,18 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
-                                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
                     } else {
                          throw new WebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, version, "QueryConstraint");
+                                                      OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 } else {
                     throw new WebServiceException("Unkwnow comparison operator: " + operator,
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
             }
         }
@@ -481,18 +473,18 @@ public class LuceneFilterParser extends FilterParser {
             //we verify that all the parameters are specified
             if (propertyName == null) {
                 throw new WebServiceException("An operator BBOX must specified the propertyName.",
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             } else if (!propertyName.contains("BoundingBox")) {
                 throw new WebServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
                 throw new WebServiceException("An operator BBOX must specified an envelope.",
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (CRSName == null) {
                 throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
-                                             INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             //we transform the EnvelopeEntry in GeneralEnvelope
@@ -506,13 +498,13 @@ public class LuceneFilterParser extends FilterParser {
                 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                 throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
                 throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
         } else if (spatialOps instanceof DistanceBufferType) {
@@ -529,20 +521,20 @@ public class LuceneFilterParser extends FilterParser {
                 filterType = SpatialFilter.BEYOND;
             else
                 throw new WebServiceException("Unknow DistanceBuffer operator.",
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
            
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
                  throw new WebServiceException("An distanceBuffer operator must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (units == null) {
                  throw new WebServiceException("An distanceBuffer operator must specified the ditance units.",
-                                                 INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (JBgeom == null || JBgeom.getValue() == null) {
                  throw new WebServiceException("An distanceBuffer operator must specified a geometric object.",
-                                                  INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
            
             Object geometry  = JBgeom.getValue(); 
@@ -570,13 +562,13 @@ public class LuceneFilterParser extends FilterParser {
                
             } catch (NoSuchAuthorityCodeException e) {
                     throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                                     INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                     INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                     throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                     INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                     INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
                     throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                      INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
            
         } else if (spatialOps instanceof BinarySpatialOpType) {
@@ -620,13 +612,13 @@ public class LuceneFilterParser extends FilterParser {
             
             if (propertyName == null && geometry == null) {
                 throw new WebServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             int filterType = SpatialFilter.valueOf(operator);
             if (filterType == -1) {
                 throw new WebServiceException("Unknow FilterType: " + operator,
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             String CRSName = "undefined CRS";
@@ -654,13 +646,13 @@ public class LuceneFilterParser extends FilterParser {
                 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                 throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
                 throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                              INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
         }

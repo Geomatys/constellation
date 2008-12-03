@@ -221,4 +221,12 @@ public class SOService extends OGCWebService {
                                    getParameter("SERVICE", true));
         
     }
+
+    /**
+     * TODO
+     */
+    @Override
+    protected void destroy() {
+       LOGGER.info("Destroying SOS service");
+    }
 }

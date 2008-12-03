@@ -20,6 +20,7 @@ package org.constellation.metadata.io;
 // J2SE dependencies
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -30,13 +31,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
 import org.constellation.cat.csw.Settable;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.ws.WebServiceException;
@@ -44,7 +48,8 @@ import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.BoundingBoxType;
 import static org.constellation.ows.OWSExceptionCode.*;
-
+import static org.constellation.metadata.CSWQueryable.*;
+        
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
@@ -58,6 +63,7 @@ import org.mdweb.sql.Reader;
 
 // geotools/GeoAPI dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.mdweb.sql.v20.Reader20;
 import org.opengis.util.CodeList;
 
 
@@ -164,9 +170,9 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Reader MDReader) throws SQLException {
+    public MDWebMetadataReader(Connection MDConnection) throws SQLException {
         super(true);
-        this.MDReader        = MDReader;
+        this.MDReader        = new Reader20(Standard.ISO_19115,  MDConnection);
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
         this.geotoolsPackage = Utils.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
@@ -211,7 +217,7 @@ public class MDWebMetadataReader extends MetadataReader {
             }
             
         } catch (NumberFormatException e) {
-             throw new WebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, version, "id");
+             throw new WebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
         }
         
         alreadyRead.clear();
@@ -1039,4 +1045,59 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         return null;
     }
+
+    @Override
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
+        List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
+        final StringTokenizer tokens = new StringTokenizer(propertyNames, ",");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            List<String> paths = ISO_QUERYABLE.get(token);
+            if (paths != null) {
+                if (paths.size() != 0) {
+                    try {
+                        List<String> values = MDReader.getDomainOfValuesFromPaths(paths);
+                        ListOfValuesType ListValues = new ListOfValuesType(values);
+                        DomainValuesType value = new DomainValuesType(null, token, ListValues, _Metadata_QNAME);
+                        responseList.add(value);
+                        if (false) throw new SQLException();
+
+                    } catch (SQLException e) {
+                        throw new WebServiceException("The service has launch an SQL exeption:" + e.getMessage(),
+                                NO_APPLICABLE_CODE);
+                    }
+                } else {
+                    throw new WebServiceException("The property " + token + " is not queryable for now",
+                            INVALID_PARAMETER_VALUE, "propertyName");
+                }
+            } else {
+                throw new WebServiceException("The property " + token + " is not queryable",
+                        INVALID_PARAMETER_VALUE, "propertyName");
+            }
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
+        try {
+            return MDReader.executeFilterQuery(SQLQuery);
+        } catch (SQLException ex) {
+           throw new WebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
+                                         "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+    }
+     
+    @Override
+    public void destroy() {
+        try {
+            MDReader.close();
+            classBinding.clear();
+            alreadyRead.clear();
+        } catch (SQLException ex) {
+            logger.severe("SQL Exception while destroying MDWeb MetadataReader");
+        }
+    }
+
+   
 }

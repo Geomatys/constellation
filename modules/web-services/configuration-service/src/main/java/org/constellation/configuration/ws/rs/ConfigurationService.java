@@ -299,4 +299,13 @@ public class ConfigurationService extends WebService  {
     private File downloadFile() throws WebServiceException {
         throw new WebServiceException("Not implemented", NO_APPLICABLE_CODE, version);
     }
+
+    /**
+     * Free the resource and close the connection at undeploying time.
+     */
+    @Override
+    protected void destroy() {
+        LOGGER.info("destroying Configuration Service");
+        cswConfigurer.destroy();
+    }
 }

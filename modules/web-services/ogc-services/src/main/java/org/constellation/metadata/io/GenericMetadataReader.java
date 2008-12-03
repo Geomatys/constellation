@@ -42,6 +42,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.ws.WebServiceException;
 import org.constellation.generic.database.Automatic;
@@ -827,6 +828,38 @@ public abstract class GenericMetadataReader extends MetadataReader {
             logger.severe("The configuration file is malformed, unable to reach the main query");
         }
         return result;
+    }
+    
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
+         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public void destroy() {
+        try {
+            for (PreparedStatement stmt : singleStatements.keySet()) {
+                stmt.close();
+            }
+            singleStatements.clear();
+
+            for (PreparedStatement stmt : multipleStatements.keySet()) {
+                stmt.close();
+            }
+            multipleStatements.clear();
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException ex) {
+            logger.severe("SQLException while destroying Generic metadata reader");
+        }
+        singleValue.clear();
+        multipleValue.clear();
+        vocabularies.clear();
+        contacts.clear();
+        logger.info("destroying generic reader");
     }
             
 }

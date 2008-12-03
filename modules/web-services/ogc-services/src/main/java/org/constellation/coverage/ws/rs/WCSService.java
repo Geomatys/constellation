@@ -62,6 +62,7 @@ import org.constellation.gml.v311.GridLimitsType;
 import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.RectifiedGridType;
 import org.constellation.gml.v311.TimePositionType;
+import org.constellation.metadata.Utils;
 import org.constellation.ows.AbstractGetCapabilities;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
@@ -1018,7 +1019,7 @@ public class WCSService extends OGCWebService {
             try {
                 final GridCoverage2D gridCov = layer.getCoverage(objEnv, new Dimension(), null, null);
                 outputStream = ImageIO.createImageOutputStream(null);
-                writeImage(gridCov.getRenderedImage(), format, outputStream);
+                Utils.writeImage(gridCov.getRenderedImage(), format, outputStream);
             } catch (IOException ex) {
                 throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
             } catch (CatalogException ex) {
@@ -1318,5 +1319,13 @@ public class WCSService extends OGCWebService {
             throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value) + "cause:" +
                            exception.getMessage(), INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
+    }
+
+    /**
+     * TODO
+     */
+    @Override
+    protected void destroy() {
+        LOGGER.info("Destroying WCS service");
     }
 }

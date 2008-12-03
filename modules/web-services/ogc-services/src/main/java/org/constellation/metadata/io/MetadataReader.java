@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
 /**
@@ -42,11 +42,6 @@ public abstract class MetadataReader {
      * A debugging logger
      */
     protected Logger logger = Logger.getLogger("org.constellation.metadata.io");
-    
-    /**
-     * A service version used in exception launch.
-     */
-    protected ServiceVersion version;
     
     /**
      * A flag indicating if the cache mecanism is enabled or not.
@@ -76,6 +71,25 @@ public abstract class MetadataReader {
     public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException;
     
     /**
+     * Return a list of values for each specific fields specified as a coma separated String.
+     */
+    public abstract List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException;
+    
+    /**
+     * Execute a SQL query and return the result as a List of identifier;
+     * 
+     * @param query
+     * @return
+     * @throws WebServiceException
+     */
+    public abstract List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException;
+    
+    /**
+     * Destroy all the resource used by this reader.
+     */
+    public abstract void destroy();
+    
+    /**
      * Add a metadata to the cache.
      * @param identifier The metadata identifier.
      * @param metadata The object to put in cache.
@@ -94,14 +108,6 @@ public abstract class MetadataReader {
         return metadatas.get(identifier);
     }
     
-    /**
-     * Set the version of the service (For execption report).
-     * 
-     * @param version
-     */
-    public final void setVersion(ServiceVersion version) {
-        this.version = version;
-    }
     
     /**
      * Return true is the cache mecanism is enbled.
@@ -109,5 +115,4 @@ public abstract class MetadataReader {
     public boolean isCacheEnabled() {
         return isCacheEnabled;
     }
-
 }

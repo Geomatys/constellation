@@ -30,6 +30,7 @@ import javax.servlet.ServletContext;
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
 import java.io.StringWriter;
+import javax.annotation.PreDestroy;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -196,7 +197,7 @@ public abstract class WebService {
         if (notFound) {
             if (mandatory) {
                 throw new WebServiceException("The parameter " + parameterName + " must be specified",
-                        MISSING_PARAMETER_VALUE, null);
+                        MISSING_PARAMETER_VALUE);
             }
             return null;
         } else {
@@ -216,7 +217,7 @@ public abstract class WebService {
                     return value;
                 }
                 throw new WebServiceException("The parameter " + parameterName + " should have a value",
-                        INVALID_PARAMETER_VALUE, null);
+                        INVALID_PARAMETER_VALUE);
             } else {
                 return value;
             }
@@ -257,7 +258,7 @@ public abstract class WebService {
                         return null;
                     } else {
                         throw new WebServiceException("The parameter " + parameterName + " must be specified",
-                                       MISSING_PARAMETER_VALUE, null);
+                                       MISSING_PARAMETER_VALUE);
 
                     }
                 }
@@ -267,7 +268,7 @@ public abstract class WebService {
             return result;
         } catch (JAXBException ex) {
              throw new WebServiceException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                            ex, INVALID_PARAMETER_VALUE, null);
+                            ex, INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -365,6 +366,12 @@ public abstract class WebService {
      */
     public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
 
+    /**
+     * This method is called at undeploy time
+     */
+    @PreDestroy
+    protected abstract void destroy();
+    
     /**
      * build an service Exception and marshall it into a StringWriter
      *

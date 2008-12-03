@@ -369,4 +369,8 @@ public class CSWconfigurer {
         return result;
     }
     
+    public void destroy() {
+        indexer.destroy();
+    }
+    
 }

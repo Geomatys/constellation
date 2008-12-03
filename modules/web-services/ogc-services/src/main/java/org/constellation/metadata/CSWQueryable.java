@@ -477,17 +477,17 @@ public class CSWQueryable {
     /**
      * a QName for csw:Record type
      */
-    protected final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    public final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
     
     /**
      * a QName for gmd:MD_Metadata type
      */
-    protected final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
+    public final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
     
     /**
      * a QName for csw:Capabilities type
      */
-    protected final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
+    public final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
     
     /**
      * some QName for ebrim 3.0 types

@@ -334,5 +334,9 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
         doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
     }
-   
+    
+   /**
+    * Destroy all the resource and close the connection.
+    */
+    public abstract void destroy();
 }

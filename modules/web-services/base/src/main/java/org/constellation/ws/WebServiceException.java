@@ -57,6 +57,22 @@ public class WebServiceException extends Exception {
         this.version = version;
         this.locator = null;
     }
+    
+    /**
+     * Creates an exception with the specified details message.
+     * There is no version specified here it will be specified at exception report build.
+     *
+     * @param message The detail message.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
+     */
+    public WebServiceException(final String message, final CodeList exceptionCode)
+    {
+        super(message);
+        this.exceptionCode = exceptionCode;
+        this.version = null;
+        this.locator = null;
+    }
 
     /**
      * Creates an exception with the specified details message.
@@ -71,6 +87,21 @@ public class WebServiceException extends Exception {
         super(message);
         this.exceptionCode = exceptionCode;
         this.version = version;
+        this.locator = locator;
+    }
+    
+    /**
+     * Creates an exception with the specified details message.
+     * There is no version specified here it will be specified at exception report build.
+     * @param message The detail message.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
+     */
+    public WebServiceException(final String message, final CodeList exceptionCode, final String locator)
+    {
+        super(message);
+        this.exceptionCode = exceptionCode;
+        this.version = null;
         this.locator = locator;
     }
 

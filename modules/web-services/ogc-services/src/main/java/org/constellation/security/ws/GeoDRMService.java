@@ -432,4 +432,9 @@ public class GeoDRMService extends OGCWebService {
             return roleName;
         }
     }
+
+    @Override
+    protected void destroy() {
+        LOGGER.info("destroying GeoDRM service");
+    }
 }

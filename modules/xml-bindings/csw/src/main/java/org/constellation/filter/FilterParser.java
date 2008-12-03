@@ -29,8 +29,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.apache.lucene.search.Filter;
 import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.ws.Service;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.gml.v311.CoordinatesType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -60,20 +58,6 @@ public abstract class FilterParser {
      * use for debugging purpose
      */
     protected Logger logger = Logger.getLogger("org.constellation.filter");
-    
-     /**
-     * The version of the service
-     */
-    protected final ServiceVersion version;
-    
-    public FilterParser(final ServiceVersion version) {
-        if (version == null) {
-            // TODO restore this throw new IllegalArgumentException("version must not null");
-            this.version = new ServiceVersion(Service.OWS, "2.0.2");
-        } else {
-            this.version = version;
-        }
-    }
     
    /**
      * Build a Filter with the specified CQL query
@@ -119,7 +103,7 @@ public abstract class FilterParser {
         String CRSName = GMLline.getSrsName();
         if (CRSName == null) {
             throw new WebServiceException("A CRS (coordinate Reference system) must be specified for the line.",
-                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
         CoordinatesType coord = GMLline.getCoordinates();
@@ -160,7 +144,7 @@ public abstract class FilterParser {
         String CRSName = GMLenvelope.getSrsName();
         if (CRSName == null) {
             throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
-                                          INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
         List<Double> lmin = GMLenvelope.getLowerCorner().getValue();
@@ -198,13 +182,13 @@ public abstract class FilterParser {
 
         if (CRSName == null) {
             throw new WebServiceException("A GML point must specify Coordinate Reference System.",
-                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
         //we get the coordinate of the point (if they are present)
         if (GMLpoint.getCoordinates() == null && GMLpoint.getPos() == null) {
             throw new WebServiceException("A GML point must specify coordinates or direct position.",
-                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
         final double[] coordinates = new double[2];
@@ -217,7 +201,7 @@ public abstract class FilterParser {
                 final double value = parseDouble(tokens.nextToken());
                 if (index >= coordinates.length) {
                     throw new WebServiceException("This service support only 2D point.",
-                            INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                            INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
                 coordinates[index++] = value;
             }
@@ -226,7 +210,7 @@ public abstract class FilterParser {
             coordinates[0] = GMLpoint.getPos().getValue().get(1);
         } else {
             throw new WebServiceException("The GML pointis malformed.",
-                    INVALID_PARAMETER_VALUE, version, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
         GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
         CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
@@ -245,7 +229,7 @@ public abstract class FilterParser {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
             throw new WebServiceException("The value:" + value + " is not a valid double coordinate.",
-                                         INVALID_PARAMETER_VALUE, version, "Coordinates");
+                                         INVALID_PARAMETER_VALUE, "Coordinates");
         }
     }
     

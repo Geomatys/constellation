@@ -985,4 +985,12 @@ public class WMSService extends OGCWebService {
 
         return f;
     }
+
+    /**
+     * TODO.
+     */
+    @Override
+    protected void destroy() {
+        LOGGER.info("destroying WMS service");
+    }
 }

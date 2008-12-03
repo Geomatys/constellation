@@ -17,6 +17,7 @@
  */
 package org.constellation.metadata.io;
 
+// J2SE dependencies
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Date;
@@ -31,6 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+
+// constellation dependencies
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.v300.InternationalStringType;
@@ -38,9 +41,10 @@ import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.Utils;
 import org.constellation.metadata.index.IndexLucene;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.geotools.metadata.iso.MetaDataImpl;
+
+// MDWeb dependencies
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -112,11 +116,6 @@ public class MetadataWriter {
     private Map<Object, Value> alreadyWrite;
     
     /**
-     * The current version of the csw
-     */
-    private ServiceVersion version;
-    
-    /**
      * An indexer lucene to add object into the index.
      */
     private final IndexLucene index;
@@ -126,7 +125,7 @@ public class MetadataWriter {
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MetadataWriter(Reader MDReader, Writer20 MDWriter, IndexLucene index, ServiceVersion version) throws SQLException {
+    public MetadataWriter(Reader MDReader, Writer20 MDWriter, IndexLucene index) throws SQLException {
         
         MDCatalog         = MDReader.getCatalog("CSWCat");
         if (MDCatalog == null) {
@@ -137,7 +136,6 @@ public class MetadataWriter {
         this.MDReader     = MDReader;  
         this.MDWriter     = MDWriter;
         this.index        = index;
-        this.version      = version;
         this.dateFormat   = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding = new HashMap<Class, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
@@ -897,7 +895,7 @@ public class MetadataWriter {
             
         } catch (IllegalArgumentException e) {
              throw new WebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
-                                           "cause: " + e.getMessage(),NO_APPLICABLE_CODE, version);
+                                           "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
         }
         
         // and we store it in the database
@@ -918,5 +916,22 @@ public class MetadataWriter {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Destoy all the resource and close connection.
+     */
+    public void destroy() {
+        classBinding.clear();
+        try {
+            MDReader.close();
+            MDWriter.close();
+            classBinding.clear();
+            alreadyWrite.clear();
+            index.destroy();
+            
+        } catch (SQLException ex) {
+            LOGGER.info("SQL Exception while destroying Metadata writer");
+        }
     }
 }
