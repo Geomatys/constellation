@@ -76,12 +76,12 @@ public abstract class OGCWebService extends WebService {
      */
     private ServiceVersion currentVersion;
 
-     /**
+    /**
      * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
      */
     private final ServiceVersion sldVersion = new ServiceVersion(Service.WMS, "1.1.0");
 
-     /**
+    /**
      * The name of the service (WMS, WCS,...)
      */
     private final String service;
@@ -91,12 +91,12 @@ public abstract class OGCWebService extends WebService {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
-     /**
+    /**
      * the service URL (used in getCapabilities document).
      */
     private String serviceURL;
 
-   /**
+    /**
      * The last update sequence
      */
     private long lastUpdateSequence;

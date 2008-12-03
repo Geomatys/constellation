@@ -293,6 +293,8 @@ class PostGridLayerDetails implements LayerDetails {
     private MapLayer createMapLayer(Object style, final Map<String, Object> params) {
         final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
 
+        mapLayer.setName(getName());
+        
         if (style == null) {
             //no style provided, try to get the favorite one
             if (favorites.size() > 0) {
@@ -336,6 +338,7 @@ class PostGridLayerDetails implements LayerDetails {
                 mapLayer.times().add(time);
             }
         }
+
 
         return mapLayer;
     }

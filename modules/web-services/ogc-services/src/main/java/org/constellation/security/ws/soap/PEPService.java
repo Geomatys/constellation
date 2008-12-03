@@ -65,7 +65,7 @@ public class PEPService {
      * @throws JAXBException if an error occurs at unmarshalling-time.
      */
     public PEPService() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("org.constellation.coverage.web:" +
+        final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
                 "org.constellation.wms.v111:org.constellation.wms.v130:" +
                 "org.constellation.sld.v110:org.constellation.gml.v311");
         final Unmarshaller unmarshaller = context.createUnmarshaller();

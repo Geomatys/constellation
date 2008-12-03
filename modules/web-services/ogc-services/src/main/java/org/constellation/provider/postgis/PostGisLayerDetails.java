@@ -96,6 +96,8 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
             final Number elevation = (Number) params.get(WMSQuery.KEY_ELEVATION);
             layer.setQuery(createQuery(date, elevation));
         }
+
+        layer.setName(getName());
         
         return layer;
     }

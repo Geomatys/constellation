@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -42,6 +43,7 @@ import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wcs.WCSQuery;
+import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.wcs.AbstractGetCoverage;
@@ -50,8 +52,13 @@ import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.canvas.CanvasController2D;
 import org.geotools.display.canvas.control.FailOnErrorMonitor;
 import org.geotools.display.exception.PortrayalException;
+import org.geotools.display.primitive.GraphicFeatureJ2D;
+import org.geotools.display.primitive.GraphicJ2D;
+import org.geotools.display.renderer.ContextRenderer2D;
+import org.geotools.display.renderer.DefaultContextRenderer2D;
 import org.geotools.display.renderer.Go2rendererHints;
-import org.geotools.display.renderer.J2DRenderer;
+import org.geotools.display.renderer.stateless.CoverageGraphicLayerJ2D;
+import org.geotools.display.renderer.stateless.FeatureGraphicLayerJ2D;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
@@ -66,6 +73,7 @@ import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
+import org.opengis.display.primitive.Graphic;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -83,7 +91,10 @@ import static org.constellation.ws.ExceptionCode.*;
  * @author Cédric Briançon (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
-        
+
+    private static final int PIXEL_TOLERANCE = 3;
+    private static final MapContextInfoExtractor extractor = new MapContextInfoExtractor();
+
     private static final Logger LOGGER = Logger.getLogger("org/constellation/portrayal/CSTLPortrayalService");
     
     /**
@@ -104,13 +115,13 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private final ReportMonitor monitor = new ReportMonitor();
         
     private final BufferedImageCanvas2D canvas;
-    private final J2DRenderer renderer;
+    private final ContextRenderer2D renderer;
     private final MapContext context;
     
     
     private CSTLPortrayalService(){
         canvas = new  BufferedImageCanvas2D(new Dimension(1,1),null);
-        renderer = new J2DRenderer(canvas);
+        renderer = new DefaultContextRenderer2D(canvas, false);
         context = MAP_BUILDER.createContext(DefaultGeographicCRS.WGS84);
         
         canvas.setRenderer(renderer);
@@ -122,17 +133,11 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         //we specifically say to not repect X/Y proportions
         canvas.getController().setAxisProportions(Double.NaN);
         
-        try {
-            renderer.setContext(context);
-        } catch (IOException ex) {
-            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TransformException ex) {
-            Logger.getLogger(CSTLPortrayalService.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        renderer.setContext(context);
         
     }
 
-    public synchronized BufferedImage portray(final AbstractGetCoverage query)
+    public BufferedImage portray(final AbstractGetCoverage query)
             throws PortrayalException, WebServiceException
     {
         if (query == null) {
@@ -238,6 +243,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             } else {
                 throw new PortrayalException(ex);
             }
+        }finally{
+            canvas.clearCache();
+            renderer.clearCache();
         }
     }
 
@@ -249,7 +257,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
      */
-    public synchronized BufferedImage portray(final GetMap query)
+    public BufferedImage portray(final GetMap query)
                             throws PortrayalException, WebServiceException
     {
         if (query == null) {
@@ -312,8 +320,138 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             }else{
                 throw new PortrayalException(ex);
             }
+        }finally{
+            canvas.clearCache();
+            renderer.clearCache();
         }
     }
+
+    public Map<String, List<String>> hit(final GetFeatureInfo query)
+                            throws PortrayalException, WebServiceException
+    {
+
+        if (query == null) {
+            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
+                    " is not well used here.");
+        }
+
+        final Map<String, List<String>> values = new HashMap<String, List<String>>();
+        final List<String> layers              = query.getQueryLayers();
+        final List<String> styles              = query.getStyles();
+        final MutableStyledLayerDescriptor sld = query.getSld();
+        final Envelope contextEnv              = query.getEnvelope();
+        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(contextEnv);
+        final String mime                      = query.getFormat();
+        final ServiceVersion version           = query.getVersion();
+        final Double elevation                 = query.getElevation();
+        final Date time                        = query.getTime();
+        final MeasurementRange dimRange        = query.getDimRange();
+        final Dimension canvasDimension        = query.getSize();
+        final double azimuth                   = query.getAzimuth();
+        final int infoX                        = query.getX();
+        final int infoY                        = query.getY();
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        params.put(WMSQuery.KEY_ELEVATION, elevation);
+        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
+        params.put(WMSQuery.KEY_TIME, time);
+        updateContext(layers, version, styles, sld, params);
+        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
+        final Rectangle selectedArea = new Rectangle(infoX-PIXEL_TOLERANCE, infoY-PIXEL_TOLERANCE, PIXEL_TOLERANCE*2, PIXEL_TOLERANCE*2);
+
+        //fill in the values with empty lists
+        for(String layer : layers){
+            values.put(layer, new ArrayList<String>());
+        }
+
+        if (true) {
+            //for debug
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Layers => ");
+            for(String layer : layers){
+                builder.append(layer +",");
+            }
+            builder.append("\n");
+            builder.append("Styles => ");
+            for(String style : styles){
+                builder.append(style +",");
+            }
+            builder.append("\n");
+            builder.append(selectedArea);
+            builder.append("\n");
+            builder.append("Context env => " + contextEnv.toString() + "\n");
+            builder.append("Azimuth => " + azimuth + "\n");
+            builder.append("Mime => " + mime.toString() + "\n");
+            builder.append("Dimension => " + canvasDimension.toString() + "\n");
+            builder.append("BGColor => " + background + "\n");
+            builder.append("Transparent => " + query.getTransparent() + "\n");
+            System.out.println(builder.toString());
+        }
+
+        //TODO horrible TRY CATCH to remove when the renderer will have a fine
+        //error handeling. This catch doesnt happen in normal case, but because of
+        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
+        //thread exceptions.
+        try{
+            prepareCanvas(refEnv, azimuth, background, canvasDimension);
+            
+            final List<? extends Graphic> graphics = canvas.getGraphicsIn(selectedArea);
+
+//            JOptionPane.showMessageDialog(null, "nb graphics = " + graphics.size());
+
+            for(final Graphic graphic : graphics){
+                if(graphic instanceof GraphicFeatureJ2D){
+                    final GraphicFeatureJ2D j2d = (GraphicFeatureJ2D) graphic;
+                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
+
+                    if(value != null){
+//                        JOptionPane.showMessageDialog(null, value);
+
+                        final String layerName = j2d.getSource().getName();
+                        final List<String> lst;
+                        if(values.containsKey(layerName)){
+                            lst = values.get(layerName);
+                        }else{
+                            lst = new ArrayList<String>();
+                            values.put(layerName, lst);
+                        }
+                        lst.add(value);
+                    }
+
+                }else if(graphic instanceof CoverageGraphicLayerJ2D){
+                    final CoverageGraphicLayerJ2D j2d = (CoverageGraphicLayerJ2D) graphic;
+                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
+
+                    if(value != null){
+                        final String layerName = j2d.getUserObject().getName();
+                        final List<String> lst;
+                        if(values.containsKey(layerName)){
+                            lst = values.get(layerName);
+                        }else{
+                            lst = new ArrayList<String>();
+                            values.put(layerName, lst);
+                        }
+                        lst.add(value);
+                    }
+                }
+            }
+
+        }catch(Exception ex){
+//            JOptionPane.showMessageDialog(null, "uneErreur");
+            if(ex instanceof PortrayalException){
+                throw (PortrayalException)ex;
+            }else if( ex instanceof WebServiceException){
+                throw (WebServiceException) ex;
+            }else{
+                throw new PortrayalException(ex);
+            }
+        }finally{
+            canvas.clearCache();
+            renderer.clearCache();
+        }
+
+        return values;
+    }
+
 
     /**
      * Makes the portray of a {@code GetMap} request.
@@ -322,10 +460,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @param output The output file where to write the result of the {@link GetMap} request.
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
-     *
-     * @deprecated
      */
-    public synchronized void portray(final GetMap query, final File output)
+    public void portray(final GetMap query, final File output)
             throws PortrayalException, WebServiceException {
 
         if (output == null) {
@@ -339,6 +475,32 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         } catch (IOException ex) {
             throw new PortrayalException(ex);
         }
+    }
+
+    private void prepareCanvas(final ReferencedEnvelope contextEnv, final double azimuth,
+            final Color background, final Dimension canvasDimension) throws PortrayalException
+    {
+
+        canvas.setSize(canvasDimension);
+        canvas.setBackground(background);
+        canvas.seMonitor(monitor);
+
+        final CanvasController2D canvasController = canvas.getController();
+        try {
+            canvasController.setObjectiveCRS(contextEnv.getCoordinateReferenceSystem());
+        } catch (TransformException ex) {
+            throw new PortrayalException(ex);
+        }
+
+        try{
+            canvasController.setVisibleArea(contextEnv);
+            if (azimuth != 0) {
+                canvasController.rotate( -Math.toRadians(azimuth) );
+            }
+        }catch(NoninvertibleTransformException ex){
+            throw new PortrayalException(ex);
+        }
+
     }
 
     /**
@@ -355,25 +517,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private BufferedImage portrayUsingCache(final ReferencedEnvelope contextEnv, final double azimuth,
             final Color background, final Dimension canvasDimension) throws PortrayalException
     {
-        canvas.setSize(canvasDimension);
-        canvas.setBackground(background);
-        canvas.seMonitor(monitor);
-        
-        final CanvasController2D canvasController = canvas.getController();
-        try {
-            canvasController.setObjectiveCRS(contextEnv.getCoordinateReferenceSystem());
-        } catch (TransformException ex) {
-            throw new PortrayalException(ex);
-        }
-
-        try{
-            canvasController.setVisibleArea(contextEnv);
-            if (azimuth != 0) {
-                canvasController.rotate( -Math.toRadians(azimuth) );
-            }
-        }catch(NoninvertibleTransformException ex){
-            throw new PortrayalException(ex);
-        }
+        prepareCanvas(contextEnv, azimuth, background, canvasDimension);
         canvas.repaint();
 
         //check if errors occured during rendering
@@ -427,6 +571,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             if (layer == null) {
                 throw new PortrayalException("Map layer "+layerName+" could not be created");
             }
+            layer.setSelectable(true);
             context.layers().add(layer);
         }
     }

@@ -35,7 +35,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -93,8 +92,6 @@ import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //Geoapi dependencies
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -123,7 +120,7 @@ public class WMSService extends OGCWebService {
                      new ServiceVersion(Service.WMS, WMSQueryVersion.WMS_1_1_1.toString()));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.coverage.web:org.constellation.wms.v111:" +
+        setXMLContext("org.constellation.ws:org.constellation.wms.v111:" +
                 "org.constellation.wms.v130:org.constellation.sld.v110:org.constellation.gml.v311",
                 "http://www.opengis.net/wms");
 
@@ -486,45 +483,14 @@ public class WMSService extends OGCWebService {
         /* Now proceed to the calculation of the values, and use the toString method to store them.
          * This map will store couples of <layerName, List<values>> obtained by the getInformationAt() method.
          */
-        final Map<String, List<String>> results = new HashMap<String, List<String>>(size);
-        for (final String key : layers) {
-            final LayerDetails layer = dp.get(key);
-            if (!layer.isQueryable(Service.GETINFO)) {
-                throw new WebServiceException("The requested layer \""+ key +
-                        "\" for a GetFeatureInfo is not queryable.", OPERATION_NOT_SUPPORTED,
-                        queryVersion, "layer");
-            }
-            final Object currentValue;
-            try {
-                currentValue = layer.getInformationAt(gfi);
-            } catch (CatalogException cat) {
-                throw new WebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
-            } catch (IOException io) {
-                throw new WebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-            }
-            final List<String> values = new ArrayList<String>();
-            if (currentValue instanceof Double) {
-                values.add(Float.toString(((Double) currentValue).floatValue()));
-            } else {
-                final List<SimpleFeature> features = (List<SimpleFeature>) currentValue;
-                // Defines how many features we will take in the list of results.
-                final int featuresSize = (gfi.getFeatureCount() > features.size()) ?
-                                          features.size() : gfi.getFeatureCount();
-                // Fill the list of values with features found.
-                for (int i=0; i<featuresSize; i++) {
-                    final SimpleFeature feature = features.get(i);
-                    final List<Object> attrs = feature.getAttributes();
-                    final List<AttributeType> attrTypes = feature.getFeatureType().getTypes();
-                    final StringBuilder value = new StringBuilder();
-                    for (int j = 0; j < attrs.size(); j++) {
-                        value.append(attrTypes.get(j).getName().toString() + "[" +
-                                attrs.get(j).toString() + "] ");
-                    }
-                    values.add(value.toString());
-                }
-            }
-            results.put(key, values);
+
+        final Map<String, List<String>> results;
+        try {
+            results = CSTLPortrayalService.getInstance().hit(gfi);
+        } catch (PortrayalException ex) {
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
         }
+
 
         // We now build the response, according to the format chosen.
         final StringBuilder response = new StringBuilder();

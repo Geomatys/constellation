@@ -88,7 +88,7 @@ public class GeoDRMService extends OGCWebService {
         super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
         try {
             initializePolicyDecisionPoint();
-            setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.coverage.web", "");
+            setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.ws", "");
         } catch (JAXBException ex){
             LOGGER.severe("The GeoDRM service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
