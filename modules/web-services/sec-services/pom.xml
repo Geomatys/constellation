@@ -77,6 +77,10 @@
       <artifactId>ogc-services</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.java.dev.opensso</groupId>
+      <artifactId>openssoclientsdk</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

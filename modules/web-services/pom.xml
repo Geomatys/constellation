@@ -58,11 +58,19 @@
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
+  <profiles>
+     <profile>
+       <id>sec</id>
+       <modules>
+         <module>sec-services</module>
+       </modules>
+     </profile>
+  </profiles>
+
   <modules>
     <module>base</module>
     <module>configuration-service</module>
     <module>ogc-services</module>
-    <module>sec-services</module>
   </modules>
 
 </project>

@@ -53,7 +53,19 @@
   </developers>
   
   
-  
+  <profiles>
+    <profile>
+      <id>sec</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.constellation.web-services</groupId>
+          <artifactId>sec-services</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
   <!--
     Dependencies required only for compilation. These dependencies will be
     included in the JARs' list for which Maven will move into "target/binaries".
@@ -78,6 +90,7 @@
       <groupId>org.constellation.web-services</groupId>
       <artifactId>sec-services</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
