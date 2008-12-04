@@ -83,26 +83,30 @@ public class EDMEDReader extends GenericMetadataReader {
     
     
     /**
+     * Build a new reader for the EDMED database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @throws java.sql.SQLException
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * 
+     * @throws java.sql.SQLException 
      * @throws javax.xml.bind.JAXBException
      */
-    public EDMEDReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
-        super(genericConfiguration, connection);
+    public EDMEDReader(Automatic configuration, Connection connection) throws SQLException, JAXBException {
+        super(configuration, connection);
     }
     
     /**
+     * Build a new reader for the EDMED database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @param fillAnchor
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * @param fillAnchor A flag indicating if we have to fill the anchors with vocabulary urns.
+     * 
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public EDMEDReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
-        super(genericConfiguration, connection, fillAnchor);
+    public EDMEDReader(Automatic configuration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+        super(configuration, connection, fillAnchor);
     }
     
     /**
@@ -174,6 +178,19 @@ public class EDMEDReader extends GenericMetadataReader {
         
         return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
         
+    }
+    
+    @Override
+    protected List<String> getVariablesForDublinCore(ElementSetType type) {
+        if (type == ElementSetType.BRIEF) {
+            return Arrays.asList("var02", "var20", "var21", "var22", "var23");
+        } else if (type == ElementSetType.SUMMARY) {
+            return Arrays.asList("var02", "var20", "var21", "var22", "var23", "var11","var12", "var13",  "var14", 
+                    "var06");
+        } else if (type == ElementSetType.FULL) {
+            return Arrays.asList("var02", "var20", "var21", "var22", "var23", "var11","var12", "var13",  "var14", 
+                    "var06", "var05", "var28");
+        } else throw new IllegalArgumentException("unknow ElementSet: " + type);
     }
     
     

@@ -26,7 +26,6 @@ import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,8 +33,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -100,11 +101,6 @@ import org.opengis.metadata.identification.Keywords;
 public abstract class GenericMetadataReader extends MetadataReader {
     
     /**
-     * A configuration object used in Generic database mode.
-     */
-    private Automatic genericConfiguration;
-    
-    /**
      * A date Formater.
      */
     protected static  List<DateFormat> dateFormats;
@@ -113,11 +109,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
     }
-    
-    /**
-     * A connection to the database.
-     */
-    private Connection connection;
     
     /**
      * An unmarshaller used for getting EDMO data.
@@ -133,6 +124,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * A list of precompiled SQL request returning multiple value.
      */
     private Map<PreparedStatement, List<String>> multipleStatements;
+    
+    /**
+     * A precompiled Statement requesting all The identifiers
+     */
+    private PreparedStatement mainStatement;
     
     /**
      * A Map of varName - value refreshed at every request.
@@ -159,11 +155,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, Connection connection) throws SQLException, JAXBException {
         super(false);
-        this.genericConfiguration = genericConfiguration;
-        this.connection     = connection;
-        initStatement();
+        initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         contacts               = new HashMap<String, ResponsibleParty>();
@@ -179,11 +173,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
         super(false);
-        this.genericConfiguration = genericConfiguration;
-        this.connection     = connection;
-        initStatement();
+        initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         contacts               = new HashMap<String, ResponsibleParty>();
@@ -200,11 +192,23 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    private void initStatement() throws SQLException {
+    private void initStatement(Connection connection, Automatic configuration) throws SQLException {
+        // we initialize the main query
+        if (configuration.getQueries() != null           &&
+            configuration.getQueries().getMain() != null &&
+            configuration.getQueries().getMain().getQuery() != null) {
+            Query mainQuery = configuration.getQueries().getMain().getQuery();
+            mainStatement      = connection.prepareStatement(mainQuery.buildSQLQuery());
+        } else {
+            logger.severe("The configuration file is malformed, unable to reach the main query");
+        }
+        
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
-        Queries queries = genericConfiguration.getQueries();
+        Queries queries = configuration.getQueries();
         if (queries != null) {
+            
+            // initialize the single statements
             Single single = queries.getSingle();
             if (single != null) {
                 for (Query query : single.getQuery()) {
@@ -219,7 +223,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
+            } else {
+                logger.severe("The configuration file is probably malformed, there is no single query.");
             }
+            
+            // initialize the multiple statements
             MultiFixed multi = queries.getMultiFixed();
             if (multi != null) {
                 for (Query query : multi.getQuery()) {
@@ -232,9 +240,15 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
                     multipleStatements.put(stmt, varNames);
                 }
+            } else {
+                logger.severe("The configuration file is probably malformed, there is no single query.");
             }
+        } else {
+            logger.severe("The configuration file is probably malformed, there is no queries part.");
         }
     }
+    
+    
     
     /**
      * Load a Map of vocabulary from the specified directory
@@ -378,22 +392,90 @@ public abstract class GenericMetadataReader extends MetadataReader {
     }
     
     /**
+     * Fill the dynamic parameters of a prepared statement with the specified identifier.
+     * @param stmt
+     * @param identifier
+     */
+    private void fillStatement(PreparedStatement stmt, String identifier) throws SQLException {
+        ParameterMetaData meta = stmt.getParameterMetaData();
+        int nbParam = meta.getParameterCount();
+        int i = 1;
+        while (i < nbParam + 1) {
+            stmt.setString(i, identifier);
+            i++;
+        }
+    }
+    
+    /**
+     * Return the correspounding statement for the specified variable name.
+     * 
+     * @param varName
+     * @return
+     */
+    private PreparedStatement getStatementFromSingleVar(String varName) {
+        for (PreparedStatement stmt : singleStatements.keySet()) {
+            List<String> vars = singleStatements.get(stmt);
+            if (vars.contains(varName))
+                return stmt;
+        }
+        return null;
+    }
+    
+     /**
+     * Return the correspounding statement for the specified variable name.
+     * 
+     * @param varName
+     * @return
+     */
+    private PreparedStatement getStatementFromMultipleVar(String varName) {
+        for (PreparedStatement stmt : multipleStatements.keySet()) {
+            List<String> vars = multipleStatements.get(stmt);
+            if (vars.contains(varName))
+                return stmt;
+        }
+        return null;
+    }
+    
+    /**
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier) {
+    private void loadData(String identifier, int mode, ElementSetType type) {
         logger.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
-        for (PreparedStatement stmt : singleStatements.keySet()) {
-            try {
-                ParameterMetaData meta = stmt.getParameterMetaData();
-                int nbParam = meta.getParameterCount();
-                int i = 1;
-                while (i < nbParam + 1) {
-                    stmt.setString(i, identifier);
-                    i++;
+        
+        // we get a sub list of all the statement
+        Set<PreparedStatement> subSingleStmts;
+        Set<PreparedStatement> subMultiStmts;
+        if (mode == ISO_19115) {
+            subSingleStmts = singleStatements.keySet();
+            subMultiStmts  = multipleStatements.keySet();
+        } else {
+            subSingleStmts = new HashSet<PreparedStatement>();
+            subMultiStmts  = new HashSet<PreparedStatement>();
+            for (String var: getVariablesForDublinCore(type)) {
+                PreparedStatement stmt = getStatementFromSingleVar(var);
+                if (stmt != null) {
+                    if (!subSingleStmts.contains(stmt))
+                        subSingleStmts.add(stmt);
+                } else {
+                    stmt = getStatementFromMultipleVar(var);
+                    if (stmt != null) {
+                        if (!subMultiStmts.contains(stmt))
+                            subMultiStmts.add(stmt);
+                    } else {
+                        logger.severe("no statement found for variable: " + var);
+                    }
                 }
+                    
+            }
+        }
+        
+        //we extract the single values
+        for (PreparedStatement stmt : subSingleStmts) {
+            try {
+                fillStatement(stmt, identifier);
                 ResultSet result = stmt.executeQuery();
                 if (result.next()) {
                     for (String varName : singleStatements.get(stmt)) {
@@ -414,15 +496,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
             }
         }
         
-        for (PreparedStatement stmt : multipleStatements.keySet()) {
+        //we extract the multiple values
+        for (PreparedStatement stmt : subMultiStmts) {
             try {
-                ParameterMetaData meta = stmt.getParameterMetaData();
-                int nbParam = meta.getParameterCount();
-                int i = 1;
-                while (i < nbParam + 1) {
-                    stmt.setString(i, identifier);
-                    i++;
-                }
+                fillStatement(stmt, identifier);
+                
                 ResultSet result = stmt.executeQuery();
                 for (String varName : multipleStatements.get(stmt)) {
                     multipleValue.put(varName, new ArrayList<String>());
@@ -440,10 +518,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         varlist += s + ',';
                     }
                 } else {
-                  varlist = "no variables"; 
+                    varlist = "no variables";
                 }
                 logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
-                              "for variable: " + varlist);
+                        "for variable: " + varlist);
             }
             
         }
@@ -465,7 +543,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Object result = null;
         
         //TODO we verify that the identifier exists
-        loadData(identifier);
+        loadData(identifier, mode, type);
         
         if (mode == ISO_19115) {
             result = getISO(identifier);
@@ -479,9 +557,30 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
+    /**
+     * return a metadata in dublin core representation.
+     * 
+     * @param identifier
+     * @param type
+     * @param elementName
+     * @return
+     */
     protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName);
     
+    /**
+     * return a metadata in ISO representation.
+     * 
+     * @param identifier
+     * @return
+     */
     protected abstract MetaDataImpl getISO(String identifier);
+    
+    /**
+     * Return a list of variables name used for the dublicore representation.
+     * @return
+     */
+    protected abstract List<String> getVariablesForDublinCore(ElementSetType type);
+            
     /**
      * return a list of value for the specified variable name.
      * 
@@ -816,21 +915,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
     public List<MetaDataImpl> getAllEntries() throws WebServiceException {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
         try {
-            Statement stmt = connection.createStatement();
-            if (genericConfiguration.getQueries() != null           &&
-                genericConfiguration.getQueries().getMain() != null &&
-                genericConfiguration.getQueries().getMain().getQuery() != null) {
-                Query mainQuery = genericConfiguration.getQueries().getMain().getQuery();
-                ResultSet res = stmt.executeQuery(mainQuery.buildSQLQuery());
-                while (res.next()) {
-                    result.add((MetaDataImpl)getMetadata(res.getString(1), ISO_19115, ElementSetType.FULL, null));
-                }
-            
-            } else {
-                logger.severe("The configuration file is malformed, unable to reach the main query");
+            ResultSet res = mainStatement.executeQuery();
+            while (res.next()) {
+                result.add((MetaDataImpl) getMetadata(res.getString(1), ISO_19115, ElementSetType.FULL, null));
             }
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new WebServiceException("SQL Exception while getting all the entries: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return result;
     }
@@ -843,6 +933,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    /**
+     * close all the statements and clear the maps.
+     */
     public void destroy() {
         try {
             for (PreparedStatement stmt : singleStatements.keySet()) {
@@ -854,9 +947,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 stmt.close();
             }
             multipleStatements.clear();
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
+            
+            mainStatement.close();
+            mainStatement = null;
+            
         } catch (SQLException ex) {
             logger.severe("SQLException while destroying Generic metadata reader");
         }

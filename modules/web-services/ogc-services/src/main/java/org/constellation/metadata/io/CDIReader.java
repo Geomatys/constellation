@@ -95,26 +95,30 @@ import org.opengis.util.InternationalString;
 public class CDIReader extends GenericMetadataReader {
     
     /**
+     * Build a new reader for the CDI database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @throws java.sql.SQLException
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * 
+     * @throws java.sql.SQLException 
      * @throws javax.xml.bind.JAXBException
      */
-    public CDIReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
-        super(genericConfiguration, connection);
+    public CDIReader(Automatic configuration, Connection connection) throws SQLException, JAXBException {
+        super(configuration, connection);
     }
     
     /**
+     * Build a new reader for the CDI database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @param fillAnchor
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * @param fillAnchor A flag indicating if we have to fill the anchors with vocabulary urns.
+     * 
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public CDIReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
-        super(genericConfiguration, connection, fillAnchor);
+    public CDIReader(Automatic configuration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+        super(configuration, connection, fillAnchor);
     }
     
     /**
@@ -189,6 +193,18 @@ public class CDIReader extends GenericMetadataReader {
         return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
         
     }
+    
+    @Override
+    protected List<String> getVariablesForDublinCore(ElementSetType type) {
+        if (type == ElementSetType.BRIEF) {
+            return Arrays.asList("var04", "var24", "var25", "var26", "var27");
+        } else if (type == ElementSetType.SUMMARY) {
+            return Arrays.asList("var04", "var24", "var25", "var26", "var27", "var10", "var11", "var12", "var13", "var37", "var08");
+        } else if (type == ElementSetType.FULL) {
+            return Arrays.asList("var04", "var24", "var25", "var26", "var27", "var10", "var11", "var12", "var13", "var37", "var08", "var07", "var36");
+        } else throw new IllegalArgumentException("unknow ElementSet: " + type);
+    }
+
     
     /**
      * Extract a metadata from a CDI database.
@@ -518,5 +534,4 @@ public class CDIReader extends GenericMetadataReader {
         
         return result;
     }
-
 }

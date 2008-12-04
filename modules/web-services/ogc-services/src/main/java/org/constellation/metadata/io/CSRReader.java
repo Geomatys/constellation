@@ -81,26 +81,30 @@ import org.opengis.util.InternationalString;
 public class CSRReader extends GenericMetadataReader {
     
     /**
+     * Build a new reader for the CSR database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @throws java.sql.SQLException
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * 
+     * @throws java.sql.SQLException 
      * @throws javax.xml.bind.JAXBException
      */
-    public CSRReader(Automatic genericConfiguration, Connection connection) throws SQLException, JAXBException {
-        super(genericConfiguration, connection);
+    public CSRReader(Automatic configuration, Connection connection) throws SQLException, JAXBException {
+        super(configuration, connection);
     }
     
     /**
+     * Build a new reader for the CSR database profile.
      * 
-     * @param genericConfiguration
-     * @param connection
-     * @param fillAnchor
+     * @param configuration An Automatic configuration object containing all the SQL request.
+     * @param connection A connection to the database.
+     * @param fillAnchor A flag indicating if we have to fill the anchors with vocabulary urns.
+     * 
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public CSRReader(Automatic genericConfiguration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
-        super(genericConfiguration, connection, fillAnchor);
+    public CSRReader(Automatic configuration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+        super(configuration, connection, fillAnchor);
     }
     
     /**
@@ -200,6 +204,19 @@ public class CSRReader extends GenericMetadataReader {
         
         return new RecordType(ident, title, dataType, subject, formats, modified, modified, _abstract, bboxes, creators, distributor, language, null, null);
         
+    }
+    
+    @Override
+    protected List<String> getVariablesForDublinCore(ElementSetType type) {
+        if (type == ElementSetType.BRIEF) {
+            return Arrays.asList("var02", "var27", "var28", "var29", "var30");
+        } else if (type == ElementSetType.SUMMARY) {
+            return Arrays.asList("var02", "var27", "var28", "var29", "var30", "var12", "var13",  "var14", 
+                    "var15", "var16", "var17", "var18", "var19", "var20", "var21", "var22", "var42", "var35", "var41");
+        } else if (type == ElementSetType.FULL) {
+            return Arrays.asList("var02", "var27", "var28", "var29", "var30", "var12", "var13",  "var14", 
+                    "var15", "var16", "var17", "var18", "var19", "var20", "var21", "var22", "var42", "var35", "var41", "var07");
+        } else throw new IllegalArgumentException("unknow ElementSet: " + type);
     }
     
     /**
