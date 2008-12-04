@@ -19,12 +19,9 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -44,27 +41,18 @@ import org.constellation.generic.database.BDD;
 import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.nerc.WhatsListsResponse;
 import org.constellation.metadata.Utils;
-import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
-import org.constellation.metadata.index.MDWebIndex;
-import org.constellation.metadata.io.CDIReader;
-import org.constellation.metadata.io.CSRReader;
-import org.constellation.metadata.io.EDMEDReader;
-import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.metadata.io.GenericCSWFactory;
+import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.geotools.metadata.note.Anchors;
-import org.geotools.resources.JDBC;
-
-// MDWeb dependencies
-import org.mdweb.utils.GlobalUtils;
-
-// postgres dependencies
-import org.postgresql.ds.PGSimpleDataSource;
-
 import static org.constellation.generic.database.Automatic.*;
 import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 import static org.constellation.ows.OWSExceptionCode.*;
+
+// geotools dependencies
+import org.geotools.metadata.note.Anchors;
+import org.mdweb.utils.GlobalUtils;
 
 /**
  *
@@ -96,83 +84,35 @@ public class CSWconfigurer {
     
     
     public CSWconfigurer(Marshaller marshaller, Unmarshaller unmarshaller, ContainerNotifierImpl cn) throws ConfigurationException {
-        this.marshaller   = marshaller;
-        this.unmarshaller = unmarshaller;
-        this.containerNotifier           = cn;
+        this.marshaller        = marshaller;
+        this.unmarshaller      = unmarshaller;
+        this.containerNotifier = cn;
         File cswConfigDir = serviceDirectory.get("CSW");
-        File f = null;
         try {
             // we get the CSW configuration file
-            f = new File(cswConfigDir, "config.properties");
-            FileInputStream in = new FileInputStream(f);
-            Properties prop = new Properties();
-            prop.load(in);
-            in.close();
+            JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
+            Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
 
-            String databaseType = prop.getProperty("DBType");
-
-            // if The database is unknow to the service we use the generic metadata reader.
-            if (databaseType != null && databaseType.equals("generic")) {
-
-                JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
-                Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
-                File configFile = new File(cswConfigDir, "generic-configuration.xml");
-                if (configFile.exists()) {
-                    Automatic genericConfiguration = (Automatic) genericUnmarshaller.unmarshal(configFile);
-                    BDD dbProperties = genericConfiguration.getBdd();
-                    if (dbProperties == null) {
-                        throw new ConfigurationException("the generic configuration file does not contains a BDD object.");
-                    } else {
-                        JDBC.loadDriver(dbProperties.getClassName());
-                        try {
-                            Connection MDConnection = DriverManager.getConnection(dbProperties.getConnectURL(),
-                                    dbProperties.getUser(),
-                                    dbProperties.getPassword());
-
-                            GenericMetadataReader MDReader = null;
-                            switch (genericConfiguration.getType()) {
-                                case CDI:
-                                    MDReader = new CDIReader(genericConfiguration, MDConnection, false);
-                                    break;
-                                case CSR:
-                                    MDReader = new CSRReader(genericConfiguration, MDConnection, false);
-                                    break;
-                                case EDMED:
-                                    MDReader = new EDMEDReader(genericConfiguration, MDConnection, false);
-                                    break;
-                                default:
-                                    LOGGER.severe("specific CSW operation will not be available!" + '\n' +
-                                            "cause: Unknow generic database type!");
-                            }
-                            indexer = new GenericIndex(MDReader);
-                        } catch (SQLException e) {
-                            throw new ConfigurationException("SQLException while connecting to the CSW database", e.getMessage());
-                        }
-                    }
+            File configFile = new File(cswConfigDir, "config.xml");
+            if (configFile.exists()) {
+                Automatic config = (Automatic) genericUnmarshaller.unmarshal(configFile);
+                BDD db = config.getBdd();
+                if (db == null) {
+                    throw new ConfigurationException("the generic configuration file does not contains a BDD object.");
                 } else {
-                    throw new ConfigurationException("No generic database configuration file have been found");
+                    Connection MDConnection = db.getConnection();
+                    MetadataReader MDReader = GenericCSWFactory.getMetadataReader(config, MDConnection);
+                    indexer = GenericCSWFactory.getIndex(config.getType(), MDReader, MDConnection);
                 }
             } else {
-                PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
-                dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-                dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
-                dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
-                dataSourceMD.setUser(prop.getProperty("MDDBUser"));
-                dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-                try {
-                    indexer = new MDWebIndex(dataSourceMD.getConnection());
-                } catch (SQLException e) {
-                    throw new ConfigurationException("SQLException while connecting to the CSW database.", e.getMessage());
-                }
-
+                throw new ConfigurationException("No generic database configuration file have been found");
             }
-
-        } catch (FileNotFoundException e) {
-            throw new ConfigurationException("No CSW configuration has been found.", e.getMessage());
-        } catch (IOException e) {
-            throw new ConfigurationException("The CSW configuration file can not be read.", e.getMessage());
+        } catch (SQLException e) {
+            throw new ConfigurationException("SQL Exception while creating CSWConfigurer.", e.getMessage());
+        } catch (WebServiceException e) {
+            throw new ConfigurationException("WebServiceException while creating CSWConfigurer.", e.getMessage());
         } catch (JAXBException ex) {
-             throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service");
+            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service");
         }
     }
     
@@ -263,11 +203,7 @@ public class CSWconfigurer {
                     indexDir.delete();
                 }
                 indexer.setFileDirectory(indexDir);
-                try  {
-                    indexer.createIndex();
-                } catch (SQLException ex) {
-                    throw new WebServiceException("SQLException while creating the index.", NO_APPLICABLE_CODE, version);
-                }
+                indexer.createIndex();
             }
             msg = "CSW index succefully recreated";
         }

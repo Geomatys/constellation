@@ -46,7 +46,8 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.metadata.Utils;
-import org.constellation.metadata.io.GenericMetadataReader;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.ws.WebServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotools dependencies
@@ -61,12 +62,12 @@ import org.opengis.util.InternationalString;
  * A Lucene Index Handler for a generic Database.
  * @author Guilhem Legal
  */
-public class GenericIndex extends IndexLucene<MetaDataImpl> {
+public class GenericIndex extends IndexLucene<Object> {
     
     /**
      * The Reader of this lucene index (generic DB mode).
      */
-    private final GenericMetadataReader genericReader;
+    private final MetadataReader reader;
     
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -76,9 +77,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndex(GenericMetadataReader reader, File configDirectory) throws SQLException {
+    public GenericIndex(MetadataReader reader, File configDirectory) throws WebServiceException {
         super(configDirectory);
-        genericReader = reader;
+        this.reader = reader;
         if (create)
             createIndex();
     }
@@ -88,9 +89,9 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * 
      * @param reader A generic reader for read the metadata database.
      */
-    public GenericIndex(GenericMetadataReader reader) throws SQLException {
+    public GenericIndex(MetadataReader reader) {
         super();
-        genericReader = reader;
+        this.reader = reader;
     }
     
     /** 
@@ -98,7 +99,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws SQLException {
+    public void createIndex() throws WebServiceException {
         logger.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -107,10 +108,10 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             writer = new IndexWriter(getFileDirectory(), analyzer, true);
 
             // TODO getting the objects list and index avery item in the IndexWriter.
-            List<MetaDataImpl> ids = genericReader.getAllEntries();
+            List<? extends Object> ids = reader.getAllEntries();
             logger.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
-            for (MetaDataImpl entry : ids) {
+            for (Object entry : ids) {
                 indexDocument(writer, entry);
             }
             writer.optimize();
@@ -137,11 +138,11 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * @param writer A lucene Index Writer.
      * @param meta A geotools Metadata object.
      */
-    public void indexDocument(IndexWriter writer, MetaDataImpl meta) {
+    public void indexDocument(IndexWriter writer, Object meta) {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.info("Metadata: " + meta.getFileIdentifier() + " indexed");
+            logger.info("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
 
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
@@ -161,13 +162,13 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * 
      * @param meta A geotools Metadata object.
      */
-    public void indexDocument(MetaDataImpl meta) {
+    public void indexDocument(Object meta) {
         try {
             IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, true);
             
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.info("Metadata: " + meta.getFileIdentifier() + " indexed");
+            logger.info("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
             
             writer.optimize();
             writer.close();
@@ -190,12 +191,12 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
     * @param metadata.
     * @return A Lucene document.
     */
-    protected Document createDocument(MetaDataImpl metadata) throws SQLException {
+    protected Document createDocument(Object metadata) throws SQLException {
         
         // make a new, empty document
         Document doc = new Document();
         
-        doc.add(new Field("id",      metadata.getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.TOKENIZED));
         
         logger.info("indexing ISO 19119 MD_Metadata");
@@ -224,7 +225,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
 
         } catch (NumberFormatException e) {
             if (!coord.equals("null")) {
-                logger.severe("unable to spatially index form: " + metadata.getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
                         "cause:  unable to parse double: " + coord);
             }
         }
@@ -272,7 +273,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
             
         } catch (NumberFormatException e) {
             if (!coord.equals("null"))
-                logger.severe("unable to spatially index metadata: " + metadata.getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index metadata: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
         
@@ -290,7 +291,7 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(String term, MetaDataImpl metadata, Map<String,List<String>> queryable) throws SQLException {
+    private String getValues(String term, Object metadata, Map<String,List<String>> queryable) throws SQLException {
         StringBuilder response  = new StringBuilder("");
         List<String> paths = queryable.get(term);
         
@@ -565,6 +566,6 @@ public class GenericIndex extends IndexLucene<MetaDataImpl> {
 
     @Override
     public void destroy() {
-        genericReader.destroy();
+        reader.destroy();
     }
 }

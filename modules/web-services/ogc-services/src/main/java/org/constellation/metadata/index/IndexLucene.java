@@ -52,6 +52,7 @@ import org.mdweb.lucene.AbstractIndex;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.metadata.Utils;
+import org.constellation.ws.WebServiceException;
 
 /**
  *
@@ -119,7 +120,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * 
      * @throws java.sql.SQLException
      */
-    public abstract void createIndex() throws SQLException;
+    public abstract void createIndex() throws WebServiceException;
 
     /**
      * Replace the precedent index directory by another pre-generated.

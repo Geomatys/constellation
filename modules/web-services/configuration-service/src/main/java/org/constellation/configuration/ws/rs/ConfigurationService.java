@@ -307,6 +307,7 @@ public class ConfigurationService extends WebService  {
     @PreDestroy
     public void destroy() {
         LOGGER.info("destroying Configuration Service");
-        cswConfigurer.destroy();
+        if (cswConfigurer != null)
+            cswConfigurer.destroy();
     }
 }

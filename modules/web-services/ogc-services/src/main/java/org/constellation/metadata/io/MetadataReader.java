@@ -85,6 +85,11 @@ public abstract class MetadataReader {
     public abstract List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException;
     
     /**
+     * Return all the entries from the database
+     */
+    public abstract List<? extends Object> getAllEntries() throws WebServiceException;
+    
+    /**
      * Destroy all the resource used by this reader.
      */
     public abstract void destroy();

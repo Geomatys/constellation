@@ -60,8 +60,7 @@ import org.constellation.generic.vocabulary.Vocabulary;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.skos.RDF;
 import org.constellation.ws.rs.WebService;
-import org.geotools.metadata.iso.ExtendedElementInformationImpl;
-import org.geotools.metadata.iso.IdentifierImpl;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -74,6 +73,8 @@ import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
 import org.geotools.metadata.iso.citation.TelephoneImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.metadata.iso.identification.KeywordsImpl;
+import org.geotools.metadata.iso.ExtendedElementInformationImpl;
+import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.metadata.note.Anchors;
 import org.geotools.util.SimpleInternationalString;
 
@@ -812,20 +813,24 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    public List<MetaDataImpl> getAllEntries() throws SQLException {
+    public List<MetaDataImpl> getAllEntries() throws WebServiceException {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
-        Statement stmt = connection.createStatement();
-        if (genericConfiguration.getQueries() != null           &&
-            genericConfiguration.getQueries().getMain() != null &&
-            genericConfiguration.getQueries().getMain().getQuery() != null) {
-            Query mainQuery = genericConfiguration.getQueries().getMain().getQuery();
-            ResultSet res = stmt.executeQuery(mainQuery.buildSQLQuery());
-            while (res.next()) {
-                result.add((MetaDataImpl)getMetadata(res.getString(1), ISO_19115, ElementSetType.FULL, null));
-            }
+        try {
+            Statement stmt = connection.createStatement();
+            if (genericConfiguration.getQueries() != null           &&
+                genericConfiguration.getQueries().getMain() != null &&
+                genericConfiguration.getQueries().getMain().getQuery() != null) {
+                Query mainQuery = genericConfiguration.getQueries().getMain().getQuery();
+                ResultSet res = stmt.executeQuery(mainQuery.buildSQLQuery());
+                while (res.next()) {
+                    result.add((MetaDataImpl)getMetadata(res.getString(1), ISO_19115, ElementSetType.FULL, null));
+                }
             
-        } else {
-            logger.severe("The configuration file is malformed, unable to reach the main query");
+            } else {
+                logger.severe("The configuration file is malformed, unable to reach the main query");
+            }
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return result;
     }

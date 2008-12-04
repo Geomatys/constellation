@@ -68,4 +68,9 @@ public class FileMetadataReader extends MetadataReader {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public List<? extends Object> getAllEntries() throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

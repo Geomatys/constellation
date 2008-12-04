@@ -159,16 +159,6 @@ public class CatalogueHarvester {
     }
     
     /**
-     * Build a new catalogue harvester with the write part.
-     */
-    public CatalogueHarvester(Marshaller marshaller, Unmarshaller unmarshaller) {
-        this.marshaller     = marshaller;
-        this.unmarshaller   = unmarshaller;
-        this.metadataWriter = null;
-        initializeRequest();
-    }
-    
-    /**
      * Initialize The object request to harvest distant CSW
      */
     private void initializeRequest() {

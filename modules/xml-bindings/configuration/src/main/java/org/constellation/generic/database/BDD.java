@@ -18,8 +18,12 @@
 
 package org.constellation.generic.database;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import org.geotools.resources.JDBC;
 import org.geotools.util.Utilities;
 
 /**
@@ -29,12 +33,24 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BDD {
 
+    /**
+     * The className of the driver
+     */
     private String className;
     
+    /**
+     * The url to connect the database
+     */
     private String connectURL;
     
+    /**
+     * The username connecting the database
+     */
     private String user;
     
+    /**
+     * The password of the user
+     */
     private String password;
 
     public String getClassName() {
@@ -51,6 +67,17 @@ public class BDD {
 
     public String getPassword() {
         return password;
+    }
+    
+    /**
+     * Return a new connection to the database.
+     * 
+     * @return
+     * @throws java.sql.SQLException
+     */
+    public Connection getConnection() throws SQLException {
+        JDBC.loadDriver(className);
+        return DriverManager.getConnection(connectURL, user, password);
     }
     
     @Override

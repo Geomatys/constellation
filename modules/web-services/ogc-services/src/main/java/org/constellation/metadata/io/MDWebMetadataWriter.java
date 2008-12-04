@@ -110,7 +110,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
      */
     public MDWebMetadataWriter(Connection MDConnection, IndexLucene index) throws SQLException {
         super(index);
-        MDCatalog         = MDReader.getCatalog("CSWCat");
+        MDReader = new Reader20(Standard.ISO_19115, MDConnection);
+        MDCatalog = MDReader.getCatalog("CSWCat");
         if (MDCatalog == null) {
             MDCatalog = new Catalog("CSWCat", "CSW Data Catalog");
             MDWriter.writeCatalog(MDCatalog);
@@ -665,15 +666,17 @@ public class MDWebMetadataWriter extends MetadataWriter {
     public void destroy() {
         classBinding.clear();
         try {
-            MDReader.close();
-            MDWriter.close();
+            if (MDReader != null)
+                MDReader.close();
+            if (MDWriter != null)
+                MDWriter.close();
             classBinding.clear();
             alreadyWrite.clear();
-            index.destroy();
+            if (index != null)
+                index.destroy();
             
         } catch (SQLException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");
         }
     }
-
 }

@@ -32,14 +32,18 @@ import org.geotools.util.Utilities;
 @XmlRootElement(name = "automatic")
 public class Automatic {
     
-     @XmlTransient
-    public static final int DEFAULT = 0;
     @XmlTransient
-    public static final int CSR     = 1;
+    public static final int DEFAULT     = 0;
     @XmlTransient
-    public static final int CDI     = 2;
+    public static final int CSR         = 1;
     @XmlTransient
-    public static final int EDMED   = 3;
+    public static final int CDI         = 2;
+    @XmlTransient
+    public static final int EDMED       = 3;
+    @XmlTransient
+    public static final int MDWEB       = 4;
+    @XmlTransient
+    public static final int FILESYSTEM  = 5;
             
     private BDD bdd;
     
@@ -67,6 +71,10 @@ public class Automatic {
             return CSR;
         else if (format.equals("edmed"))
             return EDMED;
+        else if (format.equals("mdweb"))
+            return MDWEB;
+        else if (format.equals("filesystem"))
+            return FILESYSTEM;
         else
             return DEFAULT;
     }

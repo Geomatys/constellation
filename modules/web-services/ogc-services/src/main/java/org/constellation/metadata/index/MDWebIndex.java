@@ -42,7 +42,9 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.constellation.ws.WebServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDweb dependencies
 import org.mdweb.model.schemas.Classe;
@@ -69,17 +71,17 @@ public class MDWebIndex extends IndexLucene<Form> {
     /**
      * The Reader of this lucene index (MDWeb DB mode).
      */
-    private final Reader MDWebReader;
+    private Reader MDWebReader;
     
      /**
      * A Map containg all the paths (used when reader is null)
      */
-    private final Map<String, Path> pathMap;
+    private Map<String, Path> pathMap;
     
     /**
      * A Map containing some classes (used when reader is null)
      */
-    private final Map<String, Classe> classeMap;
+    private Map<String, Classe> classeMap;
     
      /**
      * Creates a new Lucene Index into the specified directory with the specified MDweb reader.
@@ -87,13 +89,17 @@ public class MDWebIndex extends IndexLucene<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndex(Connection MDConnection, File configDirectory) throws SQLException {
+    public MDWebIndex(Connection MDConnection, File configDirectory) throws WebServiceException {
         super(configDirectory);
-        MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
-        pathMap       = null;
-        classeMap     = null;
-        if (create)
-            createIndex();
+        try {
+            MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
+            pathMap       = null;
+            classeMap     = null;
+            if (create)
+                createIndex();
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
     
     /**
@@ -101,11 +107,15 @@ public class MDWebIndex extends IndexLucene<Form> {
      * 
      * @param reader An mdweb reader for read the metadata database.
      */
-    public MDWebIndex(Connection MDConnection) throws SQLException {
+    public MDWebIndex(Connection MDConnection) throws WebServiceException {
         super();
-        MDWebReader   = new Reader20(Standard.ISO_19115, MDConnection);
-        pathMap       = null;
-        classeMap     = null;
+        try {
+            MDWebReader   = new Reader20(Standard.ISO_19115, MDConnection);
+            pathMap       = null;
+            classeMap     = null;
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
     
     /**
@@ -176,7 +186,7 @@ public class MDWebIndex extends IndexLucene<Form> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws SQLException {
+    public void createIndex() throws WebServiceException {
         logger.info("Creating lucene index for MDWeb database please wait...");
         
         long time = System.currentTimeMillis();
@@ -206,6 +216,9 @@ public class MDWebIndex extends IndexLucene<Form> {
             ex.printStackTrace();
         } catch (IOException ex) {
             logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (SQLException ex) {
+            logger.severe("SQLException while indexing document: " + ex.getMessage());
             ex.printStackTrace();
         }
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +

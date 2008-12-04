@@ -921,7 +921,8 @@ public class CSWService extends OGCWebService {
     @PreDestroy
     public void destroy() {
         LOGGER.info("destroying CSW service");
-        worker.destroy();
+        if (worker != null)
+            worker.destroy();
     }
 
 }

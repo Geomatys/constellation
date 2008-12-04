@@ -18,11 +18,17 @@
 
 package org.constellation.metadata.io;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.index.GenericIndex;
+import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.MDWebIndex;
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.ws.WebServiceException;
 
 /**
  *
@@ -30,7 +36,16 @@ import static org.constellation.generic.database.Automatic.*;
  */
 public class GenericCSWFactory {
     
-    public static GenericMetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException {
+    /**
+     * Return a Metadata reader for the specified database type.
+     * 
+     * @param configuration
+     * @param MDConnection
+     * @return
+     * @throws java.sql.SQLException
+     * @throws javax.xml.bind.JAXBException
+     */
+    public static MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException {
         switch (configuration.getType()) {
             case CDI:
                 return new CDIReader(configuration, MDConnection);
@@ -38,6 +53,113 @@ public class GenericCSWFactory {
                 return new CSRReader(configuration, MDConnection);
             case EDMED:
                 return new EDMEDReader(configuration, MDConnection);
+            case MDWEB:
+                return new MDWebMetadataReader(MDConnection);
+            case FILESYSTEM:
+                return new FileMetadataReader();
+            default:
+                throw new IllegalArgumentException("Unknow database type");
+        }
+    }
+    
+    /**
+     * Return a Metadata Writer for the specified database type.
+     * 
+     * @param configuration
+     * @param MDConnection
+     * @return
+     * @throws java.sql.SQLException
+     * @throws javax.xml.bind.JAXBException
+     */
+    public static MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index) throws SQLException, JAXBException {
+        switch (dbType) {
+            case CDI:
+                return null;
+            case CSR:
+                return null;
+            case EDMED:
+                return null;
+            case MDWEB:
+                return new MDWebMetadataWriter(MDConnection, index);
+            case FILESYSTEM:
+                return new FileMetadataWriter(index);
+            default:
+                throw new IllegalArgumentException("Unknow database type");
+        }
+    }
+    
+    /**
+     * Return a profile (discovery or transactionnal) for the specified databaseType
+     * @param dbType The type of the database.
+     * 
+     * @return DISCOVERY or TRANSACTIONAL 
+     */
+    public static int getProfile(int dbType) {
+        switch (dbType) {
+            case CDI:
+                return CSWworker.DISCOVERY;
+            case CSR:
+                return CSWworker.DISCOVERY;
+            case EDMED:
+                return CSWworker.DISCOVERY;
+            case MDWEB:
+                return CSWworker.TRANSACTIONAL;
+            case FILESYSTEM:
+                return CSWworker.TRANSACTIONAL;
+            default:
+                throw new IllegalArgumentException("Unknow database type");
+        }
+    }
+    
+    /**
+     * Return a Lucene index for the specified database type.
+     * 
+     * @param dbType The type of the database.
+     * @param reader A metadataReader (unused for MDWeb database);
+     * @param MDConnection A connecton to the database (used only for MDWeb database).
+     * @param configDir
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
+    public static IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException {
+        switch (dbType) {
+            case CDI:
+                return new GenericIndex(reader, configDir);
+            case CSR:
+                return new GenericIndex(reader, configDir);
+            case EDMED:
+                return new GenericIndex(reader, configDir);
+            case MDWEB:
+                return new MDWebIndex(MDConnection, configDir);
+            case FILESYSTEM:
+                return new GenericIndex(reader, configDir);
+            default:
+                throw new IllegalArgumentException("Unknow database type");
+        }
+    }
+    
+     /**
+     * Return a Lucene index for the specified database type.
+     * 
+     * @param dbType The type of the database.
+     * @param reader A metadataReader (unused for MDWeb database);
+     * @param MDConnection A connecton to the database (used only for MDWeb database).
+     * @param configDir
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
+    public static IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException {
+        switch (dbType) {
+            case CDI:
+                return new GenericIndex(reader);
+            case CSR:
+                return new GenericIndex(reader);
+            case EDMED:
+                return new GenericIndex(reader);
+            case MDWEB:
+                return new MDWebIndex(MDConnection);
+            case FILESYSTEM:
+                return new GenericIndex(reader);
             default:
                 throw new IllegalArgumentException("Unknow database type");
         }

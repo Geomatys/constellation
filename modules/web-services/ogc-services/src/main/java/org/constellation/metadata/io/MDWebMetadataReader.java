@@ -1099,5 +1099,18 @@ public class MDWebMetadataReader extends MetadataReader {
         }
     }
 
-   
+    @Override
+    public List<? extends Object> getAllEntries() throws WebServiceException {
+        List<Object> results = new ArrayList<Object>();
+        try {
+            List<Catalog> catalogs = MDReader.getCatalogs(); 
+            List<Form> forms       = MDReader.getAllForm(catalogs);
+            for (Form f: forms) {
+                results.add(getObjectFromForm("no cache", f));
+            }
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+        return results;
+    }
 }
