@@ -67,7 +67,7 @@ public class PEPService {
     public PEPService() throws JAXBException {
         final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
                 "org.constellation.wms.v111:org.constellation.wms.v130:" +
-                "org.constellation.sld.v110:org.constellation.gml.v311");
+                "org.geotools.internal.jaxb.v110.sld");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         worker = new PEPWorker(unmarshaller);
     }

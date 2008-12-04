@@ -65,8 +65,6 @@
     <module>kml</module>
     <module>ogc</module>
     <module>ows</module>
-    <module>se</module>
-    <module>sld</module>
     <module>wcs</module>
     <module>wms</module>
     <module>xacml</module>

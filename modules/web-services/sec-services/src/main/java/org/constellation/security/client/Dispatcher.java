@@ -23,7 +23,6 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.security.client.rs.WmsRestClient;
 import org.constellation.security.client.soap.WmsSoapClient;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
 
@@ -65,28 +64,30 @@ public class Dispatcher {
     private WmsSoapClient wmsSoapClient;
 
     /**
-     * Instanciates a dispatcher for the specified url.
+     * Instanciates a dispatcher for the specified url. The constructor defines whether it
+     * is a {@code REST} or {@code SOAP} request, in verifying the question mark character
+     * in the URL. If it is present, we know that we are faced to a {@code REST} request,
+     * otherwise it is a {@code SOAP} request.
      *
      * @param url The URL of the webservice to request.
-     * @param isRest Defines if the dispatcher has to launch a REST or SOAP interface.
      * @param marshaller The marshaller to use for parsing the request.
      * @param unmarshaller The unmarshaller to use for the response.
      */
-    public Dispatcher(final URL url, final boolean isRest, final Marshaller marshaller,
-                                                       final Unmarshaller unmarshaller)
+    public Dispatcher(final URL url, final Marshaller marshaller,
+                                 final Unmarshaller unmarshaller)
     {
         this.url    = url;
-        this.isRest = isRest;
+        this.isRest = url.getPath().contains("?");
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
     }
 
-    public AbstractWMSCapabilities requestGetCapabilities(final ServiceVersion serviceVersion)
-            throws IOException, WebServiceException
+    public AbstractWMSCapabilities requestGetCapabilities() throws IOException,
+                                                            WebServiceException
     {
         if (isRest) {
             wmsRestClient = new WmsRestClient(url, marshaller, unmarshaller);
-            return wmsRestClient.sendGetCapabilities(serviceVersion);
+            return wmsRestClient.sendGetCapabilities();
         } else {
             // implement a SOAP client.
             throw new UnsupportedOperationException();

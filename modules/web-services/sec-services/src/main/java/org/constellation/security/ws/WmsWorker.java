@@ -16,16 +16,13 @@
  */
 package org.constellation.security.ws;
 
-import org.constellation.security.client.Dispatcher;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.security.client.Dispatcher;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
 
@@ -62,23 +59,16 @@ public class WmsWorker {
      *
      * @param marshaller
      * @param unmarshaller
+     * @throws IOException if an error occurs at the URL creation.
      */
-    public WmsWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
+    public WmsWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) throws IOException {
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
-        URL url = null;
-        try {
-            url = new URL("http", "solardev", 8080, "/constellation/WS/wms?request=GetCapabilities&service=wms&version=1.1.1");
-        } catch (MalformedURLException ex) {
-            LOGGER.log(Level.SEVERE, "Not a valid URL specified for the dispatcher.", ex);
-        }
-        dispatcher = (url == null) ? null : new Dispatcher(url, true, marshaller, unmarshaller);
+        final URL url = new URL("http", "solardev", 8080, "/constellation/WS/wms?request=GetCapabilities&service=wms&version=1.1.1");
+        dispatcher = new Dispatcher(url, marshaller, unmarshaller);
     }
 
-    public AbstractWMSCapabilities launchGetCapabilities(final ServiceVersion serviceVersion) throws IOException, WebServiceException {
-        if (dispatcher == null) {
-            throw new IOException("Dispatcher not well instanciated !");
-        }
-        return dispatcher.requestGetCapabilities(serviceVersion);
+    public AbstractWMSCapabilities launchGetCapabilities() throws IOException, WebServiceException {
+        return dispatcher.requestGetCapabilities();
     }
 }

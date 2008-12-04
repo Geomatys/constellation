@@ -105,12 +105,7 @@
      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>csw</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>sld</artifactId>
-      <version>${project.version}</version>
-    </dependency>    
+    </dependency>  
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>gml</artifactId>

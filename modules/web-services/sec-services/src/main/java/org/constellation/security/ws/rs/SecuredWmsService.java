@@ -60,10 +60,10 @@ public class SecuredWmsService extends OGCWebService {
      *
      * @throws JAXBException if an error in the context occurs.
      */
-    public SecuredWmsService() throws JAXBException {
+    public SecuredWmsService() throws JAXBException, IOException {
         super("WMS", new ServiceVersion(Service.WMS, "1.1.1"), new ServiceVersion(Service.WMS, "1.3.0"));
         setXMLContext("org.constellation.ws:org.constellation.wms.v111:" +
-                "org.constellation.wms.v130:org.constellation.sld.v110:org.constellation.gml.v311",
+                "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
                 "http://www.opengis.net/wms");
         worker = new WmsWorker(marshaller, unmarshaller);
     }
@@ -89,7 +89,7 @@ public class SecuredWmsService extends OGCWebService {
             setCurrentVersion(version);
             if (request.equalsIgnoreCase(WMSQuery.GETCAPABILITIES)) {
                 try {
-                    return Response.ok(worker.launchGetCapabilities(serviceVersion), Query.TEXT_XML).build();
+                    return Response.ok(worker.launchGetCapabilities(), Query.TEXT_XML).build();
                 } catch (IOException ex) {
                     throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE, serviceVersion);
                 }

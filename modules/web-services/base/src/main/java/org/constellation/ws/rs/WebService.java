@@ -30,7 +30,6 @@ import javax.servlet.ServletContext;
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
 import java.io.StringWriter;
-import javax.annotation.PreDestroy;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;

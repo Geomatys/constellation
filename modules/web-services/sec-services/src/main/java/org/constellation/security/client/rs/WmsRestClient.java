@@ -25,10 +25,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
+
 /**
+ * {@code REST} client for a {@code WMS} request.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -55,7 +56,7 @@ public class WmsRestClient {
         this.unmarshaller = unmarshaller;
     }
 
-    public AbstractWMSCapabilities sendGetCapabilities(ServiceVersion serviceVersion) throws IOException, WebServiceException {
+    public AbstractWMSCapabilities sendGetCapabilities() throws IOException, WebServiceException {
         final URLConnection connec = url.openConnection();
         connec.setDoOutput(true);
         connec.setRequestProperty("Content-Type","text/xml");
@@ -64,13 +65,12 @@ public class WmsRestClient {
         try {
             response = unmarshaller.unmarshal(in);
         } catch (JAXBException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE, serviceVersion);
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         if (!(response instanceof AbstractWMSCapabilities)) {
             throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
                     " instance of AbstractWMSCapabilities", ExceptionCode.NO_APPLICABLE_CODE);
         }
-        System.out.println(response);
         return (AbstractWMSCapabilities) response;
     }
 
