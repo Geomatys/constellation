@@ -51,7 +51,7 @@ public class DescribeLayer extends WMSQuery {
      * {@inheritDoc}
      */
     public QueryRequest getRequest() {
-        return WMSQueryRequest.GET_LEGEND_GRAPHIC;
+        return WMSQueryRequest.DESCRIBE_LAYER;
     }
 
     /**
