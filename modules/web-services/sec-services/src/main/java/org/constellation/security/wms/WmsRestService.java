@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.ws.rs;
+package org.constellation.security.wms;
 
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import org.constellation.query.Query;
 import org.constellation.query.wms.WMSQuery;
-import org.constellation.security.ws.WmsWorker;
+import org.constellation.security.Worker;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceExceptionReport;
@@ -49,23 +49,23 @@ import org.constellation.ws.rs.OGCWebService;
  */
 @Path("wms-sec")
 @Singleton
-public class SecuredWmsService extends OGCWebService {
+public class WmsRestService extends OGCWebService {
     /**
      * A worker for requesting a WMS service.
      */
-    private final WmsWorker worker;
+    private final Worker worker;
 
     /**
      * Defines the WMS version available to a request.
      *
      * @throws JAXBException if an error in the context occurs.
      */
-    public SecuredWmsService() throws JAXBException, IOException {
+    public WmsRestService() throws JAXBException, IOException {
         super("WMS", new ServiceVersion(Service.WMS, "1.1.1"), new ServiceVersion(Service.WMS, "1.3.0"));
         setXMLContext("org.constellation.ws:org.constellation.wms.v111:" +
                 "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
                 "http://www.opengis.net/wms");
-        worker = new WmsWorker(marshaller, unmarshaller);
+        worker = new Worker(marshaller, unmarshaller);
     }
 
     /**

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.client.rs;
+package org.constellation.security.wms;
 
 import java.io.IOException;
 import java.io.InputStream;

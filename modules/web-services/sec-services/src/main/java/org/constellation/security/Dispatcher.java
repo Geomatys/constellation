@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.client;
+package org.constellation.security;
 
 import java.io.IOException;
 import java.net.URL;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.security.client.rs.WmsRestClient;
-import org.constellation.security.client.soap.WmsSoapClient;
+import org.constellation.security.wms.WmsRestClient;
+import org.constellation.security.wms.WmsSoapClient;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.WebServiceException;
 
