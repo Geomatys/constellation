@@ -74,7 +74,7 @@
   <dependencies>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>ogc-services</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

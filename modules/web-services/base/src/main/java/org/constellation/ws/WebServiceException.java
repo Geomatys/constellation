@@ -20,7 +20,7 @@ import org.opengis.util.CodeList;
 
 
 /**
- * Reports a failure in {@link WebService}.
+ * Reports a failure in a {@link WebService}.
  *
  * @version $Id$
  * @author Guihlem Legal
@@ -28,7 +28,7 @@ import org.opengis.util.CodeList;
  */
 public class WebServiceException extends Exception {
     /**
-     * The exceptioni code.
+     * The exception code.
      */
     private final CodeList exceptionCode;
 
@@ -52,10 +52,7 @@ public class WebServiceException extends Exception {
     public WebServiceException(final String message, final CodeList exceptionCode,
                                final ServiceVersion version)
     {
-        super(message);
-        this.exceptionCode = exceptionCode;
-        this.version = version;
-        this.locator = null;
+        this(message, exceptionCode, version, null);
     }
     
     /**
@@ -64,14 +61,10 @@ public class WebServiceException extends Exception {
      *
      * @param message The detail message.
      * @param exceptionCode The exception code.
-     * @param version The service version.
      */
     public WebServiceException(final String message, final CodeList exceptionCode)
     {
-        super(message);
-        this.exceptionCode = exceptionCode;
-        this.version = null;
-        this.locator = null;
+        this(message, exceptionCode, (String)null);
     }
 
     /**
@@ -80,6 +73,7 @@ public class WebServiceException extends Exception {
      * @param message The detail message.
      * @param exceptionCode The exception code.
      * @param version The service version.
+     * @param locator What causes the exception.
      */
     public WebServiceException(final String message, final CodeList exceptionCode,
                                final ServiceVersion version, final String locator)
@@ -93,22 +87,33 @@ public class WebServiceException extends Exception {
     /**
      * Creates an exception with the specified details message.
      * There is no version specified here it will be specified at exception report build.
+     *
      * @param message The detail message.
      * @param exceptionCode The exception code.
-     * @param version The service version.
+     * @param locator What causes the exception.
      */
     public WebServiceException(final String message, final CodeList exceptionCode, final String locator)
     {
-        super(message);
-        this.exceptionCode = exceptionCode;
-        this.version = null;
-        this.locator = locator;
+        this(message, exceptionCode, null, locator);
+    }
+
+    /**
+     * Creates an exception with the specified details message and cause.
+     * There is no version specified here it will be specified at exception report build.
+     *
+     * @param cause The cause of this exception.
+     * @param exceptionCode The exception code.
+     * @param version The service version.
+     */
+    public WebServiceException(final Exception cause, final CodeList exceptionCode)
+    {
+        this(cause, exceptionCode, null);
     }
 
     /**
      * Creates an exception with the specified details message and cause.
      *
-     * @param message The detail message.
+     * @param cause The cause of this exception.
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
