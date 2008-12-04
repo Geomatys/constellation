@@ -77,7 +77,7 @@ public class Dispatcher {
                                  final Unmarshaller unmarshaller)
     {
         this.url    = url;
-        this.isRest = url.getPath().contains("?");
+        this.isRest = url.getFile().contains("?");
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
     }

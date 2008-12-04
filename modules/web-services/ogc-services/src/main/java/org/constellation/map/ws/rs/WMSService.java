@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
@@ -62,6 +63,7 @@ import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.QueryAdapter;
+import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -86,6 +88,10 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.ImmutableEnvelope;
+import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
+import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
+import org.geotools.internal.jaxb.v110.sld.TypeNameType;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
@@ -151,6 +157,9 @@ public class WMSService extends OGCWebService {
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 return getLegendGraphic(adaptGetLegendGraphic());
+            }
+            if (DESCRIBELAYER.equalsIgnoreCase(request)) {
+                return describeLayer(adaptDescribeLayer());
             }
             final String version = (String) getParameter(KEY_VERSION, false);
             final WMSQueryVersion queryVersion;
@@ -642,6 +651,34 @@ public class WMSService extends OGCWebService {
     }
 
     /**
+     * Return a description of specified layers.
+     *
+     * @param descLayer The {@linkplain DescribeLayer describe layer} request.
+     *
+     * @throws WebServiceException
+     * @throws JAXBException
+     */
+    private Response describeLayer(final DescribeLayer descLayer) throws WebServiceException, JAXBException {
+        OnlineResourceType or = new OnlineResourceType();
+        or.setHref(getServiceURL() + "wcs?");
+
+        List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
+        final List<String> layers = descLayer.getLayers();
+        for (String layer : layers) {
+            final TypeNameType t = new TypeNameType(layer.trim());
+            final LayerDescriptionType outputLayer = new LayerDescriptionType(or, t);
+            layersDescriptions.add(outputLayer);
+        }
+        final DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(),
+                layersDescriptions);
+
+        //we marshall the response and return the XML String
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(response, sw);
+        return Response.ok(sw.toString(), TEXT_XML).build();
+    }
+
+    /**
      * Return the legend graphic for the current layer.
      *
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
@@ -753,6 +790,21 @@ public class WMSService extends OGCWebService {
                 updateURL(op.getDCPType());
         }
     }
+
+    /**
+     * Converts a DescribeLayer request composed of string values, to a container
+     * of real java objects.
+     *
+     * @return The DescribeLayer request.
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    private DescribeLayer adaptDescribeLayer() throws WebServiceException {
+        final String strLayer  = getParameter(KEY_LAYERS,  true );
+        final String strVersion = getParameter(KEY_VERSION, false);
+        final List<String> layers = QueryAdapter.toStringList(strLayer);
+        return new DescribeLayer(layers, (strVersion.equals("1.1.1") ?
+            WMSQueryVersion.WMS_1_1_1 : WMSQueryVersion.WMS_1_3_0));
+   }
 
     /**
      * Converts a GetCapabilities request composed of string values, to a container
