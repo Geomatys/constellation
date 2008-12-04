@@ -71,6 +71,8 @@ public class ObjectFactory {
     private final static QName _ContactElectronicMailAddress_QNAME = new QName("http://www.opengis.net/wms", "ContactElectronicMailAddress");
     private final static QName _ContactPosition_QNAME = new QName("http://www.opengis.net/wms", "ContactPosition");
 
+    private final static QName _GetLegendGraphic_QNAME = new QName("http://www.opengis.net/sld", "GetLegendGraphic");
+    private final static QName _DescribeLayer_QNAME = new QName("http://www.opengis.net/sld", "DescribeLayer");
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wms
      * 
@@ -587,4 +589,21 @@ public class ObjectFactory {
         return new JAXBElement<String>(_ContactPosition_QNAME, String.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link OperationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/sld", name = "GetLegendGraphic", substitutionHeadNamespace = "http://www.opengis.net/wms", substitutionHeadName = "_ExtendedOperation")
+    public JAXBElement<OperationType> createGetLegendGraphic(OperationType value) {
+        return new JAXBElement<OperationType>(_GetLegendGraphic_QNAME, OperationType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link OperationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/sld", name = "DescribeLayer", substitutionHeadNamespace = "http://www.opengis.net/wms", substitutionHeadName = "_ExtendedOperation")
+    public JAXBElement<OperationType> createDescribeLayer(OperationType value) {
+        return new JAXBElement<OperationType>(_DescribeLayer_QNAME, OperationType.class, null, value);
+    }
 }
