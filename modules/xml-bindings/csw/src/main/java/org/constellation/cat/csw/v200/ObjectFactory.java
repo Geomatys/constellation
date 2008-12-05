@@ -361,11 +361,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryType }{@code >}}
      * 
-     */
+    
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw", name = "Query", substitutionHeadNamespace = "http://www.opengis.net/cat/csw", substitutionHeadName = "AbstractQuery")
     public JAXBElement<QueryType> createQuery(QueryType value) {
         return new JAXBElement<QueryType>(_Query_QNAME, QueryType.class, null, value);
-    }
+    } */
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RecordType }{@code >}}
