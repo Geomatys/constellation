@@ -30,7 +30,6 @@ import org.constellation.query.wms.WMSQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
-import org.geotools.map.MapBuilder;
 import org.geotools.style.MutableStyle;
 
 import org.opengis.feature.simple.SimpleFeature;

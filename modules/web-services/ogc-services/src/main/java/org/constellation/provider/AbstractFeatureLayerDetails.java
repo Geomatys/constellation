@@ -17,15 +17,11 @@
  */
 package org.constellation.provider;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +35,6 @@ import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.Service;
-import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DefaultQuery;
@@ -47,13 +42,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.renderer.GlyphLegendFactory;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapBuilder;
 import org.geotools.map.MapLayer;
@@ -65,15 +57,8 @@ import org.geotools.util.MeasurementRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.Name;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -333,107 +318,11 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {        
-        // Pixel coordinates in the request.
-        final int pixelUpX        = gfi.getX();
-        final int pixelUpY        = gfi.getY();
-        final int pixelDownX      = pixelUpX + MARGIN;
-        final int pixelDownY      = pixelUpY + MARGIN;
-        final Envelope envObj     = gfi.getEnvelope();
-        final double widthEnv     = envObj.getSpan(0);
-        final double heightEnv    = envObj.getSpan(1);
-        final int width           = gfi.getSize().width;
-        final int height          = gfi.getSize().height;
-        // Coordinates of the lower corner and upper corner of the objective envelope.
-        final double lowerCornerX = widthEnv  * pixelUpX   / width  + envObj.getMinimum(0);
-        final double lowerCornerY = heightEnv * pixelUpY   / height + envObj.getMinimum(1);
-        final double upperCornerX = widthEnv  * pixelDownX / width  + envObj.getMinimum(0);
-        final double upperCornerY = heightEnv * pixelDownY / height + envObj.getMinimum(1);
-
-        final SimpleFeatureType sft = fs.getSchema();
-        final CoordinateReferenceSystem crsObj = envObj.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem crsData = sft.getCoordinateReferenceSystem();
-        /* Here we build the final envelope on which to filter features.
-         * If the objective crs is the same as the data one, then we do not have to apply
-         * a transformation on the coordinates.
-         */
-        final ReferencedEnvelope filterEnv;
-        if (!crsObj.equals(crsData)) {
-            final GeneralEnvelope objEnv = new GeneralEnvelope(crsObj);
-            objEnv.setRange(0, lowerCornerX, upperCornerX);
-            objEnv.setRange(1, lowerCornerY, upperCornerY);
-            try {
-                filterEnv = new ReferencedEnvelope(CRS.transform(objEnv, crsData));
-            } catch (TransformException t) {
-                throw new CatalogException(t);
-            } catch (MismatchedDimensionException m) {
-                throw new CatalogException(m);
-            }
-        } else {
-            filterEnv = new ReferencedEnvelope(lowerCornerX, upperCornerX, lowerCornerY, upperCornerY, crsData);
-        }
-
-        final Coordinate[] coord = new Coordinate[5];
-        coord[0] = new Coordinate(filterEnv.getMinX(), filterEnv.getMinY());
-        coord[1] = new Coordinate(filterEnv.getMinX(), filterEnv.getMaxY());
-        coord[2] = new Coordinate(filterEnv.getMaxX(), filterEnv.getMaxY());
-        coord[3] = new Coordinate(filterEnv.getMaxX(), filterEnv.getMinY());
-        coord[4] = coord[0];
-        final LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
-        final Geometry geom = GEOMETRY_FACTORY.createPolygon(lr1, null);
-        /* Now that we have the envelope, we need to know the name of the property which
-         * stores the geometry (usually "the_geom").
-         */
-        final Name geomAtt = sft.getGeometryDescriptor().getName();
-        final FilterFactory2 factory = CommonFactoryFinder.getFilterFactory2(null);
-        final PropertyName geomProp = factory.property(geomAtt);
-        final Filter filter = factory.intersects(geomProp, factory.literal(geom));
-
-        // Apply the bbox filter on the feature source.
-        final FeatureCollection<SimpleFeatureType, SimpleFeature> features = fs.getFeatures(filter);
-        final FeatureIterator<SimpleFeature> featureIt = features.features();
-
-        final List<SimpleFeature> requestedFeatures = new ArrayList<SimpleFeature>();
-        while (featureIt.hasNext()) {
-            final SimpleFeature feature = featureIt.next();
-            if (feature == null) {
-                continue;
-            }
-            requestedFeatures.add(feature);
-        }
-        featureIt.close();
-        return requestedFeatures;
-    }
-
-    /**
      * Should not have been called in this implementation.
      */
     public Set<Series> getSeries() {
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public GeneralDirectPosition getPixelCoordinates(GetFeatureInfo gfi) {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
-        final int width = gfi.getSize().width;
-        final int height = gfi.getSize().height;
-        final int pixelX = gfi.getX();
-        final int pixelY = gfi.getY();
-        final double widthEnv     = objEnv.getSpan(0);
-        final double heightEnv    = objEnv.getSpan(1);
-        final double resX         =      widthEnv  / width;
-        final double resY         = -1 * heightEnv / height;
-        final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
-        final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
-        final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
-        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
-        return position;
-    }
-
     
     protected Query createQuery(final Date date, final Number elevation){
         final DefaultQuery query = new DefaultQuery();

@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.GridCoverageTable;
@@ -39,15 +39,11 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.Service;
 import org.constellation.map.PostGridMapLayer;
-import org.constellation.map.PostGridMapLayer2;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.WMSQuery;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.GraphicBuilder;
@@ -159,33 +155,6 @@ class PostGridLayerDetails implements LayerDetails {
         return coverage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
-        final int width  = gfi.getSize().width;
-        final int height = gfi.getSize().height;
-        final GridCoverage2D coverage = getCoverage(objEnv, new Dimension(width, height),
-                gfi.getElevation(), gfi.getTime());
-        // Pixel coordinates in the request.
-        final int pixelUpX        = gfi.getX();
-        final int pixelUpY        = gfi.getY();
-        final double widthEnv     = objEnv.getSpan(0);
-        final double heightEnv    = objEnv.getSpan(1);
-        final double resX         =      widthEnv  / width;
-        final double resY         = -1 * heightEnv / height;
-        // Coordinates of the lower corner and upper corner of the objective envelope.
-        final double lowerCornerX = (pixelUpX + 0.5) * resX + objEnv.getMinimum(0);
-        final double lowerCornerY = (pixelUpY + 0.5) * resY + objEnv.getMaximum(1);
-
-        final GeneralDirectPosition position = new GeneralDirectPosition(lowerCornerX, lowerCornerY);
-        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
-
-        double[] result = null;
-        result = coverage.evaluate(position, result);
-        return (result == null) ? null : result[0];
-    }
 
     /**
      * {@inheritDoc}
@@ -199,26 +168,6 @@ class PostGridLayerDetails implements LayerDetails {
      */
     public String getName() {
         return reader.getTable().getLayer().getName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi) {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
-        final int width = gfi.getSize().width;
-        final int height = gfi.getSize().height;
-        final int pixelX = gfi.getX();
-        final int pixelY = gfi.getY();
-        final double widthEnv     = objEnv.getSpan(0);
-        final double heightEnv    = objEnv.getSpan(1);
-        final double resX         =      widthEnv  / width;
-        final double resY         = -1 * heightEnv / height;
-        final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
-        final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
-        final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
-        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
-        return position;
     }
 
     /**
@@ -329,12 +278,12 @@ class PostGridLayerDetails implements LayerDetails {
         }
 
         if (params != null) {
-            mapLayer.setDimRange((MeasurementRange) params.get(WMSQuery.KEY_DIM_RANGE));
-            final Double elevation = (Double) params.get(WMSQuery.KEY_ELEVATION);
+            mapLayer.setDimRange((MeasurementRange) params.get(KEY_DIM_RANGE));
+            final Double elevation = (Double) params.get(KEY_ELEVATION);
             if (elevation != null) {
                 mapLayer.setElevation(elevation);
             }
-            final Date time = (Date) params.get(WMSQuery.KEY_TIME);
+            final Date time = (Date) params.get(KEY_TIME);
             if (time != null) {
                 mapLayer.times().add(time);
             }

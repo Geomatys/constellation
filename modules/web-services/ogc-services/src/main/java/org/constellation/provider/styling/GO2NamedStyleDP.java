@@ -19,7 +19,9 @@ package org.constellation.provider.styling;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.constellation.provider.DataProvider;
+
 import org.geotools.display.renderer.GridMarkGraphicBuilder;
 import org.geotools.map.GraphicBuilder;
 

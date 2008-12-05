@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.awt.Dimension;
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -128,8 +129,6 @@ public class GMLGraphicVisitor extends AbstractGraphicVisitor{
 
         final String result = builder.toString();
         builder = new StringBuilder();
-        
-
 
         final String layerNameCorrected = layerName.replaceAll("\\W", "");
         builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
@@ -152,7 +151,7 @@ public class GMLGraphicVisitor extends AbstractGraphicVisitor{
         }
         builder.append("\t\t\t\t<gml:Box srsName=\"").append(crsName).append("\">\n");
         builder.append("\t\t\t\t\t<gml:coordinates>");
-        final GeneralDirectPosition pos = layerPostgrid.getPixelCoordinates(gfi);
+        final GeneralDirectPosition pos = getPixelCoordinates(gfi);
         builder.append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1)).append(" ")
                .append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1));
         builder.append("</gml:coordinates>").append("\n");

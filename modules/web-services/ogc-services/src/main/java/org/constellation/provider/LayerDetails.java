@@ -29,12 +29,10 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.Service;
-import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.map.MapLayer;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
@@ -42,7 +40,6 @@ import org.geotools.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -52,7 +49,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon
  */
 public interface LayerDetails {
-    
+
+    public static final String KEY_DIM_RANGE = "DIM_RANGE";
+    public static final String KEY_ELEVATION = "ELEVATION";
+    public static final String KEY_TIME      = "TIME";
+
     static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
     static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
     
@@ -96,16 +97,6 @@ public interface LayerDetails {
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
-     * Returns the information at the coordinates specified, if the layer
-     * {@linkplain Layer#isQueryable is queryable}. 
-     *
-     * @return The information at the coordinates specified.
-     * @throws CatalogException
-     * @throws IOException
-     */
-    public Object getInformationAt(final GetFeatureInfo gfi) throws CatalogException, IOException;
-
-    /**
      * @see Layer#getLegend(Dimension)
      */
     public BufferedImage getLegendGraphic(final Dimension dimension);
@@ -128,12 +119,6 @@ public interface LayerDetails {
      * @see Layer#getSeries
      */
     public Set<Series> getSeries();
-
-    /**
-     * Returns the coordinates of the requested pixel in the image, expressed in the
-     * {@linkplain CoordinateReferenceSystem crs} defined in the request.
-     */
-    public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi);
 
     /**
      * @see Layer#getRemarks
