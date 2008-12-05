@@ -205,11 +205,6 @@
       	<version>2.1</version>
       </dependency>
       <dependency>
-        <groupId>net.java.dev.ajax4jsf</groupId>
-        <artifactId>ajax4jsf</artifactId>
-        <version>1.0.6</version>
-      </dependency>
-      <dependency>
         <groupId>net.java.dev.jsr-275</groupId>
         <artifactId>jsr-275</artifactId>
         <version>1.0-beta-2</version>
@@ -296,6 +291,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
+        <artifactId>gt-metadata</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
         <artifactId>gt-openoffice</artifactId>
         <version>${geotools.version}</version>
       </dependency>
@@ -332,11 +332,6 @@
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-widgets-swing</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt-metadata</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
