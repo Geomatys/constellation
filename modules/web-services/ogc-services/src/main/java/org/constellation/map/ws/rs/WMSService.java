@@ -43,6 +43,7 @@ import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.measure.unit.Unit;
 import javax.naming.NamingException;
@@ -53,6 +54,7 @@ import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.catalog.CatalogException;
+import org.constellation.portrayal.AbstractGraphicVisitor;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceExceptionReport;
@@ -60,6 +62,9 @@ import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.portrayal.CSTLPortrayalService;
+import org.constellation.portrayal.CSVGraphicVisitor;
+import org.constellation.portrayal.GMLGraphicVisitor;
+import org.constellation.portrayal.HTMLGraphicVisitor;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.QueryAdapter;
@@ -469,7 +474,7 @@ public class WMSService extends OGCWebService {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    private Response getFeatureInfo(final GetFeatureInfo gfi)
+    private synchronized Response getFeatureInfo(final GetFeatureInfo gfi)
                           throws WebServiceException, JAXBException
     {
         final WMSQueryVersion queryVersion = gfi.getVersion();
@@ -487,167 +492,32 @@ public class WMSService extends OGCWebService {
         } else {
             infoFormat = TEXT_PLAIN;
         }
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final List<String> layers = gfi.getQueryLayers();
-        final int size = layers.size();
-        /* Now proceed to the calculation of the values, and use the toString method to store them.
-         * This map will store couples of <layerName, List<values>> obtained by the getInformationAt() method.
-         */
 
-        final Map<String, List<String>> results;
+        final AbstractGraphicVisitor visitor;
+
+        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
+            // TEXT / PLAIN
+            visitor = new CSVGraphicVisitor();
+        }else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
+            // TEXT / HTML
+            visitor = new HTMLGraphicVisitor();
+        }else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+                  infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                  infoFormat.equalsIgnoreCase(GML))  {
+            // GML
+            visitor = new GMLGraphicVisitor(gfi);
+        }else{
+            throw new WebServiceException("Unknonwed query type", NO_APPLICABLE_CODE, queryVersion);
+        }
+
+        // We now build the response, according to the format chosen.
         try {
-            results = CSTLPortrayalService.getInstance().hit(gfi);
+            CSTLPortrayalService.getInstance().hit(gfi, visitor);
         } catch (PortrayalException ex) {
             throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
         }
 
-
-        // We now build the response, according to the format chosen.
-        final StringBuilder response = new StringBuilder();
-        // TEXT / PLAIN
-        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
-            for (String layer : layers) {
-                final List<String> values = results.get(layer);
-                response.append((values.size() < 2) ? "Result for " : "Results for ")
-                        .append(layer);
-                response.append((values.size() < 2) ? " is :" : " are : ");
-                for (String value : values) {
-                    response.append(value).append("\n");
-                }
-            }
-            return Response.ok(response.toString(), infoFormat).build();
-        }
-
-        // TEXT / HTML
-        if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
-            response.append("<html>\n")
-                    .append("    <head>\n")
-                    .append("        <title>GetFeatureInfo output</title>\n")
-                    .append("    </head>\n")
-                    .append("    <body>\n")
-                    .append("    <table>\n");
-            for (String layer : layers) {
-                response.append("       <tr>")
-                        .append("           <th>").append(layer).append("</th>")
-                        .append("       </tr>");
-                final List<String> values = results.get(layer);
-                for (String value : values) {
-                    response.append("       <tr>")
-                            .append("           <th>")
-                            .append(value)
-                            .append("           </th>")
-                            .append("       </tr>");
-                }
-            }
-            response.append("    </table>\n")
-                    .append("    </body>\n")
-                    .append("</html>");
-            return Response.ok(response.toString(), infoFormat).build();
-        }
-
-        // GML
-        if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                infoFormat.equalsIgnoreCase(GML))
-        {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
-                   .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
-                   .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
-                   .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
-                   .append("\n");
-            final Envelope objEnv = gfi.getEnvelope();
-            final Date time = gfi.getTime();
-            final Double elevation = gfi.getElevation();
-            for (String layer : layers) {
-                final String layerNameCorrected = layer.replaceAll("\\W", "");
-                builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
-                       .append("\t\t<").append(layerNameCorrected).append("_feature").append(">\n");
-                       
-                final LayerDetails layerPostgrid = dp.get(layer);
-                final CoordinateReferenceSystem crs = objEnv.getCoordinateReferenceSystem();
-                builder.append("\t\t\t<gml:boundedBy>").append("\n");
-                String crsName;
-                try {
-                    crsName = CRS.lookupIdentifier(Citations.EPSG, crs, true);
-                    if (!crsName.startsWith("EPSG:")) {
-                        crsName = "ESPG:" + crsName;
-                    }
-                } catch (FactoryException ex) {
-                    crsName = crs.getName().getCode();
-                }
-                builder.append("\t\t\t\t<gml:Box srsName=\"").append(crsName).append("\">\n");
-                builder.append("\t\t\t\t\t<gml:coordinates>");
-                final GeneralDirectPosition pos = layerPostgrid.getPixelCoordinates(gfi);
-                builder.append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1)).append(" ")
-                       .append(pos.getOrdinate(0)).append(",").append(pos.getOrdinate(1));
-                builder.append("</gml:coordinates>").append("\n");
-                builder.append("\t\t\t\t</gml:Box>").append("\n");
-                builder.append("\t\t\t</gml:boundedBy>").append("\n");
-                builder.append("\t\t\t<x>").append(pos.getOrdinate(0)).append("</x>").append("\n")
-                       .append("\t\t\t<y>").append(pos.getOrdinate(1)).append("</y>").append("\n");
-                if (time != null) {
-                    builder.append("\t\t\t<time>").append(time).append("</time>")
-                           .append("\n");
-                } else {
-                    SortedSet<Date> dates = null;
-                    try {
-                        dates = layerPostgrid.getAvailableTimes();
-                    } catch (CatalogException ex) {
-                        dates = null;
-                    }
-                    if (dates != null && !(dates.isEmpty())) {
-                        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        builder.append("\t\t\t<time>").append(df.format(dates.last()))
-                               .append("</time>").append("\n");
-                    }
-                }
-                if (elevation != null) {
-                    builder.append("\t\t\t<elevation>").append(elevation)
-                           .append("</elevation>").append("\n");
-                } else {
-                    SortedSet<Number> elevs = null;
-                    try {
-                        elevs = layerPostgrid.getAvailableElevations();
-                    } catch (CatalogException ex) {
-                        elevs = null;
-                    }
-                    if (elevs != null && !(elevs.isEmpty())) {
-                        builder.append("\t\t\t<elevation>").append(elevs.first().toString())
-                               .append("</elevation>").append("\n");
-                    }
-                }
-                final GridCoverage2D coverage;
-                try {
-                    coverage = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
-                } catch (CatalogException cat) {
-                    throw new WebServiceException(cat, NO_APPLICABLE_CODE, queryVersion);
-                } catch (IOException io) {
-                    throw new WebServiceException(io, NO_APPLICABLE_CODE, queryVersion);
-                }
-                if (coverage != null) {
-                    builder.append("\t\t\t<variable>")
-                           .append(coverage.getSampleDimension(0).getDescription())
-                           .append("</variable>").append("\n");
-                }
-                final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
-                if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
-                    builder.append("\t\t\t<unit>").append(ranges[0].getUnits().toString())
-                           .append("</unit>").append("\n");
-                }
-                builder.append("\t\t\t<value>").append(results.get(layer).get(0))
-                       .append("</value>").append("\n")
-                       .append("\t\t</").append(layerNameCorrected).append("_feature").append(">\n")
-                       .append("\t</").append(layerNameCorrected).append("_layer").append(">\n");
-            }
-            builder.append("</msGMLOutput>");
-            return Response.ok(builder.toString(), APP_GML).build();
-        }
-
-        // Info format not handled.
-        throw new WebServiceException("Unsupported info format chosen",
-                INVALID_FORMAT, queryVersion, "info_format");
+        return Response.ok(visitor.getResult(), infoFormat).build();
     }
 
     /**

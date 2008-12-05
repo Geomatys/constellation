@@ -39,6 +39,7 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.Service;
 import org.constellation.map.PostGridMapLayer;
+import org.constellation.map.PostGridMapLayer2;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedStyleDP;

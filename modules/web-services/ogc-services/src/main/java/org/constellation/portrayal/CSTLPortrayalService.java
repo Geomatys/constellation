@@ -50,15 +50,13 @@ import org.constellation.wcs.AbstractGetCoverage;
 
 import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.canvas.CanvasController2D;
+import org.geotools.display.canvas.GraphicVisitor;
+import org.geotools.display.canvas.VisitFilter;
 import org.geotools.display.canvas.control.FailOnErrorMonitor;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.primitive.GraphicFeatureJ2D;
-import org.geotools.display.primitive.GraphicJ2D;
 import org.geotools.display.renderer.ContextRenderer2D;
 import org.geotools.display.renderer.DefaultContextRenderer2D;
 import org.geotools.display.renderer.Go2rendererHints;
-import org.geotools.display.renderer.stateless.CoverageGraphicLayerJ2D;
-import org.geotools.display.renderer.stateless.FeatureGraphicLayerJ2D;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
@@ -73,7 +71,6 @@ import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
-import org.opengis.display.primitive.Graphic;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -93,7 +90,6 @@ import static org.constellation.ws.ExceptionCode.*;
 public class CSTLPortrayalService extends DefaultPortrayalService {
 
     private static final int PIXEL_TOLERANCE = 3;
-    private static final MapContextInfoExtractor extractor = new MapContextInfoExtractor();
 
     private static final Logger LOGGER = Logger.getLogger("org/constellation/portrayal/CSTLPortrayalService");
     
@@ -326,7 +322,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }
     }
 
-    public Map<String, List<String>> hit(final GetFeatureInfo query)
+    public void hit(final GetFeatureInfo query, final GraphicVisitor visitor)
                             throws PortrayalException, WebServiceException
     {
 
@@ -363,7 +359,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             values.put(layer, new ArrayList<String>());
         }
 
-        if (true) {
+        if (false) {
             //for debug
             final StringBuilder builder = new StringBuilder();
             builder.append("Layers => ");
@@ -378,65 +374,53 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             builder.append("\n");
             builder.append(selectedArea);
             builder.append("\n");
-            builder.append("Context env => " + contextEnv.toString() + "\n");
+            builder.append("Context env => " + refEnv.toString() + "\n");
+            builder.append("Context crs => " + refEnv.getCoordinateReferenceSystem().toString() + "\n");
             builder.append("Azimuth => " + azimuth + "\n");
             builder.append("Mime => " + mime.toString() + "\n");
             builder.append("Dimension => " + canvasDimension.toString() + "\n");
             builder.append("BGColor => " + background + "\n");
             builder.append("Transparent => " + query.getTransparent() + "\n");
+            builder.append("elevation => " + elevation + "\n");
+            builder.append("range => " + dimRange + "\n");
+            builder.append("time => " + time + "\n");
             System.out.println(builder.toString());
         }
+
 
         //TODO horrible TRY CATCH to remove when the renderer will have a fine
         //error handeling. This catch doesnt happen in normal case, but because of
         //some strange behavior when deployed in web app, we sometimes catch runtimeException or
         //thread exceptions.
+        prepareCanvas(refEnv, azimuth, background, canvasDimension);
+
         try{
-            prepareCanvas(refEnv, azimuth, background, canvasDimension);
-            
-            final List<? extends Graphic> graphics = canvas.getGraphicsIn(selectedArea);
-
-//            JOptionPane.showMessageDialog(null, "nb graphics = " + graphics.size());
-
-            for(final Graphic graphic : graphics){
-                if(graphic instanceof GraphicFeatureJ2D){
-                    final GraphicFeatureJ2D j2d = (GraphicFeatureJ2D) graphic;
-                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
-
-                    if(value != null){
-//                        JOptionPane.showMessageDialog(null, value);
-
-                        final String layerName = j2d.getSource().getName();
-                        final List<String> lst;
-                        if(values.containsKey(layerName)){
-                            lst = values.get(layerName);
-                        }else{
-                            lst = new ArrayList<String>();
-                            values.put(layerName, lst);
-                        }
-                        lst.add(value);
-                    }
-
-                }else if(graphic instanceof CoverageGraphicLayerJ2D){
-                    final CoverageGraphicLayerJ2D j2d = (CoverageGraphicLayerJ2D) graphic;
-                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
-
-                    if(value != null){
-                        final String layerName = j2d.getUserObject().getName();
-                        final List<String> lst;
-                        if(values.containsKey(layerName)){
-                            lst = values.get(layerName);
-                        }else{
-                            lst = new ArrayList<String>();
-                            values.put(layerName, lst);
-                        }
-                        lst.add(value);
-                    }
-                }
-            }
+            canvas.getGraphicsIn(selectedArea, visitor, VisitFilter.INTERSECTS);
+//            extractor.getDescriptions()
+//
+//            final List<? extends Graphic> graphics = canvas.getGraphicsIn(selectedArea);
+//            for(final Graphic graphic : graphics){
+//                if(graphic instanceof GraphicFeatureJ2D){
+//                    final GraphicFeatureJ2D j2d = (GraphicFeatureJ2D) graphic;
+//                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
+//
+//                    if(value != null){
+//                        final String layerName = j2d.getSource().getName();
+//                        values.get(layerName).add(value);
+//                    }
+//
+//                }else if(graphic instanceof CoverageGraphicLayerJ2D){
+//                    final CoverageGraphicLayerJ2D j2d = (CoverageGraphicLayerJ2D) graphic;
+//                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
+//
+//                    if(value != null){
+//                        final String layerName = j2d.getUserObject().getName();
+//                        values.get(layerName).add(value);
+//                    }
+//                }
+//            }
 
         }catch(Exception ex){
-//            JOptionPane.showMessageDialog(null, "uneErreur");
             if(ex instanceof PortrayalException){
                 throw (PortrayalException)ex;
             }else if( ex instanceof WebServiceException){
@@ -445,11 +429,11 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                 throw new PortrayalException(ex);
             }
         }finally{
+            visitor.endVisit();
             canvas.clearCache();
             renderer.clearCache();
         }
 
-        return values;
     }
 
 
@@ -572,6 +556,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                 throw new PortrayalException("Map layer "+layerName+" could not be created");
             }
             layer.setSelectable(true);
+            layer.setVisible(true);
             context.layers().add(layer);
         }
     }

@@ -170,8 +170,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(context instanceof RenderingContext2D) {
             final RenderingContext2D context2D = (RenderingContext2D) context;
-            final Rectangle2D shape = context2D.getObjectiveShape().getBounds2D();
-            final Rectangle rect = context2D.getDisplayBounds();
+            final Rectangle2D shape = context2D.getCanvasObjectiveShape().getBounds2D();
+            final Rectangle rect = context2D.getCanvasDisplayBounds();
             env = new ReferencedEnvelope(shape, context2D.getObjectiveCRS());
             requestCRS = context2D.getObjectiveCRS();
             width = rect.width;
@@ -357,7 +357,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 //        table.setTimeRange(getTime(), getTime());
 //        table.setVerticalRange(elevation, elevation);
 
-        final GeneralEnvelope env = new GeneralEnvelope(context2D.getObjectiveBounds());
+        final GeneralEnvelope env = new GeneralEnvelope(context2D.getCanvasObjectiveBounds());
         env.setCoordinateReferenceSystem(context2D.getObjectiveCRS());
         final double[] resolution = context2D.getResolution();
         final CoverageReadParam readParam = new CoverageReadParam(env, resolution);
@@ -427,7 +427,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                 try {
                     final GeneralEnvelope general = new GeneralEnvelope(env);
                     general.setCoordinateReferenceSystem(env.getCoordinateReferenceSystem());
-                    final GridEnvelope range = new GeneralGridEnvelope(context2D.getDisplayBounds(), 2);
+                    final GridEnvelope range = new GeneralGridEnvelope(context2D.getCanvasDisplayBounds(), 2);
                     final GridGeometry gridGeom = getGridGeometry(
                                 new GeneralEnvelope(env), 
                                 reader.getTable().getLayer(),
