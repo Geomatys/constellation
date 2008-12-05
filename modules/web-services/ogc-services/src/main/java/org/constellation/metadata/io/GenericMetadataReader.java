@@ -17,6 +17,7 @@
 
 package org.constellation.metadata.io;
 
+// J2SE dependencies
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
@@ -39,6 +40,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+// constellation dependencies
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
@@ -49,27 +51,20 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.constellation.generic.nerc.CodeTableType;
-import org.constellation.generic.vocabulary.Vocabulary;
 import org.constellation.ows.v100.BoundingBoxType;
-import org.constellation.skos.RDF;
 import org.constellation.ws.rs.WebService;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.metadata.iso.citation.CitationDateImpl;
-import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.metadata.iso.identification.KeywordsImpl;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
-import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.util.SimpleInternationalString;
 
 //geoAPI dependencies
 import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.identification.KeywordType;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
@@ -77,7 +72,6 @@ import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.metadata.identification.Keywords;
 
 /**
  * A database Reader using a generic configuration to request an unknown database.
@@ -101,7 +95,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * An unmarshaller used for getting EDMO data.
      */
-    private Unmarshaller unmarshaller;
+    protected Unmarshaller unmarshaller;
     
     /**
      * A list of precompiled SQL request returning single value.
@@ -134,12 +128,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
     private Map<String, ResponsibleParty> contacts;
     
     /**
-     * A map making the correspondance between parameter code and the real keyword value.
-     * this map is fill from a list of configuration file P021.xml, L05.xml, ..
-     */
-    protected Map<String, Vocabulary> vocabularies;
-    
-    /**
      * A flag mode indicating we are searching the database for contacts.
      */
     private static int CONTACT = 10;
@@ -157,7 +145,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
                                                          "org.constellation.generic.nerc:org.constellation.skos");
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
-        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), true);
         contacts               = loadContacts(new File(cswConfigDir, "contacts"));
     }
     
@@ -175,7 +162,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
                                                          "org.constellation.generic.nerc:org.constellation.skos");
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
-        vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), fillAnchor);
         contacts               = loadContacts(new File(cswConfigDir, "contacts"));
     }
     
@@ -238,71 +224,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         } else {
             logger.severe("The configuration file is probably malformed, there is no queries part.");
         }
-    }
-    
-    
-    
-    /**
-     * Load a Map of vocabulary from the specified directory
-     */
-    private Map<String, Vocabulary> loadVocabulary(File vocabDirectory, boolean fillAnchor) {
-        Map<String, Vocabulary> result = new HashMap<String, Vocabulary>();
-        if (vocabDirectory.isDirectory()) {
-            if (vocabDirectory.listFiles().length == 0) {
-                logger.severe("the vocabulary folder is empty :" + vocabDirectory.getPath());
-            }
-            for (File f : vocabDirectory.listFiles()) {
-                if (f.getName().startsWith("SDN.") && f.getName().endsWith(".xml")) {
-                    try {
-                        
-                        Object obj      = unmarshaller.unmarshal(f);
-                        Vocabulary voca = null;
-                        if (obj instanceof CodeTableType) {
-                            CodeTableType ct = (CodeTableType) obj;
-                            voca = new Vocabulary(ct.getListVersion(), ct.getListLongName(), ct.getListLastMod());
-
-                            File skosFile = new File(f.getPath().replace("xml", "rdf"));
-                            if (skosFile.exists()) {
-                                RDF rdf = (RDF) unmarshaller.unmarshal(skosFile);
-                                if (fillAnchor)
-                                    rdf.fillAnchors();
-                                voca.setMap(rdf.getShortMap());
-                            } else {
-                                logger.severe("no skos file found for vocabulary file : " + f.getName());
-                            }
-
-                        } else if (obj instanceof Vocabulary) {
-                            voca = (Vocabulary) obj;
-                            voca.fillMap();
-                            String vocaName = f.getName();
-                            vocaName = vocaName.substring(vocaName.indexOf("SDN.") + 4);
-                            vocaName = vocaName.substring(0, vocaName.indexOf('.'));
-                        } else {
-                            logger.severe("Unexpected vocabulary file type for file: " + f.getName());
-                        }
-                        
-                        if (voca != null) {
-                            String vocaName = f.getName();
-                            vocaName = vocaName.substring(vocaName.indexOf("SDN.") + 4);
-                            vocaName = vocaName.substring(0, vocaName.indexOf('.'));
-                            result.put(vocaName, voca);
-                             //info part (debug) 
-                            String report = "added vocabulary: " + vocaName + " with ";
-                            report += voca.getMap().size() + " entries";
-                            logger.finer(report);
-                        }
-                    } catch (JAXBException ex) {
-                        logger.severe("Unable to unmarshall the vocabulary configuration file : " + f.getPath());
-                        ex.printStackTrace();
-                    }
-                } else if (!f.getName().endsWith(".rdf")){
-                    logger.severe("Vocabulary file : " + f.getPath() + " does not follow the pattern 'SDN.<vocabName>...'");
-                }
-            }
-        } else {
-            logger.severe("There is nor vocabulary directory: " + vocabDirectory.getPath());
-        }
-        return result;
     }
     
     /**
@@ -749,92 +670,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
-    /**
-     * 
-     */
-    protected List<String> getKeywordsValue(List<String> values, String altTitle) {
-        
-        //we try to get the vocabulary Map.
-        Vocabulary voca = vocabularies.get(altTitle);
-        Map<String, String> vocaMap = null;
-        if (voca == null) {
-            logger.info("No vocabulary found for code: " + altTitle);
-        } else {
-            vocaMap = voca.getMap();
-        }
-        
-        List<String> result = new ArrayList<String>();
-        for (String value: values) {
-            if (vocaMap != null) {
-                String mappedValue = vocaMap.get(value);
-                if (mappedValue != null)
-                    value = mappedValue;
-            }
-            if (value != null) {
-                result.add(value);
-            } else {
-                logger.severe("keywords value null");
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * 
-     * @param values
-     * @param keywordType
-     * @param altTitle
-     * @return
-     */
-    protected Keywords createKeyword(List<String> values, String keywordType, String altTitle) {
-
-        //we try to get the vocabulary Map.
-        Vocabulary voca = vocabularies.get(altTitle);
-        Map<String, String> vocaMap = null;
-        if (voca == null) {
-            logger.info("No vocabulary found for code: " + altTitle);
-        } else {
-            vocaMap = voca.getMap();
-        }
-        
-        KeywordsImpl keyword = new KeywordsImpl();
-        List<InternationalString> kws = new ArrayList<InternationalString>();
-        for (String value: values) {
-            if (vocaMap != null) {
-                String mappedValue = vocaMap.get(value);
-                if (mappedValue != null)
-                    value = mappedValue;
-            }
-            if (value != null) {
-                kws.add(new SimpleInternationalString(value));
-            } else {
-                logger.severe("keywords value null");
-            }
-        }
-        keyword.setKeywords(kws);
-        keyword.setType(KeywordType.valueOf(keywordType));
-        
-        //we create the citation describing the vocabulary used
-        if (voca != null) {
-            CitationImpl citation = new CitationImpl();
-            citation.setTitle(new SimpleInternationalString(voca.getTitle()));
-            citation.setAlternateTitles(Arrays.asList(new SimpleInternationalString(altTitle)));
-            CitationDate revisionDate;
-            if (voca.getDate() != null && !voca.getDate().equals("")) {
-                revisionDate = createRevisionDate(voca.getDate());
-            } else {
-                revisionDate = new CitationDateImpl(null, DateType.REVISION); 
-            }
-            citation.setDates(Arrays.asList(revisionDate));
-            if (voca.getVersion() != null && !voca.getVersion().equals(""))
-                citation.setEdition(new SimpleInternationalString(voca.getVersion()));
-            citation.setIdentifiers(Arrays.asList(new IdentifierImpl("http://www.seadatanet.org/urnurl/")));
-            keyword.setThesaurusName(citation);
-        }
-        
-        return keyword;
-    }
-    
     protected ExtendedElementInformation createExtensionInfo(String name) {
         ExtendedElementInformationImpl element = new ExtendedElementInformationImpl();
         element.setName(name);
@@ -935,7 +770,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         }
         singleValue.clear();
         multipleValue.clear();
-        vocabularies.clear();
         contacts.clear();
         logger.info("destroying generic reader");
     }

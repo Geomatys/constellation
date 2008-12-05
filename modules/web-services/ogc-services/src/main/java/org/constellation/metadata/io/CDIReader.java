@@ -92,7 +92,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal
  */
-public class CDIReader extends GenericMetadataReader {
+public class CDIReader extends SDNMetadataReader {
     
     /**
      * Build a new reader for the CDI database profile.

@@ -78,7 +78,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal
  */
-public class CSRReader extends GenericMetadataReader {
+public class CSRReader extends SDNMetadataReader {
     
     /**
      * Build a new reader for the CSR database profile.

@@ -79,7 +79,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal
  */
-public class EDMEDReader extends GenericMetadataReader {
+public class EDMEDReader extends SDNMetadataReader {
     
     
     /**
