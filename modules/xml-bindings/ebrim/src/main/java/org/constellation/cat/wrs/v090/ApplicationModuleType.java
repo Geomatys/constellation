@@ -63,16 +63,16 @@ import org.constellation.ebrim.v250.RegistryPackageType;
 public class ApplicationModuleType extends RegistryPackageType {
 
     @XmlElementRef(name = "AbstractQuery", namespace = "http://www.opengis.net/cat/csw", type = JAXBElement.class)
-    private List<JAXBElement<? extends AbstractQueryType>> abstractQuery;
+    private List<AbstractQueryType> abstractQuery;
 
     @XmlTransient
     private static ObjectFactory cswFactory = new ObjectFactory();
     /**
      * Gets the value of the abstractQuery property.
      */
-    public List<JAXBElement<? extends AbstractQueryType>> getAbstractQuery() {
+    public List<AbstractQueryType> getAbstractQuery() {
         if (abstractQuery == null) {
-            abstractQuery = new ArrayList<JAXBElement<? extends AbstractQueryType>>();
+            abstractQuery = new ArrayList<AbstractQueryType>();
         }
         return this.abstractQuery;
     }
@@ -80,7 +80,7 @@ public class ApplicationModuleType extends RegistryPackageType {
     /**
      * Sets the value of the abstractQuery property.
      */
-    public void setAbstractQuery(List<JAXBElement<? extends AbstractQueryType>> abstractQuery) {
+    public void setAbstractQuery(List<AbstractQueryType> abstractQuery) {
         this.abstractQuery = abstractQuery;
     }
     
@@ -89,12 +89,10 @@ public class ApplicationModuleType extends RegistryPackageType {
      */
     public void setAbstractQuery(AbstractQueryType abstractQuery) {
         if (this.abstractQuery == null) {
-            this.abstractQuery = new ArrayList<JAXBElement<? extends AbstractQueryType>>();
+            this.abstractQuery = new ArrayList<AbstractQueryType>();
         }
         if (abstractQuery instanceof QueryType)
-            this.abstractQuery.add(cswFactory.createQuery((QueryType)abstractQuery));
-        else
-            this.abstractQuery.add(cswFactory.createAbstractQuery(abstractQuery));
+            this.abstractQuery.add(abstractQuery);
     }
 
 }
