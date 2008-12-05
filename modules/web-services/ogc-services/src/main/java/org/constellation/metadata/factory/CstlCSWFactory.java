@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.io;
+package org.constellation.metadata.factory;
 
 import java.io.File;
 import java.sql.Connection;
@@ -27,6 +27,15 @@ import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.index.MDWebIndex;
+import org.constellation.metadata.io.CDIReader;
+import org.constellation.metadata.io.CSRReader;
+import org.constellation.metadata.io.EDMEDReader;
+import org.constellation.metadata.io.FileMetadataReader;
+import org.constellation.metadata.io.FileMetadataWriter;
+import org.constellation.metadata.io.MDWebMetadataReader;
+import org.constellation.metadata.io.MDWebMetadataWriter;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataWriter;
 import static org.constellation.generic.database.Automatic.*;
 import org.constellation.ws.WebServiceException;
 
@@ -34,7 +43,7 @@ import org.constellation.ws.WebServiceException;
  *
  * @author Guilhem Legal
  */
-public class GenericCSWFactory {
+public class CstlCSWFactory extends AbstractCSWFactory {
     
     /**
      * Return a Metadata reader for the specified database type.
@@ -45,7 +54,7 @@ public class GenericCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public static MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException {
+    public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException {
         switch (configuration.getType()) {
             case CDI:
                 return new CDIReader(configuration, MDConnection);
@@ -71,7 +80,7 @@ public class GenericCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public static MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index) throws SQLException, JAXBException {
+    public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index) throws SQLException, JAXBException {
         switch (dbType) {
             case CDI:
                 return null;
@@ -94,7 +103,7 @@ public class GenericCSWFactory {
      * 
      * @return DISCOVERY or TRANSACTIONAL 
      */
-    public static int getProfile(int dbType) {
+    public int getProfile(int dbType) {
         switch (dbType) {
             case CDI:
                 return CSWworker.DISCOVERY;
@@ -121,7 +130,7 @@ public class GenericCSWFactory {
      * @return
      * @throws org.constellation.ws.WebServiceException
      */
-    public static IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException {
+    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException {
         switch (dbType) {
             case CDI:
                 return new GenericIndex(reader, configDir);
@@ -148,7 +157,7 @@ public class GenericCSWFactory {
      * @return
      * @throws org.constellation.ws.WebServiceException
      */
-    public static IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException {
+    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException {
         switch (dbType) {
             case CDI:
                 return new GenericIndex(reader);

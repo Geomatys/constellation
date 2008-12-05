@@ -124,7 +124,9 @@ import javax.xml.namespace.QName;
 
 
 // GeoAPI dependencies
-import org.constellation.metadata.io.GenericCSWFactory;
+import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.geotools.factory.FactoryNotFoundException;
+import org.geotools.factory.FactoryRegistry;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -296,6 +298,8 @@ public class CSWworker {
      */
     private int profile;
     
+    private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
+    
     /**
      * Build a new CSW worker
      * 
@@ -329,13 +333,21 @@ public class CSWworker {
                     isStarted = false;
                     return;
                 }
-
+                AbstractCSWFactory CSWfactory;
+                try {
+                    CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
+                } catch (FactoryNotFoundException ex) {
+                    logger.severe("The CSW service is not working!" + '\n' +
+                            "cause: Unable to find a CSW Factory");
+                    isStarted = false;
+                    return;
+                }
                 //we create a connection to the metadata database
                 Connection MDConnection = db.getConnection();
-                MDReader = GenericCSWFactory.getMetadataReader(config, MDConnection);
-                profile  = GenericCSWFactory.getProfile(config.getType());
-                index    = GenericCSWFactory.getIndex(config.getType(), MDReader, MDConnection, configDir);
-                MDWriter = GenericCSWFactory.getMetadataWriter(config.getType(), MDConnection, index);
+                MDReader = CSWfactory.getMetadataReader(config, MDConnection);
+                profile  = CSWfactory.getProfile(config.getType());
+                index    = CSWfactory.getIndex(config.getType(), MDReader, MDConnection, configDir);
+                MDWriter = CSWfactory.getMetadataWriter(config.getType(), MDConnection, index);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 loadCascadedService(configDir);
                 logger.info("CSW service (" + config.getFormat() + ") running");

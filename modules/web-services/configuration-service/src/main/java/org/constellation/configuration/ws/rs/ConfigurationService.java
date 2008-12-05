@@ -40,6 +40,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.metadata.Utils;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
@@ -48,10 +49,12 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import org.geotools.factory.FactoryNotFoundException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // geotools dependencies
 import org.geotools.metadata.note.Anchors;
+import org.geotools.factory.FactoryRegistry;
 
 /**
  * A Web service dedicate to perform administration and configuration operations
@@ -68,7 +71,9 @@ public class ConfigurationService extends WebService  {
     @Context
     private ContainerNotifierImpl cn;
     
-    private CSWconfigurer cswConfigurer;
+    private AbstractCSWConfigurer cswConfigurer;
+    
+    private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
     
     private boolean CSWFunctionEnabled;
     
@@ -87,7 +92,8 @@ public class ConfigurationService extends WebService  {
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration:" +
                            "org.constellation.skos:org.constellation.generic.nerc", "");
-            cswConfigurer      = new CSWconfigurer(marshaller, unmarshaller, cn);
+            AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
+            cswConfigurer      = configurerfactory.getCSWConfigurer(marshaller, unmarshaller, cn);
             CSWFunctionEnabled = true;
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");
@@ -95,6 +101,9 @@ public class ConfigurationService extends WebService  {
             CSWFunctionEnabled = false;
         } catch (ConfigurationException ex) {
             LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
+            CSWFunctionEnabled = false;
+        } catch (FactoryNotFoundException ex) {
+            LOGGER.warning("Factory not foun for CSWConfigurer, specific CSW operation will not be available.");
             CSWFunctionEnabled = false;
         }
         LOGGER.info("Configuration service runing");
@@ -154,8 +163,12 @@ public class ConfigurationService extends WebService  {
             } else if (request.equalsIgnoreCase("updateVocabularies")) {    
                                 
                 return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build(); 
-            }
-            else {
+            
+            } else if (request.equalsIgnoreCase("updateContacts")) {    
+                                
+                return Response.ok(cswConfigurer.updateContacts(),"text/xml").build(); 
+            
+            } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, version, "Request");
             }
