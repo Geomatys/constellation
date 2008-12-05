@@ -26,25 +26,27 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.LayerDetails;
-
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
-import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.WebService;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
 import org.xml.sax.SAXException;
 
 
@@ -264,7 +266,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
             SAXException, IOException, NamingException
     {
 
-        String configFile = OGCWebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
+        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;

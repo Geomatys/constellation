@@ -161,6 +161,11 @@
       <artifactId>base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- web service-->
     <dependency>
       <groupId>com.sun.jersey</groupId>

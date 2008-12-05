@@ -96,6 +96,7 @@
   <modules>
     <module>observation</module>
     <module>postgrid</module>
+    <module>provider</module>
   </modules>
 
 </project>

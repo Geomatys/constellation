@@ -30,7 +30,7 @@ import javax.naming.NamingException;
 
 import org.constellation.provider.styling.GO2NamedStyleDP;
 import org.constellation.provider.styling.SLDNamedStyleDP;
-import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.WebService;
 
 
 /**
@@ -138,7 +138,7 @@ public class NamedStyleDP implements DataProvider<String,Object>{
         
         String strFolders = "";
         try{
-            strFolders = OGCWebService.getPropertyValue(JNDI_GROUP,KEY_SLD_DP);
+            strFolders = WebService.getPropertyValue(JNDI_GROUP,KEY_SLD_DP);
         }catch(NamingException ex){
             Logger.getLogger(NamedStyleDP.class.toString()).log(Level.WARNING, "Serveur property has not be set : "+JNDI_GROUP +" - "+ KEY_SLD_DP);
         }

@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.shapefile;
+package org.constellation.provider.postgis;
 
 
 import java.io.IOException;
@@ -26,7 +26,6 @@ import java.util.Map;
 import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.NamedStyleDP;
 
-import org.constellation.query.wms.WMSQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
@@ -35,24 +34,24 @@ import org.geotools.style.MutableStyle;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-
 /**
- *
+ * PostGIS layer details.
+ * 
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
+class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
-    ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
+    PostGisLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
         this(name,fs,favorites,null,null,null,null);
     }
     
-    ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
-        String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+    PostGisLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
+            String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,fs,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
-    
+
     protected MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{
         MapLayer layer = null;
 
@@ -91,8 +90,8 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
         }
 
         if (params != null) {
-            final Date date = (Date) params.get(WMSQuery.KEY_TIME);
-            final Number elevation = (Number) params.get(WMSQuery.KEY_ELEVATION);
+            final Date date = (Date) params.get(KEY_TIME);
+            final Number elevation = (Number) params.get(KEY_ELEVATION);
             layer.setQuery(createQuery(date, elevation));
         }
 
