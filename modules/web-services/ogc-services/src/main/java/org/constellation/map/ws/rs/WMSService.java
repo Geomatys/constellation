@@ -477,21 +477,9 @@ public class WMSService extends OGCWebService {
     private synchronized Response getFeatureInfo(final GetFeatureInfo gfi)
                           throws WebServiceException, JAXBException
     {
-        final WMSQueryVersion queryVersion = gfi.getVersion();
 
         String infoFormat = gfi.getInfoFormat();
-        if (infoFormat != null) {
-            if(!(infoFormat.equalsIgnoreCase(TEXT_PLAIN) || infoFormat.equalsIgnoreCase(TEXT_HTML) ||
-                 infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                 infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                 infoFormat.equalsIgnoreCase(GML)))
-            {
-                throw new WebServiceException("This MIME type " + infoFormat +
-                        " is not accepted by the service", INVALID_PARAMETER_VALUE, queryVersion, "info_format");
-            }
-        } else {
-            infoFormat = TEXT_PLAIN;
-        }
+        if(infoFormat == null) infoFormat = TEXT_PLAIN;
 
         final AbstractGraphicVisitor visitor;
 
@@ -507,14 +495,15 @@ public class WMSService extends OGCWebService {
             // GML
             visitor = new GMLGraphicVisitor(gfi);
         }else{
-            throw new WebServiceException("Unknonwed query type", NO_APPLICABLE_CODE, queryVersion);
+            throw new WebServiceException("This MIME type " + infoFormat +
+                        " is not accepted by the service", INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
         }
 
         // We now build the response, according to the format chosen.
         try {
             CSTLPortrayalService.getInstance().hit(gfi, visitor);
         } catch (PortrayalException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
         }
 
         return Response.ok(visitor.getResult(), infoFormat).build();
