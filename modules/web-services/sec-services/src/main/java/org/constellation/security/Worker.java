@@ -34,6 +34,16 @@ import org.constellation.ws.WebServiceException;
  */
 public class Worker {
     /**
+     * The url of the WMS web service, where the request will be sent.
+     */
+    private final String WMSURL = "http://solardev:8080/constellation/WS/wms";
+
+    /**
+     * Defines whether it is a REST or SOAP request.
+     */
+    private final boolean isRest = true;
+
+    /**
      * The dispatcher which will receive the request generated.
      */
     private final Dispatcher dispatcher;
@@ -60,14 +70,16 @@ public class Worker {
      * @param unmarshaller
      * @throws IOException if an error occurs at the URL creation.
      */
-    public Worker(final Marshaller marshaller, final Unmarshaller unmarshaller) throws IOException {
+    public Worker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
-        final URL url = new URL("http", "solardev", 8080, "/constellation/WS/wms?request=GetCapabilities&service=wms&version=1.1.1");
-        dispatcher = new Dispatcher(url, marshaller, unmarshaller);
+
+        dispatcher = new Dispatcher(WMSURL, isRest, marshaller, unmarshaller);
     }
 
-    public AbstractWMSCapabilities launchGetCapabilities() throws IOException, WebServiceException {
-        return dispatcher.requestGetCapabilities();
+    public AbstractWMSCapabilities launchGetCapabilities(final String service, final String request,
+                                                                               final String version) throws WebServiceException
+    {
+        return dispatcher.requestGetCapabilities(service, request, version);
     }
 }

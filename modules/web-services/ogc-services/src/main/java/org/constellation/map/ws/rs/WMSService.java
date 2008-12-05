@@ -37,13 +37,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.measure.unit.Unit;
 import javax.naming.NamingException;
@@ -89,22 +86,17 @@ import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotools dependencies
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
 import org.geotools.internal.jaxb.v110.sld.TypeNameType;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.CRS;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //Geoapi dependencies
-import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

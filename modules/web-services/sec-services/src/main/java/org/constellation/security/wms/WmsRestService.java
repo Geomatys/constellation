@@ -23,10 +23,12 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBException;
 import org.constellation.query.Query;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.security.Worker;
+import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceExceptionReport;
@@ -79,23 +81,37 @@ public class WmsRestService extends OGCWebService {
      * @throws javax.xml.bind.JAXBException
      */
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        
         try {
-            final String request = getParameter(Query.KEY_REQUEST, true);
-            String version = getParameter(Query.KEY_VERSION, false);
+            //Extract parameters
+            final String service = getParameter(Query.KEY_SERVICE, false); //WMS
+            final String request = getParameter(Query.KEY_REQUEST, true);  //e.g. getCaps
+            String version = getParameter(Query.KEY_VERSION, false);       //e.g. 1.3.0
             if (version == null) {
-                version = "1.1.1";
+                version = "1.1.1";//We choose to handle the lowest version for older clients that may not know about 1.3.0
             }
+
+            //Used for internal version tracking
             final ServiceVersion serviceVersion = new ServiceVersion(Service.WMS, version);
             setCurrentVersion(version);
+
+            //Handle the different kinds of Requests
             if (request.equalsIgnoreCase(WMSQuery.GETCAPABILITIES)) {
-                try {
-                    return Response.ok(worker.launchGetCapabilities(), Query.TEXT_XML).build();
-                } catch (IOException ex) {
-                    throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE, serviceVersion);
-                }
+                final AbstractWMSCapabilities awc = worker.launchGetCapabilities(service, request, version);
+                final ResponseBuilder respb = Response.ok(awc, Query.TEXT_XML);
+                return respb.build();
+            } else if (request.equalsIgnoreCase(WMSQuery.GETMAP)) {
+                throw new UnsupportedOperationException("Can't handle that yet!");
+            } else if (request.equalsIgnoreCase(WMSQuery.GETFEATUREINFO)) {
+                throw new UnsupportedOperationException("Can't handle that yet!");
+            } else {
+                //User has asked for a non-existant request
+                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                        ExceptionCode.OPERATION_NOT_SUPPORTED,
+                        serviceVersion,
+                        "request");
             }
-            throw new WebServiceException("The operation " + request +
-                    " is not supported by the service", ExceptionCode.OPERATION_NOT_SUPPORTED, serviceVersion, "request");
+
         } catch (WebServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
                     new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));

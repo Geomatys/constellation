@@ -23,6 +23,7 @@ import java.net.URLConnection;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.query.Query;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.WebServiceException;
@@ -38,7 +39,7 @@ public class WmsRestClient {
     /**
      * The URL of the webservice to request.
      */
-    private final URL url;
+    private final String url;
 
     /**
      * The marshaller of the result given by the service.
@@ -50,17 +51,39 @@ public class WmsRestClient {
      */
     private final Unmarshaller unmarshaller;
 
-    public WmsRestClient(final URL url, final Marshaller marshaller, final Unmarshaller unmarshaller) {
+    public WmsRestClient(final String url, final Marshaller marshaller, final Unmarshaller unmarshaller) {
         this.url = url;
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
     }
 
-    public AbstractWMSCapabilities sendGetCapabilities() throws IOException, WebServiceException {
-        final URLConnection connec = url.openConnection();
+    public AbstractWMSCapabilities sendGetCapabilities(final String service, final String request,
+                                                       final String version) throws WebServiceException
+    {
+        assert (service.equalsIgnoreCase("wms"));
+
+        //Connect to URL and get result
+        final URL connectionURL;
+        final URLConnection connec;
+        try {
+            connectionURL = new URL(url +"?"+ Query.KEY_REQUEST +"="+ request +"&"+
+                Query.KEY_SERVICE +"="+ service +"&"+ Query.KEY_VERSION +"="+ version);
+            connec = connectionURL.openConnection();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
         connec.setDoOutput(true);
         connec.setRequestProperty("Content-Type","text/xml");
-        final InputStream in = connec.getInputStream();
+
+        // Extract the GetCapabilities XML result.
+        final InputStream in;
+        try {
+            in = connec.getInputStream();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        //Parse response
         final Object response;
         try {
             response = unmarshaller.unmarshal(in);
@@ -71,7 +94,7 @@ public class WmsRestClient {
             throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
                     " instance of AbstractWMSCapabilities", ExceptionCode.NO_APPLICABLE_CODE);
         }
+
         return (AbstractWMSCapabilities) response;
     }
-
 }

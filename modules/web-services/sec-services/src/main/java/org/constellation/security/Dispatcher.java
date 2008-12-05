@@ -36,7 +36,7 @@ public class Dispatcher {
     /**
      * The URL of the webservice to request.
      */
-    private final URL url;
+    private final String url;
 
     /**
      * Defines whether the dispatcher has received a REST or SOAP request.
@@ -65,29 +65,27 @@ public class Dispatcher {
 
     /**
      * Instanciates a dispatcher for the specified url. The constructor defines whether it
-     * is a {@code REST} or {@code SOAP} request, in verifying the question mark character
-     * in the URL. If it is present, we know that we are faced to a {@code REST} request,
-     * otherwise it is a {@code SOAP} request.
+     * is a {@code REST} or {@code SOAP} request.
      *
      * @param url The URL of the webservice to request.
      * @param marshaller The marshaller to use for parsing the request.
      * @param unmarshaller The unmarshaller to use for the response.
      */
-    public Dispatcher(final URL url, final Marshaller marshaller,
-                                 final Unmarshaller unmarshaller)
+    public Dispatcher(final String url, final boolean isRest, final Marshaller marshaller,
+                                                          final Unmarshaller unmarshaller)
     {
         this.url    = url;
-        this.isRest = url.getFile().contains("?");
+        this.isRest = isRest;
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
     }
 
-    public AbstractWMSCapabilities requestGetCapabilities() throws IOException,
-                                                            WebServiceException
+    AbstractWMSCapabilities requestGetCapabilities(final String service, final String request,
+                                                                         final String version) throws WebServiceException
     {
         if (isRest) {
             wmsRestClient = new WmsRestClient(url, marshaller, unmarshaller);
-            return wmsRestClient.sendGetCapabilities();
+            return wmsRestClient.sendGetCapabilities( service, request, version);
         } else {
             // implement a SOAP client.
             throw new UnsupportedOperationException();
