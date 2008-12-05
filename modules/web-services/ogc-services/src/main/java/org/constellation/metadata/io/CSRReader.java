@@ -220,6 +220,16 @@ public class CSRReader extends GenericMetadataReader {
     }
     
     /**
+     * Return the list of contact ID used in this database.
+     * 
+     * @return
+     */
+    @Override
+    public List<String> getVariablesForContact() {
+        return Arrays.asList("var01", "var05", "var06", "var07", "var34", "var40");
+    }
+    
+    /**
      * Extract a metadata from a CSR database.
      * 
      * @param identifier

@@ -193,8 +193,17 @@ public class EDMEDReader extends GenericMetadataReader {
         } else throw new IllegalArgumentException("unknow ElementSet: " + type);
     }
     
+    /**
+     * Return the list of contact ID used in this database.
+     * 
+     * @return
+     */
+    @Override
+    public List<String> getVariablesForContact() {
+        return Arrays.asList("var01", "var05", "var08", "var10");
+    }
     
-     /**
+    /**
      * Extract a metadata from a EDMED database.
      * 
      * @param identifier
@@ -243,6 +252,9 @@ public class EDMEDReader extends GenericMetadataReader {
          //L231
         ExtendedElementInformation L231 = createExtensionInfo("SDN:L231:1:");
         elements.add(L231);
+        
+        extensionInfo.setExtendedElementInformation(elements);
+        result.setMetadataExtensionInfo(Arrays.asList(extensionInfo));
         
         /**
          * Data identification

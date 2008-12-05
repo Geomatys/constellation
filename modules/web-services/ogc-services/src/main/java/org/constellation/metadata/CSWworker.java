@@ -318,7 +318,7 @@ public class CSWworker {
             File configFile = new File(configDir, "config.xml");
             if (!configFile.exists()) {
                  logger.severe("The CSW service is not working!" + '\n' +
-                        "cause: The generic configuration file has not been found");
+                        "cause: The configuration file has not been found");
                  isStarted = false;
             } else {
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);

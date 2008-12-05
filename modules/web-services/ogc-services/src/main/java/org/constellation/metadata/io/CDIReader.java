@@ -204,8 +204,17 @@ public class CDIReader extends GenericMetadataReader {
             return Arrays.asList("var04", "var24", "var25", "var26", "var27", "var10", "var11", "var12", "var13", "var37", "var08", "var07", "var36");
         } else throw new IllegalArgumentException("unknow ElementSet: " + type);
     }
-
     
+    /**
+     * Return the list of contact ID used in this database.
+     * 
+     * @return
+     */
+    @Override
+    public List<String> getVariablesForContact() {
+        return Arrays.asList("var01", "var07", "var09", "var36");
+    }
+
     /**
      * Extract a metadata from a CDI database.
      * 

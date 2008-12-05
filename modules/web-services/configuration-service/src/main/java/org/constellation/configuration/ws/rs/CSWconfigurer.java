@@ -20,9 +20,14 @@ package org.constellation.configuration.ws.rs;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -38,21 +43,33 @@ import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.generic.edmo.Organisation;
+import org.constellation.generic.edmo.Organisations;
+import org.constellation.generic.edmo.ws.EdmoWebservice;
+import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
 import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.nerc.WhatsListsResponse;
 import org.constellation.metadata.Utils;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.GenericCSWFactory;
+import org.constellation.metadata.io.GenericMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import org.geotools.metadata.iso.citation.AddressImpl;
+import org.geotools.metadata.iso.citation.ContactImpl;
+import org.geotools.metadata.iso.citation.OnLineResourceImpl;
+import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
+import org.geotools.metadata.iso.citation.TelephoneImpl;
 import static org.constellation.generic.database.Automatic.*;
 import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // geotools dependencies
 import org.geotools.metadata.note.Anchors;
+import org.geotools.util.SimpleInternationalString;
 import org.mdweb.utils.GlobalUtils;
+import org.opengis.metadata.citation.ResponsibleParty;
 
 /**
  *
@@ -66,6 +83,11 @@ public class CSWconfigurer {
      * A lucene Index used to pre-build a CSW index.
      */
     private IndexLucene indexer;
+    
+     /**
+     * A Reader to the database.
+     */
+    private MetadataReader reader;
     
     /**
      * A JAXB unmarshaller used to create java object from XML file.
@@ -91,18 +113,18 @@ public class CSWconfigurer {
         try {
             // we get the CSW configuration file
             JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
-            Unmarshaller genericUnmarshaller = jb.createUnmarshaller();
+            Unmarshaller configUnmarshaller = jb.createUnmarshaller();
 
             File configFile = new File(cswConfigDir, "config.xml");
             if (configFile.exists()) {
-                Automatic config = (Automatic) genericUnmarshaller.unmarshal(configFile);
+                Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 BDD db = config.getBdd();
                 if (db == null) {
                     throw new ConfigurationException("the generic configuration file does not contains a BDD object.");
                 } else {
                     Connection MDConnection = db.getConnection();
-                    MetadataReader MDReader = GenericCSWFactory.getMetadataReader(config, MDConnection);
-                    indexer = GenericCSWFactory.getIndex(config.getType(), MDReader, MDConnection);
+                    reader = GenericCSWFactory.getMetadataReader(config, MDConnection);
+                    indexer = GenericCSWFactory.getIndex(config.getType(), reader, MDConnection);
                 }
             } else {
                 throw new ConfigurationException("No generic database configuration file have been found");
@@ -168,7 +190,7 @@ public class CSWconfigurer {
         } else {
             
             if (!asynchrone) {
-                File indexDir     = new File(serviceDirectory.get("CSW"), "index");
+                File indexDir = new File(serviceDirectory.get("CSW"), "index");
 
                 if (indexDir.exists() && indexDir.isDirectory()) {
                     for (File f: indexDir.listFiles()) {
@@ -211,7 +233,7 @@ public class CSWconfigurer {
     }
     
     /**
-     * Update all the vocabularies skos files.
+     * Update all the vocabularies skos files and the list of contact.
      */
     public AcknowlegementType updateVocabularies() throws WebServiceException {
         File vocabularyDir = new File(serviceDirectory.get("CSW"), "vocabulary");
@@ -240,6 +262,40 @@ public class CSWconfigurer {
         
         return new AcknowlegementType("success", "the vocabularies has been succefully updated");
     }
+    
+    /**
+     * Update all the contact retrieved from files and the list of contact.
+     */
+    public AcknowlegementType updateContacts() throws WebServiceException {
+        File contactDir = new File(serviceDirectory.get("CSW"), "contacts");
+        if (reader != null && reader instanceof GenericMetadataReader) {
+            List<String> contactsID = ((GenericMetadataReader)reader).getAllContactID();
+            for (String contactID : contactsID) {
+                ResponsibleParty contact = loadContactFromEDMOWS(contactID);
+                if (contact != null)
+                    saveContactFile(contactID, contact, contactDir);
+            }
+        }
+        
+        return new AcknowlegementType("success", "the EDMO contacts has been succefully updated");
+    }
+    
+    /**
+     * 
+     * @param listNumber
+     */
+    private void saveContactFile(String contactID, ResponsibleParty contact, File directory) throws WebServiceException {
+        String filePrefix = "EDMO.";
+        try {
+            File f = new File(directory, filePrefix + contactID + ".xml");
+            marshaller.marshal(contact, f);
+        
+        } catch (JAXBException ex) {
+            LOGGER.severe("JAXBException while marshalling the contact: " + contactID);
+            throw new WebServiceException("JAXBException while marshalling the contact: " + contactID, NO_APPLICABLE_CODE, version);
+        } 
+    }
+    
     
     /**
      * 
@@ -305,6 +361,87 @@ public class CSWconfigurer {
     
     public void destroy() {
         indexer.destroy();
+    }
+    
+     /**
+     * Try to get a contact from EDMO WS and add it to the map of contact.
+     * 
+     * @param contactIdentifiers
+     */
+    private ResponsibleParty loadContactFromEDMOWS(String contactID) {
+        EdmoWebservice service = new EdmoWebservice();
+        EdmoWebserviceSoap port = service.getEdmoWebserviceSoap();
+        
+        // we call the web service EDMO
+        String result = port.wsEdmoGetDetail(contactID);
+        StringReader sr = new StringReader(result);
+        Object obj;
+        try {
+            obj = unmarshaller.unmarshal(sr);
+            if (obj instanceof Organisations) {
+                Organisations orgs = (Organisations) obj;
+                switch (orgs.getOrganisation().size()) {
+                    case 0:
+                        LOGGER.severe("There is no organisation for the specified code: " + contactID);
+                        break;
+                    case 1:
+                        LOGGER.info("contact created for contact ID: " + contactID);
+                        return createContact(orgs.getOrganisation().get(0));
+                    default:
+                        LOGGER.severe("There is more than one contact for the specified code: " + contactID);
+                        break;
+                }
+            }
+        } catch (JAXBException ex) {
+            LOGGER.severe("JAXBException while getting contact from EDMO WS");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Build a new Responsible party with the specified Organisation object retrieved from EDMO WS.
+     * 
+     * @param org
+     * @return
+     * @throws java.sql.SQLException
+     */
+    private ResponsibleParty createContact(Organisation org) {
+        ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
+        contact.setOrganisationName(new SimpleInternationalString(org.getName()));
+        try {
+            URI uri = new URI("SDN:EDMO::" + org.getN_code());
+            Anchors.create(org.getName(), uri); 
+        } catch (URISyntaxException ex) {
+            LOGGER.severe("URI syntax exeption while adding contact code.");
+        }
+        ContactImpl contactInfo = new ContactImpl();
+        TelephoneImpl phone     = new TelephoneImpl();
+        AddressImpl address     = new AddressImpl();
+        OnLineResourceImpl or   = new OnLineResourceImpl();
+                
+        phone.setFacsimiles(Arrays.asList(org.getFax()));
+        phone.setVoices(Arrays.asList(org.getPhone()));
+        contactInfo.setPhone(phone);
+        
+        address.setDeliveryPoints(Arrays.asList(org.getAddress()));
+        address.setCity(new SimpleInternationalString(org.getCity()));
+        // TODO address.setAdministrativeArea(new SimpleInternationalString()); 
+        address.setPostalCode(org.getZipcode());
+        address.setCountry(new SimpleInternationalString(org.getC_country()));
+        if (org.getEmail() != null) {
+            address.setElectronicMailAddresses(Arrays.asList(org.getEmail()));
+        }
+        contactInfo.setAddress(address);
+        
+        try {
+            or.setLinkage(new URI(org.getWebsite()));
+        } catch (URISyntaxException ex) {
+            LOGGER.severe("URI Syntax exception in contact online resource");
+        }
+        contactInfo.setOnLineResource(or);
+        contact.setContactInfo(contactInfo);
+        return contact;
     }
     
 }

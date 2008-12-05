@@ -18,9 +18,6 @@
 package org.constellation.metadata.io;
 
 import java.io.File;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
@@ -52,10 +49,6 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.constellation.generic.edmo.Organisation;
-import org.constellation.generic.edmo.Organisations;
-import org.constellation.generic.edmo.ws.EdmoWebservice;
-import org.constellation.generic.edmo.ws.EdmoWebserviceSoap;
 import org.constellation.generic.nerc.CodeTableType;
 import org.constellation.generic.vocabulary.Vocabulary;
 import org.constellation.ows.v100.BoundingBoxType;
@@ -65,18 +58,13 @@ import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.metadata.iso.citation.AddressImpl;
 import org.geotools.metadata.iso.citation.CitationDateImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.metadata.iso.citation.ContactImpl;
-import org.geotools.metadata.iso.citation.OnLineResourceImpl;
 import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
-import org.geotools.metadata.iso.citation.TelephoneImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.metadata.iso.identification.KeywordsImpl;
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
-import org.geotools.metadata.note.Anchors;
 import org.geotools.util.SimpleInternationalString;
 
 //geoAPI dependencies
@@ -152,6 +140,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
     protected Map<String, Vocabulary> vocabularies;
     
     /**
+     * A flag mode indicating we are searching the database for contacts.
+     */
+    private static int CONTACT = 10;
+    
+    /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
@@ -160,13 +153,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
-        contacts               = new HashMap<String, ResponsibleParty>();
         JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary:" +
                                                          "org.constellation.generic.nerc:org.constellation.skos");
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
         vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), true);
-        List<String> contactID = new ArrayList<String>();
+        contacts               = loadContacts(new File(cswConfigDir, "contacts"));
     }
     
     /**
@@ -184,7 +176,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
         vocabularies           = loadVocabulary(new File(cswConfigDir, "vocabulary"), fillAnchor);
-        List<String> contactID = new ArrayList<String>();
+        contacts               = loadContacts(new File(cswConfigDir, "contacts"));
     }
     
     /**
@@ -314,6 +306,35 @@ public abstract class GenericMetadataReader extends MetadataReader {
     }
     
     /**
+     * Load a Map of contact from the specified directory
+     */
+    private Map<String, ResponsibleParty> loadContacts(File contactDirectory) {
+        Map<String, ResponsibleParty> results = new HashMap<String, ResponsibleParty>();
+        if (contactDirectory.isDirectory()) {
+            if (contactDirectory.listFiles().length == 0) {
+                logger.severe("the contacts folder is empty :" + contactDirectory.getPath());
+            }
+            for (File f : contactDirectory.listFiles()) {
+                if (f.getName().startsWith("EDMO.") && f.getName().endsWith(".xml")) {
+                    try {
+                        Object obj = unmarshaller.unmarshal(f);
+                        if (obj instanceof ResponsibleParty) {
+                            ResponsibleParty contact = (ResponsibleParty) obj;
+                            String code = f.getName();
+                            code = code.substring(code.indexOf("EDMO.") + 5, code.indexOf(".xml"));
+                            results.put(code, contact);
+                        }
+                    } catch (JAXBException ex) {
+                        logger.severe("Unable to unmarshall the contact file : " + f.getPath());
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        return results;
+    }
+    
+    /**
      * Retrieve a contact from the cache or from th EDMO WS if its hasn't yet been requested.
      *  
      * @param contactIdentifier
@@ -321,13 +342,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role) {
         ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
-        if (result == null) {
-            result = (ResponsiblePartyImpl) loadContactFromEDMOWS(contactIdentifier);
-            if (result != null)
-                contacts.put(contactIdentifier, result);
-        } else {
-            result = new ResponsiblePartyImpl(result);
-        }
+        result = new ResponsiblePartyImpl(result);
         if (result != null)
             result.setRole(role);
         return result;
@@ -341,13 +356,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role, String individualName) {
         ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
-        if (result == null) {
-            result = (ResponsiblePartyImpl) loadContactFromEDMOWS(contactIdentifier);
-            if (result != null)
-                contacts.put(contactIdentifier, result);
-        } else {
-            result = new ResponsiblePartyImpl(result);
-        }
+        result = new ResponsiblePartyImpl(result);
         if (result != null) {
             result.setRole(role);
             result.setIndividualName(individualName);
@@ -355,42 +364,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return result;
     }
             
-    /**
-     * Try to get a contact from EDMO WS and add it to the map of contact.
-     * 
-     * @param contactIdentifiers
-     */
-    private ResponsibleParty loadContactFromEDMOWS(String contactID) {
-        EdmoWebservice service = new EdmoWebservice();
-        EdmoWebserviceSoap port = service.getEdmoWebserviceSoap();
-        
-        // we call the web service EDMO
-        String result = port.wsEdmoGetDetail(contactID);
-        StringReader sr = new StringReader(result);
-        Object obj;
-        try {
-            obj = unmarshaller.unmarshal(sr);
-            if (obj instanceof Organisations) {
-                Organisations orgs = (Organisations) obj;
-                switch (orgs.getOrganisation().size()) {
-                    case 0:
-                        logger.severe("There is no organisation for the specified code: " + contactID);
-                        break;
-                    case 1:
-                        logger.info("contact created for contact ID: " + contactID);
-                        return createContact(orgs.getOrganisation().get(0));
-                    default:
-                        logger.severe("There is more than one contact for the specified code: " + contactID);
-                        break;
-                }
-            }
-        } catch (JAXBException ex) {
-            logger.severe("JAXBException while getting contact from EDMO WS");
-            ex.printStackTrace();
-        }
-        return null;
-    }
-    
     /**
      * Fill the dynamic parameters of a prepared statement with the specified identifier.
      * @param stmt
@@ -452,9 +425,17 @@ public abstract class GenericMetadataReader extends MetadataReader {
             subSingleStmts = singleStatements.keySet();
             subMultiStmts  = multipleStatements.keySet();
         } else {
+            List<String> variables;
+            if (mode == DUBLINCORE) {
+                variables = getVariablesForDublinCore(type);
+            } else if (mode == CONTACT) {
+                variables = getVariablesForContact();
+            } else {
+                throw new IllegalArgumentException("unknow mode");
+            }
             subSingleStmts = new HashSet<PreparedStatement>();
             subMultiStmts  = new HashSet<PreparedStatement>();
-            for (String var: getVariablesForDublinCore(type)) {
+            for (String var: variables) {
                 PreparedStatement stmt = getStatementFromSingleVar(var);
                 if (stmt != null) {
                     if (!subSingleStmts.contains(stmt))
@@ -580,7 +561,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected abstract List<String> getVariablesForDublinCore(ElementSetType type);
-            
+       
+    /**
+     * Return a list of contact id used in this database.
+     */
+    public abstract List<String> getVariablesForContact();
+    
     /**
      * return a list of value for the specified variable name.
      * 
@@ -611,52 +597,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
             return new SimpleInternationalString(value);
         else return null;
     }
-    
-    /**
-     * Build a new Responsible party with the specified Organisation object retrieved from EDMO WS.
-     * 
-     * @param org
-     * @return
-     * @throws java.sql.SQLException
-     */
-    private ResponsibleParty createContact(Organisation org) {
-        ResponsiblePartyImpl contact = new ResponsiblePartyImpl();
-        contact.setOrganisationName(new SimpleInternationalString(org.getName()));
-        try {
-            URI uri = new URI("SDN:EDMO::" + org.getN_code());
-            Anchors.create(org.getName(), uri); 
-        } catch (URISyntaxException ex) {
-            logger.severe("URI syntax exeption while adding contact code.");
-        }
-        ContactImpl contactInfo = new ContactImpl();
-        TelephoneImpl phone     = new TelephoneImpl();
-        AddressImpl address     = new AddressImpl();
-        OnLineResourceImpl or   = new OnLineResourceImpl();
-                
-        phone.setFacsimiles(Arrays.asList(org.getFax()));
-        phone.setVoices(Arrays.asList(org.getPhone()));
-        contactInfo.setPhone(phone);
-        
-        address.setDeliveryPoints(Arrays.asList(org.getAddress()));
-        address.setCity(new SimpleInternationalString(org.getCity()));
-        // TODO address.setAdministrativeArea(new SimpleInternationalString()); 
-        address.setPostalCode(org.getZipcode());
-        address.setCountry(new SimpleInternationalString(org.getC_country()));
-        if (org.getEmail() != null) {
-            address.setElectronicMailAddresses(Arrays.asList(org.getEmail()));
-        }
-        contactInfo.setAddress(address);
-        
-        try {
-            or.setLinkage(new URI(org.getWebsite()));
-        } catch (URISyntaxException ex) {
-            logger.severe("URI Syntax exception in contact online resource");
-        }
-        contactInfo.setOnLineResource(or);
-        contact.setContactInfo(contactInfo);
-        return contact;
-    }
-    
     
     /**
      * Parse the specified date and return a CitationDate with the dateType code REVISION.
@@ -914,15 +854,54 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     public List<MetaDataImpl> getAllEntries() throws WebServiceException {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
+        List<String> identifiers  = getAllIdentifiers();
+        for (String id : identifiers) {
+                result.add((MetaDataImpl) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
+        }
+        return result;
+    }
+    
+    /**
+     * Return all the identifiers in this database.
+     * 
+     * @return
+     */
+    private List<String> getAllIdentifiers() throws WebServiceException {
+        List<String> result = new ArrayList<String>();
         try {
             ResultSet res = mainStatement.executeQuery();
             while (res.next()) {
-                result.add((MetaDataImpl) getMetadata(res.getString(1), ISO_19115, ElementSetType.FULL, null));
+                result.add(res.getString(1));
             }
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while getting all the entries: " + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new WebServiceException("SQL Exception while getting all the identifiers: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return result;
+    }
+    
+    /**
+     * Return all the contact identifiers used in this database
+     * 
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
+    public List<String> getAllContactID() throws WebServiceException {
+        List<String> results = new ArrayList<String>();
+        List<String> identifiers = getAllIdentifiers();
+        for (String id : identifiers) {
+            loadData(id, CONTACT, null);
+            for(String var: getVariablesForContact()) {
+                String c = getVariable(var);
+                if (c == null) {
+                    List<String> cs = getVariables(var);
+                    if (cs != null)
+                        results.addAll(cs);
+                } else {
+                    results.add(c);
+                }
+            }
+        }
+        return results;
     }
     
     public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
