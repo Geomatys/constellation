@@ -16,12 +16,19 @@
  */
 package org.constellation.metadata.io;
 
+import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.ws.WebServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -29,10 +36,19 @@ import org.constellation.ws.WebServiceException;
  */
 public class FileMetadataReader extends MetadataReader {
 
+    private File dataDirectory;
     
-    public FileMetadataReader() {
+    /**
+     * A unMarshaller to get object from metadata files.
+     */
+    private final Unmarshaller unmarshaller;
+    
+    public FileMetadataReader(File dataDirectory, Unmarshaller unmarshaller) {
         super(true);
+        this.dataDirectory = dataDirectory;
+        this.unmarshaller  = unmarshaller;
     }
+    
     /**
      * Return a metadata object from the specified identifier.
      * 
@@ -49,28 +65,67 @@ public class FileMetadataReader extends MetadataReader {
         return getObjectFromFile(identifier);
     }
 
-    private Object getObjectFromFile(String identifier) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private Object getObjectFromFile(String identifier) throws WebServiceException {
+        File metadataFile = new File (dataDirectory,  identifier + ".xml");
+        if (metadataFile.exists()) {
+            try {
+                Object metadata = unmarshaller.unmarshal(metadataFile);
+                if (metadata instanceof JAXBElement) {
+                    metadata = ((JAXBElement) metadata).getValue();
+                }
+                addInCache(identifier, metadata);
+                return metadata;
+            } catch (JAXBException ex) {
+                throw new WebServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
+                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+            }
+        } else {
+            throw new WebServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+        }
     }
 
     @Override
     public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new WebServiceException("GetDomain operation are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
     @Override
     public void destroy() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        
     }
 
     @Override
     public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new WebServiceException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
     @Override
     public List<? extends Object> getAllEntries() throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Object> results = new ArrayList<Object>();
+        for (File f : dataDirectory.listFiles()) {
+            if (f.getName().endsWith(".xml")) {
+                String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+                try {
+                    Object metadata = unmarshaller.unmarshal(f);
+                    if (metadata instanceof JAXBElement) {
+                        metadata = ((JAXBElement) metadata).getValue();
+                    }
+                    addInCache(identifier, metadata);
+                    results.add(metadata);
+                } catch (JAXBException ex) {
+                    throw new WebServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
+                            "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                }
+            } else {
+                throw new WebServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public List<Integer> getSupportedDataTypes() {
+        return Arrays.asList(ISO_19115, DUBLINCORE);
     }
 
 }

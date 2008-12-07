@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 // apache Lucene dependencies
 import org.apache.lucene.document.Document;
@@ -202,23 +201,23 @@ public class GenericIndex extends IndexLucene<Object> {
         logger.info("indexing ISO 19119 MD_Metadata");
         //TODO add ANyText
         for (String term : ISO_QUERYABLE.keySet()) {
-            doc.add(new Field(term, getValues(term, metadata, ISO_QUERYABLE), Field.Store.YES, Field.Index.TOKENIZED));
-            doc.add(new Field(term + "_sort", getValues(term, metadata, ISO_QUERYABLE), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field(term, getValues(metadata, ISO_QUERYABLE.get(term)), Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field(term + "_sort", getValues(metadata, ISO_QUERYABLE.get(term)), Field.Store.YES, Field.Index.UN_TOKENIZED));
         }
 
         //we add the geometry parts
         String coord = "null";
         try {
-            coord = getValues("WestBoundLongitude", metadata, ISO_QUERYABLE);
+            coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
             double minx = Double.parseDouble(coord);
 
-            coord = getValues("EastBoundLongitude", metadata, ISO_QUERYABLE);
+            coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
             double maxx = Double.parseDouble(coord);
 
-            coord = getValues("NorthBoundLatitude", metadata, ISO_QUERYABLE);
+            coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
             double maxy = Double.parseDouble(coord);
 
-            coord = getValues("SouthBoundLatitude", metadata, ISO_QUERYABLE);
+            coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
             double miny = Double.parseDouble(coord);
 
             addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
@@ -235,7 +234,7 @@ public class GenericIndex extends IndexLucene<Object> {
         StringBuilder anyText = new StringBuilder();
         for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
                 
-            String values = getValues(term,  metadata, DUBLIN_CORE_QUERYABLE);
+            String values = getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term));
             if (!values.equals("null")) {
                 logger.finer("put " + term + " values: " + values);
                 anyText.append(values).append(" ");
@@ -253,21 +252,19 @@ public class GenericIndex extends IndexLucene<Object> {
         //we add the geometry parts
         coord = "null";
         try {
-            coord = getValues("WestBoundLongitude", metadata, DUBLIN_CORE_QUERYABLE);
+            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
             double minx = Double.parseDouble(coord);
                 
-            coord = getValues("EastBoundLongitude", metadata, DUBLIN_CORE_QUERYABLE);
+            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
             double maxx = Double.parseDouble(coord);
             
-            coord = getValues("NorthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
+            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
             double maxy = Double.parseDouble(coord);
             
-            coord = getValues("SouthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
+            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
             double miny = Double.parseDouble(coord);
                 
-            coord = getValues("SouthBoundLatitude", metadata, DUBLIN_CORE_QUERYABLE);
-            
-            String crs = getValues("CRS", metadata, DUBLIN_CORE_QUERYABLE);
+            String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
                 
             addBoundingBox(doc, minx, maxx, miny, maxy, crs);
             
@@ -291,9 +288,9 @@ public class GenericIndex extends IndexLucene<Object> {
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(String term, Object metadata, Map<String,List<String>> queryable) throws SQLException {
+    private String getValues(Object metadata, List<String> paths) throws SQLException {
         StringBuilder response  = new StringBuilder("");
-        List<String> paths = queryable.get(term);
+       // List<String> paths = queryable.get(term);
         
         if (paths != null) {
             for (String fullPathID: paths) {

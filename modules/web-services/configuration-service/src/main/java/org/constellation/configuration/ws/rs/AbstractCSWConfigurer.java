@@ -102,7 +102,7 @@ public abstract class AbstractCSWConfigurer {
                     Connection MDConnection = db.getConnection();
                     
                     AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
-                    reader  = CSWfactory.getMetadataReader(config, MDConnection);
+                    reader  = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), unmarshaller);
                     indexer = CSWfactory.getIndex(config.getType(), reader, MDConnection);
                 }
             } else {

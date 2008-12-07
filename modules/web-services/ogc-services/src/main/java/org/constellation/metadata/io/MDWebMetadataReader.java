@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.constellation.metadata.Utils;
 import org.constellation.ows.v100.BoundingBoxType;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.TypeNames.*;
         
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
@@ -1112,5 +1114,10 @@ public class MDWebMetadataReader extends MetadataReader {
             throw new WebServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return results;
+    }
+    
+    @Override
+    public List<Integer> getSupportedDataTypes() {
+        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM);
     }
 }

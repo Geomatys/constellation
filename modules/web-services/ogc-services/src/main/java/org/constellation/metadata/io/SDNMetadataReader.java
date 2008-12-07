@@ -231,6 +231,11 @@ public abstract class SDNMetadataReader extends GenericMetadataReader {
         return keyword;
     }
     
+    @Override
+    public List<Integer> getSupportedDataTypes() {
+        return Arrays.asList(ISO_19115, DUBLINCORE);
+    }
+    
     public void destroy() {
         super.destroy();
          vocabularies.clear();

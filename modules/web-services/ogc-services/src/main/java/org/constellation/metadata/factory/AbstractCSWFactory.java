@@ -22,6 +22,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.MetadataReader;
@@ -34,9 +36,9 @@ import org.constellation.ws.WebServiceException;
  */
 public abstract class AbstractCSWFactory {
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException;
+    public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller) throws SQLException, JAXBException;
 
-    public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index) throws SQLException, JAXBException;
+    public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException;
     
     public abstract int getProfile(int dbType);
     

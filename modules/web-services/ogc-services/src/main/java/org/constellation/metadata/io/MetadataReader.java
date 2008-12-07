@@ -90,6 +90,11 @@ public abstract class MetadataReader {
     public abstract List<? extends Object> getAllEntries() throws WebServiceException;
     
     /**
+     * Return the list of supported data types.
+     */
+    public abstract List<Integer> getSupportedDataTypes();
+    
+    /**
      * Destroy all the resource used by this reader.
      */
     public abstract void destroy();

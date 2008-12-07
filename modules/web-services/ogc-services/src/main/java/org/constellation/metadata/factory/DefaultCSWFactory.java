@@ -22,6 +22,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.index.GenericIndex;
@@ -54,7 +56,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection) throws SQLException, JAXBException {
+    public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDirectory, Unmarshaller unmarshaller) throws SQLException, JAXBException {
         switch (configuration.getType()) {
             case CDI:
                 return new CDIReader(configuration, MDConnection);
@@ -65,7 +67,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataReader(MDConnection);
             case FILESYSTEM:
-                return new FileMetadataReader();
+                return new FileMetadataReader(dataDirectory, unmarshaller);
             default:
                 throw new IllegalArgumentException("Unknow database type");
         }
@@ -80,7 +82,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index) throws SQLException, JAXBException {
+    public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException {
         switch (dbType) {
             case CDI:
                 return null;
@@ -91,7 +93,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataWriter(MDConnection, index);
             case FILESYSTEM:
-                return new FileMetadataWriter(index);
+                return new FileMetadataWriter(index, marshaller, dataDirectory);
             default:
                 throw new IllegalArgumentException("Unknow database type");
         }

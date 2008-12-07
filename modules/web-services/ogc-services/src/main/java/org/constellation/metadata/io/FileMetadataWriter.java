@@ -19,9 +19,16 @@
 
 package org.constellation.metadata.io;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.ws.WebServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -29,19 +36,49 @@ import org.constellation.ws.WebServiceException;
  */
 public class FileMetadataWriter extends MetadataWriter {
     
-    public FileMetadataWriter(IndexLucene index) throws SQLException {
+    /**
+     * A unMarshaller to get object from harvested resource.
+     */
+    private final Marshaller marshaller;
+    
+    /**
+     * A directory in witch the metadata files are stored.
+     */
+    private final File dataDirectory;
+    
+    /**
+     * 
+     * @param index
+     * @param marshaller
+     * @throws java.sql.SQLException
+     */
+    public FileMetadataWriter(IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException {
         super(index);
+        this.marshaller    = marshaller;
+        this.dataDirectory = dataDirectory;
         
     }
 
     @Override
     public boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        File f = null;
+        try {
+            //TODO find indentifier
+            String identifier = "testID";
+            f = new File(dataDirectory, identifier + ".xml");
+            f.createNewFile();
+            marshaller.marshal(obj, f);
+            index.indexDocument(obj);
+        } catch (JAXBException ex) {
+            throw new WebServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            throw new WebServiceException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
+        }
+        return true;
     }
 
     @Override
     public void destroy() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

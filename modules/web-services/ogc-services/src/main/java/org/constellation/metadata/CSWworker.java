@@ -105,6 +105,8 @@ import org.constellation.cat.csw.AbstractCswRequest;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.generic.database.Automatic.*;
+import static org.constellation.metadata.TypeNames.*;
 
 // Apache Lucene dependencies
 import org.apache.lucene.index.CorruptIndexException;
@@ -204,61 +206,7 @@ public class CSWworker {
     /**
      * A list of the supported Type name 
      */
-    private final static List<QName> SUPPORTED_TYPE_NAME;
-    static {
-        SUPPORTED_TYPE_NAME = new ArrayList<QName>();
-        //dublin core typeNames
-        SUPPORTED_TYPE_NAME.add(_Record_QNAME);
-        //iso 19115 typeNames
-        SUPPORTED_TYPE_NAME.add(_Metadata_QNAME);
-        //ebrim v3.0 typeNames
-        SUPPORTED_TYPE_NAME.add(_AdhocQuery_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Association_QNAME);
-        SUPPORTED_TYPE_NAME.add(_AuditableEvent_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ClassificationNode_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ClassificationScheme_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Classification_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ExternalIdentifier_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ExternalLink_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ExtrinsicObject_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Federation_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Notification_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ObjectRefList_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Person_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Organization_QNAME);
-        SUPPORTED_TYPE_NAME.add(_RegistryObject_QNAME);
-        SUPPORTED_TYPE_NAME.add(_RegistryPackage_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Registry_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ServiceBinding_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Service_QNAME);
-        SUPPORTED_TYPE_NAME.add(_SpecificationLink_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Subscription_QNAME);
-        SUPPORTED_TYPE_NAME.add(_User_QNAME);
-        SUPPORTED_TYPE_NAME.add(_WRSExtrinsicObject_QNAME);
-        //ebrim v2.5 typenames
-        SUPPORTED_TYPE_NAME.add(_ExtrinsicObject25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Federation25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ExternalLink25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ClassificationNode25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_User25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Classification25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_RegistryPackage25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_RegistryObject25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Association25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_RegistryEntry25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ClassificationScheme25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Organization25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ExternalIdentifier25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_SpecificationLink25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Registry25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ServiceBinding25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Service25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_AuditableEvent25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Subscription25_QNAME);
-        SUPPORTED_TYPE_NAME.add(_Geometry09_QNAME);
-        SUPPORTED_TYPE_NAME.add(_ApplicationModule09_QNAME);
-        SUPPORTED_TYPE_NAME.add(_WRSExtrinsicObject09_QNAME);
-    }
+    private List<QName> SUPPORTED_TYPE_NAME;
     
     /**
      * A list of supported MIME type. 
@@ -326,13 +274,27 @@ public class CSWworker {
                  isStarted = false;
             } else {
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                
+                // we get the database informations
                 BDD db = config.getBdd();
-                if (db == null) {
+                if (db == null && config.getType() != FILESYSTEM) {
                     logger.severe("The CSW service is not working!" + '\n' +
                             "cause: The configuration file does not contains a BDD object");
                     isStarted = false;
                     return;
                 }
+                
+                File dataDirectory = config.getdataDirectory();
+                if (!dataDirectory.exists()) {
+                    dataDirectory = new File(configDir, "data");
+                    if (!dataDirectory.exists() && config.getType() == FILESYSTEM) {
+                        logger.severe("The CSW service is not working!" + '\n' +
+                            "cause: The unable to find the data directory");
+                        isStarted = false;
+                        return;
+                    }
+                }
+                
                 AbstractCSWFactory CSWfactory;
                 try {
                     CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
@@ -344,11 +306,15 @@ public class CSWworker {
                 }
                 //we create a connection to the metadata database
                 Connection MDConnection = db.getConnection();
-                MDReader = CSWfactory.getMetadataReader(config, MDConnection);
+                
+                //we initialize all the data retriever (reader/writer) and index worker
+                MDReader = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller);
                 profile  = CSWfactory.getProfile(config.getType());
                 index    = CSWfactory.getIndex(config.getType(), MDReader, MDConnection, configDir);
-                MDWriter = CSWfactory.getMetadataWriter(config.getType(), MDConnection, index);
+                MDWriter = CSWfactory.getMetadataWriter(config.getType(), MDConnection, index, marshaller, configDir);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
+                
+                initializeSupportedTypeNames();
                 loadCascadedService(configDir);
                 logger.info("CSW service (" + config.getFormat() + ") running");
             }
@@ -369,6 +335,23 @@ public class CSWworker {
                     "cause: The web service can't create the index!");
             isStarted = false;
         }
+    }
+    
+    /**
+     * Initialize the supported type names in function of the redaer capacity.
+     */
+    public void initializeSupportedTypeNames() {
+        SUPPORTED_TYPE_NAME = new ArrayList<QName>();
+        List<Integer> supportedDataTypes = MDReader.getSupportedDataTypes();
+        if (supportedDataTypes.contains(ISO_19115))
+            SUPPORTED_TYPE_NAME.addAll(ISO_TYPE_NAMES);
+        if (supportedDataTypes.contains(DUBLINCORE))
+            SUPPORTED_TYPE_NAME.addAll(DC_TYPE_NAMES);
+        if (supportedDataTypes.contains(EBRIM)) {
+            SUPPORTED_TYPE_NAME.addAll(EBRIM30_TYPE_NAMES);
+            SUPPORTED_TYPE_NAME.addAll(EBRIM25_TYPE_NAMES);
+        }
+                    
     }
     
     /**
@@ -1638,23 +1621,6 @@ public class CSWworker {
             result.append(qn.getPrefix()).append(qn.getLocalPart()).append('\n');
         }
         return result.toString();
-    }
-    
-    /**
-     * Return An CSWProfile from a string
-     * @param profileName
-     * @return
-     */
-    private CSWProfile getServiceProfile(String profileName) {
-        if (profileName != null) {
-            if (profileName.equalsIgnoreCase("generic"))
-                return CSWProfile.GENERIC;
-            else if (profileName.equalsIgnoreCase("fileSystem"))            
-                return CSWProfile.FILESYSTEM;
-        }
-        //default
-        return CSWProfile.MDWEB;
-        
     }
     
     /**

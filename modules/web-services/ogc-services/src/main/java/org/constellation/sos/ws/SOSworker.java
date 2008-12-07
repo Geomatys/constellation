@@ -26,12 +26,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -54,10 +50,10 @@ import java.util.logging.Logger;
 // JAXB dependencies
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.catalog.NoSuchTableException;
 import org.xml.sax.SAXException;
 
 // Constellation dependencies
+import org.constellation.catalog.NoSuchTableException;
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.Contents;
 import org.constellation.sos.Contents.ObservationOfferingList;
@@ -76,7 +72,6 @@ import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.ogc.LiteralType;
 import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
@@ -85,25 +80,17 @@ import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.FeaturePropertyType;
 import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.gml.v311.ReferenceTable;
 import org.constellation.gml.v311.TimeIndeterminateValueType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
-import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.observation.MeasurementEntry;
-import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.observation.ObservationEntry;
-import org.constellation.observation.ObservationTable;
 import org.constellation.swe.v101.PhenomenonEntry;
-import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.observation.ProcessEntry;
-import org.constellation.observation.ProcessTable;
 import org.constellation.ogc.BinaryTemporalOpType;
 import org.constellation.sampling.SamplingFeatureEntry;
-import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointEntry;
-import org.constellation.sampling.SamplingPointTable;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.Operation;
@@ -114,7 +101,6 @@ import org.constellation.ows.v110.ServiceIdentification;
 import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.sos.FilterCapabilities;
 import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.ObservationTemplate;
 import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
@@ -123,7 +109,6 @@ import org.constellation.sos.ResponseModeType;
 import org.constellation.swe.v101.AbstractEncodingEntry;
 import org.constellation.swe.v101.AbstractEncodingPropertyType;
 import org.constellation.swe.v101.AnyResultEntry;
-import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.DataComponentPropertyType;
@@ -132,17 +117,8 @@ import org.constellation.swe.v101.TextBlockEntry;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
-import org.mdweb.model.users.User;
-import org.mdweb.sql.v20.Reader20;
-import org.mdweb.sql.v20.Writer20;
 import org.mdweb.xml.MalFormedDocumentException;
-import org.mdweb.xml.Reader;
-import org.mdweb.xml.Writer;
-
-// GeoAPI dependencies
 import org.opengis.observation.Observation;
 
 // postgres driver
@@ -163,48 +139,8 @@ public class SOSworker {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.sos.webservice");
+    Logger logger = Logger.getLogger("org.constellation.sos.ws");
     
-    /**
-     * A simple Connection to the SensorML database.
-     */
-    private final Connection sensorMLConnection;
-    
-    /**
-     * A Reader to the SensorML database.
-     */
-    private final Reader20 sensorMLReader;
-    
-    /**
-     * A Writer to the SensorML database.
-     */
-    private final Writer20 sensorMLWriter;
-    
-    /**
-     * the data catalog for SensorML database.
-     */
-    private final Catalog SMLCatalog;
-    
-    /**
-     * A Database object for the O&M dataBase.
-     */
-    private final Database OMDatabase;
-    
-    /**
-     * A database table for insert and get observation
-     */
-    private final ObservationTable obsTable;
-    
-    /**
-     * A database table for insert and get observation offerring.
-     */
-    private final ObservationOfferingTable offTable;
-    
-    /**
-     * A database table for insert and get reference object.
-     */
-    private final ReferenceTable refTable;
-   
     /**
      * A list of temporary ObservationTemplate
      */
@@ -297,31 +233,24 @@ public class SOSworker {
     private DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     
     /**
-     * An SQL satetement finding the last sensor ID recorded
+     * The Observation database reader
      */
-    PreparedStatement newSensorIdStmt;
+    private final ObservationReader OMReader;
     
     /**
-     * An SQL statement finding the last Observation ID recorded
+     * The Observation database writer
      */
-    PreparedStatement newObservationIDStmt;
+    private final ObservationWriter OMWriter;
     
     /**
-     * An SQL statement verying if the specified observation already exist.
+     * The sensorML database reader
      */
-    PreparedStatement observationExistStmt;
+    private final SensorReader SMLReader;
     
     /**
-     * An SQL statement get a sensorML value in the MDWeb database
+     * The sensorML database writer
      */
-    PreparedStatement getValueStmt;
-    
-    /**
-     * An SQL statement get the minimal eventime for the observation offering
-     */
-    PreparedStatement getMinEventTimeOffering;
-    
-    
+    private final SensorWriter SMLWriter;
     /**
      * Initialize the database connection.
      */
@@ -334,7 +263,7 @@ public class SOSworker {
         
         //we load the properties files
         Properties prop = new Properties();
-        map    = new Properties();
+        map   = new Properties();
         File f = null;
         File env = getSicadeDirectory();
         logger.info("path to config file=" + env);
@@ -363,6 +292,17 @@ public class SOSworker {
         }
       
         if (start) {
+
+            //we initailize the properties attribute 
+            sensorIdBase = prop.getProperty("sensorIdBase");
+            observationIdBase = prop.getProperty("observationIdBase");
+            observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
+            maxObservationByRequest = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
+            String validTime = prop.getProperty("templateValidTime");
+            int h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
+            int m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
+            templateValidTime = (h * 3600000) + (m * 60000);
+            
             //we create a connection to the sensorML database
             PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
             dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
@@ -370,73 +310,30 @@ public class SOSworker {
             dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
             dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
             dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-            sensorMLConnection = dataSourceSML.getConnection();
-            if (sensorMLConnection == null) {
-                logger.severe("The SOS service is not working!" + '\n' + 
-                              "cause: The web service can't connect to the sensorML database!");
-                sensorMLReader            = null;
-                sensorMLWriter            = null;
-                SMLCatalog                = null;
-                OMDatabase                = null;
-                obsTable                  = null;
-                offTable                  = null;
-                refTable                  = null;
-                sensorIdBase              = null;
-                observationIdBase         = null;
-                observationTemplateIdBase = null;
-                maxObservationByRequest   = -1;
-                templateValidTime         = -1;
-                
-                
-            } else {
-                sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
-                SMLCatalog         = sensorMLReader.getCatalog("SMLC");
-                sensorMLWriter     = new Writer20(sensorMLConnection);
-                //we create a connection to the O&M database
-                PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
-                dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
-                dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
-                dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
-                dataSourceOM.setUser(prop.getProperty("OMDBUser"));
-                dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
-                OMDatabase   = new Database(dataSourceOM);
-                
-                //we build the database table frequently used.
-                obsTable  = OMDatabase.getTable(ObservationTable.class);
-                offTable  = OMDatabase.getTable(ObservationOfferingTable.class);
-                refTable  = OMDatabase.getTable(ReferenceTable.class);
-        
-                //we initailize the properties attribute 
-                sensorIdBase              = prop.getProperty("sensorIdBase");
-                observationIdBase         = prop.getProperty("observationIdBase");
-                observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-                maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
-                String validTime          = prop.getProperty("templateValidTime");
-                int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
-                int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
-                templateValidTime         = (h *  3600000) + (m * 60000);
-                
-                //we build the prepared Statement
-                newSensorIdStmt      = sensorMLConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
-                newObservationIDStmt = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-                observationExistStmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
-                getValueStmt         = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
-                getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
-                
-                logger.info("SOS service running");
-            }
+            SMLReader = new SensorReader(dataSourceSML, sensorIdBase, map);
+            SMLWriter = new SensorWriter(dataSourceSML, sensorIdBase, map);
+           
+            //we create a connection to the O&M database
+            PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
+            dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
+            dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
+            dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
+            dataSourceOM.setUser(prop.getProperty("OMDBUser"));
+            dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
+
+            OMReader = new ObservationReader(dataSourceOM, observationIdBase);
+            OMWriter = new ObservationWriter(dataSourceOM);
+
+            logger.info("SOS service running");
+            
         } else {
-            sensorMLConnection        = null;
-            sensorMLReader            = null;
-            sensorMLWriter            = null;
-            SMLCatalog                = null;
-            OMDatabase                = null;
-            obsTable                  = null;
-            offTable                  = null;
-            refTable                  = null;
             sensorIdBase              = null;
             observationIdBase         = null;
             observationTemplateIdBase = null;
+            OMReader                  = null;
+            OMWriter                  = null;
+            SMLReader                 = null;
+            SMLWriter                 = null;
             maxObservationByRequest   = -1;
             templateValidTime         = -1;
             
@@ -532,33 +429,23 @@ public class SOSworker {
                Operation go = om.getOperation("GetObservation");
                
                // the list of offering names
-               Set<String> offNames = offTable.getIdentifiers();
+               Set<String> offNames = OMReader.getOfferingNames();
                go.updateParameter("offering", offNames);
                
                // the event time range
-               RangeType range = new RangeType(getMinimalEventTime(), "now");
+               RangeType range = new RangeType(OMReader.getMinimalEventTime(), "now");
                go.updateParameter("eventTime", range);
                
                //the process list
-               ProcessTable procTable = OMDatabase.getTable(ProcessTable.class);
-               Set<String> procNames  = procTable.getIdentifiers();
+               Set<String> procNames  = OMReader.getProcedureNames();
                go.updateParameter("procedure", procNames);
                
                //the phenomenon list
-               PhenomenonTable phenoTable               = OMDatabase.getTable(PhenomenonTable.class);
-               Set<String> phenoNames                   = phenoTable.getIdentifiers();
-               CompositePhenomenonTable compoPhenoTable = OMDatabase.getTable(CompositePhenomenonTable.class);
-               Set<String> compoPhenoNames              = compoPhenoTable.getIdentifiers();
-               phenoNames.addAll(compoPhenoNames);
-               phenoNames.remove("");
+               Set<String> phenoNames = OMReader.getPhenomenonNames();
                go.updateParameter("observedProperty", phenoNames);
                
                //the feature of interest list
-               SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
-               Set<String> featureNames          = featureTable.getIdentifiers();
-               SamplingPointTable pointTable     = OMDatabase.getTable(SamplingPointTable.class);
-               Set<String> pointNames            = pointTable.getIdentifiers();
-               featureNames.addAll(pointNames);
+               Set<String> featureNames = OMReader.getFeatureOfInterestNames();
                go.updateParameter("featureOfInterest", featureNames);
                
                Operation ds = om.getOperation("DescribeSensor");
@@ -575,9 +462,7 @@ public class SOSworker {
             
              if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
                 // we add the list of observation ofeerings 
-                List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
-                Set<ObservationOfferingEntry> set = offTable.getEntries();
-                loo.addAll(set);
+                List<ObservationOfferingEntry> loo = OMReader.getObservationOfferings();
                 ObservationOfferingList ool = new ObservationOfferingList(loo);
                 
                 cont = new Contents(ool);
@@ -629,24 +514,7 @@ public class SOSworker {
             String result = "";
 
             try {
-                String dbId = map.getProperty(sensorId);
-                if (dbId == null) {
-                    dbId = sensorId;
-                }
-                // we find the form id describing the sensor.
-                int id = sensorMLReader.getIdFromTitleForm(dbId);
-                logger.info("describesensor id: " + dbId);
-                logger.info("describesensor mdweb id: " + id);
-                // we get the form
-                Form f = sensorMLReader.getForm(SMLCatalog, id);
-
-                if (f == null) {
-                    throw new WebServiceException("this sensor is not registered in the database!",
-                                                  INVALID_PARAMETER_VALUE, version, "procedure");
-                }
-                //we transform the form into an XML string
-                Writer XMLWriter = new Writer(sensorMLReader);
-                result = XMLWriter.writeForm(f);
+                result = SMLReader.getSensor(sensorId);
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
@@ -714,7 +582,7 @@ public class SOSworker {
                                                  MISSING_PARAMETER_VALUE, version, "offering");
             } else {
                 try {
-                    off = offTable.getEntry(requestObservation.getOffering());
+                    off = OMReader.getObservationOffering(requestObservation.getOffering());
                 } catch (NoSuchRecordException ex) {
                     throw new WebServiceException("This offering is not registered in the service",
                                                   INVALID_PARAMETER_VALUE, version, "offering");
@@ -792,42 +660,29 @@ public class SOSworker {
             //TODO verifier que les pheno appartiennent a l'offering
             List<String> observedProperties = requestObservation.getObservedProperty();
             if (observedProperties.size() != 0 ) {
-                PhenomenonTable phenomenons                   = OMDatabase.getTable(PhenomenonTable.class);
-                CompositePhenomenonTable compositePhenomenons = OMDatabase.getTable(CompositePhenomenonTable.class);
+                
+                
                 SQLrequest.append(" AND( ");
             
-                for (String s: observedProperties) {
-                    if (s.indexOf(phenomenonIdBase) != -1){
-                        s = s.replace(phenomenonIdBase, "");
+                for (String phenomenonName : observedProperties) {
+                    if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+                        phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                     }
-                    CompositePhenomenonEntry cphen = null;
+                    PhenomenonEntry phen = null;
                     try {
-                        cphen = compositePhenomenons.getEntry(s);
+                        phen = OMReader.getPhenomenon(phenomenonName);
                     } catch (NoSuchRecordException ex) {
-                        //we let continue to look if it is a phenomenon (simple)
-                    } catch (CatalogException ex){
-                        throw new WebServiceException("Catalog exception while getting the phenomenon",
-                                                        NO_APPLICABLE_CODE, version, "observedProperty");
+                        throw new WebServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
+                                INVALID_PARAMETER_VALUE, version, "observedProperty");
+                    } catch (CatalogException ex) {
+                        throw new WebServiceException("Catalog exception while getting the phenomenon " + phenomenonName,
+                                NO_APPLICABLE_CODE, version, "observedProperty");
                     }
-                     
-                        
-                    if (cphen == null ) {
-                        PhenomenonEntry phen = null;
-                        try {
-                            phen = (PhenomenonEntry) phenomenons.getEntry(s);
-                        } catch (NoSuchRecordException ex) {
-                            throw new WebServiceException(" this phenomenon " + s + " is not registred in the database!",
-                                                          INVALID_PARAMETER_VALUE, version, "observedProperty");
-                        } catch (CatalogException ex){
-                            throw new WebServiceException("Catalog exception while getting the phenomenon",
-                                                             NO_APPLICABLE_CODE, version, "observedProperty");
-                        }
-                        if (phen != null) {
-                            SQLrequest.append(" observed_property='").append(s).append("' OR ");
-                            
-                        }
-                    } else {
-                        SQLrequest.append(" observed_property_composite='").append(s).append("' OR ");
+                    if (phen != null && phen instanceof CompositePhenomenonEntry) {
+                        SQLrequest.append(" observed_property_composite='").append(phenomenonName).append("' OR ");
+
+                    } else if (phen != null && phen instanceof PhenomenonEntry) {
+                        SQLrequest.append(" observed_property='").append(phenomenonName).append("' OR ");
                     }
                 }
             
@@ -842,16 +697,16 @@ public class SOSworker {
                     
             //we treat the restriction on the feature of interest
             if (requestObservation.getFeatureOfInterest() != null) {
-                GetObservation.FeatureOfInterest foi = requestObservation.getFeatureOfInterest();
-                SamplingPointTable foiTable = OMDatabase.getTable(SamplingPointTable.class);
+                GetObservation.FeatureOfInterest foiRequest = requestObservation.getFeatureOfInterest();
                 
                 // if the request is a list of station
-                if (!foi.getObjectID().isEmpty()) {
+                if (!foiRequest.getObjectID().isEmpty()) {
                     SQLrequest.append(" AND (");
-                    for (final String s : foi.getObjectID()) {
+                    for (final String samplingFeatureName : foiRequest.getObjectID()) {
+                        
                         //verify that the station is registred in the DB.
                         try {
-                            foiTable.getEntry(s);
+                            SamplingFeatureEntry foi = OMReader.getFeatureOfInterest(samplingFeatureName);
                         } catch (NoSuchRecordException ex){
                             throw new WebServiceException("the feature of interest is not registered",
                                                              INVALID_PARAMETER_VALUE, version, "featureOfInterest");
@@ -859,7 +714,7 @@ public class SOSworker {
                             throw new WebServiceException("Catalog exception while getting the feature of interest",
                                                              NO_APPLICABLE_CODE, version, "featureOfInterest");
                         }
-                        SQLrequest.append("feature_of_interest_point='").append(s).append("' OR");
+                        SQLrequest.append("feature_of_interest_point='").append(samplingFeatureName).append("' OR");
                     }
                     SQLrequest.delete(SQLrequest.length() - 2, SQLrequest.length());
                     SQLrequest.append(") ");
@@ -867,32 +722,32 @@ public class SOSworker {
                 // if the request is a spatial operator    
                 } else {
                     // for a BBOX Spatial ops
-                    if (foi.getBBOX() != null) {
-                        
-                        if (foi.getBBOX().getEnvelope() != null && 
-                            foi.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
-                            foi.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2 ) {
+                    if (foiRequest.getBBOX() != null) {
+                       
+                        if (foiRequest.getBBOX().getEnvelope() != null &&
+                                foiRequest.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
+                                foiRequest.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2) {
                             SQLrequest.append(" AND (");
                             boolean add = false;
-                            EnvelopeEntry e = foi.getBBOX().getEnvelope();
-                            for (ReferenceEntry refStation:off.getFeatureOfInterest()) {
+                            EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
+                            for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
                                 SamplingPointEntry station = null;
                                 try {
-                                    station = foiTable.getEntry(refStation.getHref());
-                                } catch (NoSuchTableException ex){
+                                    station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
+                                } catch (NoSuchTableException ex) {
                                     throw new WebServiceException("the feature of interest is not registered",
-                                                                     INVALID_PARAMETER_VALUE, version);
-                                } catch (CatalogException ex){
-                                     throw new WebServiceException("Catalog exception while getting the feature of interest",
-                                                                      NO_APPLICABLE_CODE, version, "observedProperty");
-                        }
+                                            INVALID_PARAMETER_VALUE, version);
+                                } catch (CatalogException ex) {
+                                    throw new WebServiceException("Catalog exception while getting the feature of interest",
+                                            NO_APPLICABLE_CODE, version, "observedProperty");
+                                }
                                 if (station instanceof SamplingPointEntry) {
                                     SamplingPointEntry sp = (SamplingPointEntry) station;
-                                    if(sp.getPosition().getPos().getValue().get(0)>e.getUpperCorner().getValue().get(0) &&
-                                       sp.getPosition().getPos().getValue().get(0)<e.getLowerCorner().getValue().get(0) &&
-                                       sp.getPosition().getPos().getValue().get(1)>e.getUpperCorner().getValue().get(1) &&
-                                       sp.getPosition().getPos().getValue().get(1)<e.getLowerCorner().getValue().get(1)) {
-                                    
+                                    if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
+                                            sp.getPosition().getPos().getValue().get(0) < e.getLowerCorner().getValue().get(0) &&
+                                            sp.getPosition().getPos().getValue().get(1) > e.getUpperCorner().getValue().get(1) &&
+                                            sp.getPosition().getPos().getValue().get(1) < e.getLowerCorner().getValue().get(1)) {
+
                                         add = true;
                                         SQLrequest.append("feature_of_interest_point='").append(sp.getId()).append("' OR");
                                     } else {
@@ -983,11 +838,10 @@ public class SOSworker {
             logger.info("request:" + SQLrequest.toString());
         
             //TODO remplacer par une filteredList ds postgrid
-            Statement stmt    = OMDatabase.getConnection().createStatement();
-            ResultSet results = stmt.executeQuery(SQLrequest.toString());
+            ResultSet results = OMReader.executeSQLQuery(SQLrequest.toString());
             try {
                 while (results.next()) {
-                    ObservationEntry o = (ObservationEntry) obsTable.getEntry(results.getString(1));
+                    ObservationEntry o = OMReader.getObservation(results.getString(1));
                     if (template) {
                     
                         String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
@@ -1020,14 +874,10 @@ public class SOSworker {
                                                   NO_APPLICABLE_CODE, version, "getObservation");
             }
             results.close();
-            stmt.close();
+            OMReader.closeCurrentStatement();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch (NoSuchTableException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a NoSuchTableException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE, version);
         }
         return normalizeDocument(response);
@@ -1106,16 +956,14 @@ public class SOSworker {
         GetResultResponse response = null;
         try {
             logger.info(SQLrequest.toString());
-            Statement stmt    = OMDatabase.getConnection().createStatement();
-            ResultSet results = stmt.executeQuery(SQLrequest.toString());
-            AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
+            ResultSet results = OMReader.executeSQLQuery(SQLrequest.toString());
             StringBuilder datablock = new StringBuilder();
             while (results.next()) {
                 AnyResultEntry a = null;
                 Timestamp tBegin = results.getTimestamp(2);
                 Timestamp tEnd   = results.getTimestamp(3);
                 try {
-                    a = resTable.getEntry(results.getString(1));
+                    a = OMReader.getResult(results.getString(1));
                 
                 } catch (NoSuchRecordException ex) {
                     logger.info("no such record in result Table");
@@ -1132,7 +980,7 @@ public class SOSworker {
             }
 
             results.close();
-            stmt.close();
+            OMReader.closeCurrentStatement();
             GetResultResponse.Result r = new GetResultResponse.Result(datablock.toString(), serviceURL + '/' + requestResult.getObservationTemplateId());
             response = new GetResultResponse(r);
         } catch (SQLException e) {
@@ -1327,13 +1175,11 @@ public class SOSworker {
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
         
-        Savepoint savePoint = null;
         boolean success = false;
         String id = "";
         try {
             //we begin a transaction
-            sensorMLConnection.setAutoCommit(false);
-            savePoint = sensorMLConnection.setSavepoint("registerSensorTransaction");
+            SMLWriter.startTransaction();
             
             //we get the SensorML file who describe the Sensor to insert.
             RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
@@ -1375,22 +1221,17 @@ public class SOSworker {
             output.flush();
             output.close();
             
-            //we reate a new Identifier from the SensorML database
-            int num = getSensorId();
+            //we create a new Identifier from the SensorML database
+            int num = SMLReader.getNewSensorId();
             id = sensorIdBase + num;
             
-            //we parse the temporay xmlFile
-            Reader XMLReader = new Reader(sensorMLReader, tempFile, sensorMLWriter);
-            
             //and we write it in the sensorML Database
-            Catalog cat  = sensorMLReader.getCatalog("SMLC");
-            User u       = sensorMLReader.getUser("admin");
-            Form f       = XMLReader.readForm(cat, u,"source",id, Standard.SENSORML);
-            sensorMLWriter.writeForm(f, false);
+            Form f = SMLWriter.writeSensor(id, tempFile);
             
             
             // we record the mapping between physical id and database id
-            String phyId = recordMapping(f, id);
+            String phyId = SMLWriter.recordMapping(f, id, getSicadeDirectory());
+            
             // and we record the position of the piezometer
             recordSensorLocation(f, phyId);
                                     
@@ -1401,16 +1242,10 @@ public class SOSworker {
             obs.setProcedure(p);
             obs.setName(observationTemplateIdBase + num);
             logger.finer(obs.toString());
-            if (obsTable != null) {
-                obsTable.getIdentifier(obs);
+            OMWriter.writeObservation(obs);
                    
-                // we add the sensor to the offering specified in the sensorML Document
-                addSensorToOffering(f, obs);
-                     
-            } else {
-                throw new WebServiceException("error with the database, the service can't retrieve the observation Table",
-                                                 NO_APPLICABLE_CODE, version);
-           }
+            addSensorToOffering(f, obs);
+            
            success = true; 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1443,15 +1278,12 @@ public class SOSworker {
                                           INVALID_PARAMETER_VALUE, version, "sensorDescription");
         } finally {
             try {
-                if (!success && savePoint != null) {
-                   sensorMLConnection.rollback(savePoint);
+                if (!success) {
+                   SMLWriter.abortTransaction();
                    logger.severe("Transaction failed");
                 } else {
-                    if (savePoint != null)
-                        sensorMLConnection.releaseSavepoint(savePoint); 
+                    SMLWriter.endTransaction();
                 }
-                sensorMLConnection.commit();
-                sensorMLConnection.setAutoCommit(true);
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
@@ -1491,7 +1323,7 @@ public class SOSworker {
             ObservationEntry obs = requestInsObs.getObservation();
             if (obs != null) {
                 obs.setProcedure(proc);
-                obs.setName(getObservationId());
+                obs.setName(OMReader.getNewObservationId());
                 logger.finer("samplingTime received: " + obs.getSamplingTime()); 
                 logger.finer("template received:" + '\n' + obs.toString());
             } else {
@@ -1501,17 +1333,15 @@ public class SOSworker {
                 
             //we record the observation in the O&M database
            if (obs instanceof MeasurementEntry) {
-               MeasurementEntry meas = (MeasurementEntry)obs;
-               MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
-               id = measTable.getIdentifier(meas);
+               OMWriter.writeMeasurement((MeasurementEntry)obs);
             } else if (obs instanceof ObservationEntry) {
                 
                 //in first we verify that the observation is conform to the template
-                ObservationEntry template = (ObservationEntry) obsTable.getEntry( observationTemplateIdBase + num);
+                ObservationEntry template = OMReader.getObservation(observationTemplateIdBase + num);
                 //if the observation to insert match the template we can insert it in the OM db
                 if (obs.matchTemplate(template)) {
                     if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                        id = obsTable.getIdentifier(obs);
+                        id = OMWriter.writeObservation(obs);
                         logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                     } else {
                         throw new WebServiceException("The observation sampling time and the result must be specify",
@@ -1534,41 +1364,6 @@ public class SOSworker {
         }
          
         return new InsertObservationResponse(id);
-    }
-    
-   
-    /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    private int getSensorId() throws SQLException {
-        ResultSet res = newSensorIdStmt.executeQuery();int id = -1;
-        while (res.next()) {
-            id = res.getInt(1);
-        }
-        res.close();
-        return (id + 1);
-    }
-    
-    /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    private String getObservationId() throws SQLException {
-        ResultSet res = newObservationIDStmt.executeQuery();
-        int id = -1;
-        while (res.next()) {
-            id = res.getInt(1);
-        }
-        res.close();
-        //there is a possibility that someone delete some observation manually.
-        // so we must verify that this id is not already assigned. if it is we must find a free identifier
-        do {
-            id ++;
-            observationExistStmt.setString(1, observationIdBase + id);
-            res = observationExistStmt.executeQuery();
-        } while (res.next());
-        res.close();
-        return observationIdBase + id;
-        
     }
     
     /**
@@ -1817,58 +1612,6 @@ public class SOSworker {
     }
     
     /**
-     * Record the mapping between physical ID and database ID.
-     * 
-     * @param form The "form" containing the sensorML data.
-     * @param dbId The identifier of the sensor in the O&M database.
-     */
-    private String recordMapping(Form form, String dbId) throws SQLException, FileNotFoundException, IOException {
-       
-        //we search which identifier is the supervisor code
-        int i                  = 1;
-        boolean found          = false;
-        boolean moreIdentifier = true;
-        while (moreIdentifier && !found) {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-            getValueStmt.setInt(2,    form.getId());
-            ResultSet result = getValueStmt.executeQuery();
-            moreIdentifier   = result.next();
-            if (moreIdentifier) {
-                String value = result.getString(1);
-                if (value.equals("supervisorCode")){
-                    found = true;
-                } 
-            }
-            result.close();
-            i++;
-        } 
-        
-        if (!found) {
-            logger.severe("There is no supervisor code in that SensorML file");
-            return "";
-        } else {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-            getValueStmt.setInt(2,    form.getId());
-            ResultSet result = getValueStmt.executeQuery();
-            String value = "";
-            if (result.next()) {
-                value = result.getString(1);
-                logger.info("PhysicalId:" + value);
-                map.setProperty(value, dbId);
-                File env         = getSicadeDirectory();
-                File mappingFile = new File(env, "/sos_configuration/mapping.properties");
-                FileOutputStream out = new FileOutputStream(mappingFile);
-                map.store(out, "");
-                out.close();
-            } else {
-                logger.severe("no value for supervisorcode identifier numero " + (i - 1));
-            }
-            result.close();
-            return value;
-        }
-    }
-    
-    /**
      * Find a newe suffix to obtain a unic temporary template id. 
      * 
      * @param templateName the full name of the sensor template.
@@ -1892,75 +1635,13 @@ public class SOSworker {
      *  @param form The "form" containing the sensorML data.
      */
     private void recordSensorLocation(Form form, String sensorId) throws SQLException, WebServiceException {
-        String column      = "";
-        String coordinates = "";
-        
-        //we get the srs name
-        getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
-        getValueStmt.setInt(2,    form.getId());
-        ResultSet result = getValueStmt.executeQuery();
-        if (result.next()) {
-            column = result.getString(1);
-            if (column.indexOf(':') != -1) {
-                column = column.substring(column.lastIndexOf(':') + 1);
-            }
-            logger.info("srsName:" + column);
-        } else {
-            logger.severe("there is no srsName for the piezo location");
-            return;
-        }
-        result.close();
-        
-        // we get the coordinates
-        getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1");
-        getValueStmt.setInt(2,    form.getId());
-        result = getValueStmt.executeQuery();
-        if (result.next()) {
-            
-            coordinates = result.getString(1);
-            logger.info(coordinates);
-        } else {
-            logger.severe("there is no coordinates for the piezo location");
-            return;
-        }
-        result.close();
+        String SRS         = SMLReader.getSRSName(form);
+        String coordinates = SMLReader.getSensorCoordinates(form);
         
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
-        Statement stmt2    = OMDatabase.getConnection().createStatement();
-        final ResultSet result2;
-        String request = "SELECT * FROM ";
-        boolean insert = true;
         
-        if (column.equals("27582")) {
-            request = request + " projected_localisations WHERE id='" + sensorId + "'";
-            result2 = stmt2.executeQuery(request);
-            if (!result2.next()) {
-                request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
-            } else {
-                insert = false;
-                logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
-            }
-        } else if (column.equals("4326")) {
-            request = request + " geographic_localisations WHERE id='" + sensorId + "'";
-            result2 = stmt2.executeQuery(request);
-            if (!result2.next()) {
-                request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
-            } else {
-                insert = false;
-                logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
-            }
-        } else {
-            throw new WebServiceException("This CRS " + column + " is not supported",
-                                          INVALID_PARAMETER_VALUE, version);
-        }
-        logger.info(request);
-        if (insert) {
-            stmt2.executeUpdate(request);
-        }
-        result2.close();
-        stmt2.close();
-        
+        OMWriter.recordProcedureLocation(SRS, sensorId, x, y);
     }
     
     /**
@@ -1973,28 +1654,9 @@ public class SOSworker {
     private void addSensorToOffering(Form form, Observation template) throws SQLException, CatalogException {
      
         //we search which are the classifier describing the networks
-        int i = 1;
-        int[] networksIndex = new int[20];
-        int size = 0;
-        boolean moreClassifier = true;
-        while (moreClassifier) {
-            
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + i + ":name.1");
-            getValueStmt.setInt(2,    form.getId());
-            ResultSet result = getValueStmt.executeQuery();
-            moreClassifier   = result.next();
-            if (moreClassifier) {
-                String value = result.getString(1);
-                if (value.equals("network")){
-                    networksIndex[size] = i;
-                    size++;
-                    
-                } 
-            }
-            result.close();
-            i++;
-        } 
+        List<Integer> networksIndex = SMLReader.getNetworkIndex(form);
         
+        int size = networksIndex.size();
         if (size == 0) {
             logger.severe("There is no network in that SensorML file");
         } 
@@ -2002,9 +1664,7 @@ public class SOSworker {
             // for each network we create (or update) an offering
             for (int j = 0; j < size + 1; j++) {
                 if (j != size) {
-                    getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
-                    getValueStmt.setInt(2,    form.getId());
-                    ResultSet result = getValueStmt.executeQuery();
+                    ResultSet result = SMLReader.getNetworkName(form, networksIndex.get(j) + "");
                 
                     if (result.next()) {
                         String offeringName = "offering-" + result.getString(1);
@@ -2013,9 +1673,8 @@ public class SOSworker {
                     
                         //we get the offering from the O&M database
                         try {
-                            offering = offTable.getEntry(offeringName);
+                            offering = OMReader.getObservationOffering(offeringName);
                         } catch (NoSuchRecordException ex) {
-                        
                             logger.info("offering " + offeringName + " not present, first build");
                         }
                         
@@ -2029,13 +1688,13 @@ public class SOSworker {
                                    ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref()); 
                                 }
                                 OfferingProcedureEntry offProc= new OfferingProcedureEntry(offering.getId(), ref);
-                                offTable.getProcedures().getIdentifier(offProc);
+                                OMWriter.writeOfferingProcedure(offProc);
                             }
                             
                             //we add the phenomenon to the offering
                             if (!offering.getObservedProperty().contains(template.getObservedProperty())){
                                 OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
-                                offTable.getPhenomenons().getIdentifier(offPheno);
+                                OMWriter.writeOfferingPhenomenon(offPheno);
                             }
                             
                             // we add the feature of interest (station) to the offering
@@ -2045,7 +1704,7 @@ public class SOSworker {
                                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId()); 
                                 }
                                 OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                                offTable.getStations().getIdentifier(offSF);
+                                OMWriter.writeOfferingSamplingFeature(offSF);
                             }
                        
                         // we build a new offering
@@ -2100,10 +1759,10 @@ public class SOSworker {
                                                                     offerinfOutputFormat,
                                                                     resultModel,
                                                                     responses);
-                            offTable.getIdentifier(offering);
+                            OMWriter.writeOffering(offering);
                         }
                     } else {
-                        logger.severe("no value for network classifier numero " + networksIndex[j]);
+                        logger.severe("no value for network classifier numero " + networksIndex.get(j));
                     }
                     result.close();
                     
@@ -2113,7 +1772,7 @@ public class SOSworker {
                     //we get the offering from the O&M database
                     ObservationOfferingEntry offering = null;
                     try {
-                        offering = offTable.getEntry("offering-allSensor");
+                        offering = OMReader.getObservationOffering("offering-allSensor");
                     } catch (NoSuchRecordException ex) {
                         
                         logger.info("offering allSensor not present, first build");
@@ -2125,13 +1784,13 @@ public class SOSworker {
                             if (ref == null){
                                 ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
                             }
-                            OfferingProcedureEntry offProc= new OfferingProcedureEntry(offering.getId(), ref);
-                            offTable.getProcedures().getIdentifier(offProc);
+                            OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
+                            OMWriter.writeOfferingProcedure(offProc);
                         }
                         //we add the phenomenon to the offering
                         if (!offering.getObservedProperty().contains(template.getObservedProperty())){
-                            OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
-                            offTable.getPhenomenons().getIdentifier(offPheno);
+                            OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
+                            OMWriter.writeOfferingPhenomenon(offPheno);
                         }
                         // we add the feature of interest (station) to the offering
                        ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
@@ -2139,8 +1798,8 @@ public class SOSworker {
                            if (ref == null) {
                                 ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
                            }
-                           OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                           offTable.getStations().getIdentifier(offSF);
+                           OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                           OMWriter.writeOfferingSamplingFeature(offSF);
                         }
                     } else {
                          // for the eventime of the offering we take the time of now.
@@ -2191,18 +1850,17 @@ public class SOSworker {
                                                                     offeringOutputFormat,
                                                                     resultModel,
                                                                     responses);
-                            offTable.getIdentifier(offering);
+                            OMWriter.writeOffering(offering);
                     }
                 }
             }
-        offTable.flush();
     }
     
     /**
      * Return the referenceEntry with the specified href attribute.
      */
     private ReferenceEntry getReferenceFromHRef(String href) throws SQLException, CatalogException {
-        Set<ReferenceEntry> refs = refTable.getEntries();
+        Set<ReferenceEntry> refs = OMReader.getReferences();
         Iterator<ReferenceEntry> it = refs.iterator();
         while (it.hasNext()) {
             ReferenceEntry ref = it.next();
@@ -2320,32 +1978,6 @@ public class SOSworker {
     }
     
     
-    /**
-     * Return the minimal value for the offering event Time
-     */
-    private String getMinimalEventTime() throws WebServiceException, SQLException {
-        String ret = null;
-        try {
-            ResultSet res = getMinEventTimeOffering.executeQuery();
-            Timestamp t = null;
-            while (res.next()) {
-                t = res.getTimestamp(1);
-            }
-            
-            if (t != null) {
-                ret = t.toString();
-            } 
-            res.close();
-        
-        } catch (SQLException ex) {
-           ex.printStackTrace();
-           throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE, version);
-           
-        } 
-        return ret;
-    }
-    
     public String getOutputFormat() {
         if (outputFormat == null) {
             return "application/xml";
@@ -2393,25 +2025,14 @@ public class SOSworker {
 
     
     
-    public void close() {
-        try {
-            newSensorIdStmt.close();
-            newObservationIDStmt.close();
-            observationExistStmt.close();
-            getMinEventTimeOffering.close();
-            getValueStmt.close();
-            
-            sensorMLConnection.close();
-            sensorMLReader.dispose();
-            sensorMLWriter.dispose();
-            OMDatabase.close();
-            for (Timer t: schreduledTask) {
-                t.cancel();
-            }
-        } catch (SQLException ex) {
-            logger.severe("SQLException while closing SOSWorker");
+    public void destroy() {
+        SMLReader.destroy();
+        SMLWriter.destroy();
+
+        for (Timer t : schreduledTask) {
+            t.cancel();
         }
-    }    
+    }
     
     /**
      * A task destroying a observation template when the template validity period pass.

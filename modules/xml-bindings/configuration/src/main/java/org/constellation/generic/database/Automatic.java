@@ -17,6 +17,7 @@
 
 package org.constellation.generic.database;
 
+import java.io.File;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -50,6 +51,8 @@ public class Automatic {
     @XmlAttribute
     private String format;
     
+    private String dataDirectory;
+    
     private Queries queries;
 
     public Queries getQueries() {
@@ -62,6 +65,10 @@ public class Automatic {
 
     public String getFormat() {
         return format;
+    }
+    
+    public File getdataDirectory() {
+        return new File(dataDirectory);
     }
     
     public int getType() {
@@ -84,6 +91,7 @@ public class Automatic {
         StringBuilder s = new StringBuilder("[Automatic]");
         s.append("format: ").append(format).append('\n');
         s.append("BDD:").append(bdd).append('\n');
+        s.append("dataDirectory:").append(bdd).append('\n');
         s.append("queries ").append(": ").append(queries).append('\n');
         return s.toString();
     }
