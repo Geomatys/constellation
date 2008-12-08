@@ -140,6 +140,9 @@ import static org.constellation.query.wcs.WCSQuery.*;
 @Path("wcs")
 @Singleton
 public class WCSService extends OGCWebService {
+
+    private static final WCSPortrayalAdapter PORTRAYAL_ADAPTER = new WCSPortrayalAdapter();
+
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
@@ -1031,7 +1034,7 @@ public class WCSService extends OGCWebService {
             // We are in the case of an image format requested.
             BufferedImage image = null;
             try {
-                image = CSTLPortrayalService.getInstance().portray(abstractRequest);
+                image = PORTRAYAL_ADAPTER.portray(abstractRequest);
             } catch (PortrayalException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                     image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);

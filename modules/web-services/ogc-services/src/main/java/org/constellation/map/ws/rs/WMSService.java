@@ -59,9 +59,9 @@ import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.portrayal.CSTLPortrayalService;
-import org.constellation.portrayal.CSVGraphicVisitor;
-import org.constellation.portrayal.GMLGraphicVisitor;
-import org.constellation.portrayal.HTMLGraphicVisitor;
+import org.constellation.map.ws.rs.CSVGraphicVisitor;
+import org.constellation.map.ws.rs.GMLGraphicVisitor;
+import org.constellation.map.ws.rs.HTMLGraphicVisitor;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.QueryAdapter;
@@ -116,6 +116,9 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Path("wms")
 @Singleton
 public class WMSService extends OGCWebService {
+
+    private static final WMSPortrayalAdapter PORTRAYAL_ADAPTER = new WMSPortrayalAdapter();
+
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
@@ -493,7 +496,7 @@ public class WMSService extends OGCWebService {
 
         // We now build the response, according to the format chosen.
         try {
-            CSTLPortrayalService.getInstance().hit(gfi, visitor);
+            PORTRAYAL_ADAPTER.hit(gfi, visitor);
         } catch (PortrayalException ex) {
             throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
         }
@@ -573,7 +576,7 @@ public class WMSService extends OGCWebService {
         
         BufferedImage image = null;
         try {
-            image = CSTLPortrayalService.getInstance().portray(getMap);
+            image = PORTRAYAL_ADAPTER.portray(getMap);
         } catch (PortrayalException ex) {
             if(errorInImage) {
                 final Dimension dim = getMap.getSize();

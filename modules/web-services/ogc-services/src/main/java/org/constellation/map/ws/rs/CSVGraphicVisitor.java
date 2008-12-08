@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.portrayal;
+package org.constellation.map.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.measure.unit.Unit;
+
+import org.constellation.portrayal.AbstractGraphicVisitor;
 
 import org.geotools.display.primitive.GraphicFeatureJ2D;
 import org.geotools.display.primitive.GraphicJ2D;
@@ -38,7 +40,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class HTMLGraphicVisitor extends AbstractGraphicVisitor{
+public class CSVGraphicVisitor extends AbstractGraphicVisitor{
 
     private final Map<String,List<String>> values = new HashMap<String,List<String>>();
 
@@ -108,32 +110,18 @@ public class HTMLGraphicVisitor extends AbstractGraphicVisitor{
      */
     @Override
     public String getResult(){
-        final StringBuilder response = new StringBuilder();
-        response.append("<html>\n")
-                .append("    <head>\n")
-                .append("        <title>GetFeatureInfo output</title>\n")
-                .append("    </head>\n")
-                .append("    <body>\n")
-                .append("    <table>\n");
-        for (String layer : values.keySet()) {
-            response.append("       <tr>")
-                    .append("           <th>").append(layer).append("</th>")
-                    .append("       </tr>");
-            final List<String> record = values.get(layer);
-            for (String value : record) {
-                response.append("       <tr>")
-                        .append("           <th>")
-                        .append(value)
-                        .append("           </th>")
-                        .append("       </tr>");
+        final StringBuilder builder = new StringBuilder();
+
+        for(final String layerName : values.keySet()){
+            builder.append(layerName).append("\n");
+            for(final String record : values.get(layerName)){
+                builder.append(record).append("\n");
             }
         }
-        response.append("    </table>\n")
-                .append("    </body>\n")
-                .append("</html>");
 
         values.clear();
-        return response.toString();
+        return builder.toString();
     }
+
 
 }

@@ -23,7 +23,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import javax.measure.unit.Unit;
-import org.constellation.query.wms.GetFeatureInfo;
+
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReadParam;
@@ -34,11 +34,10 @@ import org.geotools.display.primitive.GraphicFeatureJ2D;
 import org.geotools.display.primitive.GraphicJ2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.CoverageMapLayer;
 import org.geotools.referencing.CRS;
+
 import org.opengis.display.primitive.Graphic;
-import org.opengis.feature.Feature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -95,28 +94,6 @@ public abstract class AbstractGraphicVisitor implements GraphicVisitor {
     @Override
     public boolean isStopRequested() {
         return false;
-    }
-
-
-    /**
-     * Returns the coordinates of the requested pixel in the image, expressed in the
-     * {@linkplain CoordinateReferenceSystem crs} defined in the request.
-     */
-    public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi) {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
-        final int width = gfi.getSize().width;
-        final int height = gfi.getSize().height;
-        final int pixelX = gfi.getX();
-        final int pixelY = gfi.getY();
-        final double widthEnv     = objEnv.getSpan(0);
-        final double heightEnv    = objEnv.getSpan(1);
-        final double resX         =      widthEnv  / width;
-        final double resY         = -1 * heightEnv / height;
-        final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
-        final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
-        final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
-        position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
-        return position;
     }
 
     /**

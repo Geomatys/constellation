@@ -21,14 +21,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,17 +33,9 @@ import java.util.logging.Logger;
 
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.Service;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
-import org.constellation.query.wcs.WCSQuery;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetMap;
-import org.constellation.query.wms.WMSQuery;
-import org.constellation.wcs.AbstractGetCoverage;
 
 import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.canvas.CanvasController2D;
@@ -61,7 +50,6 @@ import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.sld.MutableLayer;
 import org.geotools.sld.MutableLayerStyle;
@@ -69,15 +57,8 @@ import org.geotools.sld.MutableNamedLayer;
 import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
-import org.geotools.util.MeasurementRange;
 
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-
-import static org.constellation.ws.ExceptionCode.*;
 
 
 /**
@@ -88,8 +69,6 @@ import static org.constellation.ws.ExceptionCode.*;
  * @author Cédric Briançon (Geomatys)
  */
 public class CSTLPortrayalService extends DefaultPortrayalService {
-
-    private static final int PIXEL_TOLERANCE = 3;
 
     private static final Logger LOGGER = Logger.getLogger("org/constellation/portrayal/CSTLPortrayalService");
     
@@ -130,263 +109,16 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         canvas.getController().setAxisProportions(Double.NaN);
         
         renderer.setContext(context);
-        
     }
 
-    public BufferedImage portray(final AbstractGetCoverage query)
-            throws PortrayalException, WebServiceException
-    {
-        if (query == null) {
-            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
-                    " is not well used here.");
-        }
-        final List<String> layers = new ArrayList<String>();
-        final ServiceVersion version;
-        final Map<String, Object> params = new HashMap<String, Object>();
-        final ReferencedEnvelope refEnv;
-        final Dimension dimension;
-        if (query instanceof org.constellation.wcs.v100.GetCoverage) {
-            final org.constellation.wcs.v100.GetCoverage query100 = (org.constellation.wcs.v100.GetCoverage) query;
-            layers.add(query100.getSourceCoverage());
-            version = new ServiceVersion(Service.WCS, query100.getVersion());
-            // Decode the CRS.
-            String crsCode = query100.getOutput().getCrs().getValue();
-            if (crsCode == null) {
-                crsCode = query100.getDomainSubset().getSpatialSubSet().getEnvelope().getSrsName();
-            }
-            if (!crsCode.contains(":")) {
-                crsCode = "EPSG:" + crsCode;
-            }
-            final CoordinateReferenceSystem crs;
-            try {
-                crs = CRS.decode(crsCode);
-            } catch (NoSuchAuthorityCodeException ex) {
-                throw new WebServiceException(ex, INVALID_CRS, version);
-            } catch (FactoryException ex) {
-                throw new WebServiceException(ex, INVALID_CRS, version);
-            }
-            // Calculate the bbox.
-            final EnvelopeEntry envEntry = query100.getDomainSubset().getSpatialSubSet().getEnvelope();
-            final List<DirectPositionType> positions = envEntry.getPos();
-            refEnv = new ReferencedEnvelope(positions.get(0).getValue().get(0), positions.get(0).getValue().get(1),
-                                            positions.get(1).getValue().get(0), positions.get(1).getValue().get(1), crs);
-            // Additionnal parameters.
-            if (query100.getDomainSubset().getTemporalSubSet() != null &&
-                query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().size() > 0)
-            {
-                params.put(WCSQuery.KEY_TIME, query100.getDomainSubset().getTemporalSubSet().getTimePositionOrTimePeriod().get(0));
-            }
-            if (envEntry.getPos().get(0).getValue().size() > 2) {
-                params.put(WMSQuery.KEY_ELEVATION, positions.get(2).getValue().get(0));
-            }
-            final int width = 
-                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(0).intValue() -
-                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(0).intValue();
-            final int height =
-                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getHigh().get(1).intValue() -
-                    query100.getDomainSubset().getSpatialSubSet().getGrid().getLimits().getGridEnvelope().getLow().get(1).intValue();
-            dimension = new Dimension(width, height);
-        } else {
-            final org.constellation.wcs.v111.GetCoverage query111 = (org.constellation.wcs.v111.GetCoverage) query;
-            layers.add(query111.getIdentifier().getValue());
-            version = new ServiceVersion(Service.WCS, query111.getVersion());
-            // Decode the CRS.
-            String crsCode = query111.getOutput().getGridCRS().getSrsName().getValue();
-            if (crsCode == null) {
-                crsCode = query111.getDomainSubset().getBoundingBox().getValue().getCrs();
-            }
-            if (!crsCode.contains(":")) {
-                crsCode = "EPSG:" + crsCode;
-            }
-            final CoordinateReferenceSystem crs;
-            try {
-                crs = CRS.decode(crsCode);
-            } catch (NoSuchAuthorityCodeException ex) {
-                throw new WebServiceException(ex, INVALID_CRS, version);
-            } catch (FactoryException ex) {
-                throw new WebServiceException(ex, INVALID_CRS, version);
-            }
-            // Calculate the bbox.
-            final List<Double> lowerCornerCoords = query111.getDomainSubset().getBoundingBox().getValue().getLowerCorner();
-            final List<Double> upperCornerCoords = query111.getDomainSubset().getBoundingBox().getValue().getUpperCorner();
-            refEnv = new ReferencedEnvelope(lowerCornerCoords.get(0), lowerCornerCoords.get(1),
-                                            upperCornerCoords.get(0), upperCornerCoords.get(1), crs);
-            // Additionnal parameters.
-            if (query111.getDomainSubset().getTemporalSubset() != null &&
-                query111.getDomainSubset().getTemporalSubset().getTimePositionOrTimePeriod().size() > 0)
-            {
-                params.put(WCSQuery.KEY_TIME, query111.getDomainSubset().getTemporalSubset().getTimePositionOrTimePeriod().get(0));
-            }
-            if (query111.getDomainSubset().getBoundingBox().getValue().getDimensions().intValue() > 2) {
-                params.put(WMSQuery.KEY_ELEVATION, lowerCornerCoords.get(2));
-            }
-            // TODO: do the good calculation with grid origin, grid offset and the envelope size.
-            dimension = new Dimension((int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(0)),
-                    (int) Math.round(query111.getOutput().getGridCRS().getGridOrigin().get(1)));
-        }
-        updateContext(layers, version, null, null, params);
-        //TODO horrible TRY CATCH to remove when the renderer will have a fine
-        //error handeling. This catch doesnt happen in normal case, but because of
-        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
-        //thread exceptions.
-        try {
-            return portrayUsingCache(refEnv, 0, null, dimension);
-        } catch (Exception ex) {
-            if (ex instanceof PortrayalException) {
-                throw (PortrayalException)ex;
-            } else if(ex instanceof WebServiceException) {
-                throw (WebServiceException) ex;
-            } else {
-                throw new PortrayalException(ex);
-            }
-        }finally{
-            canvas.clearCache();
-            renderer.clearCache();
-        }
-    }
+    public void hit(final ReferencedEnvelope refEnv, final double azimuth,
+            final Color background, final Dimension canvasDimension,
+            final List<String> layers, final List<String> styles,
+            final MutableStyledLayerDescriptor sld, final Map<String, Object> params,
+            final ServiceVersion version, Shape selectedArea, GraphicVisitor visitor)
+            throws PortrayalException,WebServiceException {
 
-    /**
-     * Makes the portray of a {@code GetMap} request.
-     *
-     * @param query A {@link GetMap} query. Should not be {@code null}.
-     *
-     * @throws PortrayalException
-     * @throws WebServiceException if an error occurs during the creation of the map context
-     */
-    public BufferedImage portray(final GetMap query)
-                            throws PortrayalException, WebServiceException
-    {
-        if (query == null) {
-            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
-                    " is not well used here.");
-        }
-
-        final List<String> layers              = query.getLayers();
-        final List<String> styles              = query.getStyles();
-        final MutableStyledLayerDescriptor sld = query.getSld();
-        final Envelope contextEnv              = query.getEnvelope();
-        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(contextEnv);
-        final String mime                      = query.getFormat();
-        final ServiceVersion version           = query.getVersion();
-        final Double elevation                 = query.getElevation();
-        final Date time                        = query.getTime();
-        final MeasurementRange dimRange        = query.getDimRange();
-        final Dimension canvasDimension        = query.getSize();
-        final double azimuth                   = query.getAzimuth();
-        final Map<String, Object> params       = new HashMap<String, Object>();
-        params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
-        params.put(WMSQuery.KEY_TIME, time);
         updateContext(layers, version, styles, sld, params);
-        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
-
-        if (false) {
-            //for debug
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Layers => ");
-            for(String layer : layers){
-                builder.append(layer +",");
-            }
-            builder.append("\n");
-            builder.append("Styles => ");
-            for(String style : styles){
-                builder.append(style +",");
-            }
-            builder.append("\n");
-            builder.append("Context env => " + contextEnv.toString() + "\n");
-            builder.append("Azimuth => " + azimuth + "\n");
-            builder.append("Mime => " + mime.toString() + "\n");
-            builder.append("Dimension => " + canvasDimension.toString() + "\n");
-            builder.append("BGColor => " + background + "\n");
-            builder.append("Transparent => " + query.getTransparent() + "\n");
-            System.out.println(builder.toString());
-        }
-
-        //TODO horrible TRY CATCH to remove when the renderer will have a fine
-        //error handeling. This catch doesnt happen in normal case, but because of
-        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
-        //thread exceptions.
-        try{
-            return portrayUsingCache(refEnv, azimuth, background, canvasDimension);
-        }catch(Exception ex){
-            if(ex instanceof PortrayalException){
-                throw (PortrayalException)ex;
-            }else if( ex instanceof WebServiceException){
-                throw (WebServiceException) ex;
-            }else{
-                throw new PortrayalException(ex);
-            }
-        }finally{
-            canvas.clearCache();
-            renderer.clearCache();
-        }
-    }
-
-    public void hit(final GetFeatureInfo query, final GraphicVisitor visitor)
-                            throws PortrayalException, WebServiceException
-    {
-
-        if (query == null) {
-            throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
-                    " is not well used here.");
-        }
-
-        final Map<String, List<String>> values = new HashMap<String, List<String>>();
-        final List<String> layers              = query.getQueryLayers();
-        final List<String> styles              = query.getStyles();
-        final MutableStyledLayerDescriptor sld = query.getSld();
-        final Envelope contextEnv              = query.getEnvelope();
-        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(contextEnv);
-        final String mime                      = query.getFormat();
-        final ServiceVersion version           = query.getVersion();
-        final Double elevation                 = query.getElevation();
-        final Date time                        = query.getTime();
-        final MeasurementRange dimRange        = query.getDimRange();
-        final Dimension canvasDimension        = query.getSize();
-        final double azimuth                   = query.getAzimuth();
-        final int infoX                        = query.getX();
-        final int infoY                        = query.getY();
-        final Map<String, Object> params       = new HashMap<String, Object>();
-        params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
-        params.put(WMSQuery.KEY_TIME, time);
-        updateContext(layers, version, styles, sld, params);
-        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
-        final Rectangle selectedArea = new Rectangle(infoX-PIXEL_TOLERANCE, infoY-PIXEL_TOLERANCE, PIXEL_TOLERANCE*2, PIXEL_TOLERANCE*2);
-
-        //fill in the values with empty lists
-        for(String layer : layers){
-            values.put(layer, new ArrayList<String>());
-        }
-
-        if (false) {
-            //for debug
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Layers => ");
-            for(String layer : layers){
-                builder.append(layer +",");
-            }
-            builder.append("\n");
-            builder.append("Styles => ");
-            for(String style : styles){
-                builder.append(style +",");
-            }
-            builder.append("\n");
-            builder.append(selectedArea);
-            builder.append("\n");
-            builder.append("Context env => " + refEnv.toString() + "\n");
-            builder.append("Context crs => " + refEnv.getCoordinateReferenceSystem().toString() + "\n");
-            builder.append("Azimuth => " + azimuth + "\n");
-            builder.append("Mime => " + mime.toString() + "\n");
-            builder.append("Dimension => " + canvasDimension.toString() + "\n");
-            builder.append("BGColor => " + background + "\n");
-            builder.append("Transparent => " + query.getTransparent() + "\n");
-            builder.append("elevation => " + elevation + "\n");
-            builder.append("range => " + dimRange + "\n");
-            builder.append("time => " + time + "\n");
-            System.out.println(builder.toString());
-        }
-
 
         //TODO horrible TRY CATCH to remove when the renderer will have a fine
         //error handeling. This catch doesnt happen in normal case, but because of
@@ -396,30 +128,6 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
 
         try{
             canvas.getGraphicsIn(selectedArea, visitor, VisitFilter.INTERSECTS);
-//            extractor.getDescriptions()
-//
-//            final List<? extends Graphic> graphics = canvas.getGraphicsIn(selectedArea);
-//            for(final Graphic graphic : graphics){
-//                if(graphic instanceof GraphicFeatureJ2D){
-//                    final GraphicFeatureJ2D j2d = (GraphicFeatureJ2D) graphic;
-//                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
-//
-//                    if(value != null){
-//                        final String layerName = j2d.getSource().getName();
-//                        values.get(layerName).add(value);
-//                    }
-//
-//                }else if(graphic instanceof CoverageGraphicLayerJ2D){
-//                    final CoverageGraphicLayerJ2D j2d = (CoverageGraphicLayerJ2D) graphic;
-//                    final String value = extractor.getHtmlDescription(graphic, selectedArea);
-//
-//                    if(value != null){
-//                        final String layerName = j2d.getUserObject().getName();
-//                        values.get(layerName).add(value);
-//                    }
-//                }
-//            }
-
         }catch(Exception ex){
             if(ex instanceof PortrayalException){
                 throw (PortrayalException)ex;
@@ -434,36 +142,40 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             renderer.clearCache();
         }
 
+
     }
 
+    public BufferedImage portray(final ReferencedEnvelope refEnv, final double azimuth,
+            final Color background, final Dimension canvasDimension,
+            final List<String> layers, final List<String> styles, 
+            final MutableStyledLayerDescriptor sld, final Map<String, Object> params,
+            final ServiceVersion version) throws PortrayalException,WebServiceException {
 
-    /**
-     * Makes the portray of a {@code GetMap} request.
-     *
-     * @param query A {@link GetMap} query.
-     * @param output The output file where to write the result of the {@link GetMap} request.
-     * @throws PortrayalException
-     * @throws WebServiceException if an error occurs during the creation of the map context
-     */
-    public void portray(final GetMap query, final File output)
-            throws PortrayalException, WebServiceException {
+        updateContext(layers, version, styles, sld, params);
 
-        if (output == null) {
-            throw new NullPointerException("Output file can not be null");
-        }
-
-        final String mime = query.getFormat();
-        final BufferedImage image = portray(query);
+        //TODO horrible TRY CATCH to remove when the renderer will have a fine
+        //error handeling. This catch doesnt happen in normal case, but because of
+        //some strange behavior when deployed in web app, we sometimes catch runtimeException or
+        //thread exceptions.
         try {
-            writeImage(image, mime, output);
-        } catch (IOException ex) {
-            throw new PortrayalException(ex);
+            return portrayUsingCache(refEnv, azimuth, background, canvasDimension);
+        } catch (Exception ex) {
+            if (ex instanceof PortrayalException) {
+                throw (PortrayalException)ex;
+            } else if(ex instanceof WebServiceException) {
+                throw (WebServiceException) ex;
+            } else {
+                throw new PortrayalException(ex);
+            }
+        }finally{
+            canvas.clearCache();
+            renderer.clearCache();
         }
+
     }
 
     private void prepareCanvas(final ReferencedEnvelope contextEnv, final double azimuth,
-            final Color background, final Dimension canvasDimension) throws PortrayalException
-    {
+            final Color background, final Dimension canvasDimension) throws PortrayalException{
 
         canvas.setSize(canvasDimension);
         canvas.setBackground(background);
@@ -499,8 +211,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
      * @throws PortrayalException
      */
     private BufferedImage portrayUsingCache(final ReferencedEnvelope contextEnv, final double azimuth,
-            final Color background, final Dimension canvasDimension) throws PortrayalException
-    {
+            final Color background, final Dimension canvasDimension) throws PortrayalException{
         prepareCanvas(contextEnv, azimuth, background, canvasDimension);
         canvas.repaint();
 
@@ -530,8 +241,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private void updateContext(final List<String> layers, final ServiceVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
-                                    throws PortrayalException, WebServiceException
-    {
+                                    throws PortrayalException, WebServiceException{
         for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
             final LayerDetails details = LAYERDP.get(layerName);
