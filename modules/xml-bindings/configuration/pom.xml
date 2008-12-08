@@ -43,28 +43,8 @@
       <timezone>+1</timezone>
     </developer>
   </developers>
-
-	<build>
-     <plugins>
-       <plugin>
-         <groupId>org.codehaus.mojo</groupId>
-           <artifactId>jaxws-maven-plugin</artifactId>
-           <executions>
-             <execution>
-               <goals>
-                 <goal>wsimport</goal>
-               </goals>
-               <configuration>
-                 <wsdlUrls>
-                   <wsdlUrl>http://seadatanet.maris2.nl/ws/ws_edmo.asmx?wsdl</wsdlUrl>
-                 </wsdlUrls>
-             <packageName>org.constellation.generic.edmo.ws</packageName>
-               </configuration>
-             </execution>
-           </executions>
-       </plugin>
-     </plugins>
-   </build> 
+  <build>
+  </build> 
 
   <!--
     Dépendances requises pour la compilation. Ces dépendances seront incluses

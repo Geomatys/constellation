@@ -29,9 +29,6 @@ import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.index.GenericIndex;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.index.MDWebIndex;
-import org.constellation.metadata.io.CDIReader;
-import org.constellation.metadata.io.CSRReader;
-import org.constellation.metadata.io.EDMEDReader;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataReader;
@@ -58,12 +55,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDirectory, Unmarshaller unmarshaller) throws SQLException, JAXBException {
         switch (configuration.getType()) {
-            case CDI:
-                return new CDIReader(configuration, MDConnection);
-            case CSR:
-                return new CSRReader(configuration, MDConnection);
-            case EDMED:
-                return new EDMEDReader(configuration, MDConnection);
             case MDWEB:
                 return new MDWebMetadataReader(MDConnection);
             case FILESYSTEM:
@@ -84,12 +75,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException {
         switch (dbType) {
-            case CDI:
-                return null;
-            case CSR:
-                return null;
-            case EDMED:
-                return null;
             case MDWEB:
                 return new MDWebMetadataWriter(MDConnection, index);
             case FILESYSTEM:
@@ -107,12 +92,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public int getProfile(int dbType) {
         switch (dbType) {
-            case CDI:
-                return CSWworker.DISCOVERY;
-            case CSR:
-                return CSWworker.DISCOVERY;
-            case EDMED:
-                return CSWworker.DISCOVERY;
             case MDWEB:
                 return CSWworker.TRANSACTIONAL;
             case FILESYSTEM:
@@ -134,12 +113,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException {
         switch (dbType) {
-            case CDI:
-                return new GenericIndex(reader, configDir);
-            case CSR:
-                return new GenericIndex(reader, configDir);
-            case EDMED:
-                return new GenericIndex(reader, configDir);
             case MDWEB:
                 return new MDWebIndex(MDConnection, configDir);
             case FILESYSTEM:
@@ -161,12 +134,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException {
         switch (dbType) {
-            case CDI:
-                return new GenericIndex(reader);
-            case CSR:
-                return new GenericIndex(reader);
-            case EDMED:
-                return new GenericIndex(reader);
             case MDWEB:
                 return new MDWebIndex(MDConnection);
             case FILESYSTEM:
