@@ -17,7 +17,6 @@
 package org.constellation.security;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -78,7 +77,7 @@ public class Worker {
     }
 
     public AbstractWMSCapabilities launchGetCapabilities(final String service, final String request,
-                                                                               final String version) throws WebServiceException
+                                                         final String version) throws WebServiceException
     {
         return dispatcher.requestGetCapabilities(service, request, version);
     }

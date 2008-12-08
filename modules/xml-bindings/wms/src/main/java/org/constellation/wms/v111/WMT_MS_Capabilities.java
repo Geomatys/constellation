@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.wms.AbstractCapability;
 import org.constellation.wms.AbstractLayer;
 import org.constellation.wms.AbstractService;
 import org.constellation.wms.AbstractWMSCapabilities;
@@ -89,6 +90,14 @@ public class WMT_MS_Capabilities extends AbstractWMSCapabilities {
      */
     public Capability getCapability() {
         return capability;
+    }
+
+    public void setCapability(AbstractCapability capability) {
+        if (capability instanceof Capability) {
+            this.capability = (Capability) capability;
+        } else {
+            throw new IllegalArgumentException("not the good version object, expected 1.1.1");
+        }
     }
 
     /**

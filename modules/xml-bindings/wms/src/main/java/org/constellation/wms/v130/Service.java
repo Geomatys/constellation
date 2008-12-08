@@ -212,4 +212,8 @@ public class Service extends AbstractService {
     public int getMaxHeight() {
         return maxHeight;
     }
+
+    public void setAccessConstraints(final String constraint) {
+        this.accessConstraints = constraint;
+    }
 }

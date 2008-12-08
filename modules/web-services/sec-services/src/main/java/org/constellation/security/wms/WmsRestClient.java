@@ -20,11 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.query.Query;
+import org.constellation.query.wms.WMSQuery;
 import org.constellation.wms.AbstractWMSCapabilities;
+import org.constellation.wms.v111.WMT_MS_Capabilities;
+import org.constellation.wms.v130.WMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.WebServiceException;
 
@@ -61,21 +65,21 @@ public class WmsRestClient {
                                                        final String version) throws WebServiceException
     {
         assert (service.equalsIgnoreCase("wms"));
+        assert (request.equalsIgnoreCase(WMSQuery.GETCAPABILITIES));
 
         //Connect to URL and get result
-        final URL connectionURL;
         final URLConnection connec;
         try {
-            connectionURL = new URL(url +"?"+ Query.KEY_REQUEST +"="+ request +"&"+
+            final URL connectionURL = new URL(url +"?"+ Query.KEY_REQUEST +"="+ request +"&"+
                 Query.KEY_SERVICE +"="+ service +"&"+ Query.KEY_VERSION +"="+ version);
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         connec.setDoOutput(true);
-        connec.setRequestProperty("Content-Type","text/xml");
+        connec.setRequestProperty("Content-Type", Query.TEXT_XML);
 
-        // Extract the GetCapabilities XML result.
+        //Extract the GetCapabilities XML result.
         final InputStream in;
         try {
             in = connec.getInputStream();
@@ -84,7 +88,7 @@ public class WmsRestClient {
         }
 
         //Parse response
-        final Object response;
+        Object response;
         try {
             response = unmarshaller.unmarshal(in);
         } catch (JAXBException ex) {
@@ -95,6 +99,57 @@ public class WmsRestClient {
                     " instance of AbstractWMSCapabilities", ExceptionCode.NO_APPLICABLE_CODE);
         }
 
+        response = removeCapabilitiesInfo(response);
+        response = addAccessConstraints(response);
         return (AbstractWMSCapabilities) response;
+    }
+
+    /**
+     * Remove the {@code Capability} tag from an XML Capabilities file.
+     *
+     * @param xmlCapab An unmarshalled GetCapabilities.
+     * @return The getCapabilities without the {@code Capability} tag filled.
+     * @throws WebServiceException if the given GetCapabilities does not match with the supposed WMS version.
+     */
+    private AbstractWMSCapabilities removeCapabilitiesInfo(final Object xmlCapab) throws WebServiceException {
+        if (xmlCapab instanceof WMT_MS_Capabilities) {
+            final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) xmlCapab;
+            org.constellation.wms.v111.Capability capability =
+                    new org.constellation.wms.v111.Capability(null, null, null, null);
+            cap.setCapability(capability);
+            return cap;
+        }
+        if (xmlCapab instanceof WMSCapabilities) {
+            final WMSCapabilities cap = (WMSCapabilities) xmlCapab;
+            org.constellation.wms.v130.Capability capability =
+                    new org.constellation.wms.v130.Capability(null, null, null, (JAXBElement<?>) null);
+            cap.setCapability(capability);
+            return cap;
+        }
+        throw new WebServiceException("Capabilities response is not valid, because it does not match" +
+                " with JAXB classes.", ExceptionCode.NO_APPLICABLE_CODE);
+    }
+
+    /**
+     * Add an {@code AccessConstraints} tag in a GetCapabilities XML file, to specify that an authentication
+     * is required.
+     *
+     * @param xmlCapab An unmarshalled GetCapabilities.
+     * @return The getCapabilities with the {@code AccessConstraints} tag filled.
+     * @throws WebServiceException if the given GetCapabilities does not match with the supposed WMS version.
+     */
+    private AbstractWMSCapabilities addAccessConstraints(final Object xmlCapab) throws WebServiceException {
+        if (xmlCapab instanceof WMT_MS_Capabilities) {
+            final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) xmlCapab;
+            cap.getService().setAccessConstraints("Require an authentication !");
+            return cap;
+        }
+        if (xmlCapab instanceof WMSCapabilities) {
+            final WMSCapabilities cap = (WMSCapabilities) xmlCapab;
+            cap.getService().setAccessConstraints("Require an authentication !");
+            return cap;
+        }
+        throw new WebServiceException("Capabilities response is not valid, because it does not match" +
+                " with JAXB classes.", ExceptionCode.NO_APPLICABLE_CODE);
     }
 }

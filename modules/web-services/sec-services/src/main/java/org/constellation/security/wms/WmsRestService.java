@@ -37,6 +37,7 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
+import static org.constellation.query.wms.WMSQuery.*;
 
 /**
  * The REST facade to this WMS Policy Enforcement Point (PEP).
@@ -107,21 +108,22 @@ public class WmsRestService extends OGCWebService {
             setCurrentVersion(version);
 
             //Handle the different kinds of Requests
-            if (request.equalsIgnoreCase(WMSQuery.GETCAPABILITIES)) {
+            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 final AbstractWMSCapabilities awc = worker.launchGetCapabilities(service, request, version);
                 final ResponseBuilder respb = Response.ok(awc, Query.TEXT_XML);
                 return respb.build();
-            } else if (request.equalsIgnoreCase(WMSQuery.GETMAP)) {
-                throw new UnsupportedOperationException("Can't handle that yet!");
-            } else if (request.equalsIgnoreCase(WMSQuery.GETFEATUREINFO)) {
-                throw new UnsupportedOperationException("Can't handle that yet!");
-            } else {
-                //User has asked for a non-existant request
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
-                        ExceptionCode.OPERATION_NOT_SUPPORTED,
-                        serviceVersion,
-                        "request");
             }
+            if (GETMAP.equalsIgnoreCase(request)) {
+                throw new UnsupportedOperationException("Can't handle that yet!");
+            }
+            if (GETFEATUREINFO.equalsIgnoreCase(request)) {
+                throw new UnsupportedOperationException("Can't handle that yet!");
+            }
+            //User has asked for a non-existant request
+            throw new WebServiceException("The operation " + request + " is not supported by the service",
+                    ExceptionCode.OPERATION_NOT_SUPPORTED,
+                    serviceVersion,
+                    "request");
 
         } catch (WebServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),

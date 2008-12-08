@@ -16,8 +16,6 @@
  */
 package org.constellation.security;
 
-import java.io.IOException;
-import java.net.URL;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.security.wms.WmsRestClient;
@@ -68,6 +66,7 @@ public class Dispatcher {
      * is a {@code REST} or {@code SOAP} request.
      *
      * @param url The URL of the webservice to request.
+     * @param isRest Defines whether the client to call will be a REST or SOAP client.
      * @param marshaller The marshaller to use for parsing the request.
      * @param unmarshaller The unmarshaller to use for the response.
      */
@@ -81,7 +80,7 @@ public class Dispatcher {
     }
 
     AbstractWMSCapabilities requestGetCapabilities(final String service, final String request,
-                                                                         final String version) throws WebServiceException
+                                                   final String version) throws WebServiceException
     {
         if (isRest) {
             wmsRestClient = new WmsRestClient(url, marshaller, unmarshaller);

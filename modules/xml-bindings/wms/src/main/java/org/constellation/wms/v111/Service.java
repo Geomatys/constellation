@@ -144,4 +144,8 @@ public class Service extends AbstractService {
     public String getAccessConstraints() {
         return accessConstraints;
     }
+
+    public void setAccessConstraints(final String constraint) {
+        this.accessConstraints = constraint;
+    }
 }
