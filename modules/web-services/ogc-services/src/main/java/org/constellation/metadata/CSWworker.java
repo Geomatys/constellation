@@ -284,6 +284,7 @@ public class CSWworker {
                     return;
                 }
                 
+                // we get the data directory (if needed)
                 File dataDirectory = config.getdataDirectory();
                 if (!dataDirectory.exists()) {
                     dataDirectory = new File(configDir, "data");
