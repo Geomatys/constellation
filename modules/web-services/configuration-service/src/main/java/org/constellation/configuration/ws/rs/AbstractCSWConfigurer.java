@@ -60,16 +60,6 @@ public abstract class AbstractCSWConfigurer {
     private ContainerNotifierImpl containerNotifier;
     
     /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    protected Unmarshaller unmarshaller;
-
-    /**
-     * A JAXB marshaller used to transform the java object in XML String.
-     */
-    protected Marshaller marshaller;
-    
-    /**
      * A lucene Index used to pre-build a CSW index.
      */
     protected IndexLucene indexer;
@@ -82,9 +72,7 @@ public abstract class AbstractCSWConfigurer {
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
     
     
-    public AbstractCSWConfigurer(Marshaller marshaller, Unmarshaller unmarshaller, ContainerNotifierImpl cn) throws ConfigurationException {
-        this.marshaller        = marshaller;
-        this.unmarshaller      = unmarshaller;
+    public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
         File cswConfigDir = serviceDirectory.get("CSW");
         try {
@@ -102,7 +90,7 @@ public abstract class AbstractCSWConfigurer {
                     Connection MDConnection = db.getConnection();
                     
                     AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
-                    reader  = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), unmarshaller);
+                    reader  = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null);
                     indexer = CSWfactory.getIndex(config.getType(), reader, MDConnection);
                 }
             } else {

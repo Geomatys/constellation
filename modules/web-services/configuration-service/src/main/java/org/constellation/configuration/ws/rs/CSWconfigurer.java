@@ -17,10 +17,6 @@
 
 package org.constellation.configuration.ws.rs;
 
-// J2SE dependencies
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 // Constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
@@ -36,8 +32,8 @@ import static org.constellation.ows.OWSExceptionCode.*;
  */
 public class CSWconfigurer extends AbstractCSWConfigurer {
 
-    public CSWconfigurer(Marshaller marshaller, Unmarshaller unmarshaller, ContainerNotifierImpl cn) throws ConfigurationException {
-        super(marshaller, unmarshaller, cn);
+    public CSWconfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
+        super(cn);
     }
     
     /**

@@ -90,10 +90,9 @@ public class ConfigurationService extends WebService  {
     public ConfigurationService() {
         super("Configuration");
         try {
-            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:" +
-                           "org.constellation.skos:org.constellation.generic.nerc", "");
+            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:org.constellation.skos", "");
             AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
-            cswConfigurer      = configurerfactory.getCSWConfigurer(marshaller, unmarshaller, cn);
+            cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             CSWFunctionEnabled = true;
         } catch (JAXBException ex) {
             LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");

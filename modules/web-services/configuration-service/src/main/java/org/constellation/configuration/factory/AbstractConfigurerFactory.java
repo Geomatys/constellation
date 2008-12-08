@@ -17,8 +17,6 @@
 
 package org.constellation.configuration.factory;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.ws.rs.AbstractCSWConfigurer;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -30,6 +28,6 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
  */
 public abstract class AbstractConfigurerFactory {
     
-    public abstract AbstractCSWConfigurer getCSWConfigurer(Marshaller marshaller, Unmarshaller unmarshaller, ContainerNotifierImpl cn) throws ConfigurationException;
+    public abstract AbstractCSWConfigurer getCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
 
 }

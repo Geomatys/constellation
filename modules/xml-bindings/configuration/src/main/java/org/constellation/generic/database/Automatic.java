@@ -68,7 +68,9 @@ public class Automatic {
     }
     
     public File getdataDirectory() {
-        return new File(dataDirectory);
+        if (dataDirectory != null)
+            return new File(dataDirectory);
+        else return null;
     }
     
     public int getType() {

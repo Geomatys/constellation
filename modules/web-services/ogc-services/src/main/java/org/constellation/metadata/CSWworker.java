@@ -286,7 +286,7 @@ public class CSWworker {
                 
                 // we get the data directory (if needed)
                 File dataDirectory = config.getdataDirectory();
-                if (!dataDirectory.exists()) {
+                if (dataDirectory != null && !dataDirectory.exists()) {
                     dataDirectory = new File(configDir, "data");
                     if (!dataDirectory.exists() && config.getType() == FILESYSTEM) {
                         logger.severe("The CSW service is not working!" + '\n' +
