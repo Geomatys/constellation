@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,12 +39,21 @@ import org.constellation.ws.rs.OGCWebService;
 
 
 /**
- * Web service designed to get a WMS request from a client and to give it to a
- * {@link org.constellation.security.ws.Dispatcher}. The dispatcher will do its job and return the result of the
- * request from the web service.
- * If the user has not proceeded the authentication part, it will return a response
- * containing an access constraint part, which will indicate that an authentication
- * is required.
+ * The REST facade to this WMS Policy Enforcement Point (PEP).
+ * 
+ * This facade covers both clients which call the service using an HTTP GET 
+ * message and include the request and all other parameters in the URL itself as 
+ * well as clients which call the service using an HTTP POST message and include 
+ * the request in the body of the message either as Key-Value pairs or as an XML 
+ * document. The latter has not yet been formalized by the OGC for WMS and so is 
+ * an extension of the existing standards.
+ * 
+ * The facade calls the {@code org.constellation.security.Worker} for all the 
+ * complex logic. 
+ * 
+ * Access control necessitates that the user be authenticated to the container.
+ * If the user has not proceeded with the authentication part, the service will 
+ * return a response indicating the policy which requires access constraint.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -52,8 +61,9 @@ import org.constellation.ws.rs.OGCWebService;
 @Path("wms-sec")
 @Singleton
 public class WmsRestService extends OGCWebService {
+
     /**
-     * A worker for requesting a WMS service.
+     * The worker that will perform the logic of this PEP service.
      */
     private final Worker worker;
 
@@ -83,6 +93,7 @@ public class WmsRestService extends OGCWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         
         try {
+        	
             //Extract parameters
             final String service = getParameter(Query.KEY_SERVICE, false); //WMS
             final String request = getParameter(Query.KEY_REQUEST, true);  //e.g. getCaps
