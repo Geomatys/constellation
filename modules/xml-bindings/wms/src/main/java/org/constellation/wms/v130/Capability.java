@@ -84,8 +84,10 @@ public class Capability extends AbstractCapability {
         this.request   = request;
         this.exception = exception;
         this.layer     = layer;
-        for (final JAXBElement<?> element : extendedCapabilities) {
-            this.extendedCapabilities.add(element);
+        if (extendedCapabilities != null && extendedCapabilities.length != 0) {
+            for (final JAXBElement<?> element : extendedCapabilities) {
+                this.extendedCapabilities.add(element);
+            }
         }
     }
     /**

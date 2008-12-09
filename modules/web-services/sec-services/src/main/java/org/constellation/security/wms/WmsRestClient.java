@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -122,7 +121,7 @@ public class WmsRestClient {
         if (xmlCapab instanceof WMSCapabilities) {
             final WMSCapabilities cap = (WMSCapabilities) xmlCapab;
             org.constellation.wms.v130.Capability capability =
-                    new org.constellation.wms.v130.Capability(null, null, null, (JAXBElement<?>) null);
+                    new org.constellation.wms.v130.Capability(null, null, null);
             cap.setCapability(capability);
             return cap;
         }
