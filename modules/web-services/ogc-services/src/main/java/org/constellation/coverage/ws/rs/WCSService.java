@@ -63,7 +63,7 @@ import org.constellation.gml.v311.GridLimitsType;
 import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.RectifiedGridType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.metadata.Utils;
+import org.constellation.util.Utils;
 import org.constellation.ows.AbstractGetCapabilities;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
