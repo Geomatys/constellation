@@ -380,7 +380,7 @@ public class CSWService extends OGCWebService {
                     version = getCurrentVersion();
                 ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
                 marshaller.marshal(report, sw);
-                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+                return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
                 return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
             }

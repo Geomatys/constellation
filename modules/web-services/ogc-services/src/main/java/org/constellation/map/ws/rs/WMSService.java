@@ -30,34 +30,20 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
-import javax.measure.unit.Unit;
 import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
-import org.constellation.catalog.CatalogException;
+import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.AbstractGraphicVisitor;
-import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.Service;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.WebServiceException;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
@@ -67,18 +53,14 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.util.PeriodUtilities;
+import org.constellation.util.Utils;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.wms.AbstractDCP;
-import org.constellation.wms.AbstractDimension;
-import org.constellation.wms.AbstractHTTP;
-import org.constellation.wms.AbstractLayer;
-import org.constellation.wms.AbstractRequest;
-import org.constellation.wms.AbstractOperation;
-import org.constellation.wms.AbstractProtocol;
-import org.constellation.wms.v111.LatLonBoundingBox;
-import org.constellation.wms.v130.OperationType;
-import org.constellation.wms.v130.EXGeographicBoundingBox;
+import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.Service;
+import org.constellation.ws.ServiceExceptionReport;
+import org.constellation.ws.ServiceExceptionType;
+import org.constellation.ws.WebServiceException;
+import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotools dependencies
@@ -93,7 +75,6 @@ import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //Geoapi dependencies
-import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -112,6 +93,10 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Path("wms")
 @Singleton
 public class WMSService extends OGCWebService {
+    /**
+     * 
+     */
+    private final WMSWorker worker;
 
     private static final WMSPortrayalAdapter PORTRAYAL_ADAPTER = new WMSPortrayalAdapter();
 
@@ -126,6 +111,7 @@ public class WMSService extends OGCWebService {
                 "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
                 "http://www.opengis.net/wms");
 
+        worker = new WMSWorker();
         LOGGER.info("WMS service running");
     }
 
@@ -153,7 +139,21 @@ public class WMSService extends OGCWebService {
                 return getFeatureInfo(adaptGetFeatureInfo());
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                return getCapabilities(adaptGetCapabilities());
+                final GetCapabilities requestCapab = adaptGetCapabilities();
+                final AbstractWMSCapabilities capab;
+                try {
+                    capab = (AbstractWMSCapabilities) getCapabilitiesObject(requestCapab.getVersion());
+                } catch (IOException e) {
+                    throw new WebServiceException("IO exception while getting Services Metadata:" +
+                            e.getMessage(), INVALID_PARAMETER_VALUE, requestCapab.getVersion());
+                }
+                final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab, getServiceURL(), capab);
+                //we marshall the response and return the XML String
+                final StringWriter sw = new StringWriter();
+                marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ?
+                    "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
+                marshaller.marshal(capabilities, sw);
+                return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 return getLegendGraphic(adaptGetLegendGraphic());
@@ -181,278 +181,15 @@ public class WMSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         } catch (NumberFormatException n) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
             LOGGER.log(Level.INFO, n.getLocalizedMessage(), n);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
-    }
-
-    /**
-     * Describe the capabilities and the layers available of this service.
-     *
-     * @param getCapab The {@linkplain GetCapabilities get capabilities} request.
-     * @return a WMSCapabilities XML document describing the capabilities of the service.
-     *
-     * @throws WebServiceException
-     * @throws JAXBException when unmarshalling the default GetCapabilities file.
-     */
-    private Response getCapabilities(final GetCapabilities getCapab) throws WebServiceException,
-                                                                            JAXBException
-    {
-        final ServiceVersion queryVersion = getCapab.getVersion();
-        String format = getParameter(KEY_FORMAT, false);
-        if (format == null || !(format.equalsIgnoreCase(TEXT_XML) ||
-                format.equalsIgnoreCase(APP_WMS_XML) || format.equalsIgnoreCase(APP_XML)))
-        {
-            format = TEXT_XML;
-        }
-
-        final AbstractWMSCapabilities response;
-        // String updateSequence = getParameter("UPDATESEQUENCE", false);
-
-        // the service shall return WMSCapabilities marshalled
-        try {
-            response = (AbstractWMSCapabilities)getCapabilitiesObject(queryVersion);
-        } catch(IOException e)   {
-            throw new WebServiceException("IO exception while getting Services Metadata:" +
-                    e.getMessage(), INVALID_PARAMETER_VALUE, getCurrentVersion());
-        }
-
-        //we build the list of accepted crs
-        final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");     crs.add("CRS:84");  crs.add("EPSG:3395");
-        crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573"); crs.add("EPSG:27574");
-        //we update the url in the static part.
-        response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        final AbstractRequest request = response.getCapability().getRequest();
-
-        updateURL(request.getGetCapabilities().getDCPType());
-        updateURL(request.getGetFeatureInfo().getDCPType());
-        updateURL(request.getGetMap().getDCPType());
-        updateExtendedOperationURL(request, getCurrentVersion());
-
-        //we get the list of layers
-        final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
-
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final Set<String> keys = dp.getKeys();
-        for (String key : keys) {
-            final LayerDetails layer = dp.get(key);
-            if (layer == null) {
-                LOGGER.warning("Missing layer : " + key);
-                continue;
-            }
-            if (!layer.isQueryable(Service.WMS)) {
-                LOGGER.info("layer" + layer.getName() + " not queryable by WMS");
-                continue;
-            }
-            /*
-             *  TODO
-             * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
-             */
-            final GeographicBoundingBox inputGeoBox;
-            try {
-                inputGeoBox = layer.getGeographicBoundingBox();
-            } catch (CatalogException exception) {
-                throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
-            }
-
-            // List of elevations, times and dim_range values.
-            final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
-
-            //the available date
-            String defaut = null;
-            AbstractDimension dim;
-            SortedSet<Date> dates = null;
-            try {
-                dates = layer.getAvailableTimes();
-            } catch (CatalogException ex) {
-                dates = null;
-            }
-            if (dates != null && !(dates.isEmpty())) {
-                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                final PeriodUtilities periodFormatter = new PeriodUtilities(df);
-                defaut = df.format(dates.last());
-                dim = (queryVersion.toString().equals("1.1.1")) ?
-                    new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null) :
-                    new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
-                dim.setValue(periodFormatter.getDatesRespresentation(dates));
-                dimensions.add(dim);
-            }
-
-            //the available elevation
-            defaut = null;
-            SortedSet<Number> elevations = null;
-            try {
-                elevations = layer.getAvailableElevations();
-            } catch (CatalogException ex) {
-                elevations = null;
-            }
-            if (elevations != null && !(elevations.isEmpty())) {
-                defaut = elevations.first().toString();
-                dim = (queryVersion.toString().equals("1.1.1")) ?
-                    new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
-                    new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
-                final StringBuilder elevs = new StringBuilder();
-                for (Iterator<Number> it = elevations.iterator(); it.hasNext();) {
-                    final Number n = it.next();
-                    elevs.append(n.toString());
-                    if (it.hasNext()) {
-                        elevs.append(',');
-                    }
-                }
-                dim.setValue(elevs.toString());
-                dimensions.add(dim);
-            }
-
-            //the dimension range
-            defaut = null;
-            final MeasurementRange[] ranges = layer.getSampleValueRanges();
-            /* If the layer has only one sample dimension, then we can apply the dim_range
-             * parameter. Otherwise it can be a multiple sample dimensions layer, and we
-             * don't apply the dim_range.
-             */
-            if (ranges != null && ranges.length == 1 && ranges[0] != null) {
-                final MeasurementRange firstRange = ranges[0];
-                final double minRange = firstRange.getMinimum();
-                final double maxRange = firstRange.getMaximum();
-                defaut = minRange + "," + maxRange;
-                final Unit<?> u = firstRange.getUnits();
-                final String unit = (u != null) ? u.toString() : null;
-                dim = (queryVersion.toString().equals("1.1.1")) ?
-                    new org.constellation.wms.v111.Dimension("dim_range", unit, defaut,
-                                                           minRange + "," + maxRange) :
-                    new org.constellation.wms.v130.Dimension("dim_range", unit, defaut,
-                                                           minRange + "," + maxRange);
-                dimensions.add(dim);
-            }
-
-            // LegendUrl generation
-            final String layerName = layer.getName();
-            final String beginLegendUrl = getServiceURL() + "wms?REQUEST=GetLegendGraphic&" +
-                    "VERSION=1.1.0&FORMAT=";
-            final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
-            final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
-            final int queryable = (layer.isQueryable(Service.GETINFO) == true) ? 1 : 0;
-            final AbstractLayer outputLayer;
-            if (queryVersion.toString().equals("1.1.1")) {
-                /*
-                 * TODO
-                 * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
-                 */
-                final org.constellation.wms.v111.BoundingBox outputBBox = (inputGeoBox != null) ?
-                    new org.constellation.wms.v111.BoundingBox("EPSG:4326",
-                            inputGeoBox.getWestBoundLongitude(),
-                            inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion.toString()) :
-                    null;
-
-                // we build The Style part
-                org.constellation.wms.v111.OnlineResource or =
-                        new org.constellation.wms.v111.OnlineResource(legendUrlPng);
-                org.constellation.wms.v111.LegendURL legendURL1 =
-                        new org.constellation.wms.v111.LegendURL(IMAGE_PNG, or);
-
-                or = new org.constellation.wms.v111.OnlineResource(legendUrlGif);
-                org.constellation.wms.v111.LegendURL legendURL2 =
-                        new org.constellation.wms.v111.LegendURL(IMAGE_GIF, or);
-
-                List<String> stylesName = layer.getFavoriteStyles();
-                List<org.constellation.wms.v111.Style> styles = new ArrayList<org.constellation.wms.v111.Style>();
-                if (stylesName != null && stylesName.size() != 0) {
-                    for (String styleName : stylesName) {
-                        org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
-                                styleName, styleName, null, null, null, legendURL1, legendURL2);
-                        styles.add(style);
-                    }
-                } else {
-                    org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
-                                "Style1", "defaultStyle", null, null, null, legendURL1, legendURL2);
-                    styles.add(style);
-                }
-                
-                //we build the complete layer object
-                outputLayer = new org.constellation.wms.v111.Layer(layerName,
-                        cleanSpecialCharacter(layer.getRemarks()),
-                        cleanSpecialCharacter(layer.getThematic()), crs,
-                        new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(),
-                                              inputGeoBox.getSouthBoundLatitude(),
-                                              inputGeoBox.getEastBoundLongitude(),
-                                              inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, styles);
-            } else {
-                /*
-                 * TODO
-                 * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
-                 */
-                final org.constellation.wms.v130.BoundingBox outputBBox = (inputGeoBox != null) ?
-                    new org.constellation.wms.v130.BoundingBox("EPSG:4326",
-                            inputGeoBox.getWestBoundLongitude(),
-                            inputGeoBox.getSouthBoundLatitude(),
-                            inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0,
-                            queryVersion.toString()) :
-                    null;
-
-                // we build a Style Object
-                org.constellation.wms.v130.OnlineResource or =
-                        new org.constellation.wms.v130.OnlineResource(legendUrlPng);
-                org.constellation.wms.v130.LegendURL legendURL1 =
-                        new org.constellation.wms.v130.LegendURL(IMAGE_PNG, or);
-
-                or = new org.constellation.wms.v130.OnlineResource(legendUrlGif);
-                org.constellation.wms.v130.LegendURL legendURL2 =
-                        new org.constellation.wms.v130.LegendURL(IMAGE_GIF, or);
-                
-                List<String> stylesName = layer.getFavoriteStyles();
-                List<org.constellation.wms.v130.Style> styles = new ArrayList<org.constellation.wms.v130.Style>();
-                if (stylesName != null && stylesName.size() != 0) {
-                    for (String styleName : stylesName) {
-                        org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
-                        styleName, styleName, null, null, null, legendURL1, legendURL2);
-                        styles.add(style);
-                    }
-                } else {
-                    org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
-                        "Style1", "default Style", null, null, null, legendURL1, legendURL2);
-                    styles.add(style);
-                }
-
-                outputLayer = new org.constellation.wms.v130.Layer(layerName,
-                        cleanSpecialCharacter(layer.getRemarks()),
-                        cleanSpecialCharacter(layer.getThematic()), crs,
-                        new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(),
-                                                    inputGeoBox.getSouthBoundLatitude(),
-                                                    inputGeoBox.getEastBoundLongitude(),
-                                                    inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, styles);
-            }
-            layers.add(outputLayer);
-        }
-
-        //we build the general layer and add it to the document
-        final AbstractLayer mainLayer = (queryVersion.toString().equals("1.1.1")) ?
-            new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs, null, layers) :
-            new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs, null, layers);
-
-        response.getCapability().setLayer(mainLayer);
-
-        //we marshall the response and return the XML String
-        final StringWriter sw = new StringWriter();
-        marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (queryVersion.toString().equals("1.1.1")) ?
-            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/" +
-            "WMS_MS_Capabilities.dtd\">\n" : "");
-        marshaller.marshal(response, sw);
-
-        return Response.ok(sw.toString(), format).build();
     }
 
     /**
@@ -586,55 +323,6 @@ public class WMSService extends OGCWebService {
     }
 
     /**
-     * update The URL in capabilities document with the service actual URL.
-     */
-    private void updateURL(final List<? extends AbstractDCP> dcpList) {
-        for(AbstractDCP dcp: dcpList) {
-            final AbstractHTTP http = dcp.getHTTP();
-            final AbstractProtocol getMethod = http.getGet();
-            if (getMethod != null) {
-                getMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
-            }
-            final AbstractProtocol postMethod = http.getPost();
-            if (postMethod != null) {
-                postMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
-            }
-        }
-    }
-
-    /**
-     * update The URL in capabilities document for the extended operation.
-     */
-    private void updateExtendedOperationURL(final AbstractRequest request,
-                                            final ServiceVersion version)
-    {
-
-        if (version.toString().equals("1.3.0")) {
-            org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
-            List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
-            for(JAXBElement<OperationType> extOp: extendedOperations) {
-                updateURL(extOp.getValue().getDCPType());
-            }
-
-        // version 1.1.1
-        } else {
-           org.constellation.wms.v111.Request r = (org.constellation.wms.v111.Request) request;
-           AbstractOperation op = r.getDescribeLayer();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getGetLegendGraphic();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getGetStyles();
-           if (op != null)
-                updateURL(op.getDCPType());
-           op = r.getPutStyles();
-           if (op != null)
-                updateURL(op.getDCPType());
-        }
-    }
-
-    /**
      * Converts a DescribeLayer request composed of string values, to a container
      * of real java objects.
      *
@@ -668,7 +356,13 @@ public class WMSService extends OGCWebService {
             throw new WebServiceException("Invalid service specified. Should be WMS.",
                     INVALID_PARAMETER_VALUE, bestVersion, "service");
         }
-        return new GetCapabilities(bestVersion);
+        String format = getParameter(KEY_FORMAT, false);
+        if (format == null || !(format.equalsIgnoreCase(TEXT_XML) ||
+                format.equalsIgnoreCase(APP_WMS_XML) || format.equalsIgnoreCase(APP_XML)))
+        {
+            format = TEXT_XML;
+        }
+        return new GetCapabilities(bestVersion, format);
     }
 
     /**

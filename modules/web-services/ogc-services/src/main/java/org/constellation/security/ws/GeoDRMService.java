@@ -50,6 +50,7 @@ import org.constellation.ws.Service;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
+import org.constellation.util.Utils;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.xacml.CstlPDP;
 import org.constellation.xacml.PEP;
@@ -268,7 +269,7 @@ public class GeoDRMService extends OGCWebService {
             } 
         } catch (WebServiceException ex) {
             StringWriter sw = new StringWriter();
-            final String code = transformCodeName(ex.getExceptionCode().name());
+            final String code = Utils.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
             marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();

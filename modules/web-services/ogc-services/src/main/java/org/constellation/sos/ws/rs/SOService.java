@@ -52,6 +52,7 @@ import org.constellation.sos.GetResult;
 import org.constellation.sos.InsertObservation;
 import org.constellation.sos.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
+import org.constellation.util.Utils;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -173,7 +174,7 @@ public class SOService extends OGCWebService {
             StringWriter sw = new StringWriter(); 
             ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), ex.getVersion());   
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
     }
     

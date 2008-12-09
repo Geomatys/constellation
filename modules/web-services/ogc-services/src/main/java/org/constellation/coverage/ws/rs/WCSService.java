@@ -223,7 +223,7 @@ public class WCSService extends OGCWebService {
         } catch (WebServiceException ex) {
             final Object report;
             if (getCurrentVersion().isOWS()) {
-                final String code = transformCodeName(ex.getExceptionCode().name());
+                final String code = Utils.transformCodeName(ex.getExceptionCode().name());
                 report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
             } else {
                 report = new ServiceExceptionReport(getCurrentVersion(),
@@ -241,7 +241,7 @@ public class WCSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         }
     }
 
@@ -670,7 +670,7 @@ public class WCSService extends OGCWebService {
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(layer.getName()));
                 List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(cleanSpecialCharacter(layer.getRemarks())));
+                remark.add(new LanguageStringType(Utils.cleanSpecialCharacter(layer.getRemarks())));
 
                 CoverageSummaryType       cs = new CoverageSummaryType(title, remark);
                 CoverageOfferingBriefType co = new CoverageOfferingBriefType();
@@ -1108,7 +1108,7 @@ public class WCSService extends OGCWebService {
                 pos.add(new DirectPositionType(pos2));
                 llenvelope = new LonLatEnvelopeType(pos, crs);
             }
-            Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
+            Keywords keywords = new Keywords("WCS", layer.getName(), Utils.cleanSpecialCharacter(layer.getThematic()));
 
             //Spatial metadata
             org.constellation.wcs.v100.SpatialDomainType spatialDomain = new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
@@ -1168,7 +1168,7 @@ public class WCSService extends OGCWebService {
             CoverageOfferingType coverage = new CoverageOfferingType(null,
                     layer.getName(),
                     layer.getName(),
-                    cleanSpecialCharacter(layer.getRemarks()),
+                    Utils.cleanSpecialCharacter(layer.getRemarks()),
                     llenvelope,
                     keywords,
                     domainSet,
@@ -1225,7 +1225,7 @@ public class WCSService extends OGCWebService {
             List<LanguageStringType> title = new ArrayList<LanguageStringType>();
             title.add(new LanguageStringType(layer.getName()));
             List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();
-            _abstract.add(new LanguageStringType(cleanSpecialCharacter(layer.getRemarks())));
+            _abstract.add(new LanguageStringType(Utils.cleanSpecialCharacter(layer.getRemarks())));
             List<KeywordsType> keywords = new ArrayList<KeywordsType>();
             keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                     new LanguageStringType(layer.getName())));
@@ -1256,7 +1256,7 @@ public class WCSService extends OGCWebService {
             intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
             intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
             InterpolationMethods interpolations = new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-            RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()),
+            RangeType range = new RangeType(new FieldType(Utils.cleanSpecialCharacter(layer.getThematic()),
                     null,
                     new org.constellation.ows.v110.CodeType("0.0"),
                     interpolations));

@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBException;
 import org.constellation.query.Query;
 import org.constellation.security.Worker;
+import org.constellation.util.Utils;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Service;
@@ -131,7 +132,7 @@ public class WmsRestService extends OGCWebService {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), Query.APP_XML).build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), Query.APP_XML).build();
         }
     }
 

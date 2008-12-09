@@ -173,7 +173,7 @@ public class ConfigurationService extends WebService  {
             }
         
         } catch (WebServiceException ex) {
-            final String code = transformCodeName(ex.getExceptionCode().name());
+            final String code = Utils.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), ex.getVersion());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
@@ -184,7 +184,7 @@ public class ConfigurationService extends WebService  {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
         
     }
