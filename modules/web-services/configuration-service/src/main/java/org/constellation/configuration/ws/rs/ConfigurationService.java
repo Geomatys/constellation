@@ -41,7 +41,7 @@ import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
-import org.constellation.metadata.Utils;
+import org.constellation.util.Utils;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.Service;
