@@ -22,8 +22,6 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.constellation.generic.database.Automatic.*;
-import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
