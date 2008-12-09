@@ -51,7 +51,7 @@ import org.mdweb.lucene.AbstractIndex;
 // Constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.metadata.Utils;
+import org.constellation.util.Utils;
 import org.constellation.ws.WebServiceException;
 
 /**

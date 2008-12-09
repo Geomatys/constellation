@@ -100,6 +100,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.util.Utils;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.cat.csw.AbstractCswRequest;
 import static org.constellation.ows.OWSExceptionCode.*;

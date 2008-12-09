@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata;
+package org.constellation.util;
 
 import java.awt.image.RenderedImage;
 import java.io.File;

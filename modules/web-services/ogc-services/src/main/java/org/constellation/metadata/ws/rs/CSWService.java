@@ -77,7 +77,7 @@ import org.constellation.ws.Service;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
-import org.constellation.metadata.Utils;
+import org.constellation.util.Utils;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.ows.OWSExceptionCode.*;

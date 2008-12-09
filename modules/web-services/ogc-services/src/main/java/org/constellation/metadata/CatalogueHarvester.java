@@ -69,6 +69,7 @@ import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
 import org.constellation.ows.v100.SectionsType;
+import org.constellation.util.Utils;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**

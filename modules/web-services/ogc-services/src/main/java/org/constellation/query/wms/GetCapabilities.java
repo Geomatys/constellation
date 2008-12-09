@@ -28,10 +28,20 @@ import org.constellation.ws.ServiceVersion;
  */
 public class GetCapabilities extends WMSQuery {
     /**
+     * The output format for this request.
+     */
+    private final String format;
+
+    /**
      * 
      */
     public GetCapabilities(final ServiceVersion version) {
+        this(version, null);
+    }
+
+    public GetCapabilities(final ServiceVersion version, final String format) {
         super(version);
+        this.format = format;
     }
 
     /**
@@ -46,5 +56,9 @@ public class GetCapabilities extends WMSQuery {
      */
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_CAPABILITIES;
+    }
+
+    public String getFormat() {
+        return format;
     }
 }

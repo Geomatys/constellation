@@ -44,7 +44,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
-import org.constellation.metadata.Utils;
+import org.constellation.util.Utils;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
