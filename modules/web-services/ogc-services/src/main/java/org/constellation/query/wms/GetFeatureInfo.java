@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
+import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
@@ -70,7 +71,7 @@ public class GetFeatureInfo extends GetMap {
         this.featureCount = featureCount;
     }
 
-    public GetFeatureInfo(final Envelope envelope, final WMSQueryVersion version,
+    public GetFeatureInfo(final Envelope envelope, final ServiceVersion version,
                   final String format, final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,

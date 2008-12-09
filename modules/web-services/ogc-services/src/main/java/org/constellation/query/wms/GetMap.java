@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
 import org.constellation.query.QueryRequest;
+import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
@@ -101,7 +102,7 @@ public class GetMap extends WMSQuery {
     /**
      * Default minimal constructor to generate a {@code GetMap} request.
      */
-    public GetMap(final Envelope envelope, final WMSQueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final ServiceVersion version, final String format,
                   final List<String> layers, final Dimension size)
     {
         this(envelope, version, format, layers, null, size);
@@ -110,7 +111,7 @@ public class GetMap extends WMSQuery {
     /**
      * GetMap with a list of styles defined.
      */
-    public GetMap(final Envelope envelope, final WMSQueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final ServiceVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Dimension size)
     {
         this(envelope, version, format, layers, styles, null, null, size);
@@ -119,7 +120,7 @@ public class GetMap extends WMSQuery {
     /**
      * GetMap with a list of styles, an elevation and a time value.
      */
-    public GetMap(final Envelope envelope, final WMSQueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final ServiceVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
                   final Date date, final Dimension size)
     {
@@ -129,7 +130,7 @@ public class GetMap extends WMSQuery {
     /**
      * GetMap with a list of styles, an elevation, a time value and a {@code dim_range}.
      */
-    public GetMap(final Envelope envelope, final WMSQueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final ServiceVersion version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
                   final Date date, final MeasurementRange dimRange, final Dimension size)
     {
@@ -139,7 +140,7 @@ public class GetMap extends WMSQuery {
     /**
      * Constructor which contains all possible parameters in a {@code GetMap} request.
      */
-    public GetMap(final Envelope envelope, final WMSQueryVersion version, final String format,
+    public GetMap(final Envelope envelope, final ServiceVersion version, final String format,
                   final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
@@ -274,7 +275,7 @@ public class GetMap extends WMSQuery {
         if (exceptions != null) {
             return exceptions;
         }
-        return (WMSQueryVersion.WMS_1_1_1.equals(super.getVersion())) ?
+        return (super.getVersion().toString().equals("1.1.1")) ?
             "application/vnd.ogc.se_xml" : "text/xml";
     }
 

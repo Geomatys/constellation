@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import java.util.List;
 import org.constellation.query.QueryRequest;
+import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -35,7 +36,7 @@ public class DescribeLayer extends WMSQuery {
     /**
      * Builds a {@code DescribeLayer} request, using the layer and mime-type specified.
      */
-    public DescribeLayer(final List<String> layers, final WMSQueryVersion version) {
+    public DescribeLayer(final List<String> layers, final ServiceVersion version) {
         super(version);
         this.layers = layers;
     }

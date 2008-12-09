@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
+import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -46,7 +47,7 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getFeatureInfo */
     public static final String KEY_QUERY_LAYERS = "QUERY_LAYERS";
     /** Parameter used in getMap, getFeatureInfo */
-    public static final String KEY_CRS_v110 = "SRS";
+    public static final String KEY_CRS_v111 = "SRS";
     /** Parameter used in getMap, getFeatureInfo */
     public static final String KEY_CRS_v130 = "CRS";
     /** Parameter used in getMap, getFeatureInfo */
@@ -102,7 +103,7 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getMap */
     public static final String KEY_AZIMUTH = "AZIMUTH";
 
-    protected final WMSQueryVersion version;
+    protected final ServiceVersion version;
 
     /**
      * {@inheritDoc}
@@ -111,14 +112,14 @@ public abstract class WMSQuery extends Query {
         return new QueryService.WMS();
     }
 
-    protected WMSQuery(final WMSQueryVersion version) {
+    protected WMSQuery(final ServiceVersion version) {
         if (version == null) {
             throw new NullPointerException("Version should not be null !");
         }
         this.version = version;
     }
 
-    public final WMSQueryVersion getVersion() {
+    public final ServiceVersion getVersion() {
         return version;
     }
 }

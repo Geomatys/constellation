@@ -17,6 +17,7 @@
 package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
+import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -29,7 +30,7 @@ public class GetCapabilities extends WMSQuery {
     /**
      * 
      */
-    public GetCapabilities(final WMSQueryVersion version) {
+    public GetCapabilities(final ServiceVersion version) {
         super(version);
     }
 
