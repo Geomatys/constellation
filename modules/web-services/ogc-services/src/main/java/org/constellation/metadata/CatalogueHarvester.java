@@ -871,6 +871,7 @@ public class CatalogueHarvester {
     }
     
     public void destroy() {
-        metadataWriter.destroy();
+        if (metadataWriter != null)
+            metadataWriter.destroy();
     }
 }

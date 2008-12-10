@@ -95,14 +95,14 @@ public class ConfigurationService extends WebService  {
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             CSWFunctionEnabled = true;
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXBexception while setting the JAXB context for configuration service");
+            LOGGER.severe("JAXBException while setting the JAXB context for configuration service:" + ex.getMessage());
             ex.printStackTrace();
             CSWFunctionEnabled = false;
         } catch (ConfigurationException ex) {
             LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
             CSWFunctionEnabled = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("Factory not foun for CSWConfigurer, specific CSW operation will not be available.");
+            LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
             CSWFunctionEnabled = false;
         }
         LOGGER.info("Configuration service runing");
@@ -160,12 +160,19 @@ public class ConfigurationService extends WebService  {
                 return Response.ok(sw.toString(), "text/xml").build();
             
             } else if (request.equalsIgnoreCase("updateVocabularies")) {    
-                                
-                return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build(); 
-            
+                if (CSWFunctionEnabled) {
+                    return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
+                } else {
+                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                }
             } else if (request.equalsIgnoreCase("updateContacts")) {    
-                                
-                return Response.ok(cswConfigurer.updateContacts(),"text/xml").build(); 
+                if (CSWFunctionEnabled) {
+                    return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
+                } else {
+                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                }
             
             } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
@@ -174,6 +181,9 @@ public class ConfigurationService extends WebService  {
         
         } catch (WebServiceException ex) {
             final String code = Utils.transformCodeName(ex.getExceptionCode().name());
+            ServiceVersion v = ex.getVersion();
+            if (v == null)
+                v = version;
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), ex.getVersion());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&

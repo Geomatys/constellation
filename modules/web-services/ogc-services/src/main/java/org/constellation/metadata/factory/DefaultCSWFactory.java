@@ -60,7 +60,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataReader(dataDirectory, unmarshaller);
             default:
-                throw new IllegalArgumentException("Unknow database type");
+                throw new IllegalArgumentException("Unknow database type: " + configuration.getType());
         }
     }
     
@@ -80,7 +80,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataWriter(index, marshaller, dataDirectory);
             default:
-                throw new IllegalArgumentException("Unknow database type");
+                throw new IllegalArgumentException("Unknow database type: " + dbType);
         }
     }
     
@@ -97,7 +97,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return CSWworker.TRANSACTIONAL;
             default:
-                throw new IllegalArgumentException("Unknow database type");
+                throw new IllegalArgumentException("Unknow database type: " + dbType);
         }
     }
     
@@ -118,7 +118,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndex(reader, configDir);
             default:
-                throw new IllegalArgumentException("Unknow database type");
+                throw new IllegalArgumentException("Unknow database type: " + dbType);
         }
     }
     
@@ -139,7 +139,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndex(reader);
             default:
-                throw new IllegalArgumentException("Unknow database type");
+                throw new IllegalArgumentException("Unknow database type: " + dbType);
         }
     }
 }

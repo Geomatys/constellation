@@ -141,8 +141,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
-        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary:" +
-                                                         "org.constellation.generic.nerc:org.constellation.skos");
+        JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
         contacts               = loadContacts(new File(cswConfigDir, "contacts"));
@@ -158,8 +157,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         contacts               = new HashMap<String, ResponsibleParty>();
-        JAXBContext context    = JAXBContext.newInstance("org.constellation.generic.edmo:org.constellation.generic.vocabulary:" +
-                                                         "org.constellation.generic.nerc:org.constellation.skos");
+        JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
         unmarshaller           = context.createUnmarshaller();
         File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
         contacts               = loadContacts(new File(cswConfigDir, "contacts"));
@@ -487,6 +485,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Return a list of contact id used in this database.
      */
     public abstract List<String> getVariablesForContact();
+
+    /**
+     * Return a list of package ':' separated use to create JAXBContext for the unmarshaller.
+     */
+    protected abstract Class[] getJAXBContext();
     
     /**
      * return a list of value for the specified variable name.
@@ -761,9 +764,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 stmt.close();
             }
             multipleStatements.clear();
-            
-            mainStatement.close();
-            mainStatement = null;
+
+            if (mainStatement != null) {
+                mainStatement.close();
+                mainStatement = null;
+            }
             
         } catch (SQLException ex) {
             logger.severe("SQLException while destroying Generic metadata reader");

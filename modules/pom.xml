@@ -51,11 +51,29 @@
     </developer>
   </developers>
 
+  <!--
+    If you don't want to build the GUI modules add -p noWar.
+    Else it will be build by default.
+  -->
+  <profiles>
+     <profile>
+        <id>defaultProfile</id>
+        <activation>
+		    <activeByDefault>true</activeByDefault>
+		</activation>
+        <modules>
+         <module>gui</module>
+       </modules>
+     </profile>
+     <profile>
+        <id>noWar</id>
+     </profile>
+  </profiles>
+
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>gui</module>
     <module>library</module>
     <module>storage</module>
     <module>web-services</module>

@@ -89,6 +89,8 @@ public class RDF {
                     Anchors.create(c.getPrefLabel() , uri);
                 } catch (URISyntaxException ex) {
                     Logger.getAnonymousLogger().severe("Unable to create an URI from: " + c.getExternalID());
+                } catch (IllegalArgumentException ex) {
+                    Logger.getAnonymousLogger().finer(ex.getMessage());
                 }
                
             }

@@ -652,6 +652,7 @@ public class CSWService extends OGCWebService {
         ElementSetType elementSet = ElementSetType.SUMMARY;
         if (eSetName != null) {
             try {
+                eSetName = eSetName.toLowerCase();
                 elementSet = ElementSetType.fromValue(eSetName);
             
             } catch (IllegalArgumentException e){

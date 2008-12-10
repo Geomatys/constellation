@@ -89,6 +89,7 @@ public abstract class AbstractCSWConfigurer {
                     Connection MDConnection = db.getConnection();
                     
                     AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
+                    LOGGER.info("loaded Factory: " + CSWfactory.getClass().getName());
                     reader  = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null);
                     indexer = CSWfactory.getIndex(config.getType(), reader, MDConnection);
                 }
@@ -103,6 +104,8 @@ public abstract class AbstractCSWConfigurer {
             throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service");
         } catch (FactoryNotFoundException ex) {
             throw new ConfigurationException("Unable to find a CSW factory for CSW in configuration service");
+        } catch (IllegalArgumentException ex) {
+            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
         }
     }
     

@@ -300,6 +300,7 @@ public class CSWworker {
                 AbstractCSWFactory CSWfactory;
                 try {
                     CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
+                    logger.info("CSW factory loaded:" + CSWfactory.getClass().getName());
                 } catch (FactoryNotFoundException ex) {
                     logger.severe("The CSW service is not working!" + '\n' +
                             "cause: Unable to find a CSW Factory");
@@ -335,6 +336,11 @@ public class CSWworker {
             logger.severe(e.getMessage());
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause: The web service can't create the index!");
+            isStarted = false;
+        } catch (IllegalArgumentException e) {
+            logger.severe(e.getMessage());
+            logger.severe("The CSW service is not working!" + '\n' +
+                    "cause: IllegalArgumentException: " + e.getMessage());
             isStarted = false;
         }
     }
