@@ -51,7 +51,7 @@ import static org.constellation.ws.ExceptionCode.*;
  */
 public class WCSPortrayalAdapter {
 
-    public BufferedImage portray(final AbstractGetCoverage query)
+    public static BufferedImage portray(final AbstractGetCoverage query)
             throws PortrayalException, WebServiceException
     {
         if (query == null) {

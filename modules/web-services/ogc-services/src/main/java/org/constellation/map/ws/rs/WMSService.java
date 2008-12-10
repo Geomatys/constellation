@@ -94,11 +94,10 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Singleton
 public class WMSService extends OGCWebService {
     /**
-     * 
+     * The worker, designed to generate the output stream matching with the request
+     * done by the user.
      */
     private final WMSWorker worker;
-
-    private static final WMSPortrayalAdapter PORTRAYAL_ADAPTER = new WMSPortrayalAdapter();
 
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
@@ -128,7 +127,7 @@ public class WMSService extends OGCWebService {
             writeParameters();
 
             String version = (String) getParameter(KEY_VERSION, false);
-            if (version == null) {
+            if (version != null) {
                 setCurrentVersion(version);
             }
 
@@ -161,11 +160,8 @@ public class WMSService extends OGCWebService {
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
                 return describeLayer(adaptDescribeLayer());
             }
-            if (version == null) {
-                setCurrentVersion("1.1.1");
-            }
             throw new WebServiceException("The operation " + request +
-                    " is not supported by the service", OPERATION_NOT_SUPPORTED, getCurrentVersion(), "request");
+                    " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
 
         } catch (WebServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getCurrentVersion(),
@@ -225,7 +221,7 @@ public class WMSService extends OGCWebService {
 
         // We now build the response, according to the format chosen.
         try {
-            PORTRAYAL_ADAPTER.hit(gfi, visitor);
+            WMSPortrayalAdapter.hit(gfi, visitor);
         } catch (PortrayalException ex) {
             throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
         }
@@ -302,7 +298,7 @@ public class WMSService extends OGCWebService {
         
         BufferedImage image = null;
         try {
-            image = PORTRAYAL_ADAPTER.portray(getMap);
+            image = WMSPortrayalAdapter.portray(getMap);
         } catch (PortrayalException ex) {
             if(errorInImage) {
                 final Dimension dim = getMap.getSize();

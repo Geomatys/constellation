@@ -48,7 +48,10 @@ import org.opengis.geometry.Envelope;
  * @author Johann Sorel (Geomatys)
  */
 public class WMSPortrayalAdapter {
-
+    /**
+     * Defines the number of pixels around the requested coordinates (X,Y), in order to
+     * search into a {@linkplain Rectangle rectangle}.
+     */
     private static final int PIXEL_TOLERANCE = 3;
 
     /**
@@ -59,7 +62,7 @@ public class WMSPortrayalAdapter {
      * @throws PortrayalException
      * @throws WebServiceException if an error occurs during the creation of the map context
      */
-    public BufferedImage portray(final GetMap query)
+    public static BufferedImage portray(final GetMap query)
                             throws PortrayalException, WebServiceException {
 
         if (query == null) {
@@ -113,7 +116,7 @@ public class WMSPortrayalAdapter {
 
     }
 
-    public void hit(final GetFeatureInfo query, final GraphicVisitor visitor)
+    public static void hit(final GetFeatureInfo query, final GraphicVisitor visitor)
                             throws PortrayalException, WebServiceException{
 
         if (query == null) {
