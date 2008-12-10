@@ -35,11 +35,19 @@ import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.catalog.CatalogException;
+import org.constellation.map.ws.rs.CSVGraphicVisitor;
+import org.constellation.map.ws.rs.GMLGraphicVisitor;
+import org.constellation.map.ws.rs.HTMLGraphicVisitor;
+import org.constellation.map.ws.rs.WMSPortrayalAdapter;
+import org.constellation.portrayal.AbstractGraphicVisitor;
+import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
+import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
+import org.constellation.query.wms.GetMap;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.Utils;
 import org.constellation.wms.AbstractDCP;
@@ -58,6 +66,7 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
 //Geotools dependencies
+import org.geotools.display.exception.PortrayalException;
 import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
@@ -345,6 +354,49 @@ public class WMSWorker {
     }
 
     /**
+     * Return the value of a point in a map.
+     *
+     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
+     * @return text, HTML , XML or GML code.
+     *
+     * @throws org.constellation.coverage.web.WebServiceException
+     */
+    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
+
+        String infoFormat = gfi.getInfoFormat();
+        if(infoFormat == null) {
+            infoFormat = TEXT_PLAIN;
+        }
+
+        final AbstractGraphicVisitor visitor;
+
+        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
+            // TEXT / PLAIN
+            visitor = new CSVGraphicVisitor();
+        }else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
+            // TEXT / HTML
+            visitor = new HTMLGraphicVisitor();
+        }else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+                  infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                  infoFormat.equalsIgnoreCase(GML))  {
+            // GML
+            visitor = new GMLGraphicVisitor(gfi);
+        }else{
+            throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
+                    INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
+        }
+
+        // We now build the response, according to the format chosen.
+        try {
+            WMSPortrayalAdapter.hit(gfi, visitor);
+        } catch (PortrayalException ex) {
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
+        }
+
+        return visitor.getResult();
+    }
+
+    /**
      * Return the legend graphic for the current layer.
      *
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
@@ -365,6 +417,40 @@ public class WMSWorker {
         final int height = getLegend.getHeight();
         final Dimension dims = new Dimension(width, height);
         return layer.getLegendGraphic(dims);
+    }
+
+    /**
+     * Return a map for the specified parameters in the query.
+     *
+     * @param getMap The {@linkplain GetMap get map} request.
+     * @return The map requested, or an error.
+     * @throws WebServiceException
+     */
+    public synchronized BufferedImage getMap(final GetMap getMap) throws WebServiceException {
+        final ServiceVersion queryVersion = getMap.getVersion();
+        final String errorType = getMap.getExceptionFormat();
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
+
+        BufferedImage image = null;
+        try {
+            image = WMSPortrayalAdapter.portray(getMap);
+        } catch (PortrayalException ex) {
+            if (errorInImage) {
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+            } else {
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+            }
+        } catch (WebServiceException ex) {
+            if (errorInImage) {
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+            } else {
+                throw new WebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
+            }
+        }
+
+        return image;
     }
 
     /**

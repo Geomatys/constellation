@@ -43,8 +43,6 @@ import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.map.ws.WMSWorker;
-import org.constellation.portrayal.AbstractGraphicVisitor;
-import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -62,7 +60,6 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 //Geotools dependencies
-import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.sld.MutableStyledLayerDescriptor;
@@ -127,10 +124,14 @@ public class WMSService extends OGCWebService {
             }
 
             if (GETMAP.equalsIgnoreCase(request)) {
-                return getMap(adaptGetMap(true));
+                final GetMap requestMap = adaptGetMap(true);
+                final BufferedImage map = worker.getMap(requestMap);
+                return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                return getFeatureInfo(adaptGetFeatureInfo());
+                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
+                final String result = worker.getFeatureInfo(requestFeatureInfo);
+                return Response.ok(result, requestFeatureInfo.getInfoFormat()).build();
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 final GetCapabilities requestCapab = adaptGetCapabilities();
@@ -187,83 +188,6 @@ public class WMSService extends OGCWebService {
             marshaller.marshal(report, sw);
             return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
-    }
-
-    /**
-     * Return the value of a point in a map.
-     *
-     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
-     * @return text, HTML , XML or GML code.
-     *
-     * @throws org.constellation.coverage.web.WebServiceException
-     */
-    private synchronized Response getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
-
-        String infoFormat = gfi.getInfoFormat();
-        if(infoFormat == null) infoFormat = TEXT_PLAIN;
-
-        final AbstractGraphicVisitor visitor;
-
-        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
-            // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor();
-        }else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
-            // TEXT / HTML
-            visitor = new HTMLGraphicVisitor();
-        }else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                  infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                  infoFormat.equalsIgnoreCase(GML))  {
-            // GML
-            visitor = new GMLGraphicVisitor(gfi);
-        }else{
-            throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
-                    INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
-        }
-
-        // We now build the response, according to the format chosen.
-        try {
-            WMSPortrayalAdapter.hit(gfi, visitor);
-        } catch (PortrayalException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
-        }
-
-        return Response.ok(visitor.getResult(), infoFormat).build();
-    }
-
-    /**
-     * Return a map for the specified parameters in the query: works with
-     * the new GO2 Renderer.
-     *
-     * @param getMap The {@linkplain GetMap get map} request.
-     * @return The map requested, or an error.
-     * @throws WebServiceException
-     */
-    private synchronized Response getMap(final GetMap getMap) throws WebServiceException {
-        final ServiceVersion queryVersion = getMap.getVersion();
-        final String errorType = getMap.getExceptionFormat();
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
-        final String format = getMap.getFormat();
-        
-        BufferedImage image = null;
-        try {
-            image = WMSPortrayalAdapter.portray(getMap);
-        } catch (PortrayalException ex) {
-            if(errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
-            } else {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
-            }
-        } catch (WebServiceException ex) {
-            if (errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
-            } else {
-                throw new WebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
-            }
-        }
-
-        return Response.ok(image, format).build();
     }
 
     /**
