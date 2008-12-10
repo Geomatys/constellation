@@ -19,6 +19,7 @@ package org.constellation.map.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
 
+//J2SE dependencies
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -31,7 +32,6 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,8 +45,6 @@ import javax.xml.bind.JAXBException;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.AbstractGraphicVisitor;
 import org.constellation.portrayal.CSTLPortrayalService;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -63,13 +61,10 @@ import org.constellation.ws.WebServiceException;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
-// Geotools dependencies
+//Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.ImmutableEnvelope;
-import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
-import org.geotools.internal.jaxb.v110.sld.TypeNameType;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
@@ -155,10 +150,16 @@ public class WMSService extends OGCWebService {
                 return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
-                return getLegendGraphic(adaptGetLegendGraphic());
+                final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
+                final BufferedImage legend = worker.getLegendGraphic(requestLegend);
+                return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-                return describeLayer(adaptDescribeLayer());
+                final DescribeLayerResponseType response = 
+                        worker.describeLayer(adaptDescribeLayer(), getServiceURL(), getSldVersion());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(response, sw);
+                return Response.ok(sw.toString(), TEXT_XML).build();
             }
             throw new WebServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
@@ -227,59 +228,6 @@ public class WMSService extends OGCWebService {
         }
 
         return Response.ok(visitor.getResult(), infoFormat).build();
-    }
-
-    /**
-     * Return a description of specified layers.
-     *
-     * @param descLayer The {@linkplain DescribeLayer describe layer} request.
-     *
-     * @throws JAXBException
-     */
-    private Response describeLayer(final DescribeLayer descLayer) throws JAXBException {
-        OnlineResourceType or = new OnlineResourceType();
-        or.setHref(getServiceURL() + "wcs?");
-
-        List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
-        final List<String> layers = descLayer.getLayers();
-        for (String layer : layers) {
-            final TypeNameType t = new TypeNameType(layer.trim());
-            final LayerDescriptionType outputLayer = new LayerDescriptionType(or, t);
-            layersDescriptions.add(outputLayer);
-        }
-        final DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(),
-                layersDescriptions);
-
-        //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();
-        marshaller.marshal(response, sw);
-        return Response.ok(sw.toString(), TEXT_XML).build();
-    }
-
-    /**
-     * Return the legend graphic for the current layer.
-     *
-     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
-     * @return a file containing the legend graphic image.
-     *
-     * @throws org.constellation.coverage.web.WebServiceException
-     * @throws javax.xml.bind.JAXBException
-     */
-    private Response getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
-        final ServiceVersion version = getLegend.getVersion();
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final LayerDetails layer = dp.get(getLegend.getLayer());
-        if (layer == null) {
-            throw new WebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
-                    version, "layer");
-        }
-        final int width  = getLegend.getWidth();
-        final int height = getLegend.getHeight();
-        final Dimension dims = new Dimension(width, height);
-        final BufferedImage image = layer.getLegendGraphic(dims);
-        final String mimeType = getLegend.getFormat();
-        
-        return Response.ok(image, mimeType).build();
     }
 
     /**

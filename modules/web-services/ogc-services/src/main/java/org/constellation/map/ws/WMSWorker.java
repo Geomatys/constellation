@@ -16,6 +16,9 @@
  */
 package org.constellation.map.ws;
 
+//J2SE dependencies
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,10 +32,14 @@ import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+
+//Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
+import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
+import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.Utils;
 import org.constellation.wms.AbstractDCP;
@@ -49,13 +56,23 @@ import org.constellation.wms.v130.OperationType;
 import org.constellation.ws.Service;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
+
+//Geotools dependencies
+import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
+import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
+import org.geotools.internal.jaxb.v110.sld.TypeNameType;
 import org.geotools.util.MeasurementRange;
+
+//Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
 
+
 /**
+ * Handle WMS requests in order to generate the wished responses.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -65,6 +82,29 @@ public class WMSWorker {
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws");
+
+    /**
+     * Return a description of specified layers.
+     *
+     * @param descLayer  The {@linkplain DescribeLayer describe layer} request.
+     * @param url        The service url.
+     * @param sldVersion The version of the sld specified.
+     */
+    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer, final String url,
+                                                   final ServiceVersion sldVersion)
+    {
+        final OnlineResourceType or = new OnlineResourceType();
+        or.setHref(url + "wcs?");
+
+        final List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
+        final List<String> layers = descLayer.getLayers();
+        for (String layer : layers) {
+            final TypeNameType t = new TypeNameType(layer.trim());
+            final LayerDescriptionType outputLayer = new LayerDescriptionType(or, t);
+            layersDescriptions.add(outputLayer);
+        }
+        return new DescribeLayerResponseType(sldVersion.toString(), layersDescriptions);
+    }
 
     /**
      * Describe the capabilities and the layers available of this service.
@@ -302,6 +342,29 @@ public class WMSWorker {
 
         inCapabilities.getCapability().setLayer(mainLayer);
         return inCapabilities;
+    }
+
+    /**
+     * Return the legend graphic for the current layer.
+     *
+     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
+     * @return a file containing the legend graphic image.
+     *
+     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws javax.xml.bind.JAXBException
+     */
+    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
+        final ServiceVersion version = getLegend.getVersion();
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
+        final LayerDetails layer = dp.get(getLegend.getLayer());
+        if (layer == null) {
+            throw new WebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
+                    version, "layer");
+        }
+        final int width  = getLegend.getWidth();
+        final int height = getLegend.getHeight();
+        final Dimension dims = new Dimension(width, height);
+        return layer.getLegendGraphic(dims);
     }
 
     /**
