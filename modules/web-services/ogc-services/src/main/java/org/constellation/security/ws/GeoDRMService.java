@@ -232,7 +232,7 @@ public class GeoDRMService extends OGCWebService {
             }
             
             //we define the selected URI
-            String requestedURI = context.getRequestUri().toString();
+            String requestedURI = uriContext.getRequestUri().toString();
             if (objectRequest == null) {
                 objectRequest = requestedURI.substring(requestedURI.indexOf('?'));
             }

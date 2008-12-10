@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.catalog.CatalogException;
@@ -118,11 +118,12 @@ public class WMSWorker {
     /**
      * Describe the capabilities and the layers available of this service.
      *
-     * @param getCapab The {@linkplain GetCapabilities get capabilities} request.
+     * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
+     * @param url            The webservice url.
+     * @param inCapabilities A default GetCapabilities read from the web service.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
      * @throws WebServiceException
-     * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab, final String url,
             AbstractWMSCapabilities inCapabilities) throws WebServiceException
@@ -178,6 +179,7 @@ public class WMSWorker {
             try {
                 dates = layer.getAvailableTimes();
             } catch (CatalogException ex) {
+                LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ key, ex);
                 dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
@@ -198,6 +200,7 @@ public class WMSWorker {
             try {
                 elevations = layer.getAvailableElevations();
             } catch (CatalogException ex) {
+                LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ key, ex);
                 elevations = null;
             }
             if (elevations != null && !(elevations.isEmpty())) {
@@ -364,7 +367,8 @@ public class WMSWorker {
     public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
 
         String infoFormat = gfi.getInfoFormat();
-        if(infoFormat == null) {
+        if (infoFormat == null) {
+            //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
             infoFormat = TEXT_PLAIN;
         }
 
@@ -373,15 +377,16 @@ public class WMSWorker {
         if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
             // TEXT / PLAIN
             visitor = new CSVGraphicVisitor();
-        }else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
+        } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
             // TEXT / HTML
             visitor = new HTMLGraphicVisitor();
-        }else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                  infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                  infoFormat.equalsIgnoreCase(GML))  {
+        } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+                   infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                   infoFormat.equalsIgnoreCase(GML))
+        {
             // GML
             visitor = new GMLGraphicVisitor(gfi);
-        }else{
+        } else {
             throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
                     INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
         }
@@ -403,7 +408,6 @@ public class WMSWorker {
      * @return a file containing the legend graphic image.
      *
      * @throws org.constellation.coverage.web.WebServiceException
-     * @throws javax.xml.bind.JAXBException
      */
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
         final ServiceVersion version = getLegend.getVersion();
@@ -424,6 +428,7 @@ public class WMSWorker {
      *
      * @param getMap The {@linkplain GetMap get map} request.
      * @return The map requested, or an error.
+     *
      * @throws WebServiceException
      */
     public synchronized BufferedImage getMap(final GetMap getMap) throws WebServiceException {

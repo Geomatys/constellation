@@ -98,25 +98,27 @@ public abstract class WebService {
      */
     protected static Boolean isGlassfish = null;
 
-     /**
-     * the service URL.
+    /**
+     * The webservice URL. This will contain url like:
+     * http://localhost:8080/constellation/WS
      */
     private String serviceURL;
 
     /**
-     * The http context containing the request parameter
+     * The http context containing the KVP request parameters.
      */
     @Context
-    protected UriInfo context;
+    protected UriInfo uriContext;
 
     /**
-     * A servlet context used for access deployed file
+     * Defines a set of methods that a servlet uses to communicate with its servlet container,
+     * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
      */
     @Context
     protected ServletContext servletContext;
 
     /**
-     * The HTTP context used for get informations on the client which send the request.
+     * The HTTP context used to get information about the client which send the request.
      */
     @Context
     protected HttpContext httpContext;
@@ -179,7 +181,7 @@ public abstract class WebService {
     protected String getParameter(final String parameterName, final boolean mandatory)
                                                             throws WebServiceException
     {
-        final MultivaluedMap parameters = context.getQueryParameters();
+        final MultivaluedMap parameters = uriContext.getQueryParameters();
         final Set<String> keySet = parameters.keySet();
         final Iterator<String> it = keySet.iterator();
 
@@ -229,7 +231,7 @@ public abstract class WebService {
      *
      */
     protected void writeParameters() throws WebServiceException {
-        final MultivaluedMap parameters = context.getQueryParameters();
+        final MultivaluedMap parameters = uriContext.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
     }
@@ -248,7 +250,7 @@ public abstract class WebService {
     protected Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException {
 
         try {
-            MultivaluedMap parameters = context.getQueryParameters();
+            MultivaluedMap parameters = uriContext.getQueryParameters();
             LinkedList<String> list = (LinkedList) parameters.get(parameterName);
             if (list == null) {
                 list = (LinkedList) parameters.get(parameterName.toLowerCase());
@@ -299,7 +301,7 @@ public abstract class WebService {
             String paramName  = token.substring(0, token.indexOf('='));
             String paramValue = token.substring(token.indexOf('=')+ 1);
             log += "put: " + paramName + "=" + paramValue + '\n';
-            context.getQueryParameters().add(paramName, paramValue);
+            uriContext.getQueryParameters().add(paramName, paramValue);
         }
         LOGGER.info("request POST kvp: " + request + '\n' + log);
         return treatIncomingRequest(null);
@@ -329,7 +331,7 @@ public abstract class WebService {
 
             if (request != null && request instanceof AbstractRequest) {
                 AbstractRequest ar = (AbstractRequest) request;
-                context.getQueryParameters().add("VERSION", ar.getVersion());
+                uriContext.getQueryParameters().add("VERSION", ar.getVersion());
             }
             return treatIncomingRequest(request);
         } else {
@@ -477,7 +479,7 @@ public abstract class WebService {
      */
     protected String getServiceURL() {
         if (serviceURL == null) {
-            serviceURL = context.getBaseUri().toString();
+            serviceURL = uriContext.getBaseUri().toString();
         }
         return serviceURL;
     }
