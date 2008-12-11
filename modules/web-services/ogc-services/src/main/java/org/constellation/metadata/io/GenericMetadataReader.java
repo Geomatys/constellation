@@ -261,9 +261,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role) {
         ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
-        result = new ResponsiblePartyImpl(result);
-        if (result != null)
+        if (result != null) {
+            result = new ResponsiblePartyImpl(result);
             result.setRole(role);
+        }
         return result;
     }
     
@@ -275,8 +276,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role, String individualName) {
         ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
-        result = new ResponsiblePartyImpl(result);
         if (result != null) {
+            result = new ResponsiblePartyImpl(result);
             result.setRole(role);
             result.setIndividualName(individualName);
         }

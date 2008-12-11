@@ -29,12 +29,17 @@ import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.WebServiceException;
+import org.geotools.factory.AbstractFactory;
 
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class AbstractCSWFactory {
+public abstract class AbstractCSWFactory extends AbstractFactory {
+
+    public AbstractCSWFactory(int priority) {
+        super(priority);
+    }
     
     public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller) throws SQLException, JAXBException;
 

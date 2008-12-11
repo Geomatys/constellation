@@ -139,6 +139,7 @@ public class Query {
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
             sql = sql.replace("':$'", "?");
+            sql = sql.replace(":$", "?");
             mainQuery += " WHERE " + sql;
         }
         if (orderBy != null && orderBy.size() > 0 && orderBy.get(0) != null && !orderBy.get(0).getvalue().equals("")) {

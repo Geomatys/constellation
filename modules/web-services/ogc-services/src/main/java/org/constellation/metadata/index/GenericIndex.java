@@ -517,9 +517,11 @@ public class GenericIndex extends IndexLucene<Object> {
      */
     private Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
-        Method getter = Utils.getGetterFromName(attributeName, object.getClass());
-        if (getter != null)
-            result = Utils.invokeMethod(getter, object);
+        if (object != null) {
+            Method getter = Utils.getGetterFromName(attributeName, object.getClass());
+            if (getter != null)
+                result = Utils.invokeMethod(getter, object);
+        }
         return result;
     }
 

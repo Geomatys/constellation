@@ -20,14 +20,19 @@ package org.constellation.configuration.factory;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.ws.rs.AbstractCSWConfigurer;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import org.geotools.factory.AbstractFactory;
 
 /**
  * An abstract factory for configurer.
  * 
  * @author Guilhem Legal
  */
-public abstract class AbstractConfigurerFactory {
-    
+public abstract class AbstractConfigurerFactory extends AbstractFactory {
+
+    public AbstractConfigurerFactory(int priority) {
+        super(priority);
+    }
+
     public abstract AbstractCSWConfigurer getCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
 
 }
