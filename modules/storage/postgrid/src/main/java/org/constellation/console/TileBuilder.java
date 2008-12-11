@@ -36,6 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.CRS;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.image.io.mosaic.Tile;
+import org.geotools.image.io.mosaic.LargeTile;
 import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.image.io.mosaic.MosaicBuilder;
 import org.geotools.image.io.mosaic.TileWritingPolicy;
@@ -250,7 +251,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                 if (sourceDirectory != null && !file.isAbsolute()) {
                     file = new File(sourceDirectory, filename);
                 }
-                final Tile tile = new Tile(null, file, 0, origin, null);
+                final Tile tile = new LargeTile(null, file, 0, origin, null);
                 tiles.add(tile);
             }
         }
@@ -292,7 +293,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                             + " is identical to the one for " + existing);
                     warnings++;
                 }
-                final Tile tile = new Tile(null, file, 0, null, tr);
+                final Tile tile = new LargeTile(null, file, 0, null, tr);
                 tiles.add(tile);
             }
         }
