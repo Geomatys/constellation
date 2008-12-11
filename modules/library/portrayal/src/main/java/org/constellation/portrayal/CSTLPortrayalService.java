@@ -140,8 +140,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             visitor.endVisit();
             canvas.clearCache();
             renderer.clearCache();
+            context.layers().clear();
         }
-
 
     }
 
@@ -170,6 +170,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }finally{
             canvas.clearCache();
             renderer.clearCache();
+            context.layers().clear();
         }
 
     }
@@ -242,6 +243,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
                                     throws PortrayalException, WebServiceException{
+        context.layers().clear();
+
         for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
             final LayerDetails details = LAYERDP.get(layerName);

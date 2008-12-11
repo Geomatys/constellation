@@ -268,7 +268,7 @@ public abstract class WebService {
             Object result = unmarshaller.unmarshal(sr);
             return result;
         } catch (JAXBException ex) {
-             throw new WebServiceException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
+             throw new WebServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
         }
     }

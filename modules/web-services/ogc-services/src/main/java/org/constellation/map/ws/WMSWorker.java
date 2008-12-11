@@ -387,7 +387,9 @@ public class WMSWorker {
             // GML
             visitor = new GMLGraphicVisitor(gfi);
         } else {
-            throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
+            throw new WebServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
+                    "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
+                    ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
                     INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
         }
 

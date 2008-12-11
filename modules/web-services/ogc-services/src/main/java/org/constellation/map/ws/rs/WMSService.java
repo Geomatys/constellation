@@ -123,6 +123,7 @@ public class WMSService extends OGCWebService {
                 setCurrentVersion(version);
             }
 
+            //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
                 final GetMap requestMap = adaptGetMap(true);
                 final BufferedImage map = worker.getMap(requestMap);
@@ -131,7 +132,7 @@ public class WMSService extends OGCWebService {
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
-                return Response.ok(result, requestFeatureInfo.getInfoFormat()).build();
+                return Response.ok(result, APP_XML).build();
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 final GetCapabilities requestCapab = adaptGetCapabilities();
@@ -143,6 +144,7 @@ public class WMSService extends OGCWebService {
                             e.getMessage(), INVALID_PARAMETER_VALUE, requestCapab.getVersion());
                 }
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab, getServiceURL(), capab);
+                //workaround because 1.1.1 is defined with a DTD rather than an XSD
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
                 marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ?
