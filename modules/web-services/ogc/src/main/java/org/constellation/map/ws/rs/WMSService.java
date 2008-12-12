@@ -132,7 +132,11 @@ public class WMSService extends OGCWebService {
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
-                return Response.ok(result, APP_XML).build();
+                String infoFormat = requestFeatureInfo.getInfoFormat();
+                if (infoFormat.equals(GML)) {
+                    infoFormat = APP_XML;
+                }
+                return Response.ok(result, infoFormat).build();
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 final GetCapabilities requestCapab = adaptGetCapabilities();
