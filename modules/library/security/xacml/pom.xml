@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>xacml-security</artifactId>
+  <artifactId>cstl-lib-xacml</artifactId>
   <packaging>jar</packaging>
   <name>XACML security library</name>
   <description>
@@ -81,7 +81,7 @@
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>xacml</artifactId>
+      <artifactId>cstl-xml-xacml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

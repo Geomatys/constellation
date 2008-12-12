@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>kml</artifactId>
+  <artifactId>cstl-xml-kml</artifactId>
   <packaging>jar</packaging>
   <name>Keyhole Markup Language binding</name>
   <description>

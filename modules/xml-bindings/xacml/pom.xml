@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>xacml</artifactId>
+  <artifactId>cstl-xml-xacml</artifactId>
   <packaging>jar</packaging>
   <name>XACML/GeoXACML binding</name>
   <description>

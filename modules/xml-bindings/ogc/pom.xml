@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>ogc</artifactId>
+  <artifactId>cstl-xml-ogc</artifactId>
   <packaging>jar</packaging>
   <name>OGC Filter binding</name>
   <description>
@@ -72,12 +72,12 @@
     </dependency>
    <dependency>
      <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>gml</artifactId>
+      <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

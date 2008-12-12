@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>wms</artifactId>
+  <artifactId>cstl-xml-wms</artifactId>
   <packaging>jar</packaging>
   <name>Web Map Service binding</name>
   <description>

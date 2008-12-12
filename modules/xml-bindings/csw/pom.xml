@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>csw</artifactId>
+  <artifactId>cstl-xml-csw</artifactId>
   <packaging>jar</packaging>
   <name>Catalogue Web Service binding</name>
   <description>
@@ -80,22 +80,22 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ogc</artifactId>
+      <artifactId>cstl-xml-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>spatial-lucene</artifactId>
+      <artifactId>cstl-lib-spatial-lucene</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

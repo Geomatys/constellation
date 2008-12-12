@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>base</artifactId>
+  <artifactId>cstl-web-base</artifactId>
   <packaging>jar</packaging>
   <name>Common implementations of web services</name>
   <description>

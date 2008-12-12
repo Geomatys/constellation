@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>ogc-services</artifactId>
+  <artifactId>cstl-web-ogc</artifactId>
   <packaging>jar</packaging>
   <name>OGC web services</name>
   <description>
@@ -93,82 +93,82 @@
     <!-- import of the other web-service modules-->
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ebrim</artifactId>
+      <artifactId>cstl-xml-ebrim</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>csw</artifactId>
+      <artifactId>cstl-xml-csw</artifactId>
       <version>${project.version}</version>
     </dependency>  
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>gml</artifactId>
+      <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>wcs</artifactId>
+      <artifactId>cstl-xml-wcs</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>wms</artifactId>
+      <artifactId>cstl-xml-wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.library</groupId>
-      <artifactId>xacml-security</artifactId>
+      <artifactId>cstl-lib-xacml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ogc</artifactId>
+      <artifactId>cstl-xml-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>spatial-lucene</artifactId>
+      <artifactId>cstl-lib-spatial-lucene</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>sos</artifactId>
+      <artifactId>cstl-xml-sos</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>metadata-FRA</artifactId>
+      <artifactId>cstl-xml-metadata-FRA</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>configuration</artifactId>
+      <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>skos</artifactId>
+      <artifactId>cstl-xml-skos</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>provider</artifactId>
+      <artifactId>cstl-stor-provider</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>portrayal</artifactId>
+      <artifactId>cstl-lib-portrayal</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- web service-->

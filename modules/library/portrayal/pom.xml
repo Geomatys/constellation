@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>portrayal</artifactId>
+  <artifactId>cstl-lib-portrayal</artifactId>
   <packaging>jar</packaging>
   <name>Portrayal Service</name>
   <description>
@@ -52,12 +52,12 @@ This module uses the GO-2 renderer.
   <dependencies>
     <dependency>
         <groupId>org.constellation.web-services</groupId>
-        <artifactId>base</artifactId>
+        <artifactId>cstl-web-base</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.constellation.storage</groupId>
-        <artifactId>provider</artifactId>
+        <artifactId>cstl-stor-provider</artifactId>
         <version>${project.version}</version>
     </dependency>
 

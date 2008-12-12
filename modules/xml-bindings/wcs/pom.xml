@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>wcs</artifactId>
+  <artifactId>cstl-xml-wcs</artifactId>
   <packaging>jar</packaging>
   <name>Web Coverage Service binding</name>
   <description>
@@ -72,12 +72,12 @@
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>gml</artifactId>
+      <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

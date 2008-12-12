@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>configuration-service</artifactId>
+  <artifactId>cstl-web-configuration</artifactId>
   <packaging>jar</packaging>
   <name>Configuration web service</name>
   <description>
@@ -74,7 +74,7 @@
   <dependencies>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>ogc-services</artifactId>
+      <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

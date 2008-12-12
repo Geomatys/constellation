@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>skos</artifactId>
+  <artifactId>cstl-xml-skos</artifactId>
   <packaging>jar</packaging>
   <name>Simple Knowledge Organization System</name>
   <description>

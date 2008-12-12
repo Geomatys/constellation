@@ -17,7 +17,7 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
+  <groupId>org.constellation.maven</groupId>
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
   <name>Build</name>

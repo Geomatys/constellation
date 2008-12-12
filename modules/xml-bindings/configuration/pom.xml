@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>configuration</artifactId>
+  <artifactId>cstl-xml-configuration</artifactId>
   <packaging>jar</packaging>
   <name>Configuration bindings</name>
   <description>

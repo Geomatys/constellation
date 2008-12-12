@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>ows</artifactId>
+  <artifactId>cstl-xml-ows</artifactId>
   <packaging>jar</packaging>
   <name>OGC Web Service binding</name>
   <description>
@@ -72,7 +72,7 @@
     </dependency>
     <dependency>
      <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
 

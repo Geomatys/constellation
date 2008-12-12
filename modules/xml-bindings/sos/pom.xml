@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>sos</artifactId>
+  <artifactId>cstl-xml-sos</artifactId>
   <packaging>jar</packaging>
   <name>Sensor Observation Service binding</name>
   <description>
@@ -72,17 +72,17 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ogc</artifactId>
+      <artifactId>cstl-xml-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>observation</artifactId>
+      <artifactId>cstl-stor-observation</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

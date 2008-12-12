@@ -19,7 +19,7 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>postgrid</artifactId>
+  <artifactId>cstl-stor-postgrid</artifactId>
   <packaging>jar</packaging>
   <name>PostGrid database storage</name>
   <description>
@@ -86,7 +86,7 @@
   <dependencies>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -18,7 +18,7 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>provider</artifactId>
+  <artifactId>cstl-stor-provider</artifactId>
   <packaging>jar</packaging>
   <name>Providers</name>
   <description>
@@ -51,12 +51,12 @@
   <dependencies>
     <dependency>
         <groupId>org.constellation.web-services</groupId>
-        <artifactId>base</artifactId>
+        <artifactId>cstl-web-base</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.constellation.storage</groupId>
-        <artifactId>postgrid</artifactId>
+        <artifactId>cstl-stor-postgrid</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
