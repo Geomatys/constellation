@@ -939,10 +939,11 @@ public class CSWworker {
             for (String id:request.getId()) {
                 
                 //we verify if  the identifier of the metadata exist
+                String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null){
                     unexistingID.add(id);
-                    logger.severe("unexisting metadata id: " + id);
+                    logger.severe("unexisting metadata id: " + saved);
                     continue;
                 }
                 //we get the metadata object
@@ -966,10 +967,11 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
+               String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting metadata id:" + id);
+                    logger.severe("unexisting metadata id:" + saved);
                     continue;
                 }
                 
@@ -998,10 +1000,11 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
+               String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting id:" + id);
+                    logger.severe("unexisting id:" + saved);
                     continue;
                 }
                 
@@ -1030,10 +1033,11 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
+               String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting metadata id: " + id);
+                    logger.severe("unexisting metadata id: " + saved);
                     continue;
                 }
                 
@@ -1062,10 +1066,11 @@ public class CSWworker {
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
+               String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
                     unexistingID.add(id);
-                    logger.severe("unexisting id:" + id);
+                    logger.severe("unexisting id:" + saved);
                     continue;
                 }
                 
