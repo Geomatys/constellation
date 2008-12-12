@@ -42,8 +42,8 @@ public class ProviderLayer {
         this.styles = styles;
         this.dateStartField = startDate;
         this.dateEndField = endDate;
-        this.elevationStartField = startDate;
-        this.elevationEndField = endDate;
+        this.elevationStartField = startElevation;
+        this.elevationEndField = endElevation;
     }
     
     

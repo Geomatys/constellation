@@ -202,7 +202,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             
             final Class type = desc.getType().getBinding();
             if( !(Date.class.isAssignableFrom(type)) ){
-                LOGGER.log(Level.WARNING , "Invalide field type for dates, layer" + name +", must be a Date, found a " + type);
+                LOGGER.log(Level.WARNING , "Invalide field type for dates, layer " + name +", must be a Date, found a " + type);
                 return dates;
             }
             
@@ -240,7 +240,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         final SortedSet<Number> elevations = new TreeSet<Number>();
         
         if(elevationStartField != null){
-            
+
             final AttributeDescriptor desc = fs.getSchema().getDescriptor(elevationStartField);
             if(desc == null){
                 LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
@@ -249,7 +249,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             
             final Class type = desc.getType().getBinding();
             if( !(Number.class.isAssignableFrom(type)) ){
-                LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer" + name +", must be a Number, found a " + type);
+                LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer " + name +", must be a Number, found a " + type);
                 return elevations;
             }
             
