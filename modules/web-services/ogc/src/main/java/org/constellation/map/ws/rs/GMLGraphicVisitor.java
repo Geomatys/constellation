@@ -126,7 +126,16 @@ public class GMLGraphicVisitor extends AbstractGraphicVisitor{
 
         StringBuilder builder = new StringBuilder();
         for(int i=0;i<results.length;i++){
-            builder.append(i).append(':').append(results[i][0]).append(" ").append( ((Unit)results[i][1]).toString()).append(';');
+            final Object value = results[i][0];
+            final Unit unit    = (Unit)results[i][1];
+            if (value == null) {
+                continue;
+            }
+            builder.append(value);
+            if (unit != null) {
+                builder.append(" ").append(unit.toString());
+            }
+            builder.append(" [").append(i).append(']');
         }
 
         final String result = builder.toString();
