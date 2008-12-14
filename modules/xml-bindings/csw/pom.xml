@@ -20,9 +20,10 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-csw</artifactId>
   <packaging>jar</packaging>
-  <name>Catalogue Web Service binding</name>
+  <name>Catalog Service for the Web binding</name>
   <description>
-    A Catalogue Web Service managing metadatas from geographic information.
+    XML bindings for the geographic information metadata schemas used by the 
+    OGC Catalog Service for the Web (CSW).
   </description>
 
 

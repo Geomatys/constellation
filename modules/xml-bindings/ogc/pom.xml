@@ -20,9 +20,9 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-ogc</artifactId>
   <packaging>jar</packaging>
-  <name>OGC Filter binding</name>
+  <name>OGC Filter bindings</name>
   <description>
-    An implementation of some version of the ogc Filter.
+    XML bindings for various versions of OGC Filter schemas.
   </description>
 
 

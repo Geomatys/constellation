@@ -20,9 +20,9 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-wms</artifactId>
   <packaging>jar</packaging>
-  <name>Web Map Service binding</name>
+  <name>Web Map Service bindings</name>
   <description>
-    An implementation of the Web Map Service.
+    XML bindings for various versions of the OGC Web Map Service schemas.
   </description>
 
 

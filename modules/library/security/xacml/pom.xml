@@ -22,7 +22,8 @@
   <packaging>jar</packaging>
   <name>XACML security library</name>
   <description>
-    A JBoss implementation of XACML reviewed and designed for constellation.
+    The sunxacml.sf.net library as improved by JBoss reviewed and redesigned for 
+    Constellation.
   </description>
 
 

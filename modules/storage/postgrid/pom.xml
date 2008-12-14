@@ -23,7 +23,7 @@
   <packaging>jar</packaging>
   <name>PostGrid database storage</name>
   <description>
-    PostgreSQL database schema and Java toolkit for 4-dimensional rasters.
+    A PostgreSQL database schema and Java toolkit for 4-dimensional rasters.
   </description>
 
 

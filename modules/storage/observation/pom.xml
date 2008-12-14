@@ -23,7 +23,8 @@
   <packaging>jar</packaging>
   <name>Observation and Measurement storage</name>
   <description>
-    An Observations and measurement implementation contanaing also Sampling Feature(OnM part-2) and Sensor Web Enablement implementation.
+    An Observations and measurement implementation extended to contain both 
+    Sampling Feature(OnM part-2) and Sensor Web Enablement implementation.
   </description>
 
 

@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <name>XACML/GeoXACML binding</name>
   <description>
-    An implementation of the GeoXACML 2.0 specification.
+    XML binding for the OASIS XACML schema and the OGC GeoXACML schema.
   </description>
 
 

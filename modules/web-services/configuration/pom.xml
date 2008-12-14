@@ -22,7 +22,8 @@
   <packaging>jar</packaging>
   <name>Configuration web service</name>
   <description>
-    Configuration web service.
+    Web Service enabling the remote configuration or control of a Constellation
+    instance.
   </description>
 
 

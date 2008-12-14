@@ -22,7 +22,9 @@
   <packaging>jar</packaging>
   <name>Security web services</name>
   <description>
-    Security module of Constellation for web services.
+    Web service facades to standardized services such as OGC Web Services. The 
+    facades act as the Policy Enforcement Point (PEP) in the OASIS architectural 
+    model for access control described in the XACML and SAMLv2 specifications.
   </description>
 
 

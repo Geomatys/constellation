@@ -22,7 +22,8 @@
   <packaging>jar</packaging>
   <name>Configuration bindings</name>
   <description>
-    Some classes used for constellation administration and configuration by POST XML request.
+    XML binding for the messages exchanged by POST used for constellation 
+    administration and configuration.
   </description>
 
 

@@ -22,8 +22,8 @@
   <packaging>jar</packaging>
   <name>Portrayal Service</name>
   <description>
-    Portrayal utilities classes used for rendering operations in several Web services.
-This module uses the GO-2 renderer.
+    Portrayal utility classes used for rendering operations in several web 
+    services using the GO-2 renderer.
   </description>
 
 

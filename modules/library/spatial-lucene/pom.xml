@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <name>Spatial Lucene indexing library</name>
   <description>
-    A lucene Index module adding spatial filter.
+    A Lucene Indexing module adding spatial filter.
   </description>
 
 

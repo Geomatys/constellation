@@ -20,9 +20,9 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-kml</artifactId>
   <packaging>jar</packaging>
-  <name>Keyhole Markup Language binding</name>
+  <name>Keyhole Markup Language bindings</name>
   <description>
-    An implementation of some version of the Keyhole Markup Language.
+    XML bindings for various versions of the Keyhole Markup Language (KML) schemas.
   </description>
 
 

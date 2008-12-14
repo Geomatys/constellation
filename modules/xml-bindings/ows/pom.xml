@@ -20,9 +20,9 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-ows</artifactId>
   <packaging>jar</packaging>
-  <name>OGC Web Service binding</name>
+  <name>OGC Web Service bindings</name>
   <description>
-    An implementation of some version of the OGC Web Service.
+    XML bindings for various versions of the OGC Web Service (OWS) schemas.
   </description>
 
 

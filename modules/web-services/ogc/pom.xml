@@ -22,7 +22,8 @@
   <packaging>jar</packaging>
   <name>OGC web services</name>
   <description>
-    An constellation of standardized OGC Web Services.
+    The geospatial web services standardized by the Open Geospatial Consortium 
+    (OGC), including CSW, SOS, WMS, and WCS.
   </description>
 
 

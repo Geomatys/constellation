@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <name>Sensor Observation Service binding</name>
   <description>
-    A Sensor Observation Service to collect, store and distribute sensor observations.
+    XML bindings for the OGC Sensor Observation Service schema.
   </description>
 
 
