@@ -184,9 +184,9 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
             value = context.lookup(key);
         } catch (NamingException n) {
             // Do nothing, the key is not found in the context and the value is still null.
-        } finally {
-            return value;
         }
+        
+        return value;
     }
 
     private PostGridNamedLayerDP() {
