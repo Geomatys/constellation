@@ -55,9 +55,9 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>security</module>
-    <module>spatial-lucene</module>
     <module>portrayal</module>
+    <module>spatial-lucene</module>
+    <module>xacml</module>
   </modules>
 
 </project>
