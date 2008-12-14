@@ -52,7 +52,7 @@
   </developers>
 
   <!--
-    If you don't want to build the GUI modules add -p noWar.
+    If you don't want to build the GUI modules add -PnoWar.
     Else it will be build by default.
   -->
   <profiles>
