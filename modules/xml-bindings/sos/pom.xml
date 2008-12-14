@@ -82,7 +82,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-stor-observation</artifactId>
+      <artifactId>cstl-store-observation</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

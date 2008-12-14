@@ -57,7 +57,7 @@
     </dependency>
     <dependency>
         <groupId>org.constellation.storage</groupId>
-        <artifactId>cstl-stor-provider</artifactId>
+        <artifactId>cstl-store-provider</artifactId>
         <version>${project.version}</version>
     </dependency>
 

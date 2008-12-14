@@ -19,7 +19,7 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-stor-postgrid</artifactId>
+  <artifactId>cstl-store-postgrid</artifactId>
   <packaging>jar</packaging>
   <name>PostGrid database storage</name>
   <description>
