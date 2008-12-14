@@ -49,8 +49,6 @@ import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 
 // Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
@@ -71,9 +69,6 @@ import org.constellation.sos.RequestBaseType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.ogc.LiteralType;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.NoSuchRecordException;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
@@ -117,8 +112,6 @@ import org.constellation.swe.v101.TextBlockEntry;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
-import org.mdweb.model.storage.Form;
-import org.mdweb.xml.MalFormedDocumentException;
 import org.opengis.observation.Observation;
 
 // postgres driver
@@ -185,11 +178,6 @@ public class SOSworker {
      * The maximum of observation return in a getObservation request.
      */
     private final int maxObservationByRequest;
-    
-    /**
-     * The version of the service
-     */
-    private ServiceVersion version;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -352,17 +340,17 @@ public class SOSworker {
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("SOS")) {
                 throw new WebServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE, version, "service");
+                                                 INVALID_PARAMETER_VALUE, "service");
             }
         } else {
             throw new WebServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, version, "service");
+                                             MISSING_PARAMETER_VALUE, "service");
         }
         AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("1.0.0")){
                  throw new WebServiceException("version available : 1.0.0",
-                                             VERSION_NEGOTIATION_FAILED, version, "acceptVersion");
+                                             VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
@@ -376,7 +364,7 @@ public class SOSworker {
             }
             if (!found) {
                 throw new WebServiceException("accepted format : text/xml, application/xml",
-                                                 INVALID_PARAMETER_VALUE, version, "acceptFormats");
+                                                 INVALID_PARAMETER_VALUE, "acceptFormats");
             }
             
         } else {
@@ -384,103 +372,85 @@ public class SOSworker {
         }
         
         //we prepare the response document
-        Capabilities c = null; 
-        try {
-            
-            ServiceIdentification si = null;
-            ServiceProvider       sp = null;
-            OperationsMetadata    om = null;
-            FilterCapabilities    fc = null;
-            Contents            cont = null;
-            
-            SectionsType sections = requestCapabilities.getSections();
-            if (sections == null) {
-                sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
-            }
-            //we enter the information for service identification.
-            if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
-                
-                si = staticCapabilities.getServiceIdentification();
-            }
-            
-            //we enter the information for service provider.
-            if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
-            
-                sp = staticCapabilities.getServiceProvider();
-            }
-            
-            //we enter the operation Metadata
-            if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
-                
-               om = staticCapabilities.getOperationsMetadata();
-               
-               //we remove the operation not supported in this profile (transactional/discovery)
-               if (profile == DISCOVERY) {
-                   om.removeOperation("InsertObservation");
-                   om.removeOperation("RegisterSensor");
-               }
-               
-               
-               //we update the URL
-               OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
-              
-               
-               //we update the parameter in operation metadata.
-               Operation go = om.getOperation("GetObservation");
-               
-               // the list of offering names
-               Set<String> offNames = OMReader.getOfferingNames();
-               go.updateParameter("offering", offNames);
-               
-               // the event time range
-               RangeType range = new RangeType(OMReader.getMinimalEventTime(), "now");
-               go.updateParameter("eventTime", range);
-               
-               //the process list
-               Set<String> procNames  = OMReader.getProcedureNames();
-               go.updateParameter("procedure", procNames);
-               
-               //the phenomenon list
-               Set<String> phenoNames = OMReader.getPhenomenonNames();
-               go.updateParameter("observedProperty", phenoNames);
-               
-               //the feature of interest list
-               Set<String> featureNames = OMReader.getFeatureOfInterestNames();
-               go.updateParameter("featureOfInterest", featureNames);
-               
-               Operation ds = om.getOperation("DescribeSensor");
-               ds.updateParameter("procedure", procNames);
-               
-            }
-            
-            //we enter the information filter capablities.
-            if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
-            
-                fc = staticCapabilities.getFilterCapabilities();
-            }
-            
-            
-             if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
-                // we add the list of observation ofeerings 
-                List<ObservationOfferingEntry> loo = OMReader.getObservationOfferings();
-                ObservationOfferingList ool = new ObservationOfferingList(loo);
-                
-                cont = new Contents(ool);
-            }
-            c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
-            
-        } catch (SQLException ex) {
-           ex.printStackTrace();
-           throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE, version);
-           
-        } catch (CatalogException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
+        Capabilities c           = null; 
+        ServiceIdentification si = null;
+        ServiceProvider       sp = null;
+        OperationsMetadata    om = null;
+        FilterCapabilities    fc = null;
+        Contents            cont = null;
+
+        SectionsType sections = requestCapabilities.getSections();
+        if (sections == null) {
+            sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
+        //we enter the information for service identification.
+        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
+
+            si = staticCapabilities.getServiceIdentification();
+        }
+
+        //we enter the information for service provider.
+        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
+
+            sp = staticCapabilities.getServiceProvider();
+        }
+
+        //we enter the operation Metadata
+        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
+
+           om = staticCapabilities.getOperationsMetadata();
+
+           //we remove the operation not supported in this profile (transactional/discovery)
+           if (profile == DISCOVERY) {
+               om.removeOperation("InsertObservation");
+               om.removeOperation("RegisterSensor");
+           }
+
+
+           //we update the URL
+           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
+
+
+           //we update the parameter in operation metadata.
+           Operation go = om.getOperation("GetObservation");
+
+           // the list of offering names
+           go.updateParameter("offering", OMReader.getOfferingNames());
+
+           // the event time range
+           RangeType range = new RangeType(OMReader.getMinimalEventTime(), "now");
+           go.updateParameter("eventTime", range);
+
+           //the process list
+           Set<String> procNames  = OMReader.getProcedureNames();
+           go.updateParameter("procedure", procNames);
+
+           //the phenomenon list
+           go.updateParameter("observedProperty", OMReader.getPhenomenonNames());
+
+           //the feature of interest list
+           go.updateParameter("featureOfInterest", OMReader.getFeatureOfInterestNames());
+
+           Operation ds = om.getOperation("DescribeSensor");
+           ds.updateParameter("procedure", procNames);
+
+        }
+
+        //we enter the information filter capablities.
+        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
+
+            fc = staticCapabilities.getFilterCapabilities();
+        }
+
+
+        if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
+            // we add the list of observation ofeerings 
+            ObservationOfferingList ool = new ObservationOfferingList(OMReader.getObservationOfferings());
+            cont = new Contents(ool);
+        }
+        c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
+
         return normalizeDocument(c);
-        
     }
     
     /**
@@ -491,39 +461,27 @@ public class SOSworker {
     public String describeSensor(DescribeSensor requestDescSensor) throws WebServiceException  {
         logger.info("DescribeSensor request processing"  + '\n');
         
-            // we get the form
-            verifyBaseRequest(requestDescSensor);
-            
-            //we verify that the output format is good.     
-            if (requestDescSensor.getOutputFormat()!= null) {
-                    if (!requestDescSensor.getOutputFormat().equalsIgnoreCase("text/xml;subtype=\"SensorML/1.0.0\"")) {
-                        throw new WebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
-                                                         INVALID_PARAMETER_VALUE, version, "outputFormat");
-                    }
-            } else {
-                throw new WebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
-                                                 MISSING_PARAMETER_VALUE, version, "outputFormat");
-            }
-            //we transform the form into an XML string
-            if (requestDescSensor.getProcedure() == null) {
-                throw new WebServiceException("You must specify the sensor ID!",
-                                             MISSING_PARAMETER_VALUE, version, "procedure");
-            }
-            String sensorId = requestDescSensor.getProcedure();
-            logger.info("sensorId received: " + sensorId);
-            String result = "";
+        // we get the form
+        verifyBaseRequest(requestDescSensor);
 
-            try {
-                result = SMLReader.getSensor(sensorId);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE, version);
+        //we verify that the output format is good.     
+        if (requestDescSensor.getOutputFormat() != null) {
+            if (!requestDescSensor.getOutputFormat().equalsIgnoreCase("text/xml;subtype=\"SensorML/1.0.0\"")) {
+                throw new WebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
+                        INVALID_PARAMETER_VALUE, "outputFormat");
             }
-
-            
-            return result;
-       
+        } else {
+            throw new WebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
+                                             MISSING_PARAMETER_VALUE, "outputFormat");
+        }
+        //we transform the form into an XML string
+        if (requestDescSensor.getProcedure() == null) {
+            throw new WebServiceException("You must specify the sensor ID!",
+                                         MISSING_PARAMETER_VALUE, "procedure");
+        }
+        String sensorId = requestDescSensor.getProcedure();
+        logger.info("sensorId received: " + sensorId);
+        return SMLReader.getSensor(sensorId);
     }
     
     /**
@@ -536,17 +494,17 @@ public class SOSworker {
         logger.info("getObservation request processing"  + '\n');
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
-        
-         //we verify that the output format is good.     
-         if (requestObservation.getResponseFormat()!= null) {
+
+        //we verify that the output format is good.     
+        if (requestObservation.getResponseFormat() != null) {
             if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0.0\"")) {
-                throw new WebServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat", 
-                                                 INVALID_PARAMETER_VALUE, version, "responseFormat");
+                throw new WebServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat",
+                        INVALID_PARAMETER_VALUE, "responseFormat");
             }
-         } else {
+        } else {
             throw new WebServiceException("Response format text/xml;subtype=\"om/1.0.0\" must be specify",
-                                          MISSING_PARAMETER_VALUE, version, "responseFormat");
-         }
+                    MISSING_PARAMETER_VALUE, "responseFormat");
+        }
         
         //we get the mode of result
         ObservationCollectionEntry response = new ObservationCollectionEntry();
@@ -560,7 +518,7 @@ public class SOSworker {
                     mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
                 } catch (IllegalArgumentException e) {
                     throw new WebServiceException(" the response Mode: " + requestObservation.getResponseMode() + " is not supported by the service (inline or template available)!",
-                                                     INVALID_PARAMETER_VALUE, version, "responseMode");
+                                                     INVALID_PARAMETER_VALUE, "responseMode");
                 }
             }
             StringBuilder SQLrequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
@@ -572,32 +530,27 @@ public class SOSworker {
                 template = true;
             } else {
                 throw new WebServiceException("This response Mode is not supported by the service (inline or template available)!",
-                                                 OPERATION_NOT_SUPPORTED, version, "responseMode");
+                                                 OPERATION_NOT_SUPPORTED, "responseMode");
             }
             
             ObservationOfferingEntry off;
             //we verify that there is an offering 
             if (requestObservation.getOffering() == null) {
                 throw new WebServiceException("Offering must be specify!",
-                                                 MISSING_PARAMETER_VALUE, version, "offering");
+                                                 MISSING_PARAMETER_VALUE, "offering");
             } else {
-                try {
-                    off = OMReader.getObservationOffering(requestObservation.getOffering());
-                } catch (NoSuchRecordException ex) {
+                off = OMReader.getObservationOffering(requestObservation.getOffering());
+                if (off == null) {
                     throw new WebServiceException("This offering is not registered in the service",
-                                                  INVALID_PARAMETER_VALUE, version, "offering");
-                } catch (CatalogException ex) {
-                  throw new WebServiceException("Catalog exception while getting the offering",
-                                                  NO_APPLICABLE_CODE, version, "offering");
-                }
-                
+                                                  INVALID_PARAMETER_VALUE, "offering");
+                } 
             }
             
             //we verify that the srsName (if there is one) is advertised in the offering
             if (requestObservation.getSrsName() != null) {
                 if (!off.getSrsName().contains(requestObservation.getSrsName())) {
                     throw new WebServiceException("This srs name is not advertised in the offering",
-                                                    INVALID_PARAMETER_VALUE, version, "srsName");
+                                                    INVALID_PARAMETER_VALUE, "srsName");
                 }
             }
             
@@ -605,7 +558,7 @@ public class SOSworker {
             if (requestObservation.getResultModel() != null) {
                 if (!off.getResultModel().contains(requestObservation.getResultModel())) {
                     throw new WebServiceException("This result model is not advertised in the offering",
-                                                    INVALID_PARAMETER_VALUE, version, "resultModel");
+                                                    INVALID_PARAMETER_VALUE, "resultModel");
                 }
             }
             
@@ -621,20 +574,15 @@ public class SOSworker {
                             dbId = s;
                         } 
                         logger.info("process ID: " + dbId);
-                        ReferenceEntry proc = null;
-                        try {
-                            proc = getReferenceFromHRef(dbId); 
-                        } catch (NoSuchRecordException ex) {
+                        ReferenceEntry proc = getReferenceFromHRef(dbId); 
+                        if (proc != null) {
                             throw new WebServiceException(" this process is not registred in the table",
-                                                          INVALID_PARAMETER_VALUE, version, "procedure");
-                        } catch (CatalogException ex) {
-                            throw new WebServiceException("Catalog exception while getting the procedure",
-                                                             NO_APPLICABLE_CODE, version, "offering");
+                                                          INVALID_PARAMETER_VALUE, "procedure");
                         }
                      
                         if (!off.getProcedure().contains(proc)) {
                            throw new WebServiceException(" this process is not registred in the offering",
-                                                        INVALID_PARAMETER_VALUE, version, "procedure");
+                                                        INVALID_PARAMETER_VALUE, "procedure");
                         } else {
                             SQLrequest.append(" procedure='").append(dbId).append("' OR ");
                         }
@@ -642,7 +590,7 @@ public class SOSworker {
                         //if there is only one proccess null we return error (we'll see)
                         if (procedures.size() == 1)
                             throw new WebServiceException("the process is null",
-                                                             INVALID_PARAMETER_VALUE, version, "procedure");
+                                                             INVALID_PARAMETER_VALUE, "procedure");
                     }
                 }
             } else {
@@ -668,20 +616,14 @@ public class SOSworker {
                     if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                         phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                     }
-                    PhenomenonEntry phen = null;
-                    try {
-                        phen = OMReader.getPhenomenon(phenomenonName);
-                    } catch (NoSuchRecordException ex) {
+                    PhenomenonEntry phen = OMReader.getPhenomenon(phenomenonName);
+                   if (phen == null)
                         throw new WebServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
-                                INVALID_PARAMETER_VALUE, version, "observedProperty");
-                    } catch (CatalogException ex) {
-                        throw new WebServiceException("Catalog exception while getting the phenomenon " + phenomenonName,
-                                NO_APPLICABLE_CODE, version, "observedProperty");
-                    }
-                    if (phen != null && phen instanceof CompositePhenomenonEntry) {
+                                INVALID_PARAMETER_VALUE, "observedProperty");
+                   if (phen instanceof CompositePhenomenonEntry) {
                         SQLrequest.append(" observed_property_composite='").append(phenomenonName).append("' OR ");
 
-                    } else if (phen != null && phen instanceof PhenomenonEntry) {
+                    } else if (phen instanceof PhenomenonEntry) {
                         SQLrequest.append(" observed_property='").append(phenomenonName).append("' OR ");
                     }
                 }
@@ -705,15 +647,10 @@ public class SOSworker {
                     for (final String samplingFeatureName : foiRequest.getObjectID()) {
                         
                         //verify that the station is registred in the DB.
-                        try {
-                            SamplingFeatureEntry foi = OMReader.getFeatureOfInterest(samplingFeatureName);
-                        } catch (NoSuchRecordException ex){
+                        SamplingFeatureEntry foi = OMReader.getFeatureOfInterest(samplingFeatureName);
+                        if (foi == null)
                             throw new WebServiceException("the feature of interest is not registered",
-                                                             INVALID_PARAMETER_VALUE, version, "featureOfInterest");
-                        } catch (CatalogException ex){
-                            throw new WebServiceException("Catalog exception while getting the feature of interest",
-                                                             NO_APPLICABLE_CODE, version, "featureOfInterest");
-                        }
+                                                             INVALID_PARAMETER_VALUE, "featureOfInterest");
                         SQLrequest.append("feature_of_interest_point='").append(samplingFeatureName).append("' OR");
                     }
                     SQLrequest.delete(SQLrequest.length() - 2, SQLrequest.length());
@@ -731,16 +668,10 @@ public class SOSworker {
                             boolean add = false;
                             EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
                             for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
-                                SamplingPointEntry station = null;
-                                try {
-                                    station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
-                                } catch (NoSuchTableException ex) {
+                                SamplingPointEntry station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
+                                if (station == null)
                                     throw new WebServiceException("the feature of interest is not registered",
-                                            INVALID_PARAMETER_VALUE, version);
-                                } catch (CatalogException ex) {
-                                    throw new WebServiceException("Catalog exception while getting the feature of interest",
-                                            NO_APPLICABLE_CODE, version, "observedProperty");
-                                }
+                                            INVALID_PARAMETER_VALUE);
                                 if (station instanceof SamplingPointEntry) {
                                     SamplingPointEntry sp = (SamplingPointEntry) station;
                                     if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
@@ -764,11 +695,11 @@ public class SOSworker {
                         
                         } else {
                             throw new WebServiceException("the envelope is not build correctly",
-                                                         INVALID_PARAMETER_VALUE, version);
+                                                         INVALID_PARAMETER_VALUE);
                         }
                     } else {
                         throw new WebServiceException("This operation is not take in charge by the Web Service",
-                                                     OPERATION_NOT_SUPPORTED, version);
+                                                     OPERATION_NOT_SUPPORTED);
                     }
                 }
             
@@ -785,7 +716,7 @@ public class SOSworker {
                     LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
                     if (literal == null || propertyName == null || propertyName.equals("")) {
                         throw new WebServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
-                                                      MISSING_PARAMETER_VALUE, version, "lessThan");
+                                                      MISSING_PARAMETER_VALUE, "lessThan");
                     } 
                     
                         
@@ -795,7 +726,7 @@ public class SOSworker {
                     LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
                     if (propertyName == null || propertyName.equals("") || literal == null) {
                         throw new WebServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
-                                                     MISSING_PARAMETER_VALUE, version, "greaterThan");
+                                                     MISSING_PARAMETER_VALUE, "greaterThan");
                     } 
                     
                 } else if (result.getPropertyIsEqualTo() != null) {
@@ -804,20 +735,20 @@ public class SOSworker {
                     LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
                     if (propertyName == null || propertyName.equals("") || literal == null) {
                          throw new WebServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
-                                                       MISSING_PARAMETER_VALUE, version, "propertyIsEqualTo");
+                                                       MISSING_PARAMETER_VALUE, "propertyIsEqualTo");
                     } 
                     
                         
                 } else if (result.getPropertyIsLike() != null) {
                     throw new WebServiceException("This operation is not take in charge by the Web Service",
-                                                  OPERATION_NOT_SUPPORTED, version, "propertyIsLike");
+                                                  OPERATION_NOT_SUPPORTED, "propertyIsLike");
 
                 } else if (result.getPropertyIsBetween() != null) {
                     
                     logger.info("PROP IS BETWEEN");
                     if (result.getPropertyIsBetween().getPropertyName() == null) {
                         throw new WebServiceException("To use the operation Between you must specify the propertyName and the litteral",
-                                                      MISSING_PARAMETER_VALUE, version, "propertyIsBetween");
+                                                      MISSING_PARAMETER_VALUE, "propertyIsBetween");
                     } 
                     String propertyName  = result.getPropertyIsBetween().getPropertyName();
                     
@@ -826,59 +757,54 @@ public class SOSworker {
                     
                     if (propertyName == null || propertyName.equals("") || LowerLiteral == null || UpperLiteral == null) {
                             throw new WebServiceException("This property name, lower and upper literal must be specify",
-                                                          INVALID_PARAMETER_VALUE, version, "result");
+                                                          INVALID_PARAMETER_VALUE, "result");
                             
                     }
                 
                 } else {
                     throw new WebServiceException("This operation is not take in charge by the Web Service",
-                                                  OPERATION_NOT_SUPPORTED, version);
+                                                  OPERATION_NOT_SUPPORTED);
                 }
             }
             logger.info("request:" + SQLrequest.toString());
         
             //TODO remplacer par une filteredList ds postgrid
             ResultSet results = OMReader.executeSQLQuery(SQLrequest.toString());
-            try {
-                while (results.next()) {
-                    ObservationEntry o = OMReader.getObservation(results.getString(1));
-                    if (template) {
-                    
-                        String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                        ObservationEntry temporaryTemplate = o.getTemporaryTemplate(temporaryTemplateId, templateTime);
-                        templates.put(temporaryTemplateId, temporaryTemplate);
-                    
-                        // we launch a timer which will destroy the template in one hours
-                        Timer t = new Timer();
-                        //we get the date and time for now
-                        Calendar now = new GregorianCalendar();
-                        long next = now.getTimeInMillis() + templateValidTime;
-                        Date d = new Date(next);
-                        logger.info("this template will be destroyed at:" + d.toString());
-                        t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
-                        schreduledTask.add(t);
-                        
-                        response.add(temporaryTemplate);
-                    } else {
-                        response.add(o);
-                    
-                        //we stop the request if its too big
-                        if (response.getMember().size() > maxObservationByRequest) {
-                            throw new WebServiceException("Your request is to voluminous please add filter and try again",
-                                                          NO_APPLICABLE_CODE, version);
-                        }
+            while (results.next()) {
+                ObservationEntry o = OMReader.getObservation(results.getString(1));
+                if (template) {
+
+                    String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                    ObservationEntry temporaryTemplate = o.getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    templates.put(temporaryTemplateId, temporaryTemplate);
+
+                    // we launch a timer which will destroy the template in one hours
+                    Timer t = new Timer();
+                    //we get the date and time for now
+                    Calendar now = new GregorianCalendar();
+                    long next = now.getTimeInMillis() + templateValidTime;
+                    Date d = new Date(next);
+                    logger.info("this template will be destroyed at:" + d.toString());
+                    t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
+                    schreduledTask.add(t);
+
+                    response.add(temporaryTemplate);
+                } else {
+                    response.add(o);
+
+                    //we stop the request if its too big
+                    if (response.getMember().size() > maxObservationByRequest) {
+                        throw new WebServiceException("Your request is to voluminous please add filter and try again",
+                                                      NO_APPLICABLE_CODE);
                     }
                 }
-            } catch (CatalogException ex) {
-                  throw new WebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE, version, "getObservation");
             }
             results.close();
             OMReader.closeCurrentStatement();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
+                                          NO_APPLICABLE_CODE);
         }
         return normalizeDocument(response);
     }
@@ -899,11 +825,11 @@ public class SOSworker {
             template = templates.get(id);
             if (template == null) {
                 throw new WebServiceException("this template does not exist or is no longer usable",
-                                              INVALID_PARAMETER_VALUE, version, "ObservationTemplateId");
+                                              INVALID_PARAMETER_VALUE, "ObservationTemplateId");
             }
         } else {
             throw new WebServiceException("ObservationTemplateID must be specified",
-                                          MISSING_PARAMETER_VALUE, version, "ObservationTemplateId");
+                                          MISSING_PARAMETER_VALUE, "ObservationTemplateId");
         }
         
         //we begin to create the sql request
@@ -959,15 +885,9 @@ public class SOSworker {
             ResultSet results = OMReader.executeSQLQuery(SQLrequest.toString());
             StringBuilder datablock = new StringBuilder();
             while (results.next()) {
-                AnyResultEntry a = null;
                 Timestamp tBegin = results.getTimestamp(2);
                 Timestamp tEnd   = results.getTimestamp(3);
-                try {
-                    a = OMReader.getResult(results.getString(1));
-                
-                } catch (NoSuchRecordException ex) {
-                    logger.info("no such record in result Table");
-                }
+                AnyResultEntry a = OMReader.getResult(results.getString(1));
                 if (a != null) {
                     DataArrayEntry array = a.getArray();
                     if (array != null) {
@@ -986,13 +906,8 @@ public class SOSworker {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new WebServiceException("The service has throw an SQL exception in GetResult Operation",
-                                          NO_APPLICABLE_CODE, version);
-        } catch (CatalogException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
+                                          NO_APPLICABLE_CODE);
         }
-
         logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
     }
@@ -1198,12 +1113,10 @@ public class SOSworker {
             if(obs == null) {
                 throw new WebServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
-                                              version,
                                               "observationTemplate");
             } else if (!obs.isComplete()) {
                 throw new WebServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
                                               INVALID_PARAMETER_VALUE,
-                                              version,
                                               "observationTemplate"); 
             }
            
@@ -1226,14 +1139,13 @@ public class SOSworker {
             id = sensorIdBase + num;
             
             //and we write it in the sensorML Database
-            Form f = SMLWriter.writeSensor(id, tempFile);
-            
+            int formID = SMLWriter.writeSensor(id, tempFile);
             
             // we record the mapping between physical id and database id
-            String phyId = SMLWriter.recordMapping(f, id, getSicadeDirectory());
+            String phyId = SMLWriter.recordMapping(formID, id, getSicadeDirectory());
             
             // and we record the position of the piezometer
-            recordSensorLocation(f, phyId);
+            recordSensorLocation(formID, phyId);
                                     
             //we write the observation template in the O&M database
             
@@ -1244,38 +1156,17 @@ public class SOSworker {
             logger.finer(obs.toString());
             OMWriter.writeObservation(obs);
                    
-            addSensorToOffering(f, obs);
+            addSensorToOffering(formID, obs);
             
            success = true; 
         } catch (SQLException e) {
             e.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE, version);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service cannot build the temporary file",
-                                          NO_APPLICABLE_CODE, version);
+                                             NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch (ParserConfigurationException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service has throw a ParserException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch (SAXException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service has throw a SAXException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch (CatalogException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service has throw a CatalogException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch (MalFormedDocumentException ex) {
-            ex.printStackTrace();
-            logger.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new WebServiceException("The SensorML Document is Malformed",
-                                          INVALID_PARAMETER_VALUE, version, "sensorDescription");
+                                          NO_APPLICABLE_CODE);
         } finally {
             try {
                 if (!success) {
@@ -1287,8 +1178,7 @@ public class SOSworker {
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                              NO_APPLICABLE_CODE,
-                                              version);
+                                              NO_APPLICABLE_CODE);
             }
         }
         
@@ -1307,62 +1197,50 @@ public class SOSworker {
        verifyBaseRequest(requestInsObs);
         
         String id = "";
-        try {
-            //we get the id of the sensor and we create a sensor object
-            String sensorId   = requestInsObs.getAssignedSensorId();
-            int num = -1;
-            if (sensorId.startsWith(sensorIdBase)) {
-                num = Integer.parseInt(sensorId.substring(sensorIdBase.length()));
-            } else {
-                throw new WebServiceException("The sensor identifier is not valid",
-                                             INVALID_PARAMETER_VALUE, version, "assignedSensorId");
-            }
-            ProcessEntry proc = new ProcessEntry(sensorId);
-            
-            //we get the observation and we assign to it the sensor
-            ObservationEntry obs = requestInsObs.getObservation();
-            if (obs != null) {
-                obs.setProcedure(proc);
-                obs.setName(OMReader.getNewObservationId());
-                logger.finer("samplingTime received: " + obs.getSamplingTime()); 
-                logger.finer("template received:" + '\n' + obs.toString());
-            } else {
-                throw new WebServiceException("The observation template must be specified",
-                                                 MISSING_PARAMETER_VALUE, version, "observationTemplate");
-            }
-                
-            //we record the observation in the O&M database
-           if (obs instanceof MeasurementEntry) {
-               OMWriter.writeMeasurement((MeasurementEntry)obs);
-            } else if (obs instanceof ObservationEntry) {
-                
-                //in first we verify that the observation is conform to the template
-                ObservationEntry template = OMReader.getObservation(observationTemplateIdBase + num);
-                //if the observation to insert match the template we can insert it in the OM db
-                if (obs.matchTemplate(template)) {
-                    if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                        id = OMWriter.writeObservation(obs);
-                        logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
-                    } else {
-                        throw new WebServiceException("The observation sampling time and the result must be specify",
-                                                      MISSING_PARAMETER_VALUE, version, "samplingTime");
-                    }
-                } else {
-                    throw new WebServiceException(" The observation doesn't match with the template of the sensor",
-                                                  INVALID_PARAMETER_VALUE, version, "samplingTime");
-                }
-            } 
-            
-        } catch( SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("The service has throw a SQLException:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
-        } catch( CatalogException e) {
-            e.printStackTrace();
-            throw new WebServiceException("The service has throw a CatalogException:" + e.getMessage(),
-                                          NO_APPLICABLE_CODE, version);
+        //we get the id of the sensor and we create a sensor object
+        String sensorId   = requestInsObs.getAssignedSensorId();
+        int num = -1;
+        if (sensorId.startsWith(sensorIdBase)) {
+            num = Integer.parseInt(sensorId.substring(sensorIdBase.length()));
+        } else {
+            throw new WebServiceException("The sensor identifier is not valid",
+                                         INVALID_PARAMETER_VALUE, "assignedSensorId");
         }
-         
+        ProcessEntry proc = new ProcessEntry(sensorId);
+
+        //we get the observation and we assign to it the sensor
+        ObservationEntry obs = requestInsObs.getObservation();
+        if (obs != null) {
+            obs.setProcedure(proc);
+            obs.setName(OMReader.getNewObservationId());
+            logger.finer("samplingTime received: " + obs.getSamplingTime()); 
+            logger.finer("template received:" + '\n' + obs.toString());
+        } else {
+            throw new WebServiceException("The observation template must be specified",
+                                             MISSING_PARAMETER_VALUE, "observationTemplate");
+        }
+
+        //we record the observation in the O&M database
+       if (obs instanceof MeasurementEntry) {
+           OMWriter.writeMeasurement((MeasurementEntry)obs);
+        } else if (obs instanceof ObservationEntry) {
+
+            //in first we verify that the observation is conform to the template
+            ObservationEntry template = OMReader.getObservation(observationTemplateIdBase + num);
+            //if the observation to insert match the template we can insert it in the OM db
+            if (obs.matchTemplate(template)) {
+                if (obs.getSamplingTime() != null && obs.getResult() != null) {
+                    id = OMWriter.writeObservation(obs);
+                    logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+                } else {
+                    throw new WebServiceException("The observation sampling time and the result must be specify",
+                                                  MISSING_PARAMETER_VALUE, "samplingTime");
+                }
+            } else {
+                throw new WebServiceException(" The observation doesn't match with the template of the sensor",
+                                              INVALID_PARAMETER_VALUE, "samplingTime");
+            }
+        } 
         return new InsertObservationResponse(id);
     }
     
@@ -1428,7 +1306,7 @@ public class SOSworker {
                         }
                     } else {
                         throw new WebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, "eventTime");
                     }
                 
                 // The operation Time before    
@@ -1456,7 +1334,7 @@ public class SOSworker {
                         
                     } else {
                         throw new WebServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, "eventTime");
                     }
                     
                 // The operation Time after    
@@ -1487,7 +1365,7 @@ public class SOSworker {
                         }
                     } else {
                        throw new WebServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, version, "eventTime");
+                                                     INVALID_PARAMETER_VALUE, "eventTime");
                     }
                     
                 // The time during operation    
@@ -1528,15 +1406,15 @@ public class SOSworker {
                         }
                     } else {
                         throw new WebServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, version, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, "eventTime");
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
                     throw new WebServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
-                                                  OPERATION_NOT_SUPPORTED, version);
+                                                  OPERATION_NOT_SUPPORTED);
                 } else {
                     throw new WebServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
-                                                  OPERATION_NOT_SUPPORTED, version);
+                                                  OPERATION_NOT_SUPPORTED);
                 }
             }
         } else {
@@ -1568,7 +1446,7 @@ public class SOSworker {
              } catch(IllegalArgumentException e) {
                 throw new WebServiceException("Unable to parse the value: " + value + '\n' +
                                                  "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
-                                                 INVALID_PARAMETER_VALUE, version, "eventTime");
+                                                 INVALID_PARAMETER_VALUE, "eventTime");
              }
           } else {
             String locator;
@@ -1577,7 +1455,7 @@ public class SOSworker {
             else
                 locator = "TimePosition value";
             throw new  WebServiceException("bad format of time, " + locator + " mustn't be null",
-                                              MISSING_PARAMETER_VALUE, version, "eventTime");
+                                              MISSING_PARAMETER_VALUE, "eventTime");
           }
     }
     
@@ -1589,24 +1467,24 @@ public class SOSworker {
             if (request.getService() != null) {
                 if (!request.getService().equals("SOS"))  {
                     throw new WebServiceException("service must be \"SOS\"!",
-                                                  INVALID_PARAMETER_VALUE, version, "service");
+                                                  INVALID_PARAMETER_VALUE, "service");
                 }
             } else {
                 throw new WebServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, version, "service");
+                                              MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().equals("1.0.0")) {
                     throw new WebServiceException("version must be \"1.0.0\"!",
-                                                  VERSION_NEGOTIATION_FAILED, version);
+                                                  VERSION_NEGOTIATION_FAILED);
                 }
             } else {
                 throw new WebServiceException("version must be specified!",
-                                              MISSING_PARAMETER_VALUE, version, "version");
+                                              MISSING_PARAMETER_VALUE, "version");
             }
          } else { 
             throw new WebServiceException("The request is null!",
-                                          NO_APPLICABLE_CODE, version);
+                                          NO_APPLICABLE_CODE);
          }  
         
     }
@@ -1634,9 +1512,9 @@ public class SOSworker {
      * 
      *  @param form The "form" containing the sensorML data.
      */
-    private void recordSensorLocation(Form form, String sensorId) throws SQLException, WebServiceException {
-        String SRS         = SMLReader.getSRSName(form);
-        String coordinates = SMLReader.getSensorCoordinates(form);
+    private void recordSensorLocation(int formID, String sensorId) throws WebServiceException {
+        String SRS         = SMLReader.getSRSName(formID);
+        String coordinates = SMLReader.getSensorCoordinates(formID);
         
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
@@ -1651,221 +1529,218 @@ public class SOSworker {
      * @param form The "form" contain the sensorML data.
      * @param template The observation template for this sensor.
      */
-    private void addSensorToOffering(Form form, Observation template) throws SQLException, CatalogException {
+    private void addSensorToOffering(int formID, Observation template) throws WebServiceException {
      
         //we search which are the classifier describing the networks
-        List<Integer> networksIndex = SMLReader.getNetworkIndex(form);
+        List<Integer> networksIndex = SMLReader.getNetworkIndex(formID);
         
         int size = networksIndex.size();
         if (size == 0) {
             logger.severe("There is no network in that SensorML file");
         } 
-            
-            // for each network we create (or update) an offering
-            for (int j = 0; j < size + 1; j++) {
-                if (j != size) {
-                    ResultSet result = SMLReader.getNetworkName(form, networksIndex.get(j) + "");
-                
-                    if (result.next()) {
-                        String offeringName = "offering-" + result.getString(1);
-                        logger.info("networks:" + offeringName);
-                        ObservationOfferingEntry offering = null;
-                    
-                        //we get the offering from the O&M database
-                        try {
-                            offering = OMReader.getObservationOffering(offeringName);
-                        } catch (NoSuchRecordException ex) {
-                            logger.info("offering " + offeringName + " not present, first build");
-                        }
-                        
-                        //if the offering is already in the database
-                        if (offering != null) {
-                             
-                            //we add the new sensor to the offering
-                            ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry)template.getProcedure()).getHref());
-                            if (!offering.getProcedure().contains(ref)) {
-                                if (ref == null) {
-                                   ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref()); 
-                                }
-                                OfferingProcedureEntry offProc= new OfferingProcedureEntry(offering.getId(), ref);
-                                OMWriter.writeOfferingProcedure(offProc);
-                            }
-                            
-                            //we add the phenomenon to the offering
-                            if (!offering.getObservedProperty().contains(template.getObservedProperty())){
-                                OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
-                                OMWriter.writeOfferingPhenomenon(offPheno);
-                            }
-                            
-                            // we add the feature of interest (station) to the offering
-                            ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                            if (!offering.getFeatureOfInterest().contains(ref)) {
-                                if (ref == null) {
-                                   ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId()); 
-                                }
-                                OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                                OMWriter.writeOfferingSamplingFeature(offSF);
-                            }
-                       
-                        // we build a new offering
-                        // TODO bounded by??? station?    
-                        } else {
-                            // for the eventime of the offering we take the time of now.
-                            Calendar now = new GregorianCalendar();
-                            Timestamp t = new Timestamp(now.getTimeInMillis());
-                            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
-                            
-                            //we create a new List of process and add the template process to it
-                            List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
-                            ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
-                            process.add(ref);
-                        
-                            //we create a new List of phenomenon and add the template phenomenon to it
-                            List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
-                            phenos.add((PhenomenonEntry)template.getObservedProperty());
-                        
-                            //we create a new List of process and add the template process to it
-                            List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
-                            ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                            logger.info(ref.toString());
-                            stations.add(ref);
-                        
-                            //we create a list of accepted responseMode (fixed)
-                            List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
-                            responses.add(ResponseModeType.INLINE);
-                            responses.add(ResponseModeType.RESULT_TEMPLATE);
-                            
-                            List<QName> resultModel = new ArrayList<QName>();
-                            resultModel.add(new QName("http://www.opengis.net/om/1.0",
-                                                      "Observation",
-                                                      "om"));
-                            List<String> offerinfOutputFormat = new ArrayList<String>();
-                            offerinfOutputFormat.add("text/xml");
-                            
-                            List<String> srsName = new ArrayList<String>();
-                            srsName.add("EPSG:4326");
-                            
-                            // we create a the new Offering
-                            offering = new ObservationOfferingEntry(offeringName, 
-                                                                    offeringIdBase + offeringName,
-                                                                    "",
-                                                                    null, 
-                                                                    null, //TODO boundedby 
-                                                                    srsName,
-                                                                    time,
-                                                                    process,
-                                                                    phenos,
-                                                                    stations,
-                                                                    offerinfOutputFormat,
-                                                                    resultModel,
-                                                                    responses);
-                            OMWriter.writeOffering(offering);
-                        }
-                    } else {
-                        logger.severe("no value for network classifier numero " + networksIndex.get(j));
-                    }
-                    result.close();
-                    
-                // we add the sensor to the global offering containing all the sensor    
-                } else {
-                    
-                    //we get the offering from the O&M database
+
+        // for each network we create (or update) an offering
+        for (int j = 0; j < size + 1; j++) {
+            if (j != size) {
+                String result = SMLReader.getNetworkName(formID, networksIndex.get(j) + "");
+
+                if (result != null) {
+                    String offeringName = "offering-" + result;
+                    logger.info("networks:" + offeringName);
                     ObservationOfferingEntry offering = null;
-                    try {
-                        offering = OMReader.getObservationOffering("offering-allSensor");
-                    } catch (NoSuchRecordException ex) {
-                        
-                        logger.info("offering allSensor not present, first build");
-                    }
+
+                    //we get the offering from the O&M database
+                    offering = OMReader.getObservationOffering(offeringName);
+
+                    //if the offering is already in the database
                     if (offering != null) {
+
                         //we add the new sensor to the offering
-                       ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry)template.getProcedure()).getHref());
-                       if (!offering.getProcedure().contains(ref)) {
-                            if (ref == null){
-                                ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
+                        ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry)template.getProcedure()).getHref());
+                        if (!offering.getProcedure().contains(ref)) {
+                            if (ref == null) {
+                               ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref()); 
                             }
-                            OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
+                            OfferingProcedureEntry offProc= new OfferingProcedureEntry(offering.getId(), ref);
                             OMWriter.writeOfferingProcedure(offProc);
                         }
+
                         //we add the phenomenon to the offering
                         if (!offering.getObservedProperty().contains(template.getObservedProperty())){
-                            OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
+                            OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
                             OMWriter.writeOfferingPhenomenon(offPheno);
                         }
+
                         // we add the feature of interest (station) to the offering
-                       ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                       if (!offering.getFeatureOfInterest().contains(ref)) {
-                           if (ref == null) {
-                                ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                           }
-                           OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                           OMWriter.writeOfferingSamplingFeature(offSF);
+                        ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+                        if (!offering.getFeatureOfInterest().contains(ref)) {
+                            if (ref == null) {
+                               ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId()); 
+                            }
+                            OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                            OMWriter.writeOfferingSamplingFeature(offSF);
                         }
+
+                    // we build a new offering
+                    // TODO bounded by??? station?    
                     } else {
-                         // for the eventime of the offering we take the time of now.
-                            Calendar now = new GregorianCalendar();
-                            Timestamp t = new Timestamp(now.getTimeInMillis());
-                            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
-                            
-                            //we create a new List of process and add the template process to it
-                            List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
-                            ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
-                            process.add(ref);
-                        
-                            //we create a new List of phenomenon and add the template phenomenon to it
-                            List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
-                            phenos.add((PhenomenonEntry)template.getObservedProperty());
-                        
-                            //we create a new List of process and add the template process to it
-                            List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
-                            ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                            stations.add(ref);
-                        
-                            //we create a list of accepted responseMode (fixed)
-                            List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
-                            responses.add(ResponseModeType.RESULT_TEMPLATE);
-                            responses.add(ResponseModeType.INLINE);
-                        
-                            List<QName> resultModel = new ArrayList<QName>();
-                            resultModel.add(new QName("http://www.opengis.net/om/1.0",
-                                                      "Observation",
-                                                      "om"));
-                            List<String> offeringOutputFormat = new ArrayList<String>();
-                            offeringOutputFormat.add("text/xml");
-                            
-                            List<String> srsName = new ArrayList<String>();
-                            srsName.add("EPSG:4326");
-                            
-                            // we create a the new Offering
-                            offering = new ObservationOfferingEntry(offeringIdBase + "allSensor", 
-                                                                    offeringIdBase + "allSensor",
-                                                                    "",
-                                                                    null, 
-                                                                    null, //TODO boundedby
-                                                                    srsName,
-                                                                    time,
-                                                                    process,
-                                                                    phenos,
-                                                                    stations,
-                                                                    offeringOutputFormat,
-                                                                    resultModel,
-                                                                    responses);
-                            OMWriter.writeOffering(offering);
+                        logger.info("offering " + offeringName + " not present, first build");
+
+                        // for the eventime of the offering we take the time of now.
+                        Calendar now = new GregorianCalendar();
+                        Timestamp t = new Timestamp(now.getTimeInMillis());
+                        TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+
+                        //we create a new List of process and add the template process to it
+                        List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
+                        ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
+                        process.add(ref);
+
+                        //we create a new List of phenomenon and add the template phenomenon to it
+                        List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
+                        phenos.add((PhenomenonEntry)template.getObservedProperty());
+
+                        //we create a new List of process and add the template process to it
+                        List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
+                        ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+                        logger.info(ref.toString());
+                        stations.add(ref);
+
+                        //we create a list of accepted responseMode (fixed)
+                        List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
+                        responses.add(ResponseModeType.INLINE);
+                        responses.add(ResponseModeType.RESULT_TEMPLATE);
+
+                        List<QName> resultModel = new ArrayList<QName>();
+                        resultModel.add(new QName("http://www.opengis.net/om/1.0",
+                                                  "Observation",
+                                                  "om"));
+                        List<String> offerinfOutputFormat = new ArrayList<String>();
+                        offerinfOutputFormat.add("text/xml");
+
+                        List<String> srsName = new ArrayList<String>();
+                        srsName.add("EPSG:4326");
+
+                        // we create a the new Offering
+                        offering = new ObservationOfferingEntry(offeringName, 
+                                                                offeringIdBase + offeringName,
+                                                                "",
+                                                                null, 
+                                                                null, //TODO boundedby 
+                                                                srsName,
+                                                                time,
+                                                                process,
+                                                                phenos,
+                                                                stations,
+                                                                offerinfOutputFormat,
+                                                                resultModel,
+                                                                responses);
+                        OMWriter.writeOffering(offering);
                     }
+                } else {
+                    logger.severe("no value for network classifier numero " + networksIndex.get(j));
+                }
+
+            // we add the sensor to the global offering containing all the sensor    
+            } else {
+
+                //we get the offering from the O&M database
+                ObservationOfferingEntry offering = OMReader.getObservationOffering("offering-allSensor");
+
+                if (offering != null) {
+                    //we add the new sensor to the offering
+                    ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
+                    if (!offering.getProcedure().contains(ref)) {
+                        if (ref == null) {
+                            ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
+                        }
+                        OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
+                        OMWriter.writeOfferingProcedure(offProc);
+                    }
+                    //we add the phenomenon to the offering
+                    if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
+                        OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
+                        OMWriter.writeOfferingPhenomenon(offPheno);
+                    }
+                    // we add the feature of interest (station) to the offering
+                    ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                    if (!offering.getFeatureOfInterest().contains(ref)) {
+                        if (ref == null) {
+                            ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                        }
+                        OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                        OMWriter.writeOfferingSamplingFeature(offSF);
+                    }
+                } else {
+                    logger.info("offering allSensor not present, first build");
+
+                    // for the eventime of the offering we take the time of now.
+                    Calendar now = new GregorianCalendar();
+                    Timestamp t = new Timestamp(now.getTimeInMillis());
+                    TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+
+                    //we create a new List of process and add the template process to it
+                    List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
+                    ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
+                    process.add(ref);
+
+                    //we create a new List of phenomenon and add the template phenomenon to it
+                    List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
+                    phenos.add((PhenomenonEntry)template.getObservedProperty());
+
+                    //we create a new List of process and add the template process to it
+                    List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
+                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+                    stations.add(ref);
+
+                    //we create a list of accepted responseMode (fixed)
+                    List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
+                    responses.add(ResponseModeType.RESULT_TEMPLATE);
+                    responses.add(ResponseModeType.INLINE);
+
+                    List<QName> resultModel = new ArrayList<QName>();
+                    resultModel.add(new QName("http://www.opengis.net/om/1.0",
+                                              "Observation",
+                                              "om"));
+                    List<String> offeringOutputFormat = new ArrayList<String>();
+                    offeringOutputFormat.add("text/xml");
+
+                    List<String> srsName = new ArrayList<String>();
+                    srsName.add("EPSG:4326");
+
+                    // we create a the new Offering
+                    offering = new ObservationOfferingEntry(offeringIdBase + "allSensor", 
+                                                            offeringIdBase + "allSensor",
+                                                            "",
+                                                            null, 
+                                                            null, //TODO boundedby
+                                                            srsName,
+                                                            time,
+                                                            process,
+                                                            phenos,
+                                                            stations,
+                                                            offeringOutputFormat,
+                                                            resultModel,
+                                                            responses);
+                    OMWriter.writeOffering(offering);
                 }
             }
+        }
     }
     
     /**
      * Return the referenceEntry with the specified href attribute.
      */
-    private ReferenceEntry getReferenceFromHRef(String href) throws SQLException, CatalogException {
+    private ReferenceEntry getReferenceFromHRef(String href) throws WebServiceException {
         Set<ReferenceEntry> refs = OMReader.getReferences();
-        Iterator<ReferenceEntry> it = refs.iterator();
-        while (it.hasNext()) {
-            ReferenceEntry ref = it.next();
-            if (ref != null && ref.getHref() != null && ref.getHref().equals(href))
-                return ref;
+        if (refs != null) {
+            Iterator<ReferenceEntry> it = refs.iterator();
+            while (it.hasNext()) {
+                ReferenceEntry ref = it.next();
+                if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
+                    return ref;
+                }
+            }
         }
         return null;
     }
@@ -1986,13 +1861,6 @@ public class SOSworker {
     }
     
     /**
-     * Set the current service version
-     */
-    public void setVersion(ServiceVersion version){
-        this.version = version;
-    }
-    
-    /**
      * Set the capabilities document.
      */
     public void setStaticCapabilities(Capabilities staticCapabilities) {
@@ -2028,7 +1896,8 @@ public class SOSworker {
     public void destroy() {
         SMLReader.destroy();
         SMLWriter.destroy();
-
+        OMReader.destroy();
+        OMWriter.destroy();
         for (Timer t : schreduledTask) {
             t.cancel();
         }

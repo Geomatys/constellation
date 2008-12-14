@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.catalog.NoSuchTableException;
+import org.constellation.ws.WebServiceException;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -40,6 +41,7 @@ import org.mdweb.xml.MalFormedDocumentException;
 import org.mdweb.xml.Reader;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.xml.sax.SAXException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -97,15 +99,43 @@ public class SensorWriter {
         getValueStmt       = smlConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
     }
     
-    public Form  writeSensor(String id, File sensorFile) throws IOException, SQLException, SAXException, ParserConfigurationException, MalFormedDocumentException {
-        //we parse the temporay xmlFile
-        Reader XMLReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
+    public int writeSensor(String id, File sensorFile) throws WebServiceException {
+        try {
+            //we parse the temporay xmlFile
+            Reader XMLReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
 
-        //and we write it in the sensorML Database
+            //and we write it in the sensorML Database
+
+            Form f = XMLReader.readForm(SMLCatalog, mainUser, "source", id, Standard.SENSORML);
+            sensorMLWriter.writeForm(f, false);
+            return f.getId();
         
-        Form f = XMLReader.readForm(SMLCatalog, mainUser, "source", id, Standard.SENSORML);
-        sensorMLWriter.writeForm(f, false);
-        return f;
+        } catch (ParserConfigurationException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("The service has throw a ParserException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } catch (SAXException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("The service has throw a SAXException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } catch (MalFormedDocumentException ex) {
+            ex.printStackTrace();
+            logger.severe("MalFormedDocumentException:" + ex.getMessage());
+            throw new WebServiceException("The SensorML Document is Malformed",
+                                          INVALID_PARAMETER_VALUE, "sensorDescription");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("The service cannot build the temporary file",
+                                          NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } 
     }
     
     
@@ -115,7 +145,7 @@ public class SensorWriter {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    public String recordMapping(Form form, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException {
+    public String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException {
        
         //we search which identifier is the supervisor code
         int i                  = 1;
@@ -123,7 +153,7 @@ public class SensorWriter {
         boolean moreIdentifier = true;
         while (moreIdentifier && !found) {
             getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-            getValueStmt.setInt(2,    form.getId());
+            getValueStmt.setInt(2, formID);
             ResultSet result = getValueStmt.executeQuery();
             moreIdentifier   = result.next();
             if (moreIdentifier) {
@@ -141,7 +171,7 @@ public class SensorWriter {
             return "";
         } else {
             getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-            getValueStmt.setInt(2,    form.getId());
+            getValueStmt.setInt(2,    formID);
             ResultSet result = getValueStmt.executeQuery();
             String value = "";
             if (result.next()) {

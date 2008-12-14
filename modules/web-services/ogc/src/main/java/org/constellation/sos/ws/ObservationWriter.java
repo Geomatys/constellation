@@ -89,72 +89,148 @@ public class ObservationWriter {
         
     }
    
-    public String writeObservation(ObservationEntry observation) throws SQLException, CatalogException {
-        if (obsTable != null) {
-            return obsTable.getIdentifier(observation);
+    public String writeObservation(ObservationEntry observation) throws WebServiceException {
+        try {
+            if (obsTable != null) {
+                return obsTable.getIdentifier(observation);
+            }
+            return null;
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
         }
-        return null;
     }
     
-    public String writeMeasurement(MeasurementEntry measurement) throws SQLException, CatalogException {
-        MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
-        return measTable.getIdentifier(measurement);
+    public String writeMeasurement(MeasurementEntry measurement) throws WebServiceException {
+        try {
+            MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
+            return measTable.getIdentifier(measurement);
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
     }
     
-    public String writeOffering(ObservationOfferingEntry offering) throws SQLException, CatalogException {
-        return offTable.getIdentifier(offering);
+    public String writeOffering(ObservationOfferingEntry offering) throws WebServiceException {
+        try {
+            return offTable.getIdentifier(offering);
+            
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } 
     }
     
-    public void writeOfferingProcedure(OfferingProcedureEntry offProc) throws NoSuchTableException, SQLException, CatalogException {
-        offTable.getProcedures().getIdentifier(offProc);
+    public void writeOfferingProcedure(OfferingProcedureEntry offProc) throws WebServiceException {
+        try {
+            offTable.getProcedures().getIdentifier(offProc);
+        
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } 
     }
     
-    public void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws NoSuchTableException, SQLException, CatalogException {
-        offTable.getPhenomenons().getIdentifier(offPheno);
+    public void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws WebServiceException {
+        try {
+            offTable.getPhenomenons().getIdentifier(offPheno);
+        
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } 
     }
     
-    public void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws NoSuchTableException, SQLException, CatalogException {
-        offTable.getStations().getIdentifier(offSF);
+    public void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws WebServiceException {
+        try {
+            offTable.getStations().getIdentifier(offSF);
+        } catch (CatalogException ex) {
+            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                    NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                    NO_APPLICABLE_CODE);
+        } 
     }
     
     public void updateOfferings() {
         offTable.flush();
     }
     
-    public void recordProcedureLocation(String SRSName, String sensorId, String x, String y) throws SQLException, WebServiceException {
-        Statement stmt2    = OMDatabase.getConnection().createStatement();
-        final ResultSet result2;
-        String request = "SELECT * FROM ";
-        boolean insert = true;
-        
-        if (SRSName.equals("27582")) {
-            request = request + " projected_localisations WHERE id='" + sensorId + "'";
-            result2 = stmt2.executeQuery(request);
-            if (!result2.next()) {
-                request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + SRSName + "))";
+    public void recordProcedureLocation(String SRSName, String sensorId, String x, String y) throws WebServiceException {
+        try {
+            Statement stmt2    = OMDatabase.getConnection().createStatement();
+            final ResultSet result2;
+            String request = "SELECT * FROM ";
+            boolean insert = true;
+
+            if (SRSName.equals("27582")) {
+                request = request + " projected_localisations WHERE id='" + sensorId + "'";
+                result2 = stmt2.executeQuery(request);
+                if (!result2.next()) {
+                    request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + SRSName + "))";
+                } else {
+                    insert = false;
+                    logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
+                }
+            } else if (SRSName.equals("4326")) {
+                request = request + " geographic_localisations WHERE id='" + sensorId + "'";
+                result2 = stmt2.executeQuery(request);
+                if (!result2.next()) {
+                    request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + SRSName + "))";
+                } else {
+                    insert = false;
+                    logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
+                }
             } else {
-                insert = false;
-                logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
+                throw new WebServiceException("This CRS " + SRSName + " is not supported",
+                                              INVALID_PARAMETER_VALUE);
             }
-        } else if (SRSName.equals("4326")) {
-            request = request + " geographic_localisations WHERE id='" + sensorId + "'";
-            result2 = stmt2.executeQuery(request);
-            if (!result2.next()) {
-                request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + SRSName + "))";
-            } else {
-                insert = false;
-                logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
+            logger.info(request);
+            if (insert) {
+                stmt2.executeUpdate(request);
             }
-        } else {
-            throw new WebServiceException("This CRS " + SRSName + " is not supported",
-                                          INVALID_PARAMETER_VALUE);
+            result2.close();
+            stmt2.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } 
+    }
+    
+    public void destroy() {
+        try {
+            obsTable.clear();
+            offTable.clear();
+            refTable.clear();
+            OMDatabase.close();
+        } catch (CatalogException ex) {
+            logger.severe("Catalog exception while destroying observation writer");
+        } catch (SQLException ex) {
+            logger.severe("SQL exception while destroying observation writer");
         }
-        logger.info(request);
-        if (insert) {
-            stmt2.executeUpdate(request);
-        }
-        result2.close();
-        stmt2.close();
     }
 
 }

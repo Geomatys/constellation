@@ -71,7 +71,6 @@ public class SOService extends OGCWebService {
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", new ServiceVersion(Service.OWS, "1.0.0"));
         worker = new SOSworker(SOSworker.TRANSACTIONAL);
-        worker.setVersion(getCurrentVersion());
         setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe:org.constellation.observation",
                       "");
     }
@@ -171,10 +170,18 @@ public class SOService extends OGCWebService {
             } else {
                 LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
             }
-            StringWriter sw = new StringWriter(); 
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), ex.getVersion());   
-            marshaller.marshal(report, sw);
-            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            ServiceVersion version = ex.getVersion();
+            if (marshaller != null) {
+                if (version == null) {
+                    version = getCurrentVersion();
+                }
+                StringWriter sw = new StringWriter();
+                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+                marshaller.marshal(report, sw);
+                return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            } else {
+                return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
+            }
         }
     }
     

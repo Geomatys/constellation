@@ -96,7 +96,11 @@ public class SOService {
      */
     private Unmarshaller unmarshaller;
     
-       
+     /**
+     * The version of the service
+     */   
+    private ServiceVersion version;
+    
     /**
      * Initialize the database connection.
      */
@@ -106,7 +110,7 @@ public class SOService {
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-       worker.setVersion(new ServiceVersion(Service.OWS, "1.0.0"));
+       version = new ServiceVersion(Service.OWS, "1.0.0");
     }
     
     /**
@@ -123,7 +127,10 @@ public class SOService {
              
             return worker.getCapabilities(requestCapabilities);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         } catch (JAXBException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }
@@ -140,7 +147,10 @@ public class SOService {
             logger.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         }
     }
     
@@ -157,7 +167,10 @@ public class SOService {
             logger.info("received SOAP getObservation request");
             return worker.getObservation(requestObservation);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         }
     }
     
@@ -170,7 +183,10 @@ public class SOService {
             logger.info("received SOAP getResult request");
             return worker.getResult(requestResult);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         }
     }
     
@@ -187,7 +203,10 @@ public class SOService {
             logger.info("received SOAP registerSensor request");
             return worker.registerSensor(requestRegSensor);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         }
     }
     
@@ -203,7 +222,10 @@ public class SOService {
             logger.info("received SOAP insertObservation request");
             return worker.insertObservation(requestInsObs);
         } catch (WebServiceException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), ex.getVersion().toString());
+            ServiceVersion exVersion = ex.getVersion();
+            if (exVersion == null)
+                exVersion = version;
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
         }
     }
     

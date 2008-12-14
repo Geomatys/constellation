@@ -373,12 +373,12 @@ public class CSWService extends OGCWebService {
             } else {
                 LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
             }
-            StringWriter sw = new StringWriter();    
             if (marshaller != null) {
                 ServiceVersion version = ex.getVersion();
                 if (version == null)
                     version = getCurrentVersion();
                 ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
+                StringWriter sw = new StringWriter();    
                 marshaller.marshal(report, sw);
                 return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
