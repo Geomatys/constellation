@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <name>Providers</name>
   <description>
-    diferent formats providers.
+    These packages provide access to data of various formats.
   </description>
 
 
