@@ -257,7 +257,8 @@ public class MeasurementTableFiller implements Runnable {
                     warning(coverage, exception);
                     continue;
                 }*/
-                pair.value = values[0];
+                //Comment out line below by AVC Dec 2008 to avoid any null pointer exception (caught by eclipse)
+                //pair.value = values[0];
                 updater.add(pair);
                 if (cancel) {
                     updater.finished();
