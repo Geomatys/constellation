@@ -27,7 +27,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.constellation.catalog.Database;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.catalog.BoundedSingletonTable;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.catalog.CatalogException;
@@ -71,7 +71,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     /**
      * The service to be requested.
      */
-    private Service service = Service.WCS;
+    private ServiceType service = ServiceType.WCS;
 
     /**
      * Creates a layer table.
@@ -100,7 +100,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     /**
      * Sets the service for the layers to be returned.
      */
-    public synchronized void setService(final Service service) {
+    public synchronized void setService(final ServiceType service) {
         ensureNonNull("service", service);
         if (!service.equals(this.service)) {
             this.service = service;

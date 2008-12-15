@@ -59,7 +59,7 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.metadata.CSWworker;
@@ -131,7 +131,7 @@ public class CSWService {
        worker = new CSWworker(unmarshaller, jbcontext.createMarshaller());
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-       this.version = new ServiceVersion(Service.OWS, "1.0.0");
+       this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");
     }
     
     /**

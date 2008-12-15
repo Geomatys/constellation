@@ -19,12 +19,19 @@ package org.constellation.map.ws;
 //J2SE dependencies
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -32,6 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.catalog.CatalogException;
@@ -61,9 +70,10 @@ import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.v111.LatLonBoundingBox;
 import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.wms.v130.OperationType;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
+import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
@@ -72,6 +82,7 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
 import org.geotools.internal.jaxb.v110.sld.TypeNameType;
 import org.geotools.util.MeasurementRange;
+import org.geotools.util.Version;
 
 //Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -86,11 +97,25 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
  */
-public class WMSWorker {
+public class WMSWorker extends AbstractWMSWorker {
     /**
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws");
+
+    /**
+     * A map containing the Capabilities Object already load from file.
+     */
+    private Map<String,Object> capabilities = new HashMap<String,Object>();
+
+    /**
+     *
+     */
+    private final Unmarshaller unmarshaller;
+
+    public WMSWorker(final Unmarshaller unmarshaller) {
+        this.unmarshaller   = unmarshaller;
+    }
 
     /**
      * Return a description of specified layers.
@@ -99,35 +124,32 @@ public class WMSWorker {
      * @param url        The service url.
      * @param sldVersion The version of the sld specified.
      */
-    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer, final String url,
-                                                   final ServiceVersion sldVersion)
-    {
+    @Override
+    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws WebServiceException {
         final OnlineResourceType or = new OnlineResourceType();
-        or.setHref(url + "wcs?");
+        or.setHref(uriContext.getBaseUri().toString() + "wcs?");
 
-        final List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
+        final List<LayerDescriptionType> layerDescriptions = new ArrayList<LayerDescriptionType>();
         final List<String> layers = descLayer.getLayers();
         for (String layer : layers) {
             final TypeNameType t = new TypeNameType(layer.trim());
             final LayerDescriptionType outputLayer = new LayerDescriptionType(or, t);
-            layersDescriptions.add(outputLayer);
+            layerDescriptions.add(outputLayer);
         }
-        return new DescribeLayerResponseType(sldVersion.toString(), layersDescriptions);
+        return new DescribeLayerResponseType("1.1.0", layerDescriptions);
     }
 
     /**
      * Describe the capabilities and the layers available of this service.
      *
      * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
-     * @param url            The webservice url.
-     * @param inCapabilities A default GetCapabilities read from the web service.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
+     * @throws JAXBException
      * @throws WebServiceException
      */
-    public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab, final String url,
-            AbstractWMSCapabilities inCapabilities) throws WebServiceException
-    {
+    @Override
+    public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws WebServiceException {
         final ServiceVersion queryVersion = getCapab.getVersion();
 
         //we build the list of accepted crs
@@ -135,6 +157,18 @@ public class WMSWorker {
         crs.add("EPSG:4326");     crs.add("CRS:84");  crs.add("EPSG:3395");
         crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573"); crs.add("EPSG:27574");
         //we update the url in the static part.
+        final AbstractWMSCapabilities inCapabilities;
+        try {
+            inCapabilities = (AbstractWMSCapabilities) getCapabilitiesObject(getCapab.getVersion(),
+                    servletContext.getRealPath("WEB-INF"));
+        } catch (IOException e) {
+            throw new WebServiceException("IO exception while getting Services Metadata:" +
+                    e.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
+        } catch (JAXBException ex) {
+            throw new WebServiceException("IO exception while getting Services Metadata:" +
+                    ex.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
+        }
+        final String url = uriContext.getBaseUri().toString();
         inCapabilities.getService().getOnlineResource().setHref(url + "wms");
         final AbstractRequest request = inCapabilities.getCapability().getRequest();
 
@@ -154,7 +188,7 @@ public class WMSWorker {
                 LOGGER.warning("Missing layer : " + key);
                 continue;
             }
-            if (!layer.isQueryable(Service.WMS)) {
+            if (!layer.isQueryable(ServiceType.WMS)) {
                 LOGGER.info("layer" + layer.getName() + " not queryable by WMS");
                 continue;
             }
@@ -248,7 +282,7 @@ public class WMSWorker {
                     "VERSION=1.1.0&FORMAT=";
             final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
-            final int queryable = (layer.isQueryable(Service.GETINFO) == true) ? 1 : 0;
+            final int queryable = (layer.isQueryable(ServiceType.GETINFO) == true) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.toString().equals("1.1.1")) {
                 /*
@@ -357,6 +391,52 @@ public class WMSWorker {
     }
 
     /**
+     * Returns the file where to read the capabilities document for each service.
+     * If no such file is found, then this method returns {@code null}.
+     *
+     * @return The capabilities Object, or {@code null} if none.
+     */
+    private Object getCapabilitiesObject(final Version version, final String home) throws JAXBException, IOException {
+        final String fileName = "WMSCapabilities" + version.toString() + ".xml";
+        final File changeFile = getFile("change.properties", home);
+        Properties p = new Properties();
+
+        // if the flag file is present we load the properties
+        if (changeFile != null && changeFile.exists()) {
+            FileInputStream in = new FileInputStream(changeFile);
+            p.load(in);
+            in.close();
+        } else {
+            p.put("update", "false");
+        }
+
+        //Look if the template capabilities is already in cache.
+        Object response = capabilities.get(fileName);
+        boolean update = p.getProperty("update").equals("true");
+
+        if (response == null || update) {
+            if (update) {
+                LOGGER.info("updating metadata");
+            }
+
+            File f = getFile(fileName, home);
+            response = unmarshaller.unmarshal(f);
+            capabilities.put(fileName, response);
+            //this.setLastUpdateSequence(System.currentTimeMillis());
+            p.put("update", "false");
+
+            // if the flag file is present we store the properties
+            if (changeFile != null && changeFile.exists()) {
+                FileOutputStream out = new FileOutputStream(changeFile);
+                p.store(out, "updated from WebService");
+                out.close();
+            }
+        }
+
+        return response;
+    }
+
+    /**
      * Return the value of a point in a map.
      *
      * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
@@ -364,6 +444,7 @@ public class WMSWorker {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
+    @Override
     public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
 
         String infoFormat = gfi.getInfoFormat();
@@ -404,6 +485,22 @@ public class WMSWorker {
     }
 
     /**
+     * Return a file located in WEB-INF deployed directory.
+     *
+     * @param fileName The name of the file requested.
+     * @return The specified file.
+     */
+    private File getFile(String fileName, String home) {
+         File path;
+         if (home == null || !(path = new File(home)).isDirectory()) {
+            path = WebService.getSicadeDirectory();
+         }
+         if (fileName != null)
+            return new File(path, fileName);
+         else return path;
+    }
+
+    /**
      * Return the legend graphic for the current layer.
      *
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
@@ -411,6 +508,7 @@ public class WMSWorker {
      *
      * @throws org.constellation.coverage.web.WebServiceException
      */
+    @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
         final ServiceVersion version = getLegend.getVersion();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
@@ -433,6 +531,7 @@ public class WMSWorker {
      *
      * @throws WebServiceException
      */
+    @Override
     public synchronized BufferedImage getMap(final GetMap getMap) throws WebServiceException {
         final ServiceVersion queryVersion = getMap.getVersion();
         final String errorType = getMap.getExceptionFormat();

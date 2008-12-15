@@ -30,7 +30,7 @@ import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.query.wcs.WCSQuery;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.wcs.AbstractGetCoverage;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 
@@ -66,7 +66,7 @@ public class WCSPortrayalAdapter {
         if (query instanceof org.constellation.wcs.v100.GetCoverage) {
             final org.constellation.wcs.v100.GetCoverage query100 = (org.constellation.wcs.v100.GetCoverage) query;
             layers.add(query100.getSourceCoverage());
-            version = new ServiceVersion(Service.WCS, query100.getVersion());
+            version = new ServiceVersion(ServiceType.WCS, query100.getVersion());
             // Decode the CRS.
             String crsCode = query100.getOutput().getCrs().getValue();
             if (crsCode == null) {
@@ -107,7 +107,7 @@ public class WCSPortrayalAdapter {
         } else {
             final org.constellation.wcs.v111.GetCoverage query111 = (org.constellation.wcs.v111.GetCoverage) query;
             layers.add(query111.getIdentifier().getValue());
-            version = new ServiceVersion(Service.WCS, query111.getVersion());
+            version = new ServiceVersion(ServiceType.WCS, query111.getVersion());
             // Decode the CRS.
             String crsCode = query111.getOutput().getGridCRS().getSrsName().getValue();
             if (crsCode == null) {

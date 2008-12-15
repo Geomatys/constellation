@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 
 /**
  *
@@ -34,7 +34,7 @@ import org.constellation.ws.Service;
 public class SOAPServiceException extends WebServiceException {
     
     /**
-     * An OGC Web Service exception report
+     * An OGC Web ServiceType exception report
      */
     private ExceptionReport exception;
     
@@ -44,7 +44,7 @@ public class SOAPServiceException extends WebServiceException {
             
     public SOAPServiceException(String message, String code, String v) {
         super(message);
-        this.exception = new ExceptionReport(message, code, null, new ServiceVersion(Service.OWS, v));
+        this.exception = new ExceptionReport(message, code, null, new ServiceVersion(ServiceType.OWS, v));
         
         this.setStackTrace(new StackTraceElement[0]);
     }

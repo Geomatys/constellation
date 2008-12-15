@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
 
 import org.geotools.util.Utilities;
 import org.constellation.catalog.Entry;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -234,7 +234,7 @@ final class SeriesEntry extends Entry implements Series {
      *
      * @param service The web service requesting the series (WMS or WCS)
      */
-    public boolean isQueryable(Service service) {
+    public boolean isQueryable(ServiceType service) {
         return (permission == null) || permission.isAccessibleService(service);
     }
 

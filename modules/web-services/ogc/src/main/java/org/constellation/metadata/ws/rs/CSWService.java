@@ -73,7 +73,7 @@ import org.constellation.ogc.SortPropertyType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.SectionsType;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
@@ -100,7 +100,7 @@ public class CSWService extends OGCWebService {
      * Build a new Restfull CSW service.
      */
     public CSWService() throws IOException, SQLException {
-        super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
+        super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
         try {
             setXMLContext("", getAllClasses());
             worker = new CSWworker(unmarshaller, marshaller);
@@ -204,7 +204,7 @@ public class CSWService extends OGCWebService {
             if (worker != null) {
             
                 worker.setServiceURL(getServiceURL());
-                writeParameters();
+                logParameters();
                 String request = "";
                 
                 if (objectRequest instanceof JAXBElement) {
@@ -228,10 +228,10 @@ public class CSWService extends OGCWebService {
                         gc = createNewGetCapabilitiesRequest();
                     }
                     try {
-                        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                        worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
                     } catch(IOException e)   {
                         throw new WebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                                         INVALID_PARAMETER_VALUE, getActingVersion());
             
                     }
                 
@@ -303,10 +303,10 @@ public class CSWService extends OGCWebService {
                         gd = createNewGetDomainRequest();
                     }
                     try {
-                        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                        worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
                     } catch(IOException e)   {
                         throw new WebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                                         INVALID_PARAMETER_VALUE, getActingVersion());
             
                     }
                     StringWriter sw = new StringWriter();
@@ -320,7 +320,7 @@ public class CSWService extends OGCWebService {
                 
                     if (t == null) {
                          throw new WebServiceException("The Operation transaction is not available in KVP",
-                                                       OPERATION_NOT_SUPPORTED, getCurrentVersion(),"transaction");
+                                                       OPERATION_NOT_SUPPORTED, getActingVersion(),"transaction");
                     }
                 
                     StringWriter sw = new StringWriter();
@@ -352,11 +352,11 @@ public class CSWService extends OGCWebService {
                         request = "undefined request";
                 
                     throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "request");
+                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "request");
                 }
             } else {
                 throw new WebServiceException("The CSW service is not running",
-                                              NO_APPLICABLE_CODE, getCurrentVersion());
+                                              NO_APPLICABLE_CODE, getActingVersion());
             }
         
         } catch (WebServiceException ex) {
@@ -376,7 +376,7 @@ public class CSWService extends OGCWebService {
             if (marshaller != null) {
                 ServiceVersion version = ex.getVersion();
                 if (version == null)
-                    version = getCurrentVersion();
+                    version = getActingVersion();
                 ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(report, sw);
@@ -418,7 +418,7 @@ public class CSWService extends OGCWebService {
                     requestedSections.add(token);
                 } else {
                     throw new WebServiceException("The section " + token + " does not exist",
-                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "Sections");
+                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "Sections");
                 }   
             }
         } else {
@@ -451,7 +451,7 @@ public class CSWService extends OGCWebService {
                 resultType = ResultType.fromValue(resultTypeName);
             } catch (IllegalArgumentException e){
                throw new WebServiceException("The resultType " + resultTypeName + " does not exist",
-                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "ResultType");        
+                                             INVALID_PARAMETER_VALUE, getActingVersion(), "ResultType");
             }
         }
         
@@ -475,7 +475,7 @@ public class CSWService extends OGCWebService {
                 startPosition = new Integer(startPos);
             } catch (NumberFormatException e){
                throw new WebServiceException("The positif integer " + startPos + " is malformed",
-                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "startPosition");        
+                                             INVALID_PARAMETER_VALUE, getActingVersion(), "startPosition");
             }
         } 
         
@@ -487,7 +487,7 @@ public class CSWService extends OGCWebService {
                 maxRecords = new Integer(maxRec);
             } catch (NumberFormatException e){
                throw new WebServiceException("The positif integer " + maxRec + " is malformed",
-                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "maxRecords");        
+                                             INVALID_PARAMETER_VALUE, getActingVersion(), "maxRecords");
             }
         } 
         
@@ -510,7 +510,7 @@ public class CSWService extends OGCWebService {
                     namespaces.put(prefix, url);
                 } else {
                      throw new WebServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
                 }
             }
         }
@@ -533,7 +533,7 @@ public class CSWService extends OGCWebService {
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
                 throw new WebServiceException("The QName " + token + " is malformed",
-                        INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
+                        INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
             }
         }
         
@@ -545,7 +545,7 @@ public class CSWService extends OGCWebService {
             
             } catch (IllegalArgumentException e){
                throw new WebServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, getCurrentVersion(), "ElementSetName");        
+                                                INVALID_PARAMETER_VALUE, getActingVersion(), "ElementSetName");
             }
         }
         
@@ -566,12 +566,12 @@ public class CSWService extends OGCWebService {
                         orderType = SortOrderType.fromValue(order);
                     } catch (IllegalArgumentException e){
                         throw new WebServiceException("The SortOrder Name " + order + " does not exist",
-                                                      INVALID_PARAMETER_VALUE, getCurrentVersion(), "SortBy");        
+                                                      INVALID_PARAMETER_VALUE, getActingVersion(), "SortBy");
                     }
                     sorts.add(new SortPropertyType(propName, orderType));
                 } else {
                      throw new WebServiceException("The expression " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, getCurrentVersion(), "SortBy");
+                                                      INVALID_PARAMETER_VALUE, getActingVersion(), "SortBy");
                 }
             }
             sortBy = new SortByType(sorts);
@@ -596,7 +596,7 @@ public class CSWService extends OGCWebService {
                 
             } else {
                 throw new WebServiceException("The constraint language " + constLanguage + " is not supported",
-                                                 INVALID_PARAMETER_VALUE, getCurrentVersion(), "ConstraintLanguage");
+                                                 INVALID_PARAMETER_VALUE, getActingVersion(), "ConstraintLanguage");
             }
         }
         
@@ -618,7 +618,7 @@ public class CSWService extends OGCWebService {
                     hopCount = Integer.parseInt(count);
                 } catch (NumberFormatException e){
                     throw new WebServiceException("The positif integer " + count + " is malformed",
-                                                  INVALID_PARAMETER_VALUE, getCurrentVersion(), "HopCount");        
+                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "HopCount");
                 }
             }
             distribSearch = new DistributedSearchType(hopCount);
@@ -657,7 +657,7 @@ public class CSWService extends OGCWebService {
             
             } catch (IllegalArgumentException e){
                throw new WebServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "ElementSetName");        
+                                             INVALID_PARAMETER_VALUE, getActingVersion(), "ElementSetName");
             }
         }
         
@@ -720,7 +720,7 @@ public class CSWService extends OGCWebService {
                     namespaces.put(prefix, url);
                 } else {
                      throw new WebServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
                 }
             }
         }
@@ -743,7 +743,7 @@ public class CSWService extends OGCWebService {
                     typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
                 } else {
                      throw new WebServiceException("The QName " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
                 }
         }
         
@@ -771,7 +771,7 @@ public class CSWService extends OGCWebService {
         String propertyName = getParameter("PROPERTYNAME", false);
         if (propertyName != null && parameterName != null) {
             throw new WebServiceException("One of propertyName or parameterName must be null",
-                                          INVALID_PARAMETER_VALUE, getCurrentVersion(), "parameterName");
+                                          INVALID_PARAMETER_VALUE, getActingVersion(), "parameterName");
         }
        
         return new GetDomainType(service, version, propertyName, parameterName);
@@ -799,7 +799,7 @@ public class CSWService extends OGCWebService {
                 harvestInterval          = factory.newDuration(interval) ;
             } catch (DatatypeConfigurationException ex) {
                 throw new WebServiceException("The Duration " + interval + " is malformed",
-                                              INVALID_PARAMETER_VALUE, getCurrentVersion(), "HarvestInsterval");
+                                              INVALID_PARAMETER_VALUE, getActingVersion(), "HarvestInsterval");
             }
         }
         

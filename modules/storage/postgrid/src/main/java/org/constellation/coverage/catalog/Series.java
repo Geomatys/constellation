@@ -21,7 +21,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.constellation.catalog.Element;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 
 
 /**
@@ -97,5 +97,5 @@ public interface Series extends Element {
      * @param service The web service trying to query this series.
      * @return {@code true} if this series can be queried by the given service.
      */
-    boolean isQueryable(Service service);
+    boolean isQueryable(ServiceType service);
 }

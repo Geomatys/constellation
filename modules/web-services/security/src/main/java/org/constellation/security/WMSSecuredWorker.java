@@ -16,12 +16,20 @@
  */
 package org.constellation.security;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.map.ws.AbstractWMSWorker;
+import org.constellation.query.wms.DescribeLayer;
+import org.constellation.query.wms.GetCapabilities;
+import org.constellation.query.wms.GetFeatureInfo;
+import org.constellation.query.wms.GetLegendGraphic;
+import org.constellation.query.wms.GetMap;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.WebServiceException;
+import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
 /**
@@ -31,7 +39,7 @@ import org.constellation.ws.WebServiceException;
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
  */
-public class Worker {
+public class WMSSecuredWorker extends AbstractWMSWorker {
     /**
      * The url of the WMS web service, where the request will be sent.
      */
@@ -62,6 +70,7 @@ public class Worker {
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.security.ws");
 
+
     /**
      * Builds a {@code GetCapabilities} request.
      *
@@ -69,16 +78,35 @@ public class Worker {
      * @param unmarshaller
      * @throws IOException if an error occurs at the URL creation.
      */
-    public Worker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
+    public WMSSecuredWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
 
         dispatcher = new Dispatcher(WMSURL, isRest, marshaller, unmarshaller);
     }
 
-    public AbstractWMSCapabilities launchGetCapabilities(final String service, final String request,
-                                                         final String version) throws WebServiceException
-    {
-        return dispatcher.requestGetCapabilities(service, request, version);
+    @Override
+    public DescribeLayerResponseType describeLayer(DescribeLayer descLayer) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public AbstractWMSCapabilities getCapabilities(GetCapabilities getCapabilities) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

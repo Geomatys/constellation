@@ -28,12 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.ServiceVersion;
@@ -59,26 +58,25 @@ import static org.constellation.ws.ExceptionCode.*;
  * @author Cédric Briançon
  */
 public abstract class OGCWebService extends WebService {
-    
     /**
-     * The supported versions supported by this web service.
+     * The supported supportedVersions supported by this web serviceType.
      */
-    private final List<ServiceVersion> versions = new ArrayList<ServiceVersion>();
+    private final List<ServiceVersion> supportedVersions = new ArrayList<ServiceVersion>();
 
     /**
-     * The current version used (since the last request)
+     * The version of the WMS specification for this request.
      */
-    private ServiceVersion currentVersion;
+    private ServiceVersion actingVersion;
 
     /**
-     * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
+     * The version of the SLD profile for the WMS web serviceType. fixed a 1.1.0 for now.
      */
-    private final ServiceVersion sldVersion = new ServiceVersion(Service.WMS, "1.1.0");
+    private final ServiceVersion sldVersion = new ServiceVersion(ServiceType.WMS, "1.1.0");
 
     /**
-     * The name of the service (WMS, WCS,...)
+     * The name of the serviceType (WMS, WCS,...)
      */
-    private final String service;
+    private final String serviceType;//TODO: use the ServiceType[type] enum.
 
     /**
      * A map containing the Capabilities Object already load from file.
@@ -86,36 +84,32 @@ public abstract class OGCWebService extends WebService {
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
     /**
-     * the service URL (used in getCapabilities document).
+     * The time of the last update of the cached capabilities map, represented
+     * as the number of milliseconds since the Unix Epoch (i.e. useful as a
+     * paramter to the Date constructor).
      */
-    private String serviceURL;
+    private long lastUpdateTime;
 
     /**
-     * The last update sequence
-     */
-    private long lastUpdateSequence;
-
-    /**
-     * Initialize the basic attribute of a web service.
+     * Initialize the basic attribute of a web serviceType.
      *
-     * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
-     * @param versions A list of the supported version of this service.
+     * @param serviceType The initials of the web serviceType (CSW, WMS, WCS, SOS, ...)
+     * @param supportedVersions A list of the supported version of this serviceType.
      */
-    public OGCWebService(String service, ServiceVersion... versions) {
+    public OGCWebService(String service, ServiceVersion... supportedVersions) {
         super(service);
-        this.service = service;
+        this.serviceType = service;
 
-        for (final ServiceVersion element : versions) {
-            this.versions.add(element);
+        for (final ServiceVersion element : supportedVersions) {
+            this.supportedVersions.add(element);
         }
-        if (this.versions.size() == 0)
+        if (this.supportedVersions.size() == 0)
              throw new IllegalArgumentException("A web service must have at least one version");
         else
-            this.currentVersion = this.versions.get(0);
+            this.actingVersion = this.supportedVersions.get(0);
         unmarshaller = null;
-        serviceURL   = null;
     }
-   
+
     /**
      * Verify the base parameter or each request.
      *
@@ -139,14 +133,14 @@ public abstract class OGCWebService extends WebService {
         if (getVersionFromNumber(inputVersion) == null) {
 
             String message = "The parameter ";
-            for (ServiceVersion vers : versions) {
+            for (ServiceVersion vers : supportedVersions) {
                 message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
             throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED);
         } else {
-            setCurrentVersion(inputVersion);
+            setActingVersion(inputVersion);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
@@ -157,13 +151,15 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     * Verify if the version is supported by the service.
-     * if the version is not accepted we send an exception
+     * Verify if the version is supported by this serviceType.
+     * <p>
+     * If the version is not accepted we send an exception.
+     * </p>
      */
-    protected void isSupportedVersion(String versionNumber) throws WebServiceException {
+    protected void isVersionSupported(String versionNumber) throws WebServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             String message = "The parameter ";
-            for (ServiceVersion vers : versions) {
+            for (ServiceVersion vers : supportedVersions) {
                 message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
@@ -173,17 +169,17 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     * Return the current version of the Web Service.
+     * Return the current version of the Web ServiceType.
      */
-    protected ServiceVersion getCurrentVersion() {
-        return this.currentVersion;
+    protected ServiceVersion getActingVersion() {
+        return this.actingVersion;
     }
 
     /**
-     * Return the current version of the Web Service.
+     * Return the current version of the Web ServiceType.
      */
-    protected void setCurrentVersion(String versionNumber) {
-        currentVersion = getVersionFromNumber(versionNumber);
+    protected void setActingVersion(String versionNumber) {
+        actingVersion = getVersionFromNumber(versionNumber);
     }
 
     /**
@@ -194,53 +190,42 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     * Treat the incomming request and call the right function.
-     *
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
-
-    /**
-     * build an service Exception and marshall it into a StringWriter
+     * build an serviceType Exception and marshall it into a StringWriter
      *
      * @param message
      * @param codeName
      * @return
      */
+    @Override
     protected Object launchException(final String message, final String codeName, final String locator) {
-        if (getCurrentVersion().isOWS()) {
+        if (getActingVersion().isOWS()) {
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getCurrentVersion());
+            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getActingVersion());
             return report;
         } else {
             final ExceptionCode code = ExceptionCode.valueOf(codeName);
-            return new ServiceExceptionReport(getCurrentVersion(), new ServiceExceptionType(message, code));
+            return new ServiceExceptionReport(getActingVersion(), new ServiceExceptionType(message, code));
         }
     }
 
     /**
-     * Returns the file where to read the capabilities document for each service.
+     * Returns the file where to read the capabilities document for each serviceType.
      * If no such file is found, then this method returns {@code null}.
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
-        return getCapabilitiesObject(getCurrentVersion());
+    public Object getStaticCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
+        return getStaticCapabilitiesObject(getActingVersion());
     }
 
     /**
-     * Returns the file where to read the capabilities document for each service.
+     * Returns the file where to read the capabilities document for each serviceType.
      * If no such file is found, then this method returns {@code null}.
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getCapabilitiesObject(final Version version) throws JAXBException, FileNotFoundException, IOException {
-       String fileName = this.service + "Capabilities" + version.toString() + ".xml";
+    public Object getStaticCapabilitiesObject(final Version version) throws JAXBException, FileNotFoundException, IOException {
+       String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
        File changeFile = getFile("change.properties");
        Properties p = new Properties();
 
@@ -270,7 +255,7 @@ public abstract class OGCWebService extends WebService {
                File f = getFile(fileName);
                response = unmarshaller.unmarshal(f);
                capabilities.put(fileName, response);
-               this.setLastUpdateSequence(System.currentTimeMillis());
+               this.setLastUpdateTIme(System.currentTimeMillis());
                p.put("update", "false");
 
                // if the flag file is present we store the properties
@@ -293,7 +278,7 @@ public abstract class OGCWebService extends WebService {
      * @return
      */
     protected ServiceVersion getVersionFromNumber(String number) {
-        for (ServiceVersion v : versions) {
+        for (ServiceVersion v : supportedVersions) {
             if (v.toString().equals(number)){
                 return v;
             }
@@ -304,23 +289,23 @@ public abstract class OGCWebService extends WebService {
     /**
      * If the requested version number is not available we choose the best version to return.
      *
-     * @param A service version number.
+     * @param A serviceType version number.
      */
     protected ServiceVersion getBestVersion(String number) {
-        for (ServiceVersion v : versions) {
+        for (ServiceVersion v : supportedVersions) {
             if (v.toString().equals(number)){
                 return v;
             }
         }
         ServiceVersion wrongVersion = new ServiceVersion(null, number);
-        if (wrongVersion.compareTo(versions.get(0)) < 0) {
-            return this.versions.get(0);
+        if (wrongVersion.compareTo(supportedVersions.get(0)) < 0) {
+            return this.supportedVersions.get(0);
         } else {
-            if (wrongVersion.compareTo(versions.get(versions.size() - 1)) > 0) {
-                return versions.get(versions.size() - 1);
+            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1)) > 0) {
+                return supportedVersions.get(supportedVersions.size() - 1);
             }
         }
-        return versions.get(0);
+        return supportedVersions.get(0);
     }
 
     /**
@@ -328,7 +313,7 @@ public abstract class OGCWebService extends WebService {
      *
      * @param operations A list of OWS operation.
      * @param url The url of the web application.
-     * @param service the initials of the web service (WMS, SOS, WCS, CSW, ...). This string correspound to the resource name in lower case.
+     * @param serviceType the initials of the web serviceType (WMS, SOS, WCS, CSW, ...). This string correspound to the resource name in lower case.
      */
     public static void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
         for (AbstractOperation op:operations) {
@@ -342,8 +327,8 @@ public abstract class OGCWebService extends WebService {
     /**
      * return the last time that the capabilities have been updated (not yet really used)
      */
-    public long getLastUpdateSequence() {
-        return lastUpdateSequence;
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
     }
 
     /**
@@ -351,7 +336,7 @@ public abstract class OGCWebService extends WebService {
      *
      * @param lastUpdateSequence A Date.
      */
-    public void setLastUpdateSequence(long lastUpdateSequence) {
-        this.lastUpdateSequence = lastUpdateSequence;
+    public void setLastUpdateTIme(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
     }
 }

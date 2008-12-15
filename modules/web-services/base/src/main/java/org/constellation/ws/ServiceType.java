@@ -23,19 +23,19 @@ package org.constellation.ws;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public enum Service {
+public enum ServiceType {
     /**
-     * Web Map Service.
+     * Web Map ServiceType.
      */
     WMS,
 
     /**
-     * Web Coverage Service.
+     * Web Coverage ServiceType.
      */
     WCS,
 
     /**
-     * Catalog Service-Web.
+     * Catalog ServiceType-Web.
      */
     CSW,
 
@@ -45,17 +45,17 @@ public enum Service {
     OWS,
 
     /**
-     * Sensor Observation Service.
+     * Sensor Observation ServiceType.
      */
     SOS,
 
     /**
-     * GetFeatureInfo WMS request, part of Web Map Service.
+     * GetFeatureInfo WMS request, part of Web Map ServiceType.
      */
     GETINFO,
 
     /**
-     * Any other Service.
+     * Any other ServiceType.
      */
     OTHER
 }

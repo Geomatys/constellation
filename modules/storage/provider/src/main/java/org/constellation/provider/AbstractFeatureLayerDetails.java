@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DefaultQuery;
@@ -157,7 +157,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public boolean isQueryable(Service service) {
+    public boolean isQueryable(ServiceType service) {
         return true;
     }
 

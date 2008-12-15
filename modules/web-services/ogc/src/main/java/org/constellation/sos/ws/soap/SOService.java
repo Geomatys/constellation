@@ -39,7 +39,7 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.catalog.NoSuchTableException;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
@@ -110,7 +110,7 @@ public class SOService {
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-       version = new ServiceVersion(Service.OWS, "1.0.0");
+       version = new ServiceVersion(ServiceType.OWS, "1.0.0");
     }
     
     /**

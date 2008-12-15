@@ -28,7 +28,7 @@ import java.util.SortedSet;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
@@ -140,5 +140,5 @@ public interface LayerDetails {
      *
      * @see Layer#isQueryable 
      */
-    public boolean isQueryable(Service service);
+    public boolean isQueryable(ServiceType service);
 }

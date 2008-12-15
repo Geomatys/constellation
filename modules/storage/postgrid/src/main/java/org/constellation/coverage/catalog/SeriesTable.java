@@ -31,7 +31,7 @@ import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
 
@@ -65,7 +65,7 @@ final class SeriesTable extends SingletonTable<Series> {
     /**
      * The service to be requested.
      */
-    private Service service = Service.WCS;
+    private ServiceType service = ServiceType.WCS;
 
     /**
      * Creates a series table.
@@ -119,7 +119,7 @@ final class SeriesTable extends SingletonTable<Series> {
      * Sets the service for the series to be returned. Next call to {@link #getEntries() getEntries()}
      * will filters the series in order to returns only the ones allowed to access the given service.
      */
-    public synchronized void setService(final Service service) {
+    public synchronized void setService(final ServiceType service) {
         ensureNonNull("service", service);
         if (!service.equals(this.service)) {
             this.service = service;

@@ -37,7 +37,7 @@ import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
@@ -180,7 +180,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
-    public boolean isQueryable(Service service) {
+    public boolean isQueryable(ServiceType service) {
         return reader.getTable().getLayer().isQueryable(service);
     }
 

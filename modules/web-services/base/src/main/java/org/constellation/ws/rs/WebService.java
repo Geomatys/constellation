@@ -96,7 +96,7 @@ public abstract class WebService {
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
-    protected static Boolean isGlassfish = null;
+    protected static Boolean runningOnGlassfish = null;
 
     /**
      * The webservice URL. This will contain url like:
@@ -230,7 +230,7 @@ public abstract class WebService {
      * It is a debug method.
      *
      */
-    protected void writeParameters() throws WebServiceException {
+    protected void logParameters() throws WebServiceException {
         final MultivaluedMap parameters = uriContext.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
@@ -433,10 +433,10 @@ public abstract class WebService {
      */
     public static String getPropertyValue(final String propGroup, final String propName) throws NamingException {
         final InitialContext ctx = new InitialContext();
-        if (isGlassfish == null) {
-            isGlassfish = (System.getProperty("domain.name") != null) ? true : false;
+        if (runningOnGlassfish == null) {
+            runningOnGlassfish = (System.getProperty("domain.name") != null) ? true : false;
         }
-        if (isGlassfish) {
+        if (runningOnGlassfish) {
             if (propGroup == null) {
                 throw new NamingException("The coverage property group is not specified.");
             }

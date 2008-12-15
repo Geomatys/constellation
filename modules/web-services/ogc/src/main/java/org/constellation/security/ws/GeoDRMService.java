@@ -46,7 +46,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
@@ -87,7 +87,7 @@ public class GeoDRMService extends OGCWebService {
     private String SERVICEURL = "http://demo.geomatys.fr/constellation/WS/wms";
     
     public GeoDRMService() {
-        super("GeoDRM", new ServiceVersion(Service.OTHER, "1.0.0"));
+        super("GeoDRM", new ServiceVersion(ServiceType.OTHER, "1.0.0"));
         try {
             initializePolicyDecisionPoint();
             setXMLContext("org.constellation.wms.v111:org.constellation.wms.v130:org.constellation.gml.v311:org.constellation.ws", "");
@@ -270,7 +270,7 @@ public class GeoDRMService extends OGCWebService {
         } catch (WebServiceException ex) {
             StringWriter sw = new StringWriter();
             final String code = Utils.transformCodeName(ex.getExceptionCode().name());
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion());
             marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();
         }  catch (IOException ex) {
@@ -312,7 +312,7 @@ public class GeoDRMService extends OGCWebService {
                     marshaller.marshal(objectRequest, sw);
                 } catch (JAXBException ex) {
                     throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE, getCurrentVersion());
+                                                  NO_APPLICABLE_CODE, getActingVersion());
                 }
                 String XMLRequest = sw.toString();
             

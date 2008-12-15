@@ -26,7 +26,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 
 
@@ -79,7 +79,7 @@ public class PEPWorker {
             LOGGER.severe("Config file \"pep.properties\" not found in the .sicade directory.\n" +
                           "Now using the default configuration (localhost:8080/constellation/WS/wms");
             this.serviceURL = "http://localhost:8080/constellation/WS/wms";
-            this.version = new ServiceVersion(Service.WMS, "1.1.1");
+            this.version = new ServiceVersion(ServiceType.WMS, "1.1.1");
         } else {
             try {
                 final FileInputStream in = new FileInputStream(propFile);
@@ -91,12 +91,12 @@ public class PEPWorker {
             this.serviceURL = props.getProperty("url");
             final String strService = props.getProperty("service");
             final String strVersion = props.getProperty("version");
-            Service service;
+            ServiceType service;
             try {
-                service = Service.valueOf(strService);
+                service = ServiceType.valueOf(strService);
             } catch (IllegalArgumentException ex) {
                 LOGGER.log(Level.INFO, "Service selected not found in the available choice", ex);
-                service = Service.WMS;
+                service = ServiceType.WMS;
             }
             this.version = new ServiceVersion(service, (strVersion == null) ? "1.1.1" : strVersion);
         }

@@ -44,7 +44,7 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.util.Utils;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.WebService;
@@ -84,7 +84,7 @@ public class ConfigurationService extends WebService  {
         serviceDirectory.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
     }
     
-    public static final ServiceVersion version = new ServiceVersion(Service.OTHER, "1.0.0");
+    public static final ServiceVersion version = new ServiceVersion(ServiceType.OTHER, "1.0.0");
     
             
     public ConfigurationService() {
@@ -208,7 +208,7 @@ public class ConfigurationService extends WebService  {
      */
     protected Object launchException(final String message, final String codeName, final String locator) {
         final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, new ServiceVersion(Service.OTHER, "1.0"));
+        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, new ServiceVersion(ServiceType.OTHER, "1.0"));
         return report;
     }
 

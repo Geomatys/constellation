@@ -49,7 +49,7 @@ import org.constellation.catalog.Entry;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ServerException;
 import org.constellation.coverage.model.Model;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 
@@ -506,7 +506,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public boolean isQueryable(Service service) {
+    public boolean isQueryable(ServiceType service) {
         for (final Series s : series) {
             if (!s.isQueryable(service)) {
                 return false;

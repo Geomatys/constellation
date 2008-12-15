@@ -49,7 +49,7 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.ServiceVersion;
@@ -144,7 +144,7 @@ public class WCSService extends OGCWebService {
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
     public WCSService() throws JAXBException, SQLException, IOException, NamingException {
-        super("WCS", new ServiceVersion(Service.WCS, "1.1.1"), new ServiceVersion(Service.WCS, "1.0.0"));
+        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"), new ServiceVersion(ServiceType.WCS, "1.0.0"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:org.constellation.wcs.v100:org.constellation.wcs.v111",
@@ -163,7 +163,7 @@ public class WCSService extends OGCWebService {
         try {
             final String request = (String) getParameter(KEY_REQUEST, true);
             LOGGER.info("New request: " + request);
-            writeParameters();
+            logParameters();
 
             if (DESCRIBECOVERAGE.equalsIgnoreCase(request) ||
                     (objectRequest instanceof AbstractDescribeCoverage))
@@ -175,7 +175,7 @@ public class WCSService extends OGCWebService {
                 String store = getParameter(KEY_STORE, false);
                 if (store!= null && store.trim().equalsIgnoreCase("true")) {
                     throw new WebServiceException("The service does not implement the store mechanism",
-                                   NO_APPLICABLE_CODE, getCurrentVersion(), "store");
+                                   NO_APPLICABLE_CODE, getActingVersion(), "store");
                 }
                 /*
                  * if the parameters have been send by GET or POST kvp,
@@ -216,14 +216,14 @@ public class WCSService extends OGCWebService {
                 return getCoverage(gc);
             }
             throw new WebServiceException("The operation " + request + " is not supported by the service",
-                    OPERATION_NOT_SUPPORTED, getCurrentVersion(), "request");
+                    OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
         } catch (WebServiceException ex) {
             final Object report;
-            if (getCurrentVersion().isOWS()) {
+            if (getActingVersion().isOWS()) {
                 final String code = Utils.transformCodeName(ex.getExceptionCode().name());
-                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getCurrentVersion());
+                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion());
             } else {
-                report = new ServiceExceptionReport(getCurrentVersion(),
+                report = new ServiceExceptionReport(getActingVersion(),
                         new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
             }
             
@@ -249,7 +249,7 @@ public class WCSService extends OGCWebService {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
             throw new WebServiceException("The parameters SERVICE=WCS must be specified",
-                    MISSING_PARAMETER_VALUE, getCurrentVersion(), "service");
+                    MISSING_PARAMETER_VALUE, getActingVersion(), "service");
         }
         String inputVersion = getParameter(KEY_VERSION, false);
         if (inputVersion == null) {
@@ -258,13 +258,13 @@ public class WCSService extends OGCWebService {
                 inputVersion = "1.1.1";
             } else {
                 //we verify that the version id supported
-                isSupportedVersion(inputVersion);
+                isVersionSupported(inputVersion);
             }
         }
 
-        this.setCurrentVersion(getBestVersion(inputVersion).toString());
+        this.setActingVersion(getBestVersion(inputVersion).toString());
 
-        if (getCurrentVersion().toString().equals("1.0.0")) {
+        if (getActingVersion().toString().equals("1.0.0")) {
             return new org.constellation.wcs.v100.GetCapabilities(getParameter(KEY_SECTION, false),
                                                            null);
         } else {
@@ -282,7 +282,7 @@ public class WCSService extends OGCWebService {
                         requestedSections.add(token);
                     } else {
                         throw new WebServiceException("The section " + token + " does not exist",
-                                INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                INVALID_PARAMETER_VALUE, getActingVersion());
                     }
                 }
             } else {
@@ -302,7 +302,7 @@ public class WCSService extends OGCWebService {
      * Build a new DescribeCoverage request from a kvp request
      */
     private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws WebServiceException {
-        if (getCurrentVersion().toString().equals("1.0.0")) {
+        if (getActingVersion().toString().equals("1.0.0")) {
             return new org.constellation.wcs.v100.DescribeCoverage(getParameter(KEY_COVERAGE, true));
         } else {
             return new org.constellation.wcs.v111.DescribeCoverage(getParameter(KEY_IDENTIFIER, true));
@@ -321,7 +321,7 @@ public class WCSService extends OGCWebService {
         String resy = getParameter(KEY_RESY, false);
         String resz = getParameter(KEY_RESZ, false);
 
-        if (getCurrentVersion().toString().equals("1.0.0")) {
+        if (getActingVersion().toString().equals("1.0.0")) {
             // temporal subset
             org.constellation.wcs.v100.TimeSequenceType temporal = null;
             final String timeParameter = getParameter(KEY_TIME, false);
@@ -351,7 +351,7 @@ public class WCSService extends OGCWebService {
 
             if ((width == null || height == null) && (resx == null || resy == null)) {
                     throw new WebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" ,
-                                   INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                   INVALID_PARAMETER_VALUE, getActingVersion());
             }
 
             final List<String> axis = new ArrayList<String>();
@@ -402,7 +402,7 @@ public class WCSService extends OGCWebService {
                     temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
                 } else {
                     throw new WebServiceException("The service does not handle TimePeriod" ,
-                                   INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                   INVALID_PARAMETER_VALUE, getActingVersion());
                 }
             }
 
@@ -417,7 +417,7 @@ public class WCSService extends OGCWebService {
                 bbox = bbox.substring(0, bbox.lastIndexOf(','));
              } else {
                 throw new WebServiceException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS",
-                                INVALID_PARAMETER_VALUE, getCurrentVersion(), "boundingbox");
+                                INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
              }
              BoundingBoxType envelope = null;
 
@@ -431,7 +431,7 @@ public class WCSService extends OGCWebService {
                 }
                  if (i < 4) {
                      throw new WebServiceException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS",
-                             INVALID_PARAMETER_VALUE, getCurrentVersion(), "boundingbox");
+                             INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
                  }
                 envelope = new BoundingBoxType(crs, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
              }
@@ -446,7 +446,7 @@ public class WCSService extends OGCWebService {
                 //for now we don't handle Axis Identifiers
                 if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
                     throw new WebServiceException("The service does not handle axis identifiers",
-                            INVALID_PARAMETER_VALUE, getCurrentVersion(), "axis");
+                            INVALID_PARAMETER_VALUE, getActingVersion(), "axis");
                 }
 
                 final StringTokenizer tokens = new StringTokenizer(rangeSubset, ";");
@@ -522,16 +522,16 @@ public class WCSService extends OGCWebService {
         //we begin by extract the base attribute
         String inputVersion = abstractRequest.getVersion();
         if (inputVersion == null) {
-            setCurrentVersion("1.1.1");
+            setActingVersion("1.1.1");
         } else {
-           isSupportedVersion(inputVersion);
-           setCurrentVersion(inputVersion);
+           isVersionSupported(inputVersion);
+           setActingVersion(inputVersion);
         }
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
         boolean contentMeta              = false;
         String format                    = TEXT_XML;
-        if (getCurrentVersion().toString().equals("1.1.1")) {
+        if (getActingVersion().toString().equals("1.1.1")) {
 
             org.constellation.wcs.v111.GetCapabilities request = (org.constellation.wcs.v111.GetCapabilities) abstractRequest;
 
@@ -543,7 +543,7 @@ public class WCSService extends OGCWebService {
                 format = formats.getOutputFormat().get(0);
                 if (!format.equals(TEXT_XML) && !format.equals(APP_XML)){
                     throw new WebServiceException("This format " + format + " is not allowed",
-                                   INVALID_PARAMETER_VALUE, getCurrentVersion(), "format");
+                                   INVALID_PARAMETER_VALUE, getActingVersion(), "format");
                 }
             }
 
@@ -555,7 +555,7 @@ public class WCSService extends OGCWebService {
                 for (String sec:requestedSections) {
                     if (!SectionsType.getExistingSections("1.1.1").contains(sec)){
                        throw new WebServiceException("This sections " + sec + " is not allowed",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getActingVersion());
                     }
                 }
             }
@@ -563,10 +563,10 @@ public class WCSService extends OGCWebService {
             // we unmarshall the static capabilities document
             Capabilities staticCapabilities = null;
             try {
-                staticCapabilities = (Capabilities)getCapabilitiesObject();
+                staticCapabilities = (Capabilities)getStaticCapabilitiesObject();
             } catch(IOException e)   {
                 throw new WebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                               INVALID_PARAMETER_VALUE, getCurrentVersion());
+                               INVALID_PARAMETER_VALUE, getActingVersion());
 
             }
             ServiceIdentification si = null;
@@ -607,16 +607,16 @@ public class WCSService extends OGCWebService {
                     requestedSection = section;
                 } else {
                     throw new WebServiceException("The section " + section + " does not exist",
-                                   INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                   INVALID_PARAMETER_VALUE, getActingVersion());
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
             }
             WCSCapabilitiesType staticCapabilities = null;
             try {
-                staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject()).getValue();
+                staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getStaticCapabilitiesObject()).getValue();
             } catch(IOException e)   {
                 throw new WebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                               INVALID_PARAMETER_VALUE, getCurrentVersion());
+                               INVALID_PARAMETER_VALUE, getActingVersion());
 
             }
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
@@ -660,7 +660,7 @@ public class WCSService extends OGCWebService {
                     LOGGER.warning("Missing layer : " + key);
                     continue;
                 }
-                if (!layer.isQueryable(Service.WCS)) {
+                if (!layer.isQueryable(ServiceType.WCS)) {
                     LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
                     continue;
                 }
@@ -679,7 +679,7 @@ public class WCSService extends OGCWebService {
 
                 if(inputGeoBox != null) {
                      String crs = "WGS84(DD)";
-                    if (getCurrentVersion().toString().equals("1.1.1")){
+                    if (getActingVersion().toString().equals("1.1.1")){
                         WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
                                                      inputGeoBox.getWestBoundLongitude(),
                                                      inputGeoBox.getSouthBoundLatitude(),
@@ -720,12 +720,12 @@ public class WCSService extends OGCWebService {
             contents        = new Contents(summary, null, null, null);
             contentMetadata = new ContentMetadata("1.0.0", offBrief);
         } catch (CatalogException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getActingVersion());
         }
 
 
         StringWriter sw = new StringWriter();
-        if (getCurrentVersion().toString().equals("1.1.1")) {
+        if (getActingVersion().toString().equals("1.1.1")) {
             responsev111.setContents(contents);
             marshaller.marshal(responsev111, sw);
         } else {
@@ -748,10 +748,10 @@ public class WCSService extends OGCWebService {
         String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new WebServiceException("The parameter version must be specified",
-                           MISSING_PARAMETER_VALUE, getCurrentVersion(), "version");
+                           MISSING_PARAMETER_VALUE, getActingVersion(), "version");
         } else {
-           isSupportedVersion(inputVersion);
-           setCurrentVersion(inputVersion);
+           isVersionSupported(inputVersion);
+           setActingVersion(inputVersion);
         }
 
         final String format, coverage;
@@ -765,14 +765,14 @@ public class WCSService extends OGCWebService {
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
         String responseCRS = null;
 
-       if (getCurrentVersion().toString().equals("1.1.1")) {
+       if (getActingVersion().toString().equals("1.1.1")) {
             final org.constellation.wcs.v111.GetCoverage request = (org.constellation.wcs.v111.GetCoverage)abstractRequest;
 
             if (request.getIdentifier() != null) {
                 coverage = request.getIdentifier().getValue();
             } else {
                 throw new WebServiceException("The parameter identifier must be specified",
-                               MISSING_PARAMETER_VALUE, getCurrentVersion(), "identifier");
+                               MISSING_PARAMETER_VALUE, getActingVersion(), "identifier");
             }
 
             /*
@@ -789,7 +789,7 @@ public class WCSService extends OGCWebService {
             org.constellation.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
             if (domain == null) {
                 throw new WebServiceException("The DomainSubset must be specify",
-                               MISSING_PARAMETER_VALUE, getCurrentVersion());
+                               MISSING_PARAMETER_VALUE, getActingVersion());
             }
             BoundingBoxType boundingBox = null;
             if (domain.getBoundingBox() != null) {
@@ -804,14 +804,14 @@ public class WCSService extends OGCWebService {
                 try {
                     crs  = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
                 } catch (FactoryException ex) {
-                    throw new WebServiceException(ex, INVALID_CRS, getCurrentVersion());
+                    throw new WebServiceException(ex, INVALID_CRS, getActingVersion());
                 }
                 objEnv = new GeneralEnvelope(crs);
                 objEnv.setRange(0, boundingBox.getLowerCorner().get(0), boundingBox.getUpperCorner().get(0));
                 objEnv.setRange(1, boundingBox.getLowerCorner().get(1), boundingBox.getUpperCorner().get(1));
             } else {
                 throw new WebServiceException("The BoundingBox is not well-formed",
-                               INVALID_PARAMETER_VALUE, getCurrentVersion(), "boundingbox");
+                               INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
             }
 
             if (domain.getTemporalSubset() != null) {
@@ -821,7 +821,7 @@ public class WCSService extends OGCWebService {
                         time = ((TimePositionType)obj).getValue();
                     else if (obj instanceof org.constellation.wcs.v111.TimePeriodType) {
                         throw new WebServiceException("The service does not handle time Period type",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getActingVersion());
                     }
                 }
             }
@@ -845,7 +845,7 @@ public class WCSService extends OGCWebService {
                     final LayerDetails currentLayer = dp.get(coverage);
                     if (currentLayer == null) {
                         throw new WebServiceException("The coverage requested is not found.",
-                                INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                INVALID_PARAMETER_VALUE, getActingVersion());
                     }
                     if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
                         interpolation = field.getInterpolationType();
@@ -855,17 +855,17 @@ public class WCSService extends OGCWebService {
                             requestedField.add(field.getIdentifier());
                         } else {
                             throw new WebServiceException("The field " + field.getIdentifier() + " is already present in the request",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getActingVersion());
                         }
 
                         //if there is some AxisSubset we send an exception
                         if (field.getAxisSubset().size() != 0) {
                             throw new WebServiceException("The service does not handle AxisSubset",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getActingVersion());
                         }
                     } else {
                         throw new WebServiceException("The field " + field.getIdentifier() + " is not present in this coverage",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getActingVersion());
                     }
                 }
 
@@ -888,12 +888,12 @@ public class WCSService extends OGCWebService {
             org.constellation.wcs.v111.OutputType output = request.getOutput();
             if (output == null) {
                 throw new WebServiceException("The OUTPUT must be specify" ,
-                               MISSING_PARAMETER_VALUE, getCurrentVersion(), "output");
+                               MISSING_PARAMETER_VALUE, getActingVersion(), "output");
             }
             format = output.getFormat();
             if (format == null) {
                 throw new WebServiceException("The FORMAT must be specify" ,
-                               MISSING_PARAMETER_VALUE, getCurrentVersion(), "format");
+                               MISSING_PARAMETER_VALUE, getActingVersion(), "format");
             }
 
             final GridCrsType grid = output.getGridCRS();
@@ -937,13 +937,13 @@ public class WCSService extends OGCWebService {
                 format = request.getOutput().getFormat().getValue();
             } else {
                 throw new WebServiceException("The parameters FORMAT have to be specified",
-                                                 MISSING_PARAMETER_VALUE, getCurrentVersion(), "format");
+                                                 MISSING_PARAMETER_VALUE, getActingVersion(), "format");
             }
 
             coverage = request.getSourceCoverage();
             if (coverage == null) {
                 throw new WebServiceException("The parameters SOURCECOVERAGE have to be specified",
-                                                 MISSING_PARAMETER_VALUE, getCurrentVersion(), "sourceCoverage");
+                                                 MISSING_PARAMETER_VALUE, getActingVersion(), "sourceCoverage");
             }
             if (request.getInterpolationMethod() != null) {
                 interpolation = request.getInterpolationMethod().value();
@@ -968,7 +968,7 @@ public class WCSService extends OGCWebService {
             try {
                 crs = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
             } catch (FactoryException ex) {
-                throw new WebServiceException(ex, INVALID_CRS, getCurrentVersion());
+                throw new WebServiceException(ex, INVALID_CRS, getActingVersion());
             }
             objEnv = new GeneralEnvelope(crs);
             objEnv.setRange(0, env.getPos().get(0).getValue().get(0), env.getPos().get(0).getValue().get(1));
@@ -976,7 +976,7 @@ public class WCSService extends OGCWebService {
 
             if (temporalSubset == null && env.getPos().size() == 0) {
                         throw new WebServiceException("The parameters BBOX or TIME have to be specified",
-                                       MISSING_PARAMETER_VALUE, getCurrentVersion());
+                                       MISSING_PARAMETER_VALUE, getActingVersion());
             }
             /* here the parameter width and height (and depth for 3D matrix)
              *  have to be fill. If not they can be replace by resx and resy
@@ -1001,7 +1001,7 @@ public class WCSService extends OGCWebService {
                     }
                 } else {
                      throw new WebServiceException("you must specify grid size or resolution",
-                                                      MISSING_PARAMETER_VALUE, getCurrentVersion());
+                                                      MISSING_PARAMETER_VALUE, getActingVersion());
                 }
             }
         }
@@ -1022,9 +1022,9 @@ public class WCSService extends OGCWebService {
                 outputStream = ImageIO.createImageOutputStream(null);
                 Utils.writeImage(gridCov.getRenderedImage(), format, outputStream);
             } catch (IOException ex) {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             } catch (CatalogException ex) {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             }
             return Response.ok(outputStream, format).build();
         } else {
@@ -1036,13 +1036,13 @@ public class WCSService extends OGCWebService {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                     image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
                 } else {
-                    throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+                    throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
                 }
             } catch (WebServiceException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                     image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
                 } else {
-                    throw new WebServiceException(ex, LAYER_NOT_DEFINED, getCurrentVersion());
+                    throw new WebServiceException(ex, LAYER_NOT_DEFINED, getActingVersion());
                 }
             }
             return Response.ok(image, format).build();
@@ -1062,32 +1062,32 @@ public class WCSService extends OGCWebService {
         String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new WebServiceException("The parameter SERVICE must be specified.",
-                           MISSING_PARAMETER_VALUE, getCurrentVersion(), "version");
+                           MISSING_PARAMETER_VALUE, getActingVersion(), "version");
         } else {
-           isSupportedVersion(inputVersion);
-           setCurrentVersion(inputVersion);
+           isVersionSupported(inputVersion);
+           setActingVersion(inputVersion);
         }
         //we prepare the response object to return
         Object response;
 
-        if (getCurrentVersion().toString().equals("1.0.0")) {
+        if (getActingVersion().toString().equals("1.0.0")) {
             org.constellation.wcs.v100.DescribeCoverage request = (org.constellation.wcs.v100.DescribeCoverage) abstractRequest;
             if (request.getCoverage().size() == 0) {
                 throw new WebServiceException("The parameter COVERAGE must be specified.",
-                        MISSING_PARAMETER_VALUE, getCurrentVersion(), "coverage");
+                        MISSING_PARAMETER_VALUE, getActingVersion(), "coverage");
             }
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getCoverage().get(0));
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
             if (layer.getSeries().size() == 0) {
                 throw new WebServiceException("The coverage " + layer.getName() + " is not defined.",
-                        LAYER_NOT_DEFINED, getCurrentVersion());
+                        LAYER_NOT_DEFINED, getActingVersion());
             }
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
             } catch (CatalogException ex) {
-                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
+                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
             }
             LonLatEnvelopeType llenvelope = null;
             if (inputGeoBox != null) {
@@ -1118,7 +1118,7 @@ public class WCSService extends OGCWebService {
             try {
                dates = layer.getAvailableTimes();
             } catch (CatalogException ex) {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             }
             for (Date d : dates) {
                 times.add(new TimePositionType(df.format(d)));
@@ -1182,7 +1182,7 @@ public class WCSService extends OGCWebService {
             org.constellation.wcs.v111.DescribeCoverage request = (org.constellation.wcs.v111.DescribeCoverage) abstractRequest;
             if (request.getIdentifier().size() == 0) {
                 throw new WebServiceException("The parameter IDENTIFIER must be specified",
-                        MISSING_PARAMETER_VALUE, getCurrentVersion(), "identifier");
+                        MISSING_PARAMETER_VALUE, getActingVersion(), "identifier");
             }
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getIdentifier().get(0));
@@ -1191,13 +1191,13 @@ public class WCSService extends OGCWebService {
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             if (layer.getSeries().size() == 0) {
                 throw new WebServiceException("the coverage " + layer.getName() +
-                        " is not defined", LAYER_NOT_DEFINED, getCurrentVersion());
+                        " is not defined", LAYER_NOT_DEFINED, getActingVersion());
             }
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
             } catch (CatalogException ex) {
-                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
+                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
             }
             List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
             if (inputGeoBox != null) {
@@ -1238,7 +1238,7 @@ public class WCSService extends OGCWebService {
             try {
                dates = layer.getAvailableTimes();
             } catch (CatalogException ex) {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             }
             for (Date d : dates) {
                 times.add(new TimePositionType(df.format(d)));
@@ -1318,7 +1318,7 @@ public class WCSService extends OGCWebService {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
             throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value) + "cause:" +
-                           exception.getMessage(), INVALID_PARAMETER_VALUE, getCurrentVersion());
+                           exception.getMessage(), INVALID_PARAMETER_VALUE, getActingVersion());
         }
     }
 

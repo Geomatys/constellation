@@ -17,7 +17,7 @@
 package org.constellation.coverage.catalog;
 
 import org.constellation.catalog.Entry;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.geotools.util.Utilities;
 
 
@@ -79,7 +79,7 @@ final class PermissionEntry extends Entry {
     /**
      * Returns {@code true} if the user is allowed to obtain data through the given service.
      */
-    public boolean isAccessibleService(final Service service) {
+    public boolean isAccessibleService(final ServiceType service) {
         switch (service) {
             case WMS:     return WMS;
             case WCS:     return WCS;

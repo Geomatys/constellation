@@ -33,7 +33,7 @@ import org.geotools.util.DateRange;
 import org.constellation.catalog.Element;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Model;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 
 
 /**
@@ -236,5 +236,5 @@ public interface Layer extends Element {
      * @param service The web service trying to request this layer (WMS or WCS).
      * @return {@code true} if all series are queryable for the given service.
      */
-    boolean isQueryable(Service service);
+    boolean isQueryable(ServiceType service);
 }

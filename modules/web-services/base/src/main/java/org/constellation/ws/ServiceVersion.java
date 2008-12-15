@@ -21,7 +21,7 @@ import org.geotools.util.Version;
 
 
 /**
- * A version applicable to a web {@linkplain Service service}.
+ * A version applicable to a web {@linkplain ServiceType service}.
  *
  * @version $Id$
  * @author Guilhem Legal
@@ -31,17 +31,17 @@ public class ServiceVersion extends Version {
     /**
      * The first WCS version to be considered as OWS.
      */
-    private static ServiceVersion THRESHOLD = new ServiceVersion(Service.WCS, "1.1");
+    private static ServiceVersion THRESHOLD = new ServiceVersion(ServiceType.WCS, "1.1");
 
     /**
      * The service.
      */
-    private final Service service;
+    private final ServiceType service;
 
     /**
      * Builds a new version for the given service.
      */
-    public ServiceVersion(final Service service, final String version) {
+    public ServiceVersion(final ServiceType service, final String version) {
         super(version);
         this.service = service;
     }
@@ -49,7 +49,7 @@ public class ServiceVersion extends Version {
     /**
      * Returns the service.
      */
-    public Service getService() {
+    public ServiceType getService() {
         return service;
     }
 

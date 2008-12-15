@@ -17,7 +17,7 @@
 package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
-import org.constellation.ws.Service;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 
 
@@ -72,7 +72,7 @@ public class GetLegendGraphic extends WMSQuery {
     public GetLegendGraphic(final String layer, final String format,
                             final int width, final int height)
     {
-        super(new ServiceVersion(Service.WMS, "1.1.0"));
+        super(new ServiceVersion(ServiceType.WMS, "1.1.0"));
         this.layer  = layer;
         this.format = format;
         this.width  = width;
