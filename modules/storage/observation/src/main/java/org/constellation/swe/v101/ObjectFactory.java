@@ -2,7 +2,6 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -15,6 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.swe.v101;
 
 import javax.xml.bind.JAXBElement;
@@ -43,7 +43,20 @@ public class ObjectFactory {
     private final static QName _Quantity_QNAME              = new QName("http://www.opengis.net/swe/1.0.1", "Quantity");
     private final static QName _Boolean_QNAME               = new QName("http://www.opengis.net/swe/1.0.1", "Boolean");
     private final static QName _DataArray_QNAME             = new QName("http://www.opengis.net/swe/1.0.1", "DataArray");
-    
+    private final static QName _ConditionalValue_QNAME      = new QName("http://www.opengis.net/swe/1.0.1", "ConditionalValue");
+    private final static QName _Envelope_QNAME              = new QName("http://www.opengis.net/swe/1.0.1", "Envelope");
+    private final static QName _GeoLocationArea_QNAME       = new QName("http://www.opengis.net/swe/1.0.1", "GeoLocationArea");
+    private final static QName _Vector_QNAME                = new QName("http://www.opengis.net/swe/1.0.1", "Vector");
+    private final static QName _Position_QNAME              = new QName("http://www.opengis.net/swe/1.0.1", "Position");
+    private final static QName _AbstractDataArray_QNAME     = new QName("http://www.opengis.net/swe/1.0.1", "AbstractDataArray");
+    private final static QName _DataBlockDefinition_QNAME   = new QName("http://www.opengis.net/swe/1.0.1", "DataBlockDefinition");
+    private final static QName _SquareMatrix_QNAME          = new QName("http://www.opengis.net/swe/1.0.1", "SquareMatrix");
+    private final static QName _XMLBlock_QNAME              = new QName("http://www.opengis.net/swe/1.0.1", "XMLBlock");
+    private final static QName _PhenomenonSeries_QNAME      = new QName("http://www.opengis.net/swe/1.0.1", "PhenomenonSeries");
+    private final static QName _DataStreamDefinition_QNAME  = new QName("http://www.opengis.net/swe/1.0.1", "DataStreamDefinition");
+    private final static QName _MultiplexStreamFormat_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "MultiplexedStreamFormat");
+    private final static QName _ConstrainedPhenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "ConstrainedPhenomenon");
+
     /**
      *
      */
@@ -186,6 +199,425 @@ public class ObjectFactory {
     public DataArrayEntry createDataArrayEntry() {
         return new DataArrayEntry();
     }
+
+    /**
+     * Create an instance of {@link SquareMatrixType }
+     *
+     */
+    public SquareMatrixType createSquareMatrixType() {
+        return new SquareMatrixType();
+    }
+
+    /**
+     * Create an instance of {@link DataBlockDefinitionPropertyType }
+     *
+     */
+    public DataBlockDefinitionPropertyType createDataBlockDefinitionPropertyType() {
+        return new DataBlockDefinitionPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link ConstrainedPhenomenonType }
+     *
+     */
+    public ConstrainedPhenomenonType createConstrainedPhenomenonType() {
+        return new ConstrainedPhenomenonType();
+    }
+
+    /**
+     * Create an instance of {@link AnyDataPropertyType }
+     *
+     */
+    public AnyDataPropertyType createAnyDataPropertyType() {
+        return new AnyDataPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link DataStreamDefinitionType }
+     *
+     */
+    public DataStreamDefinitionType createDataStreamDefinitionType() {
+        return new DataStreamDefinitionType();
+    }
+
+    /**
+     * Create an instance of {@link MultiplexedStreamFormatPropertyType }
+     *
+     */
+    public MultiplexedStreamFormatPropertyType createMultiplexedStreamFormatPropertyType() {
+        return new MultiplexedStreamFormatPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link MultiplexedStreamFormatType }
+     *
+     */
+    public MultiplexedStreamFormatType createMultiplexedStreamFormatType() {
+        return new MultiplexedStreamFormatType();
+    }
+    
+    /**
+     * Create an instance of {@link XMLBlockType }
+     *
+     */
+    public XMLBlockType createXMLBlockType() {
+        return new XMLBlockType();
+    }
+
+    /**
+     * Create an instance of {@link PhenomenonSeriesType }
+     *
+     */
+    public PhenomenonSeriesType createPhenomenonSeriesType() {
+        return new PhenomenonSeriesType();
+    }
+    
+    /**
+     * Create an instance of {@link BinaryBlock.Member }
+     *
+     */
+    public BinaryBlock.Member createBinaryBlockMember() {
+        return new BinaryBlock.Member();
+    }
+
+    /**
+     * Create an instance of {@link StandardFormat }
+     *
+     */
+    public StandardFormat createStandardFormat() {
+        return new StandardFormat();
+    }
+
+    /**
+     * Create an instance of {@link BinaryBlock.Member.Component }
+     *
+     */
+    public BinaryBlock.Member.Component createBinaryBlockMemberComponent() {
+        return new BinaryBlock.Member.Component();
+    }
+
+    /**
+     * Create an instance of {@link BinaryBlock }
+     *
+     */
+    public BinaryBlock createBinaryBlock() {
+        return new BinaryBlock();
+    }
+
+    /**
+     * Create an instance of {@link BinaryBlock.Member.Block }
+     *
+     */
+    public BinaryBlock.Member.Block createBinaryBlockMemberBlock() {
+        return new BinaryBlock.Member.Block();
+    }
+    
+    /**
+     * Create an instance of {@link BlockEncodingPropertyType }
+     *
+     */
+    public BlockEncodingPropertyType createBlockEncodingPropertyType() {
+        return new BlockEncodingPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link DataValuePropertyType }
+     *
+     */
+    public DataValuePropertyType createDataValuePropertyType() {
+        return new DataValuePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link AbstractMatrixType }
+     *
+     */
+    public AbstractMatrixType createAbstractMatrixType() {
+        return new AbstractMatrixType();
+    }
+
+    /**
+     * Create an instance of {@link QuantityPropertyType }
+     *
+     */
+    public QuantityPropertyType createQuantityPropertyType() {
+        return new QuantityPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link DataComponentPropertyType }
+     *
+     */
+    public DataComponentPropertyType createDataComponentPropertyType() {
+        return new DataComponentPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link AbstractConditionalType.Condition }
+     *
+     */
+    public AbstractConditionalType.Condition createAbstractConditionalTypeCondition() {
+        return new AbstractConditionalType.Condition();
+    }
+
+    /**
+     * Create an instance of {@link QuantityRange }
+     *
+     */
+    public QuantityRange createQuantityRange() {
+        return new QuantityRange();
+    }
+
+    /**
+     * Create an instance of {@link TimeRange }
+     *
+     */
+    public TimeRange createTimeRange() {
+        return new TimeRange();
+    }
+
+    /**
+     * Create an instance of {@link ConditionalValueType.Data }
+     *
+     */
+    public ConditionalValueType.Data createConditionalValueTypeData() {
+        return new ConditionalValueType.Data();
+    }
+
+    /**
+     * Create an instance of {@link Text }
+     *
+     */
+    public Text createText() {
+        return new Text();
+    }
+
+    /**
+     * Create an instance of {@link CountRange }
+     *
+     */
+    public CountRange createCountRange() {
+        return new CountRange();
+    }
+
+    /**
+     * Create an instance of {@link Count }
+     *
+     */
+    public Count createCount() {
+        return new Count();
+    }
+    
+    /**
+     * Create an instance of {@link AbstractConditionalType }
+     *
+     */
+    public AbstractConditionalType createAbstractConditionalType() {
+        return new AbstractConditionalType();
+    }
+
+    /**
+     * Create an instance of {@link ConditionalValueType }
+     *
+     */
+    public ConditionalValueType createConditionalValueType() {
+        return new ConditionalValueType();
+    }
+
+    /**
+     * Create an instance of {@link EnvelopePropertyType }
+     *
+     */
+    public EnvelopePropertyType createEnvelopePropertyType() {
+        return new EnvelopePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link VectorType.Coordinate }
+     *
+     */
+    public VectorType.Coordinate createVectorTypeCoordinate() {
+        return new VectorType.Coordinate();
+    }
+
+    /**
+     * Create an instance of {@link PositionType }
+     *
+     */
+    public PositionType createPositionType() {
+        return new PositionType();
+    }
+
+    /**
+     * Create an instance of {@link TimeRangePropertyType }
+     *
+     */
+    public TimeRangePropertyType createTimeRangePropertyType() {
+        return new TimeRangePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link VectorType }
+     *
+     */
+    public VectorType createVectorType() {
+        return new VectorType();
+    }
+
+    /**
+     * Create an instance of {@link GeoLocationArea }
+     *
+     */
+    public GeoLocationArea createGeoLocationArea() {
+        return new GeoLocationArea();
+    }
+
+    /**
+     * Create an instance of {@link EnvelopeType }
+     *
+     */
+    public EnvelopeType createEnvelopeType() {
+        return new EnvelopeType();
+    }
+
+     /**
+     * Create an instance of {@link AbstractDataArrayType.ElementCount }
+     *
+     */
+    public AbstractDataArrayEntry.ElementCount createAbstractDataArrayTypeElementCount() {
+        return new AbstractDataArrayEntry.ElementCount();
+    }
+
+    /**
+     * Create an instance of {@link PhenomenonPropertyType }
+     *
+     */
+    public PhenomenonPropertyType createPhenomenonPropertyType() {
+        return new PhenomenonPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link ObservableProperty }
+     *
+     */
+    public ObservableProperty createObservableProperty() {
+        return new ObservableProperty();
+    }
+
+    /**
+     * Create an instance of {@link CodeSpacePropertyType }
+     *
+     */
+    public CodeSpacePropertyType createCodeSpacePropertyType() {
+        return new CodeSpacePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link Category }
+     *
+     */
+    public Category createCategory() {
+        return new Category();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ConstrainedPhenomenonType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "ConstrainedPhenomenon", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "Phenomenon")
+    public JAXBElement<ConstrainedPhenomenonType> createConstrainedPhenomenon(ConstrainedPhenomenonType value) {
+        return new JAXBElement<ConstrainedPhenomenonType>(_ConstrainedPhenomenon_QNAME, ConstrainedPhenomenonType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataStreamDefinitionType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "DataStreamDefinition")
+    public JAXBElement<DataStreamDefinitionType> createDataStreamDefinition(DataStreamDefinitionType value) {
+        return new JAXBElement<DataStreamDefinitionType>(_DataStreamDefinition_QNAME, DataStreamDefinitionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiplexedStreamFormatType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "MultiplexedStreamFormat")
+    public JAXBElement<MultiplexedStreamFormatType> createMultiplexedStreamFormat(MultiplexedStreamFormatType value) {
+        return new JAXBElement<MultiplexedStreamFormatType>(_MultiplexStreamFormat_QNAME, MultiplexedStreamFormatType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PhenomenonSeriesType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "PhenomenonSeries", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "CompoundPhenomenon")
+    public JAXBElement<PhenomenonSeriesType> createPhenomenonSeries(PhenomenonSeriesType value) {
+        return new JAXBElement<PhenomenonSeriesType>(_PhenomenonSeries_QNAME, PhenomenonSeriesType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link XMLBlockType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "XMLBlock")
+    public JAXBElement<XMLBlockType> createXMLBlock(XMLBlockType value) {
+        return new JAXBElement<XMLBlockType>(_XMLBlock_QNAME, XMLBlockType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EnvelopeType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "Envelope", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<EnvelopeType> createEnvelope(EnvelopeType value) {
+        return new JAXBElement<EnvelopeType>(_Envelope_QNAME, EnvelopeType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ConditionalValueType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "ConditionalValue", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<ConditionalValueType> createConditionalValue(ConditionalValueType value) {
+        return new JAXBElement<ConditionalValueType>(_ConditionalValue_QNAME, ConditionalValueType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GeoLocationArea }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "GeoLocationArea", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<GeoLocationArea> createGeoLocationArea(GeoLocationArea value) {
+        return new JAXBElement<GeoLocationArea>(_GeoLocationArea_QNAME, GeoLocationArea.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link VectorType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "Vector", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<VectorType> createVector(VectorType value) {
+        return new JAXBElement<VectorType>(_Vector_QNAME, VectorType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PositionType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "Position", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<PositionType> createPosition(PositionType value) {
+        return new JAXBElement<PositionType>(_Position_QNAME, PositionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SquareMatrixType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "SquareMatrix", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataArray")
+    public JAXBElement<SquareMatrixType> createSquareMatrix(SquareMatrixType value) {
+        return new JAXBElement<SquareMatrixType>(_SquareMatrix_QNAME, SquareMatrixType.class, null, value);
+    }
     
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link CompoundPhenomenonType }{@code >}}
@@ -301,11 +733,30 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "DataArray")
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "DataArray", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataArray")
     public JAXBElement<DataArrayEntry> createDataArray(DataArrayEntry value) {
         return new JAXBElement<DataArrayEntry>(_DataArray_QNAME, DataArrayEntry.class, null, value);
     }
-    
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractDataArrayType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "AbstractDataArray")
+    public JAXBElement<AbstractDataArrayEntry> createAbstractDataArray(AbstractDataArrayEntry value) {
+        return new JAXBElement<AbstractDataArrayEntry>(_AbstractDataArray_QNAME, AbstractDataArrayEntry.class, null, value);
+    }
+    
+    /**
+     * TODO see if we need that code block
+     *
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataBlockDefinitionType }{@code >}}
+     *
+
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "DataBlockDefinition")
+    public JAXBElement<DataBlockDefinitionEntry> createDataBlockDefinition(DataBlockDefinitionEntry value) {
+        return new JAXBElement<DataBlockDefinitionEntry>(_DataBlockDefinition_QNAME, DataBlockDefinitionEntry.class, null, value);
+    }
+     */
 
 }

@@ -72,6 +72,7 @@
     <module>ebrim</module>
     <module>metadata-FRA</module>
     <module>skos</module>
+    <module>sensorML</module>
   </modules>
 
 </project>

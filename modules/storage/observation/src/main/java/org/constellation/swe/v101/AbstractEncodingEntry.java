@@ -38,7 +38,7 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({TextBlockEntry.class})
 @XmlType(name="AbstractEncoding")
-public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
+public class AbstractEncodingEntry extends Entry implements AbstractEncoding {
     
     /**
      * The encoding identifier.

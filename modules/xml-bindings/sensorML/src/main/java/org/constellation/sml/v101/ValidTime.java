@@ -1,0 +1,110 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2008, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+package org.constellation.sml.v101;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
+
+
+/**
+ * <p>Java class for anonymous complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType>
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice>
+ *         &lt;element ref="{http://www.opengis.net/gml}TimeInstant"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}TimePeriod"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "timeInstant",
+    "timePeriod"
+})
+@XmlRootElement(name = "validTime")
+public class ValidTime {
+
+    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml")
+    protected TimeInstantType timeInstant;
+    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml")
+    protected TimePeriodType timePeriod;
+
+    /**
+     * Gets the value of the timeInstant property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TimeInstantType }
+     *     
+     */
+    public TimeInstantType getTimeInstant() {
+        return timeInstant;
+    }
+
+    /**
+     * Sets the value of the timeInstant property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TimeInstantType }
+     *     
+     */
+    public void setTimeInstant(TimeInstantType value) {
+        this.timeInstant = value;
+    }
+
+    /**
+     * Gets the value of the timePeriod property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TimePeriodType }
+     *     
+     */
+    public TimePeriodType getTimePeriod() {
+        return timePeriod;
+    }
+
+    /**
+     * Sets the value of the timePeriod property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TimePeriodType }
+     *     
+     */
+    public void setTimePeriod(TimePeriodType value) {
+        this.timePeriod = value;
+    }
+
+}
