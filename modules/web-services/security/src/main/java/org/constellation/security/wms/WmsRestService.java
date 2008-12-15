@@ -52,8 +52,7 @@ public class WmsRestService extends WMSService {
 
      public WmsRestService() throws JAXBException, SQLException, IOException, NamingException {
             worker = new WMSSecuredWorker(marshaller,unmarshaller);
-            LOGGER.info("WMS service running");
-
+            LOGGER.info("WMS secured service running");
     }
 
 }

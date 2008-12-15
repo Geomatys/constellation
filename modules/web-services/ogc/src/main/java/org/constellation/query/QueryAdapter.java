@@ -35,7 +35,7 @@ import javax.xml.bind.JAXBException;
 
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.TimeParser;
+import org.constellation.util.TimeParser;
 import org.constellation.ws.WebServiceException;
 
 import org.geotools.geometry.GeneralEnvelope;
