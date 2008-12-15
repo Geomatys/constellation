@@ -29,8 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.swe.v101.PositionType;
-import org.constellation.swe.v101.VectorType;
+import org.constellation.swe.v100.PositionType;
+import org.constellation.swe.v100.VectorType;
 
 
 /**
@@ -47,7 +47,7 @@ import org.constellation.swe.v101.VectorType;
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}Position"/>
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}Vector"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -76,7 +76,7 @@ public class Position {
     private String name;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;

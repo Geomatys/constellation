@@ -41,10 +41,10 @@ import org.constellation.gml.v311.PointType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice minOccurs="0">
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}Point"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}AbstractCurve"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}Point"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}AbstractCurve"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -60,13 +60,13 @@ import org.constellation.gml.v311.PointType;
 @XmlRootElement(name = "location")
 public class Location {
 
-    @XmlElement(name = "Point", namespace = "http://www.opengis.net/gml/3.2")
+    @XmlElement(name = "Point", namespace = "http://www.opengis.net/gml")
     private PointType point;
-    @XmlElementRef(name = "AbstractCurve", namespace = "http://www.opengis.net/gml/3.2", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractCurve", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private JAXBElement<? extends AbstractCurveType> abstractCurve;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;

@@ -43,7 +43,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="copyRights" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="intellectualPropertyRights" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="privacyAct" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}id"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -66,7 +66,7 @@ public class Rights {
     private Boolean intellectualPropertyRights;
     @XmlAttribute
     private Boolean privacyAct;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;

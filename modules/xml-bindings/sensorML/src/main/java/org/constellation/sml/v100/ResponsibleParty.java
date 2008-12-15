@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="positionName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}contactInfo" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}id"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -64,7 +64,7 @@ public class ResponsibleParty {
     private String organizationName;
     private String positionName;
     private ContactInfo contactInfo;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;

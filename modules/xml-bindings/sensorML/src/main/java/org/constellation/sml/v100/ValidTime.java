@@ -36,8 +36,8 @@ import org.constellation.gml.v311.TimePeriodType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}TimeInstant"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}TimePeriod"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}TimeInstant"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}TimePeriod"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -54,9 +54,9 @@ import org.constellation.gml.v311.TimePeriodType;
 @XmlRootElement(name = "validTime")
 public class ValidTime {
 
-    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml/3.2")
+    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml")
     private TimeInstantType timeInstant;
-    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml/3.2")
+    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml")
     private TimePeriodType timePeriod;
 
     /**

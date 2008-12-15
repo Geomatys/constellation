@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="phoneNumber" type="{http://www.w3.org/2001/XMLSchema}token"/>
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}token"/>
  *       &lt;/sequence>
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}id"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -83,7 +83,7 @@ public class Person {
     @XmlElement(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String email;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;

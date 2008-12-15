@@ -35,7 +35,7 @@ import org.constellation.gml.v311.EngineeringCRSType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}EngineeringCRS"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}EngineeringCRS"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -51,7 +51,7 @@ import org.constellation.gml.v311.EngineeringCRSType;
 @XmlRootElement(name = "spatialReferenceFrame")
 public class SpatialReferenceFrame {
 
-    @XmlElement(name = "EngineeringCRS", namespace = "http://www.opengis.net/gml/3.2", required = true)
+    @XmlElement(name = "EngineeringCRS", namespace = "http://www.opengis.net/gml", required = true)
     private EngineeringCRSType engineeringCRS;
 
     /**

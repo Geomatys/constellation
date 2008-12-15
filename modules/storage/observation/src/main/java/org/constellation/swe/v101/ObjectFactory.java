@@ -17,6 +17,7 @@
 
 package org.constellation.swe.v101;
 
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
@@ -56,6 +57,8 @@ public class ObjectFactory {
     private final static QName _DataStreamDefinition_QNAME  = new QName("http://www.opengis.net/swe/1.0.1", "DataStreamDefinition");
     private final static QName _MultiplexStreamFormat_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "MultiplexedStreamFormat");
     private final static QName _ConstrainedPhenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "ConstrainedPhenomenon");
+    private final static QName _AllowedTokenValueList_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "valueList");
+    private final static QName _AllowedTimesInterval_QNAME  = new QName("http://www.opengis.net/swe/1.0.1", "interval");
 
     /**
      *
@@ -521,6 +524,78 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link VectorOrSquareMatrixPropertyType }
+     *
+     */
+    public VectorOrSquareMatrixPropertyType createVectorOrSquareMatrixPropertyType() {
+        return new VectorOrSquareMatrixPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link AllowedValuesPropertyType }
+     *
+     */
+    public AllowedValuesPropertyType createAllowedValuesPropertyType() {
+        return new AllowedValuesPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link AllowedTokensPropertyType }
+     *
+     */
+    public AllowedTokensPropertyType createAllowedTokensPropertyType() {
+        return new AllowedTokensPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TimePropertyType }
+     *
+     */
+    public TimePropertyType createTimePropertyType() {
+        return new TimePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link QualityPropertyType }
+     *
+     */
+    public QualityPropertyType createQualityPropertyType() {
+        return new QualityPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link AllowedTimesPropertyType }
+     *
+     */
+    public AllowedTimesPropertyType createAllowedTimesPropertyType() {
+        return new AllowedTimesPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link AllowedTokens }
+     *
+     */
+    public AllowedTokens createAllowedTokens() {
+        return new AllowedTokens();
+    }
+
+    /**
+     * Create an instance of {@link AllowedValues }
+     *
+     */
+    public AllowedValues createAllowedValues() {
+        return new AllowedValues();
+    }
+
+    /**
+     * Create an instance of {@link AllowedTimes }
+     *
+     */
+    public AllowedTimes createAllowedTimes() {
+        return new AllowedTimes();
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ConstrainedPhenomenonType }{@code >}}
      *
      */
@@ -745,6 +820,51 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "AbstractDataArray")
     public JAXBElement<AbstractDataArrayEntry> createAbstractDataArray(AbstractDataArrayEntry value) {
         return new JAXBElement<AbstractDataArrayEntry>(_AbstractDataArray_QNAME, AbstractDataArrayEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "valueList", scope = AllowedTokens.class)
+    public JAXBElement<List<String>> createAllowedTokensValueList(List<String> value) {
+        return new JAXBElement<List<String>>(_AllowedTokenValueList_QNAME, ((Class) List.class), AllowedTokens.class, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "valueList", scope = AllowedTimes.class)
+    public JAXBElement<List<String>> createAllowedTimesValueList(List<String> value) {
+        return new JAXBElement<List<String>>(_AllowedTokenValueList_QNAME, ((Class) List.class), AllowedTimes.class, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "interval", scope = AllowedTimes.class)
+    public JAXBElement<List<String>> createAllowedTimesInterval(List<String> value) {
+        return new JAXBElement<List<String>>(_AllowedTimesInterval_QNAME, ((Class) List.class), AllowedTimes.class, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link Double }{@code >}{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "valueList", scope = AllowedValues.class)
+    public JAXBElement<List<Double>> createAllowedValuesValueList(List<Double> value) {
+        return new JAXBElement<List<Double>>(_AllowedTokenValueList_QNAME, ((Class) List.class), AllowedValues.class, ((List<Double> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link Double }{@code >}{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "interval", scope = AllowedValues.class)
+    public JAXBElement<List<Double>> createAllowedValuesInterval(List<Double> value) {
+        return new JAXBElement<List<Double>>(_AllowedTimesInterval_QNAME, ((Class) List.class), AllowedValues.class, ((List<Double> ) value));
     }
     
     /**

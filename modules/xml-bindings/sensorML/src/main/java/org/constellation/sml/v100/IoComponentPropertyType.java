@@ -28,18 +28,18 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.swe.v101.AbstractDataArrayEntry;
-import org.constellation.swe.v101.BooleanType;
-import org.constellation.swe.v101.Category;
-import org.constellation.swe.v101.Count;
-import org.constellation.swe.v101.CountRange;
-import org.constellation.swe.v101.ObservableProperty;
-import org.constellation.swe.v101.QuantityType;
-import org.constellation.swe.v101.QuantityRange;
-import org.constellation.swe.v101.Text;
-import org.constellation.swe.v101.TimeType;
-import org.constellation.swe.v101.TimeRange;
-import org.constellation.swe.v101.AbstractDataRecordEntry;
+import org.constellation.swe.v100.AbstractDataArrayType;
+import org.constellation.swe.v100.BooleanType;
+import org.constellation.swe.v100.Category;
+import org.constellation.swe.v100.Count;
+import org.constellation.swe.v100.CountRange;
+import org.constellation.swe.v100.ObservableProperty;
+import org.constellation.swe.v100.QuantityType;
+import org.constellation.swe.v100.QuantityRange;
+import org.constellation.swe.v100.Text;
+import org.constellation.swe.v100.TimeType;
+import org.constellation.swe.v100.TimeRange;
+import org.constellation.swe.v100.AbstractDataRecordType;
 
 
 /**
@@ -55,7 +55,7 @@ import org.constellation.swe.v101.AbstractDataRecordEntry;
  *         &lt;group ref="{http://www.opengis.net/swe/1.0}AnyData"/>
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}ObservableProperty"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -100,9 +100,9 @@ public class IoComponentPropertyType {
     @XmlElement(name = "TimeRange", namespace = "http://www.opengis.net/swe/1.0")
     private TimeRange timeRange;
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractDataRecordEntry> abstractDataRecord;
+    private JAXBElement<? extends AbstractDataRecordType> abstractDataRecord;
     @XmlElementRef(name = "AbstractDataArray", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractDataArrayEntry> abstractDataArray;
+    private JAXBElement<? extends AbstractDataArrayType> abstractDataArray;
     @XmlElement(name = "ObservableProperty", namespace = "http://www.opengis.net/swe/1.0")
     private ObservableProperty observableProperty;
     @XmlAttribute(required = true)
@@ -110,7 +110,7 @@ public class IoComponentPropertyType {
     private String name;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -256,29 +256,29 @@ public class IoComponentPropertyType {
     /**
      * Gets the value of the abstractDataRecord property.
      */
-    public JAXBElement<? extends AbstractDataRecordEntry> getAbstractDataRecord() {
+    public JAXBElement<? extends AbstractDataRecordType> getAbstractDataRecord() {
         return abstractDataRecord;
     }
 
     /**
      * Sets the value of the abstractDataRecord property.
      */
-    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordEntry> value) {
-        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordEntry> ) value);
+    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordType> value) {
+        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordType> ) value);
     }
 
     /**
      * Gets the value of the abstractDataArray property.
      */
-    public JAXBElement<? extends AbstractDataArrayEntry> getAbstractDataArray() {
+    public JAXBElement<? extends AbstractDataArrayType> getAbstractDataArray() {
         return abstractDataArray;
     }
 
     /**
      * Sets the value of the abstractDataArray property.
      */
-    public void setAbstractDataArray(JAXBElement<? extends AbstractDataArrayEntry> value) {
-        this.abstractDataArray = ((JAXBElement<? extends AbstractDataArrayEntry> ) value);
+    public void setAbstractDataArray(JAXBElement<? extends AbstractDataArrayType> value) {
+        this.abstractDataArray = ((JAXBElement<? extends AbstractDataArrayType> ) value);
     }
 
     /**

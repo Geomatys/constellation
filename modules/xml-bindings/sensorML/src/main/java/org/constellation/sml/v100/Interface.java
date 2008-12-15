@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;sequence minOccurs="0">
  *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}InterfaceDefinition"/>
  *       &lt;/sequence>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -64,7 +64,7 @@ public class Interface {
     private String name;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;

@@ -41,14 +41,14 @@ import org.constellation.gml.v311.StringOrRefType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}description"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}description"/>
  *         &lt;element name="date" type="{http://www.opengis.net/swe/1.0}timeIso8601" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}contact" minOccurs="0"/>
  *         &lt;element name="format" type="{http://www.w3.org/2001/XMLSchema}token" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}onlineResource" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}token" />
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}id"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -67,7 +67,7 @@ import org.constellation.gml.v311.StringOrRefType;
 @XmlRootElement(name = "Document")
 public class Document {
 
-    @XmlElement(namespace = "http://www.opengis.net/gml/3.2", required = true)
+    @XmlElement(namespace = "http://www.opengis.net/gml", required = true)
     private StringOrRefType description;
     private String date;
     private Contact contact;
@@ -77,7 +77,7 @@ public class Document {
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String version;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;

@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.swe.v101.CodeSpacePropertyType;
+import org.constellation.swe.v100.CodeSpacePropertyType;
 
 
 /**

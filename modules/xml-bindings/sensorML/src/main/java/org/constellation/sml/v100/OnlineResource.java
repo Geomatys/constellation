@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -50,7 +50,7 @@ public class OnlineResource {
 
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;

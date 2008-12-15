@@ -33,13 +33,13 @@ import org.constellation.gml.v311.AbstractFeatureEntry;
  * <pre>
  * &lt;complexType name="AbstractSMLType">
  *   &lt;complexContent>
- *     &lt;restriction base="{http://www.opengis.net/gml/3.2}AbstractFeatureType">
+ *     &lt;restriction base="{http://www.opengis.net/gml}AbstractFeatureType">
  *       &lt;sequence>
  *         &lt;sequence>
  *           &lt;sequence>
- *             &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
- *             &lt;element ref="{http://www.opengis.net/gml/3.2}name" minOccurs="0"/>
- *             &lt;element ref="{http://www.opengis.net/gml/3.2}boundedBy" minOccurs="0"/>
+ *             &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
+ *             &lt;element ref="{http://www.opengis.net/gml}name" minOccurs="0"/>
+ *             &lt;element ref="{http://www.opengis.net/gml}boundedBy" minOccurs="0"/>
  *           &lt;/sequence>
  *         &lt;/sequence>
  *       &lt;/sequence>

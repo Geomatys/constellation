@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.swe.v101.TimeType;
+import org.constellation.swe.v100.TimeType;
 
 
 /**
@@ -45,7 +45,7 @@ import org.constellation.swe.v101.TimeType;
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}Time"/>
  *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}_Process"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -71,7 +71,7 @@ public class TimePosition {
     private String name;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;

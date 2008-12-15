@@ -43,7 +43,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  * <pre>
  * &lt;complexType name="ProcessMethodType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractGMLEntry">
+ *     &lt;extension base="{http://www.opengis.net/gml}AbstractGMLEntry">
  *       &lt;sequence>
  *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup" minOccurs="0"/>
  *         &lt;element name="rules">
@@ -56,7 +56,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+ *                             &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
  *                             &lt;element ref="{http://www.opengis.net/sensorML/1.0}ruleLanguage" minOccurs="0"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
@@ -78,7 +78,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+ *                             &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
  *                             &lt;element name="mathML" minOccurs="0">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
@@ -86,7 +86,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                                     &lt;sequence minOccurs="0">
  *                                       &lt;any/>
  *                                     &lt;/sequence>
- *                                     &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                                     &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                                   &lt;/restriction>
  *                                 &lt;/complexContent>
  *                               &lt;/complexType>
@@ -112,13 +112,13 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+ *                             &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
  *                             &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup" minOccurs="0"/>
  *                             &lt;element name="sourceRef" minOccurs="0">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                                     &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                                     &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                                   &lt;/restriction>
  *                                 &lt;/complexContent>
  *                               &lt;/complexType>
@@ -127,7 +127,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                               &lt;complexType>
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                                     &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                                     &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                                   &lt;/restriction>
  *                                 &lt;/complexContent>
  *                               &lt;/complexType>
@@ -141,7 +141,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
  *                     &lt;/complexType>
  *                   &lt;/element>
  *                 &lt;/choice>
- *                 &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -346,7 +346,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
-     *                   &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+     *                   &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
      *                   &lt;element name="mathML" minOccurs="0">
      *                     &lt;complexType>
      *                       &lt;complexContent>
@@ -354,7 +354,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *                           &lt;sequence minOccurs="0">
      *                             &lt;any/>
      *                           &lt;/sequence>
-     *                           &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *                           &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *                         &lt;/restriction>
      *                       &lt;/complexContent>
      *                     &lt;/complexType>
@@ -406,7 +406,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+         *         &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
          *         &lt;element name="mathML" minOccurs="0">
          *           &lt;complexType>
          *             &lt;complexContent>
@@ -414,7 +414,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
          *                 &lt;sequence minOccurs="0">
          *                   &lt;any/>
          *                 &lt;/sequence>
-         *                 &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+         *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
          *               &lt;/restriction>
          *             &lt;/complexContent>
          *           &lt;/complexType>
@@ -434,7 +434,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
         })
         public static class AlgorithmDefinition {
 
-            @XmlElement(namespace = "http://www.opengis.net/gml/3.2")
+            @XmlElement(namespace = "http://www.opengis.net/gml")
             private StringOrRefType description;
             private ProcessMethodType.Algorithm.AlgorithmDefinition.MathML mathML;
 
@@ -479,7 +479,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
              *       &lt;sequence minOccurs="0">
              *         &lt;any/>
              *       &lt;/sequence>
-             *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+             *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
              *     &lt;/restriction>
              *   &lt;/complexContent>
              * &lt;/complexType>
@@ -497,7 +497,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
                 private Object any;
                 @XmlAttribute
                 private List<String> nilReason;
-                @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+                @XmlAttribute(namespace = "http://www.opengis.net/gml")
                 private String remoteSchema;
                 @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
                 private String actuate;
@@ -677,13 +677,13 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
-     *                   &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+     *                   &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
      *                   &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup" minOccurs="0"/>
      *                   &lt;element name="sourceRef" minOccurs="0">
      *                     &lt;complexType>
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                           &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *                           &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *                         &lt;/restriction>
      *                       &lt;/complexContent>
      *                     &lt;/complexType>
@@ -692,7 +692,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *                     &lt;complexType>
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                           &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *                           &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *                         &lt;/restriction>
      *                       &lt;/complexContent>
      *                     &lt;/complexType>
@@ -706,7 +706,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *           &lt;/complexType>
      *         &lt;/element>
      *       &lt;/choice>
-     *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -727,7 +727,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
         private ProcessMethodType.Implementation.ImplementationCode implementationCode;
         @XmlAttribute
         private List<String> nilReason;
-        @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+        @XmlAttribute(namespace = "http://www.opengis.net/gml")
         private String remoteSchema;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
         private String actuate;
@@ -1028,13 +1028,13 @@ public class ProcessMethodType extends AbstractGMLEntry {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+         *         &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
          *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup" minOccurs="0"/>
          *         &lt;element name="sourceRef" minOccurs="0">
          *           &lt;complexType>
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *                 &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+         *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
          *               &lt;/restriction>
          *             &lt;/complexContent>
          *           &lt;/complexType>
@@ -1043,7 +1043,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
          *           &lt;complexType>
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *                 &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+         *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
          *               &lt;/restriction>
          *             &lt;/complexContent>
          *           &lt;/complexType>
@@ -1078,7 +1078,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
         })
         public static class ImplementationCode {
 
-            @XmlElement(namespace = "http://www.opengis.net/gml/3.2")
+            @XmlElement(namespace = "http://www.opengis.net/gml")
             private StringOrRefType description;
             private List<Keywords> keywords;
             private List<Identification> identification;
@@ -1541,7 +1541,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
              * &lt;complexType>
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-             *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+             *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
              *     &lt;/restriction>
              *   &lt;/complexContent>
              * &lt;/complexType>
@@ -1555,7 +1555,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
 
                 @XmlAttribute
                 private List<String> nilReason;
-                @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+                @XmlAttribute(namespace = "http://www.opengis.net/gml")
                 private String remoteSchema;
                 @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
                 private String actuate;
@@ -1809,7 +1809,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
              * &lt;complexType>
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-             *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+             *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
              *     &lt;/restriction>
              *   &lt;/complexContent>
              * &lt;/complexType>
@@ -1823,7 +1823,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
 
                 @XmlAttribute
                 private List<String> nilReason;
-                @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+                @XmlAttribute(namespace = "http://www.opengis.net/gml")
                 private String remoteSchema;
                 @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
                 private String actuate;
@@ -2087,7 +2087,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
-     *                   &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+     *                   &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
      *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}ruleLanguage" minOccurs="0"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
@@ -2146,7 +2146,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+         *         &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
          *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}ruleLanguage" minOccurs="0"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
@@ -2163,7 +2163,7 @@ public class ProcessMethodType extends AbstractGMLEntry {
         })
         public static class RulesDefinition {
 
-            @XmlElement(namespace = "http://www.opengis.net/gml/3.2")
+            @XmlElement(namespace = "http://www.opengis.net/gml")
             private StringOrRefType description;
             @XmlElementRef(name = "ruleLanguage", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
             private JAXBElement<? extends RuleLanguageType> ruleLanguage;

@@ -34,8 +34,8 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.opengis.net/sensorML/1.0}AbstractProcessType">
  *       &lt;sequence>
  *         &lt;sequence>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}name" minOccurs="0"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}name" minOccurs="0"/>
  *         &lt;/sequence>
  *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup" minOccurs="0"/>
  *       &lt;/sequence>

@@ -29,8 +29,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-import org.constellation.swe.v101.DataBlockDefinitionEntry;
-import org.constellation.swe.v101.DataStreamDefinitionType;
+import org.constellation.swe.v100.DataBlockDefinitionType;
+import org.constellation.swe.v100.DataStreamDefinitionType;
 import org.w3c.dom.Element;
 
 
@@ -54,7 +54,7 @@ import org.w3c.dom.Element;
  *                       &lt;element ref="{http://www.opengis.net/swe/1.0}DataBlockDefinition"/>
  *                       &lt;element ref="{http://www.opengis.net/swe/1.0}DataStreamDefinition"/>
  *                     &lt;/choice>
- *                     &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                     &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                   &lt;/restriction>
  *                 &lt;/complexContent>
  *               &lt;/complexType>
@@ -72,7 +72,7 @@ import org.w3c.dom.Element;
  *             &lt;complexType>
  *               &lt;complexContent>
  *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                   &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *                   &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                 &lt;/restriction>
  *               &lt;/complexContent>
  *             &lt;/complexType>
@@ -154,7 +154,7 @@ public class DataSourceType extends AbstractProcessType {
      *         &lt;element ref="{http://www.opengis.net/swe/1.0}DataBlockDefinition"/>
      *         &lt;element ref="{http://www.opengis.net/swe/1.0}DataStreamDefinition"/>
      *       &lt;/choice>
-     *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -170,12 +170,12 @@ public class DataSourceType extends AbstractProcessType {
     public static class DataDefinition {
 
         @XmlElement(name = "DataBlockDefinition", namespace = "http://www.opengis.net/swe/1.0")
-        private DataBlockDefinitionEntry dataBlockDefinition;
+        private DataBlockDefinitionType dataBlockDefinition;
         @XmlElement(name = "DataStreamDefinition", namespace = "http://www.opengis.net/swe/1.0")
         private DataStreamDefinitionType dataStreamDefinition;
         @XmlAttribute
         private List<String> nilReason;
-        @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+        @XmlAttribute(namespace = "http://www.opengis.net/gml")
         private String remoteSchema;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
         private String actuate;
@@ -196,14 +196,14 @@ public class DataSourceType extends AbstractProcessType {
          * Gets the value of the dataBlockDefinition property.
          * 
          */
-        public DataBlockDefinitionEntry getDataBlockDefinition() {
+        public DataBlockDefinitionType getDataBlockDefinition() {
             return dataBlockDefinition;
         }
 
         /**
          * Sets the value of the dataBlockDefinition property.
          */
-        public void setDataBlockDefinition(DataBlockDefinitionEntry value) {
+        public void setDataBlockDefinition(DataBlockDefinitionType value) {
             this.dataBlockDefinition = value;
         }
 
@@ -359,7 +359,7 @@ public class DataSourceType extends AbstractProcessType {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+     *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -373,7 +373,7 @@ public class DataSourceType extends AbstractProcessType {
 
         @XmlAttribute
         private List<String> nilReason;
-        @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+        @XmlAttribute(namespace = "http://www.opengis.net/gml")
         private String remoteSchema;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
         private String actuate;

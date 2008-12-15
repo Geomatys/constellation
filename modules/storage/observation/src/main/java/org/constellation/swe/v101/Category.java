@@ -2,7 +2,6 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -62,9 +61,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "Category")
 public class Category extends AbstractDataComponentEntry {
 
-   /* private CodeSpacePropertyType codeSpace;
+    private CodeSpacePropertyType codeSpace;
     private AllowedTokensPropertyType constraint;
-    private QualityPropertyType quality;*/
+    private QualityPropertyType quality;
 
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")

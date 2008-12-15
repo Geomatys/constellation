@@ -26,10 +26,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.swe.v101.Category;
-import org.constellation.swe.v101.DataBlockDefinitionEntry;
-import org.constellation.swe.v101.DataStreamDefinitionType;
-import org.constellation.swe.v101.AbstractDataRecordEntry;
+import org.constellation.swe.v100.Category;
+import org.constellation.swe.v100.DataBlockDefinitionType;
+import org.constellation.swe.v100.DataStreamDefinitionType;
+import org.constellation.swe.v100.AbstractDataRecordType;
 
 
 /**
@@ -47,7 +47,7 @@ import org.constellation.swe.v101.AbstractDataRecordEntry;
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}DataBlockDefinition"/>
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}DataStreamDefinition"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -65,16 +65,16 @@ import org.constellation.swe.v101.AbstractDataRecordEntry;
 public class PresentationLayerPropertyType {
 
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractDataRecordEntry> abstractDataRecord;
+    private JAXBElement<? extends AbstractDataRecordType> abstractDataRecord;
     @XmlElement(name = "Category", namespace = "http://www.opengis.net/swe/1.0")
     private Category category;
     @XmlElement(name = "DataBlockDefinition", namespace = "http://www.opengis.net/swe/1.0")
-    private DataBlockDefinitionEntry dataBlockDefinition;
+    private DataBlockDefinitionType dataBlockDefinition;
     @XmlElement(name = "DataStreamDefinition", namespace = "http://www.opengis.net/swe/1.0")
     private DataStreamDefinitionType dataStreamDefinition;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml/")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -94,15 +94,15 @@ public class PresentationLayerPropertyType {
     /**
      * Gets the value of the abstractDataRecord property.
      */
-    public JAXBElement<? extends AbstractDataRecordEntry> getAbstractDataRecord() {
+    public JAXBElement<? extends AbstractDataRecordType> getAbstractDataRecord() {
         return abstractDataRecord;
     }
 
     /**
      * Sets the value of the abstractDataRecord property.
      */
-    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordEntry> value) {
-        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordEntry> ) value);
+    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordType> value) {
+        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordType> ) value);
     }
 
     /**
@@ -122,7 +122,7 @@ public class PresentationLayerPropertyType {
     /**
      * Gets the value of the dataBlockDefinition property.
      */
-    public DataBlockDefinitionEntry getDataBlockDefinition() {
+    public DataBlockDefinitionType getDataBlockDefinition() {
         return dataBlockDefinition;
     }
 
@@ -130,7 +130,7 @@ public class PresentationLayerPropertyType {
      * Sets the value of the dataBlockDefinition property.
      * 
      */
-    public void setDataBlockDefinition(DataBlockDefinitionEntry value) {
+    public void setDataBlockDefinition(DataBlockDefinitionType value) {
         this.dataBlockDefinition = value;
     }
 

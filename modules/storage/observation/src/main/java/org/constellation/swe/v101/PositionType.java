@@ -60,7 +60,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class PositionType extends AbstractVectorType {
 
-    /*private TimePropertyType time;
+    private TimePropertyType time;
     private VectorPropertyType location;
     private VectorOrSquareMatrixPropertyType orientation;
     private VectorPropertyType velocity;
@@ -76,7 +76,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link TimePropertyType }
      *     
-     
+     */
     public TimePropertyType getTime() {
         return time;
     }
@@ -88,7 +88,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link TimePropertyType }
      *     
-     
+     */
     public void setTime(TimePropertyType value) {
         this.time = value;
     }
@@ -100,7 +100,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public VectorPropertyType getLocation() {
         return location;
     }
@@ -112,7 +112,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public void setLocation(VectorPropertyType value) {
         this.location = value;
     }
@@ -124,7 +124,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public VectorOrSquareMatrixPropertyType getOrientation() {
         return orientation;
     }
@@ -136,7 +136,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public void setOrientation(VectorOrSquareMatrixPropertyType value) {
         this.orientation = value;
     }
@@ -148,7 +148,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public VectorPropertyType getVelocity() {
         return velocity;
     }
@@ -160,7 +160,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public void setVelocity(VectorPropertyType value) {
         this.velocity = value;
     }
@@ -172,7 +172,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public VectorOrSquareMatrixPropertyType getAngularVelocity() {
         return angularVelocity;
     }
@@ -184,7 +184,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public void setAngularVelocity(VectorOrSquareMatrixPropertyType value) {
         this.angularVelocity = value;
     }
@@ -196,7 +196,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public VectorPropertyType getAcceleration() {
         return acceleration;
     }
@@ -208,7 +208,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorPropertyType }
      *     
-     
+     */
     public void setAcceleration(VectorPropertyType value) {
         this.acceleration = value;
     }
@@ -220,7 +220,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public VectorOrSquareMatrixPropertyType getAngularAcceleration() {
         return angularAcceleration;
     }
@@ -232,7 +232,7 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public void setAngularAcceleration(VectorOrSquareMatrixPropertyType value) {
         this.angularAcceleration = value;
     }
@@ -244,7 +244,7 @@ public class PositionType extends AbstractVectorType {
      *     possible object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public VectorOrSquareMatrixPropertyType getState() {
         return state;
     }
@@ -256,9 +256,9 @@ public class PositionType extends AbstractVectorType {
      *     allowed object is
      *     {@link VectorOrSquareMatrixPropertyType }
      *     
-     
+     */
     public void setState(VectorOrSquareMatrixPropertyType value) {
         this.state = value;
     }
-*/
+
 }

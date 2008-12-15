@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.gml.v311.StringOrRefType;
-import org.constellation.swe.v101.DataComponentPropertyType;
+import org.constellation.swe.v100.DataComponentPropertyType;
 
 
 /**
@@ -43,12 +43,12 @@ import org.constellation.swe.v101.DataComponentPropertyType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="date" type="{http://www.opengis.net/swe/1.0}timeIso8601" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}description" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}description" minOccurs="0"/>
  *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}generalInfo" minOccurs="0"/>
  *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}references" minOccurs="0"/>
  *         &lt;element name="property" type="{http://www.opengis.net/swe/1.0}DataComponentPropertyType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}id"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -71,7 +71,7 @@ import org.constellation.swe.v101.DataComponentPropertyType;
 public class Event {
 
     private String date;
-    @XmlElement(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlElement(namespace = "http://www.opengis.net/gml")
     private StringOrRefType description;
     private List<Keywords> keywords;
     private List<Identification> identification;
@@ -79,7 +79,7 @@ public class Event {
     private List<Contact> contact;
     private List<Documentation> documentation;
     private List<DataComponentPropertyType> property;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;

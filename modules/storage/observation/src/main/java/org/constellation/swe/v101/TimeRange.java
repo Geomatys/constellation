@@ -63,8 +63,8 @@ import javax.xml.bind.annotation.XmlType;
 public class TimeRange extends AbstractDataComponentEntry {
 
     private UomPropertyType uom;
-    /*private AllowedTimesPropertyType constraint;
-    private QualityPropertyType quality;*/
+    private AllowedTimesPropertyType constraint;
+    private QualityPropertyType quality;
     @XmlList
     private List<String> value;
     @XmlAttribute

@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.swe.v101.AbstractDataRecordEntry;
+import org.constellation.swe.v100.AbstractDataRecordType;
 
 
 /**
@@ -41,7 +41,7 @@ import org.constellation.swe.v101.AbstractDataRecordEntry;
  *       &lt;sequence minOccurs="0">
  *         &lt;element ref="{http://www.opengis.net/swe/1.0}AbstractDataRecord"/>
  *       &lt;/sequence>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -57,10 +57,10 @@ import org.constellation.swe.v101.AbstractDataRecordEntry;
 public class CapabilitiesSML {
 
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractDataRecordEntry> abstractDataRecord;
+    private JAXBElement<? extends AbstractDataRecordType> abstractDataRecord;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -80,15 +80,15 @@ public class CapabilitiesSML {
     /**
      * Gets the value of the abstractDataRecord property.
      */
-    public JAXBElement<? extends AbstractDataRecordEntry> getAbstractDataRecord() {
+    public JAXBElement<? extends AbstractDataRecordType> getAbstractDataRecord() {
         return abstractDataRecord;
     }
 
     /**
      * Sets the value of the abstractDataRecord property.
      */
-    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordEntry> value) {
-        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordEntry> ) value);
+    public void setAbstractDataRecord(JAXBElement<? extends AbstractDataRecordType> value) {
+        this.abstractDataRecord = ((JAXBElement<? extends AbstractDataRecordType> ) value);
     }
 
     /**
