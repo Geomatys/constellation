@@ -36,7 +36,7 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
 /**
- * Abstract definition of a {@code Web Map Service} worker czalled by a facade
+ * Abstract definition of a {@code Web Map Service} worker called by a facade
  * to perform the logic for each instance.
  *
  * @version $Id$

@@ -76,41 +76,55 @@ import static org.constellation.query.wms.WMSQuery.*;
 
 
 /**
- * WMS 1.3.0 / 1.1.1
- * web service implementing the operation getMap, getFeatureInfo and getCapabilities.
+ * The REST facade to an OGC Web Map Service, implementing versions 1.1.1 and 
+ * 1.3.0.
  *
  * @version $Id$
- * @author Guilhem Legal
- * @author Cédric Briançon
+ * 
+ * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ * @since 0.1
  */
 @Path("wms")
 @Singleton
 public class WMSService extends OGCWebService {
+	
     /**
-     * The worker, designed to generate the output stream matching with the request
-     * done by the user.
+     * The worker which will perform the core logic for this service.
      */
     protected AbstractWMSWorker worker;
-
+    
+    
     /**
-     * Build a new instance of the webService and initialise the JAXB marshaller.
+     * Build a new instance of the webService and initialize the JAXB marshaller.
      */
     public WMSService() throws JAXBException, SQLException, IOException, NamingException {
         super("WMS", new ServiceVersion(ServiceType.WMS, "1.3.0"), new ServiceVersion(ServiceType.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:org.constellation.wms.v111:" +
-                "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
-                "http://www.opengis.net/wms");
+                      "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
+                      "http://www.opengis.net/wms");
 
-        worker = new WMSWorker(unmarshaller);
+        worker = new WMSWorker(null, unmarshaller);
         LOGGER.info("WMS service running");
     }
 
     /**
-     * Treat the incoming request and call the right function.
+     * Treat the incoming request and call the right function in the worker.
+     * <p>
+     * The parent class will have processed the request sufficiently to ensure 
+     * all the relevant information is either in the {@code uriContext} field or 
+     * in the {@code Object} passed in as a parameter. Here we proceed a step 
+     * further to ensure the request is encapsulated in a Java object which we 
+     * then pass to the worker when calling the appropriate method.
+     * </p>
      *
-     * @return an image or xml response.
+     * @param  objectRequest  an object encapsulating the request or {@code null}
+     *                          if the request parameters are all in the 
+     *                          {@code uriContext} field.
+     * @return a Response, either an image or an XML document depending on the 
+     *           user's request.
      * @throw JAXBException
      */
     @Override
@@ -421,11 +435,11 @@ public class WMSService extends OGCWebService {
     }
 
     /**
-     * TODO.
+     * Logs the destruction of the service
      */
     @PreDestroy
     @Override
     public void destroy() {
-        LOGGER.info("destroying WMS service");
+        LOGGER.info("Shutting down the REST WMS service facade.");
     }
 }

@@ -57,9 +57,17 @@ import org.geotools.metadata.note.Anchors;
 import org.geotools.factory.FactoryRegistry;
 
 /**
- * A Web service dedicate to perform administration and configuration operations
+ * Web service for administration and configuration operations.
+ * <p>
+ * This web service enables basic remote management of a Constellation server. 
+ * </p>
+ * <p>
+ * <b>WARNING:</b>Use of this service is discouraged since it is run without any 
+ * security control. 
+ * </p>
  * 
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
+ * @since 0.1
  */
 @Path("configuration")
 @Singleton
@@ -84,11 +92,13 @@ public class ConfigurationService extends WebService  {
         serviceDirectory.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
     }
     
-    public static final ServiceVersion version = new ServiceVersion(ServiceType.OTHER, "1.0.0");
+    public static final ServiceVersion version = new ServiceVersion(ServiceType.OTHER, "0.3-SNAPSHOT");
     
-            
+    /**
+     * Construct the ConfigurationService and configure its context.
+     */
     public ConfigurationService() {
-        super("Configuration");
+        super();
         try {
             setXMLContext("org.constellation.ows.v110:org.constellation.configuration:org.constellation.skos", "");
             AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
@@ -108,7 +118,9 @@ public class ConfigurationService extends WebService  {
         LOGGER.info("Configuration service runing");
     }
     
-    
+    /**
+     * Handle the various types of requests made to the service.
+     */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
@@ -119,28 +131,26 @@ public class ConfigurationService extends WebService  {
                 request = (String) getParameter("REQUEST", true);
             }
             
-            if (request.equalsIgnoreCase("restart")) {
-                
+            if ("RESTART".equalsIgnoreCase(request)) {
                 marshaller.marshal(restartService(), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
-                
-            } else if (request.equalsIgnoreCase("UpdatePropertiesFile") || objectRequest instanceof UpdatePropertiesFileType) {
-                
+            }
+            
+            if ("UpdatePropertiesFile".equalsIgnoreCase(request) || objectRequest instanceof UpdatePropertiesFileType) {
                 UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
-                
                 marshaller.marshal(updatePropertiesFile(updateProp), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
-                
-            } else if (request.equalsIgnoreCase("download")) {    
+            }
+            
+            if ("Download".equalsIgnoreCase(request)) {    
                 File f = downloadFile();
-                
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
+            }
             
-            /**
-             *  CSW specific operation
-             */
-            } else if (request.equalsIgnoreCase("refreshIndex")) {
             
+            /* CSW specific operations */
+            
+            if ("RefreshIndex".equalsIgnoreCase(request)) {
                 if (CSWFunctionEnabled) {
                     boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                     String service     = getParameter("SERVICE", false);
@@ -151,33 +161,36 @@ public class ConfigurationService extends WebService  {
                      throw new WebServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
+            }
             
-            } else if (request.equalsIgnoreCase("refreshCascadedServers") || objectRequest instanceof CSWCascadingType) {
-                
+            if ("RefreshCascadedServers".equalsIgnoreCase(request) || objectRequest instanceof CSWCascadingType) {
                 CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
-                
                 marshaller.marshal(cswConfigurer.refreshCascadedServers(refreshCS), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
+            }
             
-            } else if (request.equalsIgnoreCase("updateVocabularies")) {    
+            if ("UpdateVocabularies".equalsIgnoreCase(request)) {    
                 if (CSWFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
                 } else {
                      throw new WebServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
-            } else if (request.equalsIgnoreCase("updateContacts")) {    
+            }
+            
+            if ("UpdateContacts".equalsIgnoreCase(request)) {    
                 if (CSWFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
                 } else {
                      throw new WebServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
-            
-            } else {
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, version, "Request");
             }
+            
+            
+            throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                                 OPERATION_NOT_SUPPORTED, version, "Request");
+            
         
         } catch (WebServiceException ex) {
             final String code = Utils.transformCodeName(ex.getExceptionCode().name());
@@ -200,12 +213,13 @@ public class ConfigurationService extends WebService  {
     }
 
     /**
-     * build an service Exception and marshall it into a StringWriter
+     * Build a service ExceptionReport
      *
      * @param message
      * @param codeName
      * @return
      */
+    @Override
     protected Object launchException(final String message, final String codeName, final String locator) {
         final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
         final ExceptionReport report = new ExceptionReport(message, code.name(), locator, new ServiceVersion(ServiceType.OTHER, "1.0"));
@@ -324,11 +338,12 @@ public class ConfigurationService extends WebService  {
     }
 
     /**
-     * Free the resource and close the connection at undeploying time.
+     * Free the resource and close the connection at undeploy time.
      */
+    @Override
     @PreDestroy
     public void destroy() {
-        LOGGER.info("destroying Configuration Service");
+        LOGGER.info("Shutting down the REST Configuration service facade.");
         if (cswConfigurer != null)
             cswConfigurer.destroy();
     }

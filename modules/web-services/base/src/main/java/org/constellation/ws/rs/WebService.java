@@ -57,82 +57,157 @@ import org.constellation.ws.AbstractRequest;
 import static org.constellation.ws.ExceptionCode.*;
 
 /**
- * Main class for all web services.
+ * Abstract parent of all REST facade classes for Constellation web services.
+ * <p>
+ * This class begins the handling of all REST message exchange processing. In 
+ * the REST style of web service, message parameters either are passed directly  
+ * as arguments to the query, e.g.<br>
+ *   {@code protocol://some.url/service?param=value&param2=othervalue }<br>
+ * or are passed as raw messages in the body of an HTTP POST message, for 
+ * example as Key-Value Pairs (KVP) or as XML documents.
+ * </p>
+ * <p>
+ * <i>Note:</i> This use of the term REST does not imply the services are 
+ * RESTful; we use the term to distinguish these classes from the other facade 
+ * classes in Constellation which use SOAP to exchange messages in HTTP POST 
+ * exchanges and JAXB to automatically unmarshall those messages into Java 
+ * objects.
+ * </p>
+ * <p>
+ * All incoming requests are handled by one of the {@code doGET} or 
+ * {@code doPOST*} methods. These methods handle the incoming requests by 
+ * ensuring all KVP parameters are in the {@code uriContext} object and all 
+ * other information is in a serializable object of the right kind. The methods 
+ * then call the abstract {@code treatIncomingRequest(Object)} passing any 
+ * serializable object as the method parameter. Sub-classes then handle the 
+ * request calling the {@code uriContext} object or using the method parameter 
+ * as needed.
+ * </p>
+ * <p>
+ * Two other abstract methods need to be implemented by extending classes. The 
+ * method {@code destroy()} will be called prior to the container shutting down 
+ * the service providing an opportunity to log that event. The method 
+ * {@code launchException(..)} forms part of the Constellation exception 
+ * handling design.
+ * </p>
+ * <p>
+ * TODO: explain the design for exception handling.
+ * </p>
+ * <p>
+ * Concrete extensions of this class should, in their constructor, call one of 
+ * the {@code setXMLContext(..)} methods to initialize the JAXB context and 
+ * populate the {@code marshaller} and {@code unmarshaller} fields. 
+ * </p>
+ * <p>
+ * Classes extending this one provide the REST facade to Constellation. Most of 
+ * the concrete extensions of this class in Constellation itself implement the 
+ * logic of {@code treatIncomingRequest(Object)} by calling a appropriate 
+ * method in a {@code Worker} object. Those same methods in the {@code Worker} 
+ * object are also called by the classes implementing the SOAP facade, enabling 
+ * the re-use of the logic.
+ * </p>
  *
- * @author Guilhem Legal
- * @author Cédric Briançon
+ * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ * @author Adrian Custer (Geomatys)
+ * @since 0.1
  */
 public abstract class WebService {
+	
     /**
-     * Default logger for all web services.
+     * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs");
-
-    /**
-     * The user directory where to store the configuration file on Unix platforms.
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
-
-    /**
-     * The user directory where to store the configuration file on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
-
-    /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    protected Unmarshaller unmarshaller;
-
-    /**
-     * A JAXB marshaller used to transform the java object in XML String.
-     */
-    protected Marshaller marshaller;
-
-    /**
-     * The name of the service (WMS, WCS,...)
-     */
-    private final String service;
-
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
     protected static Boolean runningOnGlassfish = null;
-
+    
     /**
-     * The webservice URL. This will contain url like:
-     * http://localhost:8080/constellation/WS
+     * The user directory where configuration files are stored on Unix platforms.
+     * TODO: How does this relate to the directories used in deployment? This is 
+     *       in the home directory of the user running the container?
      */
-    private String serviceURL;
-
+    private static final String UNIX_DIRECTORY = ".sicade";
     /**
-     * The http context containing the KVP request parameters.
+     * The user directory where configuration files are stored on Windows platforms.
+     */
+    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+    
+    /**
+     * A JAXB unmarshaller used to create Java objects from XML files.
+     */
+    protected Unmarshaller unmarshaller;
+    /**
+     * A JAXB marshaller used to transform Java objects into XML String.
+     */
+    protected Marshaller marshaller;
+    /**
+     * Provides access to the URI used in the method call, for instance, to 
+     * obtain the Key-Value Pairs in the request. The field is injected, thanks 
+     * to the annotation, when a request arrives.
      */
     @Context
     protected UriInfo uriContext;
-
     /**
-     * Defines a set of methods that a servlet uses to communicate with its servlet container,
-     * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
+     * Used to communicate with the servlet container, for example, to obtain 
+     * the MIME type of a file, to dispatch requests or to write to a log file. 
+     * The field is injected, thanks to the annotation, when a request arrives.
      */
     @Context
     protected ServletContext servletContext;
-
     /**
-     * The HTTP context used to get information about the client which send the request.
+     * The HTTP context used to get information about the client which sent the 
+     * request. The field is injected, thanks to the annotation, when a request 
+     * arrives.
      */
     @Context
     protected HttpContext httpContext;
-
+    
+    /**
+     * A cached copy of the web service URL, something like:
+     *   http://localhost:8080/constellation/WS
+     */
+    private String serviceURL;
+    
+    
+    
     /**
      * Initialize the basic attribute of a web service.
      *
      * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
      */
-    public WebService(String service) {
-        this.service = service;
+    public WebService() {
         unmarshaller = null;
         serviceURL   = null;
     }
+    
+    
+    /**
+     * Treat the incoming request and call the right function.
+     *
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this param is {@code null}
+     *
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
+    /**
+     * This method is called at undeploy time
+     */
+    public abstract void destroy();
+    /**
+     * build an service Exception and marshall it into a StringWriter
+     *
+     * @param message
+     * @param codeName
+     * @param locator
+     * @return
+     */
+    protected abstract Object launchException(String message, String codeName, String locator);
+    
     
     /**
      * Initialize the JAXB context and build the unmarshaller/marshaller
@@ -150,7 +225,6 @@ public abstract class WebService {
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         setPrefixMapper(rootNamespace);
     }
-
     /**
      * Initialize the JAXB context and build the unmarshaller/marshaller
      *
@@ -166,7 +240,87 @@ public abstract class WebService {
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         setPrefixMapper(rootNamespace);
     }
+    
+    
+    /**
+     * Treat the incoming GET request.
+     *
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @GET
+    public Response doGET() throws JAXBException  {
+        return treatIncomingRequest(null);
+    }
+    /**
+     * Treat the incoming POST request encoded in kvp.
+     * for each parameters in the request it fill the httpContext.
+     *
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @Consumes("application/x-www-form-urlencoded")
+    public Response doPOSTKvp(String request) throws JAXBException  {
+        final StringTokenizer tokens = new StringTokenizer(request, "&");
+        String log = "";
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            String paramName  = token.substring(0, token.indexOf('='));
+            String paramValue = token.substring(token.indexOf('=')+ 1);
+            log += "put: " + paramName + "=" + paramValue + '\n';
+            uriContext.getQueryParameters().add(paramName, paramValue);
+        }
+        LOGGER.info("request POST kvp: " + request + '\n' + log);
+        return treatIncomingRequest(null);
+    }
+    /**
+     * Treat the incoming POST request encoded in xml.
+     *
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @Consumes("*/xml")
+    public Response doPOSTXml(InputStream is) throws JAXBException  {
+        LOGGER.info("request POST xml: ");
+        if (unmarshaller != null) {
+            Object request = null;
+            try {
+                request = unmarshaller.unmarshal(is);
+            } catch (UnmarshalException e) {
+                LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
+                final StringWriter sw = new StringWriter();
+                final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
+                marshaller.marshal(obj, sw);
+                return Response.ok(sw, "text/xml").build();
+            }
 
+            if (request != null && request instanceof AbstractRequest) {
+                AbstractRequest ar = (AbstractRequest) request;
+                uriContext.getQueryParameters().add("VERSION", ar.getVersion());
+            }
+            return treatIncomingRequest(request);
+        } else {
+            return Response.ok("This service is not running", "text/plain").build();
+        }
+    }
+    /**
+     * Treat the incoming POST request encoded in text plain.
+     *
+     * @return an xml exception report.
+     * @throw JAXBException
+     */
+    @POST
+    @Consumes("text/plain")
+    public Response doPOSTPlain(InputStream is) throws JAXBException  {
+        LOGGER.severe("request POST plain sending Exception");
+        Object obj = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
+                                          INVALID_REQUEST.name(), null);
+        return Response.ok(obj, "text/xml").build();
+    }
+    
+    
     /**
      * Extracts the value, for a parameter specified, from a query.
      * If it is a mandatory one, and if it is {@code null}, it throws an exception.
@@ -224,7 +378,6 @@ public abstract class WebService {
             }
         }
     }
-
     /**
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
@@ -235,7 +388,6 @@ public abstract class WebService {
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
     }
-
     /**
      * Extract The complex parameter encoded in XML from the query.
      * If the parameter is mandatory and if it is null it throw an exception.
@@ -272,116 +424,6 @@ public abstract class WebService {
                             ex, INVALID_PARAMETER_VALUE);
         }
     }
-
-   /**
-     * Treat the incomming GET request.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @GET
-    public Response doGET() throws JAXBException  {
-        return treatIncomingRequest(null);
-    }
-
-    /**
-     * Treat the incomming POST request encoded in kvp.
-     * for each parameters in the request it fill the httpContext.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("application/x-www-form-urlencoded")
-    public Response doPOSTKvp(String request) throws JAXBException  {
-        final StringTokenizer tokens = new StringTokenizer(request, "&");
-        String log = "";
-        while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            String paramName  = token.substring(0, token.indexOf('='));
-            String paramValue = token.substring(token.indexOf('=')+ 1);
-            log += "put: " + paramName + "=" + paramValue + '\n';
-            uriContext.getQueryParameters().add(paramName, paramValue);
-        }
-        LOGGER.info("request POST kvp: " + request + '\n' + log);
-        return treatIncomingRequest(null);
-    }
-
-    /**
-     * Treat the incomming POST request encoded in xml.
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("*/xml")
-    public Response doPOSTXml(InputStream is) throws JAXBException  {
-        LOGGER.info("request POST xml: ");
-        if (unmarshaller != null) {
-            Object request = null;
-            try {
-                request = unmarshaller.unmarshal(is);
-            } catch (UnmarshalException e) {
-                LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-                final StringWriter sw = new StringWriter();
-                final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
-                marshaller.marshal(obj, sw);
-                return Response.ok(sw, "text/xml").build();
-            }
-
-            if (request != null && request instanceof AbstractRequest) {
-                AbstractRequest ar = (AbstractRequest) request;
-                uriContext.getQueryParameters().add("VERSION", ar.getVersion());
-            }
-            return treatIncomingRequest(request);
-        } else {
-            return Response.ok("This service is not running", "text/plain").build();
-        }
-    }
-
-    /**
-     * Treat the incomming POST request encoded in text plain.
-     *
-     * @return an xml exception report.
-     * @throw JAXBException
-     */
-    @POST
-    @Consumes("text/plain")
-    public Response doPOSTPlain(InputStream is) throws JAXBException  {
-        LOGGER.severe("request POST plain sending Exception");
-        Object obj = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                          INVALID_REQUEST.name(), null);
-        return Response.ok(obj, "text/xml").build();
-    }
-
-   
-    /**
-     * Treat the incomming request and call the right function.
-     *
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
-
-    /**
-     * This method is called at undeploy time
-     */
-    public abstract void destroy();
-    
-    /**
-     * build an service Exception and marshall it into a StringWriter
-     *
-     * @param message
-     * @param codeName
-     * @param locator
-     * @return
-     */
-    protected abstract Object launchException(String message, String codeName, String locator);
-
    /**
      * Return a file located in WEB-INF deployed directory.
      *
@@ -401,27 +443,47 @@ public abstract class WebService {
             return new File(path, fileName);
          else return path;
     }
-
     /**
-     * Returns the context value for the key specified, or {@code null} if not found
-     * in this context.
+     * Return the service url obtain by the first request made.
      *
-     * @param key The key to search in the context.
-     * @param context The context which to consider.
+     * @return the service url.
      */
-    private static Object getContextProperty(final String key, final javax.naming.Context context) {
-        Object value = null;
-        try {
-            value = context.lookup(key);
-        } catch (NamingException n) {
-            // Do nothing, the key is not found in the context and the value is still null.
+    protected String getServiceURL() {
+        if (serviceURL == null) {
+            serviceURL = uriContext.getBaseUri().toString();
         }
-        
-        return value;
+        return serviceURL;
     }
-
     /**
-     * Get the value for a property defines in the JNDI context chosen.
+     * Set the prefixMapper for the marshaller.
+     * The root namespace specified will have no prefix.
+     *
+     * @param rootNamespace The main namespace of all the produced XML document (xmlns = rootNamespace)
+     */
+    protected void setPrefixMapper(String rootNamespace) throws PropertyException {
+        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+    }
+    
+    
+    /**
+     * Return the ".sicade" directory.
+     *
+     * @return The ".sicade" directory containing.
+     */
+    public static File getSicadeDirectory() {
+        File sicadeDirectory;
+        String home = System.getProperty("user.home");
+        
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
+        } else {
+             sicadeDirectory = new File(home, UNIX_DIRECTORY);
+        }
+        return sicadeDirectory;
+    }
+    /**
+     * Get the value for a property defined in the JNDI context chosen.
      *
      * @param propGroup If you use Glassfish, you have to specify the name of the resource that
      *                  owns the property you wish to get. Otherwise you should specify {@code null}
@@ -454,44 +516,23 @@ public abstract class WebService {
             return (String) getContextProperty(propName, envContext);
         }
     }
-
     /**
-     * Return the ".sicade" directory.
+     * Returns the context value for the key specified, or {@code null} if not found
+     * in this context.
      *
-     * @return The ".sicade" directory containing .
+     * @param key The key to search in the context.
+     * @param context The context which to consider.
      */
-    public static File getSicadeDirectory() {
-        File sicadeDirectory;
-        String home = System.getProperty("user.home");
-
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
-        } else {
-             sicadeDirectory = new File(home, UNIX_DIRECTORY);
+    private static Object getContextProperty(final String key, final javax.naming.Context context) {
+        Object value = null;
+        try {
+            value = context.lookup(key);
+        } catch (NamingException n) {
+            // Do nothing, the key is not found in the context and the value is still null.
         }
-        return sicadeDirectory;
+        
+        return value;
     }
-
-    /**
-     * Return the service url obtain by the first request made.
-     *
-     * @return the service url.
-     */
-    protected String getServiceURL() {
-        if (serviceURL == null) {
-            serviceURL = uriContext.getBaseUri().toString();
-        }
-        return serviceURL;
-    }
-
-    /**
-     * Set the prefixMapper for the marshaller.
-     * The root namespace specified will have no prefix.
-     *
-     * @param rootNamespace The main namespace of all the produced XML document (xmlns = rootNamespace)
-     */
-    protected void setPrefixMapper(String rootNamespace) throws PropertyException {
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-    }
+    
+    
 }

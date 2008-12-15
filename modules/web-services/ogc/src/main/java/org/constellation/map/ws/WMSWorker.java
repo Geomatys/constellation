@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
@@ -92,33 +93,51 @@ import static org.constellation.query.wms.WMSQuery.*;
 
 
 /**
- * Handle WMS requests in order to generate the wished responses.
+ * A WMS worker for a local WMS service which handles requests from either REST 
+ * or SOAP facades and issues appropriate responses.
+ * <p>
+ * The classes implementing the REST or SOAP facades to this service will have 
+ * processed the requests sufficiently to ensure that all the information 
+ * conveyed by the HTTP request is either in the method call parameters or is 
+ * in one of the fields of the parent class which holds instances of the 
+ * injectible interface {@code Context} objects created by the JEE container.
+ * </p>
  *
  * @version $Id$
+ * 
  * @author Cédric Briançon (Geomatys)
+ * @since 0.3
  */
 public class WMSWorker extends AbstractWMSWorker {
+	
     /**
-     * Default logger.
+     * The default debugging logger for the WMS service.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws");
 
     /**
-     * A map containing the Capabilities Object already load from file.
+     * A map containing the Capabilities Object already loaded from file.
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
     /**
-     *
+     * The web service marshaller, which will use the web service name space.
+     */
+    @SuppressWarnings("unused")
+	private final Marshaller marshaller;
+
+    /**
+     * The web service unmarshaller, which will use the web service name space.
      */
     private final Unmarshaller unmarshaller;
 
-    public WMSWorker(final Unmarshaller unmarshaller) {
-        this.unmarshaller   = unmarshaller;
+    public WMSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
+        this.marshaller   = marshaller;
+        this.unmarshaller = unmarshaller;
     }
 
     /**
-     * Return a description of specified layers.
+     * Return a description of layers specified in the user's request.
      *
      * @param descLayer  The {@linkplain DescribeLayer describe layer} request.
      * @param url        The service url.

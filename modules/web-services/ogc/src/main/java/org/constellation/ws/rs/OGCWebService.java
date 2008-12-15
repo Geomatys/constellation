@@ -50,54 +50,67 @@ import static org.constellation.ws.ExceptionCode.*;
 
 
 /**
- * Main class for all web services.
+ * Abstract parent REST facade for all OGC web services in Constellation.
+ * <p>
+ * This class
+ * </p>
+ * <p>
+ * The Open Geospatial Consortium (OGC) has defined a number of web services for 
+ * geospatial data such as:
+ * <ul>
+ *   <li><b>CSW</b> -- Catalog Service for the Web</li>
+ *   <li><b>WMS</b> -- Web Map Service</li>
+ *   <li><b>WCS</b> -- Web Coverage Service</li>
+ *   <li><b>SOS</b> -- Sensor Observation Service</li>
+ * </ul>
+ * Many of these Web Services have been defined to work with REST based HTTP 
+ * message exchange; this class provides base functionality for those services.
+ * </p>
  *
  * @version $Id$
  *
- * @author Guilhem Legal
- * @author Cédric Briançon
+ * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ * @since 0.3
  */
 public abstract class OGCWebService extends WebService {
+	
     /**
      * The supported supportedVersions supported by this web serviceType.
      */
     private final List<ServiceVersion> supportedVersions = new ArrayList<ServiceVersion>();
-
     /**
      * The version of the WMS specification for this request.
      */
     private ServiceVersion actingVersion;
-
     /**
      * The version of the SLD profile for the WMS web serviceType. fixed a 1.1.0 for now.
      */
     private final ServiceVersion sldVersion = new ServiceVersion(ServiceType.WMS, "1.1.0");
-
     /**
      * The name of the serviceType (WMS, WCS,...)
      */
     private final String serviceType;//TODO: use the ServiceType[type] enum.
-
     /**
      * A map containing the Capabilities Object already load from file.
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
-
     /**
      * The time of the last update of the cached capabilities map, represented
      * as the number of milliseconds since the Unix Epoch (i.e. useful as a
-     * paramter to the Date constructor).
+     * parameter to the Date constructor).
      */
     private long lastUpdateTime;
-
+    
+    
     /**
-     * Initialize the basic attribute of a web serviceType.
+     * Initialize the basic attributes of a web serviceType.
      *
      * @param serviceType The initials of the web serviceType (CSW, WMS, WCS, SOS, ...)
      * @param supportedVersions A list of the supported version of this serviceType.
      */
     public OGCWebService(String service, ServiceVersion... supportedVersions) {
-        super(service);
+        super();
         this.serviceType = service;
 
         for (final ServiceVersion element : supportedVersions) {
@@ -107,7 +120,7 @@ public abstract class OGCWebService extends WebService {
              throw new IllegalArgumentException("A web service must have at least one version");
         else
             this.actingVersion = this.supportedVersions.get(0);
-        unmarshaller = null;
+        unmarshaller = null;//TODO: explain this. We are freeing the un-needed resource?
     }
 
     /**
@@ -190,7 +203,7 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
-     * build an serviceType Exception and marshall it into a StringWriter
+     * The shared method to build a service ExceptionReport.
      *
      * @param message
      * @param codeName
