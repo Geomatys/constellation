@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sml.v101;;
+package org.constellation.sml.v101;
 
 import java.util.ArrayList;
 import java.util.List;
