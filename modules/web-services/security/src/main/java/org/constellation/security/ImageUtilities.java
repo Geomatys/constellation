@@ -82,10 +82,18 @@ public class ImageUtilities {
     
     public static FeatureCollection<SimpleFeatureType,SimpleFeature> createClipFeatureCollection(
     		                    final CoordinateReferenceSystem dataCRS,
-    		                    final Coordinate[] coords){
+    		                    final double[] coords){
+    	
+    	//
+    	final int DIMENSION = 2;//This is JTS
+    	final int ordinateNumber = coords.length/DIMENSION;
+    	final Coordinate [] coordArray = new Coordinate[ordinateNumber];
+    	for (int i = 0; i< coords.length; i=i+2){
+    		coordArray [i/2] = new Coordinate(coords[i],coords[i+1]);
+    	}
         //create a JTS geometry from the given coordinates ---------------------
         final GeometryFactory geometryFactory = new GeometryFactory();
-        final LinearRing ring = geometryFactory.createLinearRing(coords);
+        final LinearRing ring = geometryFactory.createLinearRing(coordArray);
         final Geometry geom = geometryFactory.createPolygon(ring, new LinearRing[0]);
 
         //create a feature type with a single attribute for the geometry -------
@@ -108,7 +116,7 @@ public class ImageUtilities {
     }
     
     public static BufferedImage createMask(final ReferencedEnvelope env, final Dimension dimension,
-             final CoordinateReferenceSystem dataCRS, final Coordinate[] coords) throws PortrayalException{
+             final CoordinateReferenceSystem dataCRS, final double[] coords) throws PortrayalException{
     	
     	final FeatureCollection<SimpleFeatureType, SimpleFeature> features = createClipFeatureCollection(dataCRS,coords);
     	

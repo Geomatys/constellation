@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.map.ws.AbstractWMSWorker;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
@@ -35,8 +37,17 @@ import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.wms.v130.WMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.WebServiceException;
+import org.geotools.display.exception.PortrayalException;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.opengis.layer.Layer;
+import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -146,23 +157,59 @@ public final class WMSSecuredWorker extends AbstractWMSWorker {
     	performAccessControlDecision(getMap);
     	
     	//Filter block
-    	if (true ){
-    		//get the source of the clip geometry
+    	if (false ){
     		
+    		//TODO: get the source of the clip geometry, using the hard coordinates
+	    	
+	    	//Make a clipping mask
+	    	final double [] coords = new double[]{0.0,0.0, 20.0,0.0, 30.0,30.0, 20.0,40.0, 0.0,40.0, 0.0,0.0};
+	    	CoordinateReferenceSystem crs = null;
+	    	try {
+				crs = CRS.decode("EPSG:4236");
+			} catch (NoSuchAuthorityCodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FactoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			FeatureCollection<SimpleFeatureType,SimpleFeature> fc = ImageUtilities.createClipFeatureCollection(crs, coords);
+			
+			BufferedImage mask = null;
+			try {
+				mask = ImageUtilities.createMask(new ReferencedEnvelope(getMap.getEnvelope()),getMap.getSize(),fc);
+			} catch (MismatchedDimensionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PortrayalException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
     		//Create a stack of buffered images, for now one layer per.
     		Map<String,BufferedImage> stack = new HashMap<String,BufferedImage>();
 	    	//Get the disaggregated Layers
 	    	for (String layerName : getMap.getLayers() ){
-	    		BufferedImage bi = dispatcherWMS.getMap(getMap);
-//	    		BufferedImage bi = dispatcher.getMap(new GetMap(getMap,layerName));
+	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
 	    		stack.put(layerName, bi);
 	    	}
 	    	
-	    	//Clip the layers
-	    	
+			//Clip the first layer
+	    	String layerName = (String) stack.keySet().toArray()[0];
+			BufferedImage clipped = ImageUtilities.applyMask(stack.get(layerName), mask);
+			stack.put(layerName, clipped);
+			
 	    	//Merge the layers
-	    	return stack.get(stack.keySet().toArray()[0]);
-    	} 
+			layerName = (String) stack.keySet().toArray()[0];
+			BufferedImage result = stack.get(layerName);
+			for(int i = 1; i<stack.size();i++){
+				layerName = (String) stack.keySet().toArray()[i];
+				result = ImageUtilities.combine(result, stack.get(layerName));
+			}
+			
+	    	return result;
+    	}
+    	
         return dispatcherWMS.getMap(getMap);
     }
     
