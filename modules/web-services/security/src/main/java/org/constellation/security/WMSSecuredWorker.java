@@ -33,13 +33,41 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
 /**
+ * A WMS worker for a security Policy Enforcement Point (PEP) gateway following 
+ * the OASIS XACML model.
+ * <p>
+ * This worker takes the request issued by the REST and SOAP server facades, 
+ * ensures an Access Control decision is made based on both the security 
+ * credentials of the requestor and the parameters of the request, and then 
+ * either performs the request or denies it depending on the Access Control 
+ * decision.
+ * </p>
+ * <p>
+ * <b>WARNING:</b> This class is still experimental and not behaving correctly. 
+ * Using it in production is sure to void your warranty, shorten your life, and 
+ * increase the likelyhood that meteorites fall on your home.
+ *</p>
+ *<p>
+ * This class will send all its requests to a Dispatcher configured to 
+ * re-expresses that as an Access Control request, 
+ * performs an Access Control decision 
+ * expresses the request and authentication
+ * validates the right for t
  * Builds a {@code REST Web Map Service} request {@code GetCapabilities} on a server,
  * and send it to the {@link Dispatcher}.
  *
  * @version $Id$
+ * 
  * @author Cédric Briançon (Geomatys)
+ * @since 0.3
  */
 public class WMSSecuredWorker extends AbstractWMSWorker {
+	
+    /**
+     * The default logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.ws");
+    
     /**
      * The url of the WMS web service, where the request will be sent.
      */
@@ -57,18 +85,21 @@ public class WMSSecuredWorker extends AbstractWMSWorker {
 
     /**
      * The marshaller of the result given by the service.
+     * <p>
+     * NB this is the marshaller for the service presented as a facade, not 
+     * necessarily for any of the clients.
+     * </p>
      */
     private final Marshaller marshaller;
 
     /**
      * The unmarshaller of the result given by the service.
+     * <p>
+     * NB this is the marshaller for the service presented as a facade, not 
+     * necessarily for any of the clients.
+     * </p>
      */
     private final Unmarshaller unmarshaller;
-
-    /**
-     * The default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.ws");
 
 
     /**
@@ -92,7 +123,7 @@ public class WMSSecuredWorker extends AbstractWMSWorker {
 
     @Override
     public AbstractWMSCapabilities getCapabilities(GetCapabilities getCapabilities) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return dispatcher.getCapabilities(getCapabilities);
     }
 
     @Override
@@ -107,6 +138,6 @@ public class WMSSecuredWorker extends AbstractWMSWorker {
 
     @Override
     public BufferedImage getMap(GetMap getMap) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return dispatcher.getMap(getMap);
     }
 }

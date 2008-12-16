@@ -16,6 +16,7 @@
  */
 package org.constellation.security.wms;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -24,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.query.Query;
+import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.v111.WMT_MS_Capabilities;
@@ -42,7 +44,7 @@ public class WmsRestClient {
     /**
      * The URL of the webservice to request.
      */
-    private final String url;
+    private final String baseURL;
 
     /**
      * The marshaller of the result given by the service.
@@ -54,8 +56,8 @@ public class WmsRestClient {
      */
     private final Unmarshaller unmarshaller;
 
-    public WmsRestClient(final String url, final Marshaller marshaller, final Unmarshaller unmarshaller) {
-        this.url = url;
+    public WmsRestClient(final String baseurl, final Marshaller marshaller, final Unmarshaller unmarshaller) {
+        this.baseURL = baseurl;
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
     }
@@ -69,7 +71,7 @@ public class WmsRestClient {
         //Connect to URL and get result
         final URLConnection connec;
         try {
-            final URL connectionURL = new URL(url +"?"+ Query.KEY_REQUEST +"="+ request +"&"+
+            final URL connectionURL = new URL(baseURL +"?"+ Query.KEY_REQUEST +"="+ request +"&"+
                 Query.KEY_SERVICE +"="+ service +"&"+ Query.KEY_VERSION +"="+ version);
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
@@ -151,4 +153,24 @@ public class WmsRestClient {
         throw new WebServiceException("Capabilities response is not valid, because it does not match" +
                 " with JAXB classes.", ExceptionCode.NO_APPLICABLE_CODE);
     }
+
+	public BufferedImage sendGetMap(GetMap getMap) {
+		
+//        //Connect to URL and get result
+//        final URLConnection connec;
+//        try {
+//            final URL connectionURL = new URL(baseURL +"?"+ getMap.toQuery());
+//            connec = connectionURL.openConnection();
+//        } catch (IOException ex) {
+//            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//        }
+//        connec.setDoOutput(true);
+//        connec.setRequestProperty("Content-Type", Query.TEXT_XML);
+        
+        //TODO: fill me in
+        
+        
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

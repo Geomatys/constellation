@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 import com.sun.jersey.api.core.HttpContext;
 import java.awt.image.BufferedImage;
 import javax.servlet.ServletContext;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 //Constellation dependencies
@@ -37,29 +38,36 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
- * to perform the logic for each instance.
+ * to perform the logic for a particular WMS instance.
  *
  * @version $Id$
+ * 
  * @author Cédric Briançon (Geomatys)
  */
 public abstract class AbstractWMSWorker {
 
     /**
-     * The http context containing the KVP request parameters.
+     * Contains information about the HTTP exchange of the request, for instance, 
+     * the HTTP headers.
      */
-    protected UriInfo uriContext;
-
+    protected HttpContext httpContext = null;
+    /**
+     * Contains authentication information related to the requesting principal.
+     */
+    protected SecurityContext securityContext = null;
     /**
      * Defines a set of methods that a servlet uses to communicate with its servlet container,
      * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
      */
-    protected ServletContext servletContext;
-
+    protected ServletContext servletContext = null;
     /**
-     * The HTTP context used to get information about the client which send the request.
+     * Contains the request URI and therefore any  KVP parameters it may contain.
      */
-    protected HttpContext httpContext;
+    protected UriInfo uriContext = null;
 
+    
+    
+    
     /**
      * Initialize the {@see #uriContext} information.
      */
@@ -79,6 +87,13 @@ public abstract class AbstractWMSWorker {
      */
     public void initServletContext(final ServletContext servCtxt){
         servletContext = servCtxt;
+    }
+
+    /**
+     * Initialize the {@see #servletContext} value.
+     */
+    public void initSecurityContext(final SecurityContext secCtxt){
+        securityContext = secCtxt;
     }
 
     /**
