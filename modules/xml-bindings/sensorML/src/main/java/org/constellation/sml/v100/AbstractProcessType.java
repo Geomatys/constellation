@@ -82,6 +82,27 @@ public abstract class AbstractProcessType extends AbstractSMLType {
         return this.keywords;
     }
 
+     /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setKeywords(List<Keywords> keywords) {
+        if (keywords == null) {
+            this.keywords = keywords;
+        }
+    }
+
+    /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setKeywords(Keywords keywords) {
+        if (this.keywords == null) {
+            this.keywords = new ArrayList<Keywords>();
+        }
+        this.keywords.add(keywords);
+    }
+
     /**
      * Gets the value of the identification property.
      * 
@@ -93,6 +114,28 @@ public abstract class AbstractProcessType extends AbstractSMLType {
         return this.identification;
     }
 
+     /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setIdentification(List<Identification> identification) {
+        if (identification == null) {
+            this.identification = identification;
+        }
+    }
+
+    /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setIdentification(Identification identification) {
+        if (this.identification == null) {
+            this.identification = new ArrayList<Identification>();
+        }
+        this.identification.add(identification);
+    }
+
+
     /**
      * Gets the value of the classification property.
      */
@@ -101,6 +144,27 @@ public abstract class AbstractProcessType extends AbstractSMLType {
             classification = new ArrayList<Classification>();
         }
         return this.classification;
+    }
+
+    /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setClassification(List<Classification> classification) {
+        if (classification == null) {
+            this.classification = classification;
+        }
+    }
+
+    /**
+     * Sets the value of the keywords property.
+     *
+     */
+    public void setClassification(Classification classification) {
+        if (this.classification == null) {
+            this.classification = new ArrayList<Classification>();
+        }
+        this.classification.add(classification);
     }
 
     /**

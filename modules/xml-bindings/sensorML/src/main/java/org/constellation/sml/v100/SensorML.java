@@ -101,6 +101,18 @@ public class SensorML {
     private String version;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    public SensorML() {
+
+    }
+
+    public SensorML(String version, List<SensorML.Member> members) {
+        this.version = version;
+        this.member  = members;
+    }
+
+    /**
      * Gets the value of the keywords property.
      */
     public List<Keywords> getKeywords() {

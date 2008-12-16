@@ -18,12 +18,15 @@
 package org.constellation.sml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 //constellation
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.sml.v100.ObjectFactory;
-import org.constellation.sml.v101.ComponentType;
+import org.constellation.sml.v100.ComponentType;
 import org.constellation.util.Utils;
 
 // JAXB dependencies
@@ -33,6 +36,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
+import org.constellation.sml.v100.Keywords;
+import org.constellation.sml.v100.SensorML;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -91,16 +96,32 @@ public class SmlIOTest {
     public void ComponentUnmarshallMarshalingTest() throws Exception {
 
         InputStream is = Utils.getResourceAsStream("org/constellation/sml/component.xml");
-        Object unmarshalled = unmarshaller.unmarshal(is);
-        if (unmarshalled instanceof JAXBElement) {
-            unmarshalled = ((JAXBElement)unmarshalled).getValue();
+        Object result = unmarshaller.unmarshal(is);
+        if (result instanceof JAXBElement) {
+            result = ((JAXBElement)result).getValue();
         }
-        if (unmarshalled != null) {
-            System.out.println("unmarshalled classes: " + unmarshalled.getClass().getName());
-            System.out.println(unmarshalled);
+        if (result != null) {
+            System.out.println("unmarshalled classes: " + result.getClass().getName());
+            System.out.println(result);
         } else {
             System.out.println("unmarshalled Object null ");
         }
+
+        SensorML.Member member = new SensorML.Member();
+        member.setRole("urn:x-ogx:def:sensor:OGC:detector");
+
+        ComponentType component = new ComponentType();
+
+        List<JAXBElement<String>> kw = new ArrayList<JAXBElement<String>>();
+        kw.add(sml100Factory.createKeywordsKeywordListKeyword("piezometer"));
+        kw.add(sml100Factory.createKeywordsKeywordListKeyword("geosciences"));
+        kw.add(sml100Factory.createKeywordsKeywordListKeyword("point d'eau"));
+        Keywords keywords = new Keywords(new Keywords.KeywordList("urn:x-brgm:def:gcmd:keywords", kw));
+        component.setKeywords(keywords);
+
+        
+        member.setProcess(sml100Factory.createComponent(component));
+        SensorML expectedResult = new SensorML("1.0", Arrays.asList(member));
 
     }
 

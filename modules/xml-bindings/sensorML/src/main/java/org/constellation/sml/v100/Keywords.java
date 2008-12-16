@@ -92,6 +92,17 @@ public class Keywords {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public Keywords() {
+
+    }
+
+    /**
+     *
+     */
+    public Keywords(Keywords.KeywordList keywordList) {
+        this.keywordList = keywordList;
+    }
+
     /**
      * Gets the value of the keywordList property.
      */
@@ -308,6 +319,15 @@ public class Keywords {
         @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
         @XmlID
         private String id;
+
+        public KeywordList() {
+
+        }
+
+        public KeywordList(String codeSpace, List<JAXBElement<String>> keyword) {
+            this.codeSpace = codeSpace;
+            this.keyword   = keyword;
+        }
 
         /**
          * Gets the value of the keyword property.

@@ -101,6 +101,10 @@ import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
 import org.constellation.sos.ResponseModeType;
+import org.constellation.sos.io.MDWebSensorReader;
+import org.constellation.sos.io.MDWebSensorWriter;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 import org.constellation.swe.v101.AbstractEncodingEntry;
 import org.constellation.swe.v101.AbstractEncodingPropertyType;
 import org.constellation.swe.v101.AnyResultEntry;
@@ -298,8 +302,8 @@ public class SOSworker {
             dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
             dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
             dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-            SMLReader = new SensorReader(dataSourceSML, sensorIdBase, map);
-            SMLWriter = new SensorWriter(dataSourceSML, sensorIdBase, map);
+            SMLReader = new MDWebSensorReader(dataSourceSML, sensorIdBase, map);
+            SMLWriter = new MDWebSensorWriter(dataSourceSML, sensorIdBase, map);
            
             //we create a connection to the O&M database
             PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();

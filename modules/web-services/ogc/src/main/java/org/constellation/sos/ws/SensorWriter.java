@@ -19,125 +19,26 @@ package org.constellation.sos.ws;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.util.Properties;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.catalog.NoSuchTableException;
 import org.constellation.ws.WebServiceException;
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
-import org.mdweb.model.storage.Form;
-import org.mdweb.model.users.User;
-import org.mdweb.sql.v20.Reader20;
-import org.mdweb.sql.v20.Writer20;
-import org.mdweb.xml.MalFormedDocumentException;
-import org.mdweb.xml.Reader;
-import org.postgresql.ds.PGSimpleDataSource;
-import org.xml.sax.SAXException;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class SensorWriter {
+public abstract class SensorWriter {
 
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
     
-    /**
-     * A Writer to the SensorML database.
-     */
-    private final Writer20 sensorMLWriter;
-    
-    /**
-     * An SQL statement get a sensorML value in the MDWeb database
-     */
-    private final PreparedStatement getValueStmt;
-    
-    /**
-     * the data catalog for SensorML database.
-     */
-    private final Catalog SMLCatalog;
-    
-    /**
-     * 
-     */
-    private final User mainUser;
-    /**
-     * A Reader to the SensorML database.
-     */
-    private final Reader20 sensorMLReader;
-    
-    private final Connection smlConnection;
-    
-    private Savepoint currentSavePoint;
-    
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */ 
-    private final Properties map;
-    
-    public SensorWriter(PGSimpleDataSource dataSourceSML, String sensorIdBase, Properties map) throws IOException, NoSuchTableException, SQLException {
-        smlConnection  = dataSourceSML.getConnection();
-        sensorMLWriter = new Writer20(smlConnection);
-        sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
-        SMLCatalog     = sensorMLReader.getCatalog("SMLC");
-        mainUser       = sensorMLReader.getUser("admin");
-        this.map       = map;     
-        
-        //we build the prepared Statement
-        getValueStmt       = smlConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
+    public SensorWriter() throws SQLException {
     }
     
-    public int writeSensor(String id, File sensorFile) throws WebServiceException {
-        try {
-            //we parse the temporay xmlFile
-            Reader XMLReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
-
-            //and we write it in the sensorML Database
-
-            Form f = XMLReader.readForm(SMLCatalog, mainUser, "source", id, Standard.SENSORML);
-            sensorMLWriter.writeForm(f, false);
-            return f.getId();
-        
-        } catch (ParserConfigurationException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service has throw a ParserException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } catch (SAXException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service has throw a SAXException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } catch (MalFormedDocumentException ex) {
-            ex.printStackTrace();
-            logger.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new WebServiceException("The SensorML Document is Malformed",
-                                          INVALID_PARAMETER_VALUE, "sensorDescription");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service cannot build the temporary file",
-                                          NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } 
-    }
-    
+    public abstract int writeSensor(String id, File sensorFile) throws WebServiceException;
     
     /**
      * Record the mapping between physical ID and database ID.
@@ -145,78 +46,14 @@ public class SensorWriter {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    public String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException {
-       
-        //we search which identifier is the supervisor code
-        int i                  = 1;
-        boolean found          = false;
-        boolean moreIdentifier = true;
-        while (moreIdentifier && !found) {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-            getValueStmt.setInt(2, formID);
-            ResultSet result = getValueStmt.executeQuery();
-            moreIdentifier   = result.next();
-            if (moreIdentifier) {
-                String value = result.getString(1);
-                if (value.equals("supervisorCode")){
-                    found = true;
-                } 
-            }
-            result.close();
-            i++;
-        } 
-        
-        if (!found) {
-            logger.severe("There is no supervisor code in that SensorML file");
-            return "";
-        } else {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-            getValueStmt.setInt(2,    formID);
-            ResultSet result = getValueStmt.executeQuery();
-            String value = "";
-            if (result.next()) {
-                value = result.getString(1);
-                logger.info("PhysicalId:" + value);
-                map.setProperty(value, dbId);
-                File mappingFile = new File(sicadeDirectory, "/sos_configuration/mapping.properties");
-                FileOutputStream out = new FileOutputStream(mappingFile);
-                map.store(out, "");
-                out.close();
-            } else {
-                logger.severe("no value for supervisorcode identifier numero " + (i - 1));
-            }
-            result.close();
-            return value;
-        }
-    }
+    public abstract String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException;
     
     
-    public void startTransaction() throws SQLException {
-        smlConnection.setAutoCommit(false);
-        currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
-    }
+    public abstract void startTransaction() throws SQLException;
     
-    public void abortTransaction() throws SQLException {
-        if (currentSavePoint != null)
-            smlConnection.rollback(currentSavePoint);
-        smlConnection.commit();
-        smlConnection.setAutoCommit(true);
-    }
+    public abstract void abortTransaction() throws SQLException;
     
-    public void endTransaction() throws SQLException {
-        if (currentSavePoint != null)
-            smlConnection.releaseSavepoint(currentSavePoint); 
-        smlConnection.commit();
-        smlConnection.setAutoCommit(true);
-    }
-    public void destroy() {
-        try {
-            getValueStmt.close();
-            
-            sensorMLWriter.dispose();
-            
-        } catch (SQLException ex) {
-            logger.severe("SQLException while closing SOSWorker");
-        }
-    }    
+    public abstract void endTransaction() throws SQLException;
+
+    public abstract void destroy();
 }

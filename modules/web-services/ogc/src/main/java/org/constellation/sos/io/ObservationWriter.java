@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.ws;
+package org.constellation.sos.io;
 
 import java.io.IOException;
 import java.sql.ResultSet;

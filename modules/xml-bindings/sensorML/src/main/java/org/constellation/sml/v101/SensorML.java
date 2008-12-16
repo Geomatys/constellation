@@ -114,25 +114,6 @@ public class SensorML {
 
     /**
      * Gets the value of the identification property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the identification property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getIdentification().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Identification }
-     * 
-     * 
      */
     public List<Identification> getIdentification() {
         if (identification == null) {
@@ -143,25 +124,6 @@ public class SensorML {
 
     /**
      * Gets the value of the classification property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the classification property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getClassification().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Classification }
-     * 
-     * 
      */
     public List<Classification> getClassification() {
         if (classification == null) {
@@ -184,11 +146,6 @@ public class SensorML {
 
     /**
      * Sets the value of the validTime property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ValidTime }
-     *     
      */
     public void setValidTime(ValidTime value) {
         this.validTime = value;
@@ -196,11 +153,6 @@ public class SensorML {
 
     /**
      * Gets the value of the securityConstraint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SecurityConstraint }
-     *     
      */
     public SecurityConstraint getSecurityConstraint() {
         return securityConstraint;
@@ -208,11 +160,6 @@ public class SensorML {
 
     /**
      * Sets the value of the securityConstraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SecurityConstraint }
-     *     
      */
     public void setSecurityConstraint(SecurityConstraint value) {
         this.securityConstraint = value;
@@ -220,25 +167,6 @@ public class SensorML {
 
     /**
      * Gets the value of the legalConstraint property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the legalConstraint property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getLegalConstraint().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LegalConstraint }
-     * 
-     * 
      */
     public List<LegalConstraint> getLegalConstraint() {
         if (legalConstraint == null) {
@@ -250,24 +178,6 @@ public class SensorML {
     /**
      * Gets the value of the characteristics property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the characteristics property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCharacteristics().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Characteristics }
-     * 
-     * 
      */
     public List<Characteristics> getCharacteristics() {
         if (characteristics == null) {
@@ -278,25 +188,6 @@ public class SensorML {
 
     /**
      * Gets the value of the capabilities property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the capabilities property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCapabilities().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Capabilities }
-     * 
-     * 
      */
     public List<Capabilities> getCapabilities() {
         if (capabilities == null) {
@@ -307,25 +198,6 @@ public class SensorML {
 
     /**
      * Gets the value of the contact property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the contact property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContact().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Contact }
-     * 
-     * 
      */
     public List<Contact> getContact() {
         if (contact == null) {
@@ -336,25 +208,6 @@ public class SensorML {
 
     /**
      * Gets the value of the documentation property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the documentation property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getDocumentation().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Documentation }
-     * 
-     * 
      */
     public List<Documentation> getDocumentation() {
         if (documentation == null) {
@@ -365,25 +218,6 @@ public class SensorML {
 
     /**
      * Gets the value of the history property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the history property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getHistory().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link History }
-     * 
-     * 
      */
     public List<History> getHistory() {
         if (history == null) {
@@ -394,25 +228,6 @@ public class SensorML {
 
     /**
      * Gets the value of the member property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the member property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMember().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SensorML.Member }
-     * 
-     * 
      */
     public List<SensorML.Member> getMember() {
         if (member == null) {
@@ -423,11 +238,6 @@ public class SensorML {
 
     /**
      * Gets the value of the version property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getVersion() {
         if (version == null) {
@@ -439,11 +249,6 @@ public class SensorML {
 
     /**
      * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setVersion(String value) {
         this.version = value;
