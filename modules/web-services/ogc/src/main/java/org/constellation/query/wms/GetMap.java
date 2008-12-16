@@ -18,13 +18,17 @@ package org.constellation.query.wms;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import org.constellation.query.QueryAdapter;
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.ReferenceIdentifier;
 
 
 /**
@@ -163,6 +167,57 @@ public class GetMap extends WMSQuery {
     }
 
     /**
+     * Build a {@link GetMap} request using the parameter values found in the {@code getMap}
+     * given, and replacing the {@code layers} value by an immutable singleton list containing
+     * the layer specified.
+     *
+     * @param getMap A {@link GetMap} request.
+     * @param layer  The only layer we want to keep for the {@code WMS GetMap} request.
+     */
+    public GetMap(final GetMap getMap, final String layer) {
+        this(   getMap.envelope,
+                getMap.version,
+                getMap.format,
+                Collections.singletonList(layer),
+                getMap.styles,
+                getMap.sld,
+                getMap.elevation,
+                getMap.time,
+                getMap.dimRange,
+                getMap.size,
+                getMap.background,
+                getMap.transparent,
+                getMap.azimuth,
+                getMap.exceptions);
+    }
+
+    /**
+     * Build a {@link GetMap} request using the parameter values found in the {@code getMap}
+     * given, and replacing the {@code layers} value by an immutable singleton list containing
+     * the layer specified.
+     *
+     * @param getMap A {@link GetMap} request.
+     * @param layers A list of layers that will be requested, instead of the ones present in the
+     *               GetMap request given.
+     */
+    public GetMap(final GetMap getMap, final List<String> layers) {
+        this(   getMap.envelope,
+                getMap.version,
+                getMap.format,
+                layers,
+                getMap.styles,
+                getMap.sld,
+                getMap.elevation,
+                getMap.time,
+                getMap.dimRange,
+                getMap.size,
+                getMap.background,
+                getMap.transparent,
+                getMap.azimuth,
+                getMap.exceptions);
+    }
+
+    /**
      * Copy constructor for subclasses.
      */
     protected GetMap(final GetMap getMap) {
@@ -232,7 +287,8 @@ public class GetMap extends WMSQuery {
     }
 
     /**
-     * Returns the list of layers to request.
+     * Returns the list of layers to request. This list may be immutable, depending on the
+     * constructor chosen.
      */
     public List<String> getLayers() {
         return layers;
@@ -284,5 +340,51 @@ public class GetMap extends WMSQuery {
      */
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_MAP;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toKvp() {
+        final StringBuilder kvp = new StringBuilder();
+        //Obligatory Parameters
+        kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
+           .append('&').append(KEY_BBOX    ).append('=').append(QueryAdapter.toBboxValue(envelope))
+           .append('&').append((version.toString().equals("1.1.1")) ?
+                               KEY_CRS_v111 :
+                               KEY_CRS_v130).append('=').append(QueryAdapter.toCrsCode(envelope))
+           .append('&').append(KEY_VERSION ).append('=').append(version)
+           .append('&').append(KEY_FORMAT  ).append('=').append(format)
+           .append('&').append(KEY_LAYERS  ).append('=').append(QueryAdapter.toCommaSeparatedValues(layers))
+           .append('&').append(KEY_WIDTH   ).append('=').append(size.width)
+           .append('&').append(KEY_HEIGHT  ).append('=').append(size.height)
+           .append('&').append(KEY_STYLES  ).append('=').append(styles);
+
+        //Optional Parameters
+        if (sld != null) {
+            kvp.append('&').append(KEY_SLD).append('=').append(sld);
+        }
+        if (elevation != null) {
+            kvp.append('&').append(KEY_ELEVATION).append('=').append(elevation);
+        }
+        if (time != null) {
+            kvp.append('&').append(KEY_TIME).append('=').append(time);
+        }
+        if (dimRange != null) {
+            kvp.append('&').append(KEY_DIM_RANGE).append('=').append(dimRange);
+        }
+        if (background != null) {
+            kvp.append('&').append(KEY_BGCOLOR).append('=').append(background);
+        }
+        if (transparent != null) {
+            kvp.append('&').append(KEY_TRANSPARENT).append('=').append(transparent);
+        }
+        if (azimuth != 0d) {
+            kvp.append('&').append(KEY_AZIMUTH).append('=').append(azimuth);
+        }
+        if (exceptions != null) {
+            kvp.append('&').append(KEY_EXCEPTIONS).append('=').append(exceptions);
+        }
+        return kvp.toString();
     }
 }

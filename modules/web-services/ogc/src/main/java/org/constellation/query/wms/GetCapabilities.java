@@ -61,4 +61,23 @@ public class GetCapabilities extends WMSQuery {
     public String getFormat() {
         return format;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toKvp() {
+        final StringBuilder kvp = new StringBuilder();
+        //Obligatory Parameters
+        kvp            .append(KEY_REQUEST).append('=').append(GETCAPABILITIES)
+           .append('&').append(KEY_SERVICE).append('=').append(getService().key);
+
+        //Optional Parameters
+        if (version != null) {
+            kvp.append('&').append(KEY_VERSION).append('=').append(version);
+        }
+        if (format != null) {
+            kvp.append('&').append(KEY_FORMAT).append('=').append(format);
+        }
+        return kvp.toString();
+    }
 }

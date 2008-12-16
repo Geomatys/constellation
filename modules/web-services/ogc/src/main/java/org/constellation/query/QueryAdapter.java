@@ -55,6 +55,7 @@ import org.geotools.util.Version;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
@@ -106,6 +107,27 @@ public class QueryAdapter {
         return queryLayers;
     }
 
+    /**
+     * Returns a string representation of the {@code Bounding Box}. It is a comma-separated
+     * list matching with this pattern: minx,miny,maxx,maxy.
+     *
+     * @param envelope The envelope to return the string representation.
+     */
+    public static String toBboxValue(final Envelope envelope) {
+        final StringBuilder builder = new StringBuilder();
+        final int dimEnv = envelope.getDimension();
+        for (int i=0; i<dimEnv; i++) {
+            builder.append(envelope.getMinimum(i)).append(',');
+        }
+        for (int j=0; j<dimEnv; j++) {
+            if (j>0) {
+                builder.append(',');
+            }
+            builder.append(envelope.getMaximum(j));
+        }
+        return builder.toString();
+    }
+
     public static boolean toBoolean(final String strTransparent) {
         if (strTransparent == null) {
             return false;
@@ -123,6 +145,36 @@ public class QueryAdapter {
             color = Color.WHITE;
         }
         return color;
+    }
+
+    /**
+     * Returns the values of the list separated by commas.
+     *
+     * @param list The list to extract values.
+     */
+    public static String toCommaSeparatedValues(final List<String> list) {
+        final int listSize = list.size();
+        final StringBuilder builder = new StringBuilder();
+        for (int i=0; i<listSize; i++) {
+            if (i>0) {
+                builder.append(',');
+            }
+            builder.append(list.get(i));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Returns the CRS code for the specified envelope, or {@code null} if not found.
+     *
+     * @param envelope The envelope to return the CRS code.
+     */
+    public static String toCrsCode(final Envelope envelope) {
+        final Set<ReferenceIdentifier> identifiers = envelope.getCoordinateReferenceSystem().getIdentifiers();
+        if (identifiers != null) {
+            return identifiers.iterator().next().toString();
+        }
+        return null;
     }
 
     /**
@@ -352,24 +404,6 @@ public class QueryAdapter {
 
     }
 
-
-
-
-    /**
-     * Returns {@code 1} by default if the string passed is {@code null}, or the specified value
-     * converted in int.
-     *
-     * @param strFeatureCount An integer in a string, or {@code null}.
-     * @return 1 if not specified, or the value.
-     * @throws NumberFormatException
-     */
-    public static int toFeatureCount(final String strFeatureCount) throws NumberFormatException {
-        if (strFeatureCount == null || strFeatureCount.equals("")) {
-            return 1;
-        }
-        return toInt(strFeatureCount);
-    }
-
     public static String toFormat(String format) throws IllegalArgumentException {
         if (format == null) {
             return null;
@@ -402,13 +436,13 @@ public class QueryAdapter {
     }
 
     public static MutableStyledLayerDescriptor toSLD(final String sldURL) throws MalformedURLException {
-        
+
         if(sldURL == null || sldURL.trim().length() == 0){
             return null;
         }
-        
+
         final URL url = new URL(sldURL.trim());
-        
+
 
         MutableStyledLayerDescriptor sld = null;
 

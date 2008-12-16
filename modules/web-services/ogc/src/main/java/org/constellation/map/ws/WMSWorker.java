@@ -521,6 +521,8 @@ public class WMSWorker extends AbstractWMSWorker {
 
     /**
      * Return the legend graphic for the current layer.
+     * <p>If no width or height have been specified, a default output
+     * size is adopted (140x15 pixels).</p>
      *
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
@@ -536,9 +538,10 @@ public class WMSWorker extends AbstractWMSWorker {
             throw new WebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
                     version, "layer");
         }
-        final int width  = getLegend.getWidth();
-        final int height = getLegend.getHeight();
-        final Dimension dims = new Dimension(width, height);
+        final Integer width  = getLegend.getWidth();
+        final Integer height = getLegend.getHeight();
+        final Dimension dims = new Dimension((width == null) ? 140 : width,
+                                             (height == null) ? 15 : height);
         return layer.getLegendGraphic(dims);
     }
 

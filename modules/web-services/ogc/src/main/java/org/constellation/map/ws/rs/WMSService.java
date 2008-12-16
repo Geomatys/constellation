@@ -264,8 +264,8 @@ public class WMSService extends OGCWebService {
         final GetMap getMap  = adaptGetMap(false);
         final String version = getParameter(KEY_VERSION, true);
         setActingVersion(version);
-        final String strX    = getParameter(version.equals("1.1.1") ? KEY_I_v110 : KEY_I_v130, true);
-        final String strY    = getParameter(version.equals("1.1.1") ? KEY_J_v110 : KEY_J_v130, true);
+        final String strX    = getParameter(version.equals("1.1.1") ? KEY_I_v111 : KEY_I_v130, true);
+        final String strY    = getParameter(version.equals("1.1.1") ? KEY_J_v111 : KEY_J_v130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
@@ -273,7 +273,12 @@ public class WMSService extends OGCWebService {
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, getActingVersion());
         final int x = QueryAdapter.toInt(strX);
         final int y = QueryAdapter.toInt(strY);
-        final int featureCount = QueryAdapter.toFeatureCount(strFeatureCount);
+        final Integer featureCount;
+        if (strFeatureCount == null || strFeatureCount.equals("")) {
+            featureCount = null;
+        } else {
+            featureCount = QueryAdapter.toInt(strFeatureCount);
+        }
         return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
     }
 
@@ -297,7 +302,7 @@ public class WMSService extends OGCWebService {
                     new ServiceVersion(ServiceType.WMS, "1.1.0"));
         }
         if (strWidth == null || strHeight == null) {
-            return new GetLegendGraphic(strLayer, strFormat);
+            return new GetLegendGraphic(strLayer, strFormat, null, null);
         } else {
             final int width;
             final int height;

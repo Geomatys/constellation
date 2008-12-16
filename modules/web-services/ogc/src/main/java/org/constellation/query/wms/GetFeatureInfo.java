@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
+import org.constellation.query.QueryAdapter;
 import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
@@ -57,13 +58,13 @@ public class GetFeatureInfo extends GetMap {
     private final String infoFormat;
 
     /**
-     * Number of maximal features that the request has to handle.
+     * Number of maximal features that the request has to handle. Optional.
      */
-    private final int featureCount;
+    private final Integer featureCount;
 
     public GetFeatureInfo(final GetMap getMap, final int x, final int y,
                           final List<String> queryLayers, final String infoFormat,
-                          final int featureCount)
+                          final Integer featureCount)
     {
         super(getMap);
         this.x = x;     this.queryLayers = queryLayers;
@@ -76,7 +77,7 @@ public class GetFeatureInfo extends GetMap {
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions, final int x, final int y,
-                  final List<String> queryLayers, final String infoFormat, final int featureCount)
+                  final List<String> queryLayers, final String infoFormat, final Integer featureCount)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
                 background, transparent, 0,exceptions);
@@ -114,10 +115,30 @@ public class GetFeatureInfo extends GetMap {
     }
 
     /**
-     * Returns the number of features to request. If a negative or {@code 0} is defined,
-     * then it returns the default value {@code 1}.
+     * Returns the number of features to request.
      */
-    public int getFeatureCount() {
-        return (featureCount < 1) ? 1 : featureCount;
+    public Integer getFeatureCount() {
+        return featureCount;
+    }
+
+    @Override
+    public String toKvp() {
+        final String getMapKvp = super.toKvp();
+        final StringBuilder kvp = new StringBuilder(getMapKvp);
+        //Obligatory Parameters
+        kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(QueryAdapter.toCommaSeparatedValues(queryLayers))
+           .append('&').append(KEY_INFO_FORMAT ).append('=').append(infoFormat)
+           .append('&').append((version.toString().equals("1.1.1")) ?
+                               KEY_I_v111 :
+                               KEY_I_v130 )     .append('=').append(x)
+           .append('&').append((version.toString().equals("1.1.1")) ?
+                               KEY_J_v111 :
+                               KEY_J_v130 )     .append('=').append(y);
+
+        //Optional parameters
+        if (featureCount != null) {
+            kvp.append('&').append(KEY_FEATURE_COUNT).append('=').append(featureCount);
+        }
+        return kvp.toString();
     }
 }

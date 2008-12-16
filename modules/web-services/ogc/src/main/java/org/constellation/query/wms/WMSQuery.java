@@ -89,9 +89,9 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getFeatureInfo */
     public static final String KEY_J_v130 = "J";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_I_v110 = "X";
+    public static final String KEY_I_v111 = "X";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_J_v110 = "Y";
+    public static final String KEY_J_v111 = "Y";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_INFO_FORMAT= "INFO_FORMAT";
     /** Parameter used in getFeatureInfo */
@@ -122,4 +122,10 @@ public abstract class WMSQuery extends Query {
     public final ServiceVersion getVersion() {
         return version;
     }
+
+    /**
+     * Returns a string representation of the parameters stored in WMS requests, as
+     * a Key Value Pair list separated by the character {@code &}.
+     */
+    public abstract String toKvp();
 }

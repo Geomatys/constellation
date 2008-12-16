@@ -17,6 +17,7 @@
 package org.constellation.query.wms;
 
 import java.util.List;
+import org.constellation.query.QueryAdapter;
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.ServiceVersion;
 
@@ -60,5 +61,21 @@ public class DescribeLayer extends WMSQuery {
      */
     public List<String> getLayers() {
         return layers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toKvp() {
+        final StringBuilder kvp = new StringBuilder();
+        //Obligatory Parameters
+        kvp            .append(KEY_REQUEST).append('=').append(DESCRIBELAYER)
+           .append('&').append(KEY_LAYERS ).append('=').append(QueryAdapter.toCommaSeparatedValues(layers));
+
+        //Optional Parameters
+        if (version != null) {
+            kvp.append('&').append(KEY_VERSION).append('=').append(version);
+        }
+        return kvp.toString();
     }
 }

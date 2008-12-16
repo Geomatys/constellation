@@ -41,36 +41,19 @@ public class GetLegendGraphic extends WMSQuery {
     /**
      * Width of the generated legend image. Optional.
      */
-    private final int width;
+    private final Integer width;
 
     /**
      * Height of the generated legend image. Optional.
      */
-    private final int height;
-
-    /**
-     * Default values for the width.
-     */
-    private static final int DEFAULT_WIDTH = 140;
-
-    /**
-     * Default value for the height.
-     */
-    private static final int DEFAULT_HEIGHT = 15;
-
-    /**
-     * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified.
-     */
-    public GetLegendGraphic(final String layer, final String format) {
-        this(layer, format, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    }
+    private final Integer height;
 
     /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
-     * and width and height for the image. All parameters should not be {@code null}.
+     * and width and height for the image.
      */
     public GetLegendGraphic(final String layer, final String format,
-                            final int width, final int height)
+                            final Integer width, final Integer height)
     {
         super(new ServiceVersion(ServiceType.WMS, "1.1.0"));
         this.layer  = layer;
@@ -96,14 +79,14 @@ public class GetLegendGraphic extends WMSQuery {
     /**
      * Returns the width of the legend image.
      */
-    public int getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
     /**
      * Returns the height of the legend image.
      */
-    public int getHeight() {
+    public Integer getHeight() {
         return height;
     }
 
@@ -119,5 +102,25 @@ public class GetLegendGraphic extends WMSQuery {
      */
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_LEGEND_GRAPHIC;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toKvp() {
+        final StringBuilder kvp = new StringBuilder();
+        //Obligatory Parameters
+        kvp            .append(KEY_REQUEST).append('=').append(GETLEGENDGRAPHIC)
+           .append('&').append(KEY_FORMAT ).append('=').append(format)
+           .append('&').append(KEY_LAYER  ).append('=').append(layer);
+
+        //Optional Parameters
+        if (width != null) {
+            kvp.append('&').append(KEY_WIDTH ).append('=').append(width);
+        }
+        if (height != null) {
+            kvp.append('&').append(KEY_HEIGHT).append('=').append(height);
+        }
+        return kvp.toString();
     }
 }
