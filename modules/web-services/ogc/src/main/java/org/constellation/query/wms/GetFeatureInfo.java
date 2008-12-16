@@ -121,6 +121,9 @@ public class GetFeatureInfo extends GetMap {
         return featureCount;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toKvp() {
         final String getMapKvp = super.toKvp();

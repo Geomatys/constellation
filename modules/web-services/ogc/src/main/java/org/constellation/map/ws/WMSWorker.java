@@ -476,10 +476,10 @@ public class WMSWorker extends AbstractWMSWorker {
 
         if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
             // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor();
+            visitor = new CSVGraphicVisitor(gfi);
         } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
             // TEXT / HTML
-            visitor = new HTMLGraphicVisitor();
+            visitor = new HTMLGraphicVisitor(gfi);
         } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
                    infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
                    infoFormat.equalsIgnoreCase(GML))
