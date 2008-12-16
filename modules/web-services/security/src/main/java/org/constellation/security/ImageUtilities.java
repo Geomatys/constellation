@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.image;
+package org.constellation.security;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -52,20 +52,23 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.Symbolizer;
 
 /**
- * utility class able to merge bufferedImage and erase area given a mask.
+ * Utility class to manipulate the {@code BufferedImage} objects returned by an 
+ * OGC Service.
  *
  * @author Johann Sorel (Geomatys)
+ * @version $Id$
+ * @since 0.3
  */
-public class Combine {
+public class ImageUtilities {
 
-    private static final MapBuilder MAP_BUILDER = MapBuilder.getInstance();
+    private static final MapBuilder MAP_BUILDER            = MapBuilder.getInstance();
     private static final DefaultPortrayalService PORTRAYAL = DefaultPortrayalService.getInstance();
-    private static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
-
-
-    public static BufferedImage createMask(final ReferencedEnvelope env, final Dimension dimension,
-            final Coordinate[] coords , final CoordinateReferenceSystem dataCRS) throws PortrayalException{
-
+    private static final StyleFactory STYLE_FACTORY        = CommonFactoryFinder.getStyleFactory(null);
+    
+    
+    public static FeatureCollection<SimpleFeatureType,SimpleFeature> createClipFeatureCollection(
+    		                    final CoordinateReferenceSystem dataCRS,
+    		                    final Coordinate[] coords){
         //create a JTS geometry from the given coordinates ---------------------
         final GeometryFactory geometryFactory = new GeometryFactory();
         final LinearRing ring = geometryFactory.createLinearRing(coords);
@@ -86,10 +89,24 @@ public class Combine {
         //create a feature collection with our feature -------------------------
         final FeatureCollection<SimpleFeatureType, SimpleFeature> features = FeatureCollections.newCollection();
         features.add(sf);
-
+    	
+        return features;
+    }
+    
+    public static BufferedImage createMask(final ReferencedEnvelope env, final Dimension dimension,
+             final CoordinateReferenceSystem dataCRS, final Coordinate[] coords) throws PortrayalException{
+    	
+    	final FeatureCollection<SimpleFeatureType, SimpleFeature> features = createClipFeatureCollection(dataCRS,coords);
+    	
         //create the maplayer --------------------------------------------------
         final MapLayer layer = MAP_BUILDER.createFeatureLayer(features, STYLE_FACTORY.createStyle());
 
+        return createMask(env, dimension, layer);
+    }
+    
+    public static BufferedImage createMask(final ReferencedEnvelope env, final Dimension dimension,
+            final FeatureCollection<SimpleFeatureType,SimpleFeature> clipSource) throws PortrayalException{
+        MapLayer layer = MAP_BUILDER.createFeatureLayer(clipSource, STYLE_FACTORY.createStyle());
         return createMask(env, dimension, layer);
     }
 
