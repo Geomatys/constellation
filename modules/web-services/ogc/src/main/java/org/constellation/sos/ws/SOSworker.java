@@ -105,6 +105,8 @@ import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
+import org.constellation.sos.io.SensorReader;
+import org.constellation.sos.io.SensorWriter;
 import org.constellation.swe.v101.AbstractEncodingEntry;
 import org.constellation.swe.v101.AbstractEncodingPropertyType;
 import org.constellation.swe.v101.AnyResultEntry;

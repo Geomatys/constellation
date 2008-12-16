@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.constellation.catalog.NoSuchTableException;
-import org.constellation.sos.ws.SensorReader;
 import org.constellation.ws.WebServiceException;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;

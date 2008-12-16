@@ -15,45 +15,43 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.ws;
+package org.constellation.sos.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
+import org.constellation.catalog.NoSuchTableException;
 import org.constellation.ws.WebServiceException;
 
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class SensorWriter {
-
+public abstract class SensorReader {
+    
     /**
      * use for debugging purpose
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
-    
-    public SensorWriter() throws SQLException {
+
+    public SensorReader() throws IOException, NoSuchTableException, SQLException {
     }
     
-    public abstract int writeSensor(String id, File sensorFile) throws WebServiceException;
+    public abstract String getSensor(String sensorId) throws WebServiceException;
+    
+    public abstract String getSRSName(int formID) throws WebServiceException;
+
+    public abstract String getSensorCoordinates(int formID) throws WebServiceException;
+            
+    public abstract List<Integer> getNetworkIndex(int formID) throws WebServiceException;
+    
+    public abstract String getNetworkName(int formID, String networkName) throws WebServiceException;
     
     /**
-     * Record the mapping between physical ID and database ID.
-     * 
-     * @param form The "form" containing the sensorML data.
-     * @param dbId The identifier of the sensor in the O&M database.
+     * Create a new identifier for an observation by searching in the O&M database.
      */
-    public abstract String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException;
-    
-    
-    public abstract void startTransaction() throws SQLException;
-    
-    public abstract void abortTransaction() throws SQLException;
-    
-    public abstract void endTransaction() throws SQLException;
+    public abstract int getNewSensorId() throws SQLException;
 
     public abstract void destroy();
 }

@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.Properties;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.sos.ws.SensorWriter;
 import org.constellation.ws.WebServiceException;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
