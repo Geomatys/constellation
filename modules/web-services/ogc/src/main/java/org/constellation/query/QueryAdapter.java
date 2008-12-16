@@ -140,9 +140,6 @@ public class QueryAdapter {
         if (background != null) {
             background = background.trim();
             color = Color.decode(background);
-        } else {
-            //return the defautl specification color
-            color = Color.WHITE;
         }
         return color;
     }

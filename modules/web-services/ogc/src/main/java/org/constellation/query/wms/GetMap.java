@@ -21,14 +21,12 @@ import java.awt.Dimension;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.ReferenceIdentifier;
 
 
 /**

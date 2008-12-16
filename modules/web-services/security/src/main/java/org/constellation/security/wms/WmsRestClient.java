@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -47,8 +49,12 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
  * @author Adrian Custer (Geomatys)
  * @since 0.3
  */
-public class WmsRestClient implements WmsClient{
-	
+public class WmsRestClient implements WmsClient {
+    /**
+     * The logger for the constellation
+     */
+	private static final Logger LOGGER = Logger.getLogger("org.constellation.security.wms");
+
     /**
      * The URL of the webservice to request.
      */
@@ -88,8 +94,7 @@ public class WmsRestClient implements WmsClient{
         
 		final URLConnection connec;
         try {
-            final URL connectionURL = new URL(baseURL +"?");
-//            final URL connectionURL = new URL(baseURL +"?"+ getCapabilities.toKvp());
+            final URL connectionURL = new URL(baseURL +"?"+ getCapabilities.toKvp());
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
@@ -134,22 +139,33 @@ public class WmsRestClient implements WmsClient{
 		return null;
 	}
 
-	@Override
-	public BufferedImage getMap(GetMap getMap) throws WebServiceException {
-		
-//      //Connect to URL and get result
-//      final URLConnection connec;
-//      try {
-//          final URL connectionURL = new URL(baseURL +"?"+ getMap.toQuery());
-//          connec = connectionURL.openConnection();
-//      } catch (IOException ex) {
-//          throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
-//      }
-//      connec.setDoOutput(true);
-//      connec.setRequestProperty("Content-Type", Query.TEXT_XML);
-      
-      //TODO: fill me in
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+
+        //Connect to URL and get result
+        final URLConnection connec;
+        try {
+            LOGGER.info(baseURL + "?" + getMap.toKvp());
+            final URL connectionURL = new URL(baseURL + "?" + getMap.toKvp());
+            connec = connectionURL.openConnection();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        connec.setDoOutput(true);
+        connec.setRequestProperty("Content-Type", getMap.getFormat());
+
+        final InputStream in;
+        try {
+            in = connec.getInputStream();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        final ImageReader reader = ImageIO.getImageReadersByFormatName(getMap.getFormat()).next();
+        reader.setInput(in);
+        try {
+            return reader.read(0);
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+    }
 }

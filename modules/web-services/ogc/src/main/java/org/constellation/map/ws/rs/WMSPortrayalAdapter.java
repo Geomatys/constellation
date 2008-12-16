@@ -86,7 +86,13 @@ public class WMSPortrayalAdapter {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
+        final Color background;
+        if (query.getTransparent()) {
+            background = null;
+        } else {
+            final Color color = query.getBackground();
+            background = (color == null) ? Color.WHITE : color;
+        }
 
         if (false) {
             //for debug
@@ -143,7 +149,13 @@ public class WMSPortrayalAdapter {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        final Color background                 = (query.getTransparent()) ? null : query.getBackground();
+        final Color background;
+        if (query.getTransparent()) {
+            background = null;
+        } else {
+            final Color color = query.getBackground();
+            background = (color == null) ? Color.WHITE : color;
+        }
         final Rectangle selectedArea = new Rectangle(infoX-PIXEL_TOLERANCE, infoY-PIXEL_TOLERANCE, PIXEL_TOLERANCE*2, PIXEL_TOLERANCE*2);
 
         //fill in the values with empty lists
