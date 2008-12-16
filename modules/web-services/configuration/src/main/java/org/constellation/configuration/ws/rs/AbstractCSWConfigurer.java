@@ -73,7 +73,9 @@ public abstract class AbstractCSWConfigurer {
     
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
-        File cswConfigDir = serviceDirectory.get("CSW");
+        File cswConfigDir = getConfigurationDirectory();
+        if (cswConfigDir == null)
+            throw new ConfigurationException("No configuration directory file have been found");
         try {
             // we get the CSW configuration file
             JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
@@ -220,4 +222,5 @@ public abstract class AbstractCSWConfigurer {
     
     public abstract AcknowlegementType updateVocabularies() throws WebServiceException;
 
+    protected abstract File getConfigurationDirectory();
 }

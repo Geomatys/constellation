@@ -18,11 +18,13 @@
 package org.constellation.configuration.ws.rs;
 
 // Constellation dependencies
+import java.io.File;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 
 /**
  *
@@ -51,5 +53,10 @@ public class CSWconfigurer extends AbstractCSWConfigurer {
     public void destroy() {
         indexer.destroy();
         reader.destroy();
+    }
+
+    @Override
+    protected File getConfigurationDirectory() {
+        return serviceDirectory.get("CSW");
     }
 }

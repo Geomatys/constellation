@@ -261,7 +261,13 @@ public class CSWworker {
         
         this.unmarshaller = unmarshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
-        File configDir    = new File(WebService.getSicadeDirectory(), "csw_configuration/");
+        File configDir    = getConfigDirectory();
+        if (configDir == null) {
+            logger.severe("The CSW service is not working!" + '\n' +
+                          "cause: The configuration directory has not been found");
+             isStarted = false;
+             return;
+        }
         logger.info("Path to config directory: " + configDir);
         isStarted = true;
         try {
@@ -345,6 +351,35 @@ public class CSWworker {
         }
     }
     
+    /**
+     * In some implementations there is no sicade directory.
+     * So if we don't find The .sicade/csw_configuration directory
+     * IFREMER hack
+     * we search the CATALINA_HOME/webapps/sdn-csw/WEB-INF/csw_configuration
+     */
+    public File getConfigDirectory() {
+        File configDir = new File(WebService.getSicadeDirectory(), "csw_configuration/");
+        if (configDir.exists()) {
+            return configDir;
+        } else {
+
+            /* Ifremer's server does not contain any .sicade directory, so the
+             * configuration file is put under the WEB-INF directory of constellation.
+             */
+            final String catalinaPath = System.getenv().get("CATALINA_HOME");
+            if (catalinaPath != null) {
+                File dirCatalina = new File(catalinaPath);
+                if (dirCatalina != null && dirCatalina.exists()) {
+                    configDir = new File(dirCatalina, "webapps/sdn-csw/WEB-INF/csw_configuration");
+                    if (configDir.exists()) {
+                        return configDir;
+                    } 
+                }
+            }
+            return null;
+        }
+    }
+
     /**
      * Initialize the supported type names in function of the redaer capacity.
      */
