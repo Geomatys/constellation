@@ -27,15 +27,18 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
@@ -162,6 +165,26 @@ public class ImageUtilities {
         img1.createGraphics().drawImage(img2, 0, 0, null);
         return img1;
     }
+
+    
+//    public static DataStore readShapeFile(File shape){
+//
+//        Map<String,Object> params;
+//        DataStore store;
+//        FeatureSource<SimpleFeatureType, SimpleFeature> fs;
+//        MutableStyle style;
+//
+//        params = new HashMap<String,Object>();
+//        params.put( "url", shape.toURI().toURL() );
+//        store = DataStoreFinder.getDataStore(params);
+//
+//        //a shapefile datastore is composed of only ONE feature source
+//        //to grab it, use :
+//        //store.getFeatureSource(store.getTypeNames()[0]);
+//
+//        return store;
+//    }
+
 
     /**
      * Create a shapefile at the given url and the given features.
