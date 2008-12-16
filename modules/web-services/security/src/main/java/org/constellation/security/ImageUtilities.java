@@ -27,10 +27,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.geotools.data.DataStore;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.FileDataStoreFactorySpi;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.factory.CommonFactoryFinder;
@@ -152,5 +163,58 @@ public class ImageUtilities {
         return img1;
     }
 
+    /**
+     * Create a shapefile at the given url and the given features.
+     *
+     * @throws java.io.IOException if the datastore could not be created or could not write in the datastore.
+     */
+    public static DataStore createShapeFile(URL url, FeatureCollection<SimpleFeatureType,SimpleFeature> features) throws IOException{
+
+        // Create the datastore ------------------------------------------------
+        final FileDataStoreFactorySpi factory = new IndexedShapefileDataStoreFactory();
+
+        // Create a Map object used by our DataStore Factory
+        final Map<String, Serializable> map = Collections.singletonMap("url", (Serializable)url );
+
+        // Create the ShapefileDataStore from our factory based on our Map object
+        final ShapefileDataStore myData = (ShapefileDataStore) factory.createNewDataStore(map);
+
+        final SimpleFeatureType sft = features.getSchema();
+
+        // Create the Shapefile (empty at this point)
+        myData.createSchema(sft);
+
+        // Tell the DataStore what type of Coordinate Reference System (CRS) to use
+        myData.forceSchemaCRS(sft.getCoordinateReferenceSystem());
+
+
+        // Insert the features in the datastore --------------------------------
+        final FeatureSource<SimpleFeatureType,SimpleFeature> source = myData.getFeatureSource(myData.getTypeNames()[0]);
+
+        if( !(source instanceof FeatureStore)){
+            throw new IOException("DataStore is not writable");
+        }
+
+        final FeatureStore store = (FeatureStore) source;
+
+        final DefaultTransaction transaction = new DefaultTransaction();
+        store.setTransaction(transaction);
+
+        try {
+            store.addFeatures(features);
+            transaction.commit();
+        } catch (Exception ex) {
+            new IOException(ex);
+            try {
+                store.getTransaction().rollback();
+            } catch (IOException io) {
+                throw io;
+            }
+        }finally{
+            transaction.close();
+        }
+
+        return myData;
+    }
 
 }
