@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sml.v101;
+package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -42,23 +41,23 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;group ref="{http://www.opengis.net/sensorML/1.0.1}metadataGroup"/>
+ *         &lt;group ref="{http://www.opengis.net/sensorML/1.0}metadataGroup"/>
  *         &lt;element name="member" maxOccurs="unbounded">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;choice>
- *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
- *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}DocumentList"/>
- *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}ContactList"/>
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}_Process"/>
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}DocumentList"/>
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}ContactList"/>
  *                 &lt;/choice>
- *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
+ *                 &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
  *       &lt;/sequence>
- *       &lt;attribute name="version" use="required" type="{http://www.w3.org/2001/XMLSchema}token" fixed="1.0.1" />
+ *       &lt;attribute name="version" use="required" type="{http://www.w3.org/2001/XMLSchema}token" fixed="1.0" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -91,7 +90,7 @@ public class SensorML {
     private SecurityConstraint securityConstraint;
     private List<LegalConstraint> legalConstraint;
     private List<Characteristics> characteristics;
-    private List<Capabilities> capabilities;
+    private List<CapabilitiesSML> capabilities;
     private List<Contact> contact;
     private List<Documentation> documentation;
     private List<History> history;
@@ -99,7 +98,6 @@ public class SensorML {
     private List<SensorML.Member> member;
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
     private String version;
 
     /**
@@ -114,25 +112,6 @@ public class SensorML {
 
     /**
      * Gets the value of the identification property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the identification property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getIdentification().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Identification }
-     * 
-     * 
      */
     public List<Identification> getIdentification() {
         if (identification == null) {
@@ -143,25 +122,6 @@ public class SensorML {
 
     /**
      * Gets the value of the classification property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the classification property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getClassification().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Classification }
-     * 
-     * 
      */
     public List<Classification> getClassification() {
         if (classification == null) {
@@ -172,11 +132,6 @@ public class SensorML {
 
     /**
      * Gets the value of the validTime property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ValidTime }
-     *     
      */
     public ValidTime getValidTime() {
         return validTime;
@@ -184,11 +139,6 @@ public class SensorML {
 
     /**
      * Sets the value of the validTime property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ValidTime }
-     *     
      */
     public void setValidTime(ValidTime value) {
         this.validTime = value;
@@ -196,11 +146,6 @@ public class SensorML {
 
     /**
      * Gets the value of the securityConstraint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SecurityConstraint }
-     *     
      */
     public SecurityConstraint getSecurityConstraint() {
         return securityConstraint;
@@ -208,37 +153,12 @@ public class SensorML {
 
     /**
      * Sets the value of the securityConstraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SecurityConstraint }
-     *     
      */
     public void setSecurityConstraint(SecurityConstraint value) {
         this.securityConstraint = value;
     }
 
     /**
-     * Gets the value of the legalConstraint property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the legalConstraint property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getLegalConstraint().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LegalConstraint }
-     * 
-     * 
      */
     public List<LegalConstraint> getLegalConstraint() {
         if (legalConstraint == null) {
@@ -249,25 +169,6 @@ public class SensorML {
 
     /**
      * Gets the value of the characteristics property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the characteristics property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCharacteristics().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Characteristics }
-     * 
-     * 
      */
     public List<Characteristics> getCharacteristics() {
         if (characteristics == null) {
@@ -278,54 +179,16 @@ public class SensorML {
 
     /**
      * Gets the value of the capabilities property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the capabilities property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCapabilities().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Capabilities }
-     * 
-     * 
      */
-    public List<Capabilities> getCapabilities() {
+    public List<CapabilitiesSML> getCapabilities() {
         if (capabilities == null) {
-            capabilities = new ArrayList<Capabilities>();
+            capabilities = new ArrayList<CapabilitiesSML>();
         }
         return this.capabilities;
     }
 
     /**
      * Gets the value of the contact property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the contact property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContact().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Contact }
-     * 
-     * 
      */
     public List<Contact> getContact() {
         if (contact == null) {
@@ -336,25 +199,6 @@ public class SensorML {
 
     /**
      * Gets the value of the documentation property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the documentation property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getDocumentation().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Documentation }
-     * 
-     * 
      */
     public List<Documentation> getDocumentation() {
         if (documentation == null) {
@@ -365,25 +209,6 @@ public class SensorML {
 
     /**
      * Gets the value of the history property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the history property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getHistory().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link History }
-     * 
-     * 
      */
     public List<History> getHistory() {
         if (history == null) {
@@ -394,25 +219,6 @@ public class SensorML {
 
     /**
      * Gets the value of the member property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the member property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMember().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SensorML.Member }
-     * 
-     * 
      */
     public List<SensorML.Member> getMember() {
         if (member == null) {
@@ -431,7 +237,7 @@ public class SensorML {
      */
     public String getVersion() {
         if (version == null) {
-            return "1.0.1";
+            return "1.0";
         } else {
             return version;
         }
@@ -439,16 +245,85 @@ public class SensorML {
 
     /**
      * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setVersion(String value) {
         this.version = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[SensorML]").append("\n");
+        if (keywords != null) {
+            sb.append("Keywords:").append('\n');
+            for (Keywords k : keywords) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (identification != null) {
+            sb.append("Identification:").append('\n');
+            for (Identification k : identification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (classification != null) {
+            sb.append("Identification:").append('\n');
+            for (Classification k : classification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (validTime != null) {
+            sb.append("validTime:").append(validTime).append('\n');
+        }
+        if (securityConstraint != null) {
+            sb.append("securityConstraint:").append(securityConstraint).append('\n');
+        }
+        if (legalConstraint != null) {
+            sb.append("legalConstraint:").append('\n');
+            for (LegalConstraint k : legalConstraint) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (characteristics != null) {
+            sb.append("characteristics:").append('\n');
+            for (Characteristics k : characteristics) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (capabilities != null) {
+            sb.append("capabilities:").append('\n');
+            for (CapabilitiesSML k : capabilities) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (contact != null) {
+            sb.append("contact:").append('\n');
+            for (Contact k : contact) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (documentation != null) {
+            sb.append("documentation:").append('\n');
+            for (Documentation k : documentation) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (history != null) {
+            sb.append("history:").append('\n');
+            for (History k : history) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (member != null) {
+            sb.append("member:").append('\n');
+            for (SensorML.Member k : member) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (version != null) {
+            sb.append("version:").append(version).append('\n');
+        }
+        return sb.toString();
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -460,11 +335,11 @@ public class SensorML {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;choice>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}DocumentList"/>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}ContactList"/>
+     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}_Process"/>
+     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}DocumentList"/>
+     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}ContactList"/>
      *       &lt;/choice>
-     *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
+     *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -480,45 +355,43 @@ public class SensorML {
     })
     public static class Member {
 
-        @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
+        @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
         private JAXBElement<? extends AbstractProcessType> process;
         @XmlElement(name = "DocumentList")
         private DocumentList documentList;
         @XmlElement(name = "ContactList")
         private ContactList contactList;
-        @XmlAttribute(namespace = "http://www.opengis.net/gml")
-        @XmlSchemaType(name = "anyURI")
+        @XmlAttribute
+        private List<String> nilReason;
+        @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
         private String remoteSchema;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        private String type;
+        private String actuate;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        @XmlSchemaType(name = "anyURI")
-        private String href;
-        @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        @XmlSchemaType(name = "anyURI")
-        private String role;
-        @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        @XmlSchemaType(name = "anyURI")
         private String arcrole;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        private String title;
+        private String href;
+        @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+        private String role;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
         private String show;
         @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-        private String actuate;
+        private String title;
+        @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+        private String type;
 
         /**
          * Gets the value of the process property.
          * 
          * @return
          *     possible object is
+         *     {@link JAXBElement }{@code <}{@link ComponentType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link SystemType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}
          *     {@link JAXBElement }{@code <}{@link DataSourceType }{@code >}
          *     {@link JAXBElement }{@code <}{@link ProcessModelType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link SystemType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}
          *     {@link JAXBElement }{@code <}{@link ComponentArrayType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link ComponentType }{@code >}
          *     
          */
         public JAXBElement<? extends AbstractProcessType> getProcess() {
@@ -530,13 +403,13 @@ public class SensorML {
          * 
          * @param value
          *     allowed object is
+         *     {@link JAXBElement }{@code <}{@link ComponentType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link SystemType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}
+         *     {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}
          *     {@link JAXBElement }{@code <}{@link DataSourceType }{@code >}
          *     {@link JAXBElement }{@code <}{@link ProcessModelType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link SystemType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}
          *     {@link JAXBElement }{@code <}{@link ComponentArrayType }{@code >}
-         *     {@link JAXBElement }{@code <}{@link ComponentType }{@code >}
          *     
          */
         public void setProcess(JAXBElement<? extends AbstractProcessType> value) {
@@ -592,6 +465,16 @@ public class SensorML {
         }
 
         /**
+         * Gets the value of the nilReason property.
+         */
+        public List<String> getNilReason() {
+            if (nilReason == null) {
+                nilReason = new ArrayList<String>();
+            }
+            return this.nilReason;
+        }
+
+        /**
          * Gets the value of the remoteSchema property.
          * 
          * @return
@@ -616,31 +499,51 @@ public class SensorML {
         }
 
         /**
-         * Gets the value of the type property.
+         * Gets the value of the actuate property.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getType() {
-            if (type == null) {
-                return "simple";
-            } else {
-                return type;
-            }
+        public String getActuate() {
+            return actuate;
         }
 
         /**
-         * Sets the value of the type property.
+         * Sets the value of the actuate property.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setType(String value) {
-            this.type = value;
+        public void setActuate(String value) {
+            this.actuate = value;
+        }
+
+        /**
+         * Gets the value of the arcrole property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getArcrole() {
+            return arcrole;
+        }
+
+        /**
+         * Sets the value of the arcrole property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setArcrole(String value) {
+            this.arcrole = value;
         }
 
         /**
@@ -692,27 +595,27 @@ public class SensorML {
         }
 
         /**
-         * Gets the value of the arcrole property.
+         * Gets the value of the show property.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getArcrole() {
-            return arcrole;
+        public String getShow() {
+            return show;
         }
 
         /**
-         * Sets the value of the arcrole property.
+         * Sets the value of the show property.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setArcrole(String value) {
-            this.arcrole = value;
+        public void setShow(String value) {
+            this.show = value;
         }
 
         /**
@@ -740,53 +643,67 @@ public class SensorML {
         }
 
         /**
-         * Gets the value of the show property.
+         * Gets the value of the type property.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getShow() {
-            return show;
+        public String getType() {
+            if (type == null) {
+                return "simple";
+            } else {
+                return type;
+            }
         }
 
         /**
-         * Sets the value of the show property.
+         * Sets the value of the type property.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setShow(String value) {
-            this.show = value;
+        public void setType(String value) {
+            this.type = value;
         }
 
-        /**
-         * Gets the value of the actuate property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getActuate() {
-            return actuate;
-        }
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[SensorML Member]").append("\n");
+            if (process != null)
+                sb.append("process: ").append(process.getValue()).append('\n');
+            if (documentList != null)
+                sb.append("documentList: ").append(documentList).append('\n');
+            if (contactList != null)
+                sb.append("contactList: ").append(contactList).append('\n');
 
-        /**
-         * Sets the value of the actuate property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setActuate(String value) {
-            this.actuate = value;
+            if (nilReason != null) {
+                sb.append("nilReason:").append('\n');
+                for (String k : nilReason) {
+                    sb.append("nilReason: ").append(k).append('\n');
+                }
+            }
+            if (remoteSchema != null)
+                sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+            if (actuate != null)
+                sb.append("actuate: ").append(actuate).append('\n');
+            if (arcrole != null)
+                sb.append("actuate: ").append(arcrole).append('\n');
+            if (href != null)
+                sb.append("href: ").append(href).append('\n');
+            if (role != null)
+                sb.append("role: ").append(role).append('\n');
+            if (show != null)
+                sb.append("show: ").append(show).append('\n');
+            if (title != null)
+                sb.append("title: ").append(title).append('\n');
+            if (type != null)
+                sb.append("type: ").append(type).append('\n');
+            return sb.toString();
         }
 
     }
-
 }

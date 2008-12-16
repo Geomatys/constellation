@@ -19,6 +19,7 @@ package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -240,6 +241,46 @@ public class Identification {
         this.type = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Identification]").append("\n");
+        if (identifierList != null) {
+            sb.append("identifierList: ").append(identifierList).append('\n');
+        }
+
+        if (nilReason != null) {
+            sb.append("nilReason:").append('\n');
+            for (String k : nilReason) {
+                sb.append("nilReason: ").append(k).append('\n');
+            }
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -309,6 +350,19 @@ public class Identification {
             this.id = value;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[IdentifierList]").append("\n");
+            if (identifier != null) {
+                for (Identification.IdentifierList.Identifier k: identifier) {
+                    sb.append("identifier:").append(k).append('\n');
+                }
+            }
+            if (id != null) {
+                sb.append("id: ").append(id).append('\n');
+            }
+            return sb.toString();
+        }
 
         /**
          * <p>Java class for anonymous complex type.
@@ -368,6 +422,18 @@ public class Identification {
              */
             public void setName(String value) {
                 this.name = value;
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder("[Identifier]").append("\n");
+                if (term != null) {
+                    sb.append("term:").append(term).append('\n');
+                }
+                if (name != null) {
+                    sb.append("name: ").append(name).append('\n');
+                }
+                return sb.toString();
             }
 
         }

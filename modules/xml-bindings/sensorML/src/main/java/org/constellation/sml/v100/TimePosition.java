@@ -64,7 +64,7 @@ public class TimePosition {
 
     @XmlElement(name = "Time", namespace = "http://www.opengis.net/swe/1.0")
     private TimeType time;
-    @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

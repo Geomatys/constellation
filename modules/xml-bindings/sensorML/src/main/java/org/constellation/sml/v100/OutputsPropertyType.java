@@ -15,40 +15,31 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.swe.v100.PositionType;
-import org.constellation.swe.v100.VectorType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for outputsPropertyType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="outputsPropertyType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice minOccurs="0">
- *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}_Process"/>
- *         &lt;element ref="{http://www.opengis.net/swe/1.0}Position"/>
- *         &lt;element ref="{http://www.opengis.net/swe/1.0}Vector"/>
- *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
+ *       &lt;sequence minOccurs="0">
+ *         &lt;element name="OutputList" type="{http://www.opengis.net/sensorML/1.0}AbstractListType"/>
+ *       &lt;/sequence>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -57,26 +48,16 @@ import org.constellation.swe.v100.VectorType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "process",
-    "position",
-    "vector"
+@XmlType(name = "outputsPropertyType", propOrder = {
+    "outputList"
 })
-@XmlRootElement(name = "position")
-public class Position {
+public class OutputsPropertyType {
 
-    @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractProcessType> process;
-    @XmlElement(name = "Position", namespace = "http://www.opengis.net/swe/1.0")
-    private PositionType position;
-    @XmlElement(name = "Vector", namespace = "http://www.opengis.net/swe/1.0")
-    private VectorType vector;
-    @XmlAttribute(required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    private String name;
+    @XmlElement(name = "OutputList")
+    private AbstractListType outputList;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -94,59 +75,27 @@ public class Position {
     private String type;
 
     /**
-     * Gets the value of the process property.
+     * Gets the value of the outputList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link AbstractListType }
+     *     
      */
-    public JAXBElement<? extends AbstractProcessType> getProcess() {
-        return process;
+    public AbstractListType getOutputList() {
+        return outputList;
     }
 
     /**
-     * Sets the value of the process property.
+     * Sets the value of the outputList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link AbstractListType }
+     *     
      */
-    public void setProcess(JAXBElement<? extends AbstractProcessType> value) {
-        this.process = ((JAXBElement<? extends AbstractProcessType> ) value);
-    }
-
-    /**
-     * Gets the value of the position property.
-     */
-    public PositionType getPosition() {
-        return position;
-    }
-
-    /**
-     * Sets the value of the position property.
-     */
-    public void setPosition(PositionType value) {
-        this.position = value;
-    }
-
-    /**
-     * Gets the value of the vector property.
-      */
-    public VectorType getVector() {
-        return vector;
-    }
-
-    /**
-     * Sets the value of the vector property.
-     */
-    public void setVector(VectorType value) {
-        this.vector = value;
-    }
-
-    /**
-     * Gets the value of the name property.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     */
-    public void setName(String value) {
-        this.name = value;
+    public void setOutputList(AbstractListType value) {
+        this.outputList = value;
     }
 
     /**
@@ -161,6 +110,11 @@ public class Position {
 
     /**
      * Gets the value of the remoteSchema property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getRemoteSchema() {
         return remoteSchema;
@@ -168,6 +122,11 @@ public class Position {
 
     /**
      * Sets the value of the remoteSchema property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setRemoteSchema(String value) {
         this.remoteSchema = value;
@@ -175,6 +134,11 @@ public class Position {
 
     /**
      * Gets the value of the actuate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getActuate() {
         return actuate;
@@ -182,6 +146,11 @@ public class Position {
 
     /**
      * Sets the value of the actuate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setActuate(String value) {
         this.actuate = value;
@@ -189,6 +158,11 @@ public class Position {
 
     /**
      * Gets the value of the arcrole property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getArcrole() {
         return arcrole;
@@ -196,6 +170,11 @@ public class Position {
 
     /**
      * Sets the value of the arcrole property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setArcrole(String value) {
         this.arcrole = value;
@@ -203,6 +182,11 @@ public class Position {
 
     /**
      * Gets the value of the href property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getHref() {
         return href;
@@ -210,6 +194,11 @@ public class Position {
 
     /**
      * Sets the value of the href property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setHref(String value) {
         this.href = value;
@@ -217,6 +206,11 @@ public class Position {
 
     /**
      * Gets the value of the role property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getRole() {
         return role;
@@ -224,6 +218,11 @@ public class Position {
 
     /**
      * Sets the value of the role property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setRole(String value) {
         this.role = value;
@@ -231,6 +230,10 @@ public class Position {
 
     /**
      * Gets the value of the show property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
      *     
      */
     public String getShow() {
@@ -239,6 +242,11 @@ public class Position {
 
     /**
      * Sets the value of the show property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setShow(String value) {
         this.show = value;
@@ -246,6 +254,11 @@ public class Position {
 
     /**
      * Gets the value of the title property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getTitle() {
         return title;
@@ -253,6 +266,11 @@ public class Position {
 
     /**
      * Sets the value of the title property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setTitle(String value) {
         this.title = value;
@@ -260,6 +278,11 @@ public class Position {
 
     /**
      * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getType() {
         if (type == null) {
@@ -271,6 +294,11 @@ public class Position {
 
     /**
      * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setType(String value) {
         this.type = value;

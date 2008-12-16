@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
     "identification",
     "classification",
     "validTime",
-    "securityConstraint",
+    //"securityConstraint",
     "legalConstraint",
     "characteristics",
     "capabilities",
@@ -182,6 +182,69 @@ public abstract class AbstractProcessType extends AbstractSMLType {
             history = new ArrayList<History>();
         }
         return this.history;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[SensorML]").append("\n");
+        if (keywords != null) {
+            sb.append("Keywords:").append('\n');
+            for (Keywords k : keywords) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (identification != null) {
+            sb.append("Identification:").append('\n');
+            for (Identification k : identification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (classification != null) {
+            sb.append("Identification:").append('\n');
+            for (Classification k : classification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (validTime != null) {
+            sb.append("validTime:").append(validTime).append('\n');
+        }
+        if (legalConstraint != null) {
+            sb.append("legalConstraint:").append('\n');
+            for (LegalConstraint k : legalConstraint) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (characteristics != null) {
+            sb.append("characteristics:").append('\n');
+            for (Characteristics k : characteristics) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (capabilities != null) {
+            sb.append("capabilities:").append('\n');
+            for (CapabilitiesSML k : capabilities) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (contact != null) {
+            sb.append("contact:").append('\n');
+            for (Contact k : contact) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (documentation != null) {
+            sb.append("documentation:").append('\n');
+            for (Documentation k : documentation) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (history != null) {
+            sb.append("history:").append('\n');
+            for (History k : history) {
+                sb.append(k).append('\n');
+            }
+        }
+        return sb.toString();
     }
 
 }

@@ -140,4 +140,24 @@ public class ResponsibleParty {
         this.id = value;
     }
 
+     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ResponsibleParty]").append("\n");
+        if (individualName != null) {
+            sb.append("individualName: ").append(individualName).append('\n');
+        }
+        if (organizationName != null) {
+            sb.append("organizationName: ").append(organizationName).append('\n');
+        }
+        if (positionName != null) {
+            sb.append("positionName: ").append(positionName).append('\n');
+        }
+        if (contactInfo != null) {
+            sb.append("contactInfo: ").append(contactInfo).append('\n');
+        }
+        if (id != null) {
+            sb.append("id: ").append(id).append('\n');
+        }
+        return sb.toString();
+    }
 }

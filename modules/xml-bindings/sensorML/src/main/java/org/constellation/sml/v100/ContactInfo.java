@@ -160,6 +160,28 @@ public class ContactInfo {
         this.contactInstructions = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ContactInfo]").append("\n");
+        if (phone != null) {
+            sb.append("phone: ").append(phone).append('\n');
+        }
+        if (address != null) {
+            sb.append("address: ").append(address).append('\n');
+        }
+        if (hoursOfService != null) {
+            sb.append("hoursOfService: ").append(hoursOfService).append('\n');
+        }
+        if (contactInstructions != null) {
+            sb.append("contactInstructions: ").append(contactInstructions).append('\n');
+        }
+        if (onlineResource != null) {
+            for (OnlineResource o : onlineResource) {
+                sb.append("onlineResource: ").append(o).append('\n');
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -286,6 +308,31 @@ public class ContactInfo {
             this.electronicMailAddress = value;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[Address]").append("\n");
+            if (city != null) {
+                sb.append("city: ").append(city).append('\n');
+            }
+            if (administrativeArea != null) {
+                sb.append("administrativeArea: ").append(administrativeArea).append('\n');
+            }
+            if (postalCode != null) {
+                sb.append("postalCode: ").append(postalCode).append('\n');
+            }
+            if (country != null) {
+                sb.append("country: ").append(country).append('\n');
+            }
+            if (electronicMailAddress != null) {
+                sb.append("electronicMailAddress: ").append(electronicMailAddress).append('\n');
+            }
+            if (deliveryPoint != null) {
+                for (String d : deliveryPoint) {
+                    sb.append("deliveryPoint: ").append(d).append('\n');
+                }
+            }
+            return sb.toString();
+        }
     }
 
 
@@ -338,6 +385,22 @@ public class ContactInfo {
                 facsimile = new ArrayList<String>();
             }
             return this.facsimile;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[Phone]").append("\n");
+            if (voice != null) {
+                for (String d : voice) {
+                    sb.append("voice: ").append(d).append('\n');
+                }
+            }
+            if (facsimile != null) {
+                for (String d : facsimile) {
+                    sb.append("facsimile: ").append(d).append('\n');
+                }
+            }
+            return sb.toString();
         }
 
     }

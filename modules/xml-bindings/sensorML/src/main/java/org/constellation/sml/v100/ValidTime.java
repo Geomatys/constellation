@@ -87,4 +87,16 @@ public class ValidTime {
         this.timePeriod = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ValidTime]").append("\n");
+        if (timeInstant != null) {
+            sb.append("timeInstant: ").append(timeInstant).append('\n');
+        }
+        if (timePeriod != null) {
+            sb.append("timePeriod: ").append(timePeriod).append('\n');
+        }
+        return sb.toString();
+    }
+
 }

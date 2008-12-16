@@ -42,18 +42,18 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Process_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "_Process");
-    private final static QName _RuleLanguage_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "ruleLanguage");
-    private final static QName _ProcessMethod_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "ProcessMethod");
-    private final static QName _ComponentArray_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "ComponentArray");
-    private final static QName _ProcessModel_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "ProcessModel");
-    private final static QName _Method_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "method");
-    private final static QName _ProcessChain_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "ProcessChain");
-    private final static QName _System_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "System");
-    private final static QName _RelaxNG_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "relaxNG");
-    private final static QName _DataSource_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "DataSource");
-    private final static QName _Component_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "Component");
-    private final static QName _Schematron_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "schematron");
+    private final static QName _Process_QNAME                    = new QName("http://www.opengis.net/sensorML/1.0", "AbstractProcess");
+    private final static QName _RuleLanguage_QNAME               = new QName("http://www.opengis.net/sensorML/1.0", "ruleLanguage");
+    private final static QName _ProcessMethod_QNAME              = new QName("http://www.opengis.net/sensorML/1.0", "ProcessMethod");
+    private final static QName _ComponentArray_QNAME             = new QName("http://www.opengis.net/sensorML/1.0", "ComponentArray");
+    private final static QName _ProcessModel_QNAME               = new QName("http://www.opengis.net/sensorML/1.0", "ProcessModel");
+    private final static QName _Method_QNAME                     = new QName("http://www.opengis.net/sensorML/1.0", "method");
+    private final static QName _ProcessChain_QNAME               = new QName("http://www.opengis.net/sensorML/1.0", "ProcessChain");
+    private final static QName _System_QNAME                     = new QName("http://www.opengis.net/sensorML/1.0", "System");
+    private final static QName _RelaxNG_QNAME                    = new QName("http://www.opengis.net/sensorML/1.0", "relaxNG");
+    private final static QName _DataSource_QNAME                 = new QName("http://www.opengis.net/sensorML/1.0", "DataSource");
+    private final static QName _Component_QNAME                  = new QName("http://www.opengis.net/sensorML/1.0", "Component");
+    private final static QName _Schematron_QNAME                 = new QName("http://www.opengis.net/sensorML/1.0", "schematron");
     private final static QName _KeywordsKeywordListKeyword_QNAME = new QName("http://www.opengis.net/sensorML/1.0", "keyword");
 
     /**
@@ -738,10 +738,76 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link AbstractListType }
+     *
+     */
+    public AbstractListType createAbstractListType() {
+        return new AbstractListType();
+    }
+
+    /**
+     * Create an instance of {@link Schematron }
+     *
+     */
+    public Schematron createSchematron() {
+        return new Schematron();
+    }
+
+    /**
+     * Create an instance of {@link RelaxNG }
+     *
+     */
+    public RelaxNG createRelaxNG() {
+        return new RelaxNG();
+    }
+
+    /**
+     * Create an instance of {@link SecurityConstraint }
+     *
+     */
+    public SecurityConstraint createSecurityConstraint() {
+        return new SecurityConstraint();
+    }
+
+    /**
+     * Create an instance of {@link Security }
+     *
+     */
+    public Security createSecurity() {
+        return new Security();
+    }
+
+    /**
+     * Create an instance of {@link SensorML }
+     *
+     */
+    public SensorML createSensorML() {
+        return new SensorML();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RelaxNG }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "relaxNG", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "ruleLanguage")
+    public JAXBElement<RelaxNG> createRelaxNG(RelaxNG value) {
+        return new JAXBElement<RelaxNG>(_RelaxNG_QNAME, RelaxNG.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Schematron }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "schematron", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "ruleLanguage")
+    public JAXBElement<Schematron> createSchematron(Schematron value) {
+        return new JAXBElement<Schematron>(_Schematron_QNAME, Schematron.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "AbstractProcess")
     public JAXBElement<AbstractProcessType> createProcess(AbstractProcessType value) {
         return new JAXBElement<AbstractProcessType>(_Process_QNAME, AbstractProcessType.class, null, value);
     }
@@ -768,7 +834,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ComponentArrayType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ComponentArray", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ComponentArray", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ComponentArrayType> createComponentArray(ComponentArrayType value) {
         return new JAXBElement<ComponentArrayType>(_ComponentArray_QNAME, ComponentArrayType.class, null, value);
     }
@@ -777,7 +843,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessModelType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ProcessModel", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ProcessModel", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ProcessModelType> createProcessModel(ProcessModelType value) {
         return new JAXBElement<ProcessModelType>(_ProcessModel_QNAME, ProcessModelType.class, null, value);
     }
@@ -795,7 +861,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ProcessChain", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "ProcessChain", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ProcessChainType> createProcessChain(ProcessChainType value) {
         return new JAXBElement<ProcessChainType>(_ProcessChain_QNAME, ProcessChainType.class, null, value);
     }
@@ -804,7 +870,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SystemType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "System", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "System", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<SystemType> createSystem(SystemType value) {
         return new JAXBElement<SystemType>(_System_QNAME, SystemType.class, null, value);
     }
@@ -813,7 +879,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DataSourceType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "DataSource", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "DataSource", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<DataSourceType> createDataSource(DataSourceType value) {
         return new JAXBElement<DataSourceType>(_DataSource_QNAME, DataSourceType.class, null, value);
     }
@@ -822,7 +888,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ComponentType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "Component", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "Component", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ComponentType> createComponent(ComponentType value) {
         return new JAXBElement<ComponentType>(_Component_QNAME, ComponentType.class, null, value);
     }

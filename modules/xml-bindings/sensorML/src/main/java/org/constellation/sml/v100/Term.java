@@ -106,4 +106,18 @@ public class Term {
         this.definition = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Term]").append("\n");
+        if (codeSpace != null) {
+            sb.append("codeSpace: ").append(codeSpace).append('\n');
+        }
+        if (value != null) {
+            sb.append("value: ").append(value).append('\n');
+        }
+        if (definition != null) {
+            sb.append("definition: ").append(definition).append('\n');
+        }
+        return sb.toString();
+    }
 }

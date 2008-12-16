@@ -250,4 +250,49 @@ public class Contact {
         this.type = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Contact]").append("\n");
+        if (person != null) {
+            sb.append("person: ").append(person).append('\n');
+        }
+        if (responsibleParty != null) {
+            sb.append("responsibleParty: ").append(responsibleParty).append('\n');
+        }
+        if (contactList != null) {
+            sb.append("contactList: ").append(contactList).append('\n');
+        }
+        if (nilReason != null) {
+            sb.append("nilReason:").append('\n');
+            for (String k : nilReason) {
+                sb.append("nilReason: ").append(k).append('\n');
+            }
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+
 }

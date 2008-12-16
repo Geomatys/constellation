@@ -323,7 +323,7 @@ public class Components {
         })
         public static class Component {
 
-            @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
+            @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
             private JAXBElement<? extends AbstractProcessType> process;
             @XmlAttribute(required = true)
             @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

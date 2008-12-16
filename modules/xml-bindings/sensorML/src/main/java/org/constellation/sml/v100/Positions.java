@@ -15,16 +15,15 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -42,21 +41,21 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence minOccurs="0">
- *         &lt;element name="KeywordList">
+ *         &lt;element name="PositionList">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element name="keyword" type="{http://www.w3.org/2001/XMLSchema}token" maxOccurs="unbounded"/>
- *                 &lt;/sequence>
- *                 &lt;attribute name="codeSpace" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *                 &lt;choice>
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}position" maxOccurs="unbounded"/>
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}timePosition"/>
+ *                 &lt;/choice>
  *                 &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
  *       &lt;/sequence>
- *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -66,16 +65,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "keywordList"
+    "positionList"
 })
-@XmlRootElement(name = "keywords")
-public class Keywords {
+@XmlRootElement(name = "positions")
+public class Positions {
 
-    @XmlElement(name = "KeywordList")
-    private Keywords.KeywordList keywordList;
+    @XmlElement(name = "PositionList")
+    private Positions.PositionList positionList;
     @XmlAttribute
     private List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -93,17 +92,27 @@ public class Keywords {
     private String type;
 
     /**
-     * Gets the value of the keywordList property.
+     * Gets the value of the positionList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Positions.PositionList }
+     *     
      */
-    public Keywords.KeywordList getKeywordList() {
-        return keywordList;
+    public Positions.PositionList getPositionList() {
+        return positionList;
     }
 
     /**
-     * Sets the value of the keywordList property.
+     * Sets the value of the positionList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Positions.PositionList }
+     *     
      */
-    public void setKeywordList(Keywords.KeywordList value) {
-        this.keywordList = value;
+    public void setPositionList(Positions.PositionList value) {
+        this.positionList = value;
     }
 
     /**
@@ -118,6 +127,11 @@ public class Keywords {
 
     /**
      * Gets the value of the remoteSchema property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getRemoteSchema() {
         return remoteSchema;
@@ -125,6 +139,11 @@ public class Keywords {
 
     /**
      * Sets the value of the remoteSchema property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setRemoteSchema(String value) {
         this.remoteSchema = value;
@@ -132,6 +151,11 @@ public class Keywords {
 
     /**
      * Gets the value of the actuate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getActuate() {
         return actuate;
@@ -139,6 +163,11 @@ public class Keywords {
 
     /**
      * Sets the value of the actuate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setActuate(String value) {
         this.actuate = value;
@@ -146,6 +175,11 @@ public class Keywords {
 
     /**
      * Gets the value of the arcrole property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getArcrole() {
         return arcrole;
@@ -153,6 +187,11 @@ public class Keywords {
 
     /**
      * Sets the value of the arcrole property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setArcrole(String value) {
         this.arcrole = value;
@@ -160,6 +199,11 @@ public class Keywords {
 
     /**
      * Gets the value of the href property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getHref() {
         return href;
@@ -167,6 +211,11 @@ public class Keywords {
 
     /**
      * Sets the value of the href property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setHref(String value) {
         this.href = value;
@@ -174,6 +223,11 @@ public class Keywords {
 
     /**
      * Gets the value of the role property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getRole() {
         return role;
@@ -181,6 +235,11 @@ public class Keywords {
 
     /**
      * Sets the value of the role property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setRole(String value) {
         this.role = value;
@@ -188,6 +247,11 @@ public class Keywords {
 
     /**
      * Gets the value of the show property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getShow() {
         return show;
@@ -195,6 +259,11 @@ public class Keywords {
 
     /**
      * Sets the value of the show property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setShow(String value) {
         this.show = value;
@@ -202,6 +271,11 @@ public class Keywords {
 
     /**
      * Gets the value of the title property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getTitle() {
         return title;
@@ -209,6 +283,11 @@ public class Keywords {
 
     /**
      * Sets the value of the title property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setTitle(String value) {
         this.title = value;
@@ -216,6 +295,11 @@ public class Keywords {
 
     /**
      * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getType() {
         if (type == null) {
@@ -227,49 +311,14 @@ public class Keywords {
 
     /**
      * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setType(String value) {
         this.type = value;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("[Keywords]").append("\n");
-        if (keywordList != null) {
-            sb.append("keywordsList: ").append(keywordList).append('\n');
-        }
-
-        if (nilReason != null) {
-            sb.append("nilReason:").append('\n');
-            for (String k : nilReason) {
-                sb.append("nilReason: ").append(k).append('\n');
-            }
-        }
-        if (remoteSchema != null) {
-            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
-        }
-        if (actuate != null) {
-            sb.append("actuate: ").append(actuate).append('\n');
-        }
-        if (arcrole != null) {
-            sb.append("actuate: ").append(arcrole).append('\n');
-        }
-        if (href != null) {
-            sb.append("href: ").append(href).append('\n');
-        }
-        if (role != null) {
-            sb.append("role: ").append(role).append('\n');
-        }
-        if (show != null) {
-            sb.append("show: ").append(show).append('\n');
-        }
-        if (title != null) {
-            sb.append("title: ").append(title).append('\n');
-        }
-        if (type != null) {
-            sb.append("type: ").append(type).append('\n');
-        }
-        return sb.toString();
     }
 
 
@@ -282,10 +331,10 @@ public class Keywords {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="keyword" type="{http://www.w3.org/2001/XMLSchema}token" maxOccurs="unbounded"/>
-     *       &lt;/sequence>
-     *       &lt;attribute name="codeSpace" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+     *       &lt;choice>
+     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}position" maxOccurs="unbounded"/>
+     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}timePosition"/>
+     *       &lt;/choice>
      *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -296,45 +345,78 @@ public class Keywords {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "keyword"
+        "position",
+        "timePosition"
     })
-    public static class KeywordList {
+    public static class PositionList {
 
-        @XmlElementRef(name = "keyword", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
-        private List<JAXBElement<String>> keyword;
-        @XmlAttribute
-        private String codeSpace;
+        private List<Position> position;
+        private TimePosition timePosition;
         @XmlAttribute
         @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
         @XmlID
         private String id;
 
         /**
-         * Gets the value of the keyword property.
+         * Gets the value of the position property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the position property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getPosition().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link Position }
+         * 
+         * 
          */
-        public List<JAXBElement<String>> getKeyword() {
-            if (keyword == null) {
-                keyword = new ArrayList<JAXBElement<String>>();
+        public List<Position> getPosition() {
+            if (position == null) {
+                position = new ArrayList<Position>();
             }
-            return this.keyword;
+            return this.position;
         }
 
         /**
-         * Gets the value of the codeSpace property.
+         * Gets the value of the timePosition property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link TimePosition }
+         *     
          */
-        public String getCodeSpace() {
-            return codeSpace;
+        public TimePosition getTimePosition() {
+            return timePosition;
         }
 
         /**
-         * Sets the value of the codeSpace property.
+         * Sets the value of the timePosition property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link TimePosition }
+         *     
          */
-        public void setCodeSpace(String value) {
-            this.codeSpace = value;
+        public void setTimePosition(TimePosition value) {
+            this.timePosition = value;
         }
 
         /**
          * Gets the value of the id property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
          */
         public String getId() {
             return id;
@@ -342,26 +424,14 @@ public class Keywords {
 
         /**
          * Sets the value of the id property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
          */
         public void setId(String value) {
             this.id = value;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder("[KeywordsList]").append("\n");
-            if (keyword != null) {
-                for (JAXBElement<String> k: keyword) {
-                    sb.append("keyword:").append(k.getValue()).append('\n');
-                }
-            }
-            if (codeSpace != null) {
-                sb.append("codeSpace: ").append(codeSpace).append('\n');
-            }
-            if (id != null) {
-                sb.append("id: ").append(id).append('\n');
-            }
-            return sb.toString();
         }
 
     }
