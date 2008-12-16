@@ -48,7 +48,7 @@ import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class Dispatcher {
+public class XacmlDispatcher {
 	
     /**
      * The URL of the webservice to request.
@@ -81,7 +81,7 @@ public class Dispatcher {
     private WmsSoapClient wmsSoapClient;
 
     /**
-     * Instanciates a dispatcher for the specified url. The constructor defines whether it
+     * Instantiates a dispatcher for the specified url. The constructor defines whether it
      * is a {@code REST} or {@code SOAP} request.
      *
      * @param url The URL of the webservice to request.
@@ -89,27 +89,13 @@ public class Dispatcher {
      * @param marshaller The marshaller to use for parsing the request.
      * @param unmarshaller The unmarshaller to use for the response.
      */
-    public Dispatcher(final String url, final boolean isRest, final Marshaller marshaller,
+    public XacmlDispatcher(final String url, final boolean isRest, final Marshaller marshaller,
                                                           final Unmarshaller unmarshaller)
     {
         this.url    = url;
         this.isRest = isRest;
         this.unmarshaller = unmarshaller;
         this.  marshaller =   marshaller;
-    }
-
-    AbstractWMSCapabilities requestGetCapabilities(GetCapabilities getCaps) throws WebServiceException
-    {
-    	final String service = null;
-    	final String request = null;
-    	final String version = null;
-        if (isRest) {
-            wmsRestClient = new WmsRestClient(url, marshaller, unmarshaller);
-            return wmsRestClient.sendGetCapabilities( service, request, version);
-        } else {
-            // implement a SOAP client.
-            throw new UnsupportedOperationException();
-        }
     }
 
 	
@@ -142,12 +128,7 @@ public class Dispatcher {
 
 	
 	public BufferedImage getMap(GetMap getMap) throws WebServiceException {
-        if (isRest) {
-            wmsRestClient = new WmsRestClient(url, marshaller, unmarshaller);
-            return wmsRestClient.sendGetMap(getMap);
-        } else {
-            // implement a SOAP client.
-            throw new UnsupportedOperationException();
-        }
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

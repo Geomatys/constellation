@@ -41,7 +41,10 @@ import org.constellation.security.WMSSecuredWorker;
  * </p>
  * <p>
  * The facade calls the {@code org.constellation.security.Worker} for all the
- * complex logic.
+ * complex logic of the PEP. All the initial processing of the incoming requests 
+ * is performed in the parent classes. This class only instantiates the security 
+ * worker it needs and initializes its {@code SecurityContext} field prior to 
+ * calling the worker's methods.
  * </p>
  * <p>
  * Access control necessitates that the user be authenticated to the container.
@@ -52,17 +55,24 @@ import org.constellation.security.WMSSecuredWorker;
  * @version $Id$
  * 
  * @author Cédric Briançon (Geomatys)
+ * @author Adrian Custer (Geomatys)
  * @since 0.3
  */
 @Path("wms-sec")
 @Singleton
 public class WmsRestService extends WMSService {
-	
+	/**
+	 * Information on the identity and credentials of the principal making a 
+	 * request of this service. The instance is injected by the JEE container.
+	 */
 	@Context
 	private SecurityContext secCntxt;
 	
 	/**
+	 * Constructor building the security worker to perform the logic of this 
+	 * gateway.
 	 * 
+	 * TODO: review the usage of the exceptions and then fill out the text below.
 	 * @throws JAXBException
 	 * @throws SQLException
 	 * @throws IOException
@@ -72,7 +82,13 @@ public class WmsRestService extends WMSService {
             worker = new WMSSecuredWorker(marshaller,unmarshaller);
             LOGGER.info("WMS secured service running");
     }
-     
+    
+    /**
+     * Calls the same method in the parent class after initializing the security 
+     * context in the worker.
+     * 
+     * @see WMSService#treatIncomingRequest(Object)
+     */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException{
     	worker.initSecurityContext(secCntxt);
