@@ -67,6 +67,7 @@
     <module>ows</module>
     <module>wcs</module>
     <module>wms</module>
+    <module>wps</module>
     <module>xacml</module>
     <module>sos</module>
     <module>ebrim</module>
