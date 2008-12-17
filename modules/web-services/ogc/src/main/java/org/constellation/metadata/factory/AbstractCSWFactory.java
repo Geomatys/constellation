@@ -41,13 +41,13 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
         super(priority);
     }
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller) throws SQLException, JAXBException;
+    public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller, File configDir) throws SQLException, JAXBException;
 
     public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException;
     
     public abstract int getProfile(int dbType);
     
-    public abstract IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException;
+    public abstract IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException;
     
     public abstract IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException;
 }

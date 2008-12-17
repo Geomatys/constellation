@@ -76,8 +76,8 @@ public class GenericIndex extends IndexLucene<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndex(MetadataReader reader, File configDirectory) throws WebServiceException {
-        super(configDirectory);
+    public GenericIndex(MetadataReader reader, File configDirectory, String serviceID) throws WebServiceException {
+        super(serviceID, configDirectory);
         this.reader = reader;
         if (create)
             createIndex();
@@ -198,7 +198,7 @@ public class GenericIndex extends IndexLucene<Object> {
         doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.TOKENIZED));
         
-        logger.info("indexing ISO 19119 MD_Metadata");
+        logger.finer("indexing ISO 19119 MD_Metadata");
         //TODO add ANyText
         for (String term : ISO_QUERYABLE.keySet()) {
             doc.add(new Field(term, getValues(metadata, ISO_QUERYABLE.get(term)), Field.Store.YES, Field.Index.TOKENIZED));

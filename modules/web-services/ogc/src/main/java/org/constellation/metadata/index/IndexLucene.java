@@ -82,15 +82,15 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * 
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public IndexLucene(File configDirectory) {
+    public IndexLucene(String serviceID, File configDirectory) {
         
         analyzer      = new WhitespaceAnalyzer();
         
         //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
-        File preGeneratedIndexDirectory = new File(configDirectory, "nextIndex");
+        File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
         
         // we get the current index directory
-        File currentIndexDirectory = new File(configDirectory, "index");
+        File currentIndexDirectory = new File(configDirectory, serviceID + "index");
         setFileDirectory(currentIndexDirectory);
         
         if (preGeneratedIndexDirectory.exists()) {

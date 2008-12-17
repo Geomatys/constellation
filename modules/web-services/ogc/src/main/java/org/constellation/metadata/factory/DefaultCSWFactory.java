@@ -56,7 +56,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDirectory, Unmarshaller unmarshaller) throws SQLException, JAXBException {
+    public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDirectory, Unmarshaller unmarshaller, File configDir) throws SQLException, JAXBException {
         switch (configuration.getType()) {
             case MDWEB:
                 return new MDWebMetadataReader(MDConnection);
@@ -114,12 +114,12 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.WebServiceException
      */
-    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir) throws WebServiceException {
+    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebIndex(MDConnection, configDir);
+                return new MDWebIndex(MDConnection, configDir, serviceID);
             case FILESYSTEM:
-                return new GenericIndex(reader, configDir);
+                return new GenericIndex(reader, configDir, serviceID);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);
         }

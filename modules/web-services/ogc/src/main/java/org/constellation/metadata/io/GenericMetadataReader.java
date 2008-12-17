@@ -52,7 +52,6 @@ import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
 import org.constellation.ows.v100.BoundingBoxType;
-import org.constellation.ws.rs.WebService;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
@@ -136,22 +135,21 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic configuration, Connection connection) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, Connection connection, File configDir) throws SQLException, JAXBException {
         super(false);
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
         unmarshaller           = context.createUnmarshaller();
-        File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
-        contacts               = loadContacts(new File(cswConfigDir, "contacts"));
+        contacts               = loadContacts(new File(configDir, "contacts"));
     }
     
     /**
      * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic configuration, Connection connection, boolean fillAnchor) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, Connection connection, File configDir, boolean fillAnchor) throws SQLException, JAXBException {
         super(false);
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
@@ -159,8 +157,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         contacts               = new HashMap<String, ResponsibleParty>();
         JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
         unmarshaller           = context.createUnmarshaller();
-        File cswConfigDir      = new File(WebService.getSicadeDirectory(), "csw_configuration");
-        contacts               = loadContacts(new File(cswConfigDir, "contacts"));
+        contacts               = loadContacts(new File(configDir, "contacts"));
     }
     
     /**
@@ -383,7 +380,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         singleValue.put(varName, result.getString(varName));
                     }
                 } else {
-                    logger.info("no result");
+                    logger.finer("no result");
                 }
                 result.close();
             } catch (SQLException ex) {
@@ -535,7 +532,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
-        else logger.severe("revision date null: " + date);
+        else logger.finer("revision date null: " + date);
         return revisionDate;
     }
     
@@ -551,7 +548,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
-        else logger.severe("publication date null: " + date);
+        else logger.finer("publication date null: " + date);
         return revisionDate;
     }
 

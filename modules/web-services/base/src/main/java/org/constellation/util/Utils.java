@@ -824,7 +824,7 @@ public class Utils {
         
         //special case and corrections
         if (propertyName.equals("beginPosition")) {
-            propertyName = "begining";
+            propertyName = "beginning";
         } else if (propertyName.equals("endPosition")) {
             propertyName = "ending";
         } else if (propertyName.equals("onlineResource")) {
@@ -836,6 +836,14 @@ public class Utils {
         // TODO remove when this issue will be fix in MDWeb    
         } else if (propertyName.indexOf("geographicElement") != -1) {
             propertyName = "geographicElement";
+        
+        // avoid unnecesary log flood
+        } else if ((propertyName.equals("westBoundLongitude") || propertyName.equals("eastBoundLongitude") ||
+                   propertyName.equals("northBoundLatitude") || propertyName.equals("southBoundLatitude"))
+                   && rootClass.getName().equals("org.geotools.metadata.iso.extent.GeographicDescriptionImpl")) {
+            return null;
+        } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl")) {
+            return null;
         }
         
         String methodName = "get" + Utils.firstToUpper(propertyName);

@@ -18,15 +18,25 @@
 
 package org.constellation.configuration.ws.rs;
 
+// J2SE dependencies
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
@@ -38,12 +48,16 @@ import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import static org.constellation.configuration.ws.rs.ConfigurationService.*;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+// Geotools dependencies
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.metadata.note.Anchors;
+
+// MDWeb dependencies
 import org.mdweb.utils.GlobalUtils;
-import static org.constellation.configuration.ws.rs.ConfigurationService.*;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -61,28 +75,33 @@ public abstract class AbstractCSWConfigurer {
     /**
      * A lucene Index used to pre-build a CSW index.
      */
-    protected IndexLucene indexer;
+    protected Map<String, IndexLucene> indexers = new HashMap<String, IndexLucene>();
     
-     /**
-     * A Reader to the database.
+    /**
+     * A list of Reader to the database.
      */
-    protected MetadataReader reader;
-    
+    protected List<MetadataReader> readers = new ArrayList<MetadataReader>();
+
+    /**
+     * A generic factory to get the correct CSW Factory.
+     */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
-    
+
     
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
         File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null)
-            throw new ConfigurationException("No configuration directory file have been found");
+        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory()))
+            throw new ConfigurationException("No configuration directory have been found");
         try {
-            // we get the CSW configuration file
             JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
             Unmarshaller configUnmarshaller = jb.createUnmarshaller();
 
-            File configFile = new File(cswConfigDir, "config.xml");
-            if (configFile.exists()) {
+            for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter())) {
+                //we get the csw ID (if single mode return "")
+                String id = getConfigID(configFile);
+
+                // we get the CSW configuration file
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 BDD db = config.getBdd();
                 if (db == null) {
@@ -91,11 +110,13 @@ public abstract class AbstractCSWConfigurer {
                     Connection MDConnection = db.getConnection();
                     
                     AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
-                    LOGGER.info("loaded Factory: " + CSWfactory.getClass().getName());
-                    reader  = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null);
-                    indexer = CSWfactory.getIndex(config.getType(), reader, MDConnection);
+                    LOGGER.finer("loaded Factory: " + CSWfactory.getClass().getName());
+                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
+                    indexers.put(id, CSWfactory.getIndex(config.getType(), currentReader, MDConnection));
+                    readers.add(currentReader);
                 }
-            } else {
+            }
+            if (readers.size() == 0) {
                 throw new ConfigurationException("No database configuration file have been found");
             }
         } catch (SQLException e) {
@@ -121,7 +142,7 @@ public abstract class AbstractCSWConfigurer {
     public AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
-        File cascadingFile = new File(serviceDirectory.get("CSW"), "CSWCascading.properties");
+        File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
         Properties prop;
         try {
             prop    = Utils.getPropertiesFromFile(cascadingFile);
@@ -161,45 +182,46 @@ public abstract class AbstractCSWConfigurer {
             GlobalUtils.resetLuceneIndex();
             msg = "MDWeb search index succefully deleted";
         } else {
-            
+            File cswConfigDir = getConfigurationDirectory();
             if (!asynchrone) {
-                File indexDir = new File(serviceDirectory.get("CSW"), "index");
 
-                if (indexDir.exists() && indexDir.isDirectory()) {
+                //we delete each index directory
+                for (File indexDir: cswConfigDir.listFiles(new indexDirectoryFilter())) {
                     for (File f: indexDir.listFiles()) {
                         f.delete();
                     }
-                    boolean succeed = indexDir.delete();
-
-                    if (!succeed) {
+                    if (!indexDir.delete()) {
                         throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
                     }
-                } else if (indexDir.exists() && !indexDir.isDirectory()){
-                    indexDir.delete();
                 }
-
                 //then we restart the services
                 Anchors.clear();
                 restart();
 
             } else {
-                File indexDir     = new File(serviceDirectory.get("CSW"), "nextIndex");
 
-                if (indexDir.exists() && indexDir.isDirectory()) {
-                    for (File f: indexDir.listFiles()) {
+                //we delete each pre-builded index directory
+                for (File indexDir: cswConfigDir.listFiles(new nextIndexDirectoryFilter())) {
+                    for (File f : indexDir.listFiles()) {
                         f.delete();
                     }
-                    boolean succeed = indexDir.delete();
-
-                    if (!succeed) {
+                    if (!indexDir.delete()) {
                         throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
                     }
-                } else if (indexDir.exists() && !indexDir.isDirectory()){
-                    indexDir.delete();
                 }
-                indexer.setFileDirectory(indexDir);
-                indexer.createIndex();
+
+                //then we create all the nextIndex directory and create the indexes
+                for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter())) {
+                    String id = getConfigID(configFile);
+                    File nexIndexDir    = new File(cswConfigDir, id + "nextIndex");
+                    nexIndexDir.mkdir();
+                    IndexLucene indexer = indexers.get(id);
+                    indexer.setFileDirectory(nexIndexDir);
+                    indexer.createIndex();
+                }
+                
             }
+            
             msg = "CSW index succefully recreated";
         }
         return new AcknowlegementType("success", msg);
@@ -223,4 +245,53 @@ public abstract class AbstractCSWConfigurer {
     public abstract AcknowlegementType updateVocabularies() throws WebServiceException;
 
     protected abstract File getConfigurationDirectory();
+
+    /**
+     * Return the ID of the CSW given by the configuration file Name.
+     */
+    private String getConfigID(File configFile) {
+        if (configFile == null || (configFile != null && !configFile.exists()))
+            return "";
+        String ID = configFile.getName();
+        if (ID.indexOf("config.xml") != -1) {
+            ID = ID.substring(0, ID.indexOf("config.xml"));
+            return ID;
+        }
+        return "";
+    }
+
+    /**
+     * An internal class to filter the configuration directory and return the configuration files.
+     */
+    private class ConfigurationFileFilter implements FilenameFilter {
+
+        public boolean accept(File dir, String name) {
+            return (name.endsWith("config.xml"));
+        }
+
+    }
+
+    /**
+     * An internal class to filter the configuration directory and return the index directory.
+     */
+    private class indexDirectoryFilter implements FilenameFilter {
+
+        public boolean accept(File dir, String name) {
+            File f = new File(dir, name);
+            return (name.endsWith("index") && f.isDirectory());
+        }
+
+    }
+
+    /**
+     * An internal class to filter the configuration directory and return the pre-builded index directory.
+     */
+    private class nextIndexDirectoryFilter implements FilenameFilter {
+
+        public boolean accept(File dir, String name) {
+            File f = new File(dir, name);
+            return (name.endsWith("nextIndex") && f.isDirectory());
+        }
+
+    }
 }

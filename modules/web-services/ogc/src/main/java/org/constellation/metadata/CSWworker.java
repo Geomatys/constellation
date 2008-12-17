@@ -248,17 +248,17 @@ public class CSWworker {
     private int profile;
     
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
-    
+
     /**
      * Build a new CSW worker
      * 
-     * @param marshaller A JAXB marshaller to send xml to MDWeb
+     * @param marshaller A JAXB marshaller to send xml to another CSW service.
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      * @throws java.io.IOException
      */
-    public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) {
-        
+    public CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller) {
+
         this.unmarshaller = unmarshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
         File configDir    = getConfigDirectory();
@@ -268,13 +268,13 @@ public class CSWworker {
              isStarted = false;
              return;
         }
-        logger.info("Path to config directory: " + configDir);
+        logger.finer("Path to config directory: " + configDir);
         isStarted = true;
         try {
             // we initialize the filterParsers
             JAXBContext jb     = JAXBContext.newInstance("org.constellation.generic.database");
             Unmarshaller configUnmarshaller = jb.createUnmarshaller();
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(configDir, serviceID + "config.xml");
             if (!configFile.exists()) {
                  logger.severe("The CSW service is not working!" + '\n' +
                         "cause: The configuration file has not been found");
@@ -302,11 +302,12 @@ public class CSWworker {
                         return;
                     }
                 }
-                
+
+                // we load the factory from the available classes
                 AbstractCSWFactory CSWfactory;
                 try {
                     CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
-                    logger.info("CSW factory loaded:" + CSWfactory.getClass().getName());
+                    logger.finer("CSW factory loaded:" + CSWfactory.getClass().getName());
                 } catch (FactoryNotFoundException ex) {
                     logger.severe("The CSW service is not working!" + '\n' +
                             "cause: Unable to find a CSW Factory");
@@ -317,9 +318,9 @@ public class CSWworker {
                 Connection MDConnection = db.getConnection();
                 
                 //we initialize all the data retriever (reader/writer) and index worker
-                MDReader = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller);
+                MDReader = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller, configDir);
                 profile  = CSWfactory.getProfile(config.getType());
-                index    = CSWfactory.getIndex(config.getType(), MDReader, MDConnection, configDir);
+                index    = CSWfactory.getIndex(config.getType(), MDReader, MDConnection, configDir, serviceID);
                 MDWriter = CSWfactory.getMetadataWriter(config.getType(), MDConnection, index, marshaller, configDir);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
@@ -360,6 +361,7 @@ public class CSWworker {
     public File getConfigDirectory() {
         File configDir = new File(WebService.getSicadeDirectory(), "csw_configuration/");
         if (configDir.exists()) {
+            logger.info("taking configuration from sicade directory");
             return configDir;
         } else {
 
@@ -372,6 +374,7 @@ public class CSWworker {
                 if (dirCatalina != null && dirCatalina.exists()) {
                     configDir = new File(dirCatalina, "webapps/sdn-csw/WEB-INF/csw_configuration");
                     if (configDir.exists()) {
+                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
                         return configDir;
                     } 
                 }
@@ -1200,8 +1203,8 @@ public class CSWworker {
             }
             
             List<SchemaComponentType> components = new ArrayList<SchemaComponentType>();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder constructor = factory.newDocumentBuilder();
+            DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder constructor = documentFactory.newDocumentBuilder();
 
             if (typeNames.contains(_Record_QNAME)) {
 

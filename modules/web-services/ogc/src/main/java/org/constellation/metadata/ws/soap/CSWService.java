@@ -128,7 +128,7 @@ public class CSWService {
                         ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
        
        unmarshaller = jbcontext.createUnmarshaller();
-       worker = new CSWworker(unmarshaller, jbcontext.createMarshaller());
+       worker = new CSWworker("", unmarshaller, jbcontext.createMarshaller());
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
        this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");

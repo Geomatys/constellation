@@ -89,8 +89,8 @@ public class MDWebIndex extends IndexLucene<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndex(Connection MDConnection, File configDirectory) throws WebServiceException {
-        super(configDirectory);
+    public MDWebIndex(Connection MDConnection, File configDirectory, String serviceID) throws WebServiceException {
+        super(serviceID, configDirectory);
         try {
             MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
             pathMap       = null;
@@ -128,7 +128,7 @@ public class MDWebIndex extends IndexLucene<Form> {
      * @param configDirectory A directory where the index can write indexation file. 
      */
     protected MDWebIndex(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
-        super(configDirectory);
+        super("", configDirectory);
         MDWebReader   = null;
 
         //we fill the map of classe

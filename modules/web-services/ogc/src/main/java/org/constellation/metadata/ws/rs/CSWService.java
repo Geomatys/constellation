@@ -20,7 +20,6 @@ package org.constellation.metadata.ws.rs;
 // java se dependencies
 import java.io.IOException;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -99,16 +98,34 @@ public class CSWService extends OGCWebService {
     /**
      * Build a new Restfull CSW service.
      */
-    public CSWService() throws IOException, SQLException {
+    public CSWService() {
         super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
         try {
             setXMLContext("", getAllClasses());
-            worker = new CSWworker(unmarshaller, marshaller);
+            worker = new CSWworker("", unmarshaller, marshaller);
             
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' + 
+                          " details: " + ex.toString());
+        }
+    }
+
+    /**
+     * Build a new Restfull CSW service.
+     * used by subClasses.
+     */
+    protected CSWService(String serviceID) {
+        super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
+        try {
+            setXMLContext("", getAllClasses());
+            worker = new CSWworker(serviceID, unmarshaller, marshaller);
+
+        } catch (JAXBException ex){
+            LOGGER.severe("The CSW service is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
         }
     }
@@ -120,36 +137,36 @@ public class CSWService extends OGCWebService {
      */
     private Class[] getAllClasses() {
         List<Class> classeList = new ArrayList<Class>();
-            //ISO 19115 class
-            classeList.add(MetaDataImpl.class);
-            
-            //ISO 19115 French profile class
-            classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
-            
-            //CSW 2.0.2 classes
-            classeList.addAll(Arrays.asList(Capabilities.class, 
-                                            DescribeRecordType.class,
-                                            DistributedSearchType.class,
-                                            ElementSetNameType.class,
-                                            ElementSetType.class,
-                                            GetCapabilities.class, 
-                                            GetDomainType.class, 
-                                            GetRecordByIdType.class,
-                                            GetRecordsType.class, 
-                                            HarvestType.class, 
-                                            QueryConstraintType.class,
-                                            QueryType.class, 
-                                            ResultType.class, 
-                                            TransactionType.class,
-                                            GetRecordsResponseType.class, 
-                                            GetRecordByIdResponseType.class,
-                                            DescribeRecordResponseType.class, 
-                                            GetDomainResponseType.class,
-                                            TransactionResponseType.class, 
-                                            HarvestResponseType.class,
-                                            ExceptionReport.class, 
-                                            org.constellation.ows.v110.ExceptionReport.class,  // TODO remove
-                                            org.constellation.dublincore.v2.terms.ObjectFactory.class));
+        //ISO 19115 class
+        classeList.add(MetaDataImpl.class);
+
+        //ISO 19115 French profile class
+        classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
+
+        //CSW 2.0.2 classes
+        classeList.addAll(Arrays.asList(Capabilities.class,
+                                        DescribeRecordType.class,
+                                        DistributedSearchType.class,
+                                        ElementSetNameType.class,
+                                        ElementSetType.class,
+                                        GetCapabilities.class,
+                                        GetDomainType.class,
+                                        GetRecordByIdType.class,
+                                        GetRecordsType.class,
+                                        HarvestType.class,
+                                        QueryConstraintType.class,
+                                        QueryType.class,
+                                        ResultType.class,
+                                        TransactionType.class,
+                                        GetRecordsResponseType.class,
+                                        GetRecordByIdResponseType.class,
+                                        DescribeRecordResponseType.class,
+                                        GetDomainResponseType.class,
+                                        TransactionResponseType.class,
+                                        HarvestResponseType.class,
+                                        ExceptionReport.class,
+                                        org.constellation.ows.v110.ExceptionReport.class,  // TODO remove
+                                        org.constellation.dublincore.v2.terms.ObjectFactory.class));
             
            //CSW 2.0.0 classes
            classeList.addAll(Arrays.asList(org.constellation.cat.csw.v200.CapabilitiesType.class, 
