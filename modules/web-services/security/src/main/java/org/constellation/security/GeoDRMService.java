@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.ws;
+package org.constellation.security;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.spi.resource.Singleton;
@@ -67,7 +67,8 @@ import org.constellation.xacml.policy.PolicyType;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
- *
+ * THIS CLASS IS NOT USED BUT ONLY HERE FOR REFERENCE.
+ * 
  * @author guilhem
  */
 @Path("pep")

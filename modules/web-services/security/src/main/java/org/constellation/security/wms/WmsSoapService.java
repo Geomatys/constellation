@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.security.ws.soap;
+package org.constellation.security.wms;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,29 +32,29 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.ws.WebServiceContext;
-import org.constellation.security.PEPWorker;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.wms.v130.WMSCapabilities;
 
 
 /**
- *
+ * THIS CLASS IS NOT USED BUT ONLY HERE FOR REFERENCE.
+ * 
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
  */
 @WebService(name = "PEP")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-public class PEPService {
+public class WmsSoapService {
     /**
      * The default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.security.ws.soap");
 
-    /**
-     * The PEP worker.
-     */
-    private final PEPWorker worker;
+//    /**
+//     * The PEP worker.
+//     */
+//    private final PEPWorker worker;
 
     @Resource
     private WebServiceContext context;
@@ -64,12 +64,12 @@ public class PEPService {
      *
      * @throws JAXBException if an error occurs at unmarshalling-time.
      */
-    public PEPService() throws JAXBException {
+    public WmsSoapService() throws JAXBException {
         final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
                 "org.constellation.wms.v111:org.constellation.wms.v130:" +
                 "org.geotools.internal.jaxb.v110.sld");
         final Unmarshaller unmarshaller = context.createUnmarshaller();
-        worker = new PEPWorker(unmarshaller);
+//        worker = new PEPWorker(unmarshaller);
     }
 
     /**
@@ -79,58 +79,58 @@ public class PEPService {
      */
     @WebMethod(action="getCapabilities")
     public @WebResult(name="abstractWMSCapabilities") AbstractWMSCapabilities getCapabilities() {
-        final Object capab;
-        InputStream streamCapab = null;
-        try {
-            streamCapab = worker.getCapabilities();
-            try {
-                capab = worker.unmarshaller.unmarshal(streamCapab);
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-                streamCapab.close();
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            return null;
-        } finally {
-            try {
-                streamCapab.close();
-            } catch (IOException ex) {
-                LOGGER.info("The stream is already closed.");
-            }
-        }
-        if (capab instanceof WMT_MS_Capabilities) {
-            // WMS version 1.1.1
-            LOGGER.info("WMS Capabilities in version 1.1.1");
-            final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) capab;
-            // TODO: insert an assertion in the getcapabilities, to specify that the
-            //       identification part is missing.
-        } else {
-            // WMS version 1.3.0
-            LOGGER.info("WMS Capabilities in version 1.3.0");
-            final WMSCapabilities cap = (WMSCapabilities) capab;
-            // TODO: insert an assertion in the getcapabilities, to specify that the
-            //       identification part is missing.
-        }
-        return (AbstractWMSCapabilities) capab;
+//        final Object capab;
+//        InputStream streamCapab = null;
+//        try {
+//            streamCapab = worker.getCapabilities();
+//            try {
+//                capab = worker.unmarshaller.unmarshal(streamCapab);
+//            } catch (JAXBException ex) {
+//                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+//                streamCapab.close();
+//                return null;
+//            }
+//        } catch (IOException ex) {
+//            LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+//            return null;
+//        } finally {
+//            try {
+//                streamCapab.close();
+//            } catch (IOException ex) {
+//                LOGGER.info("The stream is already closed.");
+//            }
+//        }
+//        if (capab instanceof WMT_MS_Capabilities) {
+//            // WMS version 1.1.1
+//            LOGGER.info("WMS Capabilities in version 1.1.1");
+//            final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) capab;
+//            // TODO: insert an assertion in the getcapabilities, to specify that the
+//            //       identification part is missing.
+//        } else {
+//            // WMS version 1.3.0
+//            LOGGER.info("WMS Capabilities in version 1.3.0");
+//            final WMSCapabilities cap = (WMSCapabilities) capab;
+//            // TODO: insert an assertion in the getcapabilities, to specify that the
+//            //       identification part is missing.
+//        }
+          return null;
     }
 
-    /**
-     * Log the body of an {@link InputStream}.
-     *
-     * @param input An {@link InputStream} containing
-     * @throws java.io.IOException
-     */
-    private void logInputStream(final InputStream input) throws IOException {
-        final InputStreamReader streamReader = new InputStreamReader(input);
-        final BufferedReader reader = new BufferedReader(streamReader);
-        final StringBuilder sw = new StringBuilder();
-        String line;
-        while ((line=reader.readLine()) != null) {
-            sw.append(line).append("\n");
-        }
-        reader.close();
-        LOGGER.info(sw.toString());
-    }
+//    /**
+//     * Log the body of an {@link InputStream}.
+//     *
+//     * @param input An {@link InputStream} containing
+//     * @throws java.io.IOException
+//     */
+//    private void logInputStream(final InputStream input) throws IOException {
+//        final InputStreamReader streamReader = new InputStreamReader(input);
+//        final BufferedReader reader = new BufferedReader(streamReader);
+//        final StringBuilder sw = new StringBuilder();
+//        String line;
+//        while ((line=reader.readLine()) != null) {
+//            sw.append(line).append("\n");
+//        }
+//        reader.close();
+//        LOGGER.info(sw.toString());
+//    }
 }
