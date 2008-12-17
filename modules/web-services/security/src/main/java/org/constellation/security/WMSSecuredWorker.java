@@ -77,7 +77,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * The default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.ws");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.security");
     
     /**
      * The url of the WMS web service, where the request will be sent.
@@ -124,17 +124,23 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller;
 
-        dispatcherWMS   = new WmsDispatcher(WMSbaseURL, WMSusesREST, marshaller, unmarshaller);
+        dispatcherWMS     = new WmsDispatcher(WMSbaseURL, WMSusesREST, marshaller, unmarshaller);
         //dispatcherXACML = new 
     }
 
     @Override
-    public DescribeLayerResponseType describeLayer(DescribeLayer descLayer) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer)
+            throws WebServiceException
+    {
+        performAccessControlDecision(descLayer);
+
+        return dispatcherWMS.describeLayer(descLayer);
     }
     
     @Override
-    public AbstractWMSCapabilities getCapabilities(GetCapabilities getCapabilities) throws WebServiceException {
+    public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
+            throws WebServiceException
+    {
     	AbstractWMSCapabilities response = dispatcherWMS.getCapabilities(getCapabilities);
         response = removeCapabilitiesInfo(response);
         response = addAccessConstraints(response);
@@ -143,12 +149,16 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     
     @Override
     public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        performAccessControlDecision(getFeatureInfo);
+
+        return dispatcherWMS.getFeatureInfo(getFeatureInfo);
     }
 
     @Override
     public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        performAccessControlDecision(getLegend);
+
+        return dispatcherWMS.getLegendGraphic(getLegend);
     }
 
     @Override
@@ -157,7 +167,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     	performAccessControlDecision(getMap);
     	
     	//Filter block
-    	if (false ){
+    	if (false){
     		
     		//TODO: get the source of the clip geometry, using the hard coordinates
 	    	
@@ -218,7 +228,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     
     /**
      * 
-     * @param getMap
+     * @param query
      */
     private void performAccessControlDecision(WMSQuery query){
     	;

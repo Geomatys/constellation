@@ -27,16 +27,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
-import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -98,7 +95,7 @@ public class WMSService extends OGCWebService {
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
      */
-    public WMSService() throws JAXBException, SQLException, IOException, NamingException {
+    public WMSService() throws JAXBException {
         super("WMS", new ServiceVersion(ServiceType.WMS, "1.3.0"), new ServiceVersion(ServiceType.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml

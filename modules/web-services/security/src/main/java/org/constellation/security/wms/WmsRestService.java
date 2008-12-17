@@ -17,9 +17,6 @@
 package org.constellation.security.wms;
 
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.IOException;
-import java.sql.SQLException;
-import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -64,25 +61,22 @@ public class WmsRestService extends WMSService {
 	/**
 	 * Information on the identity and credentials of the principal making a 
 	 * request of this service. The instance is injected by the JEE container.
-	 */
-	@Context
-	private SecurityContext secCntxt;
-	
-	/**
-	 * Constructor building the security worker to perform the logic of this 
-	 * gateway.
-	 * 
-	 * TODO: review the usage of the exceptions and then fill out the text below.
-	 * @throws JAXBException
-	 * @throws SQLException
-	 * @throws IOException
-	 * @throws NamingException
-	 */
-     public WmsRestService() throws JAXBException, SQLException, IOException, NamingException {
-            worker = new WmsSecuredWorker(marshaller,unmarshaller);
-            LOGGER.info("WMS secured service running");
+     */
+    @Context
+    private SecurityContext secCntxt;
+
+    /**
+     * Constructor building the security worker to perform the logic of this
+     * gateway.
+     *
+     * TODO: review the usage of the exceptions and then fill out the text below.
+     * @throws JAXBException
+     */
+    public WmsRestService() throws JAXBException {
+        worker = new WmsSecuredWorker(marshaller, unmarshaller);
+        LOGGER.info("WMS secured service running");
     }
-    
+
     /**
      * Calls the same method in the parent class after initializing the security 
      * context in the worker.

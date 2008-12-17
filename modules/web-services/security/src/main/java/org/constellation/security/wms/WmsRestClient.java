@@ -17,8 +17,11 @@
 package org.constellation.security.wms;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -28,7 +31,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.constellation.query.Query;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -38,6 +40,8 @@ import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.WebServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
+
+import static org.constellation.query.wms.WMSQuery.*;
 
 
 /**
@@ -83,14 +87,48 @@ public class WmsRestClient implements WmsClient {
     
     
 	@Override
-	public DescribeLayerResponseType describeLayer(DescribeLayer descLayer)
-			throws WebServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws WebServiceException {
+		final URLConnection connec;
+        try {
+            final URL connectionURL = new URL(baseURL +"?"+ descLayer.toKvp());
+            connec = connectionURL.openConnection();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        connec.setDoOutput(true);
+        connec.setRequestProperty("Content-Type", TEXT_XML);
+
+        //Extract the describeLayer result.
+        final InputStream in;
+        try {
+            in = connec.getInputStream();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        //Unmarshall response
+        Object response;
+        try {
+            response = unmarshaller.unmarshal(in);
+        } catch (JAXBException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        try {
+            in.close();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        if (!(response instanceof DescribeLayerResponseType)) {
+            throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
+                    " instance of DescribeLayerResponseType", ExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        return (DescribeLayerResponseType) response;
 	}
 
 	@Override
-	public AbstractWMSCapabilities getCapabilities(GetCapabilities getCapabilities) throws WebServiceException {//Connect to URL and get result
+	public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities) throws WebServiceException {//Connect to URL and get result
         
 		final URLConnection connec;
         try {
@@ -100,7 +138,7 @@ public class WmsRestClient implements WmsClient {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         connec.setDoOutput(true);
-        connec.setRequestProperty("Content-Type", Query.TEXT_XML);
+        connec.setRequestProperty("Content-Type", TEXT_XML);
 
         //Extract the GetCapabilities XML result.
         final InputStream in;
@@ -117,6 +155,11 @@ public class WmsRestClient implements WmsClient {
         } catch (JAXBException ex) {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
+        try {
+            in.close();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
         if (!(response instanceof AbstractWMSCapabilities)) {
             throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
                     " instance of AbstractWMSCapabilities", ExceptionCode.NO_APPLICABLE_CODE);
@@ -126,21 +169,64 @@ public class WmsRestClient implements WmsClient {
 	}
 
 	@Override
-	public String getFeatureInfo(GetFeatureInfo getFeatureInfo)
-			throws WebServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public String getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws WebServiceException {
+		final URLConnection connec;
+        try {
+            final URL connectionURL = new URL(baseURL +"?"+ getFeatureInfo.toKvp());
+            connec = connectionURL.openConnection();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        connec.setDoOutput(true);
+        String infoFormat = getFeatureInfo.getInfoFormat();
+        if (infoFormat.equals(GML)) {
+            infoFormat = APP_XML;
+        }
+        connec.setRequestProperty("Content-Type", infoFormat);
+
+        //Extract the GetFeatureInfo XML result.
+        final InputStream in;
+        try {
+            in = connec.getInputStream();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        final BufferedReader buff = new BufferedReader(new InputStreamReader(in));
+        final StringWriter writer = new StringWriter();
+        final String result;
+        String line = null;
+        try {
+            while ((line = buff.readLine()) != null) {
+                writer.append(line).append("\n");
+            }
+            buff.close();
+            result = writer.toString();
+            writer.close();
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+        return result;
 	}
 
 	@Override
-	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend)
-			throws WebServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
+        final URL connectionURL;
+
+        try {
+            connectionURL = new URL(baseURL + "?" + getLegend.toKvp());
+        } catch (MalformedURLException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        try {
+            return ImageIO.read(connectionURL);
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+        }
 	}
 
     @Override
-    public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+    public BufferedImage getMap(final GetMap getMap) throws WebServiceException {
         final URL connectionURL;
 
         try {
