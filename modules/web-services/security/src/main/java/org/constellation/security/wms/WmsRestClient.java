@@ -19,11 +19,11 @@ package org.constellation.security.wms;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -141,29 +141,16 @@ public class WmsRestClient implements WmsClient {
 
     @Override
     public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+        final URL connectionURL;
 
-        //Connect to URL and get result
-        final URLConnection connec;
         try {
-            LOGGER.info(baseURL + "?" + getMap.toKvp());
-            final URL connectionURL = new URL(baseURL + "?" + getMap.toKvp());
-            connec = connectionURL.openConnection();
-        } catch (IOException ex) {
+            connectionURL = new URL(baseURL + "?" + getMap.toKvp());
+        } catch (MalformedURLException ex) {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
-        connec.setDoOutput(true);
-        connec.setRequestProperty("Content-Type", getMap.getFormat());
 
-        final InputStream in;
         try {
-            in = connec.getInputStream();
-        } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
-        }
-        final ImageReader reader = ImageIO.getImageReadersByFormatName(getMap.getFormat()).next();
-        reader.setInput(in);
-        try {
-            return reader.read(0);
+            return ImageIO.read(connectionURL);
         } catch (IOException ex) {
             throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }

@@ -72,7 +72,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Adrian Custer (Geomatys)
  * @since 0.3
  */
-public final class WMSSecuredWorker extends AbstractWMSWorker {
+public final class WmsSecuredWorker extends AbstractWMSWorker {
 	
     /**
      * The default logger.
@@ -120,7 +120,7 @@ public final class WMSSecuredWorker extends AbstractWMSWorker {
      * @param unmarshaller
      * @throws IOException if an error occurs at the URL creation.
      */
-    public WMSSecuredWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
+    public WmsSecuredWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller;
 

@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.JAXBException;
 import org.constellation.map.ws.rs.WMSService;
-import org.constellation.security.WMSSecuredWorker;
+import org.constellation.security.WmsSecuredWorker;
 
 
 /**
@@ -79,7 +79,7 @@ public class WmsRestService extends WMSService {
 	 * @throws NamingException
 	 */
      public WmsRestService() throws JAXBException, SQLException, IOException, NamingException {
-            worker = new WMSSecuredWorker(marshaller,unmarshaller);
+            worker = new WmsSecuredWorker(marshaller,unmarshaller);
             LOGGER.info("WMS secured service running");
     }
     
