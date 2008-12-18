@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -113,13 +114,30 @@ public class DataComponentPropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public DataComponentPropertyType() {
+
+    }
+
+    public DataComponentPropertyType(String name, String role, TimeRange timeRange) {
+        this.name      = name;
+        this.role      = role;
+        this.timeRange = timeRange;
+    }
+
+    public DataComponentPropertyType(String name, String role, QuantityType quantity) {
+        this.name      = name;
+        this.role      = role;
+        this.quantity  = quantity;
+    }
+
+    public DataComponentPropertyType(String name, String role, QuantityRange quantityRange) {
+        this.name      = name;
+        this.role      = role;
+        this.quantityRange = quantityRange;
+    }
+
     /**
      * Gets the value of the count property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Count }
-     *     
      */
     public Count getCount() {
         return count;
@@ -127,11 +145,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the count property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Count }
-     *     
      */
     public void setCount(Count value) {
         this.count = value;
@@ -139,11 +152,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the quantity property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Quantity }
-     *     
      */
     public QuantityType getQuantity() {
         return quantity;
@@ -151,11 +159,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the quantity property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Quantity }
-     *     
      */
     public void setQuantity(QuantityType value) {
         this.quantity = value;
@@ -163,11 +166,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the time property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Time }
-     *     
      */
     public TimeType getTime() {
         return time;
@@ -175,11 +173,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the time property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Time }
-     *     
      */
     public void setTime(TimeType value) {
         this.time = value;
@@ -187,11 +180,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the boolean property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public BooleanType getBoolean() {
         return _boolean;
@@ -199,11 +187,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the boolean property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
      */
     public void setBoolean(BooleanType value) {
         this._boolean = value;
@@ -211,11 +194,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the category property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Category }
-     *     
      */
     public Category getCategory() {
         return category;
@@ -223,11 +201,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the category property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Category }
-     *     
      */
     public void setCategory(Category value) {
         this.category = value;
@@ -235,11 +208,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the text property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Text }
-     *     
      */
     public Text getText() {
         return text;
@@ -247,11 +215,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the text property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Text }
-     *     
      */
     public void setText(Text value) {
         this.text = value;
@@ -259,11 +222,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the quantityRange property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QuantityRange }
-     *     
      */
     public QuantityRange getQuantityRange() {
         return quantityRange;
@@ -271,11 +229,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the quantityRange property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QuantityRange }
-     *     
      */
     public void setQuantityRange(QuantityRange value) {
         this.quantityRange = value;
@@ -283,11 +236,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the countRange property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CountRange }
-     *     
      */
     public CountRange getCountRange() {
         return countRange;
@@ -295,11 +243,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the countRange property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CountRange }
-     *     
      */
     public void setCountRange(CountRange value) {
         this.countRange = value;
@@ -307,11 +250,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the timeRange property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TimeRange }
-     *     
      */
     public TimeRange getTimeRange() {
         return timeRange;
@@ -319,11 +257,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the timeRange property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TimeRange }
-     *     
      */
     public void setTimeRange(TimeRange value) {
         this.timeRange = value;
@@ -403,11 +336,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getName() {
         return name;
@@ -415,11 +343,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setName(String value) {
         this.name = value;
@@ -427,11 +350,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the remoteSchema property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRemoteSchema() {
         return remoteSchema;
@@ -439,11 +357,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the remoteSchema property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRemoteSchema(String value) {
         this.remoteSchema = value;
@@ -451,11 +364,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getType() {
         if (type == null) {
@@ -467,11 +375,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setType(String value) {
         this.type = value;
@@ -479,11 +382,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the href property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHref() {
         return href;
@@ -491,11 +389,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the href property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setHref(String value) {
         this.href = value;
@@ -503,11 +396,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the role property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRole() {
         return role;
@@ -515,11 +403,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the role property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRole(String value) {
         this.role = value;
@@ -527,11 +410,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the arcrole property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getArcrole() {
         return arcrole;
@@ -539,11 +417,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the arcrole property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setArcrole(String value) {
         this.arcrole = value;
@@ -551,11 +424,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTitle() {
         return title;
@@ -563,11 +431,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setTitle(String value) {
         this.title = value;
@@ -575,11 +438,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the show property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getShow() {
         return show;
@@ -587,11 +445,6 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the show property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setShow(String value) {
         this.show = value;
@@ -599,11 +452,6 @@ public class DataComponentPropertyType {
 
     /**
      * Gets the value of the actuate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getActuate() {
         return actuate;
@@ -611,14 +459,83 @@ public class DataComponentPropertyType {
 
     /**
      * Sets the value of the actuate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setActuate(String value) {
         this.actuate = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof DataComponentPropertyType) {
+            final DataComponentPropertyType that = (DataComponentPropertyType) object;
+            boolean absDataRec = false;
+            if (this.abstractDataRecord != null && that.abstractDataRecord != null) {
+                absDataRec = Utilities.equals(this.abstractDataRecord.getValue(), that.abstractDataRecord.getValue());
+            } else if (this.abstractDataRecord == null && that.abstractDataRecord == null) {
+                absDataRec = true;
+            }
+            boolean absDataArr = false;
+            if (this.abstractDataArray != null && that.abstractDataArray != null) {
+                absDataArr = Utilities.equals(this.abstractDataArray.getValue(), that.abstractDataArray.getValue());
+            } else if (this.abstractDataArray == null && that.abstractDataArray == null) {
+                absDataArr = true;
+            }
+            return Utilities.equals(this.actuate,      that.actuate)       &&
+                   Utilities.equals(this.arcrole,      that.arcrole)       &&
+                   Utilities.equals(this.href,         that.href)          &&
+                   absDataRec                                              &&
+                   absDataArr                                              &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                   Utilities.equals(this.role,         that.role)          &&
+                   Utilities.equals(this.show,         that.show)          &&
+                   Utilities.equals(this.title,        that.title)         &&
+                   Utilities.equals(this._boolean,     that._boolean)      &&
+                   Utilities.equals(this.category,     that.category)      &&
+                   Utilities.equals(this.count,        that.count)         &&
+                   Utilities.equals(this.countRange,   that.countRange)    &&
+                   Utilities.equals(this.name,         that.name)          &&
+                   Utilities.equals(this.quantity,     that.quantity)      &&
+                   Utilities.equals(this.quantityRange,that.quantityRange) &&
+                   Utilities.equals(this.time,         that.time)          &&
+                   Utilities.equals(this.timeRange,    that.timeRange)     &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 17 * hash + (this.count != null ? this.count.hashCode() : 0);
+        hash = 17 * hash + (this.quantity != null ? this.quantity.hashCode() : 0);
+        hash = 17 * hash + (this.time != null ? this.time.hashCode() : 0);
+        hash = 17 * hash + (this._boolean != null ? this._boolean.hashCode() : 0);
+        hash = 17 * hash + (this.category != null ? this.category.hashCode() : 0);
+        hash = 17 * hash + (this.text != null ? this.text.hashCode() : 0);
+        hash = 17 * hash + (this.quantityRange != null ? this.quantityRange.hashCode() : 0);
+        hash = 17 * hash + (this.countRange != null ? this.countRange.hashCode() : 0);
+        hash = 17 * hash + (this.timeRange != null ? this.timeRange.hashCode() : 0);
+        hash = 17 * hash + (this.abstractDataRecord != null ? this.abstractDataRecord.hashCode() : 0);
+        hash = 17 * hash + (this.abstractDataArray != null ? this.abstractDataArray.hashCode() : 0);
+        hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 17 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 17 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 17 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 17 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 17 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 17 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 17 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 17 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        return hash;
+    }
+
+
 }
+

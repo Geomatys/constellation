@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.UnitDefinitionType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -80,6 +81,15 @@ public class UomPropertyType {
     private String show;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
+
+    public UomPropertyType() {
+
+    }
+
+    public UomPropertyType(String code, String href) {
+        this.code = code;
+        this.href = href;
+    }
 
     /**
      * Defines a unit inline
@@ -329,6 +339,52 @@ public class UomPropertyType {
      */
     public void setActuate(String value) {
         this.actuate = value;
+    }
+
+     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof UomPropertyType) {
+            final UomPropertyType that = (UomPropertyType) object;
+            boolean unitDef = false;
+            if (this.unitDefinition != null && that.unitDefinition != null) {
+                unitDef = Utilities.equals(this.unitDefinition.getValue(), that.unitDefinition.getValue());
+            } else if (this.unitDefinition == null && that.unitDefinition == null) {
+                unitDef = true;
+            }
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   unitDef                                                &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 13 * hash + (this.unitDefinition != null ? this.unitDefinition.hashCode() : 0);
+        hash = 13 * hash + (this.code != null ? this.code.hashCode() : 0);
+        hash = 13 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 13 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 13 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 13 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 13 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 13 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 13 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 13 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        return hash;
     }
 
 }

@@ -103,6 +103,14 @@ public class Identification {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Identification () {
+
+    }
+
+    public Identification (IdentifierList identifierList) {
+        this.identifierList = identifierList;
+    }
+
     /**
      * Gets the value of the identifierList property.
      * 
@@ -323,6 +331,40 @@ public class Identification {
         this.actuate = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Identification]").append("\n");
+        if (identifierList != null) {
+            sb.append("identifierList: ").append(identifierList).append('\n');
+        }
+
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -369,27 +411,17 @@ public class Identification {
         @XmlSchemaType(name = "ID")
         private String id;
 
+        public IdentifierList() {
+
+        }
+
+        public IdentifierList(String id, List<Identifier> identifiers) {
+            this.id         = id;
+            this.identifier = identifiers;
+        }
+        
         /**
          * Gets the value of the identifier property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the identifier property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getIdentifier().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Identification.IdentifierList.Identifier }
-         * 
-         * 
          */
         public List<Identification.IdentifierList.Identifier> getIdentifier() {
             if (identifier == null) {
@@ -422,6 +454,19 @@ public class Identification {
             this.id = value;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[IdentifierList]").append("\n");
+            if (identifier != null) {
+                for (Identification.IdentifierList.Identifier k: identifier) {
+                    sb.append("identifier:").append(k).append('\n');
+                }
+            }
+            if (id != null) {
+                sb.append("id: ").append(id).append('\n');
+            }
+            return sb.toString();
+        }
 
         /**
          * <p>Java class for anonymous complex type.
@@ -455,6 +500,15 @@ public class Identification {
             @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
             @XmlSchemaType(name = "token")
             private String name;
+
+            public Identifier() {
+
+            }
+
+            public Identifier(String name, Term term) {
+                this.name = name;
+                this.term = term;
+            }
 
             /**
              * Gets the value of the term property.
@@ -502,6 +556,18 @@ public class Identification {
              */
             public void setName(String value) {
                 this.name = value;
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder("[Identifier]").append("\n");
+                if (term != null) {
+                    sb.append("term:").append(term).append('\n');
+                }
+                if (name != null) {
+                    sb.append("name: ").append(name).append('\n');
+                }
+                return sb.toString();
             }
 
         }

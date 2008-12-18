@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -58,6 +59,18 @@ public class ValidTime {
     private TimeInstantType timeInstant;
     @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml")
     private TimePeriodType timePeriod;
+
+    public ValidTime() {
+
+    }
+
+    public ValidTime(TimeInstantType timeInstant) {
+        this.timeInstant = timeInstant;
+    }
+
+    public ValidTime(TimePeriodType timePeriod) {
+        this.timePeriod = timePeriod;
+    }
 
     /**
      * Gets the value of the timeInstant property.
@@ -97,6 +110,32 @@ public class ValidTime {
             sb.append("timePeriod: ").append(timePeriod).append('\n');
         }
         return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ValidTime) {
+            final ValidTime that = (ValidTime) object;
+
+            return Utilities.equals(this.timeInstant, that.timeInstant) &&
+                   Utilities.equals(this.timePeriod,  that.timePeriod);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.timeInstant != null ? this.timeInstant.hashCode() : 0);
+        hash = 97 * hash + (this.timePeriod != null ? this.timePeriod.hashCode() : 0);
+        return hash;
     }
 
 }

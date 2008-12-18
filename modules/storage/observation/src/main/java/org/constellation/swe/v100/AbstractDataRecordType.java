@@ -51,5 +51,11 @@ import javax.xml.bind.annotation.XmlType;
 })
 public abstract class AbstractDataRecordType extends AbstractDataComponentType {
 
+    public AbstractDataRecordType() {
 
+    }
+
+    public AbstractDataRecordType(String definition) {
+        super(definition);
+    }
 }

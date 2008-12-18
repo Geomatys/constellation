@@ -71,6 +71,14 @@ public abstract class AbstractDataComponentType extends AbstractGMLEntry {
     @XmlSchemaType(name = "anyURI")
     private String definition;
 
+    public AbstractDataComponentType() {
+
+    }
+
+    public AbstractDataComponentType(String definition) {
+        this.definition = definition;
+    }
+
     /**
      * Gets the value of the fixed property.
      */

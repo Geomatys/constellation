@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -283,6 +284,47 @@ public class Keywords {
         return sb.toString();
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Keywords) {
+            final Keywords that = (Keywords) object;
+            return Utilities.equals(this.actuate,      that.actuate)      &&
+                   Utilities.equals(this.arcrole,      that.arcrole)      &&
+                   Utilities.equals(this.href,         that.href)         &&
+                   Utilities.equals(this.keywordList,  that.keywordList)  &&
+                   Utilities.equals(this.nilReason,    that.nilReason)    &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role,         that.role)         &&
+                   Utilities.equals(this.show,         that.show)         &&
+                   Utilities.equals(this.title,        that.title)        &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + (this.keywordList != null ? this.keywordList.hashCode() : 0);
+        hash = 61 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 61 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 61 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 61 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 61 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 61 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 61 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 61 * hash + (this.title != null ? this.title.hashCode() : 0);
+        return hash;
+    }
+
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -383,6 +425,45 @@ public class Keywords {
             }
             return sb.toString();
         }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof KeywordList) {
+            final KeywordList that = (KeywordList) object;
+            boolean kw = false;
+            if (this.getKeyword().size() == that.getKeyword().size()) {
+                kw = true;
+                for (int i = 0; i < this.getKeyword().size(); i++) {
+                    JAXBElement<String> jb1 = this.getKeyword().get(i);
+                    JAXBElement<String> jb2 = that.getKeyword().get(i);
+                    if (!Utilities.equals(jb1.getValue(), jb2.getValue())) {
+                        kw = false;
+                    }
+                }
+            }
+            return Utilities.equals(this.codeSpace, that.codeSpace) &&
+                   Utilities.equals(this.id,        that.id)        &&
+                   kw;
+        }
+        return false;
+    }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 43 * hash + (this.keyword != null ? this.keyword.hashCode() : 0);
+            hash = 43 * hash + (this.codeSpace != null ? this.codeSpace.hashCode() : 0);
+            hash = 43 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
+        }
+
 
     }
 

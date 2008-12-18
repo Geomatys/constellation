@@ -42,7 +42,7 @@ import org.constellation.swe.v101.TimeType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice minOccurs="0">
  *         &lt;element ref="{http://www.opengis.net/swe/1.0.1}Time"/>
- *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
+ *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}AbstractProcess"/>
  *       &lt;/choice>
  *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
@@ -63,7 +63,7 @@ public class TimePosition {
 
     @XmlElement(name = "Time", namespace = "http://www.opengis.net/swe/1.0.1")
     private TimeType time;
-    @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

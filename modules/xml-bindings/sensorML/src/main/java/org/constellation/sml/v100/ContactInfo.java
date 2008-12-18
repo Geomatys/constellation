@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -184,6 +185,37 @@ public class ContactInfo {
     }
 
     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ContactInfo && super.equals(object)) {
+            final ContactInfo that = (ContactInfo) object;
+            return Utilities.equals(this.address,             that.address)             &&
+                   Utilities.equals(this.contactInstructions, that.contactInstructions) &&
+                   Utilities.equals(this.hoursOfService,      that.hoursOfService)      &&
+                   Utilities.equals(this.onlineResource,      that.onlineResource)      &&
+                   Utilities.equals(this.phone,               that.phone);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.phone != null ? this.phone.hashCode() : 0);
+        hash = 23 * hash + (this.address != null ? this.address.hashCode() : 0);
+        hash = 23 * hash + (this.onlineResource != null ? this.onlineResource.hashCode() : 0);
+        hash = 23 * hash + (this.hoursOfService != null ? this.hoursOfService.hashCode() : 0);
+        hash = 23 * hash + (this.contactInstructions != null ? this.contactInstructions.hashCode() : 0);
+        return hash;
+    }
+
+    /**
      * <p>Java class for anonymous complex type.
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
@@ -333,6 +365,39 @@ public class ContactInfo {
             }
             return sb.toString();
         }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof Address && super.equals(object)) {
+                final Address that = (Address) object;
+                return Utilities.equals(this.administrativeArea,  that.administrativeArea) &&
+                       Utilities.equals(this.city,                that.city)               &&
+                       Utilities.equals(this.country,             that.country)            &&
+                       Utilities.equals(this.deliveryPoint,       that.deliveryPoint)      &&
+                       Utilities.equals(this.postalCode,          that.postalCode)         &&
+                       Utilities.equals(this.electronicMailAddress, that.electronicMailAddress);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 83 * hash + (this.deliveryPoint != null ? this.deliveryPoint.hashCode() : 0);
+            hash = 83 * hash + (this.city != null ? this.city.hashCode() : 0);
+            hash = 83 * hash + (this.administrativeArea != null ? this.administrativeArea.hashCode() : 0);
+            hash = 83 * hash + (this.postalCode != null ? this.postalCode.hashCode() : 0);
+            hash = 83 * hash + (this.country != null ? this.country.hashCode() : 0);
+            hash = 83 * hash + (this.electronicMailAddress != null ? this.electronicMailAddress.hashCode() : 0);
+            return hash;
+        }
     }
 
 
@@ -403,6 +468,22 @@ public class ContactInfo {
             return sb.toString();
         }
 
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof Phone && super.equals(object)) {
+                final Phone that = (Phone) object;
+                return Utilities.equals(this.facsimile,  that.facsimile) &&
+                       Utilities.equals(this.voice,      that.voice);
+            }
+            return false;
+        }
     }
 
 }

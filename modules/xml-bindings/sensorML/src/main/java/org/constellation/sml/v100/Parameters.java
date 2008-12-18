@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.swe.v100.DataComponentPropertyType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -89,6 +90,14 @@ public class Parameters {
     private String title;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
+
+    public Parameters() {
+
+    }
+
+    public Parameters(ParameterList parameterList) {
+        this.parameterList = parameterList;
+    }
 
     /**
      * Gets the value of the parameterList property.
@@ -230,6 +239,48 @@ public class Parameters {
         this.type = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Parameters) {
+            final Parameters that = (Parameters) object;
+
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   Utilities.equals(this.parameterList, that.parameterList)       &&
+                   Utilities.equals(this.nilReason, that.nilReason)       &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.parameterList != null ? this.parameterList.hashCode() : 0);
+        hash = 97 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 97 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 97 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 97 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 97 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 97 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -264,6 +315,14 @@ public class Parameters {
         @XmlID
         private String id;
 
+        public ParameterList() {
+
+        }
+
+        public ParameterList(List<DataComponentPropertyType> parameter) {
+            this.parameter = parameter;
+        }
+        
         /**
          * Gets the value of the parameter property.
          */
@@ -287,6 +346,33 @@ public class Parameters {
         public void setId(String value) {
             this.id = value;
         }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof ParameterList) {
+                final ParameterList that = (ParameterList) object;
+
+                return Utilities.equals(this.parameter, that.parameter) &&
+                       Utilities.equals(this.id, that.id);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 29 * hash + (this.parameter != null ? this.parameter.hashCode() : 0);
+            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
+        }
+
 
     }
 

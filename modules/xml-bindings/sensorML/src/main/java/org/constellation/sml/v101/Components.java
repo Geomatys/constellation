@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence minOccurs="0">
- *                             &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
+ *                             &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}AbstractProcess"/>
  *                           &lt;/sequence>
  *                           &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *                           &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
@@ -340,7 +340,7 @@ public class Components {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence minOccurs="0">
-     *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
+     *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}AbstractProcess"/>
      *                 &lt;/sequence>
      *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
      *                 &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
@@ -405,7 +405,7 @@ public class Components {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence minOccurs="0">
-         *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
+         *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}AbstractProcess"/>
          *       &lt;/sequence>
          *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
          *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
@@ -422,7 +422,7 @@ public class Components {
         })
         public static class Component {
 
-            @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
+            @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
             private JAXBElement<? extends AbstractProcessType> process;
             @XmlAttribute(required = true)
             @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

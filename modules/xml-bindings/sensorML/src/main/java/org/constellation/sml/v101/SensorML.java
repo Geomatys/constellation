@@ -254,6 +254,81 @@ public class SensorML {
         this.version = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[SensorML]").append("\n");
+        if (keywords != null) {
+            sb.append("Keywords:").append('\n');
+            for (Keywords k : keywords) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (identification != null) {
+            sb.append("Identification:").append('\n');
+            for (Identification k : identification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (classification != null) {
+            sb.append("Identification:").append('\n');
+            for (Classification k : classification) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (validTime != null) {
+            sb.append("validTime:").append(validTime).append('\n');
+        }
+        if (securityConstraint != null) {
+            sb.append("securityConstraint:").append(securityConstraint).append('\n');
+        }
+        if (legalConstraint != null) {
+            sb.append("legalConstraint:").append('\n');
+            for (LegalConstraint k : legalConstraint) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (characteristics != null) {
+            sb.append("characteristics:").append('\n');
+            for (Characteristics k : characteristics) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (capabilities != null) {
+            sb.append("capabilities:").append('\n');
+            for (Capabilities k : capabilities) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (contact != null) {
+            sb.append("contact:").append('\n');
+            for (Contact k : contact) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (documentation != null) {
+            sb.append("documentation:").append('\n');
+            for (Documentation k : documentation) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (history != null) {
+            sb.append("history:").append('\n');
+            for (History k : history) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (member != null) {
+            sb.append("member:").append('\n');
+            for (SensorML.Member k : member) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (version != null) {
+            sb.append("version:").append(version).append('\n');
+        }
+        return sb.toString();
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -285,7 +360,7 @@ public class SensorML {
     })
     public static class Member {
 
-        @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
+        @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
         private JAXBElement<? extends AbstractProcessType> process;
         @XmlElement(name = "DocumentList")
         private DocumentList documentList;
@@ -592,6 +667,33 @@ public class SensorML {
             this.actuate = value;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[SensorML Member]").append("\n");
+            if (process != null)
+                sb.append("process: ").append(process.getValue()).append('\n');
+            if (documentList != null)
+                sb.append("documentList: ").append(documentList).append('\n');
+            if (contactList != null)
+                sb.append("contactList: ").append(contactList).append('\n');
+            if (remoteSchema != null)
+                sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+            if (actuate != null)
+                sb.append("actuate: ").append(actuate).append('\n');
+            if (arcrole != null)
+                sb.append("actuate: ").append(arcrole).append('\n');
+            if (href != null)
+                sb.append("href: ").append(href).append('\n');
+            if (role != null)
+                sb.append("role: ").append(role).append('\n');
+            if (show != null)
+                sb.append("show: ").append(show).append('\n');
+            if (title != null)
+                sb.append("title: ").append(title).append('\n');
+            if (type != null)
+                sb.append("type: ").append(type).append('\n');
+            return sb.toString();
+        }
     }
 
 }

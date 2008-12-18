@@ -44,5 +44,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "ObservableProperty")
 public class ObservableProperty extends AbstractDataComponentType {
 
+    public ObservableProperty() {
+
+    }
+
+    public ObservableProperty(String definition) {
+        super(definition);
+    }
 
 }

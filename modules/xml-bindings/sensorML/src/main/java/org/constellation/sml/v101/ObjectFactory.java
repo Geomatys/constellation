@@ -39,7 +39,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Process_QNAME = new QName("http://www.opengis.net/sensorML/1.0.1", "_Process");
+    private final static QName _Process_QNAME = new QName("http://www.opengis.net/sensorML/1.0.1", "AbstractProcess");
     private final static QName _RuleLanguage_QNAME = new QName("http://www.opengis.net/sensorML/1.0.1", "ruleLanguage");
     private final static QName _ProcessMethod_QNAME = new QName("http://www.opengis.net/sensorML/1.0.1", "ProcessMethod");
     private final static QName _ComponentArray_QNAME = new QName("http://www.opengis.net/sensorML/1.0.1", "ComponentArray");
@@ -855,7 +855,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractProcessType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "AbstractProcess")
     public JAXBElement<AbstractProcessType> createProcess(AbstractProcessType value) {
         return new JAXBElement<AbstractProcessType>(_Process_QNAME, AbstractProcessType.class, null, value);
     }
@@ -882,7 +882,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ComponentArrayType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ComponentArray", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ComponentArray", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ComponentArrayType> createComponentArray(ComponentArrayType value) {
         return new JAXBElement<ComponentArrayType>(_ComponentArray_QNAME, ComponentArrayType.class, null, value);
     }
@@ -891,7 +891,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessChainType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ProcessChain", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ProcessChain", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ProcessChainType> createProcessChain(ProcessChainType value) {
         return new JAXBElement<ProcessChainType>(_ProcessChain_QNAME, ProcessChainType.class, null, value);
     }
@@ -909,7 +909,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessModelType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ProcessModel", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "ProcessModel", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ProcessModelType> createProcessModel(ProcessModelType value) {
         return new JAXBElement<ProcessModelType>(_ProcessModel_QNAME, ProcessModelType.class, null, value);
     }
@@ -927,7 +927,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SystemType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "System", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "System", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<SystemType> createSystem(SystemType value) {
         return new JAXBElement<SystemType>(_System_QNAME, SystemType.class, null, value);
     }
@@ -936,7 +936,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DataSourceType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "DataSource", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "DataSource", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<DataSourceType> createDataSource(DataSourceType value) {
         return new JAXBElement<DataSourceType>(_DataSource_QNAME, DataSourceType.class, null, value);
     }
@@ -945,7 +945,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ComponentType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "Component", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "_Process")
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0.1", name = "Component", substitutionHeadNamespace = "http://www.opengis.net/sensorML/1.0.1", substitutionHeadName = "AbstractProcess")
     public JAXBElement<ComponentType> createComponent(ComponentType value) {
         return new JAXBElement<ComponentType>(_Component_QNAME, ComponentType.class, null, value);
     }

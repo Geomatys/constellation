@@ -43,7 +43,7 @@ import org.constellation.swe.v101.VectorType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice minOccurs="0">
- *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}_Process"/>
+ *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}AbstractProcess"/>
  *         &lt;element ref="{http://www.opengis.net/swe/1.0.1}Position"/>
  *         &lt;element ref="{http://www.opengis.net/swe/1.0.1}Vector"/>
  *       &lt;/choice>
@@ -65,7 +65,7 @@ import org.constellation.swe.v101.VectorType;
 @XmlRootElement(name = "position")
 public class Position {
 
-    @XmlElementRef(name = "_Process", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;
     @XmlElement(name = "Position", namespace = "http://www.opengis.net/swe/1.0.1")
     private PositionType position;

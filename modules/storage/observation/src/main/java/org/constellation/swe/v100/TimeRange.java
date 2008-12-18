@@ -76,13 +76,16 @@ public class TimeRange extends AbstractDataComponentType {
     @XmlSchemaType(name = "anyURI")
     private String localFrame;
 
+    public TimeRange() {
+
+    }
+
+    public TimeRange(List<String> value) {
+        this.value = value;
+    }
+
     /**
      * Gets the value of the uom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UomPropertyType }
-     *     
      */
     public UomPropertyType getUom() {
         return uom;
@@ -90,11 +93,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the uom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UomPropertyType }
-     *     
      */
     public void setUom(UomPropertyType value) {
         this.uom = value;
@@ -102,11 +100,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the constraint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AllowedTimesPropertyType }
-     *     
      */
     public AllowedTimesPropertyType getConstraint() {
         return constraint;
@@ -114,11 +107,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the constraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AllowedTimesPropertyType }
-     *     
      */
     public void setConstraint(AllowedTimesPropertyType value) {
         this.constraint = value;
@@ -126,11 +114,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the quality property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public QualityPropertyType getQuality() {
         return quality;
@@ -138,11 +121,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the quality property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public void setQuality(QualityPropertyType value) {
         this.quality = value;
@@ -150,25 +128,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the value property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getValue().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getValue() {
         if (value == null) {
@@ -179,11 +138,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceTime property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceTime() {
         return referenceTime;
@@ -191,11 +145,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the referenceTime property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceTime(String value) {
         this.referenceTime = value;
@@ -203,11 +152,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
@@ -215,11 +159,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the referenceFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceFrame(String value) {
         this.referenceFrame = value;
@@ -227,11 +166,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the localFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getLocalFrame() {
         return localFrame;
@@ -239,11 +173,6 @@ public class TimeRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the localFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setLocalFrame(String value) {
         this.localFrame = value;

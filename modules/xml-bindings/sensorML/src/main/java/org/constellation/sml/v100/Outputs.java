@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -88,6 +89,14 @@ public class Outputs {
     private String title;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
+
+    public Outputs() {
+
+    }
+
+    public Outputs(OutputList outputList) {
+        this.outputList = outputList;
+    }
 
     /**
      * Gets the value of the outputList property.
@@ -231,6 +240,47 @@ public class Outputs {
         this.type = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Outputs) {
+            final Outputs that = (Outputs) object;
+
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   Utilities.equals(this.outputList, that.outputList)       &&
+                   Utilities.equals(this.nilReason, that.nilReason)       &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.outputList != null ? this.outputList.hashCode() : 0);
+        hash = 97 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 97 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 97 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 97 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 97 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 97 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -265,6 +315,14 @@ public class Outputs {
         @XmlID
         private String id;
 
+        public OutputList()  {
+
+        }
+
+        public OutputList(List<IoComponentPropertyType> output)  {
+            this.output = output;
+        }
+
         /**
          * Gets the value of the output property.
          */
@@ -287,6 +345,32 @@ public class Outputs {
          */
         public void setId(String value) {
             this.id = value;
+        }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof OutputList) {
+                final OutputList that = (OutputList) object;
+
+                return Utilities.equals(this.output, that.output) &&
+                       Utilities.equals(this.id, that.id);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 29 * hash + (this.output != null ? this.output.hashCode() : 0);
+            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
         }
 
     }

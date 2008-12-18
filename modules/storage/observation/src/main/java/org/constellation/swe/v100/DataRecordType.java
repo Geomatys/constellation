@@ -20,9 +20,11 @@ package org.constellation.swe.v100;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -52,6 +54,15 @@ public class DataRecordType extends AbstractDataRecordType {
 
     private List<DataComponentPropertyType> field;
 
+    public DataRecordType() {
+
+    }
+
+    public DataRecordType(String definition, List<DataComponentPropertyType> field) {
+        super(definition);
+        this.field = field;
+    }
+
     /**
      * Gets the value of the field property.
      */
@@ -60,6 +71,39 @@ public class DataRecordType extends AbstractDataRecordType {
             field = new ArrayList<DataComponentPropertyType>();
         }
         return this.field;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append('\n');
+        if (field != null) {
+            for (DataComponentPropertyType d : field)
+                sb.append(d).append('\n');
+        }
+        return sb.toString();
+    }
+    
+     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof DataRecordType && super.equals(object)) {
+            final DataRecordType that = (DataRecordType) object;
+            return Utilities.equals(this.field, that.field);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (this.field != null ? this.field.hashCode() : 0);
+        return hash;
     }
 
 }

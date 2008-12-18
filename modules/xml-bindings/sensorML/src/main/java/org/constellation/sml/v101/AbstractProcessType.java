@@ -253,6 +253,25 @@ public abstract class AbstractProcessType extends AbstractSMLType {
     }
 
     /**
+     * Sets the value of the contact property.
+     *
+     */
+    public void SetContact(Contact contact) {
+        if (this.contact == null) {
+            this.contact = new ArrayList<Contact>();
+        }
+        this.contact.add(contact);
+    }
+
+    /**
+     * sets the value of the contact property.
+     *
+     */
+    public void setContact(List<Contact> contact) {
+        this.contact = contact;
+    }
+
+    /**
      * Gets the value of the documentation property.
      * 
      */

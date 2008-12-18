@@ -103,6 +103,14 @@ public class Classification {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Classification() {
+
+    }
+
+    public Classification(ClassifierList cl) {
+        this.classifierList = cl;
+    }
+
     /**
      * Gets the value of the classifierList property.
      * 
@@ -323,6 +331,38 @@ public class Classification {
         this.actuate = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Classification]").append("\n");
+        if (classifierList != null) {
+            sb.append("classifierList: ").append(classifierList).append('\n');
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -369,27 +409,17 @@ public class Classification {
         @XmlSchemaType(name = "ID")
         private String id;
 
+        public ClassifierList() {
+
+        }
+
+        public ClassifierList(String id, List<Classifier> classifier) {
+            this.classifier = classifier;
+            this.id         = id;
+        }
+
         /**
          * Gets the value of the classifier property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the classifier property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getClassifier().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Classification.ClassifierList.Classifier }
-         * 
-         * 
          */
         public List<Classification.ClassifierList.Classifier> getClassifier() {
             if (classifier == null) {
@@ -422,7 +452,18 @@ public class Classification {
             this.id = value;
         }
 
-
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[ClassifierList]").append("\n");
+            if (classifier != null) {
+                sb.append("classifier: ").append(classifier).append('\n');
+            }
+            if (id != null) {
+                sb.append("id: ").append(id).append('\n');
+            }
+            return sb.toString();
+        }
+        
         /**
          * <p>Java class for anonymous complex type.
          * 
@@ -456,6 +497,15 @@ public class Classification {
             @XmlSchemaType(name = "token")
             private String name;
 
+            public Classifier() {
+
+            }
+
+            public Classifier(String name, Term term) {
+                this.name = name;
+                this.term = term;
+            }
+            
             /**
              * Gets the value of the term property.
              * 
@@ -502,6 +552,18 @@ public class Classification {
              */
             public void setName(String value) {
                 this.name = value;
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder("[Classifier]").append("\n");
+                if (term != null) {
+                    sb.append("term: ").append(term).append('\n');
+                }
+                if (name != null) {
+                    sb.append("name: ").append(name).append('\n');
+                }
+                return sb.toString();
             }
 
         }

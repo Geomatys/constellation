@@ -129,7 +129,7 @@ public abstract class AbstractGMLEntry extends Entry{
     
      @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder("[").append(this.getClass().getSimpleName()).append("]");
         s.append("id = ").append(id);
         s.append(" name = ").append(name);
         s.append(" description = ").append(description).append('\n');

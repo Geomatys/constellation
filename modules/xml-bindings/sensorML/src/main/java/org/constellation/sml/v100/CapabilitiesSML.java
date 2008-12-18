@@ -19,6 +19,7 @@ package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,6 +28,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.swe.v100.AbstractDataRecordType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -222,34 +224,80 @@ public class CapabilitiesSML {
     }
 
     @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder("[SensorML Member]").append("\n");
-            if (abstractDataRecord != null)
-                sb.append("process: ").append(abstractDataRecord.getValue()).append('\n');
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Capabilities]").append("\n");
+        if (abstractDataRecord != null)
+            sb.append("process: ").append(abstractDataRecord.getValue()).append('\n');
 
-            if (nilReason != null) {
-                sb.append("nilReason:").append('\n');
-                for (String k : nilReason) {
-                    sb.append("nilReason: ").append(k).append('\n');
-                }
+        if (nilReason != null) {
+            sb.append("nilReason:").append('\n');
+            for (String k : nilReason) {
+                sb.append("nilReason: ").append(k).append('\n');
             }
-            if (remoteSchema != null)
-                sb.append("remoteSchema: ").append(remoteSchema).append('\n');
-            if (actuate != null)
-                sb.append("actuate: ").append(actuate).append('\n');
-            if (arcrole != null)
-                sb.append("actuate: ").append(arcrole).append('\n');
-            if (href != null)
-                sb.append("href: ").append(href).append('\n');
-            if (role != null)
-                sb.append("role: ").append(role).append('\n');
-            if (show != null)
-                sb.append("show: ").append(show).append('\n');
-            if (title != null)
-                sb.append("title: ").append(title).append('\n');
-            if (type != null)
-                sb.append("type: ").append(type).append('\n');
-            return sb.toString();
+        }
+        if (remoteSchema != null)
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        if (actuate != null)
+            sb.append("actuate: ").append(actuate).append('\n');
+        if (arcrole != null)
+            sb.append("actuate: ").append(arcrole).append('\n');
+        if (href != null)
+            sb.append("href: ").append(href).append('\n');
+        if (role != null)
+            sb.append("role: ").append(role).append('\n');
+        if (show != null)
+            sb.append("show: ").append(show).append('\n');
+        if (title != null)
+            sb.append("title: ").append(title).append('\n');
+        if (type != null)
+            sb.append("type: ").append(type).append('\n');
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
         }
 
+        if (object instanceof CapabilitiesSML) {
+            final CapabilitiesSML that = (CapabilitiesSML) object;
+            boolean proc = false;
+            if (this.abstractDataRecord != null && that.abstractDataRecord != null) {
+                proc = Utilities.equals(this.abstractDataRecord.getValue(), that.abstractDataRecord.getValue());
+            } else if (this.abstractDataRecord == null && that.abstractDataRecord == null) {
+                proc = true;
+            }
+            return Utilities.equals(this.actuate,      that.actuate)       &&
+                   Utilities.equals(this.arcrole,      that.arcrole)       &&
+                   Utilities.equals(this.href,         that.href)          &&
+                   Utilities.equals(this.nilReason,    that.nilReason)     &&
+                   proc                                                    &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                   Utilities.equals(this.role,         that.role)          &&
+                   Utilities.equals(this.show,         that.show)          &&
+                   Utilities.equals(this.title,        that.title)         &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.abstractDataRecord != null ? this.abstractDataRecord.hashCode() : 0);
+        hash = 79 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 79 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 79 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 79 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 79 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 79 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 79 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 79 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
 }

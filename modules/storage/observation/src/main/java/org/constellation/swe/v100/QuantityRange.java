@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -79,13 +80,17 @@ public class QuantityRange extends AbstractDataComponentType {
     @XmlSchemaType(name = "token")
     private String axisID;
 
+    public QuantityRange() {
+
+    }
+
+    public QuantityRange(UomPropertyType uom, List<Double> value) {
+        this.uom   = uom;
+        this.value = value;
+    }
+
     /**
      * Gets the value of the uom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UomPropertyType }
-     *     
      */
     public UomPropertyType getUom() {
         return uom;
@@ -93,11 +98,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the uom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UomPropertyType }
-     *     
      */
     public void setUom(UomPropertyType value) {
         this.uom = value;
@@ -105,11 +105,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the constraint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AllowedValuesPropertyType }
-     *     
      */
     public AllowedValuesPropertyType getConstraint() {
         return constraint;
@@ -117,11 +112,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the constraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AllowedValuesPropertyType }
-     *     
      */
     public void setConstraint(AllowedValuesPropertyType value) {
         this.constraint = value;
@@ -129,24 +119,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the quality property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the quality property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getQuality().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link QualityPropertyType }
-     * 
      * 
      */
     public List<QualityPropertyType> getQuality() {
@@ -159,24 +131,6 @@ public class QuantityRange extends AbstractDataComponentType {
     /**
      * Gets the value of the value property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the value property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getValue().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Double }
-     * 
-     * 
      */
     public List<Double> getValue() {
         if (value == null) {
@@ -187,11 +141,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
@@ -200,10 +149,6 @@ public class QuantityRange extends AbstractDataComponentType {
     /**
      * Sets the value of the referenceFrame property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceFrame(String value) {
         this.referenceFrame = value;
@@ -211,11 +156,6 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Gets the value of the axisID property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAxisID() {
         return axisID;
@@ -223,14 +163,31 @@ public class QuantityRange extends AbstractDataComponentType {
 
     /**
      * Sets the value of the axisID property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAxisID(String value) {
         this.axisID = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof QuantityRange) {
+            final QuantityRange that = (QuantityRange) object;
+
+            return Utilities.equals(this.axisID, that.axisID)   &&
+                   Utilities.equals(this.quality, that.quality) &&
+                   Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+                   Utilities.equals(this.uom, that.uom) &&
+                   Utilities.equals(this.value, that.value) &&
+                   Utilities.equals(this.constraint,  that.constraint);
+        }
+        return false;
     }
 
 }

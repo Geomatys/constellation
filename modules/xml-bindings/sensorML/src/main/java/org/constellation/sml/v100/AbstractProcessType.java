@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -216,6 +217,25 @@ public abstract class AbstractProcessType extends AbstractSMLType {
     }
 
     /**
+     * Sets the value of the capabilities property.
+     *
+     */
+    public void setCapabilities(CapabilitiesSML capabilties) {
+        if (this.capabilities == null) {
+            this.capabilities = new ArrayList<CapabilitiesSML>();
+        }
+        this.capabilities.add(capabilties);
+    }
+
+    /**
+     * Sets the value of the capabilities property.
+     *
+     */
+    public void setCapabilities(List<CapabilitiesSML> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    /**
      * Gets the value of the contact property.
      * 
      */
@@ -224,6 +244,25 @@ public abstract class AbstractProcessType extends AbstractSMLType {
             contact = new ArrayList<Contact>();
         }
         return this.contact;
+    }
+
+    /**
+     * Sets the value of the contact property.
+     *
+     */
+    public void SetContact(Contact contact) {
+        if (this.contact == null) {
+            this.contact = new ArrayList<Contact>();
+        }
+        this.contact.add(contact);
+    }
+
+    /**
+     * sets the value of the contact property.
+     *
+     */
+    public void setContact(List<Contact> contact) {
+        this.contact = contact;
     }
 
     /**
@@ -309,6 +348,47 @@ public abstract class AbstractProcessType extends AbstractSMLType {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractProcessType && super.equals(object)) {
+            final AbstractProcessType that = (AbstractProcessType) object;
+            return Utilities.equals(this.capabilities,    that.capabilities)       &&
+                   Utilities.equals(this.characteristics, that.characteristics)    &&
+                   Utilities.equals(this.classification,  that.classification)     &&
+                   Utilities.equals(this.contact,         that.contact)            &&
+                   Utilities.equals(this.documentation,   that.documentation)      &&
+                   Utilities.equals(this.identification,  that.identification)     &&
+                   Utilities.equals(this.keywords,        that.keywords)           &&
+                   Utilities.equals(this.legalConstraint, that.legalConstraint)    &&
+                   Utilities.equals(this.validTime,       that.validTime)          &&
+                   Utilities.equals(this.history,         that.history);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
+        hash = 59 * hash + (this.identification != null ? this.identification.hashCode() : 0);
+        hash = 59 * hash + (this.classification != null ? this.classification.hashCode() : 0);
+        hash = 59 * hash + (this.validTime != null ? this.validTime.hashCode() : 0);
+        hash = 59 * hash + (this.legalConstraint != null ? this.legalConstraint.hashCode() : 0);
+        hash = 59 * hash + (this.characteristics != null ? this.characteristics.hashCode() : 0);
+        hash = 59 * hash + (this.capabilities != null ? this.capabilities.hashCode() : 0);
+        hash = 59 * hash + (this.contact != null ? this.contact.hashCode() : 0);
+        hash = 59 * hash + (this.documentation != null ? this.documentation.hashCode() : 0);
+        hash = 59 * hash + (this.history != null ? this.history.hashCode() : 0);
+        return hash;
     }
 
 }

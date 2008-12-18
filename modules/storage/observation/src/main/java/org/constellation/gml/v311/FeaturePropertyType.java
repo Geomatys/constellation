@@ -209,20 +209,22 @@ public class FeaturePropertyType {
         if (object == this) {
             return true;
         }
-        boolean feat = false;
-        final FeaturePropertyType that = (FeaturePropertyType) object;
-        
-        return Utilities.equals(this.abstractFeature,    that.abstractFeature)  && 
-               Utilities.equals(this.samplingPoint,      that.samplingPoint)    && 
-               Utilities.equals(this.hiddenFeature,      that.hiddenFeature)    &&
-               Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&  
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title);
+
+        if (object instanceof FeaturePropertyType) {
+            final FeaturePropertyType that = (FeaturePropertyType) object;
+            return Utilities.equals(this.abstractFeature,    that.abstractFeature)  &&
+                   Utilities.equals(this.samplingPoint,      that.samplingPoint)    &&
+                   Utilities.equals(this.hiddenFeature,      that.hiddenFeature)    &&
+                   Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title);
+        }
+        return false;
     }
 
     

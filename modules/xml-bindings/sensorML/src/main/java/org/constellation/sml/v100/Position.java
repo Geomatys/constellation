@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.swe.v100.PositionType;
 import org.constellation.swe.v100.VectorType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -92,6 +93,15 @@ public class Position {
     private String title;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
+
+    public Position() {
+
+    }
+
+    public Position(String name, String href) {
+        this.href = href;
+        this.name = name;
+    }
 
     /**
      * Gets the value of the process property.
@@ -274,6 +284,61 @@ public class Position {
      */
     public void setType(String value) {
         this.type = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Position) {
+            final Position that = (Position) object;
+
+            boolean proc = false;
+            if (this.process != null && that.process != null) {
+                proc = Utilities.equals(this.process.getValue(), that.process.getValue());
+            } else if (this.process == null && that.process == null) {
+                proc = true;
+            }
+
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   Utilities.equals(this.name, that.name)                 &&
+                   Utilities.equals(this.position, that.position)         &&
+                   Utilities.equals(this.vector, that.vector)             &&
+                   Utilities.equals(this.nilReason, that.nilReason)       &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   proc                                                   &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.process != null ? this.process.hashCode() : 0);
+        hash = 59 * hash + (this.position != null ? this.position.hashCode() : 0);
+        hash = 59 * hash + (this.vector != null ? this.vector.hashCode() : 0);
+        hash = 59 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 59 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 59 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 59 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 59 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 59 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 59 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 59 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 59 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 59 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 
 }

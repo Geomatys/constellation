@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -184,6 +185,41 @@ public class Person {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Person && super.equals(object)) {
+            final Person that = (Person) object;
+            return Utilities.equals(this.affiliation,     that.affiliation)       &&
+                   Utilities.equals(this.email,           that.email)             &&
+                   Utilities.equals(this.id,              that.id)                &&
+                   Utilities.equals(this.name,            that.name)              &&
+                   Utilities.equals(this.phoneNumber,     that.phoneNumber)       &&
+                   Utilities.equals(this.surname,         that.surname)           &&
+                   Utilities.equals(this.userID,          that.userID);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + (this.surname != null ? this.surname.hashCode() : 0);
+        hash = 89 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 89 * hash + (this.userID != null ? this.userID.hashCode() : 0);
+        hash = 89 * hash + (this.affiliation != null ? this.affiliation.hashCode() : 0);
+        hash = 89 * hash + (this.phoneNumber != null ? this.phoneNumber.hashCode() : 0);
+        hash = 89 * hash + (this.email != null ? this.email.hashCode() : 0);
+        hash = 89 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 
 }

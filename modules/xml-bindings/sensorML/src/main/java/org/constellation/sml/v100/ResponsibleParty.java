@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -68,6 +69,14 @@ public class ResponsibleParty {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;
+
+    public ResponsibleParty() {
+
+    }
+
+    public ResponsibleParty(String organizationName) {
+        this.organizationName = organizationName;
+    }
 
     /**
      * Gets the value of the individualName property.
@@ -159,5 +168,36 @@ public class ResponsibleParty {
             sb.append("id: ").append(id).append('\n');
         }
         return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ResponsibleParty) {
+            final ResponsibleParty that = (ResponsibleParty) object;
+            return Utilities.equals(this.contactInfo,      that.contactInfo)      &&
+                   Utilities.equals(this.id,               that.id)               &&
+                   Utilities.equals(this.individualName,   that.individualName)   &&
+                   Utilities.equals(this.organizationName, that.organizationName) &&
+                   Utilities.equals(this.positionName,     that.positionName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + (this.individualName != null ? this.individualName.hashCode() : 0);
+        hash = 73 * hash + (this.organizationName != null ? this.organizationName.hashCode() : 0);
+        hash = 73 * hash + (this.positionName != null ? this.positionName.hashCode() : 0);
+        hash = 73 * hash + (this.contactInfo != null ? this.contactInfo.hashCode() : 0);
+        hash = 73 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 }

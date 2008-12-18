@@ -19,12 +19,14 @@ package org.constellation.sml.v100;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -81,6 +83,29 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
             rest = new ArrayList<Object>();
         }
         return this.rest;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractDerivableComponentType && super.equals(object)) {
+            final AbstractDerivableComponentType that = (AbstractDerivableComponentType) object;
+            return Utilities.equals(this.rest,     that.rest);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.rest != null ? this.rest.hashCode() : 0);
+        return hash;
     }
 
 }

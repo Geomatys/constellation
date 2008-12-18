@@ -55,9 +55,21 @@ import org.constellation.gml.v311.TimePeriodType;
 public class ValidTime {
 
     @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml")
-    protected TimeInstantType timeInstant;
+    private TimeInstantType timeInstant;
     @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml")
-    protected TimePeriodType timePeriod;
+    private TimePeriodType timePeriod;
+
+    public ValidTime() {
+
+    }
+
+    public ValidTime(TimeInstantType timeInstant) {
+        this.timeInstant = timeInstant;
+    }
+
+    public ValidTime(TimePeriodType timePeriod) {
+        this.timePeriod = timePeriod;
+    }
 
     /**
      * Gets the value of the timeInstant property.

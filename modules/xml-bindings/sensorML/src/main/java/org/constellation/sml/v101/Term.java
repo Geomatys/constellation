@@ -58,15 +58,31 @@ import org.constellation.swe.v101.CodeSpacePropertyType;
 @XmlRootElement(name = "Term")
 public class Term {
 
-    protected CodeSpacePropertyType codeSpace;
+    private CodeSpacePropertyType codeSpace;
     @XmlElement(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
-    protected String value;
+    private String value;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
-    protected String definition;
+    private String definition;
 
+    public Term() {
+
+    }
+
+    public Term(String value, String definition) {
+        this.codeSpace  = null;
+        this.definition = definition;
+        this.value      = value;
+    }
+
+    public Term(CodeSpacePropertyType codeSpace, String value, String definition) {
+        this.codeSpace  = codeSpace;
+        this.definition = definition;
+        this.value      = value;
+    }
+    
     /**
      * Gets the value of the codeSpace property.
      * 
@@ -137,6 +153,21 @@ public class Term {
      */
     public void setDefinition(String value) {
         this.definition = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Term]").append("\n");
+        if (codeSpace != null) {
+            sb.append("codeSpace: ").append(codeSpace).append('\n');
+        }
+        if (value != null) {
+            sb.append("value: ").append(value).append('\n');
+        }
+        if (definition != null) {
+            sb.append("definition: ").append(definition).append('\n');
+        }
+        return sb.toString();
     }
 
 }
