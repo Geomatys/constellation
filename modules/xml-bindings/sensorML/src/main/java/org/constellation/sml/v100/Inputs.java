@@ -371,8 +371,5 @@ public class Inputs {
             hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
             return hash;
         }
-
-
     }
-
 }

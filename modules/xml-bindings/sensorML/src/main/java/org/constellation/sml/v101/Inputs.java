@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -92,6 +93,14 @@ public class Inputs {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Inputs() {
+
+    }
+
+    public Inputs(InputList inputList) {
+        this.inputList = inputList;
+    }
+    
     /**
      * Gets the value of the inputList property.
      * 
@@ -312,6 +321,46 @@ public class Inputs {
         this.actuate = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Inputs) {
+            final Inputs that = (Inputs) object;
+
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   Utilities.equals(this.inputList, that.inputList)       &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.inputList != null ? this.inputList.hashCode() : 0);
+        hash = 97 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 97 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 97 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 97 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 97 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -347,27 +396,16 @@ public class Inputs {
         @XmlSchemaType(name = "ID")
         private String id;
 
+        public InputList() {
+
+        }
+
+        public InputList(List<IoComponentPropertyType> input) {
+            this.input = input;
+        }
+        
         /**
          * Gets the value of the input property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the input property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getInput().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link IoComponentPropertyType }
-         * 
-         * 
          */
         public List<IoComponentPropertyType> getInput() {
             if (input == null) {
@@ -398,6 +436,32 @@ public class Inputs {
          */
         public void setId(String value) {
             this.id = value;
+        }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof InputList) {
+                final InputList that = (InputList) object;
+
+                return Utilities.equals(this.input, that.input) &&
+                       Utilities.equals(this.id, that.id);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 29 * hash + (this.input != null ? this.input.hashCode() : 0);
+            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
         }
 
     }

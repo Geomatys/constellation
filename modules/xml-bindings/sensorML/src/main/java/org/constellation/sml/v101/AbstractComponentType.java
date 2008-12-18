@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -52,5 +53,91 @@ import javax.xml.bind.annotation.XmlType;
     SystemType.class
 })
 public abstract class AbstractComponentType extends AbstractDerivableComponentType {
+
+    private Inputs inputs;
+    private Outputs outputs;
+    private Parameters parameters;
+
+    /**
+     * @return the inputs
+     */
+    public Inputs getInputs() {
+        return inputs;
+    }
+
+    /**
+     * @param inputs the inputs to set
+     */
+    public void setInputs(Inputs inputs) {
+        this.inputs = inputs;
+    }
+
+    /**
+     * @return the outputs
+     */
+    public Outputs getOutputs() {
+        return outputs;
+    }
+
+    /**
+     * @param outputs the outputs to set
+     */
+    public void setOutputs(Outputs outputs) {
+        this.outputs = outputs;
+    }
+
+    /**
+     * @return the parameters
+     */
+    public Parameters getParameters() {
+        return parameters;
+    }
+
+    /**
+     * @param parameters the parameters to set
+     */
+    public void setParameters(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractComponentType && super.equals(object)) {
+            final AbstractComponentType that = (AbstractComponentType) object;
+            return Utilities.equals(this.inputs,     that.inputs)     &&
+                   Utilities.equals(this.outputs,    that.outputs)    &&
+                   Utilities.equals(this.parameters, that.parameters);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.inputs != null ? this.inputs.hashCode() : 0);
+        hash = 97 * hash + (this.outputs != null ? this.outputs.hashCode() : 0);
+        hash = 97 * hash + (this.parameters != null ? this.parameters.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (outputs != null)
+            s.append("outputs:").append(outputs).append('\n');
+        if (inputs != null)
+            s.append("inputs:").append(inputs).append('\n');
+        if (parameters != null)
+            s.append("parameters:").append(parameters).append('\n');
+
+        return s.toString();
+    }
 
 }

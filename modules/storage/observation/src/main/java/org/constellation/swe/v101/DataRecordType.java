@@ -18,21 +18,25 @@
 
 package org.constellation.swe.v101;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for DataRecordType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="DataRecordType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/swe/1.0.1}AbstractDataComponentType">
+ *     &lt;extension base="{http://www.opengis.net/swe/1.0.1}AbstractDataRecordType">
+ *       &lt;sequence>
+ *         &lt;element name="field" type="{http://www.opengis.net/swe/1.0.1}DataComponentPropertyType" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -41,16 +45,21 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "ObservableProperty")
-public class ObservableProperty extends AbstractDataComponentEntry {
+@XmlType(name = "DataRecordType", propOrder = {
+    "field"
+})
+public class DataRecordType extends AbstractDataRecordEntry {
 
-    public ObservableProperty() {
+    private List<DataComponentPropertyType> field;
 
-    }
-
-    public ObservableProperty(String definition) {
-        super(definition);
+    /**
+     * Gets the value of the field property.
+     */
+    public List<DataComponentPropertyType> getField() {
+        if (field == null) {
+            field = new ArrayList<DataComponentPropertyType>();
+        }
+        return this.field;
     }
 
 }

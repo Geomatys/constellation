@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sml;
+package org.constellation.sml.v101;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,13 +25,23 @@ import java.util.logging.Logger;
 
 //constellation
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.constellation.sml.v100.ObjectFactory;
-import org.constellation.sml.v100.ComponentType;
-import org.constellation.sml.v100.Classification;
-import org.constellation.sml.v100.Keywords;
-import org.constellation.sml.v100.SensorML;
-import org.constellation.sml.v100.Classification.ClassifierList.Classifier;
-import org.constellation.sml.v100.Term;
+import org.constellation.sml.v101.Classification.ClassifierList.Classifier;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.sml.v101.Identification.IdentifierList;
+import org.constellation.sml.v101.Identification.IdentifierList.Identifier;
+import org.constellation.sml.v101.Inputs.InputList;
+import org.constellation.sml.v101.Outputs.OutputList;
+import org.constellation.sml.v101.Parameters.ParameterList;
+import org.constellation.swe.v101.AbstractDataRecord;
+import org.constellation.swe.v101.CodeSpacePropertyType;
+import org.constellation.swe.v101.DataComponentPropertyType;
+import org.constellation.swe.v101.DataRecordType;
+import org.constellation.swe.v101.ObservableProperty;
+import org.constellation.swe.v101.QuantityRange;
+import org.constellation.swe.v101.QuantityType;
+import org.constellation.swe.v101.TimeRange;
+import org.constellation.swe.v101.UomPropertyType;
 import org.constellation.util.Utils;
 
 // JAXB dependencies
@@ -41,33 +51,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
-
-import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.sml.v100.CapabilitiesSML;
-import org.constellation.sml.v100.Contact;
-import org.constellation.sml.v100.Identification;
-import org.constellation.sml.v100.Identification.IdentifierList;
-import org.constellation.sml.v100.Identification.IdentifierList.Identifier;
-import org.constellation.sml.v100.Inputs;
-import org.constellation.sml.v100.Inputs.InputList;
-import org.constellation.sml.v100.IoComponentPropertyType;
-import org.constellation.sml.v100.Outputs;
-import org.constellation.sml.v100.Outputs.OutputList;
-import org.constellation.sml.v100.Parameters;
-import org.constellation.sml.v100.Parameters.ParameterList;
-import org.constellation.sml.v100.Position;
-import org.constellation.sml.v100.ResponsibleParty;
-import org.constellation.sml.v100.ValidTime;
-import org.constellation.swe.v100.AbstractDataRecordType;
-import org.constellation.swe.v100.CodeSpacePropertyType;
-import org.constellation.swe.v100.DataComponentPropertyType;
-import org.constellation.swe.v100.DataRecordType;
-import org.constellation.swe.v100.ObservableProperty;
-import org.constellation.swe.v100.QuantityRange;
-import org.constellation.swe.v100.QuantityType;
-import org.constellation.swe.v100.TimeRange;
-import org.constellation.swe.v100.UomPropertyType;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -81,7 +64,7 @@ public class SmlIOTest {
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
     private ObjectFactory sml100Factory = new ObjectFactory();
-    private org.constellation.swe.v100.ObjectFactory swe100Factory = new org.constellation.swe.v100.ObjectFactory();
+    private org.constellation.swe.v101.ObjectFactory swe100Factory = new org.constellation.swe.v101.ObjectFactory();
 
 
     @BeforeClass
@@ -94,7 +77,7 @@ public class SmlIOTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.sml.v100");
+        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.sml.v101");
         unmarshaller           = jbcontext.createUnmarshaller();
         marshaller             = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -141,10 +124,10 @@ public class SmlIOTest {
 
         ComponentType component = new ComponentType();
 
-        List<JAXBElement<String>> kw = new ArrayList<JAXBElement<String>>();
-        kw.add(sml100Factory.createKeywordsKeywordListKeyword("piezometer"));
-        kw.add(sml100Factory.createKeywordsKeywordListKeyword("geosciences"));
-        kw.add(sml100Factory.createKeywordsKeywordListKeyword("point d'eau"));
+        List<String> kw = new ArrayList<String>();
+        kw.add("piezometer");
+        kw.add("geosciences");
+        kw.add("point d'eau");
         Keywords keywords = new Keywords(new Keywords.KeywordList("urn:x-brgm:def:gcmd:keywords", kw));
         component.setKeywords(keywords);
 
@@ -172,13 +155,15 @@ public class SmlIOTest {
         ValidTime vTime = new ValidTime(period);
         component.setValidTime(vTime);
 
-        CapabilitiesSML capabilities = new CapabilitiesSML();
+        /*
+           TODO
+        Capabilities capabilities = new Capabilities();
         TimeRange timeRange = new TimeRange(Arrays.asList("1987-04-23", "now"));
         DataComponentPropertyType field = new DataComponentPropertyType("periodOfData", "urn:x-brgm:def:property:periodOfData", timeRange);
         DataRecordType record = new DataRecordType("urn:x-brgm:def:property:periodOfData", Arrays.asList(field));
         JAXBElement<? extends AbstractDataRecordType> jbRecord = swe100Factory.createDataRecord(record);
         capabilities.setAbstractDataRecord(jbRecord);
-        component.setCapabilities(capabilities);
+        component.setCapabilities(capabilities);*/
 
         Contact contact = new Contact("urn:x-ogc:def:role:manufacturer", new ResponsibleParty("IRIS"));
         component.SetContact(contact);
@@ -199,15 +184,15 @@ public class SmlIOTest {
         List<DataComponentPropertyType> params = new ArrayList<DataComponentPropertyType>();
         UomPropertyType uom = new UomPropertyType(null, "urn:ogc:unit:minuts");
         QuantityType quantity1 = new QuantityType("urn:x-ogc:def:property:frequency", uom, 60.0);
-        DataComponentPropertyType p1 = new DataComponentPropertyType("frequency", "urn:x-ogc:def:property:frequency", quantity1);
-        params.add(p1);
+//TODO  DataComponentPropertyType p1 = new DataComponentPropertyType("frequency", "urn:x-ogc:def:property:frequency", quantity1);
+//TODO  params.add(p1);
         UomPropertyType uom2 = new UomPropertyType("m", null);
         QuantityType quantity2 = new QuantityType("urn:x-ogc:def:property:precision", uom2, 0.05);
-        DataComponentPropertyType p2 = new DataComponentPropertyType("precision", "urn:x-ogc:def:property:precision", quantity2);
-        params.add(p2);
+//TODO  DataComponentPropertyType p2 = new DataComponentPropertyType("precision", "urn:x-ogc:def:property:precision", quantity2);
+//TODO  params.add(p2);
         QuantityRange quantityRange = new QuantityRange(uom2, Arrays.asList(0.0, 10.0));
-        DataComponentPropertyType p3 = new DataComponentPropertyType("validity", "urn:x-ogc:def:property:validity", quantityRange);
-        params.add(p3);
+//TODO  DataComponentPropertyType p3 = new DataComponentPropertyType("validity", "urn:x-ogc:def:property:validity", quantityRange);
+//TODO  params.add(p3);
         ParameterList paramList = new ParameterList(params);
         Parameters parameters = new Parameters(paramList);
         component.setParameters(parameters);

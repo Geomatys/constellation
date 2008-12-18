@@ -76,6 +76,14 @@ public class TimeRange extends AbstractDataComponentEntry {
     @XmlSchemaType(name = "anyURI")
     private String localFrame;
 
+    public TimeRange() {
+
+    }
+
+    public TimeRange(List<String> value) {
+        this.value = value;
+    }
+    
     /**
      * Gets the value of the uom property.
      */

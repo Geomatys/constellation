@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -71,6 +72,14 @@ public class ResponsibleParty {
     @XmlSchemaType(name = "ID")
     private String id;
 
+    public ResponsibleParty() {
+
+    }
+
+    public ResponsibleParty(String organizationName) {
+        this.organizationName = organizationName;
+    }
+    
     /**
      * Gets the value of the individualName property.
      * 
@@ -189,6 +198,58 @@ public class ResponsibleParty {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ResponsibleParty]").append("\n");
+        if (individualName != null) {
+            sb.append("individualName: ").append(individualName).append('\n');
+        }
+        if (organizationName != null) {
+            sb.append("organizationName: ").append(organizationName).append('\n');
+        }
+        if (positionName != null) {
+            sb.append("positionName: ").append(positionName).append('\n');
+        }
+        if (contactInfo != null) {
+            sb.append("contactInfo: ").append(contactInfo).append('\n');
+        }
+        if (id != null) {
+            sb.append("id: ").append(id).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ResponsibleParty) {
+            final ResponsibleParty that = (ResponsibleParty) object;
+            return Utilities.equals(this.contactInfo,      that.contactInfo)      &&
+                   Utilities.equals(this.id,               that.id)               &&
+                   Utilities.equals(this.individualName,   that.individualName)   &&
+                   Utilities.equals(this.organizationName, that.organizationName) &&
+                   Utilities.equals(this.positionName,     that.positionName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + (this.individualName != null ? this.individualName.hashCode() : 0);
+        hash = 73 * hash + (this.organizationName != null ? this.organizationName.hashCode() : 0);
+        hash = 73 * hash + (this.positionName != null ? this.positionName.hashCode() : 0);
+        hash = 73 * hash + (this.contactInfo != null ? this.contactInfo.hashCode() : 0);
+        hash = 73 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 
 }

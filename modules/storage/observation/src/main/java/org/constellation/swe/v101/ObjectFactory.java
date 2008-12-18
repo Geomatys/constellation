@@ -59,7 +59,7 @@ public class ObjectFactory {
     private final static QName _ConstrainedPhenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "ConstrainedPhenomenon");
     private final static QName _AllowedTokenValueList_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "valueList");
     private final static QName _AllowedTimesInterval_QNAME  = new QName("http://www.opengis.net/swe/1.0.1", "interval");
-
+    private final static QName _DataRecord_QNAME            = new QName("http://www.opengis.net/swe/1.0.1", "DataRecord");
     /**
      *
      */
@@ -593,6 +593,23 @@ public class ObjectFactory {
      */
     public AllowedTimes createAllowedTimes() {
         return new AllowedTimes();
+    }
+
+    /**
+     * Create an instance of {@link DataRecordType }
+     *
+     */
+    public DataRecordType createDataRecordType() {
+        return new DataRecordType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataRecordType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "DataRecord", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<DataRecordType> createDataRecord(DataRecordType value) {
+        return new JAXBElement<DataRecordType>(_DataRecord_QNAME, DataRecordType.class, null, value);
     }
     
     /**

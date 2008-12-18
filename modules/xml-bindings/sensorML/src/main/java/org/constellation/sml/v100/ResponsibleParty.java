@@ -149,7 +149,7 @@ public class ResponsibleParty {
         this.id = value;
     }
 
-     @Override
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[ResponsibleParty]").append("\n");
         if (individualName != null) {

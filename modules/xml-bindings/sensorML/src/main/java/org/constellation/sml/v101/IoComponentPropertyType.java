@@ -39,6 +39,7 @@ import org.constellation.swe.v101.QuantityRange;
 import org.constellation.swe.v101.Text;
 import org.constellation.swe.v101.TimeType;
 import org.constellation.swe.v101.TimeRange;
+import org.geotools.util.Utilities;
 
 
 
@@ -130,6 +131,16 @@ public class IoComponentPropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public IoComponentPropertyType() {
+
+    }
+
+    public IoComponentPropertyType(String name, ObservableProperty observableProperty) {
+        this.name = name;
+        this.observableProperty = observableProperty;
+    }
+
+    
     /**
      * Gets the value of the count property.
      * 
@@ -660,6 +671,81 @@ public class IoComponentPropertyType {
      */
     public void setActuate(String value) {
         this.actuate = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof IoComponentPropertyType) {
+            final IoComponentPropertyType that = (IoComponentPropertyType) object;
+            boolean absDataRec = false;
+            if (this.abstractDataRecord != null && that.abstractDataRecord != null) {
+                absDataRec = Utilities.equals(this.abstractDataRecord.getValue(), that.abstractDataRecord.getValue());
+            } else if (this.abstractDataRecord == null && that.abstractDataRecord == null) {
+                absDataRec = true;
+            }
+            boolean absDataArr = false;
+            if (this.abstractDataArray != null && that.abstractDataArray != null) {
+                absDataArr = Utilities.equals(this.abstractDataArray.getValue(), that.abstractDataArray.getValue());
+            } else if (this.abstractDataArray == null && that.abstractDataArray == null) {
+                absDataArr = true;
+            }
+            return Utilities.equals(this.actuate,      that.actuate)       &&
+                   Utilities.equals(this.arcrole,      that.arcrole)       &&
+                   Utilities.equals(this.href,         that.href)          &&
+                   absDataRec                                              &&
+                   absDataArr                                              &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                   Utilities.equals(this.role,         that.role)          &&
+                   Utilities.equals(this.show,         that.show)          &&
+                   Utilities.equals(this.title,        that.title)         &&
+                   Utilities.equals(this._boolean,     that._boolean)      &&
+                   Utilities.equals(this.category,     that.category)      &&
+                   Utilities.equals(this.count,        that.count)         &&
+                   Utilities.equals(this.countRange,   that.countRange)    &&
+                   Utilities.equals(this.name,         that.name)          &&
+                   Utilities.equals(this.quantity,     that.quantity)      &&
+                   Utilities.equals(this.quantityRange,that.quantityRange) &&
+                   Utilities.equals(this.time,         that.time)          &&
+                   Utilities.equals(this.timeRange,    that.timeRange)     &&
+                   Utilities.equals(this.text,         that.text)          &&
+                   Utilities.equals(this.observableProperty,  that.observableProperty) &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + (this.count != null ? this.count.hashCode() : 0);
+        hash = 31 * hash + (this.quantity != null ? this.quantity.hashCode() : 0);
+        hash = 31 * hash + (this.time != null ? this.time.hashCode() : 0);
+        hash = 31 * hash + (this._boolean != null ? this._boolean.hashCode() : 0);
+        hash = 31 * hash + (this.category != null ? this.category.hashCode() : 0);
+        hash = 31 * hash + (this.text != null ? this.text.hashCode() : 0);
+        hash = 31 * hash + (this.quantityRange != null ? this.quantityRange.hashCode() : 0);
+        hash = 31 * hash + (this.countRange != null ? this.countRange.hashCode() : 0);
+        hash = 31 * hash + (this.timeRange != null ? this.timeRange.hashCode() : 0);
+        hash = 31 * hash + (this.abstractDataRecord != null ? this.abstractDataRecord.hashCode() : 0);
+        hash = 31 * hash + (this.abstractDataArray != null ? this.abstractDataArray.hashCode() : 0);
+        hash = 31 * hash + (this.observableProperty != null ? this.observableProperty.hashCode() : 0);
+        hash = 31 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 31 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 31 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 31 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 31 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 31 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 31 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 31 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 31 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 
 }

@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -101,6 +102,18 @@ public class SensorML {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
     private String version;
+
+    /**
+     * An empty constructor used by JAXB
+     */
+    public SensorML() {
+
+    }
+
+    public SensorML(String version, List<SensorML.Member> members) {
+        this.version = version;
+        this.member  = members;
+    }
 
     /**
      * Gets the value of the keywords property.
@@ -329,6 +342,52 @@ public class SensorML {
         return sb.toString();
     }
 
+     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof SensorML) {
+            final SensorML that = (SensorML) object;
+            return Utilities.equals(this.capabilities,       that.capabilities)       &&
+                   Utilities.equals(this.characteristics,    that.characteristics)    &&
+                   Utilities.equals(this.classification,     that.classification)     &&
+                   Utilities.equals(this.contact,            that.contact)            &&
+                   Utilities.equals(this.documentation,      that.contact)            &&
+                   Utilities.equals(this.history,            that.history)            &&
+                   Utilities.equals(this.identification,     that.identification)     &&
+                   Utilities.equals(this.keywords,           that.keywords)           &&
+                   Utilities.equals(this.legalConstraint,    that.legalConstraint)    &&
+                   Utilities.equals(this.member,             that.member)             &&
+                   Utilities.equals(this.securityConstraint, that.securityConstraint) &&
+                   Utilities.equals(this.validTime,          that.validTime)          &&
+                   Utilities.equals(this.version,            that.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 83 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
+        hash = 83 * hash + (this.identification != null ? this.identification.hashCode() : 0);
+        hash = 83 * hash + (this.classification != null ? this.classification.hashCode() : 0);
+        hash = 83 * hash + (this.validTime != null ? this.validTime.hashCode() : 0);
+        hash = 83 * hash + (this.securityConstraint != null ? this.securityConstraint.hashCode() : 0);
+        hash = 83 * hash + (this.legalConstraint != null ? this.legalConstraint.hashCode() : 0);
+        hash = 83 * hash + (this.characteristics != null ? this.characteristics.hashCode() : 0);
+        hash = 83 * hash + (this.capabilities != null ? this.capabilities.hashCode() : 0);
+        hash = 83 * hash + (this.contact != null ? this.contact.hashCode() : 0);
+        hash = 83 * hash + (this.documentation != null ? this.documentation.hashCode() : 0);
+        hash = 83 * hash + (this.history != null ? this.history.hashCode() : 0);
+        hash = 83 * hash + (this.member != null ? this.member.hashCode() : 0);
+        hash = 83 * hash + (this.version != null ? this.version.hashCode() : 0);
+        return hash;
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -693,6 +752,59 @@ public class SensorML {
             if (type != null)
                 sb.append("type: ").append(type).append('\n');
             return sb.toString();
+        }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof Member) {
+                final Member that = (Member) object;
+                boolean proc = false;
+                if (this.process != null && that.process != null) {
+                    proc = Utilities.equals(this.process.getValue(), that.process.getValue());
+                } else if (this.process == null && that.process == null) {
+                    proc = true;
+                }
+
+                return Utilities.equals(this.actuate,      that.actuate)       &&
+                       Utilities.equals(this.arcrole,      that.arcrole)       &&
+                       Utilities.equals(this.contactList,  that.contactList)   &&
+                       Utilities.equals(this.documentList, that.documentList)  &&
+                       Utilities.equals(this.href,         that.href)          &&
+                       proc                                                    &&
+                       Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                       Utilities.equals(this.role,         that.role)          &&
+                       Utilities.equals(this.show,         that.show)          &&
+                       Utilities.equals(this.title,        that.title)         &&
+                       Utilities.equals(this.type,         that.type);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            Object proc = null;
+            if (process != null)
+                proc  = process.getValue();
+            hash = 71 * hash + (proc != null ? proc.hashCode() : 0);
+            hash = 71 * hash + (this.documentList != null ? this.documentList.hashCode() : 0);
+            hash = 71 * hash + (this.contactList != null ? this.contactList.hashCode() : 0);
+            hash = 71 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+            hash = 71 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+            hash = 71 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+            hash = 71 * hash + (this.href != null ? this.href.hashCode() : 0);
+            hash = 71 * hash + (this.role != null ? this.role.hashCode() : 0);
+            hash = 71 * hash + (this.show != null ? this.show.hashCode() : 0);
+            hash = 71 * hash + (this.title != null ? this.title.hashCode() : 0);
+            hash = 71 * hash + (this.type != null ? this.type.hashCode() : 0);
+            return hash;
         }
     }
 

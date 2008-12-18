@@ -426,34 +426,34 @@ public class Keywords {
             return sb.toString();
         }
 
-    /**
-     * Verify if this entry is identical to specified object.
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
 
-        if (object instanceof KeywordList) {
-            final KeywordList that = (KeywordList) object;
-            boolean kw = false;
-            if (this.getKeyword().size() == that.getKeyword().size()) {
-                kw = true;
-                for (int i = 0; i < this.getKeyword().size(); i++) {
-                    JAXBElement<String> jb1 = this.getKeyword().get(i);
-                    JAXBElement<String> jb2 = that.getKeyword().get(i);
-                    if (!Utilities.equals(jb1.getValue(), jb2.getValue())) {
-                        kw = false;
+            if (object instanceof KeywordList) {
+                final KeywordList that = (KeywordList) object;
+                boolean kw = false;
+                if (this.getKeyword().size() == that.getKeyword().size()) {
+                    kw = true;
+                    for (int i = 0; i < this.getKeyword().size(); i++) {
+                        JAXBElement<String> jb1 = this.getKeyword().get(i);
+                        JAXBElement<String> jb2 = that.getKeyword().get(i);
+                        if (!Utilities.equals(jb1.getValue(), jb2.getValue())) {
+                            kw = false;
+                        }
                     }
                 }
+                return Utilities.equals(this.codeSpace, that.codeSpace) &&
+                       Utilities.equals(this.id,        that.id)        &&
+                       kw;
             }
-            return Utilities.equals(this.codeSpace, that.codeSpace) &&
-                   Utilities.equals(this.id,        that.id)        &&
-                   kw;
+            return false;
         }
-        return false;
-    }
 
         @Override
         public int hashCode() {

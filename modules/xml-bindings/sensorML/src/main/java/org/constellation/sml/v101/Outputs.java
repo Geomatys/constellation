@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -93,6 +94,14 @@ public class Outputs {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Outputs() {
+
+    }
+
+    public Outputs(OutputList outputList) {
+        this.outputList = outputList;
+    }
+    
     /**
      * Gets the value of the outputList property.
      * 
@@ -315,6 +324,46 @@ public class Outputs {
 
 
     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Outputs) {
+            final Outputs that = (Outputs) object;
+
+            return Utilities.equals(this.actuate, that.actuate)           &&
+                   Utilities.equals(this.href, that.href)                 &&
+                   Utilities.equals(this.outputList, that.outputList)       &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role, that.role)                 &&
+                   Utilities.equals(this.show, that.show)                 &&
+                   Utilities.equals(this.title, that.title)               &&
+                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.arcrole, that.arcrole);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.outputList != null ? this.outputList.hashCode() : 0);
+        hash = 97 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 97 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 97 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 97 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 97 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+    
+    /**
      * <p>Java class for anonymous complex type.
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
@@ -348,27 +397,16 @@ public class Outputs {
         @XmlSchemaType(name = "ID")
         private String id;
 
+        public OutputList()  {
+
+        }
+
+        public OutputList(List<IoComponentPropertyType> output)  {
+            this.output = output;
+        }
+        
         /**
          * Gets the value of the output property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the output property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getOutput().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link IoComponentPropertyType }
-         * 
-         * 
          */
         public List<IoComponentPropertyType> getOutput() {
             if (output == null) {
@@ -401,6 +439,30 @@ public class Outputs {
             this.id = value;
         }
 
-    }
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
 
+            if (object instanceof OutputList) {
+                final OutputList that = (OutputList) object;
+
+                return Utilities.equals(this.output, that.output) &&
+                       Utilities.equals(this.id, that.id);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 29 * hash + (this.output != null ? this.output.hashCode() : 0);
+            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
+        }
+    }
 }

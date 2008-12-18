@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -93,6 +94,17 @@ public class Keywords {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Keywords() {
+
+    }
+
+    /**
+     *
+     */
+    public Keywords(Keywords.KeywordList keywordList) {
+        this.keywordList = keywordList;
+    }
+    
     /**
      * Gets the value of the keywordList property.
      * 
@@ -313,6 +325,43 @@ public class Keywords {
         this.actuate = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Keywords) {
+            final Keywords that = (Keywords) object;
+            return Utilities.equals(this.actuate,      that.actuate)      &&
+                   Utilities.equals(this.arcrole,      that.arcrole)      &&
+                   Utilities.equals(this.href,         that.href)         &&
+                   Utilities.equals(this.keywordList,  that.keywordList)  &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
+                   Utilities.equals(this.role,         that.role)         &&
+                   Utilities.equals(this.show,         that.show)         &&
+                   Utilities.equals(this.title,        that.title)        &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + (this.keywordList != null ? this.keywordList.hashCode() : 0);
+        hash = 61 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 61 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 61 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 61 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 61 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 61 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 61 * hash + (this.title != null ? this.title.hashCode() : 0);
+        return hash;
+    }
 
     /**
      * <p>Java class for anonymous complex type.
@@ -354,27 +403,17 @@ public class Keywords {
         @XmlSchemaType(name = "anyURI")
         private String codeSpace;
 
+        public KeywordList() {
+
+        }
+
+        public KeywordList(String codeSpace, List<String> keyword) {
+            this.codeSpace = codeSpace;
+            this.keyword   = keyword;
+        }
+
         /**
          * Gets the value of the keyword property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the keyword property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getKeyword().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link String }
-         * 
-         * 
          */
         public List<String> getKeyword() {
             if (keyword == null) {
@@ -429,6 +468,33 @@ public class Keywords {
          */
         public void setCodeSpace(String value) {
             this.codeSpace = value;
+        }
+
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (object instanceof KeywordList) {
+                final KeywordList that = (KeywordList) object;
+                return Utilities.equals(this.codeSpace, that.codeSpace) &&
+                       Utilities.equals(this.id,        that.id)        &&
+                       Utilities.equals(this.keyword,        that.keyword);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 43 * hash + (this.keyword != null ? this.keyword.hashCode() : 0);
+            hash = 43 * hash + (this.codeSpace != null ? this.codeSpace.hashCode() : 0);
+            hash = 43 * hash + (this.id != null ? this.id.hashCode() : 0);
+            return hash;
         }
 
     }

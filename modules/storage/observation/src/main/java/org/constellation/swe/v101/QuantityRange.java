@@ -76,6 +76,15 @@ public class QuantityRange extends AbstractDataComponentEntry {
     @XmlSchemaType(name = "token")
     private String axisID;
 
+    public QuantityRange() {
+
+    }
+
+    public QuantityRange(UomPropertyType uom, List<Double> value) {
+        this.uom   = uom;
+        this.value = value;
+    }
+    
     /**
      * Gets the value of the uom property.
      */

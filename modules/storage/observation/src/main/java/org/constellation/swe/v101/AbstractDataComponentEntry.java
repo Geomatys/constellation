@@ -51,6 +51,10 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
      * Constructor used by jaxb.
      */
     AbstractDataComponentEntry() {}
+
+    public AbstractDataComponentEntry(String definition) {
+        this.definition = definition;
+    }
     
     /**
      * a simple constructor used by the sub classes to initialize l'Entry.
