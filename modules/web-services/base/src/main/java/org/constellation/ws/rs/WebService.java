@@ -59,51 +59,51 @@ import static org.constellation.ws.ExceptionCode.*;
 /**
  * Abstract parent of all REST facade classes for Constellation web services.
  * <p>
- * This class begins the handling of all REST message exchange processing. In 
- * the REST style of web service, message parameters either are passed directly  
+ * This class begins the handling of all REST message exchange processing. In
+ * the REST style of web service, message parameters either are passed directly
  * as arguments to the query, e.g.<br>
  *   {@code protocol://some.url/service?param=value&param2=othervalue }<br>
- * or are passed as raw messages in the body of an HTTP POST message, for 
+ * or are passed as raw messages in the body of an HTTP POST message, for
  * example as Key-Value Pairs (KVP) or as XML documents.
  * </p>
  * <p>
- * <i>Note:</i> This use of the term REST does not imply the services are 
- * RESTful; we use the term to distinguish these classes from the other facade 
- * classes in Constellation which use SOAP to exchange messages in HTTP POST 
- * exchanges and JAXB to automatically unmarshall those messages into Java 
+ * <i>Note:</i> This use of the term REST does not imply the services are
+ * RESTful; we use the term to distinguish these classes from the other facade
+ * classes in Constellation which use SOAP to exchange messages in HTTP POST
+ * exchanges and JAXB to automatically unmarshall those messages into Java
  * objects.
  * </p>
  * <p>
- * All incoming requests are handled by one of the {@code doGET} or 
- * {@code doPOST*} methods. These methods handle the incoming requests by 
- * ensuring all KVP parameters are in the {@code uriContext} object and all 
- * other information is in a serializable object of the right kind. The methods 
- * then call the abstract {@code treatIncomingRequest(Object)} passing any 
- * serializable object as the method parameter. Sub-classes then handle the 
- * request calling the {@code uriContext} object or using the method parameter 
+ * All incoming requests are handled by one of the {@code doGET} or
+ * {@code doPOST*} methods. These methods handle the incoming requests by
+ * ensuring all KVP parameters are in the {@code uriContext} object and all
+ * other information is in a serializable object of the right kind. The methods
+ * then call the abstract {@code treatIncomingRequest(Object)} passing any
+ * serializable object as the method parameter. Sub-classes then handle the
+ * request calling the {@code uriContext} object or using the method parameter
  * as needed.
  * </p>
  * <p>
- * Two other abstract methods need to be implemented by extending classes. The 
- * method {@code destroy()} will be called prior to the container shutting down 
- * the service providing an opportunity to log that event. The method 
- * {@code launchException(..)} forms part of the Constellation exception 
+ * Two other abstract methods need to be implemented by extending classes. The
+ * method {@code destroy()} will be called prior to the container shutting down
+ * the service providing an opportunity to log that event. The method
+ * {@code launchException(..)} forms part of the Constellation exception
  * handling design.
  * </p>
  * <p>
  * TODO: explain the design for exception handling.
  * </p>
  * <p>
- * Concrete extensions of this class should, in their constructor, call one of 
- * the {@code setXMLContext(..)} methods to initialize the JAXB context and 
- * populate the {@code marshaller} and {@code unmarshaller} fields. 
+ * Concrete extensions of this class should, in their constructor, call one of
+ * the {@code setXMLContext(..)} methods to initialize the JAXB context and
+ * populate the {@code marshaller} and {@code unmarshaller} fields.
  * </p>
  * <p>
- * Classes extending this one provide the REST facade to Constellation. Most of 
- * the concrete extensions of this class in Constellation itself implement the 
- * logic of {@code treatIncomingRequest(Object)} by calling a appropriate 
- * method in a {@code Worker} object. Those same methods in the {@code Worker} 
- * object are also called by the classes implementing the SOAP facade, enabling 
+ * Classes extending this one provide the REST facade to Constellation. Most of
+ * the concrete extensions of this class in Constellation itself implement the
+ * logic of {@code treatIncomingRequest(Object)} by calling a appropriate
+ * method in a {@code Worker} object. Those same methods in the {@code Worker}
+ * object are also called by the classes implementing the SOAP facade, enabling
  * the re-use of the logic.
  * </p>
  *
@@ -113,65 +113,69 @@ import static org.constellation.ws.ExceptionCode.*;
  * @since 0.1
  */
 public abstract class WebService {
-	
     /**
      * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs");
+
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
     protected static Boolean runningOnGlassfish = null;
-    
+
     /**
      * The user directory where configuration files are stored on Unix platforms.
-     * TODO: How does this relate to the directories used in deployment? This is 
+     * TODO: How does this relate to the directories used in deployment? This is
      *       in the home directory of the user running the container?
      */
     private static final String UNIX_DIRECTORY = ".sicade";
+
     /**
      * The user directory where configuration files are stored on Windows platforms.
      */
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
-    
+
     /**
      * A JAXB unmarshaller used to create Java objects from XML files.
      */
     protected Unmarshaller unmarshaller;
+
     /**
      * A JAXB marshaller used to transform Java objects into XML String.
      */
     protected Marshaller marshaller;
+
     /**
-     * Provides access to the URI used in the method call, for instance, to 
-     * obtain the Key-Value Pairs in the request. The field is injected, thanks 
+     * Provides access to the URI used in the method call, for instance, to
+     * obtain the Key-Value Pairs in the request. The field is injected, thanks
      * to the annotation, when a request arrives.
      */
     @Context
     protected UriInfo uriContext;
+
     /**
-     * Used to communicate with the servlet container, for example, to obtain 
-     * the MIME type of a file, to dispatch requests or to write to a log file. 
+     * Used to communicate with the servlet container, for example, to obtain
+     * the MIME type of a file, to dispatch requests or to write to a log file.
      * The field is injected, thanks to the annotation, when a request arrives.
      */
     @Context
     protected ServletContext servletContext;
+
     /**
-     * The HTTP context used to get information about the client which sent the 
-     * request. The field is injected, thanks to the annotation, when a request 
+     * The HTTP context used to get information about the client which sent the
+     * request. The field is injected, thanks to the annotation, when a request
      * arrives.
      */
     @Context
     protected HttpContext httpContext;
-    
+
     /**
      * A cached copy of the web service URL, something like:
      *   http://localhost:8080/constellation/WS
      */
     private String serviceURL;
-    
-    
-    
+
+
     /**
      * Initialize the basic attribute of a web service.
      *
@@ -181,8 +185,8 @@ public abstract class WebService {
         unmarshaller = null;
         serviceURL   = null;
     }
-    
-    
+
+
     /**
      * Treat the incoming request and call the right function.
      *
@@ -194,10 +198,12 @@ public abstract class WebService {
      * @throw JAXBException
      */
     public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
+
     /**
      * This method is called at undeploy time
      */
     public abstract void destroy();
+
     /**
      * build an service Exception and marshall it into a StringWriter
      *
@@ -207,41 +213,56 @@ public abstract class WebService {
      * @return
      */
     protected abstract Object launchException(String message, String codeName, String locator);
-    
-    
+
+
     /**
      * Initialize the JAXB context and build the unmarshaller/marshaller
      *
      * @param packagesName A list of package containing JAXB annoted classes.
      * @param rootNamespace The main namespace for all the document.
+     *
+     * @throws JAXBException
      */
-    protected void setXMLContext(String packagesName, String rootNamespace) throws JAXBException {
+    protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
                     " packages: " + packagesName);
-
-        JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
-        unmarshaller = jbcontext.createUnmarshaller();
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper(rootNamespace);
+        final JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
+        initXMLContext(jbcontext, rootNamespace);
     }
+
     /**
      * Initialize the JAXB context and build the unmarshaller/marshaller
      *
      * @param classesName A list of JAXB annoted classes.
      * @param rootNamespace The main namespace for all the document.
+     *
+     * @throws JAXBException
      */
-    protected void setXMLContext(String rootNamespace, Class<?>... classes) throws JAXBException {
+    protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
+        final JAXBContext jbcontext = JAXBContext.newInstance(classes);
+        initXMLContext(jbcontext, rootNamespace);
+    }
 
-        JAXBContext jbcontext = JAXBContext.newInstance(classes);
+    /**
+     * Initialize the marshaller and unmarshaller, with the {@linkplain JAXBContext Jaxb Context}
+     * and the default namespace sepcified.
+     *
+     * @param jbcontext A {@linkplain JAXBContext Jaxb Context} to use for (un)marshalling processes.
+     * @param rootNamespace The root namespace to use when no namespace is defined.
+     *
+     * @throws JAXBException
+     */
+    private void initXMLContext(final JAXBContext jbcontext, final String rootNamespace)
+            throws JAXBException
+    {
         unmarshaller = jbcontext.createUnmarshaller();
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         setPrefixMapper(rootNamespace);
     }
-    
-    
+
+
     /**
      * Treat the incoming GET request.
      *
@@ -252,6 +273,7 @@ public abstract class WebService {
     public Response doGET() throws JAXBException  {
         return treatIncomingRequest(null);
     }
+
     /**
      * Treat the incoming POST request encoded in kvp.
      * for each parameters in the request it fill the httpContext.
@@ -274,6 +296,7 @@ public abstract class WebService {
         LOGGER.info("request POST kvp: " + request + '\n' + log);
         return treatIncomingRequest(null);
     }
+
     /**
      * Treat the incoming POST request encoded in xml.
      *
@@ -305,6 +328,7 @@ public abstract class WebService {
             return Response.ok("This service is not running", "text/plain").build();
         }
     }
+
     /**
      * Treat the incoming POST request encoded in text plain.
      *
@@ -319,8 +343,8 @@ public abstract class WebService {
                                           INVALID_REQUEST.name(), null);
         return Response.ok(obj, "text/xml").build();
     }
-    
-    
+
+
     /**
      * Extracts the value, for a parameter specified, from a query.
      * If it is a mandatory one, and if it is {@code null}, it throws an exception.
@@ -378,6 +402,7 @@ public abstract class WebService {
             }
         }
     }
+
     /**
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
@@ -388,6 +413,7 @@ public abstract class WebService {
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
     }
+
     /**
      * Extract The complex parameter encoded in XML from the query.
      * If the parameter is mandatory and if it is null it throw an exception.
@@ -424,7 +450,8 @@ public abstract class WebService {
                             ex, INVALID_PARAMETER_VALUE);
         }
     }
-   /**
+
+    /**
      * Return a file located in WEB-INF deployed directory.
      *
      * @param fileName The name of the file requested.
@@ -443,6 +470,7 @@ public abstract class WebService {
             return new File(path, fileName);
          else return path;
     }
+
     /**
      * Return the service url obtain by the first request made.
      *
@@ -454,6 +482,7 @@ public abstract class WebService {
         }
         return serviceURL;
     }
+
     /**
      * Set the prefixMapper for the marshaller.
      * The root namespace specified will have no prefix.
@@ -464,8 +493,8 @@ public abstract class WebService {
         NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
-    
-    
+
+
     /**
      * Return the ".sicade" directory.
      *
@@ -474,7 +503,7 @@ public abstract class WebService {
     public static File getSicadeDirectory() {
         File sicadeDirectory;
         String home = System.getProperty("user.home");
-        
+
         if (System.getProperty("os.name", "").startsWith("Windows")) {
              sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
         } else {
@@ -482,6 +511,7 @@ public abstract class WebService {
         }
         return sicadeDirectory;
     }
+
     /**
      * Get the value for a property defined in the JNDI context chosen.
      *
@@ -516,6 +546,7 @@ public abstract class WebService {
             return (String) getContextProperty(propName, envContext);
         }
     }
+
     /**
      * Returns the context value for the key specified, or {@code null} if not found
      * in this context.
@@ -530,9 +561,7 @@ public abstract class WebService {
         } catch (NamingException n) {
             // Do nothing, the key is not found in the context and the value is still null.
         }
-        
+
         return value;
     }
-    
-    
 }
