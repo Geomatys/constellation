@@ -164,6 +164,23 @@ public class GetMap extends WMSQuery {
         this.azimuth = azimuth % 360 ;
     }
 
+    public GetMap(final GetMap getMap, final Boolean transparent) {
+        this(   getMap.envelope,
+                getMap.version,
+                getMap.format,
+                getMap.layers,
+                getMap.styles,
+                getMap.sld,
+                getMap.elevation,
+                getMap.time,
+                getMap.dimRange,
+                getMap.size,
+                getMap.background,
+                transparent,
+                getMap.azimuth,
+                getMap.exceptions);
+    }
+
     /**
      * Build a {@link GetMap} request using the parameter values found in the {@code getMap}
      * given, and replacing the {@code layers} value by an immutable singleton list containing
@@ -356,7 +373,7 @@ public class GetMap extends WMSQuery {
            .append('&').append(KEY_LAYERS  ).append('=').append(QueryAdapter.toCommaSeparatedValues(layers))
            .append('&').append(KEY_WIDTH   ).append('=').append(size.width)
            .append('&').append(KEY_HEIGHT  ).append('=').append(size.height)
-           .append('&').append(KEY_STYLES  ).append('=').append(styles);
+           .append('&').append(KEY_STYLES  ).append('=').append(QueryAdapter.toCommaSeparatedValues(styles));
 
         //Optional Parameters
         if (sld != null) {

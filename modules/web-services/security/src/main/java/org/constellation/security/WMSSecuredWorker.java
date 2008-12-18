@@ -19,9 +19,7 @@ package org.constellation.security;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.bind.Marshaller;
@@ -237,12 +235,12 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 	    	
 	    	//GET EACH LAYER, CLIP IF NEEDED, AND COMBINE TO RESULT
 	    	BufferedImage result = null;
+            getMap = new GetMap(getMap, true);//Add transparency
 	    	for (String layerName : getMap.getLayers() ){
 	    		
 	    		//GET LAYER
 	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
 	    		assert (null != bi);//we should have thrown an error.
-	    		
 	    		//CLIP
 	    		if (layersToClip.contains(layerName)){
 	    			bi = ImageUtilities.applyMask(bi,mask);

@@ -150,6 +150,9 @@ public class QueryAdapter {
      * @param list The list to extract values.
      */
     public static String toCommaSeparatedValues(final List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
         final int listSize = list.size();
         final StringBuilder builder = new StringBuilder();
         for (int i=0; i<listSize; i++) {
