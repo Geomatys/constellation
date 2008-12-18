@@ -18,7 +18,9 @@ package org.constellation.security;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -145,8 +147,11 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
-            throws WebServiceException
-    {
+            throws WebServiceException {
+    	
+    	//TODO: getCaps doesn't follow this pattern.
+        performAccessControlDecision(getCapabilities);
+        
     	AbstractWMSCapabilities response = dispatcherWMS.getCapabilities(getCapabilities);
         response = removeCapabilitiesInfo(response);
         response = addAccessConstraints(response);
@@ -181,15 +186,24 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     	
     	performAccessControlDecision(getMap);
     	
+    	//INFO BLOCK
+    	String layerList = "{";
+    	for (String layerName : getMap.getLayers() ){
+            layerList = new String(layerList+" "+ layerName);
+    	}
+    	LOGGER.info("WMS-sec: WMS request asks for layers: "+layerList+" }");
+    	
     	//Filter block
-    	if (false){
+    	if (true){
     		
     		//TODO: get the source of the clip geometry, using the hard coordinates
 	    	
-	    	//Make a clipping mask
+	    	//MAKE A CLIP MASK
+    		//Coordinates are in lat/long order!
 	    	//final double [] coords = new double[]{0.0,0.0, 20.0,0.0, 30.0,30.0, 20.0,40.0, 0.0,40.0, 0.0,0.0};
             //Coordinates for the OWS-6 Airport scenario
-            final double [] coords = new double[]{29.93,-90.03, 29.94,-90.01, 29.96,-90.01, 29.965,-90.02, 29.96,-90.03, 29.93,-90.03};
+//            final double [] coords = new double[]{29.93,-90.03, 29.94,-90.01, 29.96,-90.01, 29.965,-90.02, 29.96,-90.03, 29.93,-90.03};
+            final double [] coords = new double[]{29.900,-90.000, 29.905,-90.012, 29.916,-90.002, 29.924,-89.980, 29.908,-89.978, 29.900,-90.000};
 	    	CoordinateReferenceSystem crs = null;
 	    	try {
 				crs = CRS.decode("EPSG:4236");
@@ -212,40 +226,37 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			LOGGER.info("WMS-sec: Made a mask of width: "+mask.getWidth()+" and height: "+mask.getHeight());
 			
-    		//Create a stack of buffered images, for now one layer per.
-    		Map<String,BufferedImage> stack = new HashMap<String,BufferedImage>();
-	    	//Get the disaggregated Layers
-	    	for (String layerName : getMap.getLayers() ){
-                LOGGER.info("Found layer: "+ layerName);
-	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
-	    		stack.put(layerName, bi);
-	    	}
+			
+			//DEFINE THE LAYERS TO CLIP
+			//TODO: This should be role based representation control
+			List<String> layersToClip = new ArrayList<String>();
+	    	layersToClip.add("ROAD_C_City");
+			
 	    	
-			//Clip the first layer
-//	    	String layerName = (String) stack.keySet().toArray()[0];
-	    	String layerName = "BlueMarble";
-
-            LOGGER.info("Stack has "+ stack.size()+ " layers.");
-            
-			for(int i = 0; i<stack.size();i++){
-				String l = (String) stack.keySet().toArray()[i];
-				LOGGER.info("Stack has layer " +l+":" +stack.containsKey(l));
-			}
-
-
-
-			BufferedImage clipped = ImageUtilities.applyMask(stack.get(layerName), mask);
-			LOGGER.info("Clipped image has height: " + clipped.getHeight());
-			stack.put(layerName, clipped);
-			
-	    	//Merge the layers
-			layerName = (String) stack.keySet().toArray()[0];
-			BufferedImage result = stack.get(layerName);
-			for(int i = 1; i<stack.size();i++){
-				layerName = (String) stack.keySet().toArray()[i];
-				result = ImageUtilities.combine(result, stack.get(layerName));
-			}
+	    	//GET EACH LAYER, CLIP IF NEEDED, AND COMBINE TO RESULT
+	    	BufferedImage result = null;
+	    	for (String layerName : getMap.getLayers() ){
+	    		
+	    		//GET LAYER
+	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
+	    		assert (null != bi);//we should have thrown an error.
+	    		
+	    		//CLIP
+	    		if (layersToClip.contains(layerName)){
+	    			bi = ImageUtilities.applyMask(bi,mask);
+	    			LOGGER.info("WMS-sec: Clipped layer: "+layerName+" at "+System.currentTimeMillis() );
+	    		}
+	    		
+	    		//COMBINE
+	    		if (null== result){
+	    			result = bi;
+	    		} else {
+	    			result = ImageUtilities.combine(result, bi);
+	    		}
+	    		LOGGER.info("WMS-sec: Added layer: "+layerName+" at "+System.currentTimeMillis() );
+	    	}
 			
 	    	return result;
     	}
