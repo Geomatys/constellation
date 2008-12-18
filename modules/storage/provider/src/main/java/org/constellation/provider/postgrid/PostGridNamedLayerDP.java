@@ -146,7 +146,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
              * configuration file is put under the WEB-INF directory of constellation.
              * todo: get the webservice name (here ifremerWS) from the servlet context.
              */
-            LOGGER.warning("Connecting to the database using config.xml file !");
+            LOGGER.warning("Trying to connect to the database using config.xml file !");
             File configFile = null;
             File dirCatalina = null;
             final String catalinaPath = System.getenv().get("CATALINA_HOME");
@@ -165,7 +165,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
                 LOGGER.log(Level.SEVERE, "Unable to retrieve information from the config file", io);
             }
         } catch (SQLException sql) {
-            LOGGER.log(Level.SEVERE,"Unable to connect to the database", sql);
+            LOGGER.info("Unable to connect to the database. No postgrid database available.");
         }
 
         database = tempDB;

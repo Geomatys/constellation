@@ -139,9 +139,9 @@ public class WMSWorker extends AbstractWMSWorker {
     /**
      * Return a description of layers specified in the user's request.
      *
-     * @param descLayer  The {@linkplain DescribeLayer describe layer} request.
-     * @param url        The service url.
-     * @param sldVersion The version of the sld specified.
+     * @param descLayer The {@linkplain DescribeLayer describe layer} request.
+     *
+     * @throws WebServiceException
      */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws WebServiceException {
@@ -164,7 +164,6 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
-     * @throws JAXBException
      * @throws WebServiceException
      */
     @Override
@@ -413,7 +412,12 @@ public class WMSWorker extends AbstractWMSWorker {
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
      *
+     * @param version The version of the capabilities request.
+     * @param home    The home directory, where to search for configuration files.
      * @return The capabilities Object, or {@code null} if none.
+     *
+     * @throws JAXBException
+     * @throws IOException
      */
     private Object getCapabilitiesObject(final Version version, final String home) throws JAXBException, IOException {
         final String fileName = "WMSCapabilities" + version.toString() + ".xml";
@@ -461,7 +465,7 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
      * @return text, HTML , XML or GML code.
      *
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws WebServiceException
      */
     @Override
     public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
@@ -504,12 +508,13 @@ public class WMSWorker extends AbstractWMSWorker {
     }
 
     /**
-     * Return a file located in WEB-INF deployed directory.
+     * Return a file located in the home directory. In this implementation, it should be
+     * the WEB-INF directory of the deployed service.
      *
      * @param fileName The name of the file requested.
      * @return The specified file.
      */
-    private File getFile(String fileName, String home) {
+    private File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {
             path = WebService.getSicadeDirectory();
@@ -527,7 +532,7 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
      *
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws WebServiceException
      */
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
