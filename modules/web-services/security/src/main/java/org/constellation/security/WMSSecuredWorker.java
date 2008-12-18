@@ -82,7 +82,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * The url of the WMS web service, where the request will be sent.
      */
-    private final String WMSbaseURL = "http://solardev:8080/constellation/WS/wms";
+    private final String WMSbaseURL = "http://solardev:8280/constellation/WS/wms";
 
     /**
      * Defines whether it is a REST or SOAP request.
@@ -128,6 +128,9 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         //dispatcherXACML = new 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer)
             throws WebServiceException
@@ -136,7 +139,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 
         return dispatcherWMS.describeLayer(descLayer);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
             throws WebServiceException
@@ -146,7 +152,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         response = addAccessConstraints(response);
         return response;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException {
         performAccessControlDecision(getFeatureInfo);
@@ -154,6 +163,9 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         return dispatcherWMS.getFeatureInfo(getFeatureInfo);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException {
         performAccessControlDecision(getLegend);
@@ -161,6 +173,9 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         return dispatcherWMS.getLegendGraphic(getLegend);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BufferedImage getMap(GetMap getMap) throws WebServiceException {
     	
@@ -172,7 +187,9 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     		//TODO: get the source of the clip geometry, using the hard coordinates
 	    	
 	    	//Make a clipping mask
-	    	final double [] coords = new double[]{0.0,0.0, 20.0,0.0, 30.0,30.0, 20.0,40.0, 0.0,40.0, 0.0,0.0};
+	    	//final double [] coords = new double[]{0.0,0.0, 20.0,0.0, 30.0,30.0, 20.0,40.0, 0.0,40.0, 0.0,0.0};
+            //Coordinates for the OWS-6 Airport scenario
+            final double [] coords = new double[]{29.93,-90.03, 29.94,-90.01, 29.96,-90.01, 29.965,-90.02, 29.96,-90.03, 29.93,-90.03};
 	    	CoordinateReferenceSystem crs = null;
 	    	try {
 				crs = CRS.decode("EPSG:4236");
@@ -200,13 +217,26 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     		Map<String,BufferedImage> stack = new HashMap<String,BufferedImage>();
 	    	//Get the disaggregated Layers
 	    	for (String layerName : getMap.getLayers() ){
+                LOGGER.info("Found layer: "+ layerName);
 	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
 	    		stack.put(layerName, bi);
 	    	}
 	    	
 			//Clip the first layer
-	    	String layerName = (String) stack.keySet().toArray()[0];
+//	    	String layerName = (String) stack.keySet().toArray()[0];
+	    	String layerName = "BlueMarble";
+
+            LOGGER.info("Stack has "+ stack.size()+ " layers.");
+            
+			for(int i = 0; i<stack.size();i++){
+				String l = (String) stack.keySet().toArray()[i];
+				LOGGER.info("Stack has layer " +l+":" +stack.containsKey(l));
+			}
+
+
+
 			BufferedImage clipped = ImageUtilities.applyMask(stack.get(layerName), mask);
+			LOGGER.info("Clipped image has height: " + clipped.getHeight());
 			stack.put(layerName, clipped);
 			
 	    	//Merge the layers
