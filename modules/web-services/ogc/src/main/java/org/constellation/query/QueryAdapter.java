@@ -167,8 +167,11 @@ public class QueryAdapter {
      * @param envelope The envelope to return the CRS code.
      */
     public static String toCrsCode(final Envelope envelope) {
+        if (envelope.getCoordinateReferenceSystem().equals(DefaultGeographicCRS.WGS84)) {
+            return "EPSG:4326";
+        }
         final Set<ReferenceIdentifier> identifiers = envelope.getCoordinateReferenceSystem().getIdentifiers();
-        if (identifiers != null) {
+        if (identifiers != null && !identifiers.isEmpty()) {
             return identifiers.iterator().next().toString();
         }
         return null;
