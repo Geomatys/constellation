@@ -1120,4 +1120,14 @@ public class MDWebMetadataReader extends MetadataReader {
     public List<Integer> getSupportedDataTypes() {
         return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM);
     }
+
+    @Override
+    public List<QName> getAdditionalQueryableQName() {
+        return new ArrayList<QName>();
+    }
+
+    @Override
+    public Map<String, List<String>> getAdditionalQueryablePathMap() {
+        return new HashMap<String, List<String>>();
+    }
 }

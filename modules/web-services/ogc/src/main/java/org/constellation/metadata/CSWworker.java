@@ -224,15 +224,7 @@ public class CSWworker {
     /**
      * A list of supported resource type. 
      */
-    private final static List<String> ACCEPTED_RESOURCE_TYPE;
-    static {
-        ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
-        ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gmd");
-        ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gfc");
-        ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
-        ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
-        ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
-    }
+    private List<String> ACCEPTED_RESOURCE_TYPE;
     
     /**
      * A list of known CSW server used in distributed search.
@@ -325,6 +317,7 @@ public class CSWworker {
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
+                initializeAcceptedResourceType();
                 loadCascadedService(configDir);
                 logger.info("CSW service (" + config.getFormat() + ") running");
             }
@@ -398,6 +391,25 @@ public class CSWworker {
             SUPPORTED_TYPE_NAME.addAll(EBRIM25_TYPE_NAMES);
         }
                     
+    }
+
+    /**
+     * Initialize the supported outputSchema in function of the redaer capacity.
+     */
+    public void initializeAcceptedResourceType() {
+        ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
+        List<Integer> supportedDataTypes = MDReader.getSupportedDataTypes();
+        if (supportedDataTypes.contains(ISO_19115)) {
+            ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gmd");
+            ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gfc");
+        }
+        if (supportedDataTypes.contains(DUBLINCORE)) {
+            ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
+        }
+        if (supportedDataTypes.contains(EBRIM)) {
+            ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
+            ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
+        }
     }
     
     /**
@@ -535,23 +547,33 @@ public class CSWworker {
                         tn.setValue(values);
                     }
                     
-                    //we update the queryable elements :
-                    DomainType isoQ = gr.getConstraint("SupportedISOQueryables");
-                    if (isoQ != null) {
+                    //we update the ISO queryable elements :
+                    DomainType isoQueryable = gr.getConstraint("SupportedISOQueryables");
+                    if (isoQueryable != null) {
                         List<String> values = new ArrayList<String>();
                         for (String name : ISO_QUERYABLE.keySet() ) {
                             values.add("apiso:" + name);
                         }
-                        isoQ.setValue(values);
+                        isoQueryable.setValue(values);
                     }
-                    //we update the queryable elements :
-                    DomainType dubQ = gr.getConstraint("SupportedDublinCoreQueryables");
-                    if (dubQ != null) {
+                    //we update the DC queryable elements :
+                    DomainType dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
+                    if (dcQueryable != null) {
                         List<String> values = new ArrayList<String>();
                         for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
                             values.add("dc:" + name);
                         }
-                        dubQ.setValue(values);
+                        dcQueryable.setValue(values);
+                    }
+
+                    //we update the reader's additional queryable elements :
+                    DomainType additionalQueryable = gr.getConstraint("AdditionalQueryables");
+                    if (additionalQueryable != null) {
+                        List<String> values = new ArrayList<String>();
+                        for (QName name : MDReader.getAdditionalQueryableQName()) {
+                            values.add(name.getPrefix() + ':' + name.getLocalPart());
+                        }
+                        additionalQueryable.setValue(values);
                     }
                 }
                 

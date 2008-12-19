@@ -27,9 +27,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 // apache Lucene dependencies
+import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -230,7 +232,6 @@ public class GenericIndex extends IndexLucene<Object> {
         }
             
          // All metadata types must be compatible with dublinCore.
-        
         StringBuilder anyText = new StringBuilder();
         for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
                 
@@ -273,9 +274,25 @@ public class GenericIndex extends IndexLucene<Object> {
                 logger.severe("unable to spatially index metadata: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
-        
+
+        // we add to the index the special queryable element of the metadata reader
+        Map<String, List<String>> additionalQueryable = new HashMap<String, List<String>>();
+        for (String term : additionalQueryable.keySet()) {
+
+            String values = getValues(metadata, additionalQueryable.get(term));
+            if (!values.equals("null")) {
+                logger.finer("put " + term + " values: " + values);
+                anyText.append(values).append(" ");
+            }
+            if (term.equals("date") || term.equals("modified")) {
+                values = values.replaceAll("-","");
+            }
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
+        }
+
         // add a default meta field to make searching all documents easy 
-	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
         
         return doc;
     }

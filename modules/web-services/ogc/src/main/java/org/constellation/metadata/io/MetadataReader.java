@@ -93,7 +93,17 @@ public abstract class MetadataReader {
      * Return the list of supported data types.
      */
     public abstract List<Integer> getSupportedDataTypes();
-    
+
+    /**
+     * Return the list of QName for Additional queryable element.
+     */
+    public abstract List<QName> getAdditionalQueryableQName();
+
+    /**
+     * Return the list of Additional queryable element.
+     */
+    public abstract Map<String, List<String>> getAdditionalQueryablePathMap();
+
     /**
      * Destroy all the resource used by this reader.
      */

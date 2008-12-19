@@ -20,7 +20,9 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -128,4 +130,15 @@ public class FileMetadataReader extends MetadataReader {
         return Arrays.asList(ISO_19115, DUBLINCORE);
     }
 
+    /**
+     * Return the list of Additional queryable element (0 in MDWeb).
+     */
+    public List<QName> getAdditionalQueryableQName() {
+        return new ArrayList<QName>();
+    }
+
+    @Override
+    public Map<String, List<String>> getAdditionalQueryablePathMap() {
+        return new HashMap<String, List<String>>();
+    }
 }
