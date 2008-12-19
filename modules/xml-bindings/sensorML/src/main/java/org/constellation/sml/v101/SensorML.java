@@ -30,7 +30,9 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractProcess;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.sml.SMLMember;
 import org.geotools.util.Utilities;
 
 
@@ -418,7 +420,7 @@ public class SensorML extends AbstractSensorML {
         "documentList",
         "contactList"
     })
-    public static class Member {
+    public static class Member implements SMLMember {
 
         @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
         private JAXBElement<? extends AbstractProcessType> process;
@@ -463,6 +465,12 @@ public class SensorML extends AbstractSensorML {
          */
         public JAXBElement<? extends AbstractProcessType> getProcess() {
             return process;
+        }
+
+        public AbstractProcess getRealProcess() {
+            if (process != null)
+                return process.getValue();
+            return null;
         }
 
         /**

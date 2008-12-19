@@ -17,11 +17,9 @@
 
 package org.constellation.sos.io;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
-import org.constellation.catalog.NoSuchTableException;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 

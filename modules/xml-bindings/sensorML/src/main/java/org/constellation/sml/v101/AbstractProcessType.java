@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractProcess;
 
 
 /**
@@ -64,7 +65,7 @@ import javax.xml.bind.annotation.XmlType;
     AbstractDerivableProcessType.class,
     AbstractDerivableComponentType.class
 })
-public abstract class AbstractProcessType extends AbstractSMLType {
+public abstract class AbstractProcessType extends AbstractSMLType implements AbstractProcess {
 
     private List<Keywords> keywords;
     private List<Identification> identification;

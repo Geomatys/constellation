@@ -149,11 +149,11 @@ public class MDWebSensorReader extends SensorReader {
            else
               throw new WebServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
 
-       } catch (SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
-        }catch (JAXBException ex) {
+        } catch (JAXBException ex) {
             ex.printStackTrace();
             throw new WebServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
         }

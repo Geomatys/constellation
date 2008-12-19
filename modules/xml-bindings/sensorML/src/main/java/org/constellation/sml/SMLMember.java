@@ -15,17 +15,17 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.constellation.sml;
 
-import java.util.List;
-
 /**
- * Abstract super class for all the version of a SensorML document.
+ * Abstract super class for all the version of a SensorML Member.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractSensorML {
+public interface SMLMember {
 
-    public abstract List<? extends SMLMember> getMember();
+    // The real word is temporary
+    public AbstractProcess getRealProcess();
 
 }
