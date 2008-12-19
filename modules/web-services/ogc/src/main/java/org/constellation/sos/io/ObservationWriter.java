@@ -78,14 +78,20 @@ public class ObservationWriter {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public ObservationWriter(PGSimpleDataSource dataSourceOM) throws IOException, NoSuchTableException, SQLException {
-        OMDatabase   = new Database(dataSourceOM);
+    public ObservationWriter(PGSimpleDataSource dataSourceOM) throws WebServiceException {
+        try {
+            OMDatabase   = new Database(dataSourceOM);
        
-        //we build the database table frequently used.
-        obsTable = OMDatabase.getTable(ObservationTable.class);
-        offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-        refTable = OMDatabase.getTable(ReferenceTable.class);
+            //we build the database table frequently used.
+            obsTable = OMDatabase.getTable(ObservationTable.class);
+            offTable = OMDatabase.getTable(ObservationOfferingTable.class);
+            refTable = OMDatabase.getTable(ReferenceTable.class);
         
+        } catch (NoSuchTableException ex) {
+            throw new WebServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+             throw new WebServiceException("IO Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
         
     }
    

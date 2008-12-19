@@ -63,8 +63,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class QuantityRange extends AbstractDataComponentEntry {
 
     private UomPropertyType uom;
-   /* private AllowedValuesPropertyType constraint;
-    private List<QualityPropertyType> quality;*/
+    private AllowedValuesPropertyType constraint;
+    private List<QualityPropertyType> quality;
     @XmlList
     @XmlElement(type = Double.class)
     private List<Double> value;

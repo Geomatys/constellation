@@ -43,6 +43,7 @@ import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
+import org.constellation.sml.AbstractSensorML;
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.DescribeSensor;
 import org.constellation.sos.GetCapabilities;
@@ -104,7 +105,7 @@ public class SOService {
     /**
      * Initialize the database connection.
      */
-    public SOService() throws SQLException, IOException, NoSuchTableException, JAXBException {
+    public SOService() throws SQLException, IOException, NoSuchTableException, JAXBException, WebServiceException {
        worker = new SOSworker(SOSworker.TRANSACTIONAL);
        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
@@ -142,7 +143,7 @@ public class SOService {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     @WebMethod(action="describeSensor")
-    public String describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
+    public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
         try {
             logger.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);

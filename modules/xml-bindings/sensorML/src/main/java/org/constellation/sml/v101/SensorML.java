@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractSensorML;
 import org.geotools.util.Utilities;
 
 
@@ -83,7 +84,7 @@ import org.geotools.util.Utilities;
     "member"
 })
 @XmlRootElement(name = "SensorML")
-public class SensorML {
+public class SensorML extends AbstractSensorML {
 
     private List<Keywords> keywords;
     private List<Identification> identification;

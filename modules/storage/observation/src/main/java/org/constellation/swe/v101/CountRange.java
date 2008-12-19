@@ -62,8 +62,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "CountRange")
 public class CountRange extends AbstractDataComponentEntry {
 
-    /*private AllowedValuesPropertyType constraint;
-    private List<QualityPropertyType> quality;*/
+    private AllowedValuesPropertyType constraint;
+    private List<QualityPropertyType> quality;
     @XmlList
     private List<Integer> value;
     @XmlAttribute

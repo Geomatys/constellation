@@ -51,7 +51,33 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.catalog.NoSuchTableException;
+import org.constellation.ws.WebServiceException;
+import org.constellation.ws.rs.OGCWebService;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.FeaturePropertyType;
+import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.gml.v311.TimeIndeterminateValueType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.observation.MeasurementEntry;
+import org.constellation.observation.ObservationCollectionEntry;
+import org.constellation.observation.ObservationEntry;
+import org.constellation.observation.ProcessEntry;
+import org.constellation.ogc.BinaryTemporalOpType;
+import org.constellation.ogc.LiteralType;
+import org.constellation.ows.v110.AcceptFormatsType;
+import org.constellation.ows.v110.AcceptVersionsType;
+import org.constellation.ows.v110.Operation;
+import org.constellation.ows.v110.OperationsMetadata;
+import org.constellation.ows.v110.RangeType;
+import org.constellation.ows.v110.SectionsType;
+import org.constellation.ows.v110.ServiceIdentification;
+import org.constellation.ows.v110.ServiceProvider;
+import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.sampling.SamplingPointEntry;
+import org.constellation.sml.AbstractSensorML;
 import org.constellation.sos.Capabilities;
 import org.constellation.sos.Contents;
 import org.constellation.sos.Contents.ObservationOfferingList;
@@ -66,34 +92,6 @@ import org.constellation.sos.InsertObservationResponse;
 import org.constellation.sos.RegisterSensor;
 import org.constellation.sos.RegisterSensorResponse;
 import org.constellation.sos.RequestBaseType;
-import org.constellation.gml.v311.TimeInstantType;
-import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.ogc.LiteralType;
-import org.constellation.ws.WebServiceException;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.FeaturePropertyType;
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.gml.v311.TimeIndeterminateValueType;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
-import org.constellation.observation.MeasurementEntry;
-import org.constellation.observation.ObservationCollectionEntry;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.swe.v101.PhenomenonEntry;
-import org.constellation.observation.ProcessEntry;
-import org.constellation.ogc.BinaryTemporalOpType;
-import org.constellation.sampling.SamplingFeatureEntry;
-import org.constellation.sampling.SamplingPointEntry;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.Operation;
-import org.constellation.ows.v110.OperationsMetadata;
-import org.constellation.ows.v110.RangeType;
-import org.constellation.ows.v110.SectionsType;
-import org.constellation.ows.v110.ServiceIdentification;
-import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.sos.FilterCapabilities;
 import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.sos.ObservationTemplate;
@@ -113,6 +111,8 @@ import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.DataComponentPropertyType;
+import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.TextBlockEntry;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -248,7 +248,7 @@ public class SOSworker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(int profile) throws SQLException, IOException, NoSuchTableException {
+    public SOSworker(int profile) throws SQLException, IOException, WebServiceException {
        
         this.profile = profile;
         if (profile != TRANSACTIONAL && profile != DISCOVERY) {
@@ -464,7 +464,7 @@ public class SOSworker {
      * 
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
-    public String describeSensor(DescribeSensor requestDescSensor) throws WebServiceException  {
+    public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws WebServiceException  {
         logger.info("DescribeSensor request processing"  + '\n');
         
         // we get the form
@@ -581,7 +581,7 @@ public class SOSworker {
                         } 
                         logger.info("process ID: " + dbId);
                         ReferenceEntry proc = getReferenceFromHRef(dbId); 
-                        if (proc != null) {
+                        if (proc == null) {
                             throw new WebServiceException(" this process is not registred in the table",
                                                           INVALID_PARAMETER_VALUE, "procedure");
                         }

@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io;
 
+// J2SE dependencies
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+// Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchRecordException;
@@ -48,8 +51,10 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.WebServiceException;
-import org.postgresql.ds.PGSimpleDataSource;
 import static org.constellation.ows.OWSExceptionCode.*;
+
+// postgres dependencies
+import org.postgresql.ds.PGSimpleDataSource;
 
 /**
  *
@@ -112,23 +117,26 @@ public class ObservationReader {
      * 
      * @param dataSourceOM
      * @param observationIdBase
-     * @throws java.io.IOException
-     * @throws org.constellation.catalog.NoSuchTableException
-     * @throws java.sql.SQLException
      */
-    public ObservationReader(PGSimpleDataSource dataSourceOM, String observationIdBase) throws IOException, NoSuchTableException, SQLException {
-        OMDatabase   = new Database(dataSourceOM);
-        this.observationIdBase = observationIdBase;
-       
-        //we build the database table frequently used.
-        obsTable = OMDatabase.getTable(ObservationTable.class);
-        offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-        refTable = OMDatabase.getTable(ReferenceTable.class);
-        
-        //we build the prepared Statement
-        newObservationIDStmt    = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-        observationExistStmt    = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
-        getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+    public ObservationReader(PGSimpleDataSource dataSourceOM, String observationIdBase) throws WebServiceException {
+        try {
+            OMDatabase = new Database(dataSourceOM);
+            this.observationIdBase = observationIdBase;
+            //we build the database table frequently used.
+            obsTable = OMDatabase.getTable(ObservationTable.class);
+            offTable = OMDatabase.getTable(ObservationOfferingTable.class);
+            refTable = OMDatabase.getTable(ReferenceTable.class);
+            //we build the prepared Statement
+            newObservationIDStmt = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
+            observationExistStmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+            getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (NoSuchTableException ex) {
+            throw new WebServiceException("NoSuchTable Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+             throw new WebServiceException("IO Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
         
         
     }
@@ -294,10 +302,16 @@ public class ObservationReader {
         }
     }
     
-    public ResultSet executeSQLQuery(String SQLQuery) throws SQLException {
-        closeCurrentStatement();
-        currentStatement = OMDatabase.getConnection().createStatement();
-        return currentStatement.executeQuery(SQLQuery);
+    public ResultSet executeSQLQuery(String SQLQuery) throws WebServiceException {
+        try {
+            closeCurrentStatement();
+            currentStatement = OMDatabase.getConnection().createStatement();
+            return currentStatement.executeQuery(SQLQuery);
+        } catch (SQLException ex) {
+            logger.severe("SQLExcpetion while executing the query: " + SQLQuery);
+            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        }
         
     }
     
@@ -315,9 +329,13 @@ public class ObservationReader {
         }
     }
     
-    public void closeCurrentStatement() throws SQLException {
-        if (currentStatement != null && !currentStatement.isClosed()) {
-            currentStatement.close();
+    public void closeCurrentStatement() {
+        try {
+            if (currentStatement != null)
+                currentStatement.close();
+        } catch (SQLException ex) {
+            logger.severe("SQLException while closing the current statement: " + ex.getMessage());
+
         }
     }
     
@@ -326,6 +344,7 @@ public class ObservationReader {
             return refTable.getEntries();
         
         } catch (NoSuchRecordException ex) {
+            logger.info("NoSuchRecordException in getReferences");
             return null;
         
         } catch (SQLException ex) {

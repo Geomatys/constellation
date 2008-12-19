@@ -52,6 +52,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "constraint",
+    "quality",
     "value"
 })
 @XmlRootElement(name = "Count")

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.catalog.NoSuchTableException;
+import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 
 /**
@@ -35,10 +36,10 @@ public abstract class SensorReader {
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
 
-    public SensorReader() throws IOException, NoSuchTableException, SQLException {
+    public SensorReader() throws WebServiceException {
     }
     
-    public abstract String getSensor(String sensorId) throws WebServiceException;
+    public abstract AbstractSensorML getSensor(String sensorId) throws WebServiceException;
     
     public abstract String getSRSName(int formID) throws WebServiceException;
 

@@ -19,7 +19,7 @@
              <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
              <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
              <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
-          <param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider;org.constellation.coverage.ws.rs</param-value>
+          <param-value>org.constellation.configuration.ws;org.constellation.sos.ws.rs</param-value>
           <!--param-value>org.constellation.security.wms;org.constellation.ws.rs.provider</param-value-->
         </init-param>
         <load-on-startup>1</load-on-startup>

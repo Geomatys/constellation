@@ -62,7 +62,7 @@ public class BlockEncodingPropertyType {
     @XmlElement(name = "BinaryBlock")
     private BinaryBlock binaryBlock;
     @XmlElement(name = "TextBlock")
-    private TextBlock textBlock;
+    private TextBlockEntry textBlock;
     @XmlElement(name = "XMLBlock")
     private XMLBlockType xmlBlock;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
@@ -154,7 +154,7 @@ public class BlockEncodingPropertyType {
      *     {@link TextBlock }
      *     
      */
-    public void setTextBlock(TextBlock value) {
+    public void setTextBlock(TextBlockEntry value) {
         this.textBlock = value;
     }
 

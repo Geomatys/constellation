@@ -68,11 +68,11 @@ public class SOService extends OGCWebService {
     /**
      * Build a new Restfull SOS service.
      */
-    public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
+    public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException, WebServiceException {
         super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
         worker = new SOSworker(SOSworker.TRANSACTIONAL);
-        setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe:org.constellation.observation",
-                      "");
+        setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
+                "org.constellation.observation:org.constellation.sml.v100:org.constellation.sml.v101", "");
     }
 
     @Override
@@ -101,8 +101,10 @@ public class SOService extends OGCWebService {
                     throw new WebServiceException("The operation DescribeSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, getActingVersion(), "DescribeSensor");
                 }
-        
-                return Response.ok(worker.describeSensor(ds), "text/xml").build();
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.describeSensor(ds), sw);
+
+                return Response.ok(sw.toString(), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
                 InsertObservation is = (InsertObservation)objectRequest;
@@ -110,8 +112,10 @@ public class SOService extends OGCWebService {
                     throw new WebServiceException("The operation InsertObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, getActingVersion(), "InsertObservation");
                 }
-        
-                return Response.ok(worker.insertObservation(is), "text/xml").build();
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.insertObservation(is), sw);
+
+                return Response.ok(sw.toString(), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
                 GetResult gr = (GetResult)objectRequest;
@@ -119,8 +123,10 @@ public class SOService extends OGCWebService {
                     throw new WebServiceException("The operation GetResult is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, getActingVersion(), "GetResult");
                 }
-        
-                return Response.ok(worker.getResult(gr), "text/xml").build();
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getResult(gr), sw);
+
+                return Response.ok(sw.toString(), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
                 RegisterSensor rs = (RegisterSensor)objectRequest;
@@ -128,8 +134,10 @@ public class SOService extends OGCWebService {
                     throw new WebServiceException("The operation RegisterSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, getActingVersion(), "RegisterSensor");
                 }
-        
-                return Response.ok(worker.registerSensor(rs), "text/xml").build();
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.registerSensor(rs), sw);
+
+                return Response.ok(sw.toString(), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 try {

@@ -109,8 +109,14 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
             prefix = "om";
         
         else if( "http://www.opengis.net/sensorML/1.0".equals(namespaceUri) )
+            prefix = "sml1";
+
+        else if( "http://www.opengis.net/sensorML/1.0.1".equals(namespaceUri) )
             prefix = "sml";
-        
+
+        else if( "http://www.opengis.net/swe/1.0".equals(namespaceUri) )
+            prefix = "swe1";
+
         else if( "http://www.opengis.net/swe/1.0.1".equals(namespaceUri) )
             prefix = "swe";
         
