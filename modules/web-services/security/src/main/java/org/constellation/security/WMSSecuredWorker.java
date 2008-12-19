@@ -18,6 +18,7 @@ package org.constellation.security;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -51,34 +52,34 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
- * A WMS worker for a security Policy Enforcement Point (PEP) gateway following 
+ * A WMS worker for a security Policy Enforcement Point (PEP) gateway following
  * the OASIS XACML model; this class performs most of the logic of the gateway.
  * <p>
- * This worker takes the request issued by the REST and SOAP server facades, 
- * ensures an Access Control decision is made based on both the security 
- * credentials of the requester and the parameters of the request, and then 
- * either performs the request or denies it depending on the Access Control 
+ * This worker takes the request issued by the REST and SOAP server facades,
+ * ensures an Access Control decision is made based on both the security
+ * credentials of the requester and the parameters of the request, and then
+ * either performs the request or denies it depending on the Access Control
  * decision.
  * </p>
  * <p>
- * <b>WARNING:</b> This class is still experimental and not behaving correctly. 
- * Using it in production is sure to void your warranty, shorten your life, and 
+ * <b>WARNING:</b> This class is still experimental and not behaving correctly.
+ * Using it in production is sure to void your warranty, shorten your life, and
  * increase the likelihood that meteorites will fall on your home.
  *</p>
  *
  * @version $Id$
- * 
+ *
  * @author Cédric Briançon (Geomatys)
  * @author Adrian Custer (Geomatys)
  * @since 0.3
  */
 public final class WmsSecuredWorker extends AbstractWMSWorker {
-	
+
     /**
      * The default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.security");
-    
+
     /**
      * The url of the WMS web service, where the request will be sent.
      */
@@ -97,7 +98,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * The marshaller of the result given by the service.
      * <p>
-     * NB this is the marshaller for the service presented as a facade, not 
+     * NB this is the marshaller for the service presented as a facade, not
      * necessarily for any of the clients.
      * </p>
      */
@@ -106,12 +107,13 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * The unmarshaller of the result given by the service.
      * <p>
-     * NB this is the marshaller for the service presented as a facade, not 
+     * NB this is the marshaller for the service presented as a facade, not
      * necessarily for any of the clients.
      * </p>
      */
     private final Unmarshaller unmarshaller;
 
+    private boolean applyFilter = false;
 
     /**
      * Builds a {@code GetCapabilities} request.
@@ -125,7 +127,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         this.marshaller   = marshaller;
 
         dispatcherWMS     = new WmsDispatcher(WMSbaseURL, WMSusesREST, marshaller, unmarshaller);
-        //dispatcherXACML = new 
+        //dispatcherXACML = new
     }
 
     /**
@@ -146,10 +148,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
             throws WebServiceException {
-    	
+
     	//TODO: getCaps doesn't follow this pattern.
         performAccessControlDecision(getCapabilities);
-        
+
     	AbstractWMSCapabilities response = dispatcherWMS.getCapabilities(getCapabilities);
         response = removeCapabilitiesInfo(response);
         response = addAccessConstraints(response);
@@ -181,21 +183,21 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getMap(GetMap getMap) throws WebServiceException {
-    	
+
     	performAccessControlDecision(getMap);
-    	
+
     	//INFO BLOCK
     	String layerList = "{";
     	for (String layerName : getMap.getLayers() ){
             layerList = new String(layerList+" "+ layerName);
     	}
     	LOGGER.info("WMS-sec: WMS request asks for layers: "+layerList+" }");
-    	
+
     	//Filter block
-    	if (true){
-    		
+    	if (applyFilter){
+
     		//TODO: get the source of the clip geometry, using the hard coordinates
-	    	
+
 	    	//MAKE A CLIP MASK
     		//Coordinates are in lat/long order!
 	    	//final double [] coords = new double[]{0.0,0.0, 20.0,0.0, 30.0,30.0, 20.0,40.0, 0.0,40.0, 0.0,0.0};
@@ -213,7 +215,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 				e.printStackTrace();
 			}
 			FeatureCollection<SimpleFeatureType,SimpleFeature> fc = ImageUtilities.createClipFeatureCollection(crs, coords);
-			
+
 			BufferedImage mask = null;
 			try {
 				mask = ImageUtilities.createMask(new ReferencedEnvelope(getMap.getEnvelope()),getMap.getSize(),fc);
@@ -225,19 +227,19 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 				e.printStackTrace();
 			}
 			LOGGER.info("WMS-sec: Made a mask of width: "+mask.getWidth()+" and height: "+mask.getHeight());
-			
-			
+
+
 			//DEFINE THE LAYERS TO CLIP
 			//TODO: This should be role based representation control
 			List<String> layersToClip = new ArrayList<String>();
 	    	layersToClip.add("ROAD_C_City");
-			
-	    	
+
+
 	    	//GET EACH LAYER, CLIP IF NEEDED, AND COMBINE TO RESULT
 	    	BufferedImage result = null;
             getMap = new GetMap(getMap, true);//Add transparency
 	    	for (String layerName : getMap.getLayers() ){
-	    		
+
 	    		//GET LAYER
 	    		BufferedImage bi = dispatcherWMS.getMap(new GetMap(getMap,layerName));
 	    		assert (null != bi);//we should have thrown an error.
@@ -246,8 +248,8 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 	    			bi = ImageUtilities.applyMask(bi,mask);
 	    			LOGGER.info("WMS-sec: Clipped layer: "+layerName+" at "+System.currentTimeMillis() );
 	    		}
-	    		
-	    		//COMBINE
+
+	    		//COMBINE 
 	    		if (null== result){
 	    			result = bi;
 	    		} else {
@@ -255,36 +257,77 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 	    		}
 	    		LOGGER.info("WMS-sec: Added layer: "+layerName+" at "+System.currentTimeMillis() );
 	    	}
-			
+
 	    	return result;
     	}
-    	
+
         return dispatcherWMS.getMap(getMap);
     }
-    
-    
-    
-    
+
+
+
+
     /**
-     * 
+     *
      * @param query
      */
-    private void performAccessControlDecision(WMSQuery query){
-    	;
+    private void performAccessControlDecision(WMSQuery query) throws WebServiceException {
+        if (isUserInRole(ROLE.PUBLIC.toString()) || isUserInRole("PUBLIC")) {
+            LOGGER.info("WMS-sec: user in role PUBLIC.");
+            applyFilter = false;
+            throw new WebServiceException("You haven't enough credential to perform the query you have done.",
+                    ExceptionCode.NO_APPLICABLE_CODE);
+        }
+    	if (isUserInRole(ROLE.USER.toString())) {
+            LOGGER.info("WMS-sec: user in role USER.");
+            applyFilter = true;
+            return;
+        } else if (isUserInRole(ROLE.ADMIN.toString())) {
+            LOGGER.info("WMS-sec: user in role ADMIN.");
+            applyFilter = true;
+            return;
+        } else if (isUserInRole(ROLE.ADVANCED.toString())) {
+            LOGGER.info("WMS-sec: user in role ADVANCED.");
+            applyFilter = true;
+            return;
+        } else if (isUserInRole("INTERNAL")) {
+            LOGGER.info("WMS-sec: user in role INTERNAL.");
+            applyFilter = true;
+            return;
+        } else {
+            LOGGER.info("WMS-sec: user is not in defined roles.");
+            applyFilter = false;
+        }
     }
 
     /**
-     * Removes the {@code <Capability>} block from a WMS Capability object, such 
-     * as the object created by unmarshalling an XML document returned by a 
+     * According to the service mode,
+     * @param role
+     * @return
+     */
+    private boolean isUserInRole(final String role) {
+        if (WMSusesREST) {
+            final Principal principal = securityContext.getUserPrincipal();
+            final String userName = principal.getName();
+            LOGGER.info("WMS-sec: user \""+ userName +"\" is logged.");
+            return securityContext.isUserInRole(role);
+        } else {
+            throw new UnsupportedOperationException("We don't handle SOAP authentication yet.");
+        }
+    }
+
+    /**
+     * Removes the {@code <Capability>} block from a WMS Capability object, such
+     * as the object created by unmarshalling an XML document returned by a
      * separate WMS server.
      *
      * @param wmsCaps A WMS Capability object conformant to one of the types
-     *                  supported by this facade, possibly created from an 
-     *                  XML response from a separate service and unmarshalled 
+     *                  supported by this facade, possibly created from an
+     *                  XML response from a separate service and unmarshalled
      *                  into a Java WMS Capabilities object.
      * @return The WMS Capabilities object without its {@code <Capability>}
      *           block.
-     * @throws WebServiceException if the given WMS Capabilities type does not 
+     * @throws WebServiceException if the given WMS Capabilities type does not
      *                               match the types supported by this facade.
      */
     private AbstractWMSCapabilities removeCapabilitiesInfo(final Object wmsCaps) throws WebServiceException {
@@ -307,15 +350,15 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     }
 
     /**
-     * Adds an {@code <AccessConstraints>} block to a WMS Capabilities object to 
-     * indicate the Access Control requirements for access to the OGC service 
+     * Adds an {@code <AccessConstraints>} block to a WMS Capabilities object to
+     * indicate the Access Control requirements for access to the OGC service
      * protected by this gateway.
      *
      * @param wmsCaps A WMS Capability object conformant to one of the types
      *                  supported by this facade.
-     * @return The WMS Capabilities object with an {@code <AccessConstraints>} 
+     * @return The WMS Capabilities object with an {@code <AccessConstraints>}
      *           block appropriate for the OGC service protected by this gateway.
-     * @throws WebServiceException if the given WMS Capabilities type does not 
+     * @throws WebServiceException if the given WMS Capabilities type does not
      *                               match the types supported by this facade.
      */
     private AbstractWMSCapabilities addAccessConstraints(final Object wmsCaps) throws WebServiceException {

@@ -36,6 +36,8 @@ public enum ROLE {
 	private ROLE(String role){
 		this.role = role;
 	}
+
+    @Override
 	public String toString(){
 		return role;
 	}
