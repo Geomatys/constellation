@@ -21,7 +21,7 @@
 		<ows:ProviderName>Geomatys</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://www.geomatys.fr/"/>
 		<ows:ServiceContact>
-			<ows:IndividualName>vincent Heurteaux</ows:IndividualName>
+			<ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
 			<ows:PositionName>CTO</ows:PositionName>
 			<ows:ContactInfo>
 				<ows:Phone>

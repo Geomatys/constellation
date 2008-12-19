@@ -5,7 +5,7 @@
 		<ows:Abstract xml:lang="fr">BRGM SOS Server</ows:Abstract>
 		<ows:Keywords>
 			<ows:Keyword>SOS</ows:Keyword>
-			<ows:Keyword>geomatys</ows:Keyword>
+			<ows:Keyword>Geomatys</ows:Keyword>
 			<ows:Keyword>BRGM</ows:Keyword>
 		</ows:Keywords>
 		<ows:ServiceType codeSpace="http://www.opengeospatial.net">OGC:SOS</ows:ServiceType>

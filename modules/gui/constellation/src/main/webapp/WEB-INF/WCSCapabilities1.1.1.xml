@@ -13,7 +13,7 @@ version="1.1.1" updateSequence="">
 		<ows:Abstract>Constellation Web Coverage Server maintained by geomatys.</ows:Abstract>
 		<ows:Keywords>
 			<ows:Keyword>WCS</ows:Keyword>
-			<ows:Keyword>geomatys</ows:Keyword>
+			<ows:Keyword>Geomatys</ows:Keyword>
 		</ows:Keywords>
 		<ows:ServiceType>OGC WCS</ows:ServiceType>
 		<ows:ServiceTypeVersion>1.1.1</ows:ServiceTypeVersion>
@@ -28,7 +28,7 @@ version="1.1.1" updateSequence="">
 		<ows:ProviderName>Geomatys</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://www.geomatys.fr/"/>
 		<ows:ServiceContact>
-			<ows:IndividualName>vincent Heurteaux</ows:IndividualName>
+			<ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
 			<ows:PositionName>CTO</ows:PositionName>
 			<ows:ContactInfo>
 				<ows:Phone>
