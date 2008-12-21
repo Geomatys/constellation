@@ -15,17 +15,14 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.constellation.sml;
 
 /**
- * Abstract super class for all the version of a SensorML Member.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface SMLMember {
-
-    // The "real" word is temporary
-    public AbstractProcess getRealProcess();
+public interface AbstractDerivableComponent extends AbstractProcess {
+    
+    public AbstractLocation getSMLLocation();
 
 }

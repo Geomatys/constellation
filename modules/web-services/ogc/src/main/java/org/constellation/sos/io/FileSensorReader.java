@@ -19,7 +19,6 @@ package org.constellation.sos.io;
 
 // J2SE dependencies
 import java.io.File;
-import java.sql.SQLException;
 import java.util.List;
 
 // JAXB dependencies
@@ -29,6 +28,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.sml.AbstractDerivableComponent;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -45,9 +46,12 @@ public class FileSensorReader extends SensorReader {
     private Unmarshaller unmarshaller;
 
     private File dataDirectory;
+    
+    private String sensorIdBase;
 
-    public FileSensorReader(File dataDirectory) throws WebServiceException  {
+    public FileSensorReader(File dataDirectory, String sensorIdBase) throws WebServiceException  {
         super();
+        this.sensorIdBase = sensorIdBase;
         try {
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
@@ -85,14 +89,18 @@ public class FileSensorReader extends SensorReader {
     }
 
     @Override
-    public String getSRSName(int formID) throws WebServiceException {
+    public DirectPositionType getSensorPosition(int formID) throws WebServiceException {
         AbstractSensorML sensor = getSensor(formID + "");
-        return "";
-    }
-
-    @Override
-    public String getSensorCoordinates(int formID) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (sensor.getMember().size() == 1) {
+            if (sensor.getMember().get(0) instanceof AbstractDerivableComponent) {
+                AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
+                if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
+                    component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null)
+                return component.getSMLLocation().getPoint().getPos();
+            }
+        }
+        logger.severe("there is no piezo location");
+        return null;
     }
 
     @Override
@@ -106,13 +114,26 @@ public class FileSensorReader extends SensorReader {
     }
 
     @Override
-    public int getNewSensorId() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public int getNewSensorId() throws WebServiceException {
+        int maxID = 0;
+        for (File f : dataDirectory.listFiles()) {
+            String id = f.getName();
+            id = id.substring(0, id.indexOf(".xml"));
+            id = id.substring(id.indexOf(sensorIdBase) + sensorIdBase.length());
+            try {
+                int curentID = Integer.parseInt(id);
+                if (curentID > maxID) {
+                    maxID = curentID;
+                }
+            } catch (NumberFormatException ex) {
+                throw new WebServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
+            }
+        }
+        return maxID + 1;
     }
 
     @Override
     public void destroy() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

@@ -22,5 +22,5 @@ package org.constellation.sml;
  * @author Guilhem Legal
  */
 public interface AbstractProcess {
-
+    
 }

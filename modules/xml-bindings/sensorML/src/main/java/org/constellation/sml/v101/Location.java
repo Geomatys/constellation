@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractCurveType;
 import org.constellation.gml.v311.PointType;
+import org.constellation.sml.AbstractLocation;
 
 
 /**
@@ -57,7 +58,7 @@ import org.constellation.gml.v311.PointType;
     "abstractCurve"
 })
 @XmlRootElement(name = "location")
-public class Location {
+public class Location implements AbstractLocation {
 
     @XmlElement(name = "Point", namespace = "http://www.opengis.net/gml")
     private PointType point;

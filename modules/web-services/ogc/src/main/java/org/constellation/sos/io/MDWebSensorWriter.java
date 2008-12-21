@@ -140,68 +140,99 @@ public class MDWebSensorWriter extends SensorWriter {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    public String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException {
-
-        //we search which identifier is the supervisor code
-        int i                  = 1;
-        boolean found          = false;
-        boolean moreIdentifier = true;
-        while (moreIdentifier && !found) {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-            getValueStmt.setInt(2, formID);
-            ResultSet result = getValueStmt.executeQuery();
-            moreIdentifier   = result.next();
-            if (moreIdentifier) {
-                String value = result.getString(1);
-                if (value.equals("supervisorCode")){
-                    found = true;
+    public String recordMapping(int formID, String dbId, File sicadeDirectory) throws WebServiceException {
+        try {
+            //we search which identifier is the supervisor code
+            int i                  = 1;
+            boolean found          = false;
+            boolean moreIdentifier = true;
+            while (moreIdentifier && !found) {
+                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
+                getValueStmt.setInt(2, formID);
+                ResultSet result = getValueStmt.executeQuery();
+                moreIdentifier   = result.next();
+                if (moreIdentifier) {
+                    String value = result.getString(1);
+                    if (value.equals("supervisorCode")){
+                        found = true;
+                    }
                 }
+                result.close();
+                i++;
             }
-            result.close();
-            i++;
-        }
 
-        if (!found) {
-            logger.severe("There is no supervisor code in that SensorML file");
-            return "";
-        } else {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-            getValueStmt.setInt(2,    formID);
-            ResultSet result = getValueStmt.executeQuery();
-            String value = "";
-            if (result.next()) {
-                value = result.getString(1);
-                logger.info("PhysicalId:" + value);
-                map.setProperty(value, dbId);
-                File mappingFile = new File(sicadeDirectory, "/sos_configuration/mapping.properties");
-                FileOutputStream out = new FileOutputStream(mappingFile);
-                map.store(out, "");
-                out.close();
+            if (!found) {
+                logger.severe("There is no supervisor code in that SensorML file");
+                return "";
             } else {
-                logger.severe("no value for supervisorcode identifier numero " + (i - 1));
+                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
+                getValueStmt.setInt(2,    formID);
+                ResultSet result = getValueStmt.executeQuery();
+                String value = "";
+                if (result.next()) {
+                    value = result.getString(1);
+                    logger.info("PhysicalId:" + value);
+                    map.setProperty(value, dbId);
+                    File mappingFile = new File(sicadeDirectory, "/sos_configuration/mapping.properties");
+                    FileOutputStream out = new FileOutputStream(mappingFile);
+                    map.store(out, "");
+                    out.close();
+                } else {
+                    logger.severe("no value for supervisorcode identifier numero " + (i - 1));
+                }
+                result.close();
+                return value;
             }
-            result.close();
-            return value;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("The service cannot build the temporary file",
+                                          NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
         }
     }
 
-    public void startTransaction() throws SQLException {
-        smlConnection.setAutoCommit(false);
-        currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
+    public void startTransaction() throws WebServiceException {
+        try {
+            smlConnection.setAutoCommit(false);
+            currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
     }
 
-    public void abortTransaction() throws SQLException {
-        if (currentSavePoint != null)
-            smlConnection.rollback(currentSavePoint);
-        smlConnection.commit();
-        smlConnection.setAutoCommit(true);
+    public void abortTransaction() throws WebServiceException {
+        try {
+            if (currentSavePoint != null)
+                smlConnection.rollback(currentSavePoint);
+            smlConnection.commit();
+            smlConnection.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
     }
 
-    public void endTransaction() throws SQLException {
-        if (currentSavePoint != null)
-            smlConnection.releaseSavepoint(currentSavePoint);
-        smlConnection.commit();
-        smlConnection.setAutoCommit(true);
+    public void endTransaction() throws WebServiceException {
+        try {
+            if (currentSavePoint != null)
+                smlConnection.releaseSavepoint(currentSavePoint);
+            smlConnection.commit();
+            smlConnection.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
     }
     public void destroy() {
         try {

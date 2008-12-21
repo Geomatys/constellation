@@ -46,14 +46,14 @@ public abstract class SensorWriter {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    public abstract String recordMapping(int formID, String dbId, File sicadeDirectory) throws SQLException, FileNotFoundException, IOException;
+    public abstract String recordMapping(int formID, String dbId, File sicadeDirectory) throws WebServiceException, FileNotFoundException, IOException;
     
     
-    public abstract void startTransaction() throws SQLException;
+    public abstract void startTransaction() throws WebServiceException;
     
-    public abstract void abortTransaction() throws SQLException;
+    public abstract void abortTransaction() throws WebServiceException;
     
-    public abstract void endTransaction() throws SQLException;
+    public abstract void endTransaction() throws WebServiceException;
 
     public abstract void destroy();
 }

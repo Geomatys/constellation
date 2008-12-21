@@ -54,6 +54,7 @@ import javax.xml.namespace.QName;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.FeaturePropertyType;
 import org.constellation.gml.v311.ReferenceEntry;
@@ -1165,26 +1166,16 @@ public class SOSworker {
             addSensorToOffering(formID, obs);
             
            success = true; 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } finally {
-            try {
-                if (!success) {
-                   SMLWriter.abortTransaction();
-                   logger.severe("Transaction failed");
-                } else {
-                    SMLWriter.endTransaction();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                              NO_APPLICABLE_CODE);
+            if (!success) {
+               SMLWriter.abortTransaction();
+               logger.severe("Transaction failed");
+            } else {
+                SMLWriter.endTransaction();
             }
         }
         
@@ -1496,7 +1487,7 @@ public class SOSworker {
     }
     
     /**
-     * Find a newe suffix to obtain a unic temporary template id. 
+     * Find a new suffix to obtain a unic temporary template id. 
      * 
      * @param templateName the full name of the sensor template.
      * 
@@ -1519,13 +1510,8 @@ public class SOSworker {
      *  @param form The "form" containing the sensorML data.
      */
     private void recordSensorLocation(int formID, String sensorId) throws WebServiceException {
-        String SRS         = SMLReader.getSRSName(formID);
-        String coordinates = SMLReader.getSensorCoordinates(formID);
-        
-        String x = coordinates.substring(0, coordinates.indexOf(' '));
-        String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
-        
-        OMWriter.recordProcedureLocation(SRS, sensorId, x, y);
+        DirectPositionType position = SMLReader.getSensorPosition(formID);
+        OMWriter.recordProcedureLocation(sensorId, position);
     }
     
     /**

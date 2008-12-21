@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractDerivableComponent;
 
 
 /**
@@ -57,24 +58,27 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractDerivableComponentType", propOrder = {
-    "rest"
+    "rest",
+    "location"
 })
 @XmlSeeAlso({
     ComponentArrayType.class,
     AbstractComponentType.class
 })
-public abstract class AbstractDerivableComponentType extends AbstractProcessType {
+public abstract class AbstractDerivableComponentType extends AbstractProcessType implements AbstractDerivableComponent {
 
     @XmlElementRefs({
         @XmlElementRef(name = "temporalReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0.1", type = TemporalReferenceFrame.class),
         @XmlElementRef(name = "spatialReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0.1", type = SpatialReferenceFrame.class),
-        @XmlElementRef(name = "location", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Location.class),
         @XmlElementRef(name = "timePosition", namespace = "http://www.opengis.net/sensorML/1.0.1", type = TimePosition.class),
         @XmlElementRef(name = "interfaces", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Interfaces.class),
         @XmlElementRef(name = "position", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Position.class)
     })
     private List<Object> rest;
 
+    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Location.class)
+    private Location location;
+    
     /**
      * Gets the rest of the content model. 
      * 
@@ -93,6 +97,14 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
             rest = new ArrayList<Object>();
         }
         return this.rest;
+    }
+    
+    public Location getSMLLocation() {
+        return location;
+    }
+    
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
 }
