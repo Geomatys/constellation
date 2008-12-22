@@ -17,7 +17,6 @@
 
 package org.constellation.sos.io;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.gml.v311.DirectPositionType;
@@ -38,13 +37,11 @@ public abstract class SensorReader {
     public SensorReader() throws WebServiceException {
     }
     
-    public abstract AbstractSensorML getSensor(String sensorId) throws WebServiceException;
+    public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
     
-    public abstract DirectPositionType getSensorPosition(int formID) throws WebServiceException;
+    public abstract DirectPositionType getSensorPosition(String sensorID) throws WebServiceException;
 
-    public abstract List<Integer> getNetworkIndex(int formID) throws WebServiceException;
-    
-    public abstract String getNetworkName(int formID, String networkName) throws WebServiceException;
+    public abstract List<String> getNetworkNames(String sensorID) throws WebServiceException;
     
     /**
      * Create a new identifier for an observation by searching in the O&M database.

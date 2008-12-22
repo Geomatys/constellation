@@ -19,6 +19,7 @@ package org.constellation.sos.io;
 
 // J2SE dependencies
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 // JAXB dependencies
@@ -29,7 +30,10 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.sml.AbstractClassification;
+import org.constellation.sml.AbstractClassifier;
 import org.constellation.sml.AbstractDerivableComponent;
+import org.constellation.sml.AbstractProcess;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -89,8 +93,8 @@ public class FileSensorReader extends SensorReader {
     }
 
     @Override
-    public DirectPositionType getSensorPosition(int formID) throws WebServiceException {
-        AbstractSensorML sensor = getSensor(formID + "");
+    public DirectPositionType getSensorPosition(String sensorID) throws WebServiceException {
+        AbstractSensorML sensor = getSensor(sensorID);
         if (sensor.getMember().size() == 1) {
             if (sensor.getMember().get(0) instanceof AbstractDerivableComponent) {
                 AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
@@ -104,13 +108,24 @@ public class FileSensorReader extends SensorReader {
     }
 
     @Override
-    public List<Integer> getNetworkIndex(int formID) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getNetworkName(int formID, String networkName) throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<String> getNetworkNames(String sensorID) throws WebServiceException {
+        List<String> results = new ArrayList<String>();
+        AbstractSensorML sensor = getSensor(sensorID);
+        if (sensor.getMember().size() == 1) {
+            if (sensor.getMember().get(0) instanceof AbstractProcess) {
+                AbstractProcess component = (AbstractProcess) sensor.getMember().get(0);
+                for (AbstractClassification cl : component.getClassification()) {
+                    if (cl.getClassifierList() != null) {
+                        for (AbstractClassifier classifier : cl.getClassifierList().getClassifier()) {
+                            if (classifier.getName().equals("network") && classifier.getTerm() != null) {
+                                results.add(classifier.getTerm().getValue());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return results;
     }
 
     @Override

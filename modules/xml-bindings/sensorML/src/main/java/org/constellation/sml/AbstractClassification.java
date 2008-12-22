@@ -17,14 +17,12 @@
 
 package org.constellation.sml;
 
-import java.util.List;
-
 /**
  *
  * @author Guilhem Legal
  */
-public interface AbstractProcess {
+public interface AbstractClassification {
 
-    public List<? extends AbstractClassification> getClassification();
-    
+    public AbstractClassifierList getClassifierList();
+
 }

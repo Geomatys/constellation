@@ -140,9 +140,10 @@ public class MDWebSensorWriter extends SensorWriter {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    public String recordMapping(int formID, String dbId, File sicadeDirectory) throws WebServiceException {
+    public String recordMapping(String dbId, File sicadeDirectory) throws WebServiceException {
         try {
             //we search which identifier is the supervisor code
+            int formID             = sensorMLReader.getIdFromTitleForm(dbId);
             int i                  = 1;
             boolean found          = false;
             boolean moreIdentifier = true;

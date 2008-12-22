@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractTerm;
 import org.constellation.swe.v101.CodeSpacePropertyType;
 
 
@@ -56,7 +57,7 @@ import org.constellation.swe.v101.CodeSpacePropertyType;
     "value"
 })
 @XmlRootElement(name = "Term")
-public class Term {
+public class Term implements AbstractTerm {
 
     private CodeSpacePropertyType codeSpace;
     @XmlElement(required = true)

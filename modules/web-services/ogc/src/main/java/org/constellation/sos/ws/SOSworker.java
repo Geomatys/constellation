@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -117,6 +118,7 @@ import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.TextBlockEntry;
 import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.sos.ResponseModeType.*;
 
 // MDWeb dependencies
 import org.opengis.observation.Observation;
@@ -211,10 +213,7 @@ public class SOSworker {
      */
     private final static List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
-        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
-        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
+        ACCEPTED_OUTPUT_FORMATS = Arrays.asList("text/xml", "application/xml", "text/plain");
     }
     
     /**
@@ -246,6 +245,9 @@ public class SOSworker {
      * The sensorML database writer
      */
     private final SensorWriter SMLWriter;
+
+    private final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+    
     /**
      * Initialize the database connection.
      */
@@ -519,7 +521,7 @@ public class SOSworker {
             boolean template  = false;
             ResponseModeType mode;
             if (requestObservation.getResponseMode() == null) {
-                mode = ResponseModeType.INLINE; 
+                mode = INLINE; 
             } else {
                 try {
                     mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
@@ -530,9 +532,9 @@ public class SOSworker {
             }
             StringBuilder SQLrequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
             
-            if (mode == ResponseModeType.INLINE) {
+            if (mode == INLINE) {
                 SQLrequest.append(observationIdBase).append("%' AND ");
-            } else if (mode == ResponseModeType.RESULT_TEMPLATE) {
+            } else if (mode == RESULT_TEMPLATE) {
                 SQLrequest.append(observationTemplateIdBase).append("%' AND ");
                 template = true;
             } else {
@@ -1146,13 +1148,13 @@ public class SOSworker {
             id = sensorIdBase + num;
             
             //and we write it in the sensorML Database
-            int formID = SMLWriter.writeSensor(id, tempFile);
+            SMLWriter.writeSensor(id, tempFile);
             
             // we record the mapping between physical id and database id
-            String phyId = SMLWriter.recordMapping(formID, id, getSicadeDirectory());
+            String phyId = SMLWriter.recordMapping(id, getSicadeDirectory());
             
             // and we record the position of the piezometer
-            recordSensorLocation(formID, phyId);
+            recordSensorLocation(id, phyId);
                                     
             //we write the observation template in the O&M database
             
@@ -1163,7 +1165,7 @@ public class SOSworker {
             logger.finer(obs.toString());
             OMWriter.writeObservation(obs);
                    
-            addSensorToOffering(formID, obs);
+            addSensorToOffering(id, obs);
             
            success = true; 
         } catch (IOException ex) {
@@ -1509,9 +1511,9 @@ public class SOSworker {
      * 
      *  @param form The "form" containing the sensorML data.
      */
-    private void recordSensorLocation(int formID, String sensorId) throws WebServiceException {
-        DirectPositionType position = SMLReader.getSensorPosition(formID);
-        OMWriter.recordProcedureLocation(sensorId, position);
+    private void recordSensorLocation(String sensorID, String physicalID) throws WebServiceException {
+        DirectPositionType position = SMLReader.getSensorPosition(sensorID);
+        OMWriter.recordProcedureLocation(physicalID, position);
     }
     
     /**
@@ -1521,205 +1523,162 @@ public class SOSworker {
      * @param form The "form" contain the sensorML data.
      * @param template The observation template for this sensor.
      */
-    private void addSensorToOffering(int formID, Observation template) throws WebServiceException {
+    private void addSensorToOffering(String sensorID, Observation template) throws WebServiceException {
      
-        //we search which are the classifier describing the networks
-        List<Integer> networksIndex = SMLReader.getNetworkIndex(formID);
-        
-        int size = networksIndex.size();
+        //we search which are the networks binded to this sensor
+        List<String> networkNames = SMLReader.getNetworkNames(sensorID);
+
+        int size = networkNames.size();
         if (size == 0) {
             logger.severe("There is no network in that SensorML file");
-        } 
+        }
 
         // for each network we create (or update) an offering
-        for (int j = 0; j < size + 1; j++) {
-            if (j != size) {
-                String result = SMLReader.getNetworkName(formID, networksIndex.get(j) + "");
+        for (String networkName : networkNames) {
 
-                if (result != null) {
-                    String offeringName = "offering-" + result;
-                    logger.info("networks:" + offeringName);
-                    ObservationOfferingEntry offering = null;
+            String offeringName = "offering-" + networkName;
+            logger.info("networks:" + offeringName);
+            ObservationOfferingEntry offering = null;
 
-                    //we get the offering from the O&M database
-                    offering = OMReader.getObservationOffering(offeringName);
+            //we get the offering from the O&M database
+            offering = OMReader.getObservationOffering(offeringName);
 
-                    //if the offering is already in the database
-                    if (offering != null) {
+            //if the offering is already in the database
+            if (offering != null) {
 
-                        //we add the new sensor to the offering
-                        ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry)template.getProcedure()).getHref());
-                        if (!offering.getProcedure().contains(ref)) {
-                            if (ref == null) {
-                               ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref()); 
-                            }
-                            OfferingProcedureEntry offProc= new OfferingProcedureEntry(offering.getId(), ref);
-                            OMWriter.writeOfferingProcedure(offProc);
-                        }
-
-                        //we add the phenomenon to the offering
-                        if (!offering.getObservedProperty().contains(template.getObservedProperty())){
-                            OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
-                            OMWriter.writeOfferingPhenomenon(offPheno);
-                        }
-
-                        // we add the feature of interest (station) to the offering
-                        ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                        if (!offering.getFeatureOfInterest().contains(ref)) {
-                            if (ref == null) {
-                               ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId()); 
-                            }
-                            OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                            OMWriter.writeOfferingSamplingFeature(offSF);
-                        }
-
-                    // we build a new offering
-                    // TODO bounded by??? station?    
-                    } else {
-                        logger.info("offering " + offeringName + " not present, first build");
-
-                        // for the eventime of the offering we take the time of now.
-                        Calendar now = new GregorianCalendar();
-                        Timestamp t = new Timestamp(now.getTimeInMillis());
-                        TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
-
-                        //we create a new List of process and add the template process to it
-                        List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
-                        ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
-                        process.add(ref);
-
-                        //we create a new List of phenomenon and add the template phenomenon to it
-                        List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
-                        phenos.add((PhenomenonEntry)template.getObservedProperty());
-
-                        //we create a new List of process and add the template process to it
-                        List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
-                        ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                        logger.info(ref.toString());
-                        stations.add(ref);
-
-                        //we create a list of accepted responseMode (fixed)
-                        List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
-                        responses.add(ResponseModeType.INLINE);
-                        responses.add(ResponseModeType.RESULT_TEMPLATE);
-
-                        List<QName> resultModel = new ArrayList<QName>();
-                        resultModel.add(new QName("http://www.opengis.net/om/1.0",
-                                                  "Observation",
-                                                  "om"));
-                        List<String> offerinfOutputFormat = new ArrayList<String>();
-                        offerinfOutputFormat.add("text/xml");
-
-                        List<String> srsName = new ArrayList<String>();
-                        srsName.add("EPSG:4326");
-
-                        // we create a the new Offering
-                        offering = new ObservationOfferingEntry(offeringName, 
-                                                                offeringIdBase + offeringName,
-                                                                "",
-                                                                null, 
-                                                                null, //TODO boundedby 
-                                                                srsName,
-                                                                time,
-                                                                process,
-                                                                phenos,
-                                                                stations,
-                                                                offerinfOutputFormat,
-                                                                resultModel,
-                                                                responses);
-                        OMWriter.writeOffering(offering);
+                //we add the new sensor to the offering
+                ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
+                if (!offering.getProcedure().contains(ref)) {
+                    if (ref == null) {
+                        ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
                     }
-                } else {
-                    logger.severe("no value for network classifier numero " + networksIndex.get(j));
+                    OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
+                    OMWriter.writeOfferingProcedure(offProc);
                 }
 
-            // we add the sensor to the global offering containing all the sensor    
+                //we add the phenomenon to the offering
+                if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
+                    OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
+                    OMWriter.writeOfferingPhenomenon(offPheno);
+                }
+
+                // we add the feature of interest (station) to the offering
+                ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                if (!offering.getFeatureOfInterest().contains(ref)) {
+                    if (ref == null) {
+                        ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                    }
+                    OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                    OMWriter.writeOfferingSamplingFeature(offSF);
+                }
+
+            // we build a new offering
+            // TODO bounded by??? station?
             } else {
+                logger.info("offering " + offeringName + " not present, first build");
 
-                //we get the offering from the O&M database
-                ObservationOfferingEntry offering = OMReader.getObservationOffering("offering-allSensor");
+                // for the eventime of the offering we take the time of now.
+                Timestamp t = new Timestamp(System.currentTimeMillis());
+                TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
 
-                if (offering != null) {
-                    //we add the new sensor to the offering
-                    ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
-                    if (!offering.getProcedure().contains(ref)) {
-                        if (ref == null) {
-                            ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
-                        }
-                        OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
-                        OMWriter.writeOfferingProcedure(offProc);
-                    }
-                    //we add the phenomenon to the offering
-                    if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
-                        OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
-                        OMWriter.writeOfferingPhenomenon(offPheno);
-                    }
-                    // we add the feature of interest (station) to the offering
-                    ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
-                    if (!offering.getFeatureOfInterest().contains(ref)) {
-                        if (ref == null) {
-                            ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
-                        }
-                        OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                        OMWriter.writeOfferingSamplingFeature(offSF);
-                    }
-                } else {
-                    logger.info("offering allSensor not present, first build");
+                //we add the template process
+                ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
 
-                    // for the eventime of the offering we take the time of now.
-                    Calendar now = new GregorianCalendar();
-                    Timestamp t = new Timestamp(now.getTimeInMillis());
-                    TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+                //we add the template phenomenon
+                PhenomenonEntry phenomenon = (PhenomenonEntry) template.getObservedProperty();
 
-                    //we create a new List of process and add the template process to it
-                    List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
-                    ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
-                    process.add(ref);
+                //we add the template feature of interest
+                ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
 
-                    //we create a new List of phenomenon and add the template phenomenon to it
-                    List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
-                    phenos.add((PhenomenonEntry)template.getObservedProperty());
+                //we create a list of accepted responseMode (fixed)
+                List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
+                List<QName> resultModel           = Arrays.asList(observation_QNAME);
+                List<String> offerinfOutputFormat = Arrays.asList("text/xml");
+                List<String> srsName              = Arrays.asList("EPSG:4326");
 
-                    //we create a new List of process and add the template process to it
-                    List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
-                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
-                    stations.add(ref);
-
-                    //we create a list of accepted responseMode (fixed)
-                    List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
-                    responses.add(ResponseModeType.RESULT_TEMPLATE);
-                    responses.add(ResponseModeType.INLINE);
-
-                    List<QName> resultModel = new ArrayList<QName>();
-                    resultModel.add(new QName("http://www.opengis.net/om/1.0",
-                                              "Observation",
-                                              "om"));
-                    List<String> offeringOutputFormat = new ArrayList<String>();
-                    offeringOutputFormat.add("text/xml");
-
-                    List<String> srsName = new ArrayList<String>();
-                    srsName.add("EPSG:4326");
-
-                    // we create a the new Offering
-                    offering = new ObservationOfferingEntry(offeringIdBase + "allSensor", 
-                                                            offeringIdBase + "allSensor",
-                                                            "",
-                                                            null, 
-                                                            null, //TODO boundedby
-                                                            srsName,
-                                                            time,
-                                                            process,
-                                                            phenos,
-                                                            stations,
-                                                            offeringOutputFormat,
-                                                            resultModel,
-                                                            responses);
-                    OMWriter.writeOffering(offering);
-                }
+                // we create a the new Offering
+                offering = new ObservationOfferingEntry(offeringName,
+                        offeringIdBase + offeringName,
+                        "",
+                        srsName,
+                        time,
+                        process,
+                        phenomenon,
+                        station,
+                        offerinfOutputFormat,
+                        resultModel,
+                        responses);
+                OMWriter.writeOffering(offering);
             }
+
+        }
+        //then  we add the sensor to the global offering containing all the sensor
+
+        //we get the offering from the O&M database
+        ObservationOfferingEntry offering = OMReader.getObservationOffering("offering-allSensor");
+
+        if (offering != null) {
+            //we add the new sensor to the offering
+            ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
+            if (!offering.getProcedure().contains(ref)) {
+                if (ref == null) {
+                    ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
+                }
+                OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
+                OMWriter.writeOfferingProcedure(offProc);
+            }
+            //we add the phenomenon to the offering
+            if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
+                OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
+                OMWriter.writeOfferingPhenomenon(offPheno);
+            }
+            // we add the feature of interest (station) to the offering
+            ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            if (!offering.getFeatureOfInterest().contains(ref)) {
+                if (ref == null) {
+                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                }
+                OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                OMWriter.writeOfferingSamplingFeature(offSF);
+            }
+        } else {
+            logger.info("offering allSensor not present, first build");
+
+            // for the eventime of the offering we take the time of now.
+            Timestamp t = new Timestamp(System.currentTimeMillis());
+            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+
+            //we add the template process
+            ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
+
+            //we add the template phenomenon
+            PhenomenonEntry phenomenon = (PhenomenonEntry)template.getObservedProperty();
+
+            //we add the template feature of interest
+            ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+
+            //we create a list of accepted responseMode (fixed)
+            List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);
+            List<QName> resultModel           = Arrays.asList(observation_QNAME);
+            List<String> offeringOutputFormat = Arrays.asList("text/xml");
+            List<String> srsName              = Arrays.asList("EPSG:4326");
+
+            // we create a the new Offering
+            offering = new ObservationOfferingEntry(offeringIdBase + "allSensor",
+                                                    offeringIdBase + "allSensor",
+                                                    "Base offering containing all the sensors.",
+                                                    srsName,
+                                                    time,
+                                                    process,
+                                                    phenomenon,
+                                                    station,
+                                                    offeringOutputFormat,
+                                                    resultModel,
+                                                    responses);
+            OMWriter.writeOffering(offering);
         }
     }
-    
+
     /**
      * Return the referenceEntry with the specified href attribute.
      */

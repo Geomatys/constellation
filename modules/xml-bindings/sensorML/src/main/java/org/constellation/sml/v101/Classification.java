@@ -29,6 +29,9 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractClassification;
+import org.constellation.sml.AbstractClassifier;
+import org.constellation.sml.AbstractClassifierList;
 
 
 /**
@@ -78,7 +81,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "classifierList"
 })
 @XmlRootElement(name = "classification")
-public class Classification {
+public class Classification implements AbstractClassification {
 
     @XmlElement(name = "ClassifierList")
     private Classification.ClassifierList classifierList;
@@ -399,7 +402,7 @@ public class Classification {
     @XmlType(name = "", propOrder = {
         "classifier"
     })
-    public static class ClassifierList {
+    public static class ClassifierList implements AbstractClassifierList {
 
         @XmlElement(required = true)
         private List<Classification.ClassifierList.Classifier> classifier;
@@ -488,7 +491,7 @@ public class Classification {
         @XmlType(name = "", propOrder = {
             "term"
         })
-        public static class Classifier {
+        public static class Classifier implements AbstractClassifier {
 
             @XmlElement(name = "Term", required = true)
             private Term term;

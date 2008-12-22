@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractTerm;
 import org.constellation.swe.v100.CodeSpacePropertyType;
 import org.geotools.util.Utilities;
 
@@ -56,7 +57,7 @@ import org.geotools.util.Utilities;
     "value"
 })
 @XmlRootElement(name = "Term")
-public class Term {
+public class Term implements AbstractTerm {
 
     private CodeSpacePropertyType codeSpace;
     @XmlElement(required = true)

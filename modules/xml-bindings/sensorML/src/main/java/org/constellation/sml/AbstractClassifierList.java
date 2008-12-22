@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.sml;
 
 import java.util.List;
@@ -23,8 +22,7 @@ import java.util.List;
  *
  * @author Guilhem Legal
  */
-public interface AbstractProcess {
+public interface AbstractClassifierList {
 
-    public List<? extends AbstractClassification> getClassification();
-    
+    public List<? extends AbstractClassifier> getClassifier();
 }

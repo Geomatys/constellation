@@ -185,7 +185,7 @@ public class ObservationWriter {
         offTable.flush();
     }
     
-    public void recordProcedureLocation(String sensorId, DirectPositionType position) throws WebServiceException {
+    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws WebServiceException {
         try {
             Statement stmt2    = OMDatabase.getConnection().createStatement();
             final ResultSet result2;
@@ -193,22 +193,22 @@ public class ObservationWriter {
             boolean insert = true;
 
             if (position.getSrsName().equals("27582")) {
-                request = request + " projected_localisations WHERE id='" + sensorId + "'";
+                request = request + " projected_localisations WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
+                    request = "INSERT INTO projected_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
                 } else {
                     insert = false;
-                    logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
+                    logger.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
                 }
             } else if (position.getSrsName().equals("4326")) {
-                request = request + " geographic_localisations WHERE id='" + sensorId + "'";
+                request = request + " geographic_localisations WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
+                    request = "INSERT INTO geographic_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
                 } else {
                     insert = false;
-                    logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
+                    logger.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
                 }
             } else {
                 throw new WebServiceException("This CRS " + position.getSrsName() + " is not supported", INVALID_PARAMETER_VALUE);

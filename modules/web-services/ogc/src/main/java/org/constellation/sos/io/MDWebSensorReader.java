@@ -159,9 +159,11 @@ public class MDWebSensorReader extends SensorReader {
             throw new WebServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
         }
     }
+    
     @Override
-    public DirectPositionType getSensorPosition(int formID) throws WebServiceException {
+    public DirectPositionType getSensorPosition(String sensorID) throws WebServiceException {
         try {
+            int formID = sensorMLReader.getIdFromTitleForm(sensorID);
             String SRS = "";
             //we get the srs name
             getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
@@ -204,8 +206,7 @@ public class MDWebSensorReader extends SensorReader {
         }
     }
 
-    @Override
-    public List<Integer> getNetworkIndex(int formID) throws WebServiceException {
+    private List<Integer> getNetworkIndex(int formID) throws WebServiceException {
         try {
             int i = 1;
             List<Integer> networksIndex = new ArrayList<Integer>();
@@ -235,17 +236,22 @@ public class MDWebSensorReader extends SensorReader {
     }
 
     @Override
-    public String getNetworkName(int formID, String networkName) throws WebServiceException {
+    public List<String> getNetworkNames(String sensorID) throws WebServiceException {
         try {
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + networkName + ":value.1");
-            getValueStmt.setInt(2,    formID);
-            ResultSet result = getValueStmt.executeQuery();
-            String network = null;
-            if (result.next()) {
-                network = result.getString(1);
+            int formID = sensorMLReader.getIdFromTitleForm(sensorID);
+            List<Integer> indexes = getNetworkIndex(formID);
+            List<String> networkNames = new ArrayList<String>();
+            for (Integer index : indexes) {
+                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + index + ":value.1");
+                getValueStmt.setInt(2,    formID);
+                ResultSet result = getValueStmt.executeQuery();
+                
+                if (result.next()) {
+                    networkNames.add(result.getString(1));
+                }
+                result.close();
             }
-            result.close();
-            return network;
+            return networkNames;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),

@@ -17,6 +17,7 @@
 package org.constellation.sos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -89,6 +90,25 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
             this.observedProperty.add(new PhenomenonPropertyType(p));
         }
         this.featureOfInterest = featureOfInterest;
+        this.responseFormat    = responseFormat;
+        this.resultModel       = resultModel;
+        this.responseMode      = responseMode;
+        this.time              = new TimeGeometricPrimitivePropertyType(time);
+    }
+
+    /**
+     *  Build a new offering.
+     */
+    public ObservationOfferingEntry(String id, String name, String description, List<String> srsName, AbstractTimeGeometricPrimitiveType time, ReferenceEntry procedure,
+            PhenomenonEntry observedProperty, ReferenceEntry featureOfInterest,
+            List<String> responseFormat, List<QName> resultModel, List<ResponseModeType> responseMode) {
+
+        super(id, name, description, null, null, srsName);
+        this.procedure         = Arrays.asList(procedure);
+        if(observedProperty != null){
+            this.observedProperty = Arrays.asList(new PhenomenonPropertyType(observedProperty));
+        }
+        this.featureOfInterest = Arrays.asList(featureOfInterest);
         this.responseFormat    = responseFormat;
         this.resultModel       = resultModel;
         this.responseMode      = responseMode;
