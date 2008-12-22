@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -117,13 +118,13 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * Defines whether a filter should be applied on GetMap results, to mask sensible data.
      */
-    private boolean applyFilter = false;
+    private boolean applyFilter;
 
     /**
      * Defines wheter a full get capabilities request should be returned, or if an empty one
      * should be returned.
      */
-    private boolean returnFullCapabilities = false;
+    private boolean returnFullCapabilities;
 
     /**
      * Builds a {@code GetCapabilities} request.
@@ -157,9 +158,11 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
-            throws WebServiceException {
+            throws WebServiceException
+    {
 
     	//TODO: getCaps doesn't follow this pattern.
+        logsAuthentication();
         performAccessControlDecision(getCapabilities);
 
     	AbstractWMSCapabilities response = dispatcherWMS.getCapabilities(getCapabilities);
@@ -175,6 +178,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException {
+        logsAuthentication();
         performAccessControlDecision(getFeatureInfo);
 
         return dispatcherWMS.getFeatureInfo(getFeatureInfo);
@@ -185,6 +189,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException {
+        logsAuthentication();
         performAccessControlDecision(getLegend);
 
         return dispatcherWMS.getLegendGraphic(getLegend);
@@ -195,7 +200,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getMap(GetMap getMap) throws WebServiceException {
-
+        logsAuthentication();
     	performAccessControlDecision(getMap);
 
     	//INFO BLOCK
@@ -313,21 +318,35 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         }
         //No known role has been found
         LOGGER.info("WMS-sec: user is not in defined roles.");
-        applyFilter = true;
-        returnFullCapabilities = false;
+        throw new WebServiceException("Your user role is not defined. Please log in with a valid user.",
+                    ExceptionCode.NO_APPLICABLE_CODE);
     }
 
     /**
-     * According to the service mode,
-     * @param role
-     * @return
+     * According to the service mode, chose the right context variable in order to test if the
+     * current user belongs to a specific role.
+     *
+     * @param role The role for which we want to know if the user belongs to it or not.
+     * @return True if the current user is in the specified role, false if not.
+     *
+     * @see SecurityContext#isUserInRole(String)
      */
     private boolean isUserInRole(final String role) {
+        if (WMSusesREST) {
+            return securityContext.isUserInRole(role);
+        } else {
+            throw new UnsupportedOperationException("We don't handle SOAP authentication yet.");
+        }
+    }
+
+    /**
+     * Write in logs that a user has processed with the authentication.
+     */
+    private void logsAuthentication() {
         if (WMSusesREST) {
             final Principal principal = securityContext.getUserPrincipal();
             final String userName = principal.getName();
             LOGGER.info("WMS-sec: user \""+ userName +"\" is logged.");
-            return securityContext.isUserInRole(role);
         } else {
             throw new UnsupportedOperationException("We don't handle SOAP authentication yet.");
         }
