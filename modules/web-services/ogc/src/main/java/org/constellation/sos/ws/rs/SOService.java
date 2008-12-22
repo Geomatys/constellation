@@ -240,10 +240,13 @@ public class SOService extends OGCWebService {
     }
 
     /**
-     * TODO
+     * Shutodown the SOS service.
      */
     @PreDestroy
     public void destroy() {
-       LOGGER.info("Destroying SOS service");
+        LOGGER.info("Destroying SOS service");
+        if (worker != null) {
+            worker.destroy();
+        }
     }
 }

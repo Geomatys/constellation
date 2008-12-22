@@ -27,8 +27,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.Properties;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -37,7 +42,6 @@ import org.mdweb.sql.v20.Reader20;
 import org.mdweb.sql.v20.Writer20;
 import org.mdweb.xml.MalFormedDocumentException;
 import org.mdweb.xml.Reader;
-import org.postgresql.ds.PGSimpleDataSource;
 import org.xml.sax.SAXException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -83,20 +87,44 @@ public class MDWebSensorWriter extends SensorWriter {
      */
     private final Properties map;
 
-    public MDWebSensorWriter(PGSimpleDataSource dataSourceSML, String sensorIdBase, Properties map) throws SQLException {
-        smlConnection  = dataSourceSML.getConnection();
-        sensorMLWriter = new Writer20(smlConnection);
-        sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
-        SMLCatalog     = sensorMLReader.getCatalog("SMLC");
-        mainUser       = sensorMLReader.getUser("admin");
-        this.map       = map;
+    /**
+     * A JAXB marshaller used to provide xml to the XMLReader.
+     */
+    private Marshaller marshaller;
 
-        //we build the prepared Statement
-        getValueStmt       = smlConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
+    public MDWebSensorWriter(Connection connection, String sensorIdBase, Properties map) throws WebServiceException {
+        try {
+            smlConnection  = connection;
+            sensorMLWriter = new Writer20(smlConnection);
+            sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
+            SMLCatalog     = sensorMLReader.getCatalog("SMLC");
+            mainUser       = sensorMLReader.getUser("admin");
+            this.map       = map;
+
+            //we initialize the unmarshaller
+            JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
+            marshaller        = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("http://www.opengis.net/sensorML/1.0");
+            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+
+            //we build the prepared Statement
+            getValueStmt       = smlConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
+        } catch (JAXBException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+        } catch (SQLException ex) {
+            throw new WebServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
 
-     public int writeSensor(String id, File sensorFile) throws WebServiceException {
+     public int writeSensor(String id, AbstractSensorML process) throws WebServiceException {
         try {
+
+            //we create a new Tempory File SensorML
+            File sensorFile = File.createTempFile("sml", "xml");
+            marshaller.marshal(process, sensorFile);
+
             //we parse the temporay xmlFile
             Reader XMLReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
 
@@ -117,7 +145,7 @@ public class MDWebSensorWriter extends SensorWriter {
         } catch (MalFormedDocumentException ex) {
             ex.printStackTrace();
             logger.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new WebServiceException("The SensorML Document is Malformed",
+            throw new WebServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
                                           INVALID_PARAMETER_VALUE, "sensorDescription");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,6 +158,10 @@ public class MDWebSensorWriter extends SensorWriter {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("the service has throw an JAXBException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }

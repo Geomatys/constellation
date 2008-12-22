@@ -17,226 +17,47 @@
 
 package org.constellation.sos.io;
 
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Logger;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
+
+// constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.ReferenceTable;
 import org.constellation.observation.MeasurementEntry;
-import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationEntry;
-import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
 import org.constellation.ws.WebServiceException;
-import org.postgresql.ds.PGSimpleDataSource;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class ObservationWriter {
+public abstract class ObservationWriter {
     
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    protected Logger logger = Logger.getLogger("org.constellation.sos.io");
     
-    /**
-     * A Database object for the O&M dataBase.
-     */
-    private final Database OMDatabase;
-    
-    /**
-     * A database table for insert and get observation
-     */
-    private final ObservationTable obsTable;
-    
-    /**
-     * A database table for insert and get observation offerring.
-     */
-    private final ObservationOfferingTable offTable;
-    
-    /**
-     * A database table for insert and get reference object.
-     */
-    private final ReferenceTable refTable;
-    
-    /**
-     * 
-     * @param dataSourceOM
-     * @param observationIdBase
-     * @throws java.io.IOException
-     * @throws org.constellation.catalog.NoSuchTableException
-     * @throws java.sql.SQLException
-     */
-    public ObservationWriter(PGSimpleDataSource dataSourceOM) throws WebServiceException {
-        try {
-            OMDatabase   = new Database(dataSourceOM);
-       
-            //we build the database table frequently used.
-            obsTable = OMDatabase.getTable(ObservationTable.class);
-            offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-            refTable = OMDatabase.getTable(ReferenceTable.class);
-        
-        } catch (NoSuchTableException ex) {
-            throw new WebServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-             throw new WebServiceException("IO Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
-        
+    public ObservationWriter() throws WebServiceException {
     }
    
-    public String writeObservation(ObservationEntry observation) throws WebServiceException {
-        try {
-            if (obsTable != null) {
-                return obsTable.getIdentifier(observation);
-            }
-            return null;
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
+    public abstract String writeObservation(ObservationEntry observation) throws WebServiceException;
     
-    public String writeMeasurement(MeasurementEntry measurement) throws WebServiceException {
-        try {
-            MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
-            return measTable.getIdentifier(measurement);
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
+    public abstract String writeMeasurement(MeasurementEntry measurement) throws WebServiceException;
     
-    public String writeOffering(ObservationOfferingEntry offering) throws WebServiceException {
-        try {
-            return offTable.getIdentifier(offering);
-            
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } 
-    }
+    public abstract String writeOffering(ObservationOfferingEntry offering) throws WebServiceException;
     
-    public void writeOfferingProcedure(OfferingProcedureEntry offProc) throws WebServiceException {
-        try {
-            offTable.getProcedures().getIdentifier(offProc);
-        
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } 
-    }
+    public abstract void writeOfferingProcedure(OfferingProcedureEntry offProc) throws WebServiceException;
     
-    public void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws WebServiceException {
-        try {
-            offTable.getPhenomenons().getIdentifier(offPheno);
-        
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } 
-    }
+    public abstract void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws WebServiceException;
     
-    public void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws WebServiceException {
-        try {
-            offTable.getStations().getIdentifier(offSF);
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                    NO_APPLICABLE_CODE);
-        } 
-    }
+    public abstract void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws WebServiceException;
     
-    public void updateOfferings() {
-        offTable.flush();
-    }
+    public abstract void updateOfferings();
     
-    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws WebServiceException {
-        try {
-            Statement stmt2    = OMDatabase.getConnection().createStatement();
-            final ResultSet result2;
-            String request = "SELECT * FROM ";
-            boolean insert = true;
-
-            if (position.getSrsName().equals("27582")) {
-                request = request + " projected_localisations WHERE id='" + physicalID + "'";
-                result2 = stmt2.executeQuery(request);
-                if (!result2.next()) {
-                    request = "INSERT INTO projected_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
-                } else {
-                    insert = false;
-                    logger.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
-                }
-            } else if (position.getSrsName().equals("4326")) {
-                request = request + " geographic_localisations WHERE id='" + physicalID + "'";
-                result2 = stmt2.executeQuery(request);
-                if (!result2.next()) {
-                    request = "INSERT INTO geographic_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
-                } else {
-                    insert = false;
-                    logger.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
-                }
-            } else {
-                throw new WebServiceException("This CRS " + position.getSrsName() + " is not supported", INVALID_PARAMETER_VALUE);
-            }
-            logger.info(request);
-            if (insert) {
-                stmt2.executeUpdate(request);
-            }
-            result2.close();
-            stmt2.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } 
-    }
+    public abstract void recordProcedureLocation(String physicalID, DirectPositionType position) throws WebServiceException;
     
-    public void destroy() {
-        try {
-            obsTable.clear();
-            offTable.clear();
-            refTable.clear();
-            OMDatabase.close();
-        } catch (CatalogException ex) {
-            logger.severe("Catalog exception while destroying observation writer");
-        } catch (SQLException ex) {
-            logger.severe("SQL exception while destroying observation writer");
-        }
-    }
-
+    public abstract void destroy();
 }

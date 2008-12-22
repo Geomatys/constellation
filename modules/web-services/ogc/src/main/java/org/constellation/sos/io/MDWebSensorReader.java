@@ -30,16 +30,19 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+// MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.sql.v20.Reader20;
 import org.mdweb.xml.Writer;
-import org.postgresql.ds.PGSimpleDataSource;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -96,17 +99,17 @@ public class MDWebSensorReader extends SensorReader {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public MDWebSensorReader(PGSimpleDataSource dataSourceSML, String sensorIdBase, Properties map) throws WebServiceException  {
+    public MDWebSensorReader(Connection connection, String sensorIdBase, Properties map) throws WebServiceException  {
         super();
         try {
-            sensorMLConnection = dataSourceSML.getConnection();
+            sensorMLConnection = connection;
             sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
             SMLCatalog         = sensorMLReader.getCatalog("SMLC");
             XMLWriter          = new Writer(sensorMLReader);
             this.map           = map;
 
             //we initialize the unmarshaller
-            JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100");
+            JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
             unmarshaller        = context.createUnmarshaller();
 
             //we build the prepared Statement

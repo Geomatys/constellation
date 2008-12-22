@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 
 /**
@@ -35,10 +36,10 @@ public abstract class SensorWriter {
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
     
-    public SensorWriter() throws SQLException {
+    public SensorWriter() throws WebServiceException {
     }
     
-    public abstract int writeSensor(String id, File sensorFile) throws WebServiceException;
+    public abstract int writeSensor(String id, AbstractSensorML sensor) throws WebServiceException;
     
     /**
      * Record the mapping between physical ID and database ID.

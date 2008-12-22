@@ -24,6 +24,7 @@ import java.sql.SQLException;
 
 // Constellation dependencies
 import java.sql.Timestamp;
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
@@ -455,9 +456,22 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 if (results == null) {
                     results = getDatabase().getTable(AnyResultTable.class);
                 }
-                statement.setString(indexOf(query.result), results.getIdentifier(obs.getResult()));
+                String rid = results.getIdentifier(obs.getResult());
+                Integer prid = null;
+                boolean parsed = true;
+                try {
+                    prid = Integer.parseInt(rid);
+                } catch (NumberFormatException ex) {
+                    Logger.getAnonymousLogger().severe("unable to parse an integer identifier for result:" + rid);
+                    parsed = false;
+                }
+                if (parsed)
+                    statement.setInt(indexOf(query.result), prid);
+                else
+                    statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
+
             } else {
-                statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
             }
         
             // on insere le "samplingTime""

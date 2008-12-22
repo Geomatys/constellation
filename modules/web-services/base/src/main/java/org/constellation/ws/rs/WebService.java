@@ -316,7 +316,7 @@ public abstract class WebService {
                 final StringWriter sw = new StringWriter();
                 final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
                 marshaller.marshal(obj, sw);
-                return Response.ok(sw, "text/xml").build();
+                return Response.ok(sw.toString(), "text/xml").build();
             }
 
             if (request != null && request instanceof AbstractRequest) {

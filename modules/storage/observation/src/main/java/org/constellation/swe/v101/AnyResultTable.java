@@ -116,6 +116,8 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 }
             } else if (result instanceof DataArrayPropertyType) {
                 DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                if (array == null)
+                    throw new CatalogException("The data array is null!");
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
@@ -135,7 +137,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                     return results.getString(1);
                 }
             } else {
-                throw new CatalogException(" this kinf of result is not allowed");
+                throw new CatalogException(" this kind of result is not allowed");
             }
         
             PreparedStatement statement = getStatement(QueryType.INSERT);

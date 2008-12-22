@@ -106,7 +106,7 @@ public class RegisterSensor extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof RegisterSensor && super.equals(object)) {
             final RegisterSensor that = (RegisterSensor) object;
             return Utilities.equals(this.observationTemplate, that.observationTemplate) &&
                    Utilities.equals(this.sensorDescription,   that.sensorDescription);
