@@ -72,6 +72,8 @@ public class GenericIndex extends IndexLucene<Object> {
     
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
+    private Map<String, Method> getters = new HashMap<String, Method>();
+
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
@@ -535,9 +537,17 @@ public class GenericIndex extends IndexLucene<Object> {
     private Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
         if (object != null) {
-            Method getter = Utils.getGetterFromName(attributeName, object.getClass());
-            if (getter != null)
+            String getterId = object.getClass().getName() + ':' + attributeName;
+            Method getter = getters.get(getterId);
+            if (getter != null) {
                 result = Utils.invokeMethod(getter, object);
+            } else {
+                getter = Utils.getGetterFromName(attributeName, object.getClass());
+                if (getter != null) {
+                    getters.put(object.getClass().getName() + ':' + attributeName, getter);
+                    result = Utils.invokeMethod(getter, object);
+                }
+            }
         }
         return result;
     }

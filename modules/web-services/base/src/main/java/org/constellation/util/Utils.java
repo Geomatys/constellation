@@ -53,7 +53,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +70,9 @@ import javax.xml.bind.Unmarshaller;
  * @author Mehdi Sidhoum, Legal Guilhem.
  */
 public class Utils {
-    
+
+    private static Logger logger = Logger.getLogger("org.constellation.util");
+
     /**
      * Returns true if the list contains a string in one of the list elements.
      * 
@@ -331,14 +332,13 @@ public class Utils {
                     URL url = urls.nextElement();
                     try {
                         URI uri = url.toURI();
-                        Logger.getAnonymousLogger().log(Level.FINER, "scanning :" + uri);
                         result.addAll(scan(uri, fileP));
                     } catch (URISyntaxException e) {
-                        Logger.getAnonymousLogger().log(Level.SEVERE,"URL, " + url + "cannot be converted to a URI");
+                        logger.severe("URL, " + url + "cannot be converted to a URI");
                     }
                 }
             } catch (IOException ex) {
-                Logger.getAnonymousLogger().log(Level.SEVERE,"The resources for the package" + p + ", could not be obtained");
+                logger.severe("The resources for the package" + p + ", could not be obtained");
             }
         }
 
@@ -371,7 +371,7 @@ public class Utils {
                 result.addAll(scanJar(new File(jarFile), filePackageName));
               
             } catch (IllegalArgumentException ex) {
-                Logger.getAnonymousLogger().warning("unable to scan jar file: " +u.getSchemeSpecificPart());
+                logger.warning("unable to scan jar file: " +u.getSchemeSpecificPart());
             }
         }
         return result; 
@@ -557,11 +557,11 @@ public class Utils {
                     response = ((JAXBElement) response).getValue();
                 }
             } catch (JAXBException ex) {
-                Logger.getAnonymousLogger().severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
             }
         } catch (IOException ex) {
-            Logger.getAnonymousLogger().severe("The Distant service have made an error");
+            logger.severe("The Distant service have made an error");
             return null;
         }
         return response;
@@ -579,24 +579,23 @@ public class Utils {
                 return null;
             
             Constructor constructor = classe.getConstructor();
-            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
-            
+
             //we execute the constructor
             Object result = constructor.newInstance();
             return result;
             
         } catch (InstantiationException ex) {
-            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "()");
+            logger.severe("the service can't instanciate the class: " + classe.getName() + "()");
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can't access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe("Illegal Argument in empty constructor for class: " + classe.getName());
+            logger.severe("Illegal Argument in empty constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe("invocation target exception in empty constructor for class: " + classe.getName());
+            logger.severe("invocation target exception in empty constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().severe("No such empty constructor in class: " + classe.getName());
+            logger.severe("No such empty constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instanciating class: " + classe.getName());
         }
         return null;
     }
@@ -611,26 +610,24 @@ public class Utils {
         try {
             if (classe == null)
                 return null;
-            
             Constructor constructor = classe.getConstructor(String.class);
-            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
             
             //we execute the constructor
             Object result = constructor.newInstance(parameter);
             return result;
             
         } catch (InstantiationException ex) {
-            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(string)");
+            logger.severe("the service can't instanciate the class: " + classe.getName() + "(string)");
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can't access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe("Illegal Argument in string constructor for class: " + classe.getName());
+            logger.severe("Illegal Argument in string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe("invocation target exception in string constructor for class: " + classe.getName());
+            logger.severe("invocation target exception in string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().severe("No such string constructor in class: " + classe.getName());
+            logger.severe("No such string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instanciating class: " + classe.getName());
         }
         return null;
     }
@@ -645,26 +642,23 @@ public class Utils {
         try {
             if (classe == null)
                 return null;
-            
             Constructor constructor = classe.getConstructor(String.class, String.class);
-            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
-            
             //we execute the constructor
             Object result = constructor.newInstance(parameter1, parameter2);
             return result;
             
         } catch (InstantiationException ex) {
-            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(string, string)");
+            logger.severe("the service can't instanciate the class: " + classe.getName() + "(string, string)");
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can't access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe("Illegal Argument in double string constructor for class: " + classe.getName());
+            logger.severe("Illegal Argument in double string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe("invocation target exception in double string constructor for class: " + classe.getName());
+            logger.severe("invocation target exception in double string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().severe("No such double string constructor in class: " + classe.getName());
+            logger.severe("No such double string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instanciating class: " + classe.getName());
         }
         return null;
     }
@@ -679,26 +673,23 @@ public class Utils {
         try {
             if (classe == null)
                 return null;
-            
             Constructor constructor = classe.getConstructor(CharSequence.class);
-            Logger.getAnonymousLogger().finer("constructor:" + '\n' + constructor.toGenericString());
-            
             //we execute the constructor
             Object result = constructor.newInstance(parameter);
             return result;
             
         } catch (InstantiationException ex) {
-            Logger.getAnonymousLogger().severe("the service can't instanciate the class: " + classe.getName() + "(CharSequence)");
+            logger.severe("the service can't instanciate the class: " + classe.getName() + "(CharSequence)");
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can't access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
+            logger.severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe("invocation target exception in CharSequence constructor for class: " + classe.getName());
+            logger.severe("invocation target exception in CharSequence constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().severe("No such CharSequence constructor in class: " + classe.getName());
+            logger.severe("No such CharSequence constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instanciating class: " + classe.getName());
         }
         return null;
     }
@@ -717,17 +708,17 @@ public class Utils {
             if (method != null) {
                 result = method.invoke(object);
             } else {
-                Logger.getAnonymousLogger().severe(baseMessage + "The setter is null");
+                logger.severe(baseMessage + "The setter is null");
             }
 
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "The class is not accessible");
+            logger.severe(baseMessage + "The class is not accessible");
 
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "The argument does not match with the method");
+            logger.severe(baseMessage + "The argument does not match with the method");
 
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "Exception throw in the invokated method");
+            logger.severe(baseMessage + "Exception throw in the invokated method");
         }
         return result;
     }
@@ -746,17 +737,16 @@ public class Utils {
             if (method != null) {
                 result = method.invoke(object, parameter);
             } else {
-                Logger.getAnonymousLogger().severe(baseMessage + "The setter is null");
+                logger.severe(baseMessage + "The setter is null");
             }
-
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "The class is not accessible");
+            logger.severe(baseMessage + "The class is not accessible");
 
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "The argument does not match with the method");
+            logger.severe(baseMessage + "The argument does not match with the method");
 
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe(baseMessage + "Exception throw in the invokated method");
+            logger.severe(baseMessage + "Exception throw in the invokated method");
         }
         return result;
     }
@@ -777,11 +767,11 @@ public class Utils {
             method = classe.getMethod(propertyName);
 
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().info("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            logger.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().info("The method " + propertyName + " does not exists in the classe " + classe.getName());
+            logger.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().info("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            logger.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
         }
         return method;
     }
@@ -802,11 +792,11 @@ public class Utils {
             method = classe.getMethod(propertyName, parameterClass);
 
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().info("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            logger.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            Logger.getAnonymousLogger().info("The method " + propertyName + " does not exists in the classe " + classe.getName());
+            logger.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            Logger.getAnonymousLogger().info("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            logger.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
         }
         return method;
     }
@@ -820,7 +810,6 @@ public class Utils {
      * @return a setter to this attribute.
      */
     public static Method getGetterFromName(String propertyName, Class rootClass) {
-        Logger.getLogger(propertyName).finer("search for a getter in " + rootClass.getName() + " of name :" + propertyName);
         
         //special case and corrections
         if (propertyName.equals("beginPosition")) {
@@ -876,42 +865,13 @@ public class Utils {
                     }
                    
                 }
-                if (getter != null) {
-                    Logger.getAnonymousLogger().finer("getter found: " + getter.toGenericString());
-                }
                 return getter;
 
             } catch (NoSuchMethodException e) {
-
-                switch (occurenceType) {
-
-                    case 0: {
-                        Logger.getAnonymousLogger().finer("The getter " + methodName + "() does not exist");
-                        occurenceType = 1;
-                        break;
-                    }
-
-                    case 1: {
-                        Logger.getAnonymousLogger().finer("The getter " + methodName + "s() does not exist");
-                        occurenceType = 2;
-                        break;
-                    }
-                    case 2: {
-                        Logger.getAnonymousLogger().finer("The getter " + methodName + "es() does not exist");
-                        occurenceType = 3;
-                        break;
-                    }
-                    case 3: {
-                        Logger.getAnonymousLogger().finer("The getter " + methodName + "es() does not exist");
-                        occurenceType = 4;
-                        break;
-                    }
-                    default:
-                        occurenceType = 5;
-                }
+                occurenceType++;
             }
         }
-        Logger.getAnonymousLogger().severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
+        logger.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
         return null;
     }
     
@@ -926,7 +886,7 @@ public class Utils {
      * @return a setter to this attribute.
      */
     public static Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
-        Logger.getAnonymousLogger().finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -990,7 +950,6 @@ public class Utils {
                         break;
                     }
                 }
-                Logger.getAnonymousLogger().finer("setter found: " + setter.toGenericString());
                 return setter;
 
             } catch (NoSuchMethodException e) {
@@ -1001,35 +960,35 @@ public class Utils {
                 switch (occurenceType) {
 
                     case 0: {
-                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
                     case 1: {
-                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(long) does not exist");
+                        logger.finer("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     case 2: {
                         if (interfacee != null) {
-                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
                     case 3: {
-                        Logger.getAnonymousLogger().finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        Logger.getAnonymousLogger().finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
                     case 5: {
                         if (argumentSuperClass != null) {
-                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
+                            logger.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
                             argumentSuperClass     = argumentSuperClass.getSuperclass();
                             occurenceType = 5;
                             
@@ -1040,7 +999,7 @@ public class Utils {
                     }
                     case 6: {
                         if (argumentSuperInterface != null) {
-                            Logger.getAnonymousLogger().finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
+                            logger.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
                         }
                         occurenceType = 7;
                         break;
@@ -1050,7 +1009,7 @@ public class Utils {
                 }
             }
         }
-        Logger.getAnonymousLogger().severe("No setter have been found for attribute " + propertyName + 
+        logger.severe("No setter have been found for attribute " + propertyName +
                       " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
     }
@@ -1066,16 +1025,16 @@ public class Utils {
             Method getValue = enumeration.getClass().getDeclaredMethod("value");
             value = (String) getValue.invoke(enumeration);
         } catch (IllegalAccessException ex) {
-            Logger.getAnonymousLogger().severe("The class is not accessible");
+            logger.severe("The class is not accessible");
         } catch (IllegalArgumentException ex) {
-            Logger.getAnonymousLogger().severe("IllegalArguement exeption in value()");
+            logger.severe("IllegalArguement exeption in value()");
         } catch (InvocationTargetException ex) {
-            Logger.getAnonymousLogger().severe("Exception throw in the invokated getter value() " + '\n' +
+            logger.severe("Exception throw in the invokated getter value() " + '\n' +
                        "Cause: " + ex.getMessage());
         } catch (NoSuchMethodException ex) {
-           Logger.getAnonymousLogger().severe("no such method value() in " + enumeration.getClass().getSimpleName());
+           logger.severe("no such method value() in " + enumeration.getClass().getSimpleName());
         } catch (SecurityException ex) {
-           Logger.getAnonymousLogger().severe("security Exception while getting the codelistElement in value() method");
+           logger.severe("security Exception while getting the codelistElement in value() method");
         }
         return value;
     }
