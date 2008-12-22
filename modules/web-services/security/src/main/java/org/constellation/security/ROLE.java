@@ -26,10 +26,10 @@ package org.constellation.security;
  *
  */
 public enum ROLE {
-	PUBLIC("Public"),
-	USER("BasicUser"),
-	ADVANCED("AdvancedUser"),
-	ADMIN("Administrator");
+	PUBLIC_ONE("PUBLIC"),
+	USER_ONE("USER"),
+	ADVANCED_ONE("ADVANCED"),
+	ADMIN_ONE("ADMIN");
 	
 	private final String role;
 	

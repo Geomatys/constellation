@@ -16,6 +16,7 @@
              <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
              <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
              <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
+             <!-- To enabme  Security for WMS       add    packageName: org.constellation.security.wms                               -->
              <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
              <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
              <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
@@ -100,9 +101,47 @@
         <filter-name>MyFacesExtensionsFilter</filter-name>
         <url-pattern>/faces/myFacesExtensionResource/*</url-pattern>
     </filter-mapping>
-    
+
+    <!-- Authentication via a pop-up -->
+    <!--login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>file</realm-name>
+    </login-config-->
+
+    <!-- Security role, defined in the sun-web.xml -->
+    <!--security-role>
+        <role-name>PUBLIC</role-name>
+    </security-role>
+
+    <security-role>
+        <role-name>USER</role-name>
+    </security-role>
+
+    <security-role>
+        <role-name>ADVANCED</role-name>
+    </security-role>
+
+    <security-role>
+        <role-name>ADMIN</role-name>
+    </security-role-->
+
+    <!-- Secured all GET and POST requests done on the wms-sec webservice -->
+    <!--security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Constellation secured service</web-resource-name>
+            <url-pattern>/WS/wms-sec</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Should be an internal user to request this data</description>
+            <role-name>USER</role-name>
+            <role-name>ADVANCED</role-name>
+            <role-name>ADMIN</role-name>
+        </auth-constraint>
+    </security-constraint-->
+
     <!-- Faces Servlet -->
-   
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>

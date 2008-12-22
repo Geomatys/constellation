@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -113,7 +114,16 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     private final Unmarshaller unmarshaller;
 
+    /**
+     * Defines whether a filter should be applied on GetMap results, to mask sensible data.
+     */
     private boolean applyFilter = false;
+
+    /**
+     * Defines wheter a full get capabilities request should be returned, or if an empty one
+     * should be returned.
+     */
+    private boolean returnFullCapabilities = false;
 
     /**
      * Builds a {@code GetCapabilities} request.
@@ -153,8 +163,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         performAccessControlDecision(getCapabilities);
 
     	AbstractWMSCapabilities response = dispatcherWMS.getCapabilities(getCapabilities);
-        response = removeCapabilitiesInfo(response);
-        response = addAccessConstraints(response);
+        if (!returnFullCapabilities) {
+            response = removeCapabilitiesInfo(response);
+            response = addAccessConstraints(response);
+        }
         return response;
     }
 
@@ -194,7 +206,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     	LOGGER.info("WMS-sec: WMS request asks for layers: "+layerList+" }");
 
     	//Filter block
-    	if (applyFilter){
+    	if (applyFilter) {
 
     		//TODO: get the source of the clip geometry, using the hard coordinates
 
@@ -246,21 +258,22 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 	    		//CLIP
 	    		if (layersToClip.contains(layerName)){
 	    			bi = ImageUtilities.applyMask(bi,mask);
-	    			LOGGER.info("WMS-sec: Clipped layer: "+layerName+" at "+System.currentTimeMillis() );
+	    			LOGGER.info("WMS-sec: Clipped layer: "+layerName+" at "+ new Date() );
 	    		}
 
-	    		//COMBINE 
+	    		//COMBINE
 	    		if (null== result){
 	    			result = bi;
 	    		} else {
 	    			result = ImageUtilities.combine(result, bi);
 	    		}
-	    		LOGGER.info("WMS-sec: Added layer: "+layerName+" at "+System.currentTimeMillis() );
+	    		LOGGER.info("WMS-sec: Added layer: "+layerName+" at "+ new Date() );
 	    	}
 
 	    	return result;
     	}
 
+        //We return directly the full image, since we have the rights.
         return dispatcherWMS.getMap(getMap);
     }
 
@@ -272,32 +285,36 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      * @param query
      */
     private void performAccessControlDecision(WMSQuery query) throws WebServiceException {
-        if (isUserInRole(ROLE.PUBLIC.toString()) || isUserInRole("PUBLIC")) {
+        if (isUserInRole(ROLE.PUBLIC_ONE.toString())) {
+            //This case should not happen, because the web.xml has defined users in this role
+            //should receive an error 403 before.
             LOGGER.info("WMS-sec: user in role PUBLIC.");
-            applyFilter = false;
             throw new WebServiceException("You haven't enough credential to perform the query you have done.",
                     ExceptionCode.NO_APPLICABLE_CODE);
         }
-    	if (isUserInRole(ROLE.USER.toString())) {
+
+    	if (isUserInRole(ROLE.USER_ONE.toString())) {
             LOGGER.info("WMS-sec: user in role USER.");
             applyFilter = true;
+            returnFullCapabilities = false;
             return;
-        } else if (isUserInRole(ROLE.ADMIN.toString())) {
-            LOGGER.info("WMS-sec: user in role ADMIN.");
-            applyFilter = true;
-            return;
-        } else if (isUserInRole(ROLE.ADVANCED.toString())) {
-            LOGGER.info("WMS-sec: user in role ADVANCED.");
-            applyFilter = true;
-            return;
-        } else if (isUserInRole("INTERNAL")) {
-            LOGGER.info("WMS-sec: user in role INTERNAL.");
-            applyFilter = true;
-            return;
-        } else {
-            LOGGER.info("WMS-sec: user is not in defined roles.");
-            applyFilter = false;
         }
+        if (isUserInRole(ROLE.ADMIN_ONE.toString())) {
+            LOGGER.info("WMS-sec: user in role ADMIN.");
+            applyFilter = false;
+            returnFullCapabilities = true;
+            return;
+        }
+        if (isUserInRole(ROLE.ADVANCED_ONE.toString())) {
+            LOGGER.info("WMS-sec: user in role ADVANCED.");
+            applyFilter = false;
+            returnFullCapabilities = true;
+            return;
+        }
+        //No known role has been found
+        LOGGER.info("WMS-sec: user is not in defined roles.");
+        applyFilter = true;
+        returnFullCapabilities = false;
     }
 
     /**
