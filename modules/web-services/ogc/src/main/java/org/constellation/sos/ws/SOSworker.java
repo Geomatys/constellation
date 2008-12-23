@@ -21,6 +21,7 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -95,11 +96,8 @@ import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
 import org.constellation.sos.ResponseModeType;
-import org.constellation.sos.io.DefaultObservationFilter;
-import org.constellation.sos.io.DefaultObservationReader;
-import org.constellation.sos.io.DefaultObservationWriter;
-import org.constellation.sos.io.MDWebSensorReader;
-import org.constellation.sos.io.MDWebSensorWriter;
+import org.constellation.sos.factory.AbstractSOSFactory;
+import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
@@ -115,8 +113,11 @@ import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.TextBlockEntry;
+import org.geotools.factory.FactoryNotFoundException;
+import org.geotools.factory.FactoryRegistry;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.sos.ResponseModeType.*;
+import static org.constellation.sos.ws.SensorMLUtils.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -152,11 +153,6 @@ public class SOSworker {
      * The base for sensor id.
      */ 
     private final String sensorIdBase;
-    
-     /**
-     * The base for observation id.
-     */ 
-    private final String observationIdBase;
     
     /**
      * The base for observation id.
@@ -247,6 +243,8 @@ public class SOSworker {
     private final SensorWriter SMLWriter;
 
     private final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+
+    private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
     
     /**
      * Initialize the database connection.
@@ -294,19 +292,36 @@ public class SOSworker {
                           "cause: " + e.getMessage());
             start = false;
         }
-      
+
+        //we get the Sensor reader type
+        DataSourceType SMLType = DataSourceType.valueOf(prop.getProperty("SMLDataSourceType"));
+        if (SMLType == null)
+            SMLType = DataSourceType.MDWEB;
+
         Connection SMLconnection        = null;
         PGSimpleDataSource dataSourceOM = null;
         Connection OMConnection         = null;
+        File dataDirectory              = null;
         try {
-            //we create a connection to the sensorML database
-            PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
-            dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
-            dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
-            dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
-            dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
-            dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-            SMLconnection = dataSourceSML.getConnection();
+            if (SMLType == DataSourceType.MDWEB) {
+                //we create a connection to the sensorML database
+                PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
+                dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
+                dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
+                dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
+                dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
+                dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
+                SMLconnection = dataSourceSML.getConnection();
+            } else if (SMLType == DataSourceType.FILE_SYSTEM) {
+                String path = prop.getProperty("SMLDataDirectory");
+                if (path != null) {
+                    dataDirectory = new File(path);
+                } else {
+                    dataDirectory = new File(env, "sensors");
+                    if (!dataDirectory.exists())
+                        dataDirectory.mkdir();
+                }
+            }
 
             //we create a connection to the O&M database
             dataSourceOM = new PGSimpleDataSource();
@@ -322,30 +337,37 @@ public class SOSworker {
             start = false;
         }
 
+        // we load the factory from the available classes
+        AbstractSOSFactory SOSfactory = null;
+        try {
+            SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
+        } catch (FactoryNotFoundException ex) {
+            logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
+            start = false;
+        }
+
         if (start) {
 
             //we initailize the properties attribute 
-            sensorIdBase = prop.getProperty("sensorIdBase");
-            observationIdBase = prop.getProperty("observationIdBase");
+            String observationIdBase  = prop.getProperty("observationIdBase");
+            sensorIdBase              = prop.getProperty("sensorIdBase");
             observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-            maxObservationByRequest = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
-            String validTime = prop.getProperty("templateValidTime");
-            int h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
-            int m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
-            templateValidTime = (h * 3600000) + (m * 60000);
+            maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
+            String validTime          = prop.getProperty("templateValidTime");
+            int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
+            int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
+            templateValidTime         = (h * 3600000) + (m * 60000);
 
-            SMLReader = new MDWebSensorReader(SMLconnection, sensorIdBase, map);
-            SMLWriter = new MDWebSensorWriter(SMLconnection, sensorIdBase, map);
-            OMReader  = new DefaultObservationReader(dataSourceOM, observationIdBase);
-            OMWriter  = new DefaultObservationWriter(dataSourceOM);
-            OMFilter  = new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
+            SMLReader = SOSfactory.getSensorReader(SMLType, dataDirectory, sensorIdBase, SMLconnection, map);
+            SMLWriter = SOSfactory.getSensorWriter(SMLType, dataDirectory, SMLconnection, sensorIdBase);
+            OMReader  = SOSfactory.getObservationReader(dataSourceOM, observationIdBase);
+            OMWriter  = SOSfactory.getObservationWriter(dataSourceOM);
+            OMFilter  = SOSfactory.getObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
 
             logger.info("SOS service running");
             
-            
         } else {
             sensorIdBase              = null;
-            observationIdBase         = null;
             observationTemplateIdBase = null;
             OMReader                  = null;
             OMWriter                  = null;
@@ -1075,29 +1097,28 @@ public class SOSworker {
             
             //and we write it in the sensorML Database
             SMLWriter.writeSensor(id, process);
-            
+
+            String phyId = getPhysicalID(process);
+
             // we record the mapping between physical id and database id
-            String phyId = SMLWriter.recordMapping(id, getSicadeDirectory());
+            recordMapping(id, phyId);
             
             // and we record the position of the piezometer
-            recordSensorLocation(id, phyId);
+            DirectPositionType position = getSensorPosition(process);
+            OMWriter.recordProcedureLocation(phyId, position);
                                     
-            //we write the observation template in the O&M database
-            
             //we assign the new capteur id to the observation template
             ProcessEntry p = new ProcessEntry(id);
             obs.setProcedure(p);
             obs.setName(observationTemplateIdBase + num);
             logger.finer(obs.toString());
+            //we write the observation template in the O&M database
             OMWriter.writeObservation(obs);
                    
-            addSensorToOffering(id, obs);
+            addSensorToOffering(process, obs);
             
            success = true; 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+
         } finally {
             if (!success) {
                SMLWriter.abortTransaction();
@@ -1355,26 +1376,16 @@ public class SOSworker {
     }
     
     /**
-     * Record the position of the sensor in the table system location
-     * 
-     *  @param form The "form" containing the sensorML data.
-     */
-    private void recordSensorLocation(String sensorID, String physicalID) throws WebServiceException {
-        DirectPositionType position = SMLReader.getSensorPosition(sensorID);
-        OMWriter.recordProcedureLocation(physicalID, position);
-    }
-    
-    /**
      * Add the new Sensor to an offering specified in the network attribute of sensorML file.
      * if the offering doesn't yet exist in the database, it will be create.
      * 
      * @param form The "form" contain the sensorML data.
      * @param template The observation template for this sensor.
      */
-    private void addSensorToOffering(String sensorID, Observation template) throws WebServiceException {
+    private void addSensorToOffering(AbstractSensorML sensor, Observation template) throws WebServiceException {
      
         //we search which are the networks binded to this sensor
-        List<String> networkNames = SMLReader.getNetworkNames(sensorID);
+        List<String> networkNames = getNetworkNames(sensor);
 
         int size = networkNames.size();
         if (size == 0) {
@@ -1689,7 +1700,32 @@ public class SOSworker {
         }
         return sicadeDirectory;
     }
-    
+
+    /**
+     * Record the mapping between physical ID and database ID.
+     *
+     * @param form The "form" containing the sensorML data.
+     * @param dbId The identifier of the sensor in the O&M database.
+     */
+    private void recordMapping(String dbId, String physicalID) throws WebServiceException {
+        try {
+            map.setProperty(physicalID, dbId);
+            File mappingFile = new File(getSicadeDirectory(), "/sos_configuration/mapping.properties");
+            FileOutputStream out = new FileOutputStream(mappingFile);
+            map.store(out, "");
+            out.close();
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("The service cannot build the temporary file",
+                    NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+                    NO_APPLICABLE_CODE);
+        }
+    }
+
     public void destroy() {
         SMLReader.destroy();
         SMLWriter.destroy();

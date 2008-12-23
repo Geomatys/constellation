@@ -19,8 +19,6 @@ package org.constellation.sos.io;
 
 // J2SE dependencies
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -29,11 +27,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.sml.AbstractClassification;
-import org.constellation.sml.AbstractClassifier;
-import org.constellation.sml.AbstractDerivableComponent;
-import org.constellation.sml.AbstractProcess;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -54,7 +47,6 @@ public class FileSensorReader extends SensorReader {
     private String sensorIdBase;
 
     public FileSensorReader(File dataDirectory, String sensorIdBase) throws WebServiceException  {
-        super();
         this.sensorIdBase = sensorIdBase;
         try {
             //we initialize the unmarshaller
@@ -64,7 +56,7 @@ public class FileSensorReader extends SensorReader {
             this.dataDirectory  = dataDirectory;
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+            throw new WebServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
         } 
     }
 
@@ -93,42 +85,6 @@ public class FileSensorReader extends SensorReader {
     }
 
     @Override
-    public DirectPositionType getSensorPosition(String sensorID) throws WebServiceException {
-        AbstractSensorML sensor = getSensor(sensorID);
-        if (sensor.getMember().size() == 1) {
-            if (sensor.getMember().get(0) instanceof AbstractDerivableComponent) {
-                AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
-                if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
-                    component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null)
-                return component.getSMLLocation().getPoint().getPos();
-            }
-        }
-        logger.severe("there is no piezo location");
-        return null;
-    }
-
-    @Override
-    public List<String> getNetworkNames(String sensorID) throws WebServiceException {
-        List<String> results = new ArrayList<String>();
-        AbstractSensorML sensor = getSensor(sensorID);
-        if (sensor.getMember().size() == 1) {
-            if (sensor.getMember().get(0) instanceof AbstractProcess) {
-                AbstractProcess component = (AbstractProcess) sensor.getMember().get(0);
-                for (AbstractClassification cl : component.getClassification()) {
-                    if (cl.getClassifierList() != null) {
-                        for (AbstractClassifier classifier : cl.getClassifierList().getClassifier()) {
-                            if (classifier.getName().equals("network") && classifier.getTerm() != null) {
-                                results.add(classifier.getTerm().getValue());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return results;
-    }
-
-    @Override
     public int getNewSensorId() throws WebServiceException {
         int maxID = 0;
         for (File f : dataDirectory.listFiles()) {
@@ -150,5 +106,4 @@ public class FileSensorReader extends SensorReader {
     @Override
     public void destroy() {
     }
-
 }

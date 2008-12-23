@@ -2,6 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
+ *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -17,27 +18,16 @@
 
 package org.constellation.sos.io;
 
-import java.util.logging.Logger;
-import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
-
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class SensorReader {
-    
-    /**
-     * use for debugging purpose
-     */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
+public enum DataSourceType {
 
-    public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
-    
-    /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    public abstract int getNewSensorId() throws WebServiceException;
+    FILE_SYSTEM,
 
-    public abstract void destroy();
+    MDWEB,
+
+    POSTGRID_O_M
+
 }

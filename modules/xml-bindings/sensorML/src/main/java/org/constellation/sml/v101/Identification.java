@@ -29,6 +29,9 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractIdentification;
+import org.constellation.sml.AbstractIdentifier;
+import org.constellation.sml.AbstractIdentifierList;
 
 
 /**
@@ -78,7 +81,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "identifierList"
 })
 @XmlRootElement(name = "identification")
-public class Identification {
+public class Identification implements AbstractIdentification {
 
     @XmlElement(name = "IdentifierList")
     private Identification.IdentifierList identifierList;
@@ -401,7 +404,7 @@ public class Identification {
     @XmlType(name = "", propOrder = {
         "identifier"
     })
-    public static class IdentifierList {
+    public static class IdentifierList implements AbstractIdentifierList {
 
         @XmlElement(required = true)
         private List<Identification.IdentifierList.Identifier> identifier;
@@ -492,7 +495,7 @@ public class Identification {
         @XmlType(name = "", propOrder = {
             "term"
         })
-        public static class Identifier {
+        public static class Identifier implements AbstractIdentifier {
 
             @XmlElement(name = "Term", required = true)
             private Term term;

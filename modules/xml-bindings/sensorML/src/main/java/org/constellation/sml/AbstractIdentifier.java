@@ -15,29 +15,15 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
-
-import java.util.logging.Logger;
-import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+package org.constellation.sml;
 
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class SensorReader {
-    
-    /**
-     * use for debugging purpose
-     */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
+public interface AbstractIdentifier {
 
-    public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
-    
-    /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    public abstract int getNewSensorId() throws WebServiceException;
+    public String getName();
 
-    public abstract void destroy();
+    public AbstractTerm getTerm();
 }

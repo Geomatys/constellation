@@ -22,9 +22,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -32,7 +29,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -71,11 +67,6 @@ public class MDWebSensorReader extends SensorReader {
     private final PreparedStatement newSensorIdStmt;
 
     /**
-     * An SQL statement get a sensorML value in the MDWeb database
-     */
-    private final PreparedStatement getValueStmt;
-
-    /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */
     private final Properties map;
@@ -100,7 +91,6 @@ public class MDWebSensorReader extends SensorReader {
      * @throws java.sql.SQLException
      */
     public MDWebSensorReader(Connection connection, String sensorIdBase, Properties map) throws WebServiceException  {
-        super();
         try {
             sensorMLConnection = connection;
             sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
@@ -114,7 +104,6 @@ public class MDWebSensorReader extends SensorReader {
 
             //we build the prepared Statement
             newSensorIdStmt    = sensorMLConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
-            getValueStmt       = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
@@ -163,105 +152,6 @@ public class MDWebSensorReader extends SensorReader {
         }
     }
     
-    @Override
-    public DirectPositionType getSensorPosition(String sensorID) throws WebServiceException {
-        try {
-            int formID = sensorMLReader.getIdFromTitleForm(sensorID);
-            String SRS = "";
-            //we get the srs name
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
-            getValueStmt.setInt(2, formID);
-            ResultSet result = getValueStmt.executeQuery();
-            if (result.next()) {
-                SRS = result.getString(1);
-                if (SRS.indexOf(':') != -1) {
-                    SRS = SRS.substring(SRS.lastIndexOf(':') + 1);
-                }
-                logger.info("srsName:" + SRS);
-            } else {
-                logger.severe("there is no srsName for the piezo location");
-            }
-            result.close();
-            
-            List<Double> coordinate = new ArrayList<Double>();
-            // we get the coordinates
-            getValueStmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1");
-            getValueStmt.setInt(2, formID);
-            result = getValueStmt.executeQuery();
-            if (result.next()) {
-                String coordinates = result.getString(1);
-                logger.info(coordinates);
-                Double x = Double.parseDouble(coordinates.substring(0, coordinates.indexOf(' ')));
-                Double y = Double.parseDouble(coordinates.substring(coordinates.indexOf(' ') + 1));
-                coordinate  =  Arrays.asList(x, y);
-            } else {
-                logger.severe("there is no coordinates for the piezo location");
-                return null;
-            }
-            result.close();
-            
-            return new DirectPositionType(SRS, 2, coordinate);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
-
-    private List<Integer> getNetworkIndex(int formID) throws WebServiceException {
-        try {
-            int i = 1;
-            List<Integer> networksIndex = new ArrayList<Integer>();
-            boolean moreClassifier = true;
-            while (moreClassifier) {
-
-                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + i + ":name.1");
-                getValueStmt.setInt(2,    formID);
-                ResultSet result = getValueStmt.executeQuery();
-                moreClassifier   = result.next();
-                if (moreClassifier) {
-                    String value = result.getString(1);
-                    if (value.equals("network")){
-                        networksIndex.add(i);
-
-                    }
-                }
-                result.close();
-                i++;
-            }
-            return networksIndex;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
-
-    @Override
-    public List<String> getNetworkNames(String sensorID) throws WebServiceException {
-        try {
-            int formID = sensorMLReader.getIdFromTitleForm(sensorID);
-            List<Integer> indexes = getNetworkIndex(formID);
-            List<String> networkNames = new ArrayList<String>();
-            for (Integer index : indexes) {
-                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + index + ":value.1");
-                getValueStmt.setInt(2,    formID);
-                ResultSet result = getValueStmt.executeQuery();
-                
-                if (result.next()) {
-                    networkNames.add(result.getString(1));
-                }
-                result.close();
-            }
-            return networkNames;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
-
     /**
      * Create a new identifier for an observation by searching in the O&M database.
      */
@@ -293,5 +183,4 @@ public class MDWebSensorReader extends SensorReader {
             logger.severe("SQLException while closing SOSWorker");
         }
     }
-
 }

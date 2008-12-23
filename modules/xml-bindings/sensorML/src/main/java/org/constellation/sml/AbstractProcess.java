@@ -26,5 +26,7 @@ import java.util.List;
 public interface AbstractProcess {
 
     public List<? extends AbstractClassification> getClassification();
+
+    public List<? extends AbstractIdentification> getIdentification();
     
 }

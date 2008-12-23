@@ -19,21 +19,25 @@ package org.constellation.sos.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
-import java.util.Properties;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
+
+// Constellation dependencies
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+// MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -42,8 +46,6 @@ import org.mdweb.sql.v20.Reader20;
 import org.mdweb.sql.v20.Writer20;
 import org.mdweb.xml.MalFormedDocumentException;
 import org.mdweb.xml.Reader;
-import org.xml.sax.SAXException;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -55,11 +57,6 @@ public class MDWebSensorWriter extends SensorWriter {
      * A Writer to the SensorML database.
      */
     private final Writer20 sensorMLWriter;
-
-    /**
-     * An SQL statement get a sensorML value in the MDWeb database
-     */
-    private final PreparedStatement getValueStmt;
 
     /**
      * the data catalog for SensorML database.
@@ -83,23 +80,17 @@ public class MDWebSensorWriter extends SensorWriter {
     private Savepoint currentSavePoint;
 
     /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    private final Properties map;
-
-    /**
      * A JAXB marshaller used to provide xml to the XMLReader.
      */
     private Marshaller marshaller;
 
-    public MDWebSensorWriter(Connection connection, String sensorIdBase, Properties map) throws WebServiceException {
+    public MDWebSensorWriter(Connection connection, String sensorIdBase) throws WebServiceException {
         try {
             smlConnection  = connection;
             sensorMLWriter = new Writer20(smlConnection);
             sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
             SMLCatalog     = sensorMLReader.getCatalog("SMLC");
             mainUser       = sensorMLReader.getUser("admin");
-            this.map       = map;
 
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
@@ -108,8 +99,6 @@ public class MDWebSensorWriter extends SensorWriter {
             NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("http://www.opengis.net/sensorML/1.0");
             marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
 
-            //we build the prepared Statement
-            getValueStmt       = smlConnection.prepareStatement(" SELECT value FROM \"TextValues\" WHERE id_value=? AND form=?");
         } catch (JAXBException ex) {
             ex.printStackTrace();
             throw new WebServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
@@ -118,7 +107,7 @@ public class MDWebSensorWriter extends SensorWriter {
         }
     }
 
-     public int writeSensor(String id, AbstractSensorML process) throws WebServiceException {
+     public void writeSensor(String id, AbstractSensorML process) throws WebServiceException {
         try {
 
             //we create a new Tempory File SensorML
@@ -132,7 +121,6 @@ public class MDWebSensorWriter extends SensorWriter {
 
             Form f = XMLReader.readForm(SMLCatalog, mainUser, "source", id, Standard.SENSORML);
             sensorMLWriter.writeForm(f, false);
-            return f.getId();
 
         } catch (ParserConfigurationException ex) {
             ex.printStackTrace();
@@ -162,71 +150,6 @@ public class MDWebSensorWriter extends SensorWriter {
         } catch (JAXBException ex) {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw an JAXBException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        }
-    }
-
-    /**
-     * Record the mapping between physical ID and database ID.
-     *
-     * @param form The "form" containing the sensorML data.
-     * @param dbId The identifier of the sensor in the O&M database.
-     */
-    public String recordMapping(String dbId, File sicadeDirectory) throws WebServiceException {
-        try {
-            //we search which identifier is the supervisor code
-            int formID             = sensorMLReader.getIdFromTitleForm(dbId);
-            int i                  = 1;
-            boolean found          = false;
-            boolean moreIdentifier = true;
-            while (moreIdentifier && !found) {
-                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
-                getValueStmt.setInt(2, formID);
-                ResultSet result = getValueStmt.executeQuery();
-                moreIdentifier   = result.next();
-                if (moreIdentifier) {
-                    String value = result.getString(1);
-                    if (value.equals("supervisorCode")){
-                        found = true;
-                    }
-                }
-                result.close();
-                i++;
-            }
-
-            if (!found) {
-                logger.severe("There is no supervisor code in that SensorML file");
-                return "";
-            } else {
-                getValueStmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
-                getValueStmt.setInt(2,    formID);
-                ResultSet result = getValueStmt.executeQuery();
-                String value = "";
-                if (result.next()) {
-                    value = result.getString(1);
-                    logger.info("PhysicalId:" + value);
-                    map.setProperty(value, dbId);
-                    File mappingFile = new File(sicadeDirectory, "/sos_configuration/mapping.properties");
-                    FileOutputStream out = new FileOutputStream(mappingFile);
-                    map.store(out, "");
-                    out.close();
-                } else {
-                    logger.severe("no value for supervisorcode identifier numero " + (i - 1));
-                }
-                result.close();
-                return value;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("The service cannot build the temporary file",
-                                          NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }
@@ -269,10 +192,7 @@ public class MDWebSensorWriter extends SensorWriter {
     }
     public void destroy() {
         try {
-            getValueStmt.close();
-
             sensorMLWriter.dispose();
-
         } catch (SQLException ex) {
             logger.severe("SQLException while closing SOSWorker");
         }
