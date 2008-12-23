@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.gml.v311.AbstractTimeComplexType;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.AbstractTimeObjectType;
+import org.constellation.gml.v311.AbstractTimePrimitiveType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 
@@ -55,6 +57,7 @@ import org.constellation.gml.v311.TimePeriodType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryTemporalOpType", propOrder = {
+    "propertyName",
     "rest"
 })
 public class BinaryTemporalOpType extends TemporalOpsType {
@@ -66,13 +69,16 @@ public class BinaryTemporalOpType extends TemporalOpsType {
         @XmlElement(name = "AbstractTimeObject", namespace = "http://www.opengis.net/gml", type = AbstractTimeObjectType.class),
         @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml", type = TimePeriodType.class),
         @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml", type = TimeInstantType.class),
-        @XmlElement(name = "PropertyName", type = String.class)
-        //@XmlElement(name = "AbstractTimeComplex", namespace = "http://www.opengis.net/gml", type = AbstractTimeComplexType.class)
-        //@XmlElement(name = "AbstractTimePrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimePrimitiveType.class)
+        //@XmlElement(name = "PropertyName", type = String.class)
+        @XmlElement(name = "AbstractTimeComplex", namespace = "http://www.opengis.net/gml", type = AbstractTimeComplexType.class),
+        @XmlElement(name = "AbstractTimePrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimePrimitiveType.class)
         //@XmlElement(name = "AbstractTimeTopologyPrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimeTopologyPrimitiveType.class)
         //@XmlElement(name = "TimeNode", namespace = "http://www.opengis.net/gml", type = TimeNodeType.class)
     })
     private List<Object> rest;
+
+    @XmlElement(name = "PropertyName", type = String.class)
+    private String propertyName;
 
     /**
      * Empty contructor used by JAXB
@@ -99,6 +105,20 @@ public class BinaryTemporalOpType extends TemporalOpsType {
             rest = new ArrayList<Object>();
         }
         return Collections.unmodifiableList(rest);
+    }
+
+    /**
+     * @return the propertyName
+     */
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    /**
+     * @param propertyName the propertyName to set
+     */
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 
 }

@@ -154,8 +154,9 @@ public class ConfigurationService extends WebService  {
                 if (CSWFunctionEnabled) {
                     boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                     String service     = getParameter("SERVICE", false);
+                    String id          = getParameter("ID", false);
                 
-                    marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service), sw);
+                    marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
                      throw new WebServiceException("This specific CSW operation " + request + " is not activated",

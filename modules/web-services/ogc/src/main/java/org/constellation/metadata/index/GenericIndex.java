@@ -133,7 +133,7 @@ public class GenericIndex extends IndexLucene<Object> {
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
     }
-    
+
     /**
      * This method add to index of lucene a new document based on a geotools Metadata object.
      * (implements AbstractIndex.indexDocument() )

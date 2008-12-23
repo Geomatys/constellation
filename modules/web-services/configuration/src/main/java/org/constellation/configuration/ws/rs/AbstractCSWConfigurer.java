@@ -97,7 +97,7 @@ public abstract class AbstractCSWConfigurer {
             JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
             Unmarshaller configUnmarshaller = jb.createUnmarshaller();
 
-            for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter())) {
+            for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
                 //we get the csw ID (if single mode return "")
                 String id = getConfigID(configFile);
 
@@ -145,7 +145,7 @@ public abstract class AbstractCSWConfigurer {
         File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
         Properties prop;
         try {
-            prop    = Utils.getPropertiesFromFile(cascadingFile);
+            prop = Utils.getPropertiesFromFile(cascadingFile);
         } catch (IOException ex) {
             throw new WebServiceException("IO exception while loading the cascading properties file",
                             NO_APPLICABLE_CODE, version);
@@ -175,58 +175,83 @@ public abstract class AbstractCSWConfigurer {
      * @return
      * @throws WebServiceException
      */
-    public AcknowlegementType refreshIndex(boolean asynchrone, String service) throws WebServiceException {
+    public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws WebServiceException {
         LOGGER.info("refresh index requested");
         String msg;
         if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
             GlobalUtils.resetLuceneIndex();
             msg = "MDWeb search index succefully deleted";
         } else {
+            
             File cswConfigDir = getConfigurationDirectory();
             if (!asynchrone) {
-
-                //we delete each index directory
-                for (File indexDir: cswConfigDir.listFiles(new indexDirectoryFilter())) {
-                    for (File f: indexDir.listFiles()) {
-                        f.delete();
-                    }
-                    if (!indexDir.delete()) {
-                        throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE, version);
-                    }
-                }
-                //then we restart the services
-                Anchors.clear();
-                restart();
-
+                synchroneIndexRefresh(cswConfigDir, id);
             } else {
-
-                //we delete each pre-builded index directory
-                for (File indexDir: cswConfigDir.listFiles(new nextIndexDirectoryFilter())) {
-                    for (File f : indexDir.listFiles()) {
-                        f.delete();
-                    }
-                    if (!indexDir.delete()) {
-                        throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE, version);
-                    }
-                }
-
-                //then we create all the nextIndex directory and create the indexes
-                for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter())) {
-                    String id = getConfigID(configFile);
-                    File nexIndexDir    = new File(cswConfigDir, id + "nextIndex");
-                    nexIndexDir.mkdir();
-                    IndexLucene indexer = indexers.get(id);
-                    indexer.setFileDirectory(nexIndexDir);
-                    indexer.createIndex();
-                }
-                
+                asynchroneIndexRefresh(cswConfigDir, id);
             }
             
             msg = "CSW index succefully recreated";
         }
         return new AcknowlegementType("success", msg);
     }
-    
+
+    /**
+     *
+     * @param configurationDirectory
+     * @throws org.constellation.ws.WebServiceException
+     */
+    private void synchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
+        //we delete each index directory
+        for (File indexDir : configurationDirectory.listFiles(new indexDirectoryFilter(id))) {
+            for (File f : indexDir.listFiles()) {
+                f.delete();
+            }
+            if (!indexDir.delete()) {
+                throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
+            }
+        }
+        //then we restart the services
+        Anchors.clear();
+        restart();
+    }
+
+    /**
+     *
+     * @param configurationDirectory
+     * @throws org.constellation.ws.WebServiceException
+     */
+    private void asynchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
+        /*
+         * we delete each pre-builded index directory.
+         * if there is a specific id in parameter we only delete the specified profile
+         */
+        for (File indexDir : configurationDirectory.listFiles(new nextIndexDirectoryFilter(id))) {
+            for (File f : indexDir.listFiles()) {
+                f.delete();
+            }
+            if (!indexDir.delete()) {
+                throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE);
+            }
+        }
+
+        /*
+         * then we create all the nextIndex directory and create the indexes
+         * if there is a specific id in parameter we only index the specified profile
+         */
+        for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
+            String currentId    = getConfigID(configFile);
+            File nexIndexDir    = new File(configurationDirectory, currentId + "nextIndex");
+            IndexLucene indexer = indexers.get(currentId);
+            if (indexer != null) {
+                nexIndexDir.mkdir();
+                indexer.setFileDirectory(nexIndexDir);
+                indexer.createIndex();
+            } else {
+                throw new WebServiceException("There is no indexer for the id:" + id, NO_APPLICABLE_CODE);
+            }
+        }
+    }
+
     /**
      * Reload all the web-services.
      */
@@ -265,8 +290,16 @@ public abstract class AbstractCSWConfigurer {
      */
     private class ConfigurationFileFilter implements FilenameFilter {
 
+        private String prefix;
+
+        public ConfigurationFileFilter(String id) {
+            prefix = "";
+            if (id != null)
+                prefix = id;
+        }
+
         public boolean accept(File dir, String name) {
-            return (name.endsWith("config.xml"));
+            return (name.endsWith(prefix + "config.xml"));
         }
 
     }
@@ -276,9 +309,17 @@ public abstract class AbstractCSWConfigurer {
      */
     private class indexDirectoryFilter implements FilenameFilter {
 
+        private String prefix;
+
+        public indexDirectoryFilter(String id) {
+            prefix = "";
+            if (id != null)
+                prefix = id;
+        }
+
         public boolean accept(File dir, String name) {
             File f = new File(dir, name);
-            return (name.endsWith("index") && f.isDirectory());
+            return (name.endsWith(prefix + "index") && f.isDirectory());
         }
 
     }
@@ -288,9 +329,17 @@ public abstract class AbstractCSWConfigurer {
      */
     private class nextIndexDirectoryFilter implements FilenameFilter {
 
+        private String prefix;
+        
+        public nextIndexDirectoryFilter(String id) {
+            prefix = "";
+            if (id != null)
+                prefix = id;
+        }
+        
         public boolean accept(File dir, String name) {
             File f = new File(dir, name);
-            return (name.endsWith("nextIndex") && f.isDirectory());
+            return (name.endsWith(prefix + "nextIndex") && f.isDirectory());
         }
 
     }

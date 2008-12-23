@@ -32,9 +32,9 @@ import static org.constellation.configuration.ws.rs.ConfigurationService.*;
  *
  * @author Guilhem Legal
  */
-public class CSWconfigurer extends AbstractCSWConfigurer {
+public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
 
-    public CSWconfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
+    public DefaultCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         super(cn);
     }
     

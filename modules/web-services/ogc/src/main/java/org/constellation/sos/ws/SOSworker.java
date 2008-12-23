@@ -95,6 +95,7 @@ import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
 import org.constellation.sos.ResponseModeType;
+import org.constellation.sos.io.DefaultObservationFilter;
 import org.constellation.sos.io.DefaultObservationReader;
 import org.constellation.sos.io.DefaultObservationWriter;
 import org.constellation.sos.io.MDWebSensorReader;
@@ -335,9 +336,9 @@ public class SOSworker {
 
             SMLReader = new MDWebSensorReader(SMLconnection, sensorIdBase, map);
             SMLWriter = new MDWebSensorWriter(SMLconnection, sensorIdBase, map);
-            OMReader = new DefaultObservationReader(dataSourceOM, observationIdBase);
-            OMWriter = new DefaultObservationWriter(dataSourceOM);
-            OMFilter = new ObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
+            OMReader  = new DefaultObservationReader(dataSourceOM, observationIdBase);
+            OMWriter  = new DefaultObservationWriter(dataSourceOM);
+            OMFilter  = new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
 
             logger.info("SOS service running");
             
@@ -550,8 +551,7 @@ public class SOSworker {
                                                  INVALID_PARAMETER_VALUE, "responseMode");
             }
         }
-        OMFilter.setRequestMode(mode);
-        OMFilter.initFilterObservation();
+        OMFilter.initFilterObservation(mode);
 
         if (mode == RESULT_TEMPLATE) {
             template = true;
@@ -1190,13 +1190,8 @@ public class SOSworker {
                 if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object timeFilter;
-                    if(time.getTEquals().getRest().size() == 2) {
-                       String propertyName = (String)time.getTEquals().getRest().get(0);
-                       timeFilter = time.getTEquals().getRest().get(1);
-                    } else {
-                       timeFilter = time.getTEquals().getRest().get(0);
-                    }
+                    String propertyName = time.getTEquals().getPropertyName();
+                    Object timeFilter   = time.getTEquals().getRest().get(0);
                     
                     if (!template) {
                         OMFilter.setTimeEquals(timeFilter);
@@ -1213,13 +1208,8 @@ public class SOSworker {
                 } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
 
                     // we get the property name (not used for now)
-                    Object timeFilter;
-                    if(time.getTBefore().getRest().size() == 2) {
-                       String propertyName = (String)time.getTBefore().getRest().get(0);
-                       timeFilter = time.getTBefore().getRest().get(1);
-                    } else {
-                       timeFilter = time.getTBefore().getRest().get(0);
-                    }
+                    String propertyName = time.getTBefore().getPropertyName();
+                    Object timeFilter   = time.getTBefore().getRest().get(0);
 
                     if (!template) {
                         OMFilter.setTimeBefore(timeFilter);
@@ -1235,14 +1225,8 @@ public class SOSworker {
                 } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object timeFilter;
-                    if(time.getTAfter().getRest().size() == 2) {
-                       String propertyName = (String)time.getTAfter().getRest().get(0);
-                       timeFilter = time.getTAfter().getRest().get(1);
-                    } else {
-                       timeFilter = time.getTAfter().getRest().get(0);
-                    }
-                    
+                    String propertyName = time.getTAfter().getPropertyName();
+                    Object timeFilter   = time.getTAfter().getRest().get(0);
 
                     if (!template) {
                         OMFilter.setTimeAfter(timeFilter);
@@ -1259,13 +1243,8 @@ public class SOSworker {
                 } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object timeFilter;
-                    if(time.getTDuring().getRest().size() == 2) {
-                       String propertyName = (String)time.getTDuring().getRest().get(0);
-                       timeFilter = time.getTDuring().getRest().get(1);
-                    } else {
-                       timeFilter = time.getTDuring().getRest().get(0);
-                    }
+                    String propertyName = (String)time.getTDuring().getRest().get(0);
+                    Object timeFilter   = time.getTDuring().getRest().get(0);
 
                     if (!template) {
                         OMFilter.setTimeDuring(timeFilter);
