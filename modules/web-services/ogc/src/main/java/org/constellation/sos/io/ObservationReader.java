@@ -18,8 +18,6 @@
 package org.constellation.sos.io;
 
 // J2SE dependencies
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -76,17 +74,9 @@ public abstract class ObservationReader {
     
     public abstract ObservationEntry getObservation(String identifier) throws WebServiceException;
 
-    public abstract List<String> filterObservation(String SQLQuery) throws WebServiceException;
-
-    public abstract List<ObservationResult> filterResult(String SQLQuery) throws WebServiceException;
-    
     public abstract AnyResultEntry getResult(String identifier) throws WebServiceException;
     
-    public abstract void closeCurrentStatement();
-    
     public abstract Set<ReferenceEntry> getReferences() throws WebServiceException;
-    
-    public abstract void destroy();
     
     /**
      * Create a new identifier for an observation by searching in the O&M database.
@@ -98,18 +88,5 @@ public abstract class ObservationReader {
      */
     public abstract String getMinimalEventTime() throws WebServiceException;
 
-    public class ObservationResult {
-
-        public String resultID;
-
-        public Timestamp beginTime;
-
-        public Timestamp endTime;
-
-        public ObservationResult(String resultID, Timestamp beginTime, Timestamp endTime) {
-            this.beginTime = beginTime;
-            this.endTime   = endTime;
-            this.resultID  = resultID;
-        }
-    }
+    public abstract void destroy();
 }

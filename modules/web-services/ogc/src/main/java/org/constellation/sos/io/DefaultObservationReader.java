@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,11 +93,6 @@ public class DefaultObservationReader extends ObservationReader {
      * An SQL statement get the minimal eventime for the observation offering
      */
     private final PreparedStatement getMinEventTimeOffering;
-
-    /**
-     *
-     */
-    private Statement currentStatement;
 
     /**
      *
@@ -289,47 +283,6 @@ public class DefaultObservationReader extends ObservationReader {
         }
     }
 
-    public List<ObservationResult> filterResult(String SQLQuery) throws WebServiceException {
-        try {
-            List<ObservationResult> results = new ArrayList<ObservationResult>();
-            closeCurrentStatement();
-            currentStatement = OMDatabase.getConnection().createStatement();
-            ResultSet result = currentStatement.executeQuery(SQLQuery);
-            while (result.next()) {
-                results.add(new ObservationResult(result.getString(1),
-                                                  result.getTimestamp(2),
-                                                  result.getTimestamp(3)));
-            }
-            result.close();
-            return results;
-
-        } catch (SQLException ex) {
-            logger.severe("SQLExcpetion while executing the query: " + SQLQuery);
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        }
-
-    }
-
-    public List<String> filterObservation(String SQLQuery) throws WebServiceException {
-        try {
-            List<String> results = new ArrayList<String>();
-            closeCurrentStatement();
-            currentStatement = OMDatabase.getConnection().createStatement();
-            ResultSet result = currentStatement.executeQuery(SQLQuery);
-            while (result.next()) {
-                results.add(result.getString(1));
-            }
-            result.close();
-            return results;
-        } catch (SQLException ex) {
-            logger.severe("SQLExcpetion while executing the query: " + SQLQuery);
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        }
-
-    }
-
     public AnyResultEntry getResult(String identifier) throws WebServiceException {
         try {
             AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
@@ -341,16 +294,6 @@ public class DefaultObservationReader extends ObservationReader {
             ex.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
-        }
-    }
-
-    public void closeCurrentStatement() {
-        try {
-            if (currentStatement != null)
-                currentStatement.close();
-        } catch (SQLException ex) {
-            logger.severe("SQLException while closing the current statement: " + ex.getMessage());
-
         }
     }
 

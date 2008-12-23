@@ -99,6 +99,7 @@ import org.constellation.sos.io.DefaultObservationReader;
 import org.constellation.sos.io.DefaultObservationWriter;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
+import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
@@ -228,6 +229,11 @@ public class SOSworker {
      * The Observation database writer
      */
     private final ObservationWriter OMWriter;
+
+    /**
+     * The observation filter
+     */
+    private final ObservationFilter OMFilter;
     
     /**
      * The sensorML database reader
@@ -244,8 +250,7 @@ public class SOSworker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(int profile) throws SQLException, IOException, WebServiceException {
-       
+    public SOSworker(int profile) throws WebServiceException {
         this.profile = profile;
         if (profile != TRANSACTIONAL && profile != DISCOVERY) {
             throw new IllegalArgumentException("the flag profile must be equals to TRANSACTIONAL or DISCOVERY!");
@@ -279,8 +284,43 @@ public class SOSworker {
                           "cause: The service can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
             start = false;
+        }  catch (IOException e) {
+            if (f != null) {
+                logger.severe(f.getPath());
+            }
+            logger.severe("The SOS service is not working(IOException)!"          + '\n' +
+                          "cause: The service can not load the properties files!" + '\n' +
+                          "cause: " + e.getMessage());
+            start = false;
         }
       
+        Connection SMLconnection        = null;
+        PGSimpleDataSource dataSourceOM = null;
+        Connection OMConnection         = null;
+        try {
+            //we create a connection to the sensorML database
+            PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
+            dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
+            dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
+            dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
+            dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
+            dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
+            SMLconnection = dataSourceSML.getConnection();
+
+            //we create a connection to the O&M database
+            dataSourceOM = new PGSimpleDataSource();
+            dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
+            dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
+            dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
+            dataSourceOM.setUser(prop.getProperty("OMDBUser"));
+            dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
+            OMConnection = dataSourceOM.getConnection();
+
+        } catch (SQLException ex) {
+            logger.severe("The SOS service is not running!" + '\n' + "cause: SQLException:" + ex.getMessage());
+            start = false;
+        }
+
         if (start) {
 
             //we initailize the properties attribute 
@@ -292,30 +332,15 @@ public class SOSworker {
             int h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
             int m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
             templateValidTime = (h * 3600000) + (m * 60000);
-            
-            //we create a connection to the sensorML database
-            PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
-            dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
-            dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
-            dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
-            dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
-            dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-            Connection SMLconnection = dataSourceSML.getConnection();
+
             SMLReader = new MDWebSensorReader(SMLconnection, sensorIdBase, map);
             SMLWriter = new MDWebSensorWriter(SMLconnection, sensorIdBase, map);
-           
-            //we create a connection to the O&M database
-            PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
-            dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
-            dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
-            dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
-            dataSourceOM.setUser(prop.getProperty("OMDBUser"));
-            dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
-
             OMReader = new DefaultObservationReader(dataSourceOM, observationIdBase);
             OMWriter = new DefaultObservationWriter(dataSourceOM);
+            OMFilter = new ObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
 
             logger.info("SOS service running");
+            
             
         } else {
             sensorIdBase              = null;
@@ -323,6 +348,7 @@ public class SOSworker {
             observationTemplateIdBase = null;
             OMReader                  = null;
             OMWriter                  = null;
+            OMFilter                  = null;
             SMLReader                 = null;
             SMLWriter                 = null;
             maxObservationByRequest   = -1;
@@ -524,14 +550,12 @@ public class SOSworker {
                                                  INVALID_PARAMETER_VALUE, "responseMode");
             }
         }
-        StringBuilder SQLrequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
+        OMFilter.setRequestMode(mode);
+        OMFilter.initFilterObservation();
 
-        if (mode == INLINE) {
-            SQLrequest.append(observationIdBase).append("%' AND ");
-        } else if (mode == RESULT_TEMPLATE) {
-            SQLrequest.append(observationTemplateIdBase).append("%' AND ");
+        if (mode == RESULT_TEMPLATE) {
             template = true;
-        } else {
+        } else if (mode != INLINE) {
             throw new WebServiceException("This response Mode is not supported by the service (inline or template available)!",
                                              OPERATION_NOT_SUPPORTED, "responseMode");
         }
@@ -567,78 +591,61 @@ public class SOSworker {
 
         //we get the list of process
         List<String> procedures = requestObservation.getProcedure();
-        SQLrequest.append(" ( ");
-        if (procedures.size() != 0 ) {
-
-            for (String s: procedures) {
-                if (s != null) {
-                    String dbId = map.getProperty(s);
-                    if ( dbId == null) {
-                        dbId = s;
-                    }
-                    logger.info("process ID: " + dbId);
-                    ReferenceEntry proc = getReferenceFromHRef(dbId);
-                    if (proc == null) {
-                        throw new WebServiceException(" this process is not registred in the table",
-                                                      INVALID_PARAMETER_VALUE, "procedure");
-                    }
-
-                    if (!off.getProcedure().contains(proc)) {
-                       throw new WebServiceException(" this process is not registred in the offering",
-                                                    INVALID_PARAMETER_VALUE, "procedure");
-                    } else {
-                        SQLrequest.append(" procedure='").append(dbId).append("' OR ");
-                    }
-                } else {
-                    //if there is only one proccess null we return error (we'll see)
-                    if (procedures.size() == 1)
-                        throw new WebServiceException("the process is null",
-                                                         INVALID_PARAMETER_VALUE, "procedure");
+        for (String s : procedures) {
+            if (s != null) {
+                String dbId = map.getProperty(s);
+                if (dbId == null) {
+                    dbId = s;
+                }
+                logger.info("process ID: " + dbId);
+                ReferenceEntry proc = getReferenceFromHRef(dbId);
+                if (proc == null) {
+                    throw new WebServiceException(" this process is not registred in the table",
+                            INVALID_PARAMETER_VALUE, "procedure");
+                }
+                if (!off.getProcedure().contains(proc)) {
+                    throw new WebServiceException(" this process is not registred in the offering",
+                            INVALID_PARAMETER_VALUE, "procedure");
+                }
+            } else {
+                //if there is only one proccess null we return error (we'll see)
+                if (procedures.size() == 1) {
+                    throw new WebServiceException("the process is null",
+                            INVALID_PARAMETER_VALUE, "procedure");
                 }
             }
-        } else {
-        //if is not specified we use all the process of the offering
-            for (ReferenceEntry proc: off.getProcedure()) {
-
-                SQLrequest.append(" procedure='").append(proc.getHref()).append("' OR ");
-            }
         }
-
-        SQLrequest.delete(SQLrequest.length() - 3, SQLrequest.length());
-        SQLrequest.append(") ");
+        OMFilter.setProcedure(procedures, off);
 
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
         List<String> observedProperties = requestObservation.getObservedProperty();
         if (observedProperties.size() != 0 ) {
-
-
-            SQLrequest.append(" AND( ");
-
+            List<String> singlePhenomenons    = new ArrayList<String>();
+            List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
                 if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                     phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                 }
                 PhenomenonEntry phen = OMReader.getPhenomenon(phenomenonName);
-               if (phen == null)
+                if (phen == null) {
                     throw new WebServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
                             INVALID_PARAMETER_VALUE, "observedProperty");
-               if (phen instanceof CompositePhenomenonEntry) {
-                    SQLrequest.append(" observed_property_composite='").append(phenomenonName).append("' OR ");
+                }
+                if (phen instanceof CompositePhenomenonEntry) {
+                    singlePhenomenons.add(phenomenonName);
 
                 } else if (phen instanceof PhenomenonEntry) {
-                    SQLrequest.append(" observed_property='").append(phenomenonName).append("' OR ");
+                    compositePhenomenons.add(phenomenonName);
                 }
             }
-
-            SQLrequest.delete(SQLrequest.length() - 3, SQLrequest.length());
-            SQLrequest.append(") ");
+            OMFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
         }
 
 
         //we treat the time restriction
         List<EventTime> times = requestObservation.getEventTime();
-        AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, SQLrequest, template);
+        AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template);
 
         //we treat the restriction on the feature of interest
         if (requestObservation.getFeatureOfInterest() != null) {
@@ -646,18 +653,15 @@ public class SOSworker {
 
             // if the request is a list of station
             if (!foiRequest.getObjectID().isEmpty()) {
-                SQLrequest.append(" AND (");
+                
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
-
                     //verify that the station is registred in the DB.
                     SamplingFeatureEntry foi = OMReader.getFeatureOfInterest(samplingFeatureName);
                     if (foi == null)
                         throw new WebServiceException("the feature of interest is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
-                    SQLrequest.append("feature_of_interest_point='").append(samplingFeatureName).append("' OR");
                 }
-                SQLrequest.delete(SQLrequest.length() - 2, SQLrequest.length());
-                SQLrequest.append(") ");
+                OMFilter.setFeatureOfInterest(foiRequest.getObjectID());
 
             // if the request is a spatial operator
             } else {
@@ -665,11 +669,12 @@ public class SOSworker {
                 if (foiRequest.getBBOX() != null) {
 
                     if (foiRequest.getBBOX().getEnvelope() != null &&
-                            foiRequest.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
-                            foiRequest.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2) {
-                        SQLrequest.append(" AND (");
-                        boolean add = false;
+                        foiRequest.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
+                        foiRequest.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2) {
+                        
                         EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
+                        boolean add     = false;
+                        List<String> matchingFeatureOfInterest = new ArrayList<String>();
                         for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
                             SamplingPointEntry station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
                             if (station == null)
@@ -682,20 +687,16 @@ public class SOSworker {
                                         sp.getPosition().getPos().getValue().get(1) > e.getUpperCorner().getValue().get(1) &&
                                         sp.getPosition().getPos().getValue().get(1) < e.getLowerCorner().getValue().get(1)) {
 
+                                    matchingFeatureOfInterest.add(sp.getId());
                                     add = true;
-                                    SQLrequest.append("feature_of_interest_point='").append(sp.getId()).append("' OR");
                                 } else {
                                     logger.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
                                 }
                             }
                         }
-                        if (add) {
-                            SQLrequest.delete(SQLrequest.length() - 3, SQLrequest.length());
-                            SQLrequest.append(") ");
-                        } else {
-                            SQLrequest.delete(SQLrequest.length() - 5, SQLrequest.length());
-                        }
-
+                        if (add)
+                            OMFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                        
                     } else {
                         throw new WebServiceException("the envelope is not build correctly",
                                                      INVALID_PARAMETER_VALUE);
@@ -769,9 +770,8 @@ public class SOSworker {
                                               OPERATION_NOT_SUPPORTED);
             }
         }
-        logger.info("request:" + SQLrequest.toString());
 
-        List<String> observationIDs = OMReader.filterObservation(SQLrequest.toString());
+        List<String> observationIDs = OMFilter.filterObservation();
         for (String observationID : observationIDs) {
             ObservationEntry o = OMReader.getObservation(observationID);
             if (template) {
@@ -799,7 +799,6 @@ public class SOSworker {
                 }
             }
         }
-        OMReader.closeCurrentStatement();
         return normalizeDocument(response);
     }
     
@@ -827,10 +826,7 @@ public class SOSworker {
         }
         
         //we begin to create the sql request
-        StringBuilder SQLrequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
-        
-        //we add to the request the property of the template
-        SQLrequest.append("procedure='").append(((ProcessEntry)template.getProcedure()).getHref()).append("'");
+        OMFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref());
         
         //we treat the time constraint
         List<EventTime> times = requestResult.getEventTime();
@@ -870,13 +866,12 @@ public class SOSworker {
         }
         
         //we treat the time constraint
-        treatEventTimeRequest(times, SQLrequest, false);
+        treatEventTimeRequest(times, false);
         
         //we prepare the response document
-        logger.info(SQLrequest.toString());
-        List<ObservationReader.ObservationResult> results = OMReader.filterResult(SQLrequest.toString());
+        List<ObservationFilter.ObservationResult> results = OMFilter.filterResult();
         StringBuilder datablock = new StringBuilder();
-        for (ObservationReader.ObservationResult result: results) {
+        for (ObservationFilter.ObservationResult result: results) {
             Timestamp tBegin = result.beginTime;
             Timestamp tEnd   = result.endTime;
             AnyResultEntry a = OMReader.getResult(result.resultID);
@@ -890,7 +885,6 @@ public class SOSworker {
                 }
             }
         }
-        OMReader.closeCurrentStatement();
         GetResultResponse.Result r = new GetResultResponse.Result(datablock.toString(), serviceURL + '/' + requestResult.getObservationTemplateId());
         GetResultResponse response = new GetResultResponse(r);
         logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
@@ -1183,7 +1177,7 @@ public class SOSworker {
      * 
      * @return true if there is no errors in the time constraint else return false.
      */
-    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, StringBuilder SQLrequest, boolean template) throws WebServiceException {
+    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, boolean template) throws WebServiceException {
         
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
@@ -1192,49 +1186,24 @@ public class SOSworker {
             
             for (EventTime time: times) {
 
-                if (!template)
-                    SQLrequest.append("AND (");
-                
                 // The operation Time Equals
                 if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object j;
+                    Object timeFilter;
                     if(time.getTEquals().getRest().size() == 2) {
                        String propertyName = (String)time.getTEquals().getRest().get(0);
-                       j = time.getTEquals().getRest().get(1);
+                       timeFilter = time.getTEquals().getRest().get(1);
                     } else {
-                       j = time.getTEquals().getRest().get(0);
+                       timeFilter = time.getTEquals().getRest().get(0);
                     }
                     
-                    
-                    //if the temporal object is a timePeriod
-                    if (j instanceof TimePeriodType) {
-                        TimePeriodType tp = (TimePeriodType)j;
-                        String begin = getTimeValue(tp.getBeginPosition());
-                        String end   = getTimeValue(tp.getEndPosition()); 
-                        if (!template) {
-                            // we request directly a multiple observation or a period observation (one measure during a period)
-                            SQLrequest.append(" sampling_time_begin='").append(begin).append("' AND ");
-                            SQLrequest.append(" sampling_time_end='").append(end).append("') ");
-                        } else {
-                            templateTime = tp;
-                        }
-                    
-                    // if the temporal object is a timeInstant    
-                    } else if (j instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType) j;
-                        String position = getTimeValue(ti.getTimePosition());
-                        if (!template) {
-                            // case 1 a single observation
-                            SQLrequest.append("(sampling_time_begin='").append(position).append("' AND sampling_time_end=NULL)");
-                            SQLrequest.append(" OR ");
-                            
-                            //case 2 multiple observations containing a matching value
-                            SQLrequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
-                        } else {
-                            templateTime = ti;
-                        }
+                    if (!template) {
+                        OMFilter.setTimeEquals(timeFilter);
+                        
+                    } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
+                        templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
+                        
                     } else {
                         throw new WebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
                                                       INVALID_PARAMETER_VALUE, "eventTime");
@@ -1244,25 +1213,19 @@ public class SOSworker {
                 } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
 
                     // we get the property name (not used for now)
-                    Object j;
+                    Object timeFilter;
                     if(time.getTBefore().getRest().size() == 2) {
                        String propertyName = (String)time.getTBefore().getRest().get(0);
-                       j = time.getTBefore().getRest().get(1);
+                       timeFilter = time.getTBefore().getRest().get(1);
                     } else {
-                       j = time.getTBefore().getRest().get(0);
+                       timeFilter = time.getTBefore().getRest().get(0);
                     }
-                    
-                    // for the operation before the temporal object must be an timeInstant
-                    if (j instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType)j;
-                        String position = getTimeValue(ti.getTimePosition());
-                        if (!template) { 
-                            // the single and multpile observations whitch begin after the bound
-                            SQLrequest.append("(sampling_time_begin<='").append(position).append("'))");
-                        } else {
-                            templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
-                        }
-                        
+
+                    if (!template) {
+                        OMFilter.setTimeBefore(timeFilter);
+                    } else if (timeFilter instanceof TimeInstantType) {
+                        TimeInstantType ti = (TimeInstantType)timeFilter;
+                        templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                     } else {
                         throw new WebServiceException("TM_Before operation require timeInstant!",
                                                       INVALID_PARAMETER_VALUE, "eventTime");
@@ -1272,28 +1235,21 @@ public class SOSworker {
                 } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object j;
+                    Object timeFilter;
                     if(time.getTAfter().getRest().size() == 2) {
                        String propertyName = (String)time.getTAfter().getRest().get(0);
-                       j = time.getTAfter().getRest().get(1);
+                       timeFilter = time.getTAfter().getRest().get(1);
                     } else {
-                       j = time.getTAfter().getRest().get(0);
+                       timeFilter = time.getTAfter().getRest().get(0);
                     }
                     
-                    // for the operation after the temporal object must be an timeInstant
-                    if (j instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType)j;
-                        String position = getTimeValue(ti.getTimePosition());
-                        if (!template) {
-                            // the single and multpile observations whitch begin after the bound
-                            SQLrequest.append("(sampling_time_begin>='").append(position).append("')");
-                            SQLrequest.append(" OR ");
-                            // the multiple observations overlapping the bound
-                            SQLrequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
-                            
-                        } else {
-                            templateTime = new TimePeriodType(ti.getTimePosition());
-                        }
+
+                    if (!template) {
+                        OMFilter.setTimeAfter(timeFilter);
+                    } else if (timeFilter instanceof TimeInstantType) {
+                        TimeInstantType ti = (TimeInstantType)timeFilter;
+                        templateTime = new TimePeriodType(ti.getTimePosition());
+                        
                     } else {
                        throw new WebServiceException("TM_After operation require timeInstant!",
                                                      INVALID_PARAMETER_VALUE, "eventTime");
@@ -1303,38 +1259,20 @@ public class SOSworker {
                 } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    Object j;
+                    Object timeFilter;
                     if(time.getTDuring().getRest().size() == 2) {
                        String propertyName = (String)time.getTDuring().getRest().get(0);
-                       j = time.getTDuring().getRest().get(1);
+                       timeFilter = time.getTDuring().getRest().get(1);
                     } else {
-                       j = time.getTDuring().getRest().get(0);
+                       timeFilter = time.getTDuring().getRest().get(0);
                     }
-                    
-                    if (j instanceof TimePeriodType) {
-                        TimePeriodType tp = (TimePeriodType)j;
-                        String begin = getTimeValue(tp.getBeginPosition());
-                        String end   = getTimeValue(tp.getEndPosition()); 
+
+                    if (!template) {
+                        OMFilter.setTimeDuring(timeFilter);
+                    }
+                    if (timeFilter instanceof TimePeriodType) {
+                        templateTime = (TimePeriodType)timeFilter;
                         
-                        if (!template) {
-                            // the multiple observations included in the period
-                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("')");
-                            SQLrequest.append(" OR ");
-                            // the single observations included in the period
-                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)");
-                            SQLrequest.append(" OR ");
-                            // the multiple observations whitch overlaps the first bound
-                            SQLrequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' AND sampling_time_end>='").append(begin).append("')");
-                            SQLrequest.append(" OR ");
-                            // the multiple observations whitch overlaps the second bound
-                            SQLrequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end>= '").append(end).append("' AND sampling_time_begin<='").append(end).append("')");
-                            SQLrequest.append(" OR ");
-                            // the multiple observations whitch overlaps the whole period
-                            SQLrequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end>= '").append(end).append("'))");
-                            
-                        } else {
-                            templateTime = tp;
-                        }
                     } else {
                         throw new WebServiceException("TM_During operation require TimePeriod!",
                                                       INVALID_PARAMETER_VALUE, "eventTime");
@@ -1351,7 +1289,6 @@ public class SOSworker {
         } else {
             return null;
         }
-        
         return templateTime;
     }
     

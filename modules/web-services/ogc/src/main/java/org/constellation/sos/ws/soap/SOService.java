@@ -19,8 +19,6 @@ package org.constellation.sos.ws.soap;
 
 // JDK dependencies
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,7 +36,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import org.constellation.catalog.NoSuchTableException;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
@@ -105,7 +102,7 @@ public class SOService {
     /**
      * Initialize the database connection.
      */
-    public SOService() throws SQLException, IOException, NoSuchTableException, JAXBException, WebServiceException {
+    public SOService() throws JAXBException, WebServiceException {
        worker = new SOSworker(SOSworker.TRANSACTIONAL);
        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();

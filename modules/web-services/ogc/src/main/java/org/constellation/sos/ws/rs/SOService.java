@@ -17,13 +17,13 @@
  */
 package org.constellation.sos.ws.rs;
 
-// Jersey dependencies
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.StringWriter;
+
+// Jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.StringWriter;
 
 //JAXB dependencies
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ import javax.xml.bind.JAXBException;
 // geotools dependencies
 
 // Constellation dependencies
-import org.constellation.catalog.NoSuchTableException;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
@@ -68,7 +67,7 @@ public class SOService extends OGCWebService {
     /**
      * Build a new Restfull SOS service.
      */
-    public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException, WebServiceException {
+    public SOService() throws JAXBException, WebServiceException {
         super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
         worker = new SOSworker(SOSworker.TRANSACTIONAL);
         setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
