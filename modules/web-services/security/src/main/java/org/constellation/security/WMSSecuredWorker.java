@@ -16,14 +16,24 @@
  */
 package org.constellation.security;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.spi.AuthLoginException;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -341,14 +351,71 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 
     /**
      * Write in logs that a user has processed with the authentication.
+     *
+     * @throws WebServiceException
      */
-    private void logsAuthentication() {
-        if (WMSusesREST) {
-            final Principal principal = securityContext.getUserPrincipal();
-            final String userName = principal.getName();
-            LOGGER.info("WMS-sec: user \""+ userName +"\" is logged.");
-        } else {
-            throw new UnsupportedOperationException("We don't handle SOAP authentication yet.");
+    private void logsAuthentication() throws WebServiceException {
+//        if (WMSusesREST) {
+//            final Principal principal = securityContext.getUserPrincipal();
+//            final String userName = principal.getName();
+//
+//            //Get an SSO token
+//            final String PASSWORD = "";//put in the right password locally
+//            final URL urlOpensso;
+//            try {
+//                urlOpensso = new URL("http", "strabo.geomatys.fr", 10080, "opensso");
+//            } catch (MalformedURLException ex) {
+//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//            }
+//            final AuthContext authContext;
+//            try {
+//                authContext = new AuthContext("Geomatys", urlOpensso);
+//                authContext.login(AuthContext.IndexType.MODULE_INSTANCE, "Application");//Cedric was failing here
+//            } catch (AuthLoginException ex) {
+//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//            }
+//            if (authContext.hasMoreRequirements()) {
+//                LOGGER.info("WMS-sec: authority context has more requirements! Now filling in.");
+//                Callback[] callbacks = authContext.getRequirements();
+//                if (callbacks != null) {
+//                    addLoginCallbackMessage(callbacks, "asadmin", PASSWORD);
+//                    authContext.submitRequirements(callbacks);
+//                }
+//            }
+//            if (!authContext.getStatus().equals(AuthContext.Status.SUCCESS)) {
+//                throw new WebServiceException("The status code of the AuthContext is not succes." +
+//                        " Still lacking something in the log-in process", ExceptionCode.NO_APPLICABLE_CODE);
+//            }
+//            final SSOToken token;
+//            try {
+//                token = authContext.getSSOToken();
+//            } catch (Exception ex) {
+//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//            }
+//
+//            //Get the logger, now we have the token
+//            final com.sun.identity.log.LogRecord logRecord =
+//                    new com.sun.identity.log.LogRecord(Level.INFO, "user \""+ userName +"\" is logged.", token);
+//            final com.sun.identity.log.Logger logger =
+//                    (com.sun.identity.log.Logger) com.sun.identity.log.Logger.getLogger("OpenSSO:WMS");
+//            logger.log(logRecord);
+//
+//            LOGGER.info("WMS-sec: user \""+ userName +"\" is logged.");
+//
+//        } else {
+//            throw new UnsupportedOperationException("We don't handle SOAP authentication yet.");
+//        }
+    }
+
+    private void addLoginCallbackMessage(Callback[] callbacks, String appUserName, String password) {
+        for(Callback callback : callbacks) {
+            if(callback instanceof NameCallback) {
+                NameCallback nameCallback = (NameCallback) callback;
+                nameCallback.setName(appUserName);
+            } else if(callback instanceof PasswordCallback) {
+                PasswordCallback pwdCallback = (PasswordCallback) callback;
+                pwdCallback.setPassword(password.toCharArray());
+            }
         }
     }
 
