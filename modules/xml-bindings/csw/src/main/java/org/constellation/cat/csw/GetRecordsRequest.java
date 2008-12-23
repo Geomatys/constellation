@@ -104,5 +104,10 @@ public interface GetRecordsRequest extends AbstractCswRequest {
      * @param filter FilterType
      */
     public void setFilterConstraint(FilterType filter);
+    
+    /**
+     * Sets the value of the resultType property.
+     */
+    public void setResultType(String resultType);
 
 }

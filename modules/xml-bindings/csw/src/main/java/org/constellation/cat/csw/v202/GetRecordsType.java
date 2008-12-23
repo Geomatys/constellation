@@ -208,6 +208,13 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     }
 
     /**
+     * Sets the value of the resultType property which is a string.
+     */
+    public void setResultType(String resultType) {
+        this.resultType = ResultType.fromValue(resultType);
+    }
+    
+    /**
      * Gets the value of the outputFormat property.
      */
     public String getOutputFormat() {
