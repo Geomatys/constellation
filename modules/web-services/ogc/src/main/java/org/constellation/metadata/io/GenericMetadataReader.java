@@ -35,6 +35,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -44,6 +49,7 @@ import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.ws.WebServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.Column;
@@ -130,6 +136,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * A flag mode indicating we are searching the database for contacts.
      */
     private static int CONTACT = 10;
+
+    /**
+     * Shared Thread Pool for parralele execution
+     */
+    private ExecutorService pool = Executors.newFixedThreadPool(50);
     
     /**
      * Build a new Generic metadata reader and initialize the statement.
@@ -366,10 +377,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         logger.severe("no statement found for variable: " + var);
                     }
                 }
-                    
             }
         }
-        
+        paraleleLoading(identifier, subSingleStmts, subMultiStmts);
+    }
+
+    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
             try {
@@ -379,9 +392,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     for (String varName : singleStatements.get(stmt)) {
                         singleValue.put(varName, result.getString(varName));
                     }
-                } else {
-                    logger.finer("no result");
-                }
+                } 
                 result.close();
             } catch (SQLException ex) {
                 String varlist = "";
@@ -390,15 +401,14 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 }
                 logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
                               "for variable: " + varlist);
-                
             }
         }
-        
+
         //we extract the multiple values
         for (PreparedStatement stmt : subMultiStmts) {
             try {
                 fillStatement(stmt, identifier);
-                
+
                 ResultSet result = stmt.executeQuery();
                 for (String varName : multipleStatements.get(stmt)) {
                     multipleValue.put(varName, new ArrayList<String>());
@@ -421,7 +431,99 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
                         "for variable: " + varlist);
             }
-            
+
+        }
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
+    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+        //we extract the single values
+        CompletionService cs = new BoundedCompletionService(this.pool, 10);
+        for (final PreparedStatement stmt : subSingleStmts) {
+            cs.submit(new Callable() {
+
+                public Object call() throws Exception {
+                    try {
+                        fillStatement(stmt, identifier);
+                        ResultSet result = stmt.executeQuery();
+                        if (result.next()) {
+                            for (String varName : singleStatements.get(stmt)) {
+                                singleValue.put(varName, result.getString(varName));
+                            }
+                        } 
+                        result.close();
+
+                    } catch (SQLException ex) {
+                        String varlist = "";
+                        for (String s : singleStatements.get(stmt)) {
+                            varlist += s + ',';
+                        }
+                        logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
+                                "for variable: " + varlist);
+
+                    }
+                    return null;
+                }
+            });
+        }
+
+        for (int i = 0; i < subSingleStmts.size(); i++) {
+            try {
+                cs.take().get();
+            } catch (InterruptedException ex) {
+               logger.severe("InterruptedException in parralele load data");
+            } catch (ExecutionException ex) {
+               logger.severe("ExecutionException in parralele load data");
+            }
+        }
+
+        //we extract the multiple values
+        cs = new BoundedCompletionService(this.pool, 10);
+        for (final PreparedStatement stmt : subMultiStmts) {
+            cs.submit(new Callable() {
+
+                public Object call() throws Exception {
+                    try {
+                        fillStatement(stmt, identifier);
+
+                        ResultSet result = stmt.executeQuery();
+                        for (String varName : multipleStatements.get(stmt)) {
+                            multipleValue.put(varName, new ArrayList<String>());
+                        }
+                        while (result.next()) {
+                            for (String varName : multipleStatements.get(stmt)) {
+                                multipleValue.get(varName).add(result.getString(varName));
+                            }
+                        }
+                    } catch (SQLException ex) {
+                        String varlist = "";
+                        List<String> varList = singleStatements.get(stmt);
+                        if (varList != null) {
+                            for (String s : varList) {
+                                varlist += s + ',';
+                            }
+                        } else {
+                            varlist = "no variables";
+                        }
+                        logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
+                                "for variable: " + varlist);
+                    }
+                    return null;
+                }
+            });
+        }
+
+        for (int i = 0; i < subMultiStmts.size(); i++) {
+            try {
+                cs.take().get();
+            } catch (InterruptedException ex) {
+               logger.severe("InterruptedException in parralele load data");
+            } catch (ExecutionException ex) {
+               logger.severe("ExecutionException in parralele load data");
+            }
         }
     }
     
@@ -727,13 +829,18 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (String id : identifiers) {
             loadData(id, CONTACT, null);
             for(String var: getVariablesForContact()) {
-                String c = getVariable(var);
-                if (c == null) {
-                    List<String> cs = getVariables(var);
-                    if (cs != null)
-                        results.addAll(cs);
+                String contactID = getVariable(var);
+                if (contactID == null) {
+                    List<String> contactIDs = getVariables(var);
+                    if (contactIDs != null) {
+                        for (String cID : contactIDs) {
+                            if (!results.contains(cID))
+                                results.add(cID);
+                        }
+                    }
                 } else {
-                    results.add(c);
+                    if (!results.contains(contactID))
+                        results.add(contactID);
                 }
             }
         }
@@ -767,7 +874,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 mainStatement.close();
                 mainStatement = null;
             }
-            
+
+            pool.shutdown();
         } catch (SQLException ex) {
             logger.severe("SQLException while destroying Generic metadata reader");
         }

@@ -32,6 +32,13 @@ public abstract class SensorReader {
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
 
+    /**
+     * Return the specified sensor description from the specified ID.
+     *
+     * @param sensorID The identifier of the sensor.
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
     public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
     
     /**
@@ -39,5 +46,8 @@ public abstract class SensorReader {
      */
     public abstract int getNewSensorId() throws WebServiceException;
 
+    /**
+     * Destroy and free the resource used by the reader.
+     */
     public abstract void destroy();
 }

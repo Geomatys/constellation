@@ -989,6 +989,17 @@ public class SOSworker {
         return values;
     }
     
+    /**
+     * Parse a data block and return only the values matching the time filter.
+     *
+     * @param brutValues The data block.
+     * @param abstractEncoding The encoding of the data block.
+     * @param boundBegin The begin bound of the time filter.
+     * @param boundEnd The end bound of the time filter.
+     * @param boundEquals An equals time filter (implies boundBegin and boundEnd null).
+     *
+     * @return a datablock containing only the matching observations.
+     */
     private String parseDataBlock(String brutValues, AbstractEncodingEntry abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
         String values = "";
         if (abstractEncoding instanceof TextBlockEntry) {
@@ -1191,7 +1202,7 @@ public class SOSworker {
     }
     
     /**
-     * TODO factoriser
+     *
      * 
      * @param times A list of time constraint.
      * @param SQLrequest A stringBuilder building the SQL request.
@@ -1406,31 +1417,31 @@ public class SOSworker {
             if (offering != null) {
 
                 //we add the new sensor to the offering
+                OfferingProcedureEntry offProc = null;
                 ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
                 if (!offering.getProcedure().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
                     }
-                    OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
-                    OMWriter.writeOfferingProcedure(offProc);
+                    offProc = new OfferingProcedureEntry(offering.getId(), ref);
                 }
 
                 //we add the phenomenon to the offering
+                OfferingPhenomenonEntry offPheno = null;
                 if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
-                    OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
-                    OMWriter.writeOfferingPhenomenon(offPheno);
+                    offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
                 }
 
                 // we add the feature of interest (station) to the offering
+                OfferingSamplingFeatureEntry offSF = null;
                 ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                 if (!offering.getFeatureOfInterest().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                     }
-                    OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                    OMWriter.writeOfferingSamplingFeature(offSF);
+                    offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
                 }
-
+                OMWriter.updateOffering(offProc, offPheno, offSF);
             // we build a new offering
             // TODO bounded by??? station?
             } else {
@@ -1477,29 +1488,33 @@ public class SOSworker {
         ObservationOfferingEntry offering = OMReader.getObservationOffering("offering-allSensor");
 
         if (offering != null) {
+
             //we add the new sensor to the offering
+            OfferingProcedureEntry offProc = null;
             ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
             if (!offering.getProcedure().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
                 }
-                OfferingProcedureEntry offProc = new OfferingProcedureEntry(offering.getId(), ref);
-                OMWriter.writeOfferingProcedure(offProc);
+                offProc = new OfferingProcedureEntry(offering.getId(), ref);
             }
+
             //we add the phenomenon to the offering
+            OfferingPhenomenonEntry offPheno = null;
             if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
-                OfferingPhenomenonEntry offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
-                OMWriter.writeOfferingPhenomenon(offPheno);
+                offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
             }
+
             // we add the feature of interest (station) to the offering
+            OfferingSamplingFeatureEntry offSF = null;
             ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
             if (!offering.getFeatureOfInterest().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                 }
-                OfferingSamplingFeatureEntry offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
-                OMWriter.writeOfferingSamplingFeature(offSF);
+                offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
             }
+            OMWriter.updateOffering(offProc, offPheno, offSF);
         } else {
             logger.info("offering allSensor not present, first build");
 
@@ -1662,7 +1677,11 @@ public class SOSworker {
         return collection;
     }
     
-    
+    /**
+     * Return the current output format MIME type (default: application/xml).
+     * 
+     * @return The current output format MIME type (default: application/xml).
+     */
     public String getOutputFormat() {
         if (outputFormat == null) {
             return "application/xml";
@@ -1726,6 +1745,9 @@ public class SOSworker {
         }
     }
 
+    /**
+     * Destroy and free the resource used by the worker.
+     */
     public void destroy() {
         SMLReader.destroy();
         SMLWriter.destroy();

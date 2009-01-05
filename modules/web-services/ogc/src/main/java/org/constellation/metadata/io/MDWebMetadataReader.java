@@ -18,6 +18,10 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.sql.Connection;
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
@@ -172,7 +177,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Connection MDConnection) throws SQLException {
+    public MDWebMetadataReader(Connection MDConnection, File configDir) throws SQLException {
         super(true);
         this.MDReader        = new Reader20(Standard.ISO_19115,  MDConnection);
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
@@ -187,9 +192,42 @@ public class MDWebMetadataReader extends MetadataReader {
         this.ebrimV3Package  = Utils.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
         this.ebrimV25Package = Utils.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
-        this.classBinding    = new HashMap<String, Class>();
+        this.classBinding    = initClassBinding(configDir);
         this.alreadyRead     = new HashMap<Value, Object>();
         this.classeNotFound  = new ArrayList<String>();
+    }
+
+    /**
+     * Initialize the class binding between MDWeb database classes and java implementation classes.
+     * 
+     * We give the possibility to the user to add a configuration file making the mapping.
+     * @return
+     */
+    public Map<String, Class> initClassBinding(File configDir) {
+        Map<String, Class> result = new HashMap<String, Class>();
+        try {
+            // we get the configuration file
+            File bindingFile   = new File(configDir, "classMapping.properties");
+            FileInputStream in = new FileInputStream(bindingFile);
+            Properties prop    = new Properties();
+            prop.load(in);
+            in.close();
+
+            for(Object className : prop.keySet()) {
+                try {
+                    Class c = Class.forName(prop.getProperty((String)className));
+                    result.put((String)className, c);
+                } catch (ClassNotFoundException ex) {
+                    logger.severe("error in class binding initialization for class:" + className);
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            logger.info("no class mapping found (optional)");
+        }  catch (IOException e) {
+            logger.info("no class mapping found (optional) IOException");
+        }
+        return result;
     }
 
     /**

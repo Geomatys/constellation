@@ -29,7 +29,7 @@ public class MDWMetadataReaderProfile {
 
 
     public MDWMetadataReaderProfile(Connection MDConnection) throws Exception {
-        MDWebMetadataReader reader = new MDWebMetadataReader(MDConnection);
+        MDWebMetadataReader reader = new MDWebMetadataReader(MDConnection, null);
         reader.getAllEntries();
     }
     

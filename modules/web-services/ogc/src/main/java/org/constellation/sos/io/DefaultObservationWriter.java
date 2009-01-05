@@ -136,9 +136,14 @@ public class DefaultObservationWriter extends ObservationWriter {
         }
     }
 
-    public void writeOfferingProcedure(OfferingProcedureEntry offProc) throws WebServiceException {
+    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws WebServiceException {
         try {
-            offTable.getProcedures().getIdentifier(offProc);
+            if (offProc != null)
+                offTable.getProcedures().getIdentifier(offProc);
+            if (offPheno != null)
+                offTable.getPhenomenons().getIdentifier(offPheno);
+            if (offSF != null)
+                offTable.getStations().getIdentifier(offSF);
 
         } catch (CatalogException ex) {
             throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
@@ -147,33 +152,6 @@ public class DefaultObservationWriter extends ObservationWriter {
             e.printStackTrace();
             throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
-        }
-    }
-
-    public void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws WebServiceException {
-        try {
-            offTable.getPhenomenons().getIdentifier(offPheno);
-
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
-
-    public void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws WebServiceException {
-        try {
-            offTable.getStations().getIdentifier(offSF);
-        } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                    NO_APPLICABLE_CODE);
         }
     }
 

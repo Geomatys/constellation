@@ -49,11 +49,8 @@ public abstract class ObservationWriter {
     
     public abstract String writeOffering(ObservationOfferingEntry offering) throws WebServiceException;
     
-    public abstract void writeOfferingProcedure(OfferingProcedureEntry offProc) throws WebServiceException;
-    
-    public abstract void writeOfferingPhenomenon(OfferingPhenomenonEntry offPheno) throws WebServiceException;
-    
-    public abstract void writeOfferingSamplingFeature(OfferingSamplingFeatureEntry offSF) throws WebServiceException;
+    public abstract void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
+            OfferingSamplingFeatureEntry offSF) throws WebServiceException;
     
     public abstract void updateOfferings();
     

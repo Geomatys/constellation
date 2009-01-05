@@ -341,6 +341,7 @@ public class CSWworker {
             logger.severe(e.getMessage());
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause: IllegalArgumentException: " + e.getMessage());
+            e.printStackTrace();
             isStarted = false;
         }
     }

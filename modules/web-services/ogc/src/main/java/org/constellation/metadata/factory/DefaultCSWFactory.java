@@ -59,7 +59,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     public MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDirectory, Unmarshaller unmarshaller, File configDir) throws SQLException, JAXBException {
         switch (configuration.getType()) {
             case MDWEB:
-                return new MDWebMetadataReader(MDConnection);
+                return new MDWebMetadataReader(MDConnection, configDir);
             case FILESYSTEM:
                 return new FileMetadataReader(dataDirectory, unmarshaller);
             default:
