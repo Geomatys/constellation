@@ -60,7 +60,7 @@ import org.constellation.ws.WebServiceException;
  */
 public abstract class IndexLucene<E> extends AbstractIndex<E> {
 
-    protected final Logger logger = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A lucene analyser.

@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,14 +64,11 @@ import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.metadata.iso.citation.CitationDateImpl;
 import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.util.SimpleInternationalString;
 
 //geoAPI dependencies
 import org.opengis.metadata.citation.DateType;
 import org.opengis.util.InternationalString;
-import org.opengis.metadata.Datatype;
-import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
@@ -100,7 +96,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * An unmarshaller used for getting EDMO data.
      */
-    protected Unmarshaller unmarshaller;
+    protected final Unmarshaller unmarshaller;
     
     /**
      * A list of precompiled SQL request returning single value.
@@ -140,14 +136,14 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * Shared Thread Pool for parralele execution
      */
-    private ExecutorService pool = Executors.newFixedThreadPool(50);
+    private ExecutorService pool = Executors.newFixedThreadPool(6);
     
     /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
     public GenericMetadataReader(Automatic configuration, Connection connection, File configDir) throws SQLException, JAXBException {
-        super(false);
+        super(false, true);
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
@@ -161,7 +157,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param genericConfiguration
      */
     public GenericMetadataReader(Automatic configuration, Connection connection, File configDir, boolean fillAnchor) throws SQLException, JAXBException {
-        super(false);
+        super(false, true);
         initStatement(connection, configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
@@ -176,7 +172,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    private void initStatement(Connection connection, Automatic configuration) throws SQLException {
+    private final void initStatement(Connection connection, Automatic configuration) throws SQLException {
         // we initialize the main query
         if (configuration.getQueries() != null           &&
             configuration.getQueries().getMain() != null &&
@@ -379,9 +375,19 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 }
             }
         }
-        paraleleLoading(identifier, subSingleStmts, subMultiStmts);
+        if (isThreadEnabled())
+            paraleleLoading(identifier, subSingleStmts, subMultiStmts);
+        else
+            sequentialLoading(identifier, subSingleStmts, subMultiStmts);
     }
 
+    /**
+     * Execute the list of single and multiple statement sequentially.
+     *
+     * @param identifier
+     * @param subSingleStmts
+     * @param subMultiStmts
+     */
     private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
@@ -437,15 +443,17 @@ public abstract class GenericMetadataReader extends MetadataReader {
 
     /**
      * Load all the data for the specified Identifier from the database.
+     * Execute the list of single and multiple statement by pack of ten thread.
+     *
      * @param identifier
      */
     private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
         //we extract the single values
-        CompletionService cs = new BoundedCompletionService(this.pool, 10);
+        CompletionService cs = new BoundedCompletionService(this.pool, 5);
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
-                public Object call() throws Exception {
+                public Object call() {
                     try {
                         fillStatement(stmt, identifier);
                         ResultSet result = stmt.executeQuery();
@@ -474,18 +482,17 @@ public abstract class GenericMetadataReader extends MetadataReader {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data");
+               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data");
+               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
             }
         }
-
         //we extract the multiple values
-        cs = new BoundedCompletionService(this.pool, 10);
+        cs = new BoundedCompletionService(this.pool, 5);
         for (final PreparedStatement stmt : subMultiStmts) {
             cs.submit(new Callable() {
 
-                public Object call() throws Exception {
+                public Object call() {
                     try {
                         fillStatement(stmt, identifier);
 
@@ -520,9 +527,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data");
+               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data");
+               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
             }
         }
     }
@@ -773,17 +780,6 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return result;
     }
     
-    protected ExtendedElementInformation createExtensionInfo(String name) {
-        ExtendedElementInformationImpl element = new ExtendedElementInformationImpl();
-        element.setName(name);
-        element.setDefinition(new SimpleInternationalString("http://www.seadatanet.org/urnurl/"));
-	element.setDataType(Datatype.CODE_LIST);		
-        element.setParentEntity(Arrays.asList("SeaDataNet"));
-        //TODO see for the source
-        
-        return element;
-    }
-    
     /**
      * Return all the entries from the database.
      * 
@@ -794,7 +790,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
         List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
-                result.add((MetaDataImpl) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
+            result.add((MetaDataImpl) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
         }
         return result;
     }

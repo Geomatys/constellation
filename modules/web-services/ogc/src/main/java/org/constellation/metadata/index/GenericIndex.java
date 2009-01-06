@@ -29,9 +29,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 // apache Lucene dependencies
-import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -46,6 +51,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.util.Utils;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
@@ -73,6 +79,11 @@ public class GenericIndex extends IndexLucene<Object> {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     private Map<String, Method> getters = new HashMap<String, Method>();
+
+    /**
+     * Shared Thread Pool for parralele execution
+     */
+    private ExecutorService pool = Executors.newFixedThreadPool(6);
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
@@ -145,7 +156,7 @@ public class GenericIndex extends IndexLucene<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.info("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
+            logger.finer("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
 
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
@@ -171,7 +182,7 @@ public class GenericIndex extends IndexLucene<Object> {
             
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.info("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
+            logger.finer("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
             
             writer.optimize();
             writer.close();
@@ -194,21 +205,37 @@ public class GenericIndex extends IndexLucene<Object> {
     * @param metadata.
     * @return A Lucene document.
     */
-    protected Document createDocument(Object metadata) throws SQLException {
+    protected Document createDocument(final Object metadata) throws SQLException {
         
         // make a new, empty document
-        Document doc = new Document();
-        
+        final Document doc = new Document();
+        CompletionService<String> cs = new BoundedCompletionService<String>(this.pool, 5);
+
         doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.TOKENIZED));
         
         logger.finer("indexing ISO 19119 MD_Metadata");
         //TODO add ANyText
-        for (String term : ISO_QUERYABLE.keySet()) {
-            doc.add(new Field(term, getValues(metadata, ISO_QUERYABLE.get(term)), Field.Store.YES, Field.Index.TOKENIZED));
-            doc.add(new Field(term + "_sort", getValues(metadata, ISO_QUERYABLE.get(term)), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        for (final String term : ISO_QUERYABLE.keySet()) {
+             cs.submit(new Callable<String>() {
+                public String call() {
+                    return getValues(metadata, ISO_QUERYABLE.get(term));
+                }
+           });
         }
 
+        for (String term : ISO_QUERYABLE.keySet()) {
+            try {
+                String values = cs.take().get();
+                doc.add(new Field(term, values, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.UN_TOKENIZED));
+            } catch (InterruptedException ex) {
+               logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+            } catch (ExecutionException ex) {
+               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
+            }
+        }
+        
         //we add the geometry parts
         String coord = "null";
         try {
@@ -234,19 +261,34 @@ public class GenericIndex extends IndexLucene<Object> {
         }
             
          // All metadata types must be compatible with dublinCore.
-        StringBuilder anyText = new StringBuilder();
-        for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-                
-            String values = getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term));
-            if (!values.equals("null")) {
-                logger.finer("put " + term + " values: " + values);
-                anyText.append(values).append(" ");
+        cs = new BoundedCompletionService<String>(this.pool, 5);
+        final StringBuilder anyText = new StringBuilder();
+        for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+            cs.submit(new Callable<String>() {
+
+                public String call() {
+                    return getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term));
+                }
+            });
+        }
+
+        for (String term : DUBLIN_CORE_QUERYABLE.keySet()) {
+            try {
+                String values = cs.take().get();
+                if (!values.equals("null")) {
+                    anyText.append(values).append(" ");
+                }
+                if (term.equals("date") || term.equals("modified")) {
+                    values = values.replaceAll("-", "");
+                }
+                doc.add(new Field(term, values, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.UN_TOKENIZED));
+
+            } catch (InterruptedException ex) {
+               logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+            } catch (ExecutionException ex) {
+               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
             }
-            if (term.equals("date") || term.equals("modified")) {
-                values = values.replaceAll("-","");
-            }
-            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
-            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
         }
             
         //we add the anyText values
@@ -307,9 +349,8 @@ public class GenericIndex extends IndexLucene<Object> {
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(Object metadata, List<String> paths) throws SQLException {
+    private String getValues(Object metadata, List<String> paths) {
         StringBuilder response  = new StringBuilder("");
-       // List<String> paths = queryable.get(term);
         
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -424,9 +465,11 @@ public class GenericIndex extends IndexLucene<Object> {
         } else if (obj instanceof java.util.Locale) {
             result = ((java.util.Locale)obj).getISO3Language();
         } else if (obj instanceof Collection) {
+            StringBuilder sb = new StringBuilder();
             for (Object o : (Collection) obj) {
-                result = result + getStringValue(o) + ',';
+                sb.append(getStringValue(o)).append(',');
             }
+            result = sb.toString();
             if (result.indexOf(',') != -1)
             result = result.substring(0, result.length() - 1);
             if (result.length() == 0)
@@ -519,7 +562,7 @@ public class GenericIndex extends IndexLucene<Object> {
      * @param conditionalValue
      * @return
      */
-    public boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
+    private boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
         Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
         logger.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
                      "conditionalValue: " + conditionalValue               + '\n' +
@@ -593,5 +636,6 @@ public class GenericIndex extends IndexLucene<Object> {
     @Override
     public void destroy() {
         reader.destroy();
+        pool.shutdown();
     }
 }

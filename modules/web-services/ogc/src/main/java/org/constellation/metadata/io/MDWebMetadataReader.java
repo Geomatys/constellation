@@ -178,7 +178,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param MDReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(Connection MDConnection, File configDir) throws SQLException {
-        super(true);
+        super(true, false);
         this.MDReader        = new Reader20(Standard.ISO_19115,  MDConnection);
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         

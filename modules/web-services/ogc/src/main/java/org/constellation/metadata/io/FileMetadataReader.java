@@ -46,7 +46,7 @@ public class FileMetadataReader extends MetadataReader {
     private final Unmarshaller unmarshaller;
     
     public FileMetadataReader(File dataDirectory, Unmarshaller unmarshaller) {
-        super(true);
+        super(true, false);
         this.dataDirectory = dataDirectory;
         this.unmarshaller  = unmarshaller;
     }

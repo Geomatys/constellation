@@ -47,14 +47,20 @@ public abstract class MetadataReader {
      * A flag indicating if the cache mecanism is enabled or not.
      */
     private final boolean isCacheEnabled;
+
+    /**
+     * A flag indicating if the cache mecanism is enabled or not.
+     */
+    private final boolean isThreadEnabled;
     
     /**
      * A map containing the metadata already extract from the database.
      */
     private final Map<String, Object> metadatas = new HashMap<String, Object>();
     
-    public MetadataReader(boolean isCacheEnabled) {
-        this.isCacheEnabled = isCacheEnabled;
+    public MetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
+        this.isCacheEnabled  = isCacheEnabled;
+        this.isThreadEnabled = isThreadEnabled;
     }
     
     /**
@@ -128,11 +134,17 @@ public abstract class MetadataReader {
         return metadatas.get(identifier);
     }
     
-    
     /**
      * Return true is the cache mecanism is enbled.
      */
     public boolean isCacheEnabled() {
         return isCacheEnabled;
+    }
+
+    /**
+     * Return true is the cache mecanism is enbled.
+     */
+    public boolean isThreadEnabled() {
+        return isThreadEnabled;
     }
 }

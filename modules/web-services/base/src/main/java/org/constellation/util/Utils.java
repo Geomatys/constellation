@@ -810,12 +810,19 @@ public class Utils {
      * @return a setter to this attribute.
      */
     public static Method getGetterFromName(String propertyName, Class rootClass) {
-        
+
+
         //special case and corrections
         if (propertyName.equals("beginPosition")) {
-            propertyName = "beginning";
+            if (rootClass.getName().equals("org.geotools.temporal.object.DefaultInstant"))
+                return null;
+            else
+                propertyName = "beginning";
         } else if (propertyName.equals("endPosition")) {
-            propertyName = "ending";
+            if (rootClass.getName().equals("org.geotools.temporal.object.DefaultInstant"))
+                return null;
+            else
+                propertyName = "ending";
         } else if (propertyName.equals("onlineResource")) {
             propertyName = "onLineResource";
         } else if (propertyName.equals("dataSetURI")) {
@@ -832,6 +839,8 @@ public class Utils {
                    && rootClass.getName().equals("org.geotools.metadata.iso.extent.GeographicDescriptionImpl")) {
             return null;
         } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl")) {
+            return null;
+        } if (propertyName.equals("position") && (rootClass.getName().equals("org.geotools.temporal.object.DefaultPeriod"))) {
             return null;
         }
         

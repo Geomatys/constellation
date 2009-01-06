@@ -183,7 +183,7 @@ public class CSWQueryable {
         
         //TODO not existing path in MDWeb or geotools (Distance is treated as a primitive type)
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
+        //paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
         ISO_QUERYABLE.put("DistanceUOM", paths);
         
         /*
@@ -191,10 +191,12 @@ public class CSWQueryable {
          */ 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_begin", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_end", paths);
         
        
