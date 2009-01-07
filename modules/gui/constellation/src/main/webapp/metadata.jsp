@@ -95,11 +95,11 @@
                     <h:outputText value="Web Services configuration and maintenance for Constellation" style="font-size:17px;font-weight:bold;"/>
                     <br/>
                     <h:panelGrid id="maintenanceGrid" columns="2" cellpadding="2" cellspacing="30" width="100%">
-                        <t:commandLink styleClass="button" id="restart-id" onclick="" action="#{servicesBean.restartServices}">
+                        <t:commandLink styleClass="button" id="restart-id" onclick="" action="#{configurationBean.restartServices}">
                             <h:outputText id="restart_label" value="Restart the services"/>
                         </t:commandLink>
                         
-                        <t:commandLink styleClass="button" id="generateIndex-id" action="#{servicesBean.generateIndex}">
+                        <t:commandLink styleClass="button" id="generateIndex-id" action="#{configurationBean.generateIndex}">
                             <h:outputText id="generate_label" value="Generate Index"/>
                         </t:commandLink>
                         

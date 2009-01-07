@@ -28,15 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 // apache Lucene dependencies
-import org.apache.lucene.analysis.standard.ParseException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
@@ -546,17 +544,14 @@ public class MDWebIndex extends IndexLucene<Form> {
         
         TermQuery query = new TermQuery(new Term("identifier_sort", id));
         List<String> results = new ArrayList<String>();
+        Searcher searcher = getSearcher();
         
-        IndexReader ireader = IndexReader.open(getFileDirectory());
-        Searcher searcher   = new IndexSearcher(ireader);
         logger.info("TermQuery: " + query.toString());
         Hits hits = searcher.search(query);
         
         for (int i = 0; i < hits.length(); i ++) {
             results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
         }
-        ireader.close();
-        searcher.close();
         if (results.size() > 1)
             logger.warning("multiple record in lucene index for identifier: " + id);
         
@@ -573,6 +568,7 @@ public class MDWebIndex extends IndexLucene<Form> {
 
     @Override
     public void destroy() {
+        super.destroy();
         if (pathMap != null)
             pathMap.clear();
         if (classeMap != null)

@@ -2,7 +2,6 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
@@ -31,7 +29,6 @@ import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -39,14 +36,10 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-
-// MDWeb dependencies
-import org.mdweb.lucene.AbstractIndex;
 
 // Constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
@@ -58,10 +51,8 @@ import org.constellation.ws.WebServiceException;
  *
  * @author Guilhem Legal
  */
-public abstract class IndexLucene<E> extends AbstractIndex<E> {
+public abstract class IndexLucene<E> extends AbstractIndexer<E> {
 
-    protected static final Logger logger = Logger.getLogger("org.constellation.metadata");
-    
     /**
      * A lucene analyser.
      */
@@ -157,7 +148,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
     * @return A Lucene document.
     */
     protected abstract Document createDocument(E object) throws SQLException;
-    
+
     /**
      * This method proceed a lucene search and returns a list of ID.
      *
@@ -166,18 +157,25 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * @return      A List of id.
      */
     public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
-        
+        long start = System.currentTimeMillis();
+ 
+        //we initialize the indexSearcher
+        Searcher searcher = getSearcher();
+
         List<String> results = new ArrayList<String>();
-        File indexDirectory = getFileDirectory();
-        logger.info("index directory:" + indexDirectory.getPath());
-        IndexReader ireader = IndexReader.open(indexDirectory);
-        Searcher searcher   = new IndexSearcher(ireader);
+        
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
+
+        // we enable the leading wildcard mode if the first character of the query is a '*'
         if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ) {
             parser.setAllowLeadingWildcard(true);
             BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
         }
+
+        //if we recognize the main query title:** we return directly all the identifiers
+        if (spatialQuery.getQuery().equals("title:**"))
+            spatialQuery.setQuery("metafile:doc");
         
         Query query   = parser.parse(spatialQuery.getQuery());
         Filter f      = spatialQuery.getSpatialFilter();
@@ -248,10 +246,7 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
             }
         }
         
-        logger.info(results.size() + " total matching documents");
-        
-        ireader.close();
-        searcher.close();
+        logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
         return results;
     } 
     
@@ -285,7 +280,6 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
     protected void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
-
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -305,7 +299,6 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
     protected void addPoint(Document doc, double y, double x, String crsName) {
-
         // convert the lat / long to lucene fields
         doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -325,8 +318,6 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
     protected void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
-
-        
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -335,9 +326,4 @@ public abstract class IndexLucene<E> extends AbstractIndex<E> {
         doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
     }
-    
-   /**
-    * Destroy all the resource and close the connection.
-    */
-    public abstract void destroy();
 }

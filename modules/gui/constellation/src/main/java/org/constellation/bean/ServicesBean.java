@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -46,7 +42,6 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContext;
 
 // JAXB dependencies
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -223,8 +218,6 @@ public class ServicesBean {
     
     private boolean existPrefrence = false;
     
-    private HttpServletRequest servletRequest;
-    
     /**
      * Debugging purpose
      */
@@ -238,8 +231,6 @@ public class ServicesBean {
         FacesContext context = FacesContext.getCurrentInstance();
         servletContext = (ServletContext) context.getExternalContext().getContext();
 
-        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
-        
         //adding items into the webServices list.
         addWebServices();
 
@@ -1415,66 +1406,5 @@ public class ServicesBean {
 
     public void setExistPrefrence(boolean existPrefrence) {
         this.existPrefrence = existPrefrence;
-    }
-    
-    public void restartServices() {
-        logger.info("GUI restart services");
-        String URL = "";
-        FacesContext context = FacesContext.getCurrentInstance();
-        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
-        
-        try {
-            URL = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" + servletRequest.getServerPort() + servletContext.getContextPath() + "/WS/configuration?request=restart";
-            System.out.println(URL);
-            URL source = new URL(URL);
-            URLConnection conec = source.openConnection();
-            
-            // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
-            int size;
-
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                out.write(new String(buffer, 0, size));
-            }
-            
-            String response = out.toString();
-            
-        } catch (MalformedURLException ex) {
-            logger.severe("Malformed URL exception: " + URL);
-        } catch (IOException ex) {
-            logger.severe("IO exception");
-        }
-    }
-    
-    public void generateIndex() {
-        logger.info("GUI generate index");
-        String URL = "";
-        FacesContext context = FacesContext.getCurrentInstance();
-        servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
-        
-        try {
-            URL = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":" + servletRequest.getServerPort() + servletContext.getContextPath() + "/WS/configuration?request=refreshIndex";
-            URL source = new URL(URL);
-            URLConnection conec = source.openConnection();
-
-            // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
-            int size;
-
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                out.write(new String(buffer, 0, size));
-            }
-            
-            String response = out.toString();
-        
-        } catch (MalformedURLException ex) {
-            logger.severe("Malformed URL exception: " + URL);
-        } catch (IOException ex) {
-            logger.severe("IO exception");
-        }
     }
 }

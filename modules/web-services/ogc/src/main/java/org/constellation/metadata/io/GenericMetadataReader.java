@@ -283,7 +283,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
         if (result != null) {
             result = new ResponsiblePartyImpl(result);
             result.setRole(role);
-            result.setIndividualName(individualName);
+            if (individualName != null)
+                result.setIndividualName(individualName);
         }
         return result;
     }

@@ -40,12 +40,10 @@ import java.util.concurrent.Executors;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
@@ -62,6 +60,7 @@ import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.temporal.object.DefaultInstant;
 
 // geoAPI dependencies
+import org.geotools.temporal.object.DefaultPosition;
 import org.opengis.util.InternationalString;
 
 
@@ -477,6 +476,9 @@ public class GenericIndex extends IndexLucene<Object> {
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
         
+        } else if (obj instanceof DefaultPosition) {
+            result = obj.toString();
+            
         } else if (obj instanceof DefaultInstant) {
             result = obj.toString();
             
@@ -608,17 +610,14 @@ public class GenericIndex extends IndexLucene<Object> {
     public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
         TermQuery query = new TermQuery(new Term("identifier_sort", id));
         List<String> results = new ArrayList<String>();
+        Searcher searcher = getSearcher();
         
-        IndexReader ireader = IndexReader.open(getFileDirectory());
-        Searcher searcher   = new IndexSearcher(ireader);
         logger.info("TermQuery: " + query.toString());
         Hits hits = searcher.search(query);
         
         for (int i = 0; i < hits.length(); i ++) {
             results.add(hits.doc(i).get("id"));
         }
-        ireader.close();
-        searcher.close();
         if (results.size() > 1)
             logger.warning("multiple record in lucene index for identifier: " + id);
         
@@ -635,6 +634,7 @@ public class GenericIndex extends IndexLucene<Object> {
 
     @Override
     public void destroy() {
+        super.destroy();
         reader.destroy();
         pool.shutdown();
     }

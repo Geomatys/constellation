@@ -13,6 +13,11 @@
       <managed-bean-class>org.constellation.bean.AuthentificationBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
+    <managed-bean>
+      <managed-bean-name>configurationBean</managed-bean-name>
+      <managed-bean-class>org.constellation.bean.ConfigurationBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
    <navigation-rule>
     <!-- Indique pour quelle vue courante la règle s'applique -->
     <from-view-id>/*</from-view-id>
