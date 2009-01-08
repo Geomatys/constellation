@@ -236,10 +236,8 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            
+        if (object instanceof ObservationOfferingEntry && super.equals(object)) {
             final ObservationOfferingEntry that = (ObservationOfferingEntry) object;
-            
             return Utilities.equals(this.time,                that.time)                &&
                    Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
                    Utilities.equals(this.intendedApplication, that.intendedApplication) && 
@@ -248,7 +246,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
                    Utilities.equals(this.responseFormat,      that.responseFormat)      &&
                    Utilities.equals(this.responseMode,        that.responseMode)        &&
                    Utilities.equals(this.resultModel,         that.resultModel);
-        } else System.out.println("obs offering SUPER NOT EQUALSSSSS");
+        }
         return false;
     }
 

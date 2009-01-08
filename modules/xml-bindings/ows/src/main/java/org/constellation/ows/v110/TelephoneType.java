@@ -113,10 +113,13 @@ public class TelephoneType {
         if (object == this) {
             return true;
         }
-        final TelephoneType that = (TelephoneType) object;
+        if (object instanceof TelephoneType) {
+            final TelephoneType that = (TelephoneType) object;
 
-        return Utilities.equals(this.facsimile, that.facsimile) &&
-               Utilities.equals(this.voice,     that.voice);
+            return Utilities.equals(this.facsimile, that.facsimile) &&
+                   Utilities.equals(this.voice,     that.voice);
+        }
+        return true;
     }
 
     @Override

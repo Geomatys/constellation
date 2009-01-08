@@ -118,9 +118,11 @@ public class AllowedValues {
         if (object == this) {
             return true;
         }
-        final AllowedValues that = (AllowedValues) object;
-
-        return Utilities.equals(this.valueOrRange,   that.valueOrRange);
+        if (object instanceof AllowedValues) {
+            final AllowedValues that = (AllowedValues) object;
+            return Utilities.equals(this.valueOrRange,   that.valueOrRange);
+        }
+        return false;
     }
 
     @Override

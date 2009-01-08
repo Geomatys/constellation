@@ -99,10 +99,13 @@ public class CodeType {
         if (object == this) {
             return true;
         }
-        final CodeType that = (CodeType) object;
+        if (object instanceof CodeType) {
+            final CodeType that = (CodeType) object;
 
-        return Utilities.equals(this.value,     that.value) &&
-               Utilities.equals(this.codeSpace, that.codeSpace);
+            return Utilities.equals(this.value,     that.value) &&
+                   Utilities.equals(this.codeSpace, that.codeSpace);
+        }
+        return false;
     }
 
     @Override

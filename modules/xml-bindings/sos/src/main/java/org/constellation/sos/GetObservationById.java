@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -104,4 +105,33 @@ public class GetObservationById extends RequestBaseType {
         return srsName;
     }
 
+    /**
+     * Verify if this entry is identical to�the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof GetObservationById && super.equals(object)) {
+            final GetObservationById that = (GetObservationById) object;
+            return Utilities.equals(this.observationId,         that.observationId) &&
+                   Utilities.equals(this.responseFormat,    that.responseFormat)    &&
+                   Utilities.equals(this.responseMode,      that.responseMode)      &&
+                   Utilities.equals(this.resultModel,       that.resultModel)       &&
+                   Utilities.equals(this.srsName,           that.srsName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + (this.observationId != null ? this.observationId.hashCode() : 0);
+        hash = 71 * hash + (this.responseFormat != null ? this.responseFormat.hashCode() : 0);
+        hash = 71 * hash + (this.resultModel != null ? this.resultModel.hashCode() : 0);
+        hash = 71 * hash + (this.responseMode != null ? this.responseMode.hashCode() : 0);
+        hash = 71 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
+        return hash;
+    }
 }

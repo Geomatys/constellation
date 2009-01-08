@@ -204,21 +204,24 @@ public class EventTime {
         if (object == this) {
             return true;
         }
-        final EventTime that = (EventTime) object;
-        return Utilities.equals(this.tAfter, that.tAfter) &&
-                Utilities.equals(this.tBefore, that.tBefore) &&
-                Utilities.equals(this.tBegins, that.tBegins) &&
-                Utilities.equals(this.tBegunBy, that.tBegunBy) &&
-                Utilities.equals(this.tContains, that.tContains) &&
-                Utilities.equals(this.tDuring, that.tDuring) &&
-                Utilities.equals(this.tEndedBy, that.tEndedBy) &&
-                Utilities.equals(this.tEnds, that.tEnds) &&
-                Utilities.equals(this.tEquals, that.tEquals) &&
-                Utilities.equals(this.tMeets, that.tMeets) &&
-                Utilities.equals(this.tMetBy, that.tMetBy) &&
-                Utilities.equals(this.tOveralps, that.tOveralps) &&
-                Utilities.equals(this.tOverlappedBy, that.tOverlappedBy) &&
-                Utilities.equals(this.temporalOps, that.temporalOps);
+        if (object instanceof EventTime) {
+            final EventTime that = (EventTime) object;
+            return Utilities.equals(this.tAfter, that.tAfter) &&
+                    Utilities.equals(this.tBefore, that.tBefore) &&
+                    Utilities.equals(this.tBegins, that.tBegins) &&
+                    Utilities.equals(this.tBegunBy, that.tBegunBy) &&
+                    Utilities.equals(this.tContains, that.tContains) &&
+                    Utilities.equals(this.tDuring, that.tDuring) &&
+                    Utilities.equals(this.tEndedBy, that.tEndedBy) &&
+                    Utilities.equals(this.tEnds, that.tEnds) &&
+                    Utilities.equals(this.tEquals, that.tEquals) &&
+                    Utilities.equals(this.tMeets, that.tMeets) &&
+                    Utilities.equals(this.tMetBy, that.tMetBy) &&
+                    Utilities.equals(this.tOveralps, that.tOveralps) &&
+                    Utilities.equals(this.tOverlappedBy, that.tOverlappedBy) &&
+                    Utilities.equals(this.temporalOps, that.temporalOps);
+        }
+        return false;
     }
 
     @Override

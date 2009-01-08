@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -192,4 +193,37 @@ public class AbstractReferenceBaseType {
         this.actuate = value;
     }
 
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AbstractReferenceBaseType) {
+            final AbstractReferenceBaseType that = (AbstractReferenceBaseType) object;
+            return Utilities.equals(this.actuate, that.actuate) &&
+                   Utilities.equals(this.arcrole, that.arcrole) &&
+                   Utilities.equals(this.href,    that.href)    &&
+                   Utilities.equals(this.role,    that.role)    &&
+                   Utilities.equals(this.show,    that.show)    &&
+                   Utilities.equals(this.title,   that.title)   &&
+                   Utilities.equals(this.type,    that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 79 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 79 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 79 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 79 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 79 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        return hash;
+    }
 }

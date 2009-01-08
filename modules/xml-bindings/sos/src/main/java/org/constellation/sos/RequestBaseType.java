@@ -103,9 +103,12 @@ public class RequestBaseType {
         if (object == this) {
             return true;
         }
-        final RequestBaseType that = (RequestBaseType) object;
-        return Utilities.equals(this.service, that.service) &&
-               Utilities.equals(this.version, that.version);
+        if (object instanceof RequestBaseType) {
+            final RequestBaseType that = (RequestBaseType) object;
+            return Utilities.equals(this.service, that.service) &&
+                   Utilities.equals(this.version, that.version);
+        }
+        return false;
     }
 
     @Override

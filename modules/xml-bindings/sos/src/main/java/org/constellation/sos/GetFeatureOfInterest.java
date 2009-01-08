@@ -137,7 +137,7 @@ public class GetFeatureOfInterest extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof GetFeatureOfInterest && super.equals(object)) {
             final GetFeatureOfInterest that = (GetFeatureOfInterest) object;
             return Utilities.equals(this.eventTime,           that.eventTime)           &&
                    Utilities.equals(this.featureOfInterestId, that.featureOfInterestId) &&
@@ -199,8 +199,11 @@ public class GetFeatureOfInterest extends RequestBaseType {
             if (object == this) {
                 return true;
             }
-            final  Location that = ( Location) object;
-            return Utilities.equals(this.spatialOps.getValue(), that.spatialOps.getValue());
+            if (object instanceof Location) {
+                final  Location that = ( Location) object;
+                return Utilities.equals(this.spatialOps.getValue(), that.spatialOps.getValue());
+            }
+            return false;
         }
 
         @Override

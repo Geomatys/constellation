@@ -77,7 +77,7 @@ public class DomainType extends UnNamedDomainType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof DomainType && super.equals(object)) {
             final DomainType that = (DomainType) object;
             return Utilities.equals(this.name, that.name);
         } 

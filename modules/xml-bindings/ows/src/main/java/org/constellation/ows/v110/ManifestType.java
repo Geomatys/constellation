@@ -51,35 +51,13 @@ import org.geotools.util.Utilities;
 @XmlType(name = "ManifestType", propOrder = {
     "referenceGroup"
 })
-public class ManifestType
-    extends BasicIdentificationType
-{
+public class ManifestType extends BasicIdentificationType {
 
     @XmlElementRef(name = "ReferenceGroup", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class)
-    protected List<JAXBElement<ReferenceGroupType>> referenceGroup;
+    private List<JAXBElement<ReferenceGroupType>> referenceGroup;
 
     /**
      * Gets the value of the referenceGroup property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the referenceGroup property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getReferenceGroup().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link ReferenceGroupType }{@code >}
-     * {@link JAXBElement }{@code <}{@link ReferenceGroupType }{@code >}
-     * 
-     * 
      */
     public List<JAXBElement<ReferenceGroupType>> getReferenceGroup() {
         if (referenceGroup == null) {
@@ -96,8 +74,8 @@ public class ManifestType
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-             final ManifestType that = (ManifestType) object;
+        if (object instanceof ManifestType && super.equals(object)) {
+            final ManifestType that = (ManifestType) object;
             return Utilities.equals(this.referenceGroup, that.referenceGroup);
         }
         return false;

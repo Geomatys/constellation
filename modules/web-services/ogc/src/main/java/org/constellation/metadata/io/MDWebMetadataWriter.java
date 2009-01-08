@@ -663,7 +663,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
     /**
      * Destoy all the resource and close connection.
      */
+    @Override
     public void destroy() {
+        super.destroy();
         classBinding.clear();
         try {
             if (MDReader != null)
@@ -672,8 +674,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 MDWriter.close();
             classBinding.clear();
             alreadyWrite.clear();
-            if (indexer != null)
-                indexer.destroy();
             
         } catch (SQLException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");

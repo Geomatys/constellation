@@ -97,10 +97,13 @@ public class LanguageStringType {
         if (object == this) {
             return true;
         }
-        final LanguageStringType that = (LanguageStringType) object;
+        if (object instanceof LanguageStringType) {
+            final LanguageStringType that = (LanguageStringType) object;
 
-        return Utilities.equals(this.lang,  that.lang)  &&
-               Utilities.equals(this.value, that.value);
+            return Utilities.equals(this.lang,  that.lang)  &&
+                   Utilities.equals(this.value, that.value);
+        }
+        return false;
     }
 
     @Override

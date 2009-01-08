@@ -91,8 +91,11 @@ public class GetResultResponse {
         if (object == this) {
             return true;
         }
-        final GetResultResponse that = (GetResultResponse) object;
-        return Utilities.equals(this.result, that.result);
+        if (object instanceof GetResultResponse) {
+            final GetResultResponse that = (GetResultResponse) object;
+            return Utilities.equals(this.result, that.result);
+        }
+        return false;
     }
 
     @Override
@@ -167,9 +170,12 @@ public class GetResultResponse {
             if (object == this) {
                 return true;
             }
-            final Result that = (Result) object;
-            return Utilities.equals(this.rs,    that.rs) &&
-                   Utilities.equals(this.value, that.value);
+            if (object instanceof Result) {
+                final Result that = (Result) object;
+                return Utilities.equals(this.rs,    that.rs) &&
+                       Utilities.equals(this.value, that.value);
+            }
+            return false;
         }
 
         @Override

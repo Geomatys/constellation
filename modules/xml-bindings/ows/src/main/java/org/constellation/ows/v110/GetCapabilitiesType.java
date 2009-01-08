@@ -128,11 +128,14 @@ public class GetCapabilitiesType extends AbstractGetCapabilities {
         if (object == this) {
             return true;
         }
+        if (object instanceof GetCapabilitiesType) {
         final GetCapabilitiesType that = (GetCapabilitiesType) object;
         return Utilities.equals(this.acceptFormats,  that.acceptFormats)  &&
                Utilities.equals(this.acceptVersions, that.acceptVersions) &&
                Utilities.equals(this.sections,       that.sections)       &&
                Utilities.equals(this.updateSequence, that.updateSequence);
+        }
+        return false;
     }
 
     @Override

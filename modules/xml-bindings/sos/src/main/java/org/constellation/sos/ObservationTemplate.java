@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.observation.ObservationEntry;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -72,5 +73,27 @@ public class ObservationTemplate {
      */
     public ObservationEntry getObservation() {
         return observation;
+    }
+
+    /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ObservationTemplate && super.equals(object)) {
+            final ObservationTemplate that = (ObservationTemplate) object;
+            return Utilities.equals(this.observation, that.observation);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.observation != null ? this.observation.hashCode() : 0);
+        return hash;
     }
 }

@@ -84,8 +84,11 @@ public class RegisterSensorResponse {
         if (object == this) {
             return true;
         }
-        final RegisterSensorResponse that = (RegisterSensorResponse) object;
-        return Utilities.equals(this.assignedSensorId, that.assignedSensorId);
+        if (object instanceof RegisterSensorResponse) {
+            final RegisterSensorResponse that = (RegisterSensorResponse) object;
+            return Utilities.equals(this.assignedSensorId, that.assignedSensorId);
+        }
+        return false;
     }
 
     @Override

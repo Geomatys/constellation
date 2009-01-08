@@ -201,5 +201,8 @@ public abstract class MetadataWriter {
     /**
      * Destoy all the resource and close connection.
      */
-    public abstract void destroy();
+    public void destroy() {
+        if (indexer != null)
+            indexer.destroy();
+    }
 }

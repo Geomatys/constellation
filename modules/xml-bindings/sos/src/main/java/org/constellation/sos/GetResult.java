@@ -110,7 +110,7 @@ public class GetResult extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof GetResult && super.equals(object)) {
             final GetResult that = (GetResult) object;
             return Utilities.equals(this.eventTime, that.eventTime) &&
                    Utilities.equals(this.observationTemplateId,   that.observationTemplateId);

@@ -86,8 +86,11 @@ public class InsertObservationResponse {
         if (object == this) {
             return true;
         }
-        final InsertObservationResponse that = (InsertObservationResponse) object;
-        return Utilities.equals(this.assignedObservationId, that.assignedObservationId);
+        if (object instanceof InsertObservationResponse) {
+            final InsertObservationResponse that = (InsertObservationResponse) object;
+            return Utilities.equals(this.assignedObservationId, that.assignedObservationId);
+        }
+        return false;
     }
 
     @Override
@@ -100,7 +103,6 @@ public class InsertObservationResponse {
     
     @Override
     public String toString() {
-        
         return "class:InsertObservationResponse observation ID=" + assignedObservationId; 
     }
 }

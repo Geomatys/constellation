@@ -17,10 +17,11 @@
 package org.constellation.sos;
 
 import org.constellation.catalog.Entry;
+import org.geotools.util.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class OfferingResponseModeEntry extends Entry{
 
@@ -57,4 +58,27 @@ public class OfferingResponseModeEntry extends Entry{
         return mode;
     }
 
+    /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof OfferingResponseModeEntry && super.equals(object)) {
+            final OfferingResponseModeEntry that = (OfferingResponseModeEntry) object;
+            return Utilities.equals(this.idOffering, that.idOffering) &&
+                   Utilities.equals(this.mode,       that.mode);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + (this.idOffering != null ? this.idOffering.hashCode() : 0);
+        hash = 83 * hash + (this.mode != null ? this.mode.hashCode() : 0);
+        return hash;
+    }
 }

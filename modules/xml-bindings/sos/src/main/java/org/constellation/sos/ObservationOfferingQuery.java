@@ -24,7 +24,7 @@ import org.constellation.catalog.QueryType;
 import static org.constellation.catalog.QueryType.*;
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class ObservationOfferingQuery extends Query {
     

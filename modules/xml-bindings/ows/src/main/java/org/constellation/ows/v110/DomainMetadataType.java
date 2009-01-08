@@ -96,9 +96,12 @@ public class DomainMetadataType {
         if (object == this) {
             return true;
         }
+        if (object instanceof DomainMetadataType) {
         final DomainMetadataType that = (DomainMetadataType) object;
         return Utilities.equals(this.reference, that.reference) &&
                Utilities.equals(this.value,     that.value);
+        }
+        return false;
     }
 
     @Override

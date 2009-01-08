@@ -151,12 +151,15 @@ public class OperationsMetadata {
         if (object == this) {
             return true;
         }
-        final OperationsMetadata that = (OperationsMetadata) object;
+        if (object instanceof OperationsMetadata) {
+            final OperationsMetadata that = (OperationsMetadata) object;
 
-        return Utilities.equals(this.constraint,           that.constraint)           &&
-               Utilities.equals(this.extendedCapabilities, that.extendedCapabilities) &&
-               Utilities.equals(this.operation,            that.operation)            &&
-               Utilities.equals(this.parameter,            that.parameter);
+            return Utilities.equals(this.constraint,           that.constraint)           &&
+                   Utilities.equals(this.extendedCapabilities, that.extendedCapabilities) &&
+                   Utilities.equals(this.operation,            that.operation)            &&
+                   Utilities.equals(this.parameter,            that.parameter);
+        }
+        return false;
     }
 
     @Override

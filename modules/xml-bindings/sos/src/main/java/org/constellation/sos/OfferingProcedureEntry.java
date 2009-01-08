@@ -18,6 +18,7 @@ package org.constellation.sos;
 
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
+import org.geotools.util.Utilities;
 
 /**
  *
@@ -58,4 +59,27 @@ public class OfferingProcedureEntry extends Entry {
         return component;
     }
     
+    /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof OfferingProcedureEntry && super.equals(object)) {
+            final OfferingProcedureEntry that = (OfferingProcedureEntry) object;
+            return Utilities.equals(this.idOffering, that.idOffering) &&
+                   Utilities.equals(this.component,  that.component);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + (this.idOffering != null ? this.idOffering.hashCode() : 0);
+        hash = 83 * hash + (this.component != null ? this.component.hashCode() : 0);
+        return hash;
+    }
 }

@@ -70,7 +70,7 @@ public class GetFeatureOfInterestTime extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof GetFeatureOfInterestTime && super.equals(object)) {
             final GetFeatureOfInterestTime that = (GetFeatureOfInterestTime) object;
             return Utilities.equals(this.featureOfInterestId, that.featureOfInterestId);
         } 

@@ -106,7 +106,7 @@ public class DescribeSensor extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof DescribeSensor && super.equals(object)) {
             final DescribeSensor that = (DescribeSensor) object;
             return Utilities.equals(this.outputFormat, that.outputFormat) &&
                    Utilities.equals(this.procedure,   that.procedure);

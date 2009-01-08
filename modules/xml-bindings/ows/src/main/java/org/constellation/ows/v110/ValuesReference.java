@@ -94,10 +94,13 @@ public class ValuesReference {
         if (object == this) {
             return true;
         }
-        final  ValuesReference that = ( ValuesReference) object;
+        if (object instanceof ValuesReference) {
+            final  ValuesReference that = ( ValuesReference) object;
 
-        return Utilities.equals(this.reference,   that.reference)   &&
-               Utilities.equals(this.value,       that.value);
+            return Utilities.equals(this.reference,   that.reference)   &&
+                   Utilities.equals(this.value,       that.value);
+        }
+        return false;
     }
 
     @Override

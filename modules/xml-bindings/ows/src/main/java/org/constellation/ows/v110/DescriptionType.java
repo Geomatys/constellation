@@ -141,11 +141,14 @@ public class DescriptionType {
         if (object == this) {
             return true;
         }
+        if (object instanceof DescriptionType) {
         final DescriptionType that = (DescriptionType) object;
 
         return Utilities.equals(this._abstract, that._abstract) &&
                Utilities.equals(this.keywords, that.keywords) &&
                Utilities.equals(this.title, that.title);
+        }
+        return false;
     }
 
     @Override

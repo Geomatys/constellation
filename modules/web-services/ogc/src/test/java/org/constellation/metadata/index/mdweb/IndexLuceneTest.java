@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.index;
+package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.io.File;
@@ -67,7 +67,7 @@ public class IndexLuceneTest {
     
     private Logger logger = Logger.getLogger("org.constellation.metadata");
    
-    private IndexLucene indexLucene;
+    private MDWebIndexSearcher indexSearcher;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -87,7 +87,8 @@ public class IndexLuceneTest {
         File configDirectory = new File("config-test");
         configDirectory.mkdir();
         
-        indexLucene = new MDWebIndex(forms, classes, paths, configDirectory);
+        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
+        indexSearcher        = new MDWebIndexSearcher(configDirectory, "");
     }
 
     @After
@@ -108,7 +109,7 @@ public class IndexLuceneTest {
          * Test 1 simple search: title = title1
          */
         SpatialQuery spatialQuery = new SpatialQuery("Title:title1", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexLucene.doSearch(spatialQuery);
+        List<String> result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -125,7 +126,7 @@ public class IndexLuceneTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("Title:tit*", nullFilter, SerialChainFilter.AND);
-        result       = indexLucene.doSearch(spatialQuery);
+        result       = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -145,7 +146,7 @@ public class IndexLuceneTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.AND);
-        result       = indexLucene.doSearch(spatialQuery);
+        result       = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -177,7 +178,7 @@ public class IndexLuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         spatialQuery.setSort(new Sort("type_sort", false));
         
-        List<String> result = indexLucene.doSearch(spatialQuery);
+        List<String> result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -199,7 +200,7 @@ public class IndexLuceneTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         spatialQuery.setSort(new Sort("type_sort", true));
         
-        result = indexLucene.doSearch(spatialQuery);
+        result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -221,7 +222,7 @@ public class IndexLuceneTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         spatialQuery.setSort(new Sort("identifier_sort", false));
         
-        result = indexLucene.doSearch(spatialQuery);
+        result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -243,7 +244,7 @@ public class IndexLuceneTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         spatialQuery.setSort(new Sort("identifier_sort", true));
         
-        result = indexLucene.doSearch(spatialQuery);
+        result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -280,7 +281,7 @@ public class IndexLuceneTest {
         SpatialFilter sf          = new SpatialFilter(bbox, "EPSG:4326", SpatialFilter.BBOX);
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
         
-        List<String> result = indexLucene.doSearch(spatialQuery);
+        List<String> result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -305,7 +306,7 @@ public class IndexLuceneTest {
         SerialChainFilter f = new SerialChainFilter(lf, op);
         spatialQuery = new SpatialQuery("metafile:doc", f, SerialChainFilter.AND);
         
-        result = indexLucene.doSearch(spatialQuery);
+        result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
             resultReport = resultReport + s + '\n';

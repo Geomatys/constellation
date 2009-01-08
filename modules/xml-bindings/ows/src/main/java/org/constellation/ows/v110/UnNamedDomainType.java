@@ -223,18 +223,21 @@ public class UnNamedDomainType {
         if (object == this) {
             return true;
         }
-        final UnNamedDomainType that = (UnNamedDomainType) object;
+        if (object instanceof UnNamedDomainType) {
+            final UnNamedDomainType that = (UnNamedDomainType) object;
 
-        return Utilities.equals(this.allowedValues,   that.allowedValues)   &&
-               Utilities.equals(this.anyValue,        that.anyValue)        &&
-               Utilities.equals(this.dataType,        that.dataType)        &&
-               Utilities.equals(this.defaultValue,    that.defaultValue)    &&
-               Utilities.equals(this.meaning,         that.meaning)         &&
-               Utilities.equals(this.metadata,        that.metadata)        &&
-               Utilities.equals(this.noValues,        that.noValues)        &&
-               Utilities.equals(this.referenceSystem, that.referenceSystem) &&
-               Utilities.equals(this.uom,             that.uom)             &&
-               Utilities.equals(this.valuesReference, that.valuesReference);
+            return Utilities.equals(this.allowedValues,   that.allowedValues)   &&
+                   Utilities.equals(this.anyValue,        that.anyValue)        &&
+                   Utilities.equals(this.dataType,        that.dataType)        &&
+                   Utilities.equals(this.defaultValue,    that.defaultValue)    &&
+                   Utilities.equals(this.meaning,         that.meaning)         &&
+                   Utilities.equals(this.metadata,        that.metadata)        &&
+                   Utilities.equals(this.noValues,        that.noValues)        &&
+                   Utilities.equals(this.referenceSystem, that.referenceSystem) &&
+                   Utilities.equals(this.uom,             that.uom)             &&
+                   Utilities.equals(this.valuesReference, that.valuesReference);
+        }
+        return false;
     }
 
     @Override

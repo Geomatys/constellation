@@ -175,11 +175,6 @@ public class CSWworker {
     private final Unmarshaller unmarshaller;
     
     /**
-     * A lucene indexer to build the index.
-     */
-    private AbstractIndexer indexer;
-
-    /**
      * A lucene index searcher to make quick search on the metadatas.
      */
     private AbstractIndexSearcher indexSearcher;
@@ -313,13 +308,14 @@ public class CSWworker {
                 }
                 //we create a connection to the metadata database
                 Connection MDConnection = db.getConnection();
-                
+
+                int datasourceType = config.getType();
                 //we initialize all the data retriever (reader/writer) and index worker
                 MDReader      = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller, configDir);
-                profile       = CSWfactory.getProfile(config.getType());
-                indexer       = CSWfactory.getIndexer(config.getType(), MDReader, MDConnection, configDir, serviceID);
-                indexSearcher = CSWfactory.getIndexSearcher(config.getType(), configDir, serviceID);
-                MDWriter      = CSWfactory.getMetadataWriter(config.getType(), MDConnection, indexer, marshaller, configDir);
+                profile       = CSWfactory.getProfile(datasourceType);
+                AbstractIndexer indexer = CSWfactory.getIndexer(datasourceType, MDReader, MDConnection, configDir, serviceID);
+                indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
+                MDWriter      = CSWfactory.getMetadataWriter(datasourceType, MDConnection, indexer, marshaller, configDir);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
@@ -1736,9 +1732,6 @@ public class CSWworker {
         }
         if (MDWriter != null) {
             MDWriter.destroy();
-        }
-        if (indexer != null) {
-            indexer.destroy();
         }
         if (indexSearcher != null) {
             indexSearcher.destroy();

@@ -23,15 +23,22 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.logging.Logger;
+
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.search.Filter;
+
+// geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.util.Utilities;
+
+// GeoAPI dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -98,19 +105,19 @@ public class SpatialFilter extends Filter {
     public final static int TOUCHES   = 9; //ok
     public final static int OVERLAPS  = 10;//todo
     
-    private final static List<String> supportedUnits;
+    private final static List<String> SUPPORTED_UNITS;
     static {
-        supportedUnits = new ArrayList<String>();
-        supportedUnits.add("kilometers");
-        supportedUnits.add("km");
-        supportedUnits.add("meters");
-        supportedUnits.add("m");
-        supportedUnits.add("centimeters");
-        supportedUnits.add("cm");
-        supportedUnits.add("milimeters");
-        supportedUnits.add("mm");
-        supportedUnits.add("miles");
-        supportedUnits.add("mi");
+        SUPPORTED_UNITS = new ArrayList<String>();
+        SUPPORTED_UNITS.add("kilometers");
+        SUPPORTED_UNITS.add("km");
+        SUPPORTED_UNITS.add("meters");
+        SUPPORTED_UNITS.add("m");
+        SUPPORTED_UNITS.add("centimeters");
+        SUPPORTED_UNITS.add("cm");
+        SUPPORTED_UNITS.add("milimeters");
+        SUPPORTED_UNITS.add("mm");
+        SUPPORTED_UNITS.add("miles");
+        SUPPORTED_UNITS.add("mi");
     }
     
     /**
@@ -165,9 +172,9 @@ public class SpatialFilter extends Filter {
     public SpatialFilter(Object geometry, String crsName, int filterType, Double distance, String units) throws NoSuchAuthorityCodeException, FactoryException  {
        
        this.distance = distance;
-       if (!supportedUnits.contains(units)) {
+       if (!SUPPORTED_UNITS.contains(units)) {
            String msg = "Unsupported distance units. supported ones are: ";
-           for (String s: supportedUnits) {
+           for (String s: SUPPORTED_UNITS) {
                msg = msg + s + ',';
            }
            msg = msg.substring(0, msg.length() - 1);
@@ -848,4 +855,42 @@ public class SpatialFilter extends Filter {
         return s.toString();
     }
 
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SpatialFilter) {
+            final SpatialFilter that = (SpatialFilter) object;
+
+            return Utilities.equals(this.boundingBox,     that.boundingBox)     &&
+                   Utilities.equals(this.distance,        that.distance)        &&
+                   Utilities.equals(this.distanceUnit,    that.distanceUnit)    &&
+                   Utilities.equals(this.geometryCRS,     that.geometryCRS)     &&
+                   Utilities.equals(this.geometryCRSName, that.geometryCRSName) &&
+                   Utilities.equals(this.line,            that.line)            &&
+                   Utilities.equals(this.point,           that.point)           &&
+                   Utilities.equals(this.precision,       that.precision)       &&
+                   Utilities.equals(this.filterType,      that.filterType);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.boundingBox != null ? this.boundingBox.hashCode() : 0);
+        hash = 29 * hash + (this.point != null ? this.point.hashCode() : 0);
+        hash = 29 * hash + (this.line != null ? this.line.hashCode() : 0);
+        hash = 29 * hash + (this.geometryCRS != null ? this.geometryCRS.hashCode() : 0);
+        hash = 29 * hash + (this.geometryCRSName != null ? this.geometryCRSName.hashCode() : 0);
+        hash = 29 * hash + (this.distance != null ? this.distance.hashCode() : 0);
+        hash = 29 * hash + (this.distanceUnit != null ? this.distanceUnit.hashCode() : 0);
+        hash = 29 * hash + this.filterType;
+        hash = 29 * hash + (int) (Double.doubleToLongBits(this.precision) ^ (Double.doubleToLongBits(this.precision) >>> 32));
+        return hash;
+    }
 }

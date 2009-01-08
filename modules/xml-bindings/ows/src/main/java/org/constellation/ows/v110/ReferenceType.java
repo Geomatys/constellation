@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -124,4 +125,31 @@ public class ReferenceType extends AbstractReferenceBaseType {
         return this.metadata;
     }
 
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ReferenceType && super.equals(object)) {
+            final ReferenceType that = (ReferenceType) object;
+            return Utilities.equals(this._abstract,  that._abstract)  &&
+                   Utilities.equals(this.format,     that.format)     &&
+                   Utilities.equals(this.identifier, that.identifier) &&
+                   Utilities.equals(this.metadata,   that.metadata);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 29 * hash + (this._abstract != null ? this._abstract.hashCode() : 0);
+        hash = 29 * hash + (this.format != null ? this.format.hashCode() : 0);
+        hash = 29 * hash + (this.metadata != null ? this.metadata.hashCode() : 0);
+        return hash;
+    }
 }

@@ -93,7 +93,7 @@ public class GetCapabilities extends GetCapabilitiesType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof GetCapabilities && super.equals(object)) {
             final GetCapabilities that = (GetCapabilities) object;
             return Utilities.equals(this.service, that.service);
         }

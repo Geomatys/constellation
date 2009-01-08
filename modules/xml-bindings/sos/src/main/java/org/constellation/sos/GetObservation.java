@@ -246,7 +246,7 @@ public class GetObservation extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof GetObservation && super.equals(object)) {
             final GetObservation that = (GetObservation) object;
             return Utilities.equals(this.eventTime,         that.eventTime)         &&
                    Utilities.equals(this.featureOfInterest, that.featureOfInterest) &&
@@ -515,21 +515,23 @@ public class GetObservation extends RequestBaseType {
         if (object == this) {
             return true;
         }
+        if (object instanceof FeatureOfInterest) {
         final FeatureOfInterest that = (FeatureOfInterest) object;
-        return Utilities.equals(this.bbox,       that.bbox)       &&
-               Utilities.equals(this.beyond,     that.beyond)     &&
-               Utilities.equals(this.contains,   that.contains)   &&
-               Utilities.equals(this.crosses,    that.crosses)    &&
-               Utilities.equals(this.dWithin,    that.dWithin )   &&
-               Utilities.equals(this.disjoint,   that.disjoint)   &&
-               Utilities.equals(this.equals,     that.equals)     &&
-               Utilities.equals(this.intersects, that.intersects) &&
-               Utilities.equals(this.objectID,   that.objectID)   &&
-               Utilities.equals(this.overlaps,   that.overlaps)   &&
-               Utilities.equals(this.spatialOps, that.spatialOps) &&
-               Utilities.equals(this.touches,    that.touches)    &&
-               Utilities.equals(this.within,     that.within);
-       
+            return Utilities.equals(this.bbox,       that.bbox)       &&
+                   Utilities.equals(this.beyond,     that.beyond)     &&
+                   Utilities.equals(this.contains,   that.contains)   &&
+                   Utilities.equals(this.crosses,    that.crosses)    &&
+                   Utilities.equals(this.dWithin,    that.dWithin )   &&
+                   Utilities.equals(this.disjoint,   that.disjoint)   &&
+                   Utilities.equals(this.equals,     that.equals)     &&
+                   Utilities.equals(this.intersects, that.intersects) &&
+                   Utilities.equals(this.objectID,   that.objectID)   &&
+                   Utilities.equals(this.overlaps,   that.overlaps)   &&
+                   Utilities.equals(this.spatialOps, that.spatialOps) &&
+                   Utilities.equals(this.touches,    that.touches)    &&
+                   Utilities.equals(this.within,     that.within);
+        }
+        return false;
     }
 
         @Override
@@ -697,18 +699,20 @@ public class GetObservation extends RequestBaseType {
             if (object == this) {
                 return true;
             }
-            final Result that = (Result) object;
-            return Utilities.equals(this.comparisonOps,                  that.comparisonOps)                  &&
-                   Utilities.equals(this.propertyIsBetween,              that.propertyIsBetween)              &&
-                   Utilities.equals(this.propertyIsEqualTo,              that.propertyIsEqualTo)              &&
-                   Utilities.equals(this.propertyIsGreaterThan,          that.propertyIsGreaterThan)          &&
-                   Utilities.equals(this.propertyIsGreaterThanOrEqualTo, that.propertyIsGreaterThanOrEqualTo) &&
-                   Utilities.equals(this.propertyIsLessThan,             that.propertyIsLessThan)             &&
-                   Utilities.equals(this.propertyIsLessThanOrEqualTo,    that.propertyIsLessThanOrEqualTo)    &&
-                   Utilities.equals(this.propertyIsLike,                 that.propertyIsLike)                 &&
-                   Utilities.equals(this.propertyIsNotEqualTo,           that.propertyIsNotEqualTo)           &&
-                   Utilities.equals(this.propertyIsNull,                 that.propertyIsNull);
-       
+            if (object instanceof Result) {
+                final Result that = (Result) object;
+                return Utilities.equals(this.comparisonOps,                  that.comparisonOps)                  &&
+                       Utilities.equals(this.propertyIsBetween,              that.propertyIsBetween)              &&
+                       Utilities.equals(this.propertyIsEqualTo,              that.propertyIsEqualTo)              &&
+                       Utilities.equals(this.propertyIsGreaterThan,          that.propertyIsGreaterThan)          &&
+                       Utilities.equals(this.propertyIsGreaterThanOrEqualTo, that.propertyIsGreaterThanOrEqualTo) &&
+                       Utilities.equals(this.propertyIsLessThan,             that.propertyIsLessThan)             &&
+                       Utilities.equals(this.propertyIsLessThanOrEqualTo,    that.propertyIsLessThanOrEqualTo)    &&
+                       Utilities.equals(this.propertyIsLike,                 that.propertyIsLike)                 &&
+                       Utilities.equals(this.propertyIsNotEqualTo,           that.propertyIsNotEqualTo)           &&
+                       Utilities.equals(this.propertyIsNull,                 that.propertyIsNull);
+            }
+            return false;
         }
 
         @Override

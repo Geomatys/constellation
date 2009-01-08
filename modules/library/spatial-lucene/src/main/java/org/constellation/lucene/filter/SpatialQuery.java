@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.geotools.util.Utilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.TransformException;
@@ -215,15 +216,14 @@ public class SpatialQuery {
     public String toString() {
         StringBuilder s = new StringBuilder("[SpatialQuery]:").append('\n');
         
-        
-        if (spatialFilter == null && !query.equals("") && logicalOperator == SerialChainFilter.NOT) {
+        if (spatialFilter == null && !query.toString().equals("") && logicalOperator == SerialChainFilter.NOT) {
             s.append("query: NOT <").append(query).append(">").append('\n');
             
-        } else if (!query.equals("")) {
-            s.append('\t').append("query: |").append(query).append('|').append('\n');
+        } else if (!query.toString().equals("")) {
+            s.append('\t').append("query: |").append(query.toString()).append('|').append('\n');
         }
             
-        if (spatialFilter != null && !query.equals("")) {
+        if (spatialFilter != null && !query.toString().equals("")) {
             s.append(SerialChainFilter.ValueOf(logicalOperator)).append('\n');
         }
         
@@ -242,5 +242,36 @@ public class SpatialQuery {
             s.append("Sort: ").append(sort).append('\n');
         }
         return s.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SpatialQuery) {
+            final SpatialQuery that = (SpatialQuery) object;
+
+            return (this.logicalOperator ==  that.logicalOperator)          &&
+                   Utilities.equals(this.getQuery(), that.getQuery())       &&
+                   Utilities.equals(this.sort, that.sort)                   &&
+                   Utilities.equals(this.spatialFilter, that.spatialFilter) &&
+                   Utilities.equals(this.subQueries, that.subQueries);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.spatialFilter != null ? this.spatialFilter.hashCode() : 0);
+        hash = 97 * hash + (this.query != null ? getQuery().hashCode() : 0);
+        hash = 97 * hash + this.logicalOperator;
+        hash = 97 * hash + (this.subQueries != null ? this.subQueries.hashCode() : 0);
+        hash = 97 * hash + (this.sort != null ? this.sort.hashCode() : 0);
+        return hash;
     }
 }

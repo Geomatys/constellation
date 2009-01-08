@@ -78,8 +78,11 @@ public class ValueType {
         if (object == this) {
             return true;
         }
-        final ValueType that = (ValueType) object;
-        return Utilities.equals(this.value, that.value);
+        if (object instanceof ValueType) {
+            final ValueType that = (ValueType) object;
+            return Utilities.equals(this.value, that.value);
+        }
+        return false;
     }
 
     @Override

@@ -174,13 +174,15 @@ public class Operation extends AbstractOperation {
         if (object == this) {
             return true;
         }
-        final Operation that = (Operation) object;
-
-        return Utilities.equals(this.constraint, that.constraint) &&
-               Utilities.equals(this.dcp,        that.dcp)        &&
-               Utilities.equals(this.metadata,   that.metadata)   &&
-               Utilities.equals(this.parameter,  that.parameter)  &&
-               Utilities.equals(this.name,       that.name);
+        if (object instanceof Operation) {
+            final Operation that = (Operation) object;
+            return Utilities.equals(this.constraint, that.constraint) &&
+                   Utilities.equals(this.dcp,        that.dcp)        &&
+                   Utilities.equals(this.metadata,   that.metadata)   &&
+                   Utilities.equals(this.parameter,  that.parameter)  &&
+                   Utilities.equals(this.name,       that.name);
+        }
+        return false;
     }
 
     @Override

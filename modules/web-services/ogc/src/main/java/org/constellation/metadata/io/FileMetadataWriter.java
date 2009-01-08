@@ -77,6 +77,6 @@ public class FileMetadataWriter extends MetadataWriter {
 
     @Override
     public void destroy() {
+        super.destroy();
     }
-
 }

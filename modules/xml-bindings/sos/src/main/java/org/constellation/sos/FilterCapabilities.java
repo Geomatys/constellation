@@ -25,6 +25,7 @@ import org.constellation.ogc.IdCapabilitiesType;
 import org.constellation.ogc.ScalarCapabilitiesType;
 import org.constellation.ogc.SpatialCapabilitiesType;
 import org.constellation.ogc.TemporalCapabilitiesType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -101,5 +102,33 @@ public class FilterCapabilities {
      */
     public IdCapabilitiesType getIdCapabilities() {
         return idCapabilities;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof FilterCapabilities) {
+            final FilterCapabilities that = (FilterCapabilities) object;
+            return Utilities.equals(this.idCapabilities,       that.idCapabilities)      &&
+                   Utilities.equals(this.scalarCapabilities,   that.scalarCapabilities)  &&
+                   Utilities.equals(this.spatialCapabilities,  that.spatialCapabilities) &&
+                   Utilities.equals(this.temporalCapabilities, that.temporalCapabilities);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + (this.spatialCapabilities != null ? this.spatialCapabilities.hashCode() : 0);
+        hash = 53 * hash + (this.temporalCapabilities != null ? this.temporalCapabilities.hashCode() : 0);
+        hash = 53 * hash + (this.scalarCapabilities != null ? this.scalarCapabilities.hashCode() : 0);
+        hash = 53 * hash + (this.idCapabilities != null ? this.idCapabilities.hashCode() : 0);
+        return hash;
     }
 }

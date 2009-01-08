@@ -110,9 +110,12 @@ public class KeywordsType {
         if (object == this) {
             return true;
         }
-        final KeywordsType that = (KeywordsType) object;
-        return Utilities.equals(this.keyword, that.keyword) &&
-               Utilities.equals(this.type,    that.type) ;
+        if (object instanceof KeywordsType) {
+            final KeywordsType that = (KeywordsType) object;
+            return Utilities.equals(this.keyword, that.keyword) &&
+                   Utilities.equals(this.type,    that.type);
+        }
+        return false;
     }
 
     @Override

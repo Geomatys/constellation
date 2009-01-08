@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -60,17 +61,12 @@ import javax.xml.bind.annotation.XmlType;
 public class BasicIdentificationType extends DescriptionType {
 
     @XmlElement(name = "Identifier")
-    protected CodeType identifier;
+    private CodeType identifier;
     @XmlElement(name = "Metadata")
-    protected List<MetadataType> metadata;
+    private List<MetadataType> metadata;
 
     /**
      * Optional unique identifier or name of this dataset. 
-     * 
-     * @return
-     *     possible object is
-     *     {@link CodeType }
-     *     
      */
     public CodeType getIdentifier() {
         return identifier;
@@ -78,11 +74,6 @@ public class BasicIdentificationType extends DescriptionType {
 
     /**
      * Sets the value of the identifier property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CodeType }
-     *     
      */
     public void setIdentifier(CodeType value) {
         this.identifier = value;
@@ -90,31 +81,36 @@ public class BasicIdentificationType extends DescriptionType {
 
     /**
      * Optional unordered list of additional metadata about this data(set). A list of optional metadata elements for this data identification could be specified in the Implementation Specification for this service. Gets the value of the metadata property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the metadata property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMetadata().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link MetadataType }
-     * 
-     * 
      */
     public List<MetadataType> getMetadata() {
         if (metadata == null) {
             metadata = new ArrayList<MetadataType>();
         }
         return this.metadata;
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof BasicIdentificationType && super.equals(object)) {
+             final BasicIdentificationType that = (BasicIdentificationType) object;
+            return Utilities.equals(this.identifier, that.identifier) &&
+                   Utilities.equals(this.metadata,   that.metadata);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 79 * hash + (this.metadata != null ? this.metadata.hashCode() : 0);
+        return hash;
     }
 
 }

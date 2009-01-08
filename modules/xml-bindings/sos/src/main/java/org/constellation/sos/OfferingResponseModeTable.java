@@ -27,7 +27,7 @@ import org.geotools.util.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeEntry>{
 

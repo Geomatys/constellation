@@ -163,7 +163,7 @@ public class ServiceIdentification extends DescriptionType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof ServiceIdentification && super.equals(object)) {
             final ServiceIdentification that = (ServiceIdentification) object;
 
             return Utilities.equals(this.accessConstraints,  that.accessConstraints) &&

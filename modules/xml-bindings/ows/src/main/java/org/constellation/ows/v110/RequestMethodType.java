@@ -87,8 +87,11 @@ public class RequestMethodType extends OnlineResourceType {
         if (object == this) {
             return true;
         }
-        final RequestMethodType that = (RequestMethodType) object;
-        return Utilities.equals(this.constraint, that.constraint);
+        if (object instanceof RequestMethodType && super.equals(object)) {
+            final RequestMethodType that = (RequestMethodType) object;
+            return Utilities.equals(this.constraint, that.constraint);
+        }
+        return false;
     }
 
     @Override

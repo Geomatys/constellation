@@ -83,8 +83,11 @@ public class DCP extends AbstractDCP {
         if (object == this) {
             return true;
         }
-        final DCP that = (DCP) object;
-        return Utilities.equals(this.http, that.http);
+        if (object instanceof DCP) {
+            final DCP that = (DCP) object;
+            return Utilities.equals(this.http, that.http);
+        }
+        return false;
     }
 
     @Override

@@ -95,8 +95,11 @@ public class Contents {
         if (object == this) {
             return true;
         }
-        final Contents that = (Contents) object;
-        return Utilities.equals(this.observationOfferingList, that.observationOfferingList);
+        if (object instanceof Contents) {
+            final Contents that = (Contents) object;
+            return Utilities.equals(this.observationOfferingList, that.observationOfferingList);
+        }
+        return false;
     }
 
     @Override

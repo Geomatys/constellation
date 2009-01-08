@@ -20,7 +20,11 @@ package org.constellation.metadata.index;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -35,6 +39,8 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 
@@ -54,6 +60,22 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      */
     private final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
 
+    /**
+     * A map of cached request
+     */
+    private final Map<SpatialQuery, List<String>> cachedQueries = new HashMap<SpatialQuery, List<String>>();
+
+    /**
+     * The maximum size of the map of queries.
+     */
+    private final static int MaxCachedQueriesSize = 50;
+    
+    /**
+     * Build a new index searcher.
+     *
+     * @param configDir The configuration Directory where to build the indexDirectory.
+     * @param serviceID the "ID" of the service (allow multiple index in the same directory). The value "" is allowed.
+     */
     public AbstractIndexSearcher(File configDir, String serviceID) {
         super();
         setFileDirectory(new File(configDir, serviceID + "index"));
@@ -100,6 +122,12 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
         long start = System.currentTimeMillis();
 
+        //we look for a cached Query
+        if (cachedQueries.containsKey(spatialQuery)) {
+            logger.info("returning result from cache");
+            return cachedQueries.get(spatialQuery);
+        }
+        
         //we initialize the indexSearcher
         initSearcher();
         int maxRecords = searcher.maxDoc();
@@ -114,10 +142,6 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             parser.setAllowLeadingWildcard(true);
             BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
         }
-
-        //if we recognize the main query title:** we return directly all the identifiers TODO
-        if (spatialQuery.getQuery().equals("title:**"))
-            spatialQuery.setQuery("metafile:doc");
 
         Query query   = parser.parse(spatialQuery.getQuery());
         Filter f      = spatialQuery.getSpatialFilter();
@@ -210,8 +234,25 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             }
         }
 
+        //we put the query in cache
+        putInCache(spatialQuery, results);
+
         logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
         return results;
+    }
+
+    /**
+     * Add a query and its results to the cache.
+     * if the map has reach the maximum size the older query is rtemoved from the cache.
+     * @param query
+     * @param results
+     */
+    private void putInCache(SpatialQuery query, List<String> results) {
+        // if we had reach the maximum cache size we remove the first request
+        if (cachedQueries.size() >= MaxCachedQueriesSize) {
+            cachedQueries.remove(cachedQueries.keySet().iterator().next());
+        }
+        cachedQueries.put(query, results);
     }
 
     public void destroy() {

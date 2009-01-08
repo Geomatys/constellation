@@ -129,8 +129,11 @@ public class SectionsType {
         if (object == this) {
             return true;
         }
-        final SectionsType that = (SectionsType) object;
-        return Utilities.equals(this.section, that.section);
+        if (object instanceof SectionsType) {
+            final SectionsType that = (SectionsType) object;
+            return Utilities.equals(this.section, that.section);
+        }
+        return false;
     }
 
     @Override

@@ -102,7 +102,7 @@ public class InsertObservation extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof InsertObservation && super.equals(object)) {
             final InsertObservation that = (InsertObservation) object;
             return Utilities.equals(this.assignedSensorId, that.assignedSensorId) &&
                    Utilities.equals(this.observation,      that.observation);

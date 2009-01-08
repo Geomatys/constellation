@@ -109,7 +109,7 @@ public class Capabilities extends CapabilitiesBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof Capabilities && super.equals(object)) {
             final Capabilities that = (Capabilities) object;
 
             return Utilities.equals(this.contents,              that.contents)              &&

@@ -75,7 +75,7 @@ public class DescribeResultModel extends RequestBaseType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof DescribeResultModel && super.equals(object)) {
             final DescribeResultModel that = (DescribeResultModel) object;
             return Utilities.equals(this.resultName, that.resultName);
         } 

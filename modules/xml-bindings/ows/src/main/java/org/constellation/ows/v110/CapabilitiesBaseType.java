@@ -142,13 +142,16 @@ public class CapabilitiesBaseType {
         if (object == this) {
             return true;
         }
-        final CapabilitiesBaseType that = (CapabilitiesBaseType) object;
+        if (object instanceof CapabilitiesBaseType) {
+            final CapabilitiesBaseType that = (CapabilitiesBaseType) object;
 
-        return Utilities.equals(this.operationsMetadata,    that.operationsMetadata)    &&
-               Utilities.equals(this.serviceIdentification, that.serviceIdentification) && 
-               Utilities.equals(this.serviceProvider,       that.serviceProvider)       &&
-               Utilities.equals(this.updateSequence,        that.updateSequence)        &&
-               Utilities.equals(this.version,               that.version);
+            return Utilities.equals(this.operationsMetadata,    that.operationsMetadata)    &&
+                   Utilities.equals(this.serviceIdentification, that.serviceIdentification) &&
+                   Utilities.equals(this.serviceProvider,       that.serviceProvider)       &&
+                   Utilities.equals(this.updateSequence,        that.updateSequence)        &&
+                   Utilities.equals(this.version,               that.version);
+        }
+        return false;
     }
 
     @Override
