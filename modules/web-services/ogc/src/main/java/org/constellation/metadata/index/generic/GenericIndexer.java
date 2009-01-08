@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index;
+package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
 import java.io.File;
@@ -45,6 +45,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.util.Utils;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
@@ -63,7 +64,7 @@ import org.opengis.util.InternationalString;
  * A Lucene Index Handler for a generic Database.
  * @author Guilhem Legal
  */
-public class GenericIndex extends AbstractIndexer<Object> {
+public class GenericIndexer extends AbstractIndexer<Object> {
     
     /**
      * The Reader of this lucene index (generic DB mode).
@@ -85,7 +86,7 @@ public class GenericIndex extends AbstractIndexer<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndex(MetadataReader reader, File configDirectory, String serviceID) throws WebServiceException {
+    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws WebServiceException {
         super(serviceID, configDirectory);
         this.reader = reader;
         if (create)

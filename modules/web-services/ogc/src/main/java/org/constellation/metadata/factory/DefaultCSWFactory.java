@@ -28,10 +28,10 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.index.AbstractIndexSearcher;
 import org.constellation.metadata.index.AbstractIndexer;
-import org.constellation.metadata.index.GenericIndex;
-import org.constellation.metadata.index.GenericIndexSearcher;
-import org.constellation.metadata.index.MDWebIndex;
-import org.constellation.metadata.index.MDWebIndexSearcher;
+import org.constellation.metadata.index.generic.GenericIndexer;
+import org.constellation.metadata.index.generic.GenericIndexSearcher;
+import org.constellation.metadata.index.mdweb.MDWebIndexer;
+import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataReader;
@@ -120,9 +120,9 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     public AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebIndex(MDConnection, configDir, serviceID);
+                return new MDWebIndexer(MDConnection, configDir, serviceID);
             case FILESYSTEM:
-                return new GenericIndex(reader, configDir, serviceID);
+                return new GenericIndexer(reader, configDir, serviceID);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);
         }

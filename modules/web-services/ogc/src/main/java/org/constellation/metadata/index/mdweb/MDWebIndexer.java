@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index;
+package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.io.File;
@@ -35,6 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -59,7 +60,7 @@ import org.mdweb.sql.v20.Reader20;
  * 
  * @author Guilhem Legal
  */
-public class MDWebIndex extends AbstractIndexer<Form> {
+public class MDWebIndexer extends AbstractIndexer<Form> {
     
     /**
      * The Reader of this lucene index (MDWeb DB mode).
@@ -82,7 +83,7 @@ public class MDWebIndex extends AbstractIndexer<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndex(Connection MDConnection, File configDirectory, String serviceID) throws WebServiceException {
+    public MDWebIndexer(Connection MDConnection, File configDirectory, String serviceID) throws WebServiceException {
         super(serviceID, configDirectory);
         try {
             MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
@@ -104,7 +105,7 @@ public class MDWebIndex extends AbstractIndexer<Form> {
      * @param paths The list of path used in the forms (necesary because of there is no reader)
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    protected MDWebIndex(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
+    protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
         super("", configDirectory);
         MDWebReader   = null;
 

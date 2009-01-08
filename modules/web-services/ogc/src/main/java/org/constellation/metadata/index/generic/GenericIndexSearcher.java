@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index;
+package org.constellation.metadata.index.generic;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.constellation.metadata.index.AbstractIndexSearcher;
 
 /**
  *
