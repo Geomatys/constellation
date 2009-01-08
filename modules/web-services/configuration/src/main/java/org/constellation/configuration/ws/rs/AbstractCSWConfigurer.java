@@ -44,7 +44,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Utils;
 import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -75,7 +75,7 @@ public abstract class AbstractCSWConfigurer {
     /**
      * A lucene Index used to pre-build a CSW index.
      */
-    protected Map<String, IndexLucene> indexers = new HashMap<String, IndexLucene>();
+    protected Map<String, AbstractIndexer> indexers = new HashMap<String, AbstractIndexer>();
     
     /**
      * A list of Reader to the database.
@@ -112,7 +112,7 @@ public abstract class AbstractCSWConfigurer {
                     AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
                     LOGGER.finer("loaded Factory: " + CSWfactory.getClass().getName());
                     MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
-                    indexers.put(id, CSWfactory.getIndex(config.getType(), currentReader, MDConnection));
+                    indexers.put(id, CSWfactory.getIndexer(config.getType(), currentReader, MDConnection, cswConfigDir, id));
                     readers.add(currentReader);
                 }
             }
@@ -241,7 +241,7 @@ public abstract class AbstractCSWConfigurer {
         for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
             String currentId    = getConfigID(configFile);
             File nexIndexDir    = new File(configurationDirectory, currentId + "nextIndex");
-            IndexLucene indexer = indexers.get(currentId);
+            AbstractIndexer indexer = indexers.get(currentId);
             if (indexer != null) {
                 nexIndexDir.mkdir();
                 indexer.setFileDirectory(nexIndexDir);

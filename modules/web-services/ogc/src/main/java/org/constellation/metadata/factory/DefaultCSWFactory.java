@@ -26,9 +26,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.metadata.index.GenericIndex;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.GenericIndexSearcher;
 import org.constellation.metadata.index.MDWebIndex;
+import org.constellation.metadata.index.MDWebIndexSearcher;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataReader;
@@ -76,12 +79,12 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws java.sql.SQLException
      * @throws javax.xml.bind.JAXBException
      */
-    public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException {
+    public MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, AbstractIndexer indexer, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebMetadataWriter(MDConnection, index);
+                return new MDWebMetadataWriter(MDConnection, indexer);
             case FILESYSTEM:
-                return new FileMetadataWriter(index, marshaller, dataDirectory);
+                return new FileMetadataWriter(indexer, marshaller, dataDirectory);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);
         }
@@ -114,7 +117,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.WebServiceException
      */
-    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException {
+    public AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException {
         switch (dbType) {
             case MDWEB:
                 return new MDWebIndex(MDConnection, configDir, serviceID);
@@ -125,22 +128,13 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
         }
     }
     
-     /**
-     * Return a Lucene index for the specified database type.
-     * 
-     * @param dbType The type of the database.
-     * @param reader A metadataReader (unused for MDWeb database);
-     * @param MDConnection A connecton to the database (used only for MDWeb database).
-     * @param configDir
-     * @return
-     * @throws org.constellation.ws.WebServiceException
-     */
-    public IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException {
+     @Override
+    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws WebServiceException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebIndex(MDConnection);
+                return new MDWebIndexSearcher(configDir, serviceID);
             case FILESYSTEM:
-                return new GenericIndex(reader);
+                return new GenericIndexSearcher(configDir, serviceID);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);
         }

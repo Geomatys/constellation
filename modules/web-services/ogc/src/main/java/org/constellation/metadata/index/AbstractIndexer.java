@@ -18,101 +18,150 @@
 package org.constellation.metadata.index;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Logger;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
+import java.sql.SQLException;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.store.RAMDirectory;
+import org.constellation.util.Utils;
+import org.constellation.ws.WebServiceException;
 
 /**
  *
  * @author Mehdi Sidhoum
  * @author Guilhem Legal
  */
-public abstract class AbstractIndexer<E> {
-
-    protected static final Logger logger = Logger.getLogger("org.constellation.metadata");
+public abstract class AbstractIndexer<E> extends IndexLucene {
 
     /**
-     * This is the RAM Directory if you would like to store the index in the RAM memory.
+     * A flag use in child constructor.
      */
-    private RAMDirectory RAMdirectory = new RAMDirectory();
+    protected boolean create;
+
+    public AbstractIndexer(String serviceID, File configDirectory) {
+        super();
+        //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
+        File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
+
+        // we get the current index directory
+        File currentIndexDirectory = new File(configDirectory, serviceID + "index");
+        setFileDirectory(currentIndexDirectory);
+
+        if (preGeneratedIndexDirectory.exists()) {
+            switchIndexDir(preGeneratedIndexDirectory, currentIndexDirectory);
+            logger.info("using pre-created index.");
+
+        } else {
+            //if the index File exists we don't need to index the documents again.
+            if(!currentIndexDirectory.exists()) {
+                create = true;
+            } else {
+                logger.info("Index already created.");
+                create = false;
+            }
+        }
+    }
 
     /**
-     * This the File Directory if you would like to store the index in a File directory.
+     * Replace the precedent index directory by another pre-generated.
      */
-    private File FileDirectory = new File("index");
-
+    private void switchIndexDir(File preGeneratedDirectory, File indexDirectory) {
+        if (indexDirectory.exists()) {
+            Utils.deleteDirectory(indexDirectory);
+        }
+        preGeneratedDirectory.renameTo(indexDirectory);
+    }
+    
     /**
-     * This is the index searcher of Lucene.
+     * Create a new Index.
+     *
+     * @throws java.sql.SQLException
      */
-    private IndexSearcher searcher;
-
-
-    /**
-     * Creates a new instance of AbstractIndex
-     */
-    public AbstractIndexer() {}
+    public abstract void createIndex() throws WebServiceException;
 
     /**
-     * This method add documents into the index, the model's object is specified in the childrens classes.
+     * Index a document from the specified object with the specified index writer.
+     * Used when indexing in line many document.
+     *
+     * @param writer An Lucene index writer.
+     * @param object The object to index.
      */
     public abstract void indexDocument(IndexWriter writer, E object);
 
     /**
-     * Returns a RAMdirectory of this Index Object.
-     */
-    public RAMDirectory getRAMdirectory() {
-        return RAMdirectory;
-    }
-
-    /**
-     * The RAMdirectory setter for this Index object.
+     * This method add to index of lucene a new document.
+     * (implements AbstractIndex.indexDocument() )
      *
-     * @param RAMDirectory a RAMDirectory object.
+     * @param object The object to index.
      */
-    public void setRAMdirectory(RAMDirectory RAMdirectory) {
-        this.RAMdirectory = RAMdirectory;
-    }
+    public abstract void indexDocument(E object);
+
 
     /**
-     * Returns a file directory of this index.
-     */
-    public File getFileDirectory() {
-        return FileDirectory;
-    }
+    * Makes a document from the specified object.
+    *
+    * @param Form An MDweb formular to index.
+    * @return A Lucene document.
+    */
+    protected abstract Document createDocument(E object) throws SQLException;
 
     /**
-     * The FileDirectory setter of this index.
+     * Add a boundingBox geometry to the specified Document.
      *
-     * @param aFileDirectory a FileDirectory object.
+     * @param doc  The document to add the geometry
+     * @param minx the minimun X coordinate of the bounding box.
+     * @param maxx the maximum X coordinate of the bounding box.
+     * @param miny the minimun Y coordinate of the bounding box.
+     * @param maxy the maximum Y coordinate of the bounding box.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    public void setFileDirectory(File aFileDirectory) {
-        FileDirectory = aFileDirectory;
+    protected void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
+        // convert the corner of the box to lucene fields
+        doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("maxx"     , maxx + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        logger.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
     }
 
     /**
-     * Returns the IndexSearcher of this index.
+     *  Add a point geometry to the specified Document.
+     *
+     * @param doc     The document to add the geometry
+     * @param x       The x coordinate of the point.
+     * @param y       The y coordinate of the point.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    public IndexSearcher getSearcher() throws CorruptIndexException, IOException {
-       if (searcher == null) {
-            File indexDirectory = getFileDirectory();
-            logger.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
-            IndexReader ireader = IndexReader.open(indexDirectory);
-            searcher   = new IndexSearcher(ireader);
-        }
-        return searcher;
+    protected void addPoint(Document doc, double y, double x, String crsName) {
+        // convert the lat / long to lucene fields
+        doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("y"        , y + "" , Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
     }
 
-    public void destroy() {
-        try {
-            if (searcher != null)
-                searcher.close();
-        } catch (IOException ex) {
-            logger.info("IOException while closing the indexer");
-        }
+    /**
+     * Add a Line geometry to the specified Document.
+     *
+     * @param doc The document to add the geometry
+     * @param x1  the X coordinate of the first point of the line.
+     * @param y1  the Y coordinate of the first point of the line.
+     * @param x2  the X coordinate of the second point of the line.
+     * @param y2  the Y coordinate of the first point of the line.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
+     */
+    protected void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
+        // convert the corner of the box to lucene fields
+        doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("y1"       , y1 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("x2"       , x2 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
     }
+
+    public abstract void destroy();
 }
 

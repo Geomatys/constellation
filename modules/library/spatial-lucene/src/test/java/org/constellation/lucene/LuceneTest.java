@@ -78,8 +78,8 @@ public class LuceneTest {
     @Before
     public void setUp() throws Exception {
         directory = new RAMDirectory();
-	IndexWriter writer = new IndexWriter(directory, new WhitespaceAnalyzer(), true);
-	fillTestData(writer);
+        IndexWriter writer = new IndexWriter(directory, new WhitespaceAnalyzer(), true);
+        fillTestData(writer);
         searcher = new IndexSearcher(directory);
         //create a term query to search against all documents
         simpleQuery = new TermQuery(new Term("metafile", "doc"));

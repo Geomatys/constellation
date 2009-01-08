@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -50,7 +50,7 @@ public class FileMetadataWriter extends MetadataWriter {
      * @param marshaller
      * @throws java.sql.SQLException
      */
-    public FileMetadataWriter(IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException {
+    public FileMetadataWriter(AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws SQLException {
         super(index);
         this.marshaller    = marshaller;
         this.dataDirectory = dataDirectory;
@@ -66,7 +66,7 @@ public class FileMetadataWriter extends MetadataWriter {
             f = new File(dataDirectory, identifier + ".xml");
             f.createNewFile();
             marshaller.marshal(obj, f);
-            index.indexDocument(obj);
+            indexer.indexDocument(obj);
         } catch (JAXBException ex) {
             throw new WebServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
         } catch (IOException ex) {

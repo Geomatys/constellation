@@ -36,8 +36,8 @@ import javax.xml.bind.JAXBElement;
 // constellation dependencies
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.util.Utils;
-import org.constellation.metadata.index.IndexLucene;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -108,7 +108,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MDWebMetadataWriter(Connection MDConnection, IndexLucene index) throws SQLException {
+    public MDWebMetadataWriter(Connection MDConnection, AbstractIndexer index) throws SQLException {
         super(index);
         MDReader = new Reader20(Standard.ISO_19115, MDConnection);
         MDCatalog = MDReader.getCatalog("CSWCat");
@@ -654,7 +654,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             
             long time = System.currentTimeMillis() - start; 
             LOGGER.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
-            index.indexDocument(f);
+            indexer.indexDocument(f);
             return true;
         }
         return false;
@@ -672,8 +672,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 MDWriter.close();
             classBinding.clear();
             alreadyWrite.clear();
-            if (index != null)
-                index.destroy();
+            if (indexer != null)
+                indexer.destroy();
             
         } catch (SQLException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");

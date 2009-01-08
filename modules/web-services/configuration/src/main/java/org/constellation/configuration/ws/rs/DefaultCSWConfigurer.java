@@ -21,7 +21,7 @@ package org.constellation.configuration.ws.rs;
 import java.io.File;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -53,7 +53,7 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     }
     
     public void destroy() {
-        for (IndexLucene indexer : indexers.values()) {
+        for (AbstractIndexer indexer : indexers.values()) {
             indexer.destroy();
         }
         for (MetadataReader reader: readers) {

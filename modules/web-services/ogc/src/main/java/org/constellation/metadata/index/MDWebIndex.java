@@ -32,11 +32,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -64,7 +59,7 @@ import org.mdweb.sql.v20.Reader20;
  * 
  * @author Guilhem Legal
  */
-public class MDWebIndex extends IndexLucene<Form> {
+public class MDWebIndex extends AbstractIndexer<Form> {
     
     /**
      * The Reader of this lucene index (MDWeb DB mode).
@@ -95,22 +90,6 @@ public class MDWebIndex extends IndexLucene<Form> {
             classeMap     = null;
             if (create)
                 createIndex();
-        } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
-        }
-    }
-    
-    /**
-     * Creates a new Lucene Indexer with the specified MDweb reader.
-     * 
-     * @param reader An mdweb reader for read the metadata database.
-     */
-    public MDWebIndex(Connection MDConnection) throws WebServiceException {
-        super();
-        try {
-            MDWebReader   = new Reader20(Standard.ISO_19115, MDConnection);
-            pathMap       = null;
-            classeMap     = null;
         } catch (SQLException ex) {
             throw new WebServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
@@ -533,42 +512,7 @@ public class MDWebIndex extends IndexLucene<Form> {
         return response.toString();
     }
     
-    /**
-     * This method proceed a lucene search and returns a list of ID.
-     *
-     * @param query A simple Term query.
-     * 
-     * @return      A List of id.
-     */
-    public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
-        
-        TermQuery query = new TermQuery(new Term("identifier_sort", id));
-        List<String> results = new ArrayList<String>();
-        Searcher searcher = getSearcher();
-        
-        logger.info("TermQuery: " + query.toString());
-        Hits hits = searcher.search(query);
-        
-        for (int i = 0; i < hits.length(); i ++) {
-            results.add( hits.doc(i).get("id") + ':' + hits.doc(i).get("catalog"));
-        }
-        if (results.size() > 1)
-            logger.warning("multiple record in lucene index for identifier: " + id);
-        
-        if (results.size() > 0)
-            return results.get(0);
-        else 
-            return null;
-    }
-
-    @Override
-    public String getMatchingID(Document doc) throws CorruptIndexException, IOException, org.apache.lucene.queryParser.ParseException {
-        return doc.get("id") + ':' + doc.get("catalog");
-    }
-
-    @Override
     public void destroy() {
-        super.destroy();
         if (pathMap != null)
             pathMap.clear();
         if (classeMap != null)

@@ -25,7 +25,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.WebServiceException;
@@ -43,11 +44,11 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
     
     public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller, File configDir) throws SQLException, JAXBException;
 
-    public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, IndexLucene index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException;
+    public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException;
     
     public abstract int getProfile(int dbType);
     
-    public abstract IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException;
+    public abstract AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException;
     
-    public abstract IndexLucene getIndex(int dbType, MetadataReader reader, Connection MDConnection) throws WebServiceException;
+    public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws WebServiceException;
 }

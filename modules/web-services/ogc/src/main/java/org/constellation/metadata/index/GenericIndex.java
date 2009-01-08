@@ -41,11 +41,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -68,7 +63,7 @@ import org.opengis.util.InternationalString;
  * A Lucene Index Handler for a generic Database.
  * @author Guilhem Legal
  */
-public class GenericIndex extends IndexLucene<Object> {
+public class GenericIndex extends AbstractIndexer<Object> {
     
     /**
      * The Reader of this lucene index (generic DB mode).
@@ -95,16 +90,6 @@ public class GenericIndex extends IndexLucene<Object> {
         this.reader = reader;
         if (create)
             createIndex();
-    }
-    
-     /**
-     * Creates a new Lucene Index with the specified generic database reader.
-     * 
-     * @param reader A generic reader for read the metadata database.
-     */
-    public GenericIndex(MetadataReader reader) {
-        super();
-        this.reader = reader;
     }
     
     /** 
@@ -210,8 +195,8 @@ public class GenericIndex extends IndexLucene<Object> {
         final Document doc = new Document();
         CompletionService<String> cs = new BoundedCompletionService<String>(this.pool, 5);
 
-        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.TOKENIZED));
-        //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.ANALYZED));
+        //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
         
         logger.finer("indexing ISO 19119 MD_Metadata");
         //TODO add ANyText
@@ -226,8 +211,8 @@ public class GenericIndex extends IndexLucene<Object> {
         for (String term : ISO_QUERYABLE.keySet()) {
             try {
                 String values = cs.take().get();
-                doc.add(new Field(term, values, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.UN_TOKENIZED));
+                doc.add(new Field(term, values, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
@@ -280,8 +265,8 @@ public class GenericIndex extends IndexLucene<Object> {
                 if (term.equals("date") || term.equals("modified")) {
                     values = values.replaceAll("-", "");
                 }
-                doc.add(new Field(term, values, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.UN_TOKENIZED));
+                doc.add(new Field(term, values, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
@@ -291,7 +276,7 @@ public class GenericIndex extends IndexLucene<Object> {
         }
             
         //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
             
         //we add the geometry parts
         coord = "null";
@@ -319,7 +304,7 @@ public class GenericIndex extends IndexLucene<Object> {
         }
 
         // we add to the index the special queryable element of the metadata reader
-        Map<String, List<String>> additionalQueryable = new HashMap<String, List<String>>();
+        Map<String, List<String>> additionalQueryable = reader.getAdditionalQueryablePathMap();
         for (String term : additionalQueryable.keySet()) {
 
             String values = getValues(metadata, additionalQueryable.get(term));
@@ -330,12 +315,12 @@ public class GenericIndex extends IndexLucene<Object> {
             if (term.equals("date") || term.equals("modified")) {
                 values = values.replaceAll("-","");
             }
-            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
-            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
         // add a default meta field to make searching all documents easy 
-        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
         
         return doc;
     }
@@ -597,44 +582,7 @@ public class GenericIndex extends IndexLucene<Object> {
         return result;
     }
 
-    /**
-     * In generic index we don't need to perform a lucene query for the identifier.
-     * 
-     * @param id
-     * @return
-     * @throws org.apache.lucene.index.CorruptIndexException
-     * @throws java.io.IOException
-     * @throws org.apache.lucene.queryParser.ParseException
-     */
-    @Override
-    public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
-        TermQuery query = new TermQuery(new Term("identifier_sort", id));
-        List<String> results = new ArrayList<String>();
-        Searcher searcher = getSearcher();
-        
-        logger.info("TermQuery: " + query.toString());
-        Hits hits = searcher.search(query);
-        
-        for (int i = 0; i < hits.length(); i ++) {
-            results.add(hits.doc(i).get("id"));
-        }
-        if (results.size() > 1)
-            logger.warning("multiple record in lucene index for identifier: " + id);
-        
-        if (results.size() > 0)
-            return results.get(0);
-        else 
-            return null;
-    }
-
-    @Override
-    public String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException {
-        return doc.get("id");
-    }
-
-    @Override
     public void destroy() {
-        super.destroy();
         reader.destroy();
         pool.shutdown();
     }

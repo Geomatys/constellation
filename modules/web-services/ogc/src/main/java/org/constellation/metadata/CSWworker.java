@@ -97,9 +97,11 @@ import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.metadata.index.IndexLucene;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.util.Utils;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.cat.csw.AbstractCswRequest;
@@ -116,6 +118,8 @@ import org.apache.lucene.search.Sort;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.factory.FactoryNotFoundException;
+import org.geotools.factory.FactoryRegistry;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -125,11 +129,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
-
 // GeoAPI dependencies
-import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -175,9 +175,14 @@ public class CSWworker {
     private final Unmarshaller unmarshaller;
     
     /**
-     * A lucene index to make quick search on the metadatas.
+     * A lucene indexer to build the index.
      */
-    private IndexLucene index;
+    private AbstractIndexer indexer;
+
+    /**
+     * A lucene index searcher to make quick search on the metadatas.
+     */
+    private AbstractIndexSearcher indexSearcher;
     
     /**
      * A filter parser whitch create lucene query from OGC filter
@@ -310,10 +315,11 @@ public class CSWworker {
                 Connection MDConnection = db.getConnection();
                 
                 //we initialize all the data retriever (reader/writer) and index worker
-                MDReader = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller, configDir);
-                profile  = CSWfactory.getProfile(config.getType());
-                index    = CSWfactory.getIndex(config.getType(), MDReader, MDConnection, configDir, serviceID);
-                MDWriter = CSWfactory.getMetadataWriter(config.getType(), MDConnection, index, marshaller, configDir);
+                MDReader      = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller, configDir);
+                profile       = CSWfactory.getProfile(config.getType());
+                indexer       = CSWfactory.getIndexer(config.getType(), MDReader, MDConnection, configDir, serviceID);
+                indexSearcher = CSWfactory.getIndexSearcher(config.getType(), configDir, serviceID);
+                MDWriter      = CSWfactory.getMetadataWriter(config.getType(), MDConnection, indexer, marshaller, configDir);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
@@ -918,7 +924,7 @@ public class CSWworker {
      */
     private List<String> executeLuceneQuery(SpatialQuery query) throws WebServiceException {
         try {
-            return index.doSearch(query);
+            return indexSearcher.doSearch(query);
         
         } catch (CorruptIndexException ex) {
             throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
@@ -941,7 +947,7 @@ public class CSWworker {
      */
     private String executeIdentifierQuery(String id) throws WebServiceException {
         try {
-            return index.identifierQuery(id);
+            return indexSearcher.identifierQuery(id);
         
         } catch (CorruptIndexException ex) {
             throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
@@ -1731,8 +1737,11 @@ public class CSWworker {
         if (MDWriter != null) {
             MDWriter.destroy();
         }
-        if (index != null) {
-            index.destroy();
+        if (indexer != null) {
+            indexer.destroy();
+        }
+        if (indexSearcher != null) {
+            indexSearcher.destroy();
         }
         if (catalogueHarvester != null) {
             catalogueHarvester.destroy();

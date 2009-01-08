@@ -18,312 +18,77 @@ package org.constellation.metadata.index;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 // Lucene dependencies
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 
 // Constellation dependencies
-import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.util.Utils;
-import org.constellation.ws.WebServiceException;
+import org.apache.lucene.store.RAMDirectory;
 
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class IndexLucene<E> extends AbstractIndexer<E> {
+public abstract class IndexLucene {
+
+    protected static final Logger logger = Logger.getLogger("org.constellation.metadata.index");
 
     /**
      * A lucene analyser.
      */
     protected final Analyzer analyzer;
-    
+
     /**
-     * A default Query requesting all the document
+     * This is the RAM Directory if you would like to store the index in the RAM memory.
      */
-    private final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
-    
+    private RAMDirectory RAMdirectory = new RAMDirectory();
+
     /**
-     * A flag use in child constructor.
+     * This the File Directory if you would like to store the index in a File directory.
      */
-    protected boolean create;
+    private File FileDirectory;
     
    /**
      * Creates a new Lucene Index.
      * 
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public IndexLucene(String serviceID, File configDirectory) {
-        
-        analyzer      = new WhitespaceAnalyzer();
-        
-        //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
-        File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
-        
-        // we get the current index directory
-        File currentIndexDirectory = new File(configDirectory, serviceID + "index");
-        setFileDirectory(currentIndexDirectory);
-        
-        if (preGeneratedIndexDirectory.exists()) {
-            switchIndexDir(preGeneratedIndexDirectory, currentIndexDirectory);
-            logger.info("using pre-created index.");
-            
-        } else {
-            //if the index File exists we don't need to index the documents again.
-            if(!currentIndexDirectory.exists()) {
-                create = true;
-            } else {
-                logger.info("Index already created.");
-                create = false;
-            }
-        }
-    }
-    
-    /**
-     * Creates a new Lucene Index.
-     */
     public IndexLucene() {
-        analyzer      = new WhitespaceAnalyzer();
+        analyzer = new SimpleAnalyzer();
     }
-    
-    /** 
-     * Create a new Index.
-     * 
-     * @throws java.sql.SQLException
-     */
-    public abstract void createIndex() throws WebServiceException;
 
     /**
-     * Replace the precedent index directory by another pre-generated.
+     * Returns a RAMdirectory of this Index Object.
      */
-    private void switchIndexDir(File preGeneratedDirectory, File indexDirectory) {
-        if (indexDirectory.exists()) {
-            Utils.deleteDirectory(indexDirectory);
-        }
-        preGeneratedDirectory.renameTo(indexDirectory);
+    public RAMDirectory getRAMdirectory() {
+        return RAMdirectory;
     }
-    
-    /**
-     * Index a document from the specified object with the specified index writer.
-     * Used when indexing in line many document.
-     * 
-     * @param writer An Lucene index writer.
-     * @param object The object to index.
-     */
-    public abstract void indexDocument(IndexWriter writer, E object);
-    
-    /**
-     * This method add to index of lucene a new document.
-     * (implements AbstractIndex.indexDocument() )
-     * 
-     * @param object The object to index.
-     */
-    public abstract void indexDocument(E object);
-    
-    
-    /**
-    * Makes a document from the specified object.
-    * 
-    * @param Form An MDweb formular to index.
-    * @return A Lucene document.
-    */
-    protected abstract Document createDocument(E object) throws SQLException;
 
     /**
-     * This method proceed a lucene search and returns a list of ID.
+     * The RAMdirectory setter for this Index object.
      *
-     * @param query The lucene query string with spatials filters.
-     * 
-     * @return      A List of id.
+     * @param RAMDirectory a RAMDirectory object.
      */
-    public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
-        long start = System.currentTimeMillis();
- 
-        //we initialize the indexSearcher
-        Searcher searcher = getSearcher();
+    public void setRAMdirectory(RAMDirectory RAMdirectory) {
+        this.RAMdirectory = RAMdirectory;
+    }
 
-        List<String> results = new ArrayList<String>();
-        
-        String field        = "Title";
-        QueryParser parser  = new QueryParser(field, analyzer);
-
-        // we enable the leading wildcard mode if the first character of the query is a '*'
-        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ) {
-            parser.setAllowLeadingWildcard(true);
-            BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
-        }
-
-        //if we recognize the main query title:** we return directly all the identifiers
-        if (spatialQuery.getQuery().equals("title:**"))
-            spatialQuery.setQuery("metafile:doc");
-        
-        Query query   = parser.parse(spatialQuery.getQuery());
-        Filter f      = spatialQuery.getSpatialFilter();
-        int operator  = spatialQuery.getLogicalOperator();
-        Sort sort     = spatialQuery.getSort();
-        String sorted = "";
-        if (sort != null)
-            sorted = "order by: " + sort.toString();
-        
-        logger.info("Searching for: "    + query.toString(field) + '\n' +
-                    SerialChainFilter.ValueOf(operator)          + '\n' +
-                    f                                            + '\n' +
-                    sorted                                       + '\n');
-        
-        // simple query with an AND
-        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
-            Hits hits = searcher.search(query, f, sort);
-        
-            for (int i = 0; i < hits.length(); i ++) {
-                results.add(getMatchingID(hits.doc(i)));
-            }
-        
-        // for a OR we need to perform many request 
-        } else if (operator == SerialChainFilter.OR) {
-            Hits hits1 = searcher.search(query, sort);
-            Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), sort);
-            
-            for (int i = 0; i < hits1.length(); i++) {
-                results.add(getMatchingID(hits1.doc(i)));
-            }
-            
-            for (int i = 0; i < hits2.length(); i++) {
-                String id = getMatchingID(hits2.doc(i));
-                if (!results.contains(id)) {
-                    results.add(id);
-                }
-            }
-            
-        // for a NOT we need to perform many request 
-        } else if (operator == SerialChainFilter.NOT) {
-            Hits hits1 = searcher.search(query, f, sort);
-            
-            List<String> unWanteds = new ArrayList<String>();
-            for (int i = 0; i < hits1.length(); i++) {
-                unWanteds.add(getMatchingID(hits1.doc(i)));
-            }
-            
-            Hits hits2 = searcher.search(simpleQuery, sort);
-            for (int i = 0; i < hits2.length(); i++) {
-                String id = getMatchingID(hits2.doc(i)); 
-                if (!unWanteds.contains(id)) {
-                    results.add(id);
-                }
-            }
-            
-        } else {
-            throw new IllegalArgumentException("unsupported logical Operator");
-        }
-        
-        // if we have some subQueries we execute it separely and merge the result
-        if (spatialQuery.getSubQueries().size() > 0) {
-            SpatialQuery sub = spatialQuery.getSubQueries().get(0);
-            List<String> subResults =  doSearch(sub);
-            for (String r: results) {
-                if (!subResults.contains(r)) {
-                    results.remove(r);
-                } 
-            }
-        }
-        
-        logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
-        return results;
-    } 
-    
     /**
-     * This method proceed a lucene search and to verify that the identifier exist.
-     * If it exist it return the database ID.
+     * Returns a file directory of this index.
+     */
+    public File getFileDirectory() {
+        return FileDirectory;
+    }
+
+    /**
+     * The FileDirectory setter of this index.
      *
-     * @param query A simple Term query on "indentifier field".
-     * 
-     * @return A database id.
+     * @param aFileDirectory a FileDirectory object.
      */
-    public abstract String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
-    
-    /**
-     * This method return the database ID of a matching Document
-     *
-     * @param doc A matching document. 
-     * 
-     * @return A database id.
-     */
-    public abstract String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException;
-    
-    /**
-     * Add a boundingBox geometry to the specified Document.
-     * 
-     * @param doc  The document to add the geometry
-     * @param minx the minimun X coordinate of the bounding box.
-     * @param maxx the maximum X coordinate of the bounding box.
-     * @param miny the minimun Y coordinate of the bounding box.
-     * @param maxy the maximum Y coordinate of the bounding box.
-     * @param crsName The coordinate reference system in witch the coordinates are expressed.
-     */
-    protected void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
-        // convert the corner of the box to lucene fields
-        doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("maxx"     , maxx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        logger.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
+    public void setFileDirectory(File aFileDirectory) {
+        FileDirectory = aFileDirectory;
     }
-    
-    /**
-     *  Add a point geometry to the specified Document.
-     * 
-     * @param doc     The document to add the geometry
-     * @param x       The x coordinate of the point.
-     * @param y       The y coordinate of the point.
-     * @param crsName The coordinate reference system in witch the coordinates are expressed.
-     */
-    protected void addPoint(Document doc, double y, double x, String crsName) {
-        // convert the lat / long to lucene fields
-        doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y"        , y + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
-       
-    }
-    
-    /**
-     * Add a Line geometry to the specified Document.
-     * 
-     * @param doc The document to add the geometry
-     * @param x1  the X coordinate of the first point of the line.
-     * @param y1  the Y coordinate of the first point of the line.
-     * @param x2  the X coordinate of the second point of the line.
-     * @param y2  the Y coordinate of the first point of the line.
-     * @param crsName The coordinate reference system in witch the coordinates are expressed.
-     */
-    protected void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
-        // convert the corner of the box to lucene fields
-        doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y1"       , y1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x2"       , x2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
-    }
+
 }

@@ -17,34 +17,210 @@
 
 package org.constellation.metadata.index;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
+import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialQuery;
 
 /**
  *
  * @author Guilhem legal (Geomatys)
  */
-public class AbstractIndexSearcher {
+public abstract class AbstractIndexSearcher extends IndexLucene {
 
     /**
      * This is the index searcher of Lucene.
      */
-    private IndexSearcher searcher;
+    protected IndexSearcher searcher;
 
+    /**
+     * A default Query requesting all the document
+     */
+    private final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
+
+    public AbstractIndexSearcher(File configDir, String serviceID) {
+        super();
+        setFileDirectory(new File(configDir, serviceID + "index"));
+    }
 
     /**
      * Returns the IndexSearcher of this index.
      */
-    public IndexSearcher getSearcher() {
-        return searcher;
+    public void initSearcher() throws CorruptIndexException, IOException {
+       if (searcher == null) {
+            File indexDirectory = getFileDirectory();
+            logger.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
+            IndexReader ireader = IndexReader.open(indexDirectory);
+            searcher   = new IndexSearcher(ireader);
+        }
     }
 
     /**
-     * The IndexSearcher setter of this index.
+     * This method proceed a lucene search and to verify that the identifier exist.
+     * If it exist it return the database ID.
      *
-     * @param searcher an IndexSearcher object.
+     * @param query A simple Term query on "indentifier field".
+     *
+     * @return A database id.
      */
-    public void setSearcher(IndexSearcher searcher) {
-        this.searcher = searcher;
+    public abstract String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
+
+    /**
+     * This method return the database ID of a matching Document
+     *
+     * @param doc A matching document.
+     *
+     * @return A database id.
+     */
+    public abstract String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException;
+
+    /**
+     * This method proceed a lucene search and returns a list of ID.
+     *
+     * @param query The lucene query string with spatials filters.
+     *
+     * @return      A List of id.
+     */
+    public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
+        long start = System.currentTimeMillis();
+
+        //we initialize the indexSearcher
+        initSearcher();
+        int maxRecords = searcher.maxDoc();
+
+        List<String> results = new ArrayList<String>();
+
+        String field        = "Title";
+        QueryParser parser  = new QueryParser(field, analyzer);
+
+        // we enable the leading wildcard mode if the first character of the query is a '*'
+        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ) {
+            parser.setAllowLeadingWildcard(true);
+            BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+        }
+
+        //if we recognize the main query title:** we return directly all the identifiers TODO
+        if (spatialQuery.getQuery().equals("title:**"))
+            spatialQuery.setQuery("metafile:doc");
+
+        Query query   = parser.parse(spatialQuery.getQuery());
+        Filter f      = spatialQuery.getSpatialFilter();
+        int operator  = spatialQuery.getLogicalOperator();
+        Sort sort     = spatialQuery.getSort();
+        String sorted = "";
+        if (sort != null)
+            sorted = "order by: " + sort.toString();
+
+        logger.info("Searching for: "    + query.toString(field) + '\n' +
+                    SerialChainFilter.ValueOf(operator)          + '\n' +
+                    f                                            + '\n' +
+                    sorted                                       + '\n' +
+                    "max records: " + maxRecords);
+
+        // simple query with an AND
+        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
+
+            TopDocs docs;
+            if (sort != null)
+                docs = searcher.search(query, f, maxRecords, sort);
+            else
+                docs = searcher.search(query, f, maxRecords);
+
+            for (ScoreDoc doc :docs.scoreDocs) {
+                results.add(getMatchingID(searcher.doc(doc.doc)));
+            }
+
+        // for a OR we need to perform many request
+        } else if (operator == SerialChainFilter.OR) {
+            TopDocs hits1;
+            TopDocs hits2;
+            if (sort != null) {
+                hits1 = searcher.search(query, null, maxRecords, sort);
+                hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords, sort);
+            } else {
+                hits1 = searcher.search(query, maxRecords);
+                hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords);
+            }
+
+            for (ScoreDoc doc :hits1.scoreDocs) {
+                results.add(getMatchingID(searcher.doc(doc.doc)));
+            }
+
+            for (ScoreDoc doc :hits2.scoreDocs) {
+                String id = getMatchingID(searcher.doc(doc.doc));
+                if (!results.contains(id)) {
+                    results.add(id);
+                }
+            }
+
+        // for a NOT we need to perform many request
+        } else if (operator == SerialChainFilter.NOT) {
+            TopDocs hits1;
+            if (sort != null)
+                hits1 = searcher.search(query, f, maxRecords, sort);
+            else
+                hits1 = searcher.search(query, f, maxRecords);
+
+            List<String> unWanteds = new ArrayList<String>();
+            for (ScoreDoc doc :hits1.scoreDocs) {
+                unWanteds.add(getMatchingID(searcher.doc(doc.doc)));
+            }
+
+            TopDocs hits2;
+            if (sort != null)
+                hits2 = searcher.search(simpleQuery, null, maxRecords, sort);
+            else
+               hits2 = searcher.search(simpleQuery, maxRecords);
+
+            for (ScoreDoc doc :hits2.scoreDocs) {
+                String id = getMatchingID(searcher.doc(doc.doc));
+                if (!unWanteds.contains(id)) {
+                    results.add(id);
+                }
+            }
+
+        } else {
+            throw new IllegalArgumentException("unsupported logical Operator");
+        }
+
+        // if we have some subQueries we execute it separely and merge the result
+        if (spatialQuery.getSubQueries().size() > 0) {
+            SpatialQuery sub = spatialQuery.getSubQueries().get(0);
+            List<String> subResults =  doSearch(sub);
+            for (String r: results) {
+                if (!subResults.contains(r)) {
+                    results.remove(r);
+                }
+            }
+        }
+
+        logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
+        return results;
+    }
+
+    public void destroy() {
+        try {
+            if (searcher != null)
+                searcher.close();
+        } catch (IOException ex) {
+            logger.info("IOException while closing the indexer");
+        }
     }
 
 }

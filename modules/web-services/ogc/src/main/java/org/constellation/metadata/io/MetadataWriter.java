@@ -31,9 +31,8 @@ import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
-import org.constellation.metadata.index.IndexLucene;
+import org.constellation.metadata.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -60,15 +59,15 @@ public abstract class MetadataWriter {
     /**
      * An indexer lucene to add object into the index.
      */
-    protected final IndexLucene index;
+    protected final AbstractIndexer indexer;
     
     /**
      * Build a new metadata writer.
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MetadataWriter(IndexLucene index) throws SQLException {
-        this.index        = index;
+    public MetadataWriter(AbstractIndexer indexer) throws SQLException {
+        this.indexer        = indexer;
     }
 
     /**
