@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -124,4 +125,33 @@ public class DomainType {
     public String getName() {
         return name;
     }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DomainType) {
+            final DomainType that = (DomainType) object;
+            return Utilities.equals(this.defaultValue, that.defaultValue) &&
+                   Utilities.equals(this.metadata,     that.metadata)     &&
+                   Utilities.equals(this.name,         that.name)         &&
+                   Utilities.equals(this.value,        that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 89 * hash + (this.defaultValue != null ? this.defaultValue.hashCode() : 0);
+        hash = 89 * hash + (this.metadata != null ? this.metadata.hashCode() : 0);
+        hash = 89 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+
 }

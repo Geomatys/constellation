@@ -169,13 +169,16 @@ public class AddressType {
         if (object == this) {
             return true;
         }
-        final AddressType that = (AddressType) object;
+        if (object instanceof AddressType) {
+            final AddressType that = (AddressType) object;
             return Utilities.equals(this.administrativeArea,    that.administrativeArea)    &&
                    Utilities.equals(this.city,                  that.city)                  && 
                    Utilities.equals(this.country,               that.country)               && 
                    Utilities.equals(this.deliveryPoint,         that.deliveryPoint)         &&
                    Utilities.equals(this.electronicMailAddress, that.electronicMailAddress) &&
                    Utilities.equals(this.postalCode,            that.postalCode) ;
+        }
+        return false;
     }
 
     @Override

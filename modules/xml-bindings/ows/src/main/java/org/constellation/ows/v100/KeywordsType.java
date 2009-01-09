@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -98,5 +99,29 @@ public class KeywordsType {
      */
     public CodeType getType() {
         return type;
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof KeywordsType) {
+            final KeywordsType that = (KeywordsType) object;
+            return Utilities.equals(this.keyword, that.keyword) &&
+                   Utilities.equals(this.type,    that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.keyword != null ? this.keyword.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 }

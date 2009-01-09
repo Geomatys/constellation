@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.ws.ServiceVersion;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -112,7 +113,33 @@ public class ExceptionReport {
     public String getLanguage() {
         return language;
     }
-    
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ExceptionReport) {
+            final ExceptionReport that = (ExceptionReport) object;
+            return Utilities.equals(this.exception, that.exception) &&
+                   Utilities.equals(this.language,  that.language)   &&
+                   Utilities.equals(this.version,   that.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.exception != null ? this.exception.hashCode() : 0);
+        hash = 41 * hash + (this.version != null ? this.version.hashCode() : 0);
+        hash = 41 * hash + (this.language != null ? this.language.hashCode() : 0);
+        return hash;
+    }
+
     /**
      * Return a String representation of the exception report.
      * 

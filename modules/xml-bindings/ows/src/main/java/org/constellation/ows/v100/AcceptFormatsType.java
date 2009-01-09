@@ -108,8 +108,11 @@ public class AcceptFormatsType {
         if (object == this) {
             return true;
         }
-        final AcceptFormatsType that = (AcceptFormatsType) object;
-        return Utilities.equals(this.outputFormat, that.outputFormat);
+        if (object instanceof AcceptFormatsType) {
+            final AcceptFormatsType that = (AcceptFormatsType) object;
+            return Utilities.equals(this.outputFormat, that.outputFormat);
+        }
+        return false;
     }
 
     @Override

@@ -173,13 +173,14 @@ public class BoundingBoxType {
         if (object == this) {
             return true;
         }
-        final BoundingBoxType that = (BoundingBoxType) object;
-
-        return Utilities.equals(this.crs        , that.crs)         &&
-               Utilities.equals(this.dimensions , that.dimensions)  &&
-               Utilities.equals(this.lowerCorner, that.lowerCorner) &&
-               Utilities.equals(this.upperCorner, that.upperCorner);
-        
+        if (object instanceof BoundingBoxType) {
+            final BoundingBoxType that = (BoundingBoxType) object;
+            return Utilities.equals(this.crs        , that.crs)         &&
+                   Utilities.equals(this.dimensions , that.dimensions)  &&
+                   Utilities.equals(this.lowerCorner, that.lowerCorner) &&
+                   Utilities.equals(this.upperCorner, that.upperCorner);
+        }
+        return false;
     }
 
     @Override

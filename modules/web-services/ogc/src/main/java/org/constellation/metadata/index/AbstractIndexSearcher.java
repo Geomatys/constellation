@@ -69,6 +69,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * The maximum size of the map of queries.
      */
     private final static int MaxCachedQueriesSize = 50;
+
+    /**
+     * A flag indicating if the cache system for query is enabled.
+     */
+    private final boolean isCacheEnabled;
     
     /**
      * Build a new index searcher.
@@ -79,6 +84,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     public AbstractIndexSearcher(File configDir, String serviceID) {
         super();
         setFileDirectory(new File(configDir, serviceID + "index"));
+        isCacheEnabled = true;
     }
 
     /**
@@ -123,7 +129,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         long start = System.currentTimeMillis();
 
         //we look for a cached Query
-        if (cachedQueries.containsKey(spatialQuery)) {
+        if (isCacheEnabled && cachedQueries.containsKey(spatialQuery)) {
             logger.info("returning result from cache");
             return cachedQueries.get(spatialQuery);
         }
@@ -248,11 +254,13 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * @param results
      */
     private void putInCache(SpatialQuery query, List<String> results) {
-        // if we had reach the maximum cache size we remove the first request
-        if (cachedQueries.size() >= MaxCachedQueriesSize) {
-            cachedQueries.remove(cachedQueries.keySet().iterator().next());
+        if (isCacheEnabled) {
+            // if we had reach the maximum cache size we remove the first request
+            if (cachedQueries.size() >= MaxCachedQueriesSize) {
+                cachedQueries.remove(cachedQueries.keySet().iterator().next());
+            }
+            cachedQueries.put(query, results);
         }
-        cachedQueries.put(query, results);
     }
 
     public void destroy() {

@@ -106,11 +106,13 @@ public class ServiceProvider {
         if (object == this) {
             return true;
         }
-        final ServiceProvider that = (ServiceProvider) object;
-
-        return Utilities.equals(this.providerName,   that.providerName) &&
-               Utilities.equals(this.providerSite,   that.providerSite) && 
-               Utilities.equals(this.serviceContact, that.serviceContact);
+        if (object instanceof ServiceProvider) {
+            final ServiceProvider that = (ServiceProvider) object;
+            return Utilities.equals(this.providerName,   that.providerName) &&
+                   Utilities.equals(this.providerSite,   that.providerSite) &&
+                   Utilities.equals(this.serviceContact, that.serviceContact);
+        }
+        return false;
     }
 
     @Override

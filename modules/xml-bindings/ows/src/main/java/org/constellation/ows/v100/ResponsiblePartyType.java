@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -102,5 +103,34 @@ public class ResponsiblePartyType {
     public CodeType getRole() {
         return role;
     }
-    
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ResponsiblePartyType) {
+            final ResponsiblePartyType that = (ResponsiblePartyType) object;
+            return Utilities.equals(this.contactInfo,      that.contactInfo)    &&
+                   Utilities.equals(this.individualName,   that.individualName) &&
+                   Utilities.equals(this.positionName,     that.positionName)   &&
+                   Utilities.equals(this.role,             that.role)           &&
+                   Utilities.equals(this.organisationName, that.organisationName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + (this.individualName != null ? this.individualName.hashCode() : 0);
+        hash = 37 * hash + (this.organisationName != null ? this.organisationName.hashCode() : 0);
+        hash = 37 * hash + (this.positionName != null ? this.positionName.hashCode() : 0);
+        hash = 37 * hash + (this.contactInfo != null ? this.contactInfo.hashCode() : 0);
+        hash = 37 * hash + (this.role != null ? this.role.hashCode() : 0);
+        return hash;
+    }
 }

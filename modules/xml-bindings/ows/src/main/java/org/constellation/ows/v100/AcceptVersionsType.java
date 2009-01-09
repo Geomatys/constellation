@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -89,6 +90,21 @@ public class AcceptVersionsType {
      */
     public void addVersion(String version) {
         this.version.add(version);
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AcceptVersionsType) {
+            final AcceptVersionsType that = (AcceptVersionsType) object;
+            return Utilities.equals(this.version, that.version);
+        }
+        return false;
     }
 
 }

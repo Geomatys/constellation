@@ -130,13 +130,15 @@ public class ContactType {
         if (object == this) {
             return true;
         }
-        final ContactType that = (ContactType) object;
-
-        return Utilities.equals(this.address,             that.address)             &&
-               Utilities.equals(this.contactInstructions, that.contactInstructions) &&
-               Utilities.equals(this.hoursOfService,      that.hoursOfService)      &&
-               Utilities.equals(this.onlineResource,      that.onlineResource)      &&
-               Utilities.equals(this.phone,               that.phone);
+        if (object instanceof ContactType) {
+            final ContactType that = (ContactType) object;
+            return Utilities.equals(this.address,             that.address)             &&
+                   Utilities.equals(this.contactInstructions, that.contactInstructions) &&
+                   Utilities.equals(this.hoursOfService,      that.hoursOfService)      &&
+                   Utilities.equals(this.onlineResource,      that.onlineResource)      &&
+                   Utilities.equals(this.phone,               that.phone);
+        }
+        return false;
     }
 
     @Override

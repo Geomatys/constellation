@@ -122,12 +122,14 @@ public class ResponsiblePartySubsetType {
         if (object == this) {
             return true;
         }
-        final ResponsiblePartySubsetType that = (ResponsiblePartySubsetType) object;
-
-        return Utilities.equals(this.contactInfo,    that.contactInfo)    &&
-               Utilities.equals(this.individualName, that.individualName) && 
-               Utilities.equals(this.positionName,   that.positionName)   &&
-               Utilities.equals(this.role,           that.role);
+        if (object instanceof ResponsiblePartySubsetType) {
+            final ResponsiblePartySubsetType that = (ResponsiblePartySubsetType) object;
+            return Utilities.equals(this.contactInfo,    that.contactInfo)    &&
+                   Utilities.equals(this.individualName, that.individualName) &&
+                   Utilities.equals(this.positionName,   that.positionName)   &&
+                   Utilities.equals(this.role,           that.role);
+        }
+        return false;
     }
 
     @Override

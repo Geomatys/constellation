@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -120,4 +121,29 @@ public class DescriptionType {
         return Collections.unmodifiableList(keywords);
     }
 
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DescriptionType) {
+            final DescriptionType that = (DescriptionType) object;
+            return Utilities.equals(this._abstract, that._abstract) &&
+                   Utilities.equals(this.keywords,  that.keywords)   &&
+                   Utilities.equals(this.title,     that.title);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 17 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 17 * hash + (this._abstract != null ? this._abstract.hashCode() : 0);
+        hash = 17 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
+        return hash;
+    }
 }

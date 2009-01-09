@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -135,4 +136,31 @@ public class ServiceIdentification extends DescriptionType {
         return this.accessConstraints;
     }
 
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ServiceIdentification) {
+            final ServiceIdentification that = (ServiceIdentification) object;
+            return Utilities.equals(this.accessConstraints,  that.accessConstraints) &&
+                   Utilities.equals(this.fees,               that.fees)              &&
+                   Utilities.equals(this.serviceType,        that.serviceType)       &&
+                   Utilities.equals(this.serviceTypeVersion, that.serviceTypeVersion);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (this.serviceType != null ? this.serviceType.hashCode() : 0);
+        hash = 37 * hash + (this.serviceTypeVersion != null ? this.serviceTypeVersion.hashCode() : 0);
+        hash = 37 * hash + (this.fees != null ? this.fees.hashCode() : 0);
+        hash = 37 * hash + (this.accessConstraints != null ? this.accessConstraints.hashCode() : 0);
+        return hash;
+    }
 }

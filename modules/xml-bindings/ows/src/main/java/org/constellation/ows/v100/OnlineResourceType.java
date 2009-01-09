@@ -152,15 +152,17 @@ public class OnlineResourceType extends AbstractOnlineResourceType {
         if (object == this) {
             return true;
         }
-        final OnlineResourceType that = (OnlineResourceType) object;
-
-        return Utilities.equals(this.actuate, that.actuate) &&
-               Utilities.equals(this.arcrole, that.arcrole) &&
-               Utilities.equals(this.href,    that.href)    &&
-               Utilities.equals(this.role,    that.role)    &&
-               Utilities.equals(this.show,    that.show)    &&
-               Utilities.equals(this.title,   that.title)   &&
-               Utilities.equals(this.type,    that.type);
+        if (object instanceof OnlineResourceType) {
+            final OnlineResourceType that = (OnlineResourceType) object;
+            return Utilities.equals(this.actuate, that.actuate) &&
+                   Utilities.equals(this.arcrole, that.arcrole) &&
+                   Utilities.equals(this.href,    that.href)    &&
+                   Utilities.equals(this.role,    that.role)    &&
+                   Utilities.equals(this.show,    that.show)    &&
+                   Utilities.equals(this.title,   that.title)   &&
+                   Utilities.equals(this.type,    that.type);
+        }
+        return false;
     }
 
     @Override
