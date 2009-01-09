@@ -708,22 +708,45 @@ public abstract class GenericMetadataReader extends MetadataReader {
         int size = w.size();
         for (int i = 0; i < size; i++) {
             double west = 0; double east = 0; double south = 0; double north = 0;
+            String westValue  = null; String eastValue  = null;
+            String southValue = null; String northValue = null;
             try {
-                if (w.get(i) != null) {
-                    west = Double.parseDouble(w.get(i));
+                westValue = w.get(i);
+                if (westValue != null) {
+                    if (westValue.indexOf(',') != -1) {
+                        westValue = westValue.substring(0, westValue.indexOf(','));
+                    }
+                    west = Double.parseDouble(westValue);
                 }
-                if (e.get(i) != null) {
-                    east = Double.parseDouble(e.get(i));
+                eastValue = e.get(i);
+                if (eastValue != null) {
+                    if (eastValue.indexOf(',') != -1) {
+                        eastValue = eastValue.substring(0, eastValue.indexOf(','));
+                    }
+                    east = Double.parseDouble(eastValue);
                 }
-                if (s.get(i) != null) {
-                    south = Double.parseDouble(s.get(i));
+                southValue = s.get(i);
+                if (southValue != null) {
+                    if (southValue.indexOf(',') != -1) {
+                        southValue = southValue.substring(0, southValue.indexOf(','));
+                    }
+                    south = Double.parseDouble(southValue);
                 }
-                if (n.get(i) != null) {
-                    north = Double.parseDouble(n.get(i));
+                northValue = n.get(i);
+                if (northValue != null) {
+                    north = Double.parseDouble(northValue);
+                }
+
+                // for point BBOX we replace the westValue equals to 0 by the eastValue (respectively for  north/south)
+                if (east == 0) {
+                    east = west;
+                }
+                if (north == 0) {
+                    north = south;
                 }
             } catch (NumberFormatException ex) {
                 logger.severe("Number format exception while parsing boundingBox: " + '\n' +
-                        "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
+                        "current box: " + westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
             }
             GeographicExtent geo = new GeographicBoundingBoxImpl(west, east, south, north);
             result.add(geo);

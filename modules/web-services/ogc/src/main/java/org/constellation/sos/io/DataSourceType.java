@@ -28,6 +28,8 @@ public enum DataSourceType {
 
     MDWEB,
 
-    POSTGRID_O_M
+    POSTGRID_O_M,
+
+    GENERIC_O_M
 
 }

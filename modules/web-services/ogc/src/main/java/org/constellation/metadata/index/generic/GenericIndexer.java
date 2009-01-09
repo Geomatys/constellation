@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -225,18 +226,49 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         String coord = "null";
         try {
             coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
-            double minx = Double.parseDouble(coord);
+            StringTokenizer tokens = new StringTokenizer(coord, ",;");
+            final double[] minx = new double[tokens.countTokens()];
+            int i = 0;
+            while (tokens.hasMoreTokens()) {
+                minx[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
 
             coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
-            double maxx = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] maxx = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                maxx[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
 
             coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
-            double maxy = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] maxy = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                maxy[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
 
             coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
-            double miny = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] miny = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                miny[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
 
-            addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+            if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
+                for (int j = 0; j < minx.length; j++)  {
+                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
+                }
+            } else {
+                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                        "cause: missing coordinates.: " + coord);
+            }
 
         } catch (NumberFormatException e) {
             if (!coord.equals("null")) {
@@ -283,20 +315,51 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         coord = "null";
         try {
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
-            double minx = Double.parseDouble(coord);
+            StringTokenizer tokens = new StringTokenizer(coord, ",;");
+            final double[] minx = new double[tokens.countTokens()];
+            int i = 0;
+            while (tokens.hasMoreTokens()) {
+                minx[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
                 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
-            double maxx = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] maxx = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                maxx[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
             
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
-            double maxy = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] maxy = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                maxy[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
             
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
-            double miny = Double.parseDouble(coord);
+            tokens = new StringTokenizer(coord, ",;");
+            final double[] miny = new double[tokens.countTokens()];
+            i = 0;
+            while (tokens.hasMoreTokens()) {
+                miny[i] = Double.parseDouble(tokens.nextToken());
+                i++;
+            }
                 
             String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
                 
-            addBoundingBox(doc, minx, maxx, miny, maxy, crs);
+            if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
+                for (int j = 0; j < minx.length; j++)  {
+                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
+                }
+            } else {
+                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                        "cause: missing coordinates.: " + coord);
+            }
             
         } catch (NumberFormatException e) {
             if (!coord.equals("null"))

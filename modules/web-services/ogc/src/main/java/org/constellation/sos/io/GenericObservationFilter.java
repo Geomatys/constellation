@@ -2,7 +2,6 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -25,6 +24,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.constellation.generic.filter.From;
+import org.constellation.generic.filter.Query;
+import org.constellation.generic.filter.Select;
+import org.constellation.generic.filter.Where;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
@@ -38,38 +41,41 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public class DefaultObservationFilter extends ObservationFilter {
+public class GenericObservationFilter extends ObservationFilter {
 
+    public final Query configurationQuery;
 
-    private StringBuilder SQLRequest;
+    public Query currentQuery;
 
     /**
      *
      */
     private final Connection connection;
 
-
-    /**
-     *
-     */
-    public DefaultObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) {
+    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) {
         super(observationIdBase, observationTemplateIdBase, map);
-        this.connection = connection;
+        this.configurationQuery = null;
+        this.connection         = connection;
     }
-
-
+    
     /**
      * Initialize the query.
      */
     @Override
     public void initFilterObservation(ResponseModeType requestMode) {
-        SQLRequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
-        if (requestMode == INLINE) {
-            SQLRequest.append(observationIdBase).append("%' AND ");
+        currentQuery  = new Query();
+        Select select = configurationQuery.getSelect("filterObservation");
+        From from     = configurationQuery.getFrom("observations");
+        Where where   = configurationQuery.getWhere("observationType");
 
+        if (requestMode == INLINE) {
+            where.replaceVariable("observationIdBase", observationIdBase);
         } else if (requestMode == RESULT_TEMPLATE) {
-            SQLRequest.append(observationTemplateIdBase).append("%' AND ");
+            where.replaceVariable("observationIdBase", observationTemplateIdBase);
         }
+        currentQuery.addSelect(select);
+        currentQuery.addFrom(from);
+        currentQuery.addWhere(where);
     }
 
     /**
@@ -77,9 +83,14 @@ public class DefaultObservationFilter extends ObservationFilter {
      */
     @Override
     public void initFilterGetResult(String procedure) {
-        SQLRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
-        //we add to the request the property of the template
-        SQLRequest.append("procedure='").append(procedure).append("'");
+        currentQuery  = new Query();
+        Select select = configurationQuery.getSelect("filterResult");
+        From from     = configurationQuery.getFrom("observations");
+        Where where   = configurationQuery.getWhere("procedure");
+        where.replaceVariable("procedure", procedure);
+        currentQuery.addSelect(select);
+        currentQuery.addFrom(from);
+        currentQuery.addWhere(where);
     }
 
     /**
@@ -91,26 +102,26 @@ public class DefaultObservationFilter extends ObservationFilter {
      */
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
-        SQLRequest.append(" ( ");
         if (procedures.size() != 0) {
-
             for (String s : procedures) {
                 if (s != null) {
                     String dbId = map.getProperty(s);
                     if (dbId == null) {
                         dbId = s;
                     }
-                    SQLRequest.append(" procedure='").append(dbId).append("' OR ");
+                    Where where = configurationQuery.getWhere("procedure");
+                    where.replaceVariable("procedure", dbId);
+                    currentQuery.addWhere(where);
                 }
             }
         } else {
             //if is not specified we use all the process of the offering
             for (ReferenceEntry proc : off.getProcedure()) {
-                SQLRequest.append(" procedure='").append(proc.getHref()).append("' OR ");
+                 Where where = configurationQuery.getWhere("procedure");
+                 where.replaceVariable("procedure", proc.getHref());
+                 currentQuery.addWhere(where);
             }
         }
-        SQLRequest.delete(SQLRequest.length() - 3, SQLRequest.length());
-        SQLRequest.append(") ");
     }
 
     /**
@@ -121,16 +132,16 @@ public class DefaultObservationFilter extends ObservationFilter {
      */
     @Override
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
-        SQLRequest.append(" AND( ");
         for (String p : phenomenon) {
-            SQLRequest.append(" observed_property='").append(p).append("' OR ");
-
+            Where where = configurationQuery.getWhere("simplePhenomenon");
+            where.replaceVariable("phenomenon", p);
+            currentQuery.addWhere(where);
         }
         for (String p : compositePhenomenon) {
-            SQLRequest.append(" observed_property_composite='").append(p).append("' OR ");
+            Where where = configurationQuery.getWhere("compositePhenomenon");
+            where.replaceVariable("phenomenon", p);
+            currentQuery.addWhere(where);
         }
-        SQLRequest.delete(SQLRequest.length() - 3, SQLRequest.length());
-        SQLRequest.append(") ");
     }
 
     /**
@@ -141,12 +152,11 @@ public class DefaultObservationFilter extends ObservationFilter {
      */
     @Override
     public void setFeatureOfInterest(List<String> fois) {
-        SQLRequest.append(" AND (");
         for (String foi : fois) {
-            SQLRequest.append("feature_of_interest_point='").append(foi).append("' OR");
+            Where where = configurationQuery.getWhere("foi");
+            where.replaceVariable("foi", foi);
+            currentQuery.addWhere(where);
         }
-        SQLRequest.delete(SQLRequest.length() - 3, SQLRequest.length());
-        SQLRequest.append(") ");
     }
 
     /**
@@ -162,23 +172,19 @@ public class DefaultObservationFilter extends ObservationFilter {
             String begin = getTimeValue(tp.getBeginPosition());
             String end = getTimeValue(tp.getEndPosition());
 
-            // we request directly a multiple observation or a period observation (one measure during a period)
-            SQLRequest.append("AND (");
-            SQLRequest.append(" sampling_time_begin='").append(begin).append("' AND ");
-            SQLRequest.append(" sampling_time_end='").append(end).append("') ");
+            Where where = configurationQuery.getWhere("tequalsTP");
+            where.replaceVariable("begin", begin);
+            where.replaceVariable("end", end);
+            currentQuery.addWhere(where);
 
         // if the temporal object is a timeInstant
         } else if (time instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) time;
             String position = getTimeValue(ti.getTimePosition());
-            SQLRequest.append("AND (");
 
-            // case 1 a single observation
-            SQLRequest.append("(sampling_time_begin='").append(position).append("' AND sampling_time_end=NULL)");
-            SQLRequest.append(" OR ");
-
-            //case 2 multiple observations containing a matching value
-            SQLRequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
+            Where where = configurationQuery.getWhere("tequalsTI");
+            where.replaceVariable("position", position);
+            currentQuery.addWhere(where);
 
         } else {
             throw new WebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
@@ -198,10 +204,10 @@ public class DefaultObservationFilter extends ObservationFilter {
         if (time instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) time;
             String position = getTimeValue(ti.getTimePosition());
-            SQLRequest.append("AND (");
-
-            // the single and multpile observations whitch begin after the bound
-            SQLRequest.append("(sampling_time_begin<='").append(position).append("'))");
+            
+            Where where = configurationQuery.getWhere("tbefore");
+            where.replaceVariable("time", position);
+            currentQuery.addWhere(where);
 
         } else {
             throw new WebServiceException("TM_Before operation require timeInstant!",
@@ -221,14 +227,10 @@ public class DefaultObservationFilter extends ObservationFilter {
         if (time instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) time;
             String position = getTimeValue(ti.getTimePosition());
-            SQLRequest.append("AND (");
-
-            // the single and multpile observations whitch begin after the bound
-            SQLRequest.append("(sampling_time_begin>='").append(position).append("')");
-            SQLRequest.append(" OR ");
-            // the multiple observations overlapping the bound
-            SQLRequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
-
+            
+            Where where = configurationQuery.getWhere("tafter");
+            where.replaceVariable("time", position);
+            currentQuery.addWhere(where);
 
         } else {
             throw new WebServiceException("TM_After operation require timeInstant!",
@@ -248,23 +250,11 @@ public class DefaultObservationFilter extends ObservationFilter {
             TimePeriodType tp = (TimePeriodType) time;
             String begin = getTimeValue(tp.getBeginPosition());
             String end = getTimeValue(tp.getEndPosition());
-            SQLRequest.append("AND (");
 
-            // the multiple observations included in the period
-            SQLRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("')");
-            SQLRequest.append(" OR ");
-            // the single observations included in the period
-            SQLRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)");
-            SQLRequest.append(" OR ");
-            // the multiple observations whitch overlaps the first bound
-            SQLRequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' AND sampling_time_end>='").append(begin).append("')");
-            SQLRequest.append(" OR ");
-            // the multiple observations whitch overlaps the second bound
-            SQLRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end>= '").append(end).append("' AND sampling_time_begin<='").append(end).append("')");
-            SQLRequest.append(" OR ");
-            // the multiple observations whitch overlaps the whole period
-            SQLRequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end>= '").append(end).append("'))");
-
+            Where where = configurationQuery.getWhere("tduring");
+            where.replaceVariable("begin", begin);
+            where.replaceVariable("end", end);
+            currentQuery.addWhere(where);
 
         } else {
             throw new WebServiceException("TM_During operation require TimePeriod!",
@@ -274,11 +264,12 @@ public class DefaultObservationFilter extends ObservationFilter {
 
     @Override
     public List<ObservationFilter.ObservationResult> filterResult() throws WebServiceException {
-        logger.info("request:" + SQLRequest.toString());
+        String request = currentQuery.buildSQLQuery();
+        logger.info("request:" + request);
         try {
             List<ObservationFilter.ObservationResult> results = new ArrayList<ObservationFilter.ObservationResult>();
             Statement currentStatement = connection.createStatement();
-            ResultSet result = currentStatement.executeQuery(SQLRequest.toString());
+            ResultSet result = currentStatement.executeQuery(request);
             while (result.next()) {
                 results.add(new ObservationFilter.ObservationResult(result.getString(1),
                                                                     result.getTimestamp(2),
@@ -289,7 +280,7 @@ public class DefaultObservationFilter extends ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            logger.severe("SQLExcpetion while executing the query: " + SQLRequest.toString());
+            logger.severe("SQLExcpetion while executing the query: " + request);
             throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
@@ -298,11 +289,12 @@ public class DefaultObservationFilter extends ObservationFilter {
 
     @Override
     public List<String> filterObservation() throws WebServiceException {
-        logger.info("request:" + SQLRequest.toString());
+        String request = currentQuery.buildSQLQuery();
+        logger.info("request:" + request);
         try {
             List<String> results = new ArrayList<String>();
             Statement currentStatement = connection.createStatement();
-            ResultSet result = currentStatement.executeQuery(SQLRequest.toString());
+            ResultSet result = currentStatement.executeQuery(request);
             while (result.next()) {
                 results.add(result.getString(1));
             }
@@ -310,7 +302,7 @@ public class DefaultObservationFilter extends ObservationFilter {
             currentStatement.close();
             return results;
         } catch (SQLException ex) {
-            logger.severe("SQLException while executing the query: " + SQLRequest.toString());
+            logger.severe("SQLException while executing the query: " + request);
             throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
