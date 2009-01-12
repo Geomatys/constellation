@@ -43,6 +43,8 @@ import org.apache.lucene.search.TopDocs;
 // constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.ws.WebServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -74,6 +76,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * A flag indicating if the cache system for query is enabled.
      */
     private final boolean isCacheEnabled;
+
+    /**
+     * A list of metadata ID ordered by DocID.
+     */
+    private  List<String> identifiers;
     
     /**
      * Build a new index searcher.
@@ -81,21 +88,44 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * @param configDir The configuration Directory where to build the indexDirectory.
      * @param serviceID the "ID" of the service (allow multiple index in the same directory). The value "" is allowed.
      */
-    public AbstractIndexSearcher(File configDir, String serviceID) {
+    public AbstractIndexSearcher(File configDir, String serviceID) throws WebServiceException {
         super();
-        setFileDirectory(new File(configDir, serviceID + "index"));
-        isCacheEnabled = true;
+        try {
+            setFileDirectory(new File(configDir, serviceID + "index"));
+            isCacheEnabled = true;
+            initSearcher();
+            initIdentifiersList();
+
+        } catch (CorruptIndexException ex) {
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (ParseException ex) {
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+        }
+        
     }
 
     /**
      * Returns the IndexSearcher of this index.
      */
     public void initSearcher() throws CorruptIndexException, IOException {
-       if (searcher == null) {
-            File indexDirectory = getFileDirectory();
-            logger.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
-            IndexReader ireader = IndexReader.open(indexDirectory);
-            searcher   = new IndexSearcher(ireader);
+        File indexDirectory = getFileDirectory();
+        IndexReader ireader = IndexReader.open(indexDirectory);
+        searcher   = new IndexSearcher(ireader);
+        logger.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
+       
+    }
+
+    /**
+     * Fill the list of identifiers ordered by doc ID
+     */
+    public final void initIdentifiersList() throws IOException, CorruptIndexException, ParseException {
+        long start = System.currentTimeMillis();
+        identifiers = new ArrayList<String>();
+        for (int i = 0; i < searcher.maxDoc(); i++) {
+            String metadataID = getMatchingID(searcher.doc(i));
+            identifiers.add(i, metadataID);
         }
     }
 
@@ -127,18 +157,18 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      */
     public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
         long start = System.currentTimeMillis();
-
+        List<String> results = new ArrayList<String>();
+        
         //we look for a cached Query
         if (isCacheEnabled && cachedQueries.containsKey(spatialQuery)) {
-            logger.info("returning result from cache");
-            return cachedQueries.get(spatialQuery);
+            results = cachedQueries.get(spatialQuery);
+            logger.info("returning result from cache (" + results.size() +" matching documents)");
+            return results;
         }
         
         //we initialize the indexSearcher
         initSearcher();
         int maxRecords = searcher.maxDoc();
-
-        List<String> results = new ArrayList<String>();
 
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
@@ -167,13 +197,14 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
 
             TopDocs docs;
-            if (sort != null)
+            if (sort != null) {
                 docs = searcher.search(query, f, maxRecords, sort);
-            else
+            } else {
                 docs = searcher.search(query, f, maxRecords);
+            }
 
             for (ScoreDoc doc :docs.scoreDocs) {
-                results.add(getMatchingID(searcher.doc(doc.doc)));
+                results.add(identifiers.get(doc.doc));
             }
 
         // for a OR we need to perform many request
@@ -189,11 +220,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             }
 
             for (ScoreDoc doc :hits1.scoreDocs) {
-                results.add(getMatchingID(searcher.doc(doc.doc)));
+                results.add(identifiers.get(doc.doc));
             }
 
             for (ScoreDoc doc :hits2.scoreDocs) {
-                String id = getMatchingID(searcher.doc(doc.doc));
+                String id = identifiers.get(doc.doc);
                 if (!results.contains(id)) {
                     results.add(id);
                 }
@@ -209,7 +240,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
             List<String> unWanteds = new ArrayList<String>();
             for (ScoreDoc doc :hits1.scoreDocs) {
-                unWanteds.add(getMatchingID(searcher.doc(doc.doc)));
+                unWanteds.add(identifiers.get(doc.doc));
             }
 
             TopDocs hits2;
@@ -219,7 +250,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                hits2 = searcher.search(simpleQuery, maxRecords);
 
             for (ScoreDoc doc :hits2.scoreDocs) {
-                String id = getMatchingID(searcher.doc(doc.doc));
+                String id = identifiers.get(doc.doc);
                 if (!unWanteds.contains(id)) {
                     results.add(id);
                 }

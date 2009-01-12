@@ -27,6 +27,9 @@ import java.util.logging.Logger;
 // Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.FieldSelectorResult;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
@@ -45,8 +48,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- *
- * @author guilhem
+ * A lucene filter for OGC spatial filter
+
+ * @author Guilhem legal
  */
 public class SpatialFilter extends Filter {
     
@@ -217,7 +221,7 @@ public class SpatialFilter extends Filter {
         termDocs.seek(new Term("geometry", "point"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
-            GeneralDirectPosition tempPoint = readPoint(reader.document(docNum));
+            GeneralDirectPosition tempPoint = readPoint(reader, docNum);
             Line2D pointLine                = new Line2D.Double(tempPoint.getOrdinate(0), tempPoint.getOrdinate(1), 
                                                                 tempPoint.getOrdinate(0), tempPoint.getOrdinate(1));
             switch (filterType) {
@@ -320,7 +324,7 @@ public class SpatialFilter extends Filter {
         termDocs.seek(new Term("geometry", "boundingbox"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
-            GeneralEnvelope tempBox = readBoundingBox(reader.document(docNum));
+            GeneralEnvelope tempBox = readBoundingBox(reader, docNum);
             if (tempBox == null)
                 continue;
             switch (filterType) {
@@ -437,7 +441,7 @@ public class SpatialFilter extends Filter {
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             
-            Line2D tempLine = readLine(reader.document(docNum));
+            Line2D tempLine = readLine(reader, docNum);
             GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(tempLine.getX1(), tempLine.getY1());
             tempPoint1.setCoordinateReferenceSystem(geometryCRS);
             GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(tempLine.getX2(), tempLine.getY2());
@@ -560,8 +564,9 @@ public class SpatialFilter extends Filter {
      * @param doc a Document containing a geometry of type bounding box.
      * @return a GeneralEnvelope.
      */
-    private GeneralEnvelope readBoundingBox(Document doc) {
-        
+    private GeneralEnvelope readBoundingBox(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
+        FieldSelector fs = new BboxFieldSelector();
+        Document doc = reader.document(docNum, fs);
 
         double minx = Double.parseDouble(doc.getField("minx").stringValue());
         double miny = Double.parseDouble(doc.getField("miny").stringValue());
@@ -625,8 +630,10 @@ public class SpatialFilter extends Filter {
      * @param doc a Document containing a geometry of type line.
      * @return a Line2D.
      */
-    private Line2D readLine(Document doc) {
-        
+    private Line2D readLine(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
+        FieldSelector fs = new LineFieldSelector();
+        Document doc= reader.document(docNum, fs);
+
         double x1 = Double.parseDouble(doc.getField("x1").stringValue());
         double y1 = Double.parseDouble(doc.getField("y1").stringValue());
         double x2 = Double.parseDouble(doc.getField("x2").stringValue());
@@ -657,8 +664,10 @@ public class SpatialFilter extends Filter {
      * @param doc a Document containing a geometry of type point.
      * @return a GeneralDirectPosition.
      */
-    private GeneralDirectPosition readPoint(Document doc) {
-        
+    private GeneralDirectPosition readPoint(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
+        FieldSelector fs = new PointFieldSelector();
+        Document doc= reader.document(docNum, fs);
+
         double x = Double.parseDouble(doc.getField("x").stringValue());
         double y = Double.parseDouble(doc.getField("y").stringValue());
         String sourceCRSName = doc.getField("CRS").stringValue();
@@ -892,5 +901,52 @@ public class SpatialFilter extends Filter {
         hash = 29 * hash + this.filterType;
         hash = 29 * hash + (int) (Double.doubleToLongBits(this.precision) ^ (Double.doubleToLongBits(this.precision) >>> 32));
         return hash;
+    }
+
+    private class BboxFieldSelector implements FieldSelector {
+
+        public FieldSelectorResult accept(String fieldName) {
+            if (fieldName != null) {
+                if (fieldName.equals("minx") || fieldName.equals("miny") ||
+                    fieldName.equals("maxx") || fieldName.equals("maxy") ||
+                    fieldName.equals("CRS")  || fieldName.equals("Title")) {
+                    return FieldSelectorResult.LOAD;
+                } else {
+                    return FieldSelectorResult.NO_LOAD;
+                }
+            }
+            return FieldSelectorResult.NO_LOAD;
+        }
+    }
+
+    private class LineFieldSelector implements FieldSelector {
+
+        public FieldSelectorResult accept(String fieldName) {
+            if (fieldName != null) {
+                if (fieldName.equals("x1") || fieldName.equals("y1") ||
+                    fieldName.equals("x2") || fieldName.equals("y2") ||
+                    fieldName.equals("CRS")) {
+                    return FieldSelectorResult.LOAD;
+                } else {
+                    return FieldSelectorResult.NO_LOAD;
+                }
+            }
+            return FieldSelectorResult.NO_LOAD;
+        }
+    }
+
+    private class PointFieldSelector implements FieldSelector {
+
+        public FieldSelectorResult accept(String fieldName) {
+            if (fieldName != null) {
+                if (fieldName.equals("x") || fieldName.equals("y") ||
+                    fieldName.equals("CRS")) {
+                    return FieldSelectorResult.LOAD;
+                } else {
+                    return FieldSelectorResult.NO_LOAD;
+                }
+            }
+            return FieldSelectorResult.NO_LOAD;
+        }
     }
 }

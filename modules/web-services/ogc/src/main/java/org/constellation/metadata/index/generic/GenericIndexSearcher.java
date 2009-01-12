@@ -17,26 +17,35 @@
 
 package org.constellation.metadata.index.generic;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// constellation dependencies
 import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.ws.WebServiceException;
 
 /**
+ * A Lucene searcher for a Generic index.
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class GenericIndexSearcher extends AbstractIndexSearcher {
 
-    public GenericIndexSearcher(File configDir, String serviceID) {
+    public GenericIndexSearcher(File configDir, String serviceID) throws WebServiceException {
         super(configDir, serviceID);
     }
     
@@ -60,7 +69,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
         TopDocs hits = searcher.search(query, maxRecords);
 
         for (ScoreDoc doc :hits.scoreDocs) {
-            results.add(searcher.doc(doc.doc).get("id"));
+            results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
         }
         if (results.size() > 1)
             logger.warning("multiple record in lucene index for identifier: " + id);
@@ -79,5 +88,19 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
     @Override
     public void destroy() {
         super.destroy();
+    }
+
+    private class IDFieldSelector implements FieldSelector {
+
+        public FieldSelectorResult accept(String fieldName) {
+            if (fieldName != null) {
+                if (fieldName.equals("id")) {
+                    return FieldSelectorResult.LOAD;
+                } else {
+                    return FieldSelectorResult.NO_LOAD;
+                }
+            }
+            return FieldSelectorResult.NO_LOAD;
+        }
     }
 }

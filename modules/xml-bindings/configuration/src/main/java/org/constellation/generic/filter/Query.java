@@ -238,7 +238,56 @@ public class Query {
     }
 
     public String buildSQLQuery() {
-        return "";
+        StringBuilder sb = new StringBuilder();
+        if (select != null) {
+            sb.append("SELECT ");
+            for (Select s : select) {
+                sb.append(s).append(" , ");
+            }
+            if (select.size() > 0)
+               sb = sb.delete(sb.length() - 3, sb.length());
+        }
+        if (from != null) {
+            sb.append("FROM ");
+            for (From s : from) {
+                sb.append(s).append(" , ");
+            }
+            if (from.size() > 0)
+               sb = sb.delete(sb.length() - 3, sb.length());
+        }
+        if (where != null) {
+            sb.append("WHERE ");
+            for (Where s : where) {
+                sb.append(s).append(" AND ");
+            }
+            if (where.size() > 0)
+               sb = sb.delete(sb.length() - 5, sb.length());
+        }
+        /*if (union != null) {
+            sb.append("UNION ");
+            for (Union s : union) {
+                sb.append(s).append(" ");
+            }
+        }
+        if (complement != null) {
+            sb.append("COMPLEMENT: ");
+            for (Complement s : complement) {
+                sb.append(s).append(" ");
+            }
+        }*/
+        if (orderby != null) {
+            sb.append("ORDER BY ");
+            for (Orderby s : orderby) {
+                sb.append(s).append(" ");
+            }
+        }
+        if (groupby != null) {
+            sb.append("GROUP BY ");
+            for (Groupby s : groupby) {
+                sb.append(s).append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     @Override

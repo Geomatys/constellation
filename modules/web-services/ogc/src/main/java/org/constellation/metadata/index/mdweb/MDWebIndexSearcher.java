@@ -17,18 +17,26 @@
 
 package org.constellation.metadata.index.mdweb;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// Constellation dependencies
 import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.ws.WebServiceException;
 
 /**
  *
@@ -36,7 +44,7 @@ import org.constellation.metadata.index.AbstractIndexSearcher;
  */
 public class MDWebIndexSearcher extends AbstractIndexSearcher {
 
-    public MDWebIndexSearcher(File configDir, String serviceID) {
+    public MDWebIndexSearcher(File configDir, String serviceID) throws WebServiceException {
         super(configDir, serviceID);
     }
 
@@ -57,7 +65,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
         TopDocs hits = searcher.search(query, maxRecords);
 
         for (ScoreDoc doc :hits.scoreDocs) {
-            Document document = searcher.doc(doc.doc);
+            Document document = searcher.doc(doc.doc, new IDFieldSelector());
             results.add(document.get("id") + ':' + document.get("catalog"));
         }
         if (results.size() > 1)
@@ -79,4 +87,17 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
         super.destroy();
     }
 
+    private class IDFieldSelector implements FieldSelector {
+
+        public FieldSelectorResult accept(String fieldName) {
+            if (fieldName != null) {
+                if (fieldName.equals("id") || fieldName.equals("catalog")) {
+                    return FieldSelectorResult.LOAD;
+                } else {
+                    return FieldSelectorResult.NO_LOAD;
+                }
+            }
+            return FieldSelectorResult.NO_LOAD;
+        }
+    }
 }
