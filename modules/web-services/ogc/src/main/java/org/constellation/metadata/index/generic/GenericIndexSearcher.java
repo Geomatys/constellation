@@ -95,7 +95,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("id")) {
-                    return FieldSelectorResult.LOAD;
+                    return FieldSelectorResult.LOAD_AND_BREAK;
                 } else {
                     return FieldSelectorResult.NO_LOAD;
                 }

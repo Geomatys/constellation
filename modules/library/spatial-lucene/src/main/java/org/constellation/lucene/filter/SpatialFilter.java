@@ -567,12 +567,17 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new BboxFieldSelector();
         Document doc = reader.document(docNum, fs);
 
-        double minx = Double.parseDouble(doc.get("minx"));
-        double miny = Double.parseDouble(doc.get("miny"));
-        double maxx = Double.parseDouble(doc.get("maxx"));
-        double maxy = Double.parseDouble(doc.get("maxy"));
-        String sourceCRSName = doc.get("CRS");
-        
+        String fullBBOX = doc.get("fullBBOX");
+        double minx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
+        double maxx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
+        double miny = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
+        double maxy = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
+        String sourceCRSName = fullBBOX;
+
         double[] min = {minx, miny};
         double[] max = {maxx, maxy};
         GeneralEnvelope result = null;
@@ -633,11 +638,17 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new LineFieldSelector();
         Document doc= reader.document(docNum, fs);
 
-        double x1 = Double.parseDouble(doc.get("x1"));
-        double y1 = Double.parseDouble(doc.get("y1"));
-        double x2 = Double.parseDouble(doc.get("x2"));
-        double y2 = Double.parseDouble(doc.get("y2"));
-        String sourceCRSName = doc.get("CRS");
+        String fullLine = doc.get("fullLine");
+        double x1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
+        double y1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
+        double x2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
+        double y2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
+        String sourceCRSName = fullLine;
+        
         Line2D result = new Line2D.Double(x1, y1, x2, y2);
         try {
             if (!sourceCRSName.equals(geometryCRSName)) {
@@ -667,9 +678,12 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new PointFieldSelector();
         Document doc= reader.document(docNum, fs);
 
-        double x = Double.parseDouble(doc.get("x"));
-        double y = Double.parseDouble(doc.get("y"));
-        String sourceCRSName = doc.get("CRS");
+        String fullPoint = doc.get("fullPoint");
+        double x = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
+        fullPoint = fullPoint.substring(fullPoint.indexOf(',') + 1);
+        double y = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
+        fullPoint = fullPoint.substring(fullPoint.indexOf(',') + 1);
+        String sourceCRSName = fullPoint;
         GeneralDirectPosition result = new GeneralDirectPosition(y, x);
         
         try {
@@ -906,10 +920,8 @@ public class SpatialFilter extends Filter {
 
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
-                if (fieldName.equals("minx") || fieldName.equals("miny") ||
-                    fieldName.equals("maxx") || fieldName.equals("maxy") ||
-                    fieldName.equals("CRS")  || fieldName.equals("Title")) {
-                    return FieldSelectorResult.LOAD;
+                if (fieldName.equals("fullBBOX")) {
+                    return FieldSelectorResult.LOAD_AND_BREAK;
                 } else {
                     return FieldSelectorResult.NO_LOAD;
                 }
@@ -922,10 +934,8 @@ public class SpatialFilter extends Filter {
 
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
-                if (fieldName.equals("x1") || fieldName.equals("y1") ||
-                    fieldName.equals("x2") || fieldName.equals("y2") ||
-                    fieldName.equals("CRS")) {
-                    return FieldSelectorResult.LOAD;
+                if (fieldName.equals("fullLine")) {
+                    return FieldSelectorResult.LOAD_AND_BREAK;
                 } else {
                     return FieldSelectorResult.NO_LOAD;
                 }
@@ -938,9 +948,8 @@ public class SpatialFilter extends Filter {
 
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
-                if (fieldName.equals("x") || fieldName.equals("y") ||
-                    fieldName.equals("CRS")) {
-                    return FieldSelectorResult.LOAD;
+                if (fieldName.equals("fullPoint")) {
+                    return FieldSelectorResult.LOAD_AND_BREAK;
                 } else {
                     return FieldSelectorResult.NO_LOAD;
                 }

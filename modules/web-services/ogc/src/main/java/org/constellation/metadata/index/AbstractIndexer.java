@@ -26,6 +26,7 @@ import org.constellation.util.Utils;
 import org.constellation.ws.WebServiceException;
 
 /**
+ * An abstract lucene Indexer used to create and writer lucene index.
  *
  * @author Mehdi Sidhoum
  * @author Guilhem Legal
@@ -117,12 +118,9 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
     protected void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("maxx"     , maxx + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullBBOX", minx + "," + maxx + "," + miny + "," + maxy + "," + crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
         logger.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
+        
     }
 
     /**
@@ -136,9 +134,8 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
     protected void addPoint(Document doc, double y, double x, String crsName) {
         // convert the lat / long to lucene fields
         doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("y"        , y + "" , Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullPoint", x + "," + y + "," + crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+
 
     }
 
@@ -155,11 +152,7 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
     protected void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("y1"       , y1 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("x2"       , x2 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullLine", x1 + "," + y1 + "," + x2 + "," + y2 + "," + crsName , Field.Store.YES, Field.Index.NOT_ANALYZED));
     }
 
     public abstract void destroy();
