@@ -902,7 +902,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         singleValue.clear();
         multipleValue.clear();
         contacts.clear();
-        logger.info("destroying generic reader");
+        logger.info("destroying generic metadata reader");
     }
             
 }

@@ -31,13 +31,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -499,7 +499,7 @@ public class SOSworker {
            go.updateParameter("eventTime", range);
 
            //the process list
-           Set<String> procNames  = OMReader.getProcedureNames();
+           Collection<String> procNames  = OMReader.getProcedureNames();
            go.updateParameter("procedure", procNames);
 
            //the phenomenon list
@@ -1582,7 +1582,7 @@ public class SOSworker {
      * Return the referenceEntry with the specified href attribute.
      */
     private ReferenceEntry getReferenceFromHRef(String href) throws WebServiceException {
-        Set<ReferenceEntry> refs = OMReader.getReferences();
+        Collection<ReferenceEntry> refs = OMReader.getReferences();
         if (refs != null) {
             Iterator<ReferenceEntry> it = refs.iterator();
             while (it.hasNext()) {

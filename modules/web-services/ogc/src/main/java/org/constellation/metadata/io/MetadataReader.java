@@ -49,7 +49,7 @@ public abstract class MetadataReader {
     private final boolean isCacheEnabled;
 
     /**
-     * A flag indicating if the cache mecanism is enabled or not.
+     * A flag indicating if the multi thread mecanism is enabled or not.
      */
     private final boolean isThreadEnabled;
     

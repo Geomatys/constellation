@@ -17,6 +17,7 @@
 package org.constellation.ows.v110;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class Operation extends AbstractOperation {
     /**
      * Update the specified parameter with the list of values.
      */
-    public void updateParameter(String parameterName, Set<String> values) {
+    public void updateParameter(String parameterName, Collection<String> values) {
         for (DomainType dom: parameter) {
             if (dom.getName().equals(parameterName)) {
                 List<ValueType> valuesTyped = new ArrayList<ValueType>();

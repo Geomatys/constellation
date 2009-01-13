@@ -18,8 +18,8 @@
 package org.constellation.sos.io;
 
 // J2SE dependencies
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 // Constellation dependencies
@@ -56,19 +56,19 @@ public abstract class ObservationReader {
         this.observationIdBase = observationIdBase;
     }
     
-    public abstract Set<String> getOfferingNames() throws WebServiceException;
+    public abstract Collection<String> getOfferingNames() throws WebServiceException;
     
     public abstract ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException;
 
     public abstract List<ObservationOfferingEntry> getObservationOfferings() throws WebServiceException;
     
-    public abstract Set<String> getProcedureNames() throws WebServiceException;
+    public abstract Collection<String> getProcedureNames() throws WebServiceException;
     
-    public abstract Set<String> getPhenomenonNames() throws WebServiceException;
+    public abstract Collection<String> getPhenomenonNames() throws WebServiceException;
     
     public abstract PhenomenonEntry getPhenomenon(String phenomenonName) throws WebServiceException;
     
-    public abstract Set<String> getFeatureOfInterestNames() throws WebServiceException;
+    public abstract Collection<String> getFeatureOfInterestNames() throws WebServiceException;
     
     public abstract SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws WebServiceException;
     
@@ -76,7 +76,7 @@ public abstract class ObservationReader {
 
     public abstract AnyResultEntry getResult(String identifier) throws WebServiceException;
     
-    public abstract Set<ReferenceEntry> getReferences() throws WebServiceException;
+    public abstract Collection<ReferenceEntry> getReferences() throws WebServiceException;
     
     /**
      * Create a new identifier for an observation by searching in the O&M database.
