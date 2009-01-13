@@ -214,8 +214,7 @@ public class SpatialFilter extends Filter {
         // we prepare the result
         BitSet bits = new BitSet(reader.maxDoc());
         
-        TermDocs termDocs = reader.termDocs();
-        
+        TermDocs termDocs = reader.termDocs(new Term("geometry"));
                   
         // we are searching for matching points
         termDocs.seek(new Term("geometry", "point"));
@@ -568,11 +567,11 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new BboxFieldSelector();
         Document doc = reader.document(docNum, fs);
 
-        double minx = Double.parseDouble(doc.getField("minx").stringValue());
-        double miny = Double.parseDouble(doc.getField("miny").stringValue());
-        double maxx = Double.parseDouble(doc.getField("maxx").stringValue());
-        double maxy = Double.parseDouble(doc.getField("maxy").stringValue());
-        String sourceCRSName = doc.getField("CRS").stringValue();
+        double minx = Double.parseDouble(doc.get("minx"));
+        double miny = Double.parseDouble(doc.get("miny"));
+        double maxx = Double.parseDouble(doc.get("maxx"));
+        double maxy = Double.parseDouble(doc.get("maxy"));
+        String sourceCRSName = doc.get("CRS");
         
         double[] min = {minx, miny};
         double[] max = {maxx, maxy};
@@ -634,11 +633,11 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new LineFieldSelector();
         Document doc= reader.document(docNum, fs);
 
-        double x1 = Double.parseDouble(doc.getField("x1").stringValue());
-        double y1 = Double.parseDouble(doc.getField("y1").stringValue());
-        double x2 = Double.parseDouble(doc.getField("x2").stringValue());
-        double y2 = Double.parseDouble(doc.getField("y2").stringValue());
-        String sourceCRSName = doc.getField("CRS").stringValue();
+        double x1 = Double.parseDouble(doc.get("x1"));
+        double y1 = Double.parseDouble(doc.get("y1"));
+        double x2 = Double.parseDouble(doc.get("x2"));
+        double y2 = Double.parseDouble(doc.get("y2"));
+        String sourceCRSName = doc.get("CRS");
         Line2D result = new Line2D.Double(x1, y1, x2, y2);
         try {
             if (!sourceCRSName.equals(geometryCRSName)) {
@@ -668,9 +667,9 @@ public class SpatialFilter extends Filter {
         FieldSelector fs = new PointFieldSelector();
         Document doc= reader.document(docNum, fs);
 
-        double x = Double.parseDouble(doc.getField("x").stringValue());
-        double y = Double.parseDouble(doc.getField("y").stringValue());
-        String sourceCRSName = doc.getField("CRS").stringValue();
+        double x = Double.parseDouble(doc.get("x"));
+        double y = Double.parseDouble(doc.get("y"));
+        String sourceCRSName = doc.get("CRS");
         GeneralDirectPosition result = new GeneralDirectPosition(y, x);
         
         try {

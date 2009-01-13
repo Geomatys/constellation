@@ -27,9 +27,11 @@ import org.constellation.sos.io.DefaultObservationReader;
 import org.constellation.sos.io.DefaultObservationWriter;
 import org.constellation.sos.io.FileSensorReader;
 import org.constellation.sos.io.FileSensorWriter;
+import org.constellation.sos.io.GenericObservationFilter;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
@@ -47,8 +49,15 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationFilter getObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) throws WebServiceException {
-        return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, connection);
+    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDir) throws WebServiceException {
+      switch (type) {
+            case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, connection);
+
+            case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, connection, configDir);
+
+            default: throw new IllegalArgumentException("Unknow observationFilter type: " + type);
+        }
+
     }
 
     @Override

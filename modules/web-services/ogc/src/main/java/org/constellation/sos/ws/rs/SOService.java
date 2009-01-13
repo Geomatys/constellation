@@ -69,7 +69,7 @@ public class SOService extends OGCWebService {
      */
     public SOService() throws JAXBException, WebServiceException {
         super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
-        worker = new SOSworker(SOSworker.TRANSACTIONAL);
+        worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
         setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
                 "org.constellation.observation:org.constellation.sml.v100:org.constellation.sml.v101", "");
     }

@@ -302,7 +302,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if (results == null) {
             results = getDatabase().getTable(AnyResultTable.class);
         }
-        AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
+        AnyResultEntry any = results.getEntry(result.getInt(indexOf(query.result)));
         Object resultat = null;
         if (any != null) {
             if (any.getReference() == null && any.getArray() != null) {

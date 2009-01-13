@@ -377,7 +377,9 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public AbstractTimeGeometricPrimitiveType getSamplingTime() {
-        return samplingTime.getTimeGeometricPrimitive();
+        if (samplingTime != null)
+            return samplingTime.getTimeGeometricPrimitive();
+        return null;
         
     }
     
@@ -402,7 +404,9 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public AbstractTimeGeometricPrimitiveType getProcedureTime() {
-        return procedureTime.getTimeGeometricPrimitive();
+        if (procedureTime != null)
+            return procedureTime.getTimeGeometricPrimitive();
+        return null;
         
     }
     
@@ -485,7 +489,7 @@ public class ObservationEntry extends Entry implements Observation {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof ObservationEntry && super.equals(object)) {
             final ObservationEntry that = (ObservationEntry) object;
             return Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
                    Utilities.equals(this.observedProperty,    that.observedProperty)    &&

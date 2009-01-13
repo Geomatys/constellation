@@ -242,23 +242,23 @@ public class Query {
         if (select != null) {
             sb.append("SELECT ");
             for (Select s : select) {
-                sb.append(s).append(" , ");
+                sb.append(s.getvalue()).append(" , ");
             }
             if (select.size() > 0)
                sb = sb.delete(sb.length() - 3, sb.length());
         }
         if (from != null) {
-            sb.append("FROM ");
+            sb.append(" FROM ");
             for (From s : from) {
-                sb.append(s).append(" , ");
+                sb.append(s.getvalue()).append(" , ");
             }
             if (from.size() > 0)
                sb = sb.delete(sb.length() - 3, sb.length());
         }
         if (where != null) {
-            sb.append("WHERE ");
+            sb.append(" WHERE ");
             for (Where s : where) {
-                sb.append(s).append(" AND ");
+                sb.append('(').append(s.getvalue()).append(") AND ");
             }
             if (where.size() > 0)
                sb = sb.delete(sb.length() - 5, sb.length());
@@ -276,15 +276,15 @@ public class Query {
             }
         }*/
         if (orderby != null) {
-            sb.append("ORDER BY ");
+            sb.append(" ORDER BY ");
             for (Orderby s : orderby) {
-                sb.append(s).append(" ");
+                sb.append(s.getvalue()).append(" ");
             }
         }
         if (groupby != null) {
-            sb.append("GROUP BY ");
+            sb.append(" GROUP BY ");
             for (Groupby s : groupby) {
-                sb.append(s).append(" ");
+                sb.append(s.getvalue()).append(" ");
             }
         }
         return sb.toString();

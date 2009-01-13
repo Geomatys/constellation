@@ -91,9 +91,14 @@ public class DataArrayPropertyType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof DataArrayPropertyType) {
             final DataArrayPropertyType that = (DataArrayPropertyType) object;
-            return Utilities.equals(this.dataArray,   that.dataArray);
+            if (this.dataArray == null && that.dataArray == null) {
+                return true;
+            } else if (this.dataArray != null && that.dataArray != null) {
+                return Utilities.equals(this.dataArray.getValue(), that.dataArray.getValue());
+            }
+            return false;
         }
         return false;
     }

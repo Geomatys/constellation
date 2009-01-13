@@ -99,6 +99,7 @@ import org.constellation.sos.ResponseModeType;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
@@ -242,14 +243,14 @@ public class SOSworker {
      */
     private final SensorWriter SMLWriter;
 
-    private final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+    public static final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
     
     /**
      * Initialize the database connection.
      */
-    public SOSworker(int profile) throws WebServiceException {
+    public SOSworker(int profile, File configurationDirectory) throws WebServiceException {
         this.profile = profile;
         if (profile != TRANSACTIONAL && profile != DISCOVERY) {
             throw new IllegalArgumentException("the flag profile must be equals to TRANSACTIONAL or DISCOVERY!");
@@ -259,18 +260,21 @@ public class SOSworker {
         Properties prop = new Properties();
         map   = new Properties();
         File f = null;
-        File env = getSicadeDirectory();
-        logger.info("path to config file=" + env);
+        if (configurationDirectory == null) {
+            configurationDirectory = getSicadeDirectory();
+        } 
+        logger.info("path to config file=" + configurationDirectory);
+        File sosConfigDir = new File(configurationDirectory, "sos_configuration");
         boolean start = true;
         try {
             // we get the configuration file
-            f = new File(env, "/sos_configuration/config.properties");
+            f = new File(sosConfigDir, "config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
             in.close();
             
             // the file who record the map between phisycal ID and DB ID.
-            f = new File(env, "/sos_configuration/mapping.properties");
+            f = new File(sosConfigDir, "mapping.properties");
             in = new FileInputStream(f);
             map.load(in);
             in.close();
@@ -293,8 +297,29 @@ public class SOSworker {
             start = false;
         }
 
+        //we get the O&M filter Type
+        String omfType = prop.getProperty("OMFilterType");
+        ObservationFilterType OMFilterType = null;
+        if (omfType != null) {
+            try {
+                OMFilterType = ObservationFilterType.valueOf(omfType);
+            } catch (IllegalArgumentException ex) {
+                logger.severe("unknow OM Filter type:" + omfType);
+            }
+        }
+        if (OMFilterType == null)
+            OMFilterType = ObservationFilterType.DEFAULT;
+
         //we get the Sensor reader type
-        DataSourceType SMLType = DataSourceType.valueOf(prop.getProperty("SMLDataSourceType"));
+        String smlt = prop.getProperty("SMLDataSourceType");
+        DataSourceType SMLType = null;
+        if (smlt != null)  {
+            try {
+                SMLType = DataSourceType.valueOf(smlt);
+            } catch (IllegalArgumentException ex) {
+                logger.severe("unknow SML type:" + smlt);
+            }
+        }
         if (SMLType == null)
             SMLType = DataSourceType.MDWEB;
 
@@ -317,7 +342,7 @@ public class SOSworker {
                 if (path != null) {
                     dataDirectory = new File(path);
                 } else {
-                    dataDirectory = new File(env, "sensors");
+                    dataDirectory = new File(sosConfigDir, "sensors");
                     if (!dataDirectory.exists())
                         dataDirectory.mkdir();
                 }
@@ -362,7 +387,7 @@ public class SOSworker {
             SMLWriter = SOSfactory.getSensorWriter(SMLType, dataDirectory, SMLconnection, sensorIdBase);
             OMReader  = SOSfactory.getObservationReader(dataSourceOM, observationIdBase);
             OMWriter  = SOSfactory.getObservationWriter(dataSourceOM);
-            OMFilter  = SOSfactory.getObservationFilter(observationIdBase, observationTemplateIdBase, map, OMConnection);
+            OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConnection, sosConfigDir);
 
             logger.info("SOS service running");
             
@@ -1275,7 +1300,7 @@ public class SOSworker {
                 } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    String propertyName = (String)time.getTDuring().getRest().get(0);
+                    String propertyName = time.getTDuring().getPropertyName();
                     Object timeFilter   = time.getTDuring().getRest().get(0);
 
                     if (!template) {

@@ -130,7 +130,7 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof DataArrayEntry && super.equals(object)) {
             final DataArrayEntry that = (DataArrayEntry) object;
             return Utilities.equals(this.elementType,   that.elementType)   &&
                    Utilities.equals(this.encoding,    that.encoding)    &&

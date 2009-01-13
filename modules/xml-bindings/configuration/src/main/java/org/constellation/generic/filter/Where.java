@@ -89,8 +89,11 @@ public class Where {
         this.value = value;
     }
 
-    public void replaceVariable(String varName, String varValue) {
-        value = value.replaceAll('&' + varName, varValue);
+    public void replaceVariable(String varName, String varValue, boolean withQuote) {
+        if (withQuote)
+            value = value.replaceAll('&' + varName, "'" + varValue + "'");
+        else
+            value = value.replaceAll('&' + varName, varValue);
     }
 
     @Override

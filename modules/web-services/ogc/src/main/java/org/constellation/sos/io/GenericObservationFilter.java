@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.filter.From;
 import org.constellation.generic.filter.Query;
 import org.constellation.generic.filter.Select;
@@ -52,10 +56,26 @@ public class GenericObservationFilter extends ObservationFilter {
      */
     private final Connection connection;
 
-    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) {
+    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection,
+            File configDir) throws WebServiceException {
         super(observationIdBase, observationTemplateIdBase, map);
-        this.configurationQuery = null;
-        this.connection         = connection;
+        try {
+            JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            File affinage = new File(configDir, "affinage.xml");
+            if (affinage.exists()) {
+                Object object = unmarshaller.unmarshal(affinage);
+                if (object instanceof Query)
+                    this.configurationQuery = (Query) object;
+                else
+                    throw new WebServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
+            } else {
+                throw new WebServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
+            }
+            this.connection = connection;
+        } catch (JAXBException ex) {
+            throw new WebServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
+        }
     }
     
     /**
@@ -69,9 +89,9 @@ public class GenericObservationFilter extends ObservationFilter {
         Where where   = configurationQuery.getWhere("observationType");
 
         if (requestMode == INLINE) {
-            where.replaceVariable("observationIdBase", observationIdBase);
+            where.replaceVariable("observationIdBase", observationIdBase, false);
         } else if (requestMode == RESULT_TEMPLATE) {
-            where.replaceVariable("observationIdBase", observationTemplateIdBase);
+            where.replaceVariable("observationIdBase", observationTemplateIdBase, false);
         }
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
@@ -87,7 +107,7 @@ public class GenericObservationFilter extends ObservationFilter {
         Select select = configurationQuery.getSelect("filterResult");
         From from     = configurationQuery.getFrom("observations");
         Where where   = configurationQuery.getWhere("procedure");
-        where.replaceVariable("procedure", procedure);
+        where.replaceVariable("procedure", procedure, true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
         currentQuery.addWhere(where);
@@ -110,7 +130,7 @@ public class GenericObservationFilter extends ObservationFilter {
                         dbId = s;
                     }
                     Where where = configurationQuery.getWhere("procedure");
-                    where.replaceVariable("procedure", dbId);
+                    where.replaceVariable("procedure", dbId, true);
                     currentQuery.addWhere(where);
                 }
             }
@@ -118,7 +138,7 @@ public class GenericObservationFilter extends ObservationFilter {
             //if is not specified we use all the process of the offering
             for (ReferenceEntry proc : off.getProcedure()) {
                  Where where = configurationQuery.getWhere("procedure");
-                 where.replaceVariable("procedure", proc.getHref());
+                 where.replaceVariable("procedure", proc.getHref(), true);
                  currentQuery.addWhere(where);
             }
         }
@@ -134,12 +154,12 @@ public class GenericObservationFilter extends ObservationFilter {
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         for (String p : phenomenon) {
             Where where = configurationQuery.getWhere("simplePhenomenon");
-            where.replaceVariable("phenomenon", p);
+            where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
         for (String p : compositePhenomenon) {
             Where where = configurationQuery.getWhere("compositePhenomenon");
-            where.replaceVariable("phenomenon", p);
+            where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
     }
@@ -154,7 +174,7 @@ public class GenericObservationFilter extends ObservationFilter {
     public void setFeatureOfInterest(List<String> fois) {
         for (String foi : fois) {
             Where where = configurationQuery.getWhere("foi");
-            where.replaceVariable("foi", foi);
+            where.replaceVariable("foi", foi, true);
             currentQuery.addWhere(where);
         }
     }
@@ -173,8 +193,8 @@ public class GenericObservationFilter extends ObservationFilter {
             String end = getTimeValue(tp.getEndPosition());
 
             Where where = configurationQuery.getWhere("tequalsTP");
-            where.replaceVariable("begin", begin);
-            where.replaceVariable("end", end);
+            where.replaceVariable("begin", begin, true);
+            where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
 
         // if the temporal object is a timeInstant
@@ -183,7 +203,7 @@ public class GenericObservationFilter extends ObservationFilter {
             String position = getTimeValue(ti.getTimePosition());
 
             Where where = configurationQuery.getWhere("tequalsTI");
-            where.replaceVariable("position", position);
+            where.replaceVariable("position", position, true);
             currentQuery.addWhere(where);
 
         } else {
@@ -206,7 +226,7 @@ public class GenericObservationFilter extends ObservationFilter {
             String position = getTimeValue(ti.getTimePosition());
             
             Where where = configurationQuery.getWhere("tbefore");
-            where.replaceVariable("time", position);
+            where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
         } else {
@@ -229,7 +249,7 @@ public class GenericObservationFilter extends ObservationFilter {
             String position = getTimeValue(ti.getTimePosition());
             
             Where where = configurationQuery.getWhere("tafter");
-            where.replaceVariable("time", position);
+            where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
         } else {
@@ -252,8 +272,8 @@ public class GenericObservationFilter extends ObservationFilter {
             String end = getTimeValue(tp.getEndPosition());
 
             Where where = configurationQuery.getWhere("tduring");
-            where.replaceVariable("begin", begin);
-            where.replaceVariable("end", end);
+            where.replaceVariable("begin", begin, true);
+            where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
 
         } else {

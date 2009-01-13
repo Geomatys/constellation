@@ -23,6 +23,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
@@ -40,7 +41,7 @@ public abstract class AbstractSOSFactory extends AbstractFactory {
         super(priority);
     }
 
-    public abstract ObservationFilter getObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) throws WebServiceException;
+    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDirectory) throws WebServiceException;
 
     public abstract ObservationReader getObservationReader(DataSource dataSourceOM, String observationIdBase) throws WebServiceException;
 

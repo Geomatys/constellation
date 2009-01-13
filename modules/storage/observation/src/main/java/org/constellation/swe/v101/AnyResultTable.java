@@ -61,7 +61,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      */
     private AnyResultTable(final AnyResultQuery query) {
         super(query);
-        setIdentifierParameters(query.byIdResult, null);
+        setIdentifierParameters(null, query.byIdResult);
     }
    
     /**
@@ -75,7 +75,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                  references = getDatabase().getTable(ReferenceTable.class);
             }
             ReferenceEntry ref = references.getEntry(idRef);
-            return new AnyResultEntry(results.getString(indexOf(query.idResult)), ref);
+            return new AnyResultEntry(results.getInt(indexOf(query.idResult)) + "", ref);
          } else {
 
             if(dataArrays == null) {
@@ -87,7 +87,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                                                       entry.getElementType(),
                                                       entry.getEncoding(),
                                                       results.getString(indexOf(query.values))); 
-            return new AnyResultEntry(results.getString(indexOf(query.idResult)), array);
+            return new AnyResultEntry(results.getInt(indexOf(query.idResult)) + "", array);
          }
     }
     

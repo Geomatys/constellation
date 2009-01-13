@@ -286,9 +286,13 @@ public class DefaultObservationReader extends ObservationReader {
     public AnyResultEntry getResult(String identifier) throws WebServiceException {
         try {
             AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
-            return resTable.getEntry(identifier);
+            Integer id = Integer.parseInt(identifier);
+            return resTable.getEntry(id);
         } catch (CatalogException ex) {
-            throw new WebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
+            throw new WebServiceException("Catalog exception while getting the results: " + ex.getMessage(),
+                    NO_APPLICABLE_CODE, "getResult");
+        } catch (NumberFormatException ex) {
+            throw new WebServiceException("Number format exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
         } catch (SQLException ex) {
             ex.printStackTrace();
