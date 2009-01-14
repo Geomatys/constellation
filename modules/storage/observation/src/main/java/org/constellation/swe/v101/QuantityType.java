@@ -100,7 +100,7 @@ public class QuantityType extends AbstractDataComponentEntry {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof QuantityType && super.equals(object)) {
         final QuantityType that = (QuantityType) object;
         return Utilities.equals(this.axisID,     that.axisID)     &&
                Utilities.equals(this.referenceFrame, that.referenceFrame) &&

@@ -66,7 +66,7 @@ public class BaseUnitType extends UnitDefinitionType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof BaseUnitType && super.equals(object)) {
             final BaseUnitType that = (BaseUnitType) object;
             return Utilities.equals(this.unitsSystem,        that.unitsSystem); 
         }

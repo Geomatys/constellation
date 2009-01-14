@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -294,5 +295,45 @@ public class AllowedTokensPropertyType {
     public void setActuate(String value) {
         this.actuate = value;
     }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AllowedTokensPropertyType) {
+            final AllowedTokensPropertyType that = (AllowedTokensPropertyType) object;
+
+            return Utilities.equals(this.allowedTokens,      that.allowedTokens)    &&
+                   Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.allowedTokens != null ? this.allowedTokens.hashCode() : 0);
+        hash = 53 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 53 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 53 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 53 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 53 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 53 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 53 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 53 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        return hash;
+    }
+
 
 }

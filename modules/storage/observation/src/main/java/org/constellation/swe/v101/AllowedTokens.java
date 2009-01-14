@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -96,4 +97,44 @@ public class AllowedTokens {
         this.id = value;
     }
 
+    /**
+     * Verify that the object is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AllowedTokens) {
+            final AllowedTokens that = (AllowedTokens) object;
+            boolean valueL = false;
+            if (this.valueList != null && that.valueList != null) {
+                if (this.valueList.size() != that.valueList.size()) {
+                    valueL = false;
+                } else {
+                    valueL = true;
+                    for (int i = 0; i < this.valueList.size(); i++) {
+                        JAXBElement<List<String>> thisJB = this.valueList.get(i);
+                        JAXBElement<List<String>> thatJB = that.valueList.get(i);
+                        if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                            valueL = false;
+                        }
+                    }
+                }
+            } else if (this.valueList == null && that.valueList == null) {
+                valueL = true;
+            }
+            return Utilities.equals(this.id,  that.id) &&
+                   valueL;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 61 * hash + (this.valueList != null ? this.valueList.hashCode() : 0);
+        hash = 61 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

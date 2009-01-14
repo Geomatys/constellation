@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -86,11 +87,6 @@ public class AllowedValues {
 
     /**
      * Gets the value of the min property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Double }
-     *     
      */
     public Double getMin() {
         return min;
@@ -98,11 +94,6 @@ public class AllowedValues {
 
     /**
      * Sets the value of the min property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Double }
-     *     
      */
     public void setMin(Double value) {
         this.min = value;
@@ -110,11 +101,6 @@ public class AllowedValues {
 
     /**
      * Gets the value of the max property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Double }
-     *     
      */
     public Double getMax() {
         return max;
@@ -122,11 +108,6 @@ public class AllowedValues {
 
     /**
      * Sets the value of the max property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Double }
-     *     
      */
     public void setMax(Double value) {
         this.max = value;
@@ -134,26 +115,6 @@ public class AllowedValues {
 
     /**
      * Gets the value of the intervalOrValueList property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the intervalOrValueList property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getIntervalOrValueList().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link List }{@code <}{@link Double }{@code >}{@code >}
-     * {@link JAXBElement }{@code <}{@link List }{@code <}{@link Double }{@code >}{@code >}
-     * 
-     * 
      */
     public List<JAXBElement<List<Double>>> getIntervalOrValueList() {
         if (intervalOrValueList == null) {
@@ -164,11 +125,6 @@ public class AllowedValues {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getId() {
         return id;
@@ -176,14 +132,53 @@ public class AllowedValues {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setId(String value) {
         this.id = value;
     }
 
+    /**
+     * Verify that the object is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AllowedValues) {
+            final AllowedValues that = (AllowedValues) object;
+            boolean intervalOrValue = false;
+            if (this.intervalOrValueList != null && that.intervalOrValueList != null) {
+                if (this.intervalOrValueList.size() != that.intervalOrValueList.size()) {
+                    intervalOrValue = false;
+                } else {
+                    intervalOrValue = true;
+                    for (int i = 0; i < this.intervalOrValueList.size(); i++) {
+                        JAXBElement<List<Double>> thisJB = this.intervalOrValueList.get(i);
+                        JAXBElement<List<Double>> thatJB = that.intervalOrValueList.get(i);
+                        if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                            intervalOrValue = false;
+                        }
+                    }
+                }
+            } else if (this.intervalOrValueList == null && that.intervalOrValueList == null) {
+                intervalOrValue = true;
+            }
+            return Utilities.equals(this.id,  that.id) &&
+                   Utilities.equals(this.max, that.max) &&
+                   Utilities.equals(this.min, that.min) &&
+                   intervalOrValue;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + (this.min != null ? this.min.hashCode() : 0);
+        hash = 59 * hash + (this.max != null ? this.max.hashCode() : 0);
+        hash = 59 * hash + (this.intervalOrValueList != null ? this.intervalOrValueList.hashCode() : 0);
+        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

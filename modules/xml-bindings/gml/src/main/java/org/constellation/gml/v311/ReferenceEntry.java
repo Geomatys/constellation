@@ -172,19 +172,22 @@ public class ReferenceEntry extends Entry implements Reference{
         if (object == this) {
             return true;
         }
-        final ReferenceEntry that = (ReferenceEntry) object;
+        if (object instanceof ReferenceEntry) {
+            final ReferenceEntry that = (ReferenceEntry) object;
 
-        return Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&  
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.nilReason,          that.nilReason)        &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title)            &&
-             //  Utilities.equals(this.id,                 that.id)               && because its transient
-               Utilities.equals(this.owns,               that.owns);       
+            return Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.nilReason,          that.nilReason)        &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title)            &&
+                 //  Utilities.equals(this.id,                 that.id)               && because its transient
+                   Utilities.equals(this.owns,               that.owns);
+        }
+        return false;
     }
 
     

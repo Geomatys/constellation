@@ -215,20 +215,23 @@ public class AnyScalarPropertyType extends Entry {
         if (object == this) {
             return true;
         }
-        final AnyScalarPropertyType that = (AnyScalarPropertyType) object;
-        
-        return Utilities.equals(this._boolean,           that._boolean)         &&
-               Utilities.equals(this.abstractDataComponent, that.abstractDataComponent)          &&
-               Utilities.equals(this.quantity,           that.quantity)         &&
-               Utilities.equals(this.time,               that.time)             &&
-               Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&  
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title);
+        if (object instanceof AnyScalarPropertyType) {
+            final AnyScalarPropertyType that = (AnyScalarPropertyType) object;
+
+            return Utilities.equals(this._boolean,           that._boolean)         &&
+                   Utilities.equals(this.abstractDataComponent, that.abstractDataComponent)          &&
+                   Utilities.equals(this.quantity,           that.quantity)         &&
+                   Utilities.equals(this.time,               that.time)             &&
+                   Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title);
+            }
+        return false;
     }
 
     

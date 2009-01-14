@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -89,4 +90,29 @@ public abstract class AbstractVectorType extends AbstractDataRecordEntry {
         this.localFrame = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractVectorType && super.equals(object)) {
+            final AbstractVectorType that = (AbstractVectorType) object;
+
+            return Utilities.equals(this.localFrame,     that.localFrame) &&
+                   Utilities.equals(this.referenceFrame, that.referenceFrame);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 37 * hash + (this.localFrame != null ? this.localFrame.hashCode() : 0);
+        return hash;
+    }
 }

@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -103,5 +104,35 @@ public class Count extends AbstractDataComponentEntry {
      */
     public String getAxisID() {
         return axisID;
+    }
+
+    /**
+     * Verify that the object is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Count && super.equals(object)) {
+            final Count that = (Count) object;
+            return Utilities.equals(this.axisID, that.axisID) &&
+                    Utilities.equals(this.constraint, that.constraint) &&
+                    Utilities.equals(this.quality, that.quality) &&
+                    Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+                    Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.constraint != null ? this.constraint.hashCode() : 0);
+        hash = 47 * hash + (this.quality != null ? this.quality.hashCode() : 0);
+        hash = 47 * hash + this.value;
+        hash = 47 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 47 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        return hash;
     }
 }

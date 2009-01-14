@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
+import org.geotools.util.Utilities;
 
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.
@@ -82,21 +83,21 @@ public class AnyResultEntry extends Entry {
     }
 
     /**
-     * Retourne l'identifiant du resultat
+     * Return the result identifier.
      */
     public String getId() {
         return id;
     }
 
     /**
-     * retourne un resultat de type reference si s'en est un, {@code null} sinon.
+     * return a result of type reference if it is, {@code null} else.
      */
     public ReferenceEntry getReference() {
         return reference;
     }
 
     /**
-     * retourne un resultat de type dataArray si s'en est un, {@code null} sinon.
+     * return a result of type dataArray if it is, {@code null} else.
      */
     public DataArrayEntry getArray() {
         if (array != null) {
@@ -106,15 +107,41 @@ public class AnyResultEntry extends Entry {
     }
     
     /**
-     * retourne un resultat de type dataArray si s'en est un, {@code null} sinon.
+     * return a result of type dataArray if it is, {@code null} else.
      */
     public DataArrayPropertyType getPropertyArray() {
         return array;
     }
-    
+
     /**
-     * retourne une chaine de caractere decrivant le resultat (debug)
-     * 
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AnyResultEntry) {
+            final AnyResultEntry that = (AnyResultEntry) object;
+
+            return Utilities.equals(this.array,     that.array)    &&
+                   Utilities.equals(this.id,        that.id)          &&
+                   Utilities.equals(this.reference, that.reference);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 13 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 13 * hash + (this.reference != null ? this.reference.hashCode() : 0);
+        hash = 13 * hash + (this.array != null ? this.array.hashCode() : 0);
+        return hash;
+    }
+
+    /**
+     * return a String describing the result (debug).
      */
     @Override
     public String toString() {

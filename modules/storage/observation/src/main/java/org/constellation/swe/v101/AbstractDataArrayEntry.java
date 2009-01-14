@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -91,6 +92,28 @@ public abstract class AbstractDataArrayEntry extends AbstractDataComponentEntry 
     }
 
     /**
+     * Verify that the object is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AbstractDataArrayEntry && super.equals(object)) {
+            final AbstractDataArrayEntry that = (AbstractDataArrayEntry) object;
+            return Utilities.equals(this.elementCount, that.elementCount);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.elementCount != null ? this.elementCount.hashCode() : 0);
+        return hash;
+    }
+
+    /**
      * <p>Java class for anonymous complex type.
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
@@ -149,6 +172,30 @@ public abstract class AbstractDataArrayEntry extends AbstractDataComponentEntry 
          */
         public Object getRef() {
             return ref;
+        }
+
+        /**
+         * Verify that the object is identical to the specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+            if (object instanceof ElementCount) {
+                final ElementCount that = (ElementCount) object;
+                return Utilities.equals(this.count, that.count) &&
+                       Utilities.equals(this.ref,   that.ref);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 23 * hash + (this.count != null ? this.count.hashCode() : 0);
+            hash = 23 * hash + (this.ref != null ? this.ref.hashCode() : 0);
+            return hash;
         }
     }
 }

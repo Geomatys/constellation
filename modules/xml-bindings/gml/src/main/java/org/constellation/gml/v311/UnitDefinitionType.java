@@ -86,7 +86,7 @@ public class UnitDefinitionType extends DefinitionType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof UnitDefinitionType && super.equals(object)) {
             final UnitDefinitionType that = (UnitDefinitionType) object;
             return Utilities.equals(this.catalogSymbol,        that.catalogSymbol)        &&
                    Utilities.equals(this.quantityType,        that.quantityType)        &&

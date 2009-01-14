@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -147,6 +148,39 @@ public class Category extends AbstractDataComponentEntry {
      */
     public void setAxisID(String value) {
         this.axisID = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Category && super.equals(object)) {
+            final Category that = (Category) object;
+
+            return Utilities.equals(this.axisID,           that.axisID)         &&
+                   Utilities.equals(this.constraint,       that.constraint)     &&
+                   Utilities.equals(this.quality,          that.quality)        &&
+                   Utilities.equals(this.referenceFrame,   that.referenceFrame) &&
+                   Utilities.equals(this.codeSpace,        that.codeSpace)      &&
+                   Utilities.equals(this.value,            that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.codeSpace != null ? this.codeSpace.hashCode() : 0);
+        hash = 29 * hash + (this.constraint != null ? this.constraint.hashCode() : 0);
+        hash = 29 * hash + (this.quality != null ? this.quality.hashCode() : 0);
+        hash = 29 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 29 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 29 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        return hash;
     }
 
 }

@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -160,6 +161,36 @@ public class BinaryBlock extends AbstractEncodingEntry {
         this.byteOrder = value;
     }
 
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof BinaryBlock && super.equals(object)) {
+            final BinaryBlock that = (BinaryBlock) object;
+
+            return Utilities.equals(this.byteEncoding, that.byteEncoding) &&
+                   Utilities.equals(this.byteLength,   that.byteLength)   &&
+                   Utilities.equals(this.member,       that.member)   &&
+                   Utilities.equals(this.byteOrder,    that.byteOrder);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.member != null ? this.member.hashCode() : 0);
+        hash = 59 * hash + (this.byteLength != null ? this.byteLength.hashCode() : 0);
+        hash = 59 * hash + (this.byteEncoding != null ? this.byteEncoding.hashCode() : 0);
+        hash = 59 * hash + (this.byteOrder != null ? this.byteOrder.hashCode() : 0);
+        return hash;
+    }
+
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -248,6 +279,30 @@ public class BinaryBlock extends AbstractEncodingEntry {
             this.block = value;
         }
 
+        /**
+         * Verify if this entry is identical to specified object.
+         */
+        @Override
+        public boolean equals(final Object object) {
+            if (object == this) {
+                return true;
+            }
+            if (object instanceof Member) {
+                final Member that = (Member) object;
+
+                return Utilities.equals(this.block, that.block) &&
+                       Utilities.equals(this.component, that.component);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 71 * hash + (this.component != null ? this.component.hashCode() : 0);
+            hash = 71 * hash + (this.block != null ? this.block.hashCode() : 0);
+            return hash;
+        }
 
         /**
          * <p>Java class for anonymous complex type.
@@ -387,6 +442,39 @@ public class BinaryBlock extends AbstractEncodingEntry {
              */
             public void setCompression(String value) {
                 this.compression = value;
+            }
+
+            /**
+             * Verify if this entry is identical to specified object.
+             */
+            @Override
+            public boolean equals(final Object object) {
+                if (object == this) {
+                    return true;
+                }
+                if (object instanceof Block) {
+                    final Block that = (Block) object;
+
+                    return Utilities.equals(this.byteLength,  that.byteLength)                &&
+                           Utilities.equals(this.encryption,  that.encryption)                &&
+                           Utilities.equals(this.paddingBytesAfter,  that.paddingBytesAfter)  &&
+                           Utilities.equals(this.paddingBytesBefore, that.paddingBytesBefore) &&
+                           Utilities.equals(this.ref,         that.ref)                       &&
+                           Utilities.equals(this.compression, that.compression);
+                }
+                return false;
+            }
+
+            @Override
+            public int hashCode() {
+                int hash = 7;
+                hash = 29 * hash + (this.ref != null ? this.ref.hashCode() : 0);
+                hash = 29 * hash + (this.byteLength != null ? this.byteLength.hashCode() : 0);
+                hash = 29 * hash + (this.paddingBytesBefore != null ? this.paddingBytesBefore.hashCode() : 0);
+                hash = 29 * hash + (this.paddingBytesAfter != null ? this.paddingBytesAfter.hashCode() : 0);
+                hash = 29 * hash + (this.encryption != null ? this.encryption.hashCode() : 0);
+                hash = 29 * hash + (this.compression != null ? this.compression.hashCode() : 0);
+                return hash;
             }
 
         }
@@ -551,6 +639,41 @@ public class BinaryBlock extends AbstractEncodingEntry {
              */
             public void setEncryption(String value) {
                 this.encryption = value;
+            }
+
+            /**
+             * Verify if this entry is identical to specified object.
+             */
+            @Override
+            public boolean equals(final Object object) {
+                if (object == this) {
+                    return true;
+                }
+                if (object instanceof Component) {
+                    final Component that = (Component) object;
+
+                    return Utilities.equals(this.bitLength,   that.bitLength)                 &&
+                           Utilities.equals(this.encryption,  that.encryption)                &&
+                           Utilities.equals(this.dataType,    that.dataType)                  &&
+                           Utilities.equals(this.paddingBitsAfter,  that.paddingBitsAfter)    &&
+                           Utilities.equals(this.paddingBitsBefore, that.paddingBitsBefore)   &&
+                           Utilities.equals(this.ref,         that.ref)                       &&
+                           Utilities.equals(this.significantBits, that.significantBits);
+                }
+                return false;
+            }
+
+            @Override
+            public int hashCode() {
+                int hash = 3;
+                hash = 61 * hash + (this.ref != null ? this.ref.hashCode() : 0);
+                hash = 61 * hash + (this.dataType != null ? this.dataType.hashCode() : 0);
+                hash = 61 * hash + (this.significantBits != null ? this.significantBits.hashCode() : 0);
+                hash = 61 * hash + (this.bitLength != null ? this.bitLength.hashCode() : 0);
+                hash = 61 * hash + (this.paddingBitsBefore != null ? this.paddingBitsBefore.hashCode() : 0);
+                hash = 61 * hash + (this.paddingBitsAfter != null ? this.paddingBitsAfter.hashCode() : 0);
+                hash = 61 * hash + (this.encryption != null ? this.encryption.hashCode() : 0);
+                return hash;
             }
 
         }

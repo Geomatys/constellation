@@ -103,10 +103,13 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
         if (object == this) {
             return true;
         }
-        final AbstractDataComponentEntry that = (AbstractDataComponentEntry) object;
-        return Utilities.equals(this.id,         that.id)         &&
-               Utilities.equals(this.definition, that.definition) &&
-               Utilities.equals(this.fixed,      that.fixed);
+        if (object instanceof AbstractDataComponentEntry) {
+            final AbstractDataComponentEntry that = (AbstractDataComponentEntry) object;
+            return Utilities.equals(this.id,         that.id)         &&
+                   Utilities.equals(this.definition, that.definition) &&
+                   Utilities.equals(this.fixed,      that.fixed);
+        }
+        return false;
     }
     
     @Override

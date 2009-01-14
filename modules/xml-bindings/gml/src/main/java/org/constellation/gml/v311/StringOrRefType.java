@@ -148,18 +148,20 @@ public class StringOrRefType {
         if (object == this) {
             return true;
         }
-        final StringOrRefType that = (StringOrRefType) object;
+        if (object instanceof StringOrRefType) {
+            final StringOrRefType that = (StringOrRefType) object;
 
-        return Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.value,              that.value)            &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title);
-        
+            return Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this.value,              that.value)            &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title);
+        }
+        return false;
     }
 
     @Override

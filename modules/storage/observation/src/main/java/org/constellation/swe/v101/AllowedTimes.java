@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -119,11 +120,6 @@ public class AllowedTimes {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getId() {
         return id;
@@ -131,14 +127,53 @@ public class AllowedTimes {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setId(String value) {
         this.id = value;
     }
 
+     /**
+     * Verify that the object is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof AllowedTimes) {
+            final AllowedTimes that = (AllowedTimes) object;
+            boolean intervalOrValue = false;
+            if (this.intervalOrValueList != null && that.intervalOrValueList != null) {
+                if (this.intervalOrValueList.size() != that.intervalOrValueList.size()) {
+                    intervalOrValue = false;
+                } else {
+                    intervalOrValue = true;
+                    for (int i = 0; i < this.intervalOrValueList.size(); i++) {
+                        JAXBElement<List<String>> thisJB = this.intervalOrValueList.get(i);
+                        JAXBElement<List<String>> thatJB = that.intervalOrValueList.get(i);
+                        if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                            intervalOrValue = false;
+                        }
+                    }
+                }
+            } else if (this.intervalOrValueList == null && that.intervalOrValueList == null) {
+                intervalOrValue = true;
+            }
+            return Utilities.equals(this.id,  that.id) &&
+                   Utilities.equals(this.max, that.max) &&
+                   Utilities.equals(this.min, that.min) &&
+                   intervalOrValue;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.min != null ? this.min.hashCode() : 0);
+        hash = 53 * hash + (this.max != null ? this.max.hashCode() : 0);
+        hash = 53 * hash + (this.intervalOrValueList != null ? this.intervalOrValueList.hashCode() : 0);
+        hash = 53 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

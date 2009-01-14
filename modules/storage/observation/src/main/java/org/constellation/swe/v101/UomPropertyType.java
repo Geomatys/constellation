@@ -199,20 +199,22 @@ public class UomPropertyType {
         if (object == this) {
             return true;
         }
-        final UomPropertyType that = (UomPropertyType) object;
-        return Utilities.equals(this.actuate,        that.actuate)        &&
-               Utilities.equals(this.arcrole,        that.arcrole)        &&
-               Utilities.equals(this.baseUnit,       that.baseUnit)       &&
-               Utilities.equals(this.code,           that.code)           &&
-               Utilities.equals(this.href,           that.href)           &&
-               Utilities.equals(this.nilReason,      that.nilReason)      &&
-               Utilities.equals(this.remoteSchema,   that.remoteSchema)   &&
-               Utilities.equals(this.role,           that.role)           &&
-               Utilities.equals(this.show,           that.show)           &&
-               Utilities.equals(this.title,          that.title)          &&
-               Utilities.equals(this.type,           that.type)           &&
-               Utilities.equals(this.unitDefinition, that.unitDefinition);
-        
+        if (object instanceof UomPropertyType) {
+            final UomPropertyType that = (UomPropertyType) object;
+            return Utilities.equals(this.actuate,        that.actuate)        &&
+                   Utilities.equals(this.arcrole,        that.arcrole)        &&
+                   Utilities.equals(this.baseUnit,       that.baseUnit)       &&
+                   Utilities.equals(this.code,           that.code)           &&
+                   Utilities.equals(this.href,           that.href)           &&
+                   Utilities.equals(this.nilReason,      that.nilReason)      &&
+                   Utilities.equals(this.remoteSchema,   that.remoteSchema)   &&
+                   Utilities.equals(this.role,           that.role)           &&
+                   Utilities.equals(this.show,           that.show)           &&
+                   Utilities.equals(this.title,          that.title)          &&
+                   Utilities.equals(this.type,           that.type)           &&
+                   Utilities.equals(this.unitDefinition, that.unitDefinition);
+        }
+        return false;
     }
 
     @Override
