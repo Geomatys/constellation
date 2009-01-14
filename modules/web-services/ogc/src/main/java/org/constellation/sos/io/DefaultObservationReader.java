@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.sql.DataSource;
@@ -301,9 +302,19 @@ public class DefaultObservationReader extends ObservationReader {
         }
     }
 
-    public Set<ReferenceEntry> getReferences() throws WebServiceException {
+    public ReferenceEntry getReference(String href) throws WebServiceException {
         try {
-            return refTable.getEntries();
+            Set<ReferenceEntry> references = refTable.getEntries();
+            if (references != null) {
+                Iterator<ReferenceEntry> it = references.iterator();
+                while (it.hasNext()) {
+                    ReferenceEntry ref = it.next();
+                    if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
+                        return ref;
+                    }
+                }
+            }
+            return null;
 
         } catch (NoSuchRecordException ex) {
             logger.info("NoSuchRecordException in getReferences");

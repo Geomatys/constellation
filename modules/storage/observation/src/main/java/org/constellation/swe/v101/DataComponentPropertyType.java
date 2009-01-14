@@ -82,7 +82,7 @@ public class DataComponentPropertyType {
         if (component instanceof SimpleDataRecordEntry) {
             this.abstractDataRecord = sweFactory.createSimpleDataRecord((SimpleDataRecordEntry)component);
         } else {
-            throw new IllegalArgumentException("only SimpleDataRecord is allowed");
+            throw new IllegalArgumentException("only SimpleDataRecord is allowed in dataComponentPropertyType");
         }
     }
     /**

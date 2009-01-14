@@ -21,6 +21,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.Properties;
 import javax.sql.DataSource;
+import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.DefaultObservationFilter;
 import org.constellation.sos.io.DefaultObservationReader;
@@ -28,11 +29,13 @@ import org.constellation.sos.io.DefaultObservationWriter;
 import org.constellation.sos.io.FileSensorReader;
 import org.constellation.sos.io.FileSensorWriter;
 import org.constellation.sos.io.GenericObservationFilter;
+import org.constellation.sos.io.GenericObservationReader;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -61,8 +64,14 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationReader getObservationReader(DataSource dataSourceOM, String observationIdBase) throws WebServiceException {
-        return new DefaultObservationReader(dataSourceOM, observationIdBase);
+    public ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws WebServiceException {
+        switch (type) {
+            case DEFAULT : return new DefaultObservationReader(dataSourceOM, observationIdBase);
+
+            case GENERIC : return new GenericObservationReader(observationIdBase, configuration);
+
+            default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
+        }
     }
 
     @Override
@@ -77,7 +86,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
             case MDWEB: return new MDWebSensorReader(connection, sensorIdBase, map);
 
-            default: throw new IllegalArgumentException("Unknow dataSource type: " + type);
+            default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
     }
 
@@ -88,7 +97,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
             case MDWEB: return new MDWebSensorWriter(connection, sensorIdBase);
 
-            default: throw new IllegalArgumentException("Unknow dataSource type: " + type);
+            default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
     }
 

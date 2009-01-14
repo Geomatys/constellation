@@ -17,6 +17,7 @@
  */
 package org.constellation.swe.v101;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,13 +37,13 @@ import org.geotools.util.Utilities;
 public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements SimpleDataRecord {
     
     /**
-     * L'identifiant du dataBlock qui contient ce data record.
+     * The databblock identifier containing this data record.
      */
     @XmlTransient
     private String blockId;
     
     /**
-     * List de valeur textuelle ou scalaire.
+     * Textual or scalar value List.
      */
     private Collection<AnyScalarPropertyType> field;
    
@@ -52,7 +53,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     public SimpleDataRecordEntry() {}
     
     /** 
-     * Créé une nouvelle Liste de valeur textuelle ou scalaire.
+     * Build a new Textual or scalar value List.
      */
     public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
             final Collection<AnyScalarPropertyType> fields) {
@@ -65,25 +66,28 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
      * {@inheritDoc}
      */
     public Collection<AnyScalarPropertyType> getField() {
+        if (field == null) {
+            field = new ArrayList<AnyScalarPropertyType>();
+        }
         return field;
     }
 
     /**
-     * Retourne l'identifiant du block qui contient ce data record.
+     * Return the block identifier containing this data record.
      */
     public String getBlockId() {
         return blockId;
     }
 
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Verify that the object is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof SimpleDataRecordEntry && super.equals(object)) {
             final SimpleDataRecordEntry that = (SimpleDataRecordEntry) object;
             if (this.field.size() != that.field.size())
                 return false;
@@ -104,7 +108,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     }
     
     /**
-     * Retourne une representation de l'objet (debug).
+     * Return a String representation of the objet (debug).
      */
     @Override
     public String toString() {
@@ -119,9 +123,12 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
      * Ajoute la description des composants du dataBlock definition.
      */
     private void appendTo(final StringBuilder buffer, String margin, final String lineSeparator) {
-        buffer.append("nb fields ").append(field.size()).append(" :").append(lineSeparator);
+        int fieldSize = 0;
+        if (field != null)
+            fieldSize = field.size();
+        buffer.append("nb fields ").append(fieldSize).append(" :").append(lineSeparator);
         int i = 0;
-        for (final AnyScalarPropertyType a : field) {
+        for (final AnyScalarPropertyType a : getField()) {
             buffer.append(margin).append("field[").append(i).append(']').append(a.toString());
             i++;
         }

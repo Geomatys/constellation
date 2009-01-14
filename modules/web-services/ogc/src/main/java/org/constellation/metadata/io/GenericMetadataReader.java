@@ -346,6 +346,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
         // we get a sub list of all the statement
         Set<PreparedStatement> subSingleStmts;
         Set<PreparedStatement> subMultiStmts;
+
+        //for ISO mode we load all variables
         if (mode == ISO_19115) {
             subSingleStmts = singleStatements.keySet();
             subMultiStmts  = multipleStatements.keySet();
@@ -394,20 +396,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (PreparedStatement stmt : subSingleStmts) {
             try {
                 fillStatement(stmt, identifier);
-                ResultSet result = stmt.executeQuery();
-                if (result.next()) {
-                    for (String varName : singleStatements.get(stmt)) {
-                        singleValue.put(varName, result.getString(varName));
-                    }
-                } 
-                result.close();
+                fillSingleValues(stmt);
             } catch (SQLException ex) {
-                String varlist = "";
-                for (String s : singleStatements.get(stmt)) {
-                    varlist += s + ',';
-                }
-                logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
-                              "for variable: " + varlist);
+                logSqlError(singleStatements.get(stmt), ex);
             }
         }
 
@@ -415,28 +406,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (PreparedStatement stmt : subMultiStmts) {
             try {
                 fillStatement(stmt, identifier);
-
-                ResultSet result = stmt.executeQuery();
-                for (String varName : multipleStatements.get(stmt)) {
-                    multipleValue.put(varName, new ArrayList<String>());
-                }
-                while (result.next()) {
-                    for (String varName : multipleStatements.get(stmt)) {
-                        multipleValue.get(varName).add(result.getString(varName));
-                    }
-                }
+                fillMultipleValues(stmt);
             } catch (SQLException ex) {
-                String varlist = "";
-                List<String> varList = singleStatements.get(stmt);
-                if (varList != null) {
-                    for (String s : varList) {
-                        varlist += s + ',';
-                    }
-                } else {
-                    varlist = "no variables";
-                }
-                logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
-                        "for variable: " + varlist);
+                logSqlError(multipleStatements.get(stmt), ex);
             }
 
         }
@@ -457,21 +429,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 public Object call() {
                     try {
                         fillStatement(stmt, identifier);
-                        ResultSet result = stmt.executeQuery();
-                        if (result.next()) {
-                            for (String varName : singleStatements.get(stmt)) {
-                                singleValue.put(varName, result.getString(varName));
-                            }
-                        } 
-                        result.close();
+                        fillSingleValues(stmt);
 
                     } catch (SQLException ex) {
-                        String varlist = "";
-                        for (String s : singleStatements.get(stmt)) {
-                            varlist += s + ',';
-                        }
-                        logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
-                                "for variable: " + varlist);
+                        logSqlError(singleStatements.get(stmt), ex);
 
                     }
                     return null;
@@ -496,28 +457,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 public Object call() {
                     try {
                         fillStatement(stmt, identifier);
-
-                        ResultSet result = stmt.executeQuery();
-                        for (String varName : multipleStatements.get(stmt)) {
-                            multipleValue.put(varName, new ArrayList<String>());
-                        }
-                        while (result.next()) {
-                            for (String varName : multipleStatements.get(stmt)) {
-                                multipleValue.get(varName).add(result.getString(varName));
-                            }
-                        }
+                        fillMultipleValues(stmt);
+                        
                     } catch (SQLException ex) {
-                        String varlist = "";
-                        List<String> varList = singleStatements.get(stmt);
-                        if (varList != null) {
-                            for (String s : varList) {
-                                varlist += s + ',';
-                            }
-                        } else {
-                            varlist = "no variables";
-                        }
-                        logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
-                                "for variable: " + varlist);
+                        logSqlError(multipleStatements.get(stmt), ex);
                     }
                     return null;
                 }
@@ -533,6 +476,49 @@ public abstract class GenericMetadataReader extends MetadataReader {
                logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
             }
         }
+    }
+
+    private void fillSingleValues(PreparedStatement stmt) throws SQLException {
+        ResultSet result = stmt.executeQuery();
+        if (result.next()) {
+            for (String varName : singleStatements.get(stmt)) {
+                singleValue.put(varName, result.getString(varName));
+            }
+        }
+        result.close();
+    }
+
+    private void fillMultipleValues(PreparedStatement stmt) throws SQLException {
+        ResultSet result = stmt.executeQuery();
+        for (String varName : multipleStatements.get(stmt)) {
+            multipleValue.put(varName, new ArrayList<String>());
+        }
+        while (result.next()) {
+            for (String varName : multipleStatements.get(stmt)) {
+                multipleValue.get(varName).add(result.getString(varName));
+            }
+        }
+        result.close();
+    }
+
+    /**
+     * Log the list of variables involved in a query which launch a SQL exception.
+     * (debugging purpose).
+     *
+     * @param varList a list of variable.
+     * @param ex
+     */
+    public void logSqlError(List<String> varList, SQLException ex) {
+        String varlist = "";
+        if (varList != null) {
+            for (String s : varList) {
+                varlist += s + ',';
+            }
+        } else {
+            varlist = "no variables";
+        }
+        logger.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
+                      "for variable: " + varlist);
     }
     
     /**

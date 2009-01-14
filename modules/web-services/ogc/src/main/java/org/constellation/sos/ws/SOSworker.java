@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,9 +43,14 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 // JAXB dependencies
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
@@ -101,6 +105,7 @@ import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -310,6 +315,19 @@ public class SOSworker {
         if (OMFilterType == null)
             OMFilterType = ObservationFilterType.DEFAULT;
 
+        //we get the O&M reader Type
+        String omrType = prop.getProperty("OMReaderType");
+        ObservationReaderType OMReaderType = null;
+        if (omrType != null) {
+            try {
+                OMReaderType = ObservationReaderType.valueOf(omrType);
+            } catch (IllegalArgumentException ex) {
+                logger.severe("unknow OM Reader type:" + omrType);
+            }
+        }
+        if (OMReaderType == null)
+            OMReaderType = ObservationReaderType.DEFAULT;
+
         //we get the Sensor reader type
         String smlt = prop.getProperty("SMLDataSourceType");
         DataSourceType SMLType = null;
@@ -323,10 +341,12 @@ public class SOSworker {
         if (SMLType == null)
             SMLType = DataSourceType.MDWEB;
 
+        // Database configuration
         Connection SMLconnection        = null;
         PGSimpleDataSource dataSourceOM = null;
         Connection OMConnection         = null;
         File dataDirectory              = null;
+        Automatic configuration         = null;
         try {
             if (SMLType == DataSourceType.MDWEB) {
                 //we create a connection to the sensorML database
@@ -337,6 +357,7 @@ public class SOSworker {
                 dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
                 dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
                 SMLconnection = dataSourceSML.getConnection();
+
             } else if (SMLType == DataSourceType.FILE_SYSTEM) {
                 String path = prop.getProperty("SMLDataDirectory");
                 if (path != null) {
@@ -348,17 +369,52 @@ public class SOSworker {
                 }
             }
 
-            //we create a connection to the O&M database
-            dataSourceOM = new PGSimpleDataSource();
-            dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
-            dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
-            dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
-            dataSourceOM.setUser(prop.getProperty("OMDBUser"));
-            dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
-            OMConnection = dataSourceOM.getConnection();
+            if (OMReaderType == ObservationReaderType.DEFAULT) {
+                //we create a connection to the O&M database
+                dataSourceOM = new PGSimpleDataSource();
+                dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
+                dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
+                dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
+                dataSourceOM.setUser(prop.getProperty("OMDBUser"));
+                dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
+                OMConnection = dataSourceOM.getConnection();
+                
+            } else if (OMReaderType == ObservationReaderType.GENERIC) {
+                JAXBContext context = JAXBContext.newInstance("org.constellation.generic.database");
+                Unmarshaller genericUnmarshaller = context.createUnmarshaller();
+                f = new File(sosConfigDir, "generic-config.xml");
+                if (f.exists()) {
+                    Object object = genericUnmarshaller.unmarshal(f);
+                    if (object instanceof Automatic) {
+                        configuration = (Automatic) object;
+                        BDD bdd = configuration.getBdd();
+                        if (bdd != null) {
+                            OMConnection = bdd.getConnection();
+                        } else {
+                            logger.severe("The SOS service is not running!" + '\n' +
+                                      "cause: The generic configuration file is malformed: no database information");
+                            start = false;
+                        }
+                    } else {
+                        logger.severe("The SOS service is not running!" + '\n' +
+                                      "cause: The generic configuration file is malformed");
+                        start = false;
+                    }
+                } else {
+                    logger.severe("The SOS service is not running!" + '\n' +
+                                  "cause: The generic configuration file can't be found");
+                     start = false;
+                }
+            }
 
         } catch (SQLException ex) {
-            logger.severe("The SOS service is not running!" + '\n' + "cause: SQLException:" + ex.getMessage());
+            logger.severe("The SOS service is not running!" + '\n' +
+                          "cause: SQLException:" + ex.getMessage());
+            start = false;
+        } catch (JAXBException ex) {
+            ex.printStackTrace();
+            logger.severe("The SOS service is not running!" + '\n' +
+                          "cause: JAXBException:" + ex.getMessage());
             start = false;
         }
 
@@ -385,7 +441,7 @@ public class SOSworker {
 
             SMLReader = SOSfactory.getSensorReader(SMLType, dataDirectory, sensorIdBase, SMLconnection, map);
             SMLWriter = SOSfactory.getSensorWriter(SMLType, dataDirectory, SMLconnection, sensorIdBase);
-            OMReader  = SOSfactory.getObservationReader(dataSourceOM, observationIdBase);
+            OMReader  = SOSfactory.getObservationReader(OMReaderType, dataSourceOM, observationIdBase, configuration);
             OMWriter  = SOSfactory.getObservationWriter(dataSourceOM);
             OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConnection, sosConfigDir);
 
@@ -645,7 +701,7 @@ public class SOSworker {
                     dbId = s;
                 }
                 logger.info("process ID: " + dbId);
-                ReferenceEntry proc = getReferenceFromHRef(dbId);
+                ReferenceEntry proc = OMReader.getReference(dbId);
                 if (proc == null) {
                     throw new WebServiceException(" this process is not registred in the table",
                             INVALID_PARAMETER_VALUE, "procedure");
@@ -1443,7 +1499,7 @@ public class SOSworker {
 
                 //we add the new sensor to the offering
                 OfferingProcedureEntry offProc = null;
-                ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
+                ReferenceEntry ref = OMReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
                 if (!offering.getProcedure().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
@@ -1459,7 +1515,7 @@ public class SOSworker {
 
                 // we add the feature of interest (station) to the offering
                 OfferingSamplingFeatureEntry offSF = null;
-                ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                ref = OMReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                 if (!offering.getFeatureOfInterest().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
@@ -1516,7 +1572,7 @@ public class SOSworker {
 
             //we add the new sensor to the offering
             OfferingProcedureEntry offProc = null;
-            ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry) template.getProcedure()).getHref());
+            ReferenceEntry ref = OMReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
             if (!offering.getProcedure().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
@@ -1532,7 +1588,7 @@ public class SOSworker {
 
             // we add the feature of interest (station) to the offering
             OfferingSamplingFeatureEntry offSF = null;
-            ref = getReferenceFromHRef(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            ref = OMReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
             if (!offering.getFeatureOfInterest().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
@@ -1578,23 +1634,6 @@ public class SOSworker {
         }
     }
 
-    /**
-     * Return the referenceEntry with the specified href attribute.
-     */
-    private ReferenceEntry getReferenceFromHRef(String href) throws WebServiceException {
-        Collection<ReferenceEntry> refs = OMReader.getReferences();
-        if (refs != null) {
-            Iterator<ReferenceEntry> it = refs.iterator();
-            while (it.hasNext()) {
-                ReferenceEntry ref = it.next();
-                if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
-                    return ref;
-                }
-            }
-        }
-        return null;
-    }
-    
     /**
      * Normalize the capabilities document by replacing the double by reference
      * 

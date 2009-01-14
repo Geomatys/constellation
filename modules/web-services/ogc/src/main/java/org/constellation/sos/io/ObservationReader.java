@@ -76,7 +76,7 @@ public abstract class ObservationReader {
 
     public abstract AnyResultEntry getResult(String identifier) throws WebServiceException;
     
-    public abstract Collection<ReferenceEntry> getReferences() throws WebServiceException;
+    public abstract ReferenceEntry getReference(String href) throws WebServiceException;
     
     /**
      * Create a new identifier for an observation by searching in the O&M database.

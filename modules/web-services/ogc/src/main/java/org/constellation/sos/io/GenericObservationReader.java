@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ import javax.xml.namespace.QName;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.coverage.model.Distribution;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
@@ -103,13 +105,21 @@ public class GenericObservationReader extends ObservationReader {
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
-    public GenericObservationReader(String observationIdBase, Connection connection, Automatic configuration) throws WebServiceException {
+    public GenericObservationReader(String observationIdBase, Automatic configuration) throws WebServiceException {
         super(observationIdBase);
         try {
-            initStatement(connection, configuration);
+            BDD bdd = configuration.getBdd();
+            if (bdd != null) {
+                Connection connection = bdd.getConnection();
+                initStatement(connection, configuration);
+            } else {
+                throw new WebServiceException("The database par of the generic configuration file is null", NO_APPLICABLE_CODE);
+            }
         } catch (SQLException ex) {
             throw new WebServiceException(ex, NO_APPLICABLE_CODE);
         }
+        singleValue     = new HashMap<String, String>();
+        multipleValue   = new HashMap<String, List<String>>();
         isThreadEnabled = false;
     }
 
@@ -178,15 +188,35 @@ public class GenericObservationReader extends ObservationReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier) {
-        logger.finer("loading data for " + identifier);
+    private void loadData(List<String> variables, String value) {
         singleValue.clear();
         multipleValue.clear();
 
-        if (isThreadEnabled)
-            paraleleLoading(identifier, singleStatements.keySet(), multipleStatements.keySet());
-        else
-            sequentialLoading(identifier, singleStatements.keySet(), multipleStatements.keySet());
+        Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
+        Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
+        for (String var : variables) {
+            PreparedStatement stmt = getStatementFromSingleVar(var);
+            if (stmt != null) {
+                if (!subSingleStmts.contains(stmt)) {
+                    subSingleStmts.add(stmt);
+                }
+            } else {
+                stmt = getStatementFromMultipleVar(var);
+                if (stmt != null) {
+                    if (!subMultiStmts.contains(stmt)) {
+                        subMultiStmts.add(stmt);
+                    }
+                } else {
+                    logger.severe("no statement found for variable: " + var);
+                }
+            }
+        }
+
+        if (isThreadEnabled) {
+            paraleleLoading(value, singleStatements.keySet(), multipleStatements.keySet());
+        } else {
+            sequentialLoading(value, singleStatements.keySet(), multipleStatements.keySet());
+        }
     }
 
     /**
@@ -201,20 +231,9 @@ public class GenericObservationReader extends ObservationReader {
         for (PreparedStatement stmt : subSingleStmts) {
             try {
                 fillStatement(stmt, identifier);
-                ResultSet result = stmt.executeQuery();
-                if (result.next()) {
-                    for (String varName : singleStatements.get(stmt)) {
-                        singleValue.put(varName, result.getString(varName));
-                    }
-                }
-                result.close();
+                fillSingleValues(stmt);
             } catch (SQLException ex) {
-                String varlist = "";
-                for (String s : singleStatements.get(stmt)) {
-                    varlist += s + ',';
-                }
-                logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
-                              "for variable: " + varlist);
+                logSqlError(singleStatements.get(stmt), ex, stmt);
             }
         }
 
@@ -222,28 +241,10 @@ public class GenericObservationReader extends ObservationReader {
         for (PreparedStatement stmt : subMultiStmts) {
             try {
                 fillStatement(stmt, identifier);
-
-                ResultSet result = stmt.executeQuery();
-                for (String varName : multipleStatements.get(stmt)) {
-                    multipleValue.put(varName, new ArrayList<String>());
-                }
-                while (result.next()) {
-                    for (String varName : multipleStatements.get(stmt)) {
-                        multipleValue.get(varName).add(result.getString(varName));
-                    }
-                }
+                fillMultipleValues(stmt);
+                
             } catch (SQLException ex) {
-                String varlist = "";
-                List<String> varList = singleStatements.get(stmt);
-                if (varList != null) {
-                    for (String s : varList) {
-                        varlist += s + ',';
-                    }
-                } else {
-                    varlist = "no variables";
-                }
-                logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
-                        "for variable: " + varlist);
+               logSqlError(multipleStatements.get(stmt), ex, stmt);
             }
 
         }
@@ -264,22 +265,10 @@ public class GenericObservationReader extends ObservationReader {
                 public Object call() {
                     try {
                         fillStatement(stmt, identifier);
-                        ResultSet result = stmt.executeQuery();
-                        if (result.next()) {
-                            for (String varName : singleStatements.get(stmt)) {
-                                singleValue.put(varName, result.getString(varName));
-                            }
-                        }
-                        result.close();
+                        fillSingleValues(stmt);
 
                     } catch (SQLException ex) {
-                        String varlist = "";
-                        for (String s : singleStatements.get(stmt)) {
-                            varlist += s + ',';
-                        }
-                        logger.severe("SQLException while executing single query: " + ex.getMessage() + '\n' +
-                                "for variable: " + varlist);
-
+                        logSqlError(singleStatements.get(stmt), ex, stmt);
                     }
                     return null;
                 }
@@ -303,28 +292,10 @@ public class GenericObservationReader extends ObservationReader {
                 public Object call() {
                     try {
                         fillStatement(stmt, identifier);
-
-                        ResultSet result = stmt.executeQuery();
-                        for (String varName : multipleStatements.get(stmt)) {
-                            multipleValue.put(varName, new ArrayList<String>());
-                        }
-                        while (result.next()) {
-                            for (String varName : multipleStatements.get(stmt)) {
-                                multipleValue.get(varName).add(result.getString(varName));
-                            }
-                        }
+                        fillMultipleValues(stmt);
+                        
                     } catch (SQLException ex) {
-                        String varlist = "";
-                        List<String> varList = singleStatements.get(stmt);
-                        if (varList != null) {
-                            for (String s : varList) {
-                                varlist += s + ',';
-                            }
-                        } else {
-                            varlist = "no variables";
-                        }
-                        logger.severe("SQLException while executing multiple query: " + ex.getMessage() + '\n' +
-                                "for variable: " + varlist);
+                        logSqlError(multipleStatements.get(stmt), ex, stmt);
                     }
                     return null;
                 }
@@ -357,6 +328,80 @@ public class GenericObservationReader extends ObservationReader {
         }
     }
 
+    private void fillSingleValues(PreparedStatement stmt) throws SQLException {
+        ResultSet result = stmt.executeQuery();
+        if (result.next()) {
+            for (String varName : singleStatements.get(stmt)) {
+                singleValue.put(varName, result.getString(varName));
+            }
+        }
+        result.close();
+    }
+
+    private void fillMultipleValues(PreparedStatement stmt) throws SQLException {
+        ResultSet result = stmt.executeQuery();
+        for (String varName : multipleStatements.get(stmt)) {
+            multipleValue.put(varName, new ArrayList<String>());
+        }
+        while (result.next()) {
+            for (String varName : multipleStatements.get(stmt)) {
+                multipleValue.get(varName).add(result.getString(varName));
+            }
+        }
+        result.close();
+    }
+
+    /**
+     * Return the correspounding statement for the specified variable name.
+     *
+     * @param varName
+     * @return
+     */
+    private PreparedStatement getStatementFromSingleVar(String varName) {
+        for (PreparedStatement stmt : singleStatements.keySet()) {
+            List<String> vars = singleStatements.get(stmt);
+            if (vars.contains(varName))
+                return stmt;
+        }
+        return null;
+    }
+
+     /**
+     * Return the correspounding statement for the specified variable name.
+     *
+     * @param varName
+     * @return
+     */
+    private PreparedStatement getStatementFromMultipleVar(String varName) {
+        for (PreparedStatement stmt : multipleStatements.keySet()) {
+            List<String> vars = multipleStatements.get(stmt);
+            if (vars.contains(varName))
+                return stmt;
+        }
+        return null;
+    }
+
+    /**
+     * Log the list of variables involved in a query which launch a SQL exception.
+     * (debugging purpose).
+     *
+     * @param varList a list of variable.
+     * @param ex
+     */
+    public void logSqlError(List<String> varList, SQLException ex, PreparedStatement stmt) {
+        String varlist = "";
+        if (varList != null) {
+            for (String s : varList) {
+                varlist += s + ',';
+            }
+        } else {
+            varlist = "no variables";
+        }
+        logger.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
+                      "query: " + stmt.toString()                              + '\n' +
+                      "for variable: " + varlist);
+    }
+
     /**
      * return a list of value for the specified variable name.
      *
@@ -364,7 +409,10 @@ public class GenericObservationReader extends ObservationReader {
      * @return
      */
     protected List<String> getVariables(String variable) {
-        return multipleValue.get(variable);
+        List<String> values = multipleValue.get(variable);
+        if (values == null)
+            values = new ArrayList<String>();
+        return values;
     }
 
     /**
@@ -379,27 +427,38 @@ public class GenericObservationReader extends ObservationReader {
     
     @Override
     public List<String> getOfferingNames() throws WebServiceException {
+        loadData(Arrays.asList("var01"), null);
         return getVariables("var01");
     }
 
     @Override
     public List<String> getProcedureNames() throws WebServiceException {
+        loadData(Arrays.asList("var02"), null);
         return getVariables("var02");
     }
 
     @Override
     public List<String> getPhenomenonNames() throws WebServiceException {
+        loadData(Arrays.asList("var03"), null);
         return getVariables("var03");
     }
 
     @Override
     public List<String> getFeatureOfInterestNames() throws WebServiceException {
+        loadData(Arrays.asList("var04"), null);
         return getVariables("var04");
     }
 
     @Override
     public String getNewObservationId() throws WebServiceException {
-        return getVariable("var05");
+        int id = Integer.parseInt(getVariable("var05"));
+        String _continue = null;
+        do {
+            id++;
+            _continue = getVariable("var34");
+
+        } while (_continue != null);
+        return observationIdBase + id;
     }
 
     @Override
@@ -409,6 +468,7 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException {
+        loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var15", "var16", "var17", "var18"), offeringName);
         List<String> srsName = getVariables("var07");
         
         // event time
@@ -418,24 +478,24 @@ public class GenericObservationReader extends ObservationReader {
 
         // procedure
         List<ReferenceEntry> procedures = new ArrayList<ReferenceEntry>();
-        for (String procedureName : getVariables("var09")) {
+        for (String procedureName : getVariables("var10")) {
             procedures.add(new ReferenceEntry(null, procedureName));
         }
 
         // phenomenon
         List<PhenomenonEntry> observedProperties = new ArrayList<PhenomenonEntry>();
-        for (String phenomenonId : getVariables("var10")) {
+        for (String phenomenonId : getVariables("var11")) {
             PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
             observedProperties.add(phenomenon);
         }
-        for (String phenomenonId : getVariables("var11")) {
+        for (String phenomenonId : getVariables("var12")) {
             List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
-            for (String componentID : getVariables("var16")) {
+            for (String componentID : getVariables("var17")) {
                 components.add(getPhenomenon(componentID));
             }
             CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
-                                                                               getVariable("var14"),
                                                                                getVariable("var15"),
+                                                                               getVariable("var16"),
                                                                                null,
                                                                                components);
             observedProperties.add(phenomenon);
@@ -443,7 +503,7 @@ public class GenericObservationReader extends ObservationReader {
 
         // feature of interest
         List<ReferenceEntry> fois = new ArrayList<ReferenceEntry>();
-        for (String foiID : getVariables("var17")) {
+        for (String foiID : getVariables("var18")) {
             fois.add(new ReferenceEntry(null, foiID));
         }
 
@@ -469,6 +529,7 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws WebServiceException {
+        loadData(Arrays.asList("var01"), null);
         List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
         List<String> offeringNames = getVariables("var01");
         for (String offeringName : offeringNames) {
@@ -482,20 +543,28 @@ public class GenericObservationReader extends ObservationReader {
      */
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws WebServiceException {
-       PhenomenonEntry phenomenon = new PhenomenonEntry(phenomenonName, getVariable("var12"), getVariable("var13"));
-       return phenomenon;
+        loadData(Arrays.asList("var13", "var14"), phenomenonName);
+        PhenomenonEntry phenomenon = new PhenomenonEntry(phenomenonName, getVariable("var13"), getVariable("var14"));
+        return phenomenon;
     }
 
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws WebServiceException {
-
-        String name            = getVariable("var18");
-        String description     = getVariable("var19");
-        String sampledFeature  = getVariable("var20");
+        loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24"), samplingFeatureId);
+        String name            = getVariable("var19");
+        String description     = getVariable("var20");
+        String sampledFeature  = getVariable("var21");
         
-        String pointID         = getVariable("var21");
-        String SRSname         = getVariable("var22");
-        int srsDimension       = Integer.parseInt(getVariable("var23"));
+        String pointID         = getVariable("var22");
+        String SRSname         = getVariable("var23");
+
+        String dimension       = getVariable("var24");
+        int srsDimension       = 0;
+        try {
+            srsDimension       = Integer.parseInt(dimension);
+        } catch (NumberFormatException ex) {
+            logger.severe("unable to parse the srs dimension: " + dimension);
+        }
         List<Double> coordinates = getCoordinates(samplingFeatureId);
         DirectPositionType pos = new DirectPositionType(SRSname, srsDimension, coordinates);
         PointType location     = new PointType(pointID, pos);
@@ -505,8 +574,9 @@ public class GenericObservationReader extends ObservationReader {
     }
 
     private List<Double> getCoordinates(String samplingFeatureId) throws WebServiceException {
+        loadData(Arrays.asList("var25"), samplingFeatureId);
         List<Double> result = new ArrayList<Double>();
-        List<String> coordinates = getVariables("var24");
+        List<String> coordinates = getVariables("var25");
         for (String coordinate : coordinates) {
             try {
                 result.add(Double.parseDouble(coordinate));
@@ -519,12 +589,13 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public ObservationEntry getObservation(String identifier) throws WebServiceException {
-        SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(getVariable("var25"));
-        PhenomenonEntry observedProperty = getPhenomenon(getVariable("var26"));
-        ProcessEntry procedure = new ProcessEntry(getVariable("var27"));
+        loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
+        SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(getVariable("var26"));
+        PhenomenonEntry observedProperty = getPhenomenon(getVariable("var27"));
+        ProcessEntry procedure = new ProcessEntry(getVariable("var28"));
 
-        TimePeriodType samplingTime = new TimePeriodType(getVariable("var28"), getVariable("var29"));
-        AnyResultEntry anyResult = getResult(getVariable("var30"));
+        TimePeriodType samplingTime = new TimePeriodType(getVariable("var29"), getVariable("var30"));
+        AnyResultEntry anyResult = getResult(getVariable("var31"));
         DataArrayEntry result = anyResult.getArray();
         ObservationEntry observation = new ObservationEntry(identifier,
                                                             null,
@@ -539,18 +610,20 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public AnyResultEntry getResult(String identifier) throws WebServiceException {
-        int count = Integer.parseInt(getVariable("var31"));
+        loadData(Arrays.asList("var32", "var33"), identifier);
+        int count = Integer.parseInt(getVariable("var32"));
         TextBlockEntry encoding = new TextBlockEntry("encoding-1", ",", "@@", ".");
         //TODO
-        SimpleDataRecordEntry elementType = null;
-        String values = getVariable("var32");
+        SimpleDataRecordEntry elementType = new SimpleDataRecordEntry();
+        String values = getVariable("var33");
         DataArrayEntry result = new DataArrayEntry(identifier, count, elementType, encoding, values);
         return new AnyResultEntry(identifier, result);
     }
 
     @Override
-    public List<ReferenceEntry> getReferences() throws WebServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ReferenceEntry getReference(String href) throws WebServiceException {
+        //TODO
+        return new ReferenceEntry(null, href);
     }
 
 

@@ -49,6 +49,7 @@ public class Query {
     private List<From> from;
     private List<Where> where;
     private List<Orderby> orderBy;
+    private Union union;
     
 
     /**
@@ -116,7 +117,21 @@ public class Query {
         }
         return this.orderBy;
     }
-    
+
+    /**
+     * @return the union
+     */
+    public Union getUnion() {
+        return union;
+    }
+
+    /**
+     * @param union the union to set
+     */
+    public void setUnion(Union union) {
+        this.union = union;
+    }
+
     /**
      * Return an textual SQL query for a preparedStatement (contains '?').
      * 
@@ -124,30 +139,38 @@ public class Query {
      * @return
      */
     public String buildSQLQuery() {
-        String mainQuery = "SELECT ";
+        StringBuilder mainQuery = new StringBuilder("SELECT ");
 
         for (Column col : select.getCol()) {
             String varName = col.getVar();
-            if (varName.equals(":$"))
-                varName = "ID";
-            mainQuery += col.getSql() + " AS " + varName + ',';
+            if (varName != null) {
+                if (varName.equals(":$"))
+                    varName = "ID";
+                mainQuery.append(col.getSql()).append(" AS ").append(varName).append(',');
+            } else {
+                mainQuery.append(col.getSql()).append(',');
+            }
         }
-        mainQuery = mainQuery.substring(0, mainQuery.length() - 1);
+        mainQuery = mainQuery.deleteCharAt(mainQuery.length() - 1);
 
-        mainQuery += " FROM " + from.get(0).getvalue();
+        mainQuery.append(" FROM ").append(from.get(0).getvalue());
 
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
             sql = sql.replace("':$'", "?");
             sql = sql.replace(":$", "?");
-            mainQuery += " WHERE " + sql;
+            mainQuery.append(" WHERE ").append(sql);
         }
         if (orderBy != null && orderBy.size() > 0 && orderBy.get(0) != null && !orderBy.get(0).getvalue().equals("")) {
             String sql = orderBy.get(0).getvalue();
             sql = sql.replace("':$'", "?");
-            mainQuery += " ORDER BY " + sql;
+            mainQuery.append(" ORDER BY ").append(sql);
         }
-        return mainQuery;    
+
+        if (union != null) {
+            mainQuery.append(" UNION ").append(union.getQuery().buildSQLQuery());
+        }
+        return mainQuery.toString();
     }
     
     @Override
@@ -215,4 +238,5 @@ public class Query {
         hash = 29 * hash + (this.orderBy != null ? this.orderBy.hashCode() : 0);
         return hash;
     }
+
 }
