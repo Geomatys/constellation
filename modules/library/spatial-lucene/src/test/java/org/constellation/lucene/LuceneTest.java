@@ -23,16 +23,28 @@ import java.util.logging.Logger;
 import java.awt.geom.Line2D;
 
 // Constellation dependencies
+import java.io.File;
 import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.lucene.filter.BBOXFilter;
+import org.constellation.lucene.filter.BeyondFilter;
+import org.constellation.lucene.filter.ContainsFilter;
+import org.constellation.lucene.filter.CrossesFilter;
+import org.constellation.lucene.filter.DWithinFilter;
+import org.constellation.lucene.filter.DisjointFilter;
+import org.constellation.lucene.filter.EqualsFilter;
+import org.constellation.lucene.filter.IntersectFilter;
+import org.constellation.lucene.filter.OverlapsFilter;
+import org.constellation.lucene.filter.TouchesFilter;
+import org.constellation.lucene.filter.WithinFilter;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
@@ -41,7 +53,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.search.TopDocs;
 
 // geotools/geoAPI dependencies
 import org.geotools.geometry.GeneralDirectPosition;
@@ -61,7 +73,7 @@ import static org.junit.Assert.*;
  */
 public class LuceneTest {
     
-    private RAMDirectory  directory;
+    private File directory;
     private IndexSearcher searcher;
     private Query         simpleQuery;
     private Logger logger = Logger.getLogger("org.constellation.lucene");
@@ -77,10 +89,18 @@ public class LuceneTest {
 
     @Before
     public void setUp() throws Exception {
-        directory = new RAMDirectory();
-        IndexWriter writer = new IndexWriter(directory, new WhitespaceAnalyzer(), true);
+        directory = new File("luceneTest");
+        if (!directory.exists())
+            directory.mkdir();
+        else {
+            for (File f: directory.listFiles()) {
+                f.delete();
+            }
+        }
+        IndexWriter writer = new IndexWriter(directory, new SimpleAnalyzer());
         fillTestData(writer);
-        searcher = new IndexSearcher(directory);
+        IndexReader reader = IndexReader.open(directory);
+        searcher = new IndexSearcher(reader);
         //create a term query to search against all documents
         simpleQuery = new TermQuery(new Term("metafile", "doc"));
     }
@@ -103,17 +123,19 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        BBOXFilter spaFilter = new BBOXFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(spaFilter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("BBOX:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -138,10 +160,11 @@ public class LuceneTest {
         double max2[] = { 2226389.8158654715,  2258423.6490963805};
         bbox = new GeneralEnvelope(min2, max2);
         bbox.setCoordinateReferenceSystem(CRS.decode("EPSG:3395", true));
-        bboxQuery = new SpatialQuery(bbox, "EPSG:3395", SpatialFilter.BBOX);
+        spaFilter = new BBOXFilter(bbox, "EPSG:3395");
+        bboxQuery = new SpatialQuery(spaFilter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
 
         nbResults = hits.length();
         logger.finer("BBOX:BBOX 1 CRS= 3395: nb Results: " + nbResults);
@@ -172,7 +195,8 @@ public class LuceneTest {
         double min3[] = { -5, -5};
         double max3[] = { 60,  60};
         bbox = new GeneralEnvelope(min3, max3);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        spaFilter = new BBOXFilter(bbox, "EPSG:4326");
+        bboxQuery = new SpatialQuery(spaFilter);
         
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -205,7 +229,8 @@ public class LuceneTest {
         double min4[] = { 40, -9};
         double max4[] = { 50, -5};
         bbox = new GeneralEnvelope(min4, max4);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        spaFilter = new BBOXFilter(bbox, "EPSG:4326");
+        bboxQuery = new SpatialQuery(spaFilter);
         
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -239,7 +264,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.INTERSECT);
+        IntersectFilter filter = new IntersectFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -274,7 +300,8 @@ public class LuceneTest {
         double max2[] = { 2226389.8158654715,  2258423.6490963805};
         bbox = new GeneralEnvelope(min2, max2);
         bbox.setCoordinateReferenceSystem(CRS.decode("EPSG:3395", true));
-        bboxQuery = new SpatialQuery(bbox, "EPSG:3395", SpatialFilter.INTERSECT);
+        filter = new IntersectFilter(bbox, "EPSG:3395");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -306,7 +333,8 @@ public class LuceneTest {
          * case 3: line
          */ 
         Line2D line = new Line2D.Double(7, 30, 7,-30);
-        bboxQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
+        filter = new IntersectFilter(line, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -332,7 +360,8 @@ public class LuceneTest {
          * case 4: same line diferent CRS
          */ 
         line = new Line2D.Double(775978.5043848383, 3339584.723798207, 775978.5043848383, -3339584.723798207);
-        bboxQuery = new SpatialQuery(line, "EPSG:3395", SpatialFilter.INTERSECT);
+        filter = new IntersectFilter(line, "EPSG:3395");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -358,7 +387,8 @@ public class LuceneTest {
          * case 5: another line
          */ 
         line = new Line2D.Double(40, 40, 40, -30);
-        bboxQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
+        filter = new IntersectFilter(line, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -382,7 +412,8 @@ public class LuceneTest {
          * case 6: same line another CRS
          */ 
         line = new Line2D.Double(4452779.631730943, 4838471.398061137, 4452779.631730943, -3339584.723798207);
-        bboxQuery = new SpatialQuery(line, "EPSG:3395", SpatialFilter.INTERSECT);
+        filter = new IntersectFilter(line, "EPSG:3395");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -417,7 +448,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.EQUALS);
+        EqualsFilter filter = new EqualsFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -441,7 +473,8 @@ public class LuceneTest {
          * case 2: line
          */ 
         Line2D line = new Line2D.Double(0, 0, 25,0);
-        bboxQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.EQUALS);
+        filter = new EqualsFilter(line, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -468,7 +501,8 @@ public class LuceneTest {
          */ 
         GeneralDirectPosition point = new GeneralDirectPosition(-10, 10);
         point.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.EQUALS);
+        filter = new EqualsFilter(point, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -502,7 +536,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.CONTAINS);
+        ContainsFilter filter = new ContainsFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -525,7 +560,8 @@ public class LuceneTest {
          * case 2: BOX/Line
          */ 
         Line2D line = new Line2D.Double(-25, 5, -15, 5);
-        bboxQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.CONTAINS);
+        filter = new ContainsFilter(line, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -549,7 +585,8 @@ public class LuceneTest {
          */ 
         GeneralDirectPosition point = new GeneralDirectPosition(-25, 5);
         point.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.CONTAINS);
+        filter = new ContainsFilter(point, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -573,7 +610,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(20, 0);
         point.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.CONTAINS);
+        filter = new ContainsFilter(point, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -598,7 +636,8 @@ public class LuceneTest {
          */ 
         line = new Line2D.Double(20, 0, 15, 0);
         point.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.CONTAINS);
+        filter = new ContainsFilter(line, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -632,7 +671,8 @@ public class LuceneTest {
         GeneralDirectPosition point = new GeneralDirectPosition(-25, 5);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         point.setCoordinateReferenceSystem(crs);
-        SpatialQuery spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DISJOINT);
+        DisjointFilter filter = new DisjointFilter(point, "EPSG:4326");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -661,8 +701,8 @@ public class LuceneTest {
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 5"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 2: another point intersecting with the two registered lines.
@@ -671,7 +711,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DISJOINT);
+        filter = new DisjointFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -706,7 +747,8 @@ public class LuceneTest {
          */ 
         Line2D line = new Line2D.Double(-40, 0, 30, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DISJOINT);
+        filter = new DisjointFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -738,7 +780,8 @@ public class LuceneTest {
          */ 
         line = new Line2D.Double(7, 40, 7, -20);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DISJOINT);
+        filter = new DisjointFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -775,7 +818,8 @@ public class LuceneTest {
         double max1[] = { 20,  20};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         bbox.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.DISJOINT);
+        filter = new DisjointFilter(bbox, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -806,7 +850,8 @@ public class LuceneTest {
         double max2[] = { -5,  60};
         bbox = new GeneralEnvelope(min2, max2);
         bbox.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.DISJOINT);
+        filter = new DisjointFilter(bbox, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -824,14 +869,14 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 9);
         assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 3"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 5"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
 
         
     }
@@ -849,7 +894,8 @@ public class LuceneTest {
         GeneralDirectPosition point = new GeneralDirectPosition(0, 0);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         point.setCoordinateReferenceSystem(crs);
-        SpatialQuery spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.TOUCHES);
+        TouchesFilter filter = new TouchesFilter(point, "EPSG:4326");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -868,8 +914,8 @@ public class LuceneTest {
         assertEquals(nbResults, 4);
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 2: another point
@@ -877,7 +923,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(-30, 5);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -894,7 +941,7 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 1);
-	assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("box 4"));
         
         /*
          * case 3: another point
@@ -902,7 +949,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(-25, -50);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -919,7 +967,7 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 1);
-	assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 1"));
         
         /*
          * case 4: another point
@@ -927,7 +975,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition( 0, -10);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -944,7 +993,7 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 1);
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 5: another point
@@ -952,7 +1001,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition( 40, 20);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -969,14 +1019,15 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 1);
-	assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 4"));
         
         /*
          * case 6: a line
          * 
          */ 
         Line2D line = new Line2D.Double(7, 30, 7, 0);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1001,7 +1052,8 @@ public class LuceneTest {
          * 
          */ 
         line = new Line2D.Double(-15, 3, 30, 4);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1026,7 +1078,8 @@ public class LuceneTest {
          * 
          */ 
         line = new Line2D.Double(0, 0, -40, -40);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1046,8 +1099,8 @@ public class LuceneTest {
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("box 1"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 9: a BBOX
@@ -1057,7 +1110,8 @@ public class LuceneTest {
         double max1[] = { 30,  50};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         bbox.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.TOUCHES);
+        filter = new TouchesFilter(bbox, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1079,8 +1133,8 @@ public class LuceneTest {
         assertTrue(results.contains("box 3"  ));
         assertTrue(results.contains("box 4"  ));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
     }
     
     /**
@@ -1097,7 +1151,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.WITHIN);
+        WithinFilter filter = new WithinFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -1115,12 +1170,12 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 7);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 2: another BBOX.
@@ -1129,7 +1184,8 @@ public class LuceneTest {
         double max2[] = { 55,  50};
         bbox = new GeneralEnvelope(min2, max2);
         bbox.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.WITHIN);
+        filter = new WithinFilter(bbox, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -1146,16 +1202,17 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 3);
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 4"));
 
         /*
          * case 6: a line
          * 
          */ 
         Line2D line = new Line2D.Double(-40, 30, 40, 20);
-        SpatialQuery spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.WITHIN);
+        filter = new WithinFilter(line, "EPSG:4326");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1187,7 +1244,8 @@ public class LuceneTest {
          * 
          */ 
         Line2D line = new Line2D.Double(40, 10, 40, 30);
-        SpatialQuery spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.CROSSES);
+        CrossesFilter filter = new CrossesFilter(line, "EPSG:4326");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1212,7 +1270,8 @@ public class LuceneTest {
          * 
          */ 
         line = new Line2D.Double(40, 10, -5, -5);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.CROSSES);
+        filter = new CrossesFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1239,7 +1298,8 @@ public class LuceneTest {
          * 
          */ 
         line = new Line2D.Double(-25, 5, -35, -45);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.CROSSES);
+        filter = new CrossesFilter(line, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1266,7 +1326,8 @@ public class LuceneTest {
         GeneralDirectPosition point = new GeneralDirectPosition(0, 0);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.CROSSES);
+        filter = new CrossesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1285,8 +1346,8 @@ public class LuceneTest {
         assertEquals(nbResults, 4);
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 5: another point
@@ -1294,7 +1355,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(5, 13);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.CROSSES);
+        filter = new CrossesFilter(point, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1322,7 +1384,8 @@ public class LuceneTest {
         double max1[] = { 20,   5};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         bbox.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.CROSSES);
+        filter = new CrossesFilter(bbox, "EPSG:4326");
+        spatialQuery = new SpatialQuery(filter);
         
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1359,8 +1422,10 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery spatialQuery1 = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.TOUCHES);
-        SpatialQuery spatialQuery2 = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        TouchesFilter filter1 = new TouchesFilter(bbox, "EPSG:4326");
+        BBOXFilter filter2 = new BBOXFilter(bbox, "EPSG:4326");
+        SpatialQuery spatialQuery1 = new SpatialQuery(filter1);
+        SpatialQuery spatialQuery2 = new SpatialQuery(filter2);
         
         List<Filter> filters  = new ArrayList<Filter>();
         filters.add(spatialQuery1.getSpatialFilter());
@@ -1423,7 +1488,8 @@ public class LuceneTest {
          * 
          */ 
         Line2D line               = new Line2D.Double(7, 40, 6, -40);
-        SpatialQuery spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
+        IntersectFilter filter    = new IntersectFilter(line, "EPSG:4326");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
         List<Filter> filters3     = new ArrayList<Filter>();
         filters3.add(spatialQuery.getSpatialFilter());
         int filterType3[]         = {SerialChainFilter.NOT};
@@ -1445,16 +1511,16 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 11);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("point 5"));
-	assertTrue(results.contains("box 1"));
-	assertTrue(results.contains("box 3"));
-	assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 5"));
+        assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 3"));
+        assertTrue(results.contains("box 4"));
         assertTrue(results.contains("box 5"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 2"));
         
         
         /*
@@ -1465,7 +1531,8 @@ public class LuceneTest {
         double max2[]          = { 15,  50};
         GeneralEnvelope bbox2  = new GeneralEnvelope(min2, max2);
         bbox2.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox2, "EPSG:4326", SpatialFilter.BBOX);
+        BBOXFilter bfilter = new BBOXFilter(bbox2, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(bfilter);
         List<Filter> filters4  = new ArrayList<Filter>();
         filters4.add(spatialQuery.getSpatialFilter());
         filters4.add(bboxQuery.getSpatialFilter());
@@ -1531,7 +1598,8 @@ public class LuceneTest {
         GeneralDirectPosition point = new GeneralDirectPosition(0, 0);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         point.setCoordinateReferenceSystem(crs);
-        SpatialQuery spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 5, "kilometers");
+        DWithinFilter filter = new DWithinFilter(point, "EPSG:4326", 5.0, "kilometers");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1550,8 +1618,8 @@ public class LuceneTest {
         assertEquals(nbResults, 4);
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 2: point distance 1500Km
@@ -1559,7 +1627,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 1500, "kilometers");
+        filter = new DWithinFilter(point, "EPSG:4326", 1500.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1579,10 +1648,10 @@ public class LuceneTest {
         assertTrue(results.contains("point 2"));
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 2 projected"));
         
         /*
          * case 3: point distance 1500000m (same request than 2 in meters)
@@ -1590,7 +1659,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 1500000, "meters");
+        filter = new DWithinFilter(point, "EPSG:4326", 1500000.0, "meters");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1610,10 +1680,10 @@ public class LuceneTest {
         assertTrue(results.contains("point 2"));
         assertTrue(results.contains("point 3"));
         assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 2 projected"));
         
         /*
          * case 4: point distance 2000Km
@@ -1621,7 +1691,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 2000, "kilometers");
+        filter = new DWithinFilter(point, "EPSG:4326", 2000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1639,15 +1710,15 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 10);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 4"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 5: point distance 4000Km
@@ -1655,7 +1726,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 4000, "kilometers");
+        filter = new DWithinFilter(point, "EPSG:4326", 4000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1673,15 +1745,15 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 11);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 4"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 3"));
         
         /*
@@ -1690,7 +1762,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 5000, "kilometers");
+        filter = new DWithinFilter(point, "EPSG:4326", 5000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1708,16 +1781,16 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 13);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
         assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 4"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 5"));
         
@@ -1727,7 +1800,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.DWITHIN, 6000, "kilometers");
+        filter = new DWithinFilter(point, "EPSG:4326", 6000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1745,16 +1819,16 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 15);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
         assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 4"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("point 5"));
         assertTrue(results.contains("box 1"));
@@ -1767,7 +1841,8 @@ public class LuceneTest {
         double max1[] = { 20,  20};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.DWITHIN, 5, "kilometers");
+        filter = new DWithinFilter(bbox, "EPSG:4326", 5.0, "kilometers");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -1785,21 +1860,22 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 10);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
         assertTrue(results.contains("box 4"));
         assertTrue(results.contains("line 1"));
         assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 2"));
         
         
         /*
          * case 8: BBOX distance 1500km  
-         */ 
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.DWITHIN, 1500, "kilometers");
+         */
+        filter = new DWithinFilter(bbox, "EPSG:4326", 1500.0, "kilometers");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -1817,21 +1893,22 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 11);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 4"));
         assertTrue(results.contains("line 1"));
         assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 9: BBOX distance 3000km  
-         */ 
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.DWITHIN, 3000, "kilometers");
+         */
+        filter = new DWithinFilter(bbox, "EPSG:4326", 3000.0, "kilometers");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -1849,16 +1926,16 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 15);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 4"));
         assertTrue(results.contains("line 1"));
         assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 2"));
         assertTrue(results.contains("point 4"));
         assertTrue(results.contains("point 5"));
         assertTrue(results.contains("box 1"));
@@ -1869,7 +1946,8 @@ public class LuceneTest {
          * 
          */ 
         Line2D line = new Line2D.Double(-50, -45, 60, -43);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DWITHIN, 5, "kilometers");
+        filter = new DWithinFilter(line, "EPSG:4326", 5.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1886,13 +1964,14 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 1);
-	assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 1"));
         
          /*
          * case 11: a line distance 4000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DWITHIN, 4000, "kilometers");
+         */
+        filter = new DWithinFilter(line, "EPSG:4326", 4000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1909,7 +1988,7 @@ public class LuceneTest {
         
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 4);
-	assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 1"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("line 2"));
         assertTrue(results.contains("box 5"));
@@ -1917,8 +1996,9 @@ public class LuceneTest {
         /*
          * case 12: a line distance 5000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DWITHIN, 5000, "kilometers");
+         */
+        filter = new DWithinFilter(line, "EPSG:4326", 5000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1937,7 +2017,7 @@ public class LuceneTest {
         assertEquals(nbResults, 9);
         assertTrue(results.contains("point 2"));
         assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 1"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 4"));
         assertTrue(results.contains("box 5"));
@@ -1948,8 +2028,9 @@ public class LuceneTest {
         /*
          * case 12: a line distance 6000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.DWITHIN, 6000, "kilometers");
+         */
+        filter = new DWithinFilter(line, "EPSG:4326", 6000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -1968,7 +2049,7 @@ public class LuceneTest {
         assertEquals(nbResults, 14);
         assertTrue(results.contains("point 2"));
         assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("box 1"));
+        assertTrue(results.contains("box 1"));
         assertTrue(results.contains("box 3"));
         assertTrue(results.contains("box 4"));
         assertTrue(results.contains("box 5"));
@@ -1976,10 +2057,10 @@ public class LuceneTest {
         assertTrue(results.contains("line 1"));
         assertTrue(results.contains("line 1 projected"));
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
 
     }
     
@@ -1996,7 +2077,8 @@ public class LuceneTest {
         GeneralDirectPosition point = new GeneralDirectPosition(0, 0);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         point.setCoordinateReferenceSystem(crs);
-        SpatialQuery spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 5, "kilometers");
+        BeyondFilter filter = new BeyondFilter(point, "EPSG:4326", 5.0, "kilometers");
+        SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2031,7 +2113,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 1500, "kilometers");
+        filter = new BeyondFilter(point, "EPSG:4326", 1500.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2063,7 +2146,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 1500000, "meters");
+        filter = new BeyondFilter(point, "EPSG:4326", 1500000.0, "meters");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2096,7 +2180,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 2000, "kilometers");
+        filter = new BeyondFilter(point, "EPSG:4326", 2000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2125,7 +2210,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 4000, "kilometers");
+        filter = new BeyondFilter(point, "EPSG:4326", 4000.0 ,"kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2153,7 +2239,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 5000, "kilometers");
+        filter = new BeyondFilter(point, "EPSG:4326", 5000.0 ,"kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2179,7 +2266,8 @@ public class LuceneTest {
          */ 
         point = new GeneralDirectPosition(0, 0);
         point.setCoordinateReferenceSystem(crs);
-        spatialQuery = new SpatialQuery(point, "EPSG:4326", SpatialFilter.BEYOND, 6000, "kilometers");
+        filter = new BeyondFilter(point, "EPSG:4326", 6000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2204,7 +2292,8 @@ public class LuceneTest {
         double max1[] = { 20,  20};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BEYOND, 5, "kilometers");
+        filter = new BeyondFilter(bbox, "EPSG:4326", 5.0, "kilometers");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2231,7 +2320,8 @@ public class LuceneTest {
          * case 8: BBOX distance 1500km  
          */ 
         bbox.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BEYOND, 1500, "kilometers");
+        filter = new BeyondFilter(bbox, "EPSG:4326", 1500.0, "kilometers");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2257,7 +2347,8 @@ public class LuceneTest {
          * case 9: BBOX distance 3000km  
          */ 
         bbox.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BEYOND, 3000, "kilometers");
+        filter = new BeyondFilter(bbox, "EPSG:4326", 3000.0, "kilometers");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2280,7 +2371,8 @@ public class LuceneTest {
          * 
          */ 
         Line2D line = new Line2D.Double(-50, -45, 60, -43);
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.BEYOND, 5, "kilometers");
+        filter = new BeyondFilter(line, "EPSG:4326", 5.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2298,25 +2390,26 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 14);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("point 5"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
-	assertTrue(results.contains("box 3"));
-	assertTrue(results.contains("box 4"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 5"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("box 3"));
+        assertTrue(results.contains("box 4"));
         assertTrue(results.contains("box 5"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
-	assertTrue(results.contains("line 2"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 2"));
         
         /*
          * case 11: a line distance 4000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.BEYOND, 4000, "kilometers");
+         */
+        filter = new BeyondFilter(line, "EPSG:4326", 4000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2334,23 +2427,24 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 11);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 2"));
-	assertTrue(results.contains("point 3"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("point 5"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 5"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
         //issue: this box as tha same y value than box 3
         assertTrue(results.contains("box 4"));
-	assertTrue(results.contains("line 1"));
-	assertTrue(results.contains("line 1 projected"));
+        assertTrue(results.contains("line 1"));
+        assertTrue(results.contains("line 1 projected"));
         
         /*
          * case 12: a line distance 5000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.BEYOND, 5000, "kilometers");
+         */
+        filter = new BeyondFilter(line, "EPSG:4326", 5000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2368,17 +2462,18 @@ public class LuceneTest {
         //we verify that we obtain the correct results.
         assertEquals(nbResults, 6);
         assertTrue(results.contains("point 1"));
-	assertTrue(results.contains("point 1 projected"));
-	assertTrue(results.contains("point 4"));
-	assertTrue(results.contains("point 5"));
-	assertTrue(results.contains("box 2"));
-	assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("point 1 projected"));
+    	assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 5"));
+        assertTrue(results.contains("box 2"));
+    	assertTrue(results.contains("box 2 projected"));
         
         /*
          * case 13: a line distance 6000km
          * 
-         */ 
-        spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.BEYOND, 6000, "kilometers");
+         */
+        filter = new BeyondFilter(line, "EPSG:4326", 6000.0, "kilometers");
+        spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
@@ -2413,7 +2508,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.OVERLAPS);
+        OverlapsFilter filter = new OverlapsFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2439,7 +2535,8 @@ public class LuceneTest {
         double max2[] = {  7,  20};
         bbox = new GeneralEnvelope(min2, max2);
         bbox.setCoordinateReferenceSystem(crs);
-        bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.OVERLAPS);
+        filter = new OverlapsFilter(bbox, "EPSG:4326");
+        bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
         hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2476,7 +2573,8 @@ public class LuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        BBOXFilter bboxFilter = new BBOXFilter(bbox, "EPSG:4326");
+        SpatialQuery bboxQuery = new SpatialQuery(bboxFilter);
 
         //we perform a lucene query
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
@@ -2589,7 +2687,8 @@ public class LuceneTest {
         Query query1            = parser.parse("name:point*");
         Query query2            = parser.parse("name:box*");
         Line2D line             = new Line2D.Double(40, 30, 40, -30);
-        SpatialQuery interQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
+        IntersectFilter intFilter = new IntersectFilter(line, "EPSG:4326");
+        SpatialQuery interQuery = new SpatialQuery(intFilter);
         
         hits1 = searcher.search(query1, bboxQuery.getSpatialFilter());
         hits2 = searcher.search(query2, interQuery.getSpatialFilter());
@@ -2624,68 +2723,68 @@ public class LuceneTest {
     
     private void fillTestData(IndexWriter writer) throws Exception {
         Document doc = new Document();
-        doc.add(new Field("name", "point 1", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 1", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,           -10,                10, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "point 1 projected", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 1 projected", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,           -1111475.102852225,   1113194.9079327357, "EPSG:3395");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "point 2", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 2", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,           -10,                 0, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "point 3", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 3", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,             0,                 0, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "point 4", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 4", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,            40,                20, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "point 5", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "point 5", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,           -40,                30, "EPSG:4326");
         writer.addDocument(doc);
         
         doc = new Document();
-        doc.add(new Field("name", "box 1", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 1", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,           -40,                -25,           -50,               -40, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "box 2", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 2", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,             5,                 10,            10,                15, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "box 2 projected", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 2 projected", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,             556597.4539663679,  1113194.9079327357,  1111475.1028522244, 1678147.5163917788, "EPSG:3395");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "box 3", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 3", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,            30,                 50,             0,                15, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "box 4", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 4", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,           -30,                -15,             0,                10, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "box 5", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "box 5", Field.Store.YES, Field.Index.ANALYZED));
         addBoundingBox(doc,        44.792,             51.126,        -6.171,             -2.28, "EPSG:4326");
         writer.addDocument(doc);
         
         doc = new Document();
-        doc.add(new Field("name", "line 1", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "line 1", Field.Store.YES, Field.Index.ANALYZED));
         addLine       (doc,             0,                  0,            25,                 0, "EPSG:4326");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "line 1 projected", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "line 1 projected", Field.Store.YES, Field.Index.ANALYZED));
         addLine       (doc,             0,        0,      2857692.6111605316,                 0, "EPSG:3395");
         writer.addDocument(doc);
         doc = new Document();
-        doc.add(new Field("name", "line 2", Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("name", "line 2", Field.Store.YES, Field.Index.ANALYZED));
         addLine       (doc,             0,                  0,             0,               -15, "EPSG:4326");
         writer.addDocument(doc);
-        writer.flush();
+        writer.close();
     }
 
     /**
@@ -2699,13 +2798,11 @@ public class LuceneTest {
     private void addPoint(Document doc, double y, double x, String crsName) {
 
         // convert the lat / long to lucene fields
-        doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y"        , y + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullPoint", x + "," + y + "," + crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
         
         // add a default meta field to make searching all documents easy 
-        doc.add(new Field("metafile", "doc",    Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("metafile", "doc",    Field.Store.YES, Field.Index.ANALYZED));
     }
     
     /**
@@ -2721,16 +2818,11 @@ public class LuceneTest {
     private void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
 
         // convert the corner of the box to lucene fields
-        doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("maxx"     , maxx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.UN_TOKENIZED));
-        
+        doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullBBOX", minx + "," + maxx + "," + miny + "," + maxy + "," + crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         // add a default meta field to make searching all documents easy 
-        doc.add(new Field("metafile", "doc",          Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("metafile", "doc",          Field.Store.YES, Field.Index.ANALYZED));
     }
     
     /**
@@ -2747,15 +2839,11 @@ public class LuceneTest {
 
         
         // convert the corner of the box to lucene fields
-        doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y1"       , y1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("x2"       , x2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("fullLine", x1 + "," + y1 + "," + x2 + "," + y2 + "," + crsName , Field.Store.YES, Field.Index.NOT_ANALYZED));
         
         // add a default meta field to make searching all documents easy 
-        doc.add(new Field("metafile", "doc",   Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("metafile", "doc",   Field.Store.YES, Field.Index.ANALYZED));
 
     }
 

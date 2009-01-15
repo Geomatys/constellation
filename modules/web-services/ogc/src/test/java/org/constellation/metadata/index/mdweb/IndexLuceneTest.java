@@ -38,6 +38,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
 // geotools dependencies
+import org.constellation.lucene.filter.BBOXFilter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 
@@ -79,13 +80,17 @@ public class IndexLuceneTest {
 
     @Before
     public void setUp() throws Exception {
+
         List<Form> forms     = new ArrayList<Form>();
         List<Path> paths     = new ArrayList<Path>();
         List<Classe> classes = new ArrayList<Classe>();
         forms                = fillTestData(paths, classes); 
         
         File configDirectory = new File("config-test");
-        configDirectory.mkdir();
+        if (!configDirectory.exists())
+            configDirectory.mkdir();
+        else
+            deleteIndex(configDirectory);
         
         MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
         indexSearcher        = new MDWebIndexSearcher(configDirectory, "");
@@ -94,7 +99,20 @@ public class IndexLuceneTest {
     @After
     public void tearDown() throws Exception {
     }
-    
+
+    public void deleteIndex(File configDir) {
+        if (configDir.exists()) {
+            File indexDirectory = new File(configDir, "index");
+            if (indexDirectory.exists()) {
+                for (File f : indexDirectory.listFiles()) {
+                    f.delete();
+                }
+                indexDirectory.delete();
+            }
+        }
+
+    }
+
     /**
      * Test simple lucene search. 
      * 
@@ -278,7 +296,7 @@ public class IndexLuceneTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialFilter sf          = new SpatialFilter(bbox, "EPSG:4326", SpatialFilter.BBOX);
+        SpatialFilter sf          = new BBOXFilter(bbox, "EPSG:4326");
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
         
         List<String> result = indexSearcher.doSearch(spatialQuery);
@@ -300,7 +318,7 @@ public class IndexLuceneTest {
          */
         resultReport = "";
         List<Filter> lf = new ArrayList<Filter>();
-        sf           = new SpatialFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326", SpatialFilter.BBOX);
+        sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};
         SerialChainFilter f = new SerialChainFilter(lf, op);

@@ -70,31 +70,11 @@ public class SpatialQuery {
      * @throws org.opengis.referencing.FactoryException
      * @throws org.opengis.referencing.operation.TransformException
      */
-    public SpatialQuery(Object geometry, String crsName, int filterType) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
+    public SpatialQuery(SpatialFilter spatialFilter) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
         
-        spatialFilter = new SpatialFilter(geometry, crsName, filterType);
-        query         = new StringBuilder();
-        subQueries    = new ArrayList<SpatialQuery>();
-    }
-    
-    /**
-     * Build a new Query combinating a lucene query and a distance filter .
-     * 
-     * @param geometry   A geometry object.
-     * @param crsName    A corrdinate Reference System name
-     * @param filterType A flag correspounding to the type of the spatial filter
-     * @param distance   A distance expressed in the specified units.
-     * @param units      The units of the specified distance. 
-     * 
-     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
-     * @throws org.opengis.referencing.FactoryException
-     * @throws org.opengis.referencing.operation.TransformException
-     */
-    public SpatialQuery(Object geometry, String crsName, int filterType, double distance, String units) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
-        
-        spatialFilter = new SpatialFilter(geometry, crsName, filterType, distance, units);
-        query         = new StringBuilder();
-        subQueries    = new ArrayList<SpatialQuery>();
+        this.spatialFilter = spatialFilter;
+        query              = new StringBuilder();
+        subQueries         = new ArrayList<SpatialQuery>();
     }
     
     /**

@@ -17,7 +17,6 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import java.awt.geom.Line2D;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +53,18 @@ import org.constellation.ogc.PropertyIsNullType;
 import org.constellation.ogc.PropertyNameType;
 import org.constellation.ogc.SpatialOpsType;
 import org.constellation.ogc.UnaryLogicOpType;
+import org.constellation.lucene.filter.BBOXFilter;
+import org.constellation.lucene.filter.BeyondFilter;
+import org.constellation.lucene.filter.ContainsFilter;
+import org.constellation.lucene.filter.CrossesFilter;
+import org.constellation.lucene.filter.DWithinFilter;
+import org.constellation.lucene.filter.DisjointFilter;
+import org.constellation.lucene.filter.EqualsFilter;
+import org.constellation.lucene.filter.IntersectFilter;
+import org.constellation.lucene.filter.OverlapsFilter;
+import org.constellation.lucene.filter.SpatialFilterType;
+import org.constellation.lucene.filter.TouchesFilter;
+import org.constellation.lucene.filter.WithinFilter;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Lucene dependencies
@@ -61,7 +72,6 @@ import org.apache.lucene.search.Filter;
 
 // geotools dependencies
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 
@@ -494,7 +504,7 @@ public class LuceneFilterParser extends FilterParser {
                 GeneralEnvelope envelope      = new GeneralEnvelope(min, max);
                 CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
                 envelope.setCoordinateReferenceSystem(crs);
-                spatialfilter = new SpatialFilter(envelope, CRSName, SpatialFilter.BBOX);
+                spatialfilter = new BBOXFilter(envelope, CRSName);
                 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
@@ -514,14 +524,6 @@ public class LuceneFilterParser extends FilterParser {
             String units            = dist.getDistanceUnits();
             JAXBElement JBgeom      = dist.getAbstractGeometry();
             String operator         = JBSpatialOps.getName().getLocalPart();
-            int filterType;
-            if (operator.equals("DWithin"))
-                filterType = SpatialFilter.DWITHIN;
-            else if (operator.equals("Beyond"))
-                filterType = SpatialFilter.BEYOND;
-            else
-                throw new WebServiceException("Unknow DistanceBuffer operator.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
            
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
@@ -558,8 +560,16 @@ public class LuceneFilterParser extends FilterParser {
                     CRSName  = GMLenvelope.getSrsName();
                     geometry = GMLenvelopeToGeneralEnvelope(GMLenvelope);
                 }
-                spatialfilter = new SpatialFilter(geometry, CRSName, filterType, distance, units);
-               
+
+                if (operator.equals("DWithin")) {
+                    spatialfilter = new DWithinFilter(geometry, CRSName, distance, units);
+                } else if (operator.equals("Beyond")) {
+                    spatialfilter = new BeyondFilter(geometry, CRSName, distance, units);
+                } else {
+                    throw new WebServiceException("Unknow DistanceBuffer operator.",
+                            INVALID_PARAMETER_VALUE, "QueryConstraint");
+                }
+                
             } catch (NoSuchAuthorityCodeException e) {
                     throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
@@ -577,6 +587,7 @@ public class LuceneFilterParser extends FilterParser {
                         
             String propertyName = null;
             String operator     = JBSpatialOps.getName().getLocalPart();
+            operator            = operator.toUpperCase();
             Object geometry     = null;
             
             // the propertyName
@@ -615,33 +626,47 @@ public class LuceneFilterParser extends FilterParser {
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
-            int filterType = SpatialFilter.valueOf(operator);
-            if (filterType == -1) {
+            SpatialFilterType filterType = null;
+            try {
+                filterType = SpatialFilterType.valueOf(operator);
+            } catch (IllegalArgumentException ex) {
+                logger.severe("unknow spatial filter Type");
+            }
+            if (filterType == null) {
                 throw new WebServiceException("Unknow FilterType: " + operator,
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             String CRSName = "undefined CRS";
             try {
+                Object filterGeometry = null;
                 if (geometry instanceof EnvelopeEntry) {
                     
                     //we transform the EnvelopeEntry in GeneralEnvelope
-                    EnvelopeEntry GMLenvelope   = (EnvelopeEntry)geometry;
-                    CRSName                     = GMLenvelope.getSrsName();
-                    GeneralEnvelope envelope    = GMLenvelopeToGeneralEnvelope(GMLenvelope);
-                    spatialfilter               = new SpatialFilter(envelope, CRSName, filterType);
+                    EnvelopeEntry GMLenvelope = (EnvelopeEntry)geometry;
+                    CRSName                   = GMLenvelope.getSrsName();
+                    filterGeometry            = GMLenvelopeToGeneralEnvelope(GMLenvelope);
                 
                 } else if (geometry instanceof PointType) {
-                    PointType GMLpoint          = (PointType) geometry;
-                    CRSName                     = GMLpoint.getSrsName();
-                    GeneralDirectPosition point = GMLpointToGeneralDirectPosition(GMLpoint);
-                    spatialfilter               = new SpatialFilter(point, CRSName, filterType);
+                    PointType GMLpoint        = (PointType) geometry;
+                    CRSName                   = GMLpoint.getSrsName();
+                    filterGeometry            = GMLpointToGeneralDirectPosition(GMLpoint);
                 
                 } else if (geometry instanceof LineStringType) {
                     LineStringType GMLline =  (LineStringType) geometry;
                     CRSName                = GMLline.getSrsName();
-                    Line2D line            = GMLlineToline2d(GMLline);
-                    spatialfilter          = new SpatialFilter(line, CRSName, filterType);
+                    filterGeometry         = GMLlineToline2d(GMLline);
+                }
+
+                switch (filterType) {
+                    case CONTAINS  : spatialfilter = new ContainsFilter(filterGeometry, CRSName);  break;
+                    case CROSSES   : spatialfilter = new CrossesFilter(filterGeometry, CRSName);   break;
+                    case DISJOINT  : spatialfilter = new DisjointFilter(filterGeometry, CRSName);  break;
+                    case EQUALS    : spatialfilter = new EqualsFilter(filterGeometry, CRSName);    break;
+                    case INTERSECTS : spatialfilter = new IntersectFilter(filterGeometry, CRSName); break;
+                    case OVERLAPS  : spatialfilter = new OverlapsFilter(filterGeometry, CRSName);  break;
+                    case TOUCHES   : spatialfilter = new TouchesFilter(filterGeometry, CRSName);   break;
+                    case WITHIN    : spatialfilter = new WithinFilter(filterGeometry, CRSName);    break;
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
