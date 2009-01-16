@@ -647,7 +647,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     }
 
     public void destroy() {
-        reader.destroy();
+        if (reader != null)
+            reader.destroy();
         pool.shutdown();
     }
 }

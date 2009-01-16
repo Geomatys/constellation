@@ -20,15 +20,13 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -40,6 +38,9 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.configuration.filter.ConfigurationFileFilter;
+import org.constellation.configuration.filter.IndexDirectoryFilter;
+import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Utils;
@@ -60,6 +61,7 @@ import org.geotools.metadata.note.Anchors;
 import org.mdweb.utils.GlobalUtils;
 
 /**
+ * The base for The CSW configurer.
  *
  * @author Guilhem Legal
  */
@@ -75,63 +77,127 @@ public abstract class AbstractCSWConfigurer {
     /**
      * A lucene Index used to pre-build a CSW index.
      */
-    protected Map<String, AbstractIndexer> indexers = new HashMap<String, AbstractIndexer>();
+    private Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
     
-    /**
-     * A list of Reader to the database.
-     */
-    protected List<MetadataReader> readers = new ArrayList<MetadataReader>();
-
     /**
      * A generic factory to get the correct CSW Factory.
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
 
-    
+    /**
+     * A CSW factory
+     */
+    private AbstractCSWFactory CSWfactory;
+
+    /**
+     * Build a new CSW configurer.
+     * 
+     * @param cn
+     * @throws org.constellation.configuration.exception.ConfigurationException
+     */
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
-        File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory()))
-            throw new ConfigurationException("No configuration directory have been found");
-        try {
-            JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
-            Unmarshaller configUnmarshaller = jb.createUnmarshaller();
 
-            for (File configFile: cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
+        File cswConfigDir = getConfigurationDirectory();
+        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory())) {
+            throw new ConfigurationException("No configuration directory have been found");
+        }
+        
+        try {
+            Unmarshaller configUnmarshaller = JAXBContext.newInstance("org.constellation.generic.database").createUnmarshaller();
+            CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
+
+            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
                 //we get the csw ID (if single mode return "")
                 String id = getConfigID(configFile);
-
                 // we get the CSW configuration file
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                BDD db = config.getBdd();
-                if (db == null) {
-                    throw new ConfigurationException("the configuration file does not contains a BDD object.");
-                } else {
-                    Connection MDConnection = db.getConnection();
-                    
-                    AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
-                    LOGGER.finer("loaded Factory: " + CSWfactory.getClass().getName());
-                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
-                    indexers.put(id, CSWfactory.getIndexer(config.getType(), currentReader, MDConnection, cswConfigDir, id));
-                    readers.add(currentReader);
-                }
+                serviceConfiguration.put(id, config);
             }
-            if (readers.size() == 0) {
-                throw new ConfigurationException("No database configuration file have been found");
-            }
-        } catch (SQLException e) {
-            throw new ConfigurationException("SQL Exception while creating CSWConfigurer.", e.getMessage());
-        } catch (WebServiceException e) {
-            throw new ConfigurationException("WebServiceException while creating CSWConfigurer.", e.getMessage());
+            
         } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service");
+            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
         } catch (FactoryNotFoundException ex) {
-            throw new ConfigurationException("Unable to find a CSW factory for CSW in configuration service");
+            throw new ConfigurationException("Unable to find a CSW factory for CSW in configuration service", ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
         }
     }
-    
+
+
+    /**
+     * Build a new Indexer for the specified service ID.
+     * 
+     * @param serviceID
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
+    protected AbstractIndexer initIndexer(String serviceID) throws WebServiceException {
+
+        // we get the CSW configuration file
+        Automatic config = serviceConfiguration.get(serviceID);
+
+        if (config != null) {
+            BDD db = config.getBdd();
+            if (db == null) {
+                throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
+            } else {
+                try {
+                    File cswConfigDir            = getConfigurationDirectory();
+                    Connection MDConnection      = db.getConnection();
+                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
+                    AbstractIndexer indexer      = CSWfactory.getIndexer(config.getType(), currentReader, MDConnection, cswConfigDir, serviceID);
+                    return indexer;
+                    
+                } catch (JAXBException ex) {
+                    throw new WebServiceException("JAXBException while initializing the indexer!", NO_APPLICABLE_CODE);
+                } catch (SQLException ex) {
+                    throw new WebServiceException("SQLException while initializing the indexer!", NO_APPLICABLE_CODE);
+                }
+            }
+        } else {
+            throw new WebServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * Build a new Metadata reader for the specified service ID.
+     *
+     * @param serviceID
+     * @return
+     * @throws org.constellation.ws.WebServiceException
+     */
+    protected MetadataReader initReader(String serviceID) throws WebServiceException {
+
+        // we get the CSW configuration file
+        Automatic config = serviceConfiguration.get(serviceID);
+
+        if (config != null) {
+            BDD db = config.getBdd();
+            if (db == null) {
+                throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
+            } else {
+                try {
+                    File cswConfigDir            = getConfigurationDirectory();
+                    Connection MDConnection      = db.getConnection();
+                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
+                    return currentReader;
+
+                } catch (JAXBException ex) {
+                    throw new WebServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
+                } catch (SQLException ex) {
+                    throw new WebServiceException("SQLException while initializing the reader!", NO_APPLICABLE_CODE);
+                }
+            }
+        } else {
+            throw new WebServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
+        }
+    }
+
+    public Set<String> getAllServiceIDs() {
+        return serviceConfiguration.keySet();
+    }
+
     /**
      * Refresh the properties file used by the CSW service to store federated catalogues.
      * 
@@ -196,13 +262,14 @@ public abstract class AbstractCSWConfigurer {
     }
 
     /**
+     * Delete The index folder and call the restart() method.
      *
      * @param configurationDirectory
      * @throws org.constellation.ws.WebServiceException
      */
     private void synchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
         //we delete each index directory
-        for (File indexDir : configurationDirectory.listFiles(new indexDirectoryFilter(id))) {
+        for (File indexDir : configurationDirectory.listFiles(new IndexDirectoryFilter(id))) {
             for (File f : indexDir.listFiles()) {
                 f.delete();
             }
@@ -216,6 +283,8 @@ public abstract class AbstractCSWConfigurer {
     }
 
     /**
+     * Build a new Index in a new folder.
+     * This index will be used at the next restart of the server.
      *
      * @param configurationDirectory
      * @throws org.constellation.ws.WebServiceException
@@ -225,7 +294,7 @@ public abstract class AbstractCSWConfigurer {
          * we delete each pre-builded index directory.
          * if there is a specific id in parameter we only delete the specified profile
          */
-        for (File indexDir : configurationDirectory.listFiles(new nextIndexDirectoryFilter(id))) {
+        for (File indexDir : configurationDirectory.listFiles(new NextIndexDirectoryFilter(id))) {
             for (File f : indexDir.listFiles()) {
                 f.delete();
             }
@@ -239,15 +308,23 @@ public abstract class AbstractCSWConfigurer {
          * if there is a specific id in parameter we only index the specified profile
          */
         for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
-            String currentId    = getConfigID(configFile);
-            File nexIndexDir    = new File(configurationDirectory, currentId + "nextIndex");
-            AbstractIndexer indexer = indexers.get(currentId);
-            if (indexer != null) {
-                nexIndexDir.mkdir();
-                indexer.setFileDirectory(nexIndexDir);
-                indexer.createIndex();
-            } else {
-                throw new WebServiceException("There is no indexer for the id:" + id, NO_APPLICABLE_CODE);
+            String currentId        = getConfigID(configFile);
+            File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
+            AbstractIndexer indexer = null;
+            try {
+                indexer = initIndexer(currentId);
+                if (indexer != null) {
+                    nexIndexDir.mkdir();
+                    indexer.setFileDirectory(nexIndexDir);
+                    indexer.createIndex();
+
+                } else {
+                    throw new WebServiceException("There is no indexer for the id:" + id, NO_APPLICABLE_CODE);
+                }
+            } finally {
+                if (indexer != null) {
+                    indexer.destroy();
+                }
             }
         }
     }
@@ -258,18 +335,6 @@ public abstract class AbstractCSWConfigurer {
     protected void restart() {
         containerNotifier.reload();
     }
-    
-    /**
-     * destroy all the resource and close the connection.
-     */
-    public abstract void destroy();
-    
-    
-    public abstract AcknowlegementType updateContacts() throws WebServiceException;
-    
-    public abstract AcknowlegementType updateVocabularies() throws WebServiceException;
-
-    protected abstract File getConfigurationDirectory();
 
     /**
      * Return the ID of the CSW given by the configuration file Name.
@@ -284,63 +349,16 @@ public abstract class AbstractCSWConfigurer {
         }
         return "";
     }
+    
+    public abstract AcknowlegementType updateContacts() throws WebServiceException;
+    
+    public abstract AcknowlegementType updateVocabularies() throws WebServiceException;
+
+    protected abstract File getConfigurationDirectory();
 
     /**
-     * An internal class to filter the configuration directory and return the configuration files.
+     * destroy all the resource and close the connection.
      */
-    private class ConfigurationFileFilter implements FilenameFilter {
-
-        private String prefix;
-
-        public ConfigurationFileFilter(String id) {
-            prefix = "";
-            if (id != null)
-                prefix = id;
-        }
-
-        public boolean accept(File dir, String name) {
-            return (name.endsWith(prefix + "config.xml"));
-        }
-
-    }
-
-    /**
-     * An internal class to filter the configuration directory and return the index directory.
-     */
-    private class indexDirectoryFilter implements FilenameFilter {
-
-        private String prefix;
-
-        public indexDirectoryFilter(String id) {
-            prefix = "";
-            if (id != null)
-                prefix = id;
-        }
-
-        public boolean accept(File dir, String name) {
-            File f = new File(dir, name);
-            return (name.endsWith(prefix + "index") && f.isDirectory());
-        }
-
-    }
-
-    /**
-     * An internal class to filter the configuration directory and return the pre-builded index directory.
-     */
-    private class nextIndexDirectoryFilter implements FilenameFilter {
-
-        private String prefix;
-        
-        public nextIndexDirectoryFilter(String id) {
-            prefix = "";
-            if (id != null)
-                prefix = id;
-        }
-        
-        public boolean accept(File dir, String name) {
-            File f = new File(dir, name);
-            return (name.endsWith(prefix + "nextIndex") && f.isDirectory());
-        }
-
+    public void destroy() {
     }
 }

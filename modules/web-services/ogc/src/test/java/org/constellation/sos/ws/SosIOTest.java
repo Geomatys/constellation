@@ -35,6 +35,7 @@ import org.constellation.sos.GetResultResponse;
 import org.constellation.sos.ResponseModeType;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
+import org.constellation.swe.v101.SimpleDataRecordEntry;
 import org.junit.Test;
 import org.constellation.ws.WebServiceException;
 import org.junit.After;
@@ -115,6 +116,22 @@ public class SosIOTest {
         assertEquals(expObs.getQuality(), obs.getQuality());
         DataArrayEntry expRes = ((DataArrayPropertyType)expObs.getResult()).getDataArray();
         DataArrayEntry res    = ((DataArrayPropertyType)obs.getResult()).getDataArray();
+        assertEquals(expRes.getEncoding(), res.getEncoding());
+        assertEquals(expRes.getValues(), res.getValues());
+
+        assertTrue(expRes.getElementType() instanceof SimpleDataRecordEntry);
+        assertTrue(res.getElementType()    instanceof SimpleDataRecordEntry);
+        SimpleDataRecordEntry expElementType = (SimpleDataRecordEntry) expRes.getElementType();
+        SimpleDataRecordEntry resElementType = (SimpleDataRecordEntry) res.getElementType();
+
+        assertEquals(expElementType.getBlockId(), resElementType.getBlockId());
+        assertEquals(expElementType.getDefinition(), resElementType.getDefinition());
+        assertEquals(expElementType.getId(), resElementType.getId());
+        assertEquals(expElementType.getField().size(), resElementType.getField().size());
+        assertEquals(expElementType.getField(), resElementType.getField());
+        assertEquals(expElementType, resElementType);
+
+        assertEquals(expRes.getElementType(), res.getElementType());
         assertEquals(expRes, res);
         assertEquals(expObs.getResult(), obs.getResult());
         assertEquals(expObs, obs);

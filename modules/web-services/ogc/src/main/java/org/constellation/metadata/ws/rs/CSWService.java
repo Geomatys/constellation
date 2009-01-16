@@ -94,15 +94,18 @@ import org.geotools.metadata.iso.MetaDataImpl;
 public class CSWService extends OGCWebService {
     
     private CSWworker worker;
+
+    private final String serviceID;
     
     /**
      * Build a new Restfull CSW service.
      */
     public CSWService() {
         super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
+        serviceID = "";
         try {
             setXMLContext("", getAllClasses());
-            worker = new CSWworker("", unmarshaller, marshaller);
+            worker = new CSWworker(serviceID, unmarshaller, marshaller);
             
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
@@ -118,6 +121,7 @@ public class CSWService extends OGCWebService {
      */
     protected CSWService(String serviceID) {
         super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
+        this.serviceID = serviceID;
         try {
             setXMLContext("", getAllClasses());
             worker = new CSWworker(serviceID, unmarshaller, marshaller);
@@ -938,7 +942,11 @@ public class CSWService extends OGCWebService {
      */
     @PreDestroy
     public void destroy() {
-        LOGGER.info("destroying CSW service");
+        String id = "";
+        if (serviceID != null && !serviceID.equals(""))
+            id = '(' + serviceID + ')';
+
+        LOGGER.info("destroying CSW service " + id);
         if (worker != null)
             worker.destroy();
     }

@@ -21,8 +21,6 @@ package org.constellation.configuration.ws.rs;
 import java.io.File;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.metadata.index.AbstractIndexer;
-import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -52,15 +50,6 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
         throw new WebServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
     
-    public void destroy() {
-        for (AbstractIndexer indexer : indexers.values()) {
-            indexer.destroy();
-        }
-        for (MetadataReader reader: readers) {
-            reader.destroy();
-        }
-    }
-
     @Override
     protected File getConfigurationDirectory() {
         return serviceDirectory.get("CSW");

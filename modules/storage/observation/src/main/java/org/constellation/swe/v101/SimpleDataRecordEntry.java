@@ -89,7 +89,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
         }
         if (object instanceof SimpleDataRecordEntry && super.equals(object)) {
             final SimpleDataRecordEntry that = (SimpleDataRecordEntry) object;
-            if (this.field.size() != that.field.size())
+            if (this.getField().size() != that.getField().size())
                 return false;
         
             Iterator<AnyScalarPropertyType> i = field.iterator();

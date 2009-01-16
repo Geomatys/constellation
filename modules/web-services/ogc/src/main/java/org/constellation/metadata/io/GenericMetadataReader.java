@@ -136,7 +136,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * Shared Thread Pool for parralele execution
      */
-    private ExecutorService pool = Executors.newFixedThreadPool(6);
+    private final ExecutorService pool = Executors.newFixedThreadPool(6);
+
+    /**
+     * A connection to the database.
+     */
+    private final Connection connection;
     
     /**
      * Build a new Generic metadata reader and initialize the statement.
@@ -144,7 +149,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     public GenericMetadataReader(Automatic configuration, Connection connection, File configDir) throws SQLException, JAXBException {
         super(false, true);
-        initStatement(connection, configuration);
+        this.connection        = connection;
+        initStatement(configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
@@ -158,7 +164,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     public GenericMetadataReader(Automatic configuration, Connection connection, File configDir, boolean fillAnchor) throws SQLException, JAXBException {
         super(false, true);
-        initStatement(connection, configuration);
+        this.connection        = connection;
+        initStatement(configuration);
         singleValue            = new HashMap<String, String>();
         multipleValue          = new HashMap<String, List<String>>();
         contacts               = new HashMap<String, ResponsibleParty>();
@@ -172,12 +179,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    private final void initStatement(Connection connection, Automatic configuration) throws SQLException {
+    private final void initStatement(Automatic configuration) throws SQLException {
         // we initialize the main query
         if (configuration.getQueries() != null           &&
             configuration.getQueries().getMain() != null &&
             configuration.getQueries().getMain().getQuery() != null) {
-            Query mainQuery = configuration.getQueries().getMain().getQuery();
+            Query mainQuery    = configuration.getQueries().getMain().getQuery();
             mainStatement      = connection.prepareStatement(mainQuery.buildSQLQuery());
         } else {
             logger.severe("The configuration file is malformed, unable to reach the main query");
@@ -880,7 +887,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 mainStatement.close();
                 mainStatement = null;
             }
-
+            connection.close();
             pool.shutdown();
         } catch (SQLException ex) {
             logger.severe("SQLException while destroying Generic metadata reader");
