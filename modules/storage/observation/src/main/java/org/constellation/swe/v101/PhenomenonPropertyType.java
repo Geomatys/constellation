@@ -230,35 +230,40 @@ public class PhenomenonPropertyType {
         if (object == this) {
             return true;
         }
-        final PhenomenonPropertyType that = (PhenomenonPropertyType) object;
-        
-        return Utilities.equals(this.hiddenPhenomenon,    that.hiddenPhenomenon)    &&
-               Utilities.equals(this.phenomenon,          that.phenomenon)          &&
-               Utilities.equals(this.compoundPhenomenon,  that.compoundPhenomenon)  &&
-               Utilities.equals(this.compositePhenomenon, that.compositePhenomenon) &&
-               Utilities.equals(this.actuate,             that.actuate)             &&
-               Utilities.equals(this.arcrole,             that.arcrole)             &&  
-               Utilities.equals(this.type,                that.type)                &&
-               Utilities.equals(this.href,                that.href)                &&
-               Utilities.equals(this.remoteSchema,        that.remoteSchema)        &&
-               Utilities.equals(this.show,                that.show)                &&
-               Utilities.equals(this.role,                that.role)                &&
-               Utilities.equals(this.title,               that.title);
+        if (object instanceof PhenomenonPropertyType) {
+            final PhenomenonPropertyType that = (PhenomenonPropertyType) object;
+
+            return Utilities.equals(this.hiddenPhenomenon,    that.hiddenPhenomenon)    &&
+                   Utilities.equals(this.phenomenon,          that.phenomenon)          &&
+                   Utilities.equals(this.compoundPhenomenon,  that.compoundPhenomenon)  &&
+                   Utilities.equals(this.compositePhenomenon, that.compositePhenomenon) &&
+                   Utilities.equals(this.actuate,             that.actuate)             &&
+                   Utilities.equals(this.arcrole,             that.arcrole)             &&
+                   Utilities.equals(this.type,                that.type)                &&
+                   Utilities.equals(this.href,                that.href)                &&
+                   Utilities.equals(this.remoteSchema,        that.remoteSchema)        &&
+                   Utilities.equals(this.show,                that.show)                &&
+                   Utilities.equals(this.role,                that.role)                &&
+                   Utilities.equals(this.title,               that.title);
+        }
+        return false;
     }
 
-    
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 47 * hash + (this.phenomenon != null ? this.phenomenon.hashCode() : 0);
-        hash = 47 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
-        hash = 47 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
-        hash = 47 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
-        hash = 47 * hash + (this.href != null ? this.href.hashCode() : 0);
-        hash = 47 * hash + (this.role != null ? this.role.hashCode() : 0);
-        hash = 47 * hash + (this.show != null ? this.show.hashCode() : 0);
-        hash = 47 * hash + (this.title != null ? this.title.hashCode() : 0);
-        hash = 47 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 97 * hash + (this.phenomenon != null ? this.phenomenon.hashCode() : 0);
+        hash = 97 * hash + (this.compoundPhenomenon != null ? this.compoundPhenomenon.hashCode() : 0);
+        hash = 97 * hash + (this.compositePhenomenon != null ? this.compositePhenomenon.hashCode() : 0);
+        hash = 97 * hash + (this.hiddenPhenomenon != null ? this.hiddenPhenomenon.hashCode() : 0);
+        hash = 97 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 97 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 97 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 97 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 97 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         return hash;
     }
 

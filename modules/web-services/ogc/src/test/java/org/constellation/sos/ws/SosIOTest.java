@@ -22,22 +22,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.observation.ObservationEntry;
 import org.constellation.ogc.BinaryTemporalOpType;
+import org.constellation.sos.Capabilities;
 import org.constellation.sos.EventTime;
+import org.constellation.sos.GetCapabilities;
 import org.constellation.sos.GetObservation;
 import org.constellation.sos.GetResult;
 import org.constellation.sos.GetResultResponse;
+import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.sos.ResponseModeType;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
 import org.junit.Test;
-import org.constellation.ws.WebServiceException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,6 +63,8 @@ public class SosIOTest {
 
     private SOSworker genericWorker;
 
+    private Marshaller marshaller;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -74,15 +81,67 @@ public class SosIOTest {
     public void tearDown() throws Exception {
     }
 
-    public SosIOTest() throws WebServiceException {
+    public SosIOTest() throws Exception {
+        File capabilitiesFile = new File("/home/guilhem/netbeans project/Constellation/sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
+        JAXBContext context = JAXBContext.newInstance("org.constellation.sos:org.constellation.ows.v110");
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        
+        Object obj = unmarshaller.unmarshal(capabilitiesFile);
+        Capabilities staticCapabilities = null;
+        if (obj instanceof Capabilities) {
+            staticCapabilities = (Capabilities) obj;
+        }
+
         File configDirectory1 = new File("sosDefaultConfig");
         defaultWorker = new SOSworker(DISCOVERY, configDirectory1);
+        defaultWorker.setStaticCapabilities(staticCapabilities);
+
         File configDirectory2 = new File("sosGenericConfig");
         genericWorker = new SOSworker(DISCOVERY, configDirectory2);
+        genericWorker.setStaticCapabilities(staticCapabilities);
     }
 
     /**
-     * Test simple lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void GetCapabilitiesTest() throws Exception {
+        GetCapabilities request = new GetCapabilities("1.0.0", "application/xml");
+        Capabilities expResult  = defaultWorker.getCapabilities(request);
+        Capabilities result     = genericWorker.getCapabilities(request);
+
+        marshaller.marshal(expResult, new File("expectedCapabilities.xml"));
+        marshaller.marshal(result, new File("resultCapabilities.xml"));
+        
+        List<ObservationOfferingEntry> expOfferingList = expResult.getContents().getObservationOfferingList().getObservationOffering();
+        List<ObservationOfferingEntry> resOfferingList = result.getContents().getObservationOfferingList().getObservationOffering();
+        assertEquals(expOfferingList.size(), resOfferingList.size());
+        for (int i = 0; i <expOfferingList.size(); i++) {
+            ObservationOfferingEntry expOffering = expOfferingList.get(i);
+            ObservationOfferingEntry resOffering = resOfferingList.get(i);
+
+            assertEquals(expOffering.getObservedProperty().size(),  resOffering.getObservedProperty().size());
+            assertEquals(expOffering.getObservedProperty(),  resOffering.getObservedProperty());
+            assertEquals(expOffering.getFeatureOfInterest(), resOffering.getFeatureOfInterest());
+            assertEquals(expOffering.getProcedure(),         resOffering.getProcedure());
+            assertEquals(expOffering.getTime(),         resOffering.getTime());
+            assertEquals(expOffering, resOffering);
+        }
+        assertEquals(expOfferingList, resOfferingList);
+
+        assertEquals(expResult.getContents().getObservationOfferingList(), result.getContents().getObservationOfferingList());
+        assertEquals(expResult.getContents(), result.getContents());
+        assertEquals(expResult.getFilterCapabilities(), result.getFilterCapabilities());
+        assertEquals(expResult.getOperationsMetadata(), result.getOperationsMetadata());
+        assertEquals(expResult.getServiceIdentification(), result.getServiceIdentification());
+        assertEquals(expResult.getServiceProvider(), result.getServiceProvider());
+        assertEquals(expResult, result);
+
+    }
+    /**
      *
      * @throws java.lang.Exception
      */
@@ -128,10 +187,14 @@ public class SosIOTest {
         assertEquals(expElementType.getDefinition(), resElementType.getDefinition());
         assertEquals(expElementType.getId(), resElementType.getId());
         assertEquals(expElementType.getField().size(), resElementType.getField().size());
+        
         assertEquals(expElementType.getField(), resElementType.getField());
         assertEquals(expElementType, resElementType);
 
         assertEquals(expRes.getElementType(), res.getElementType());
+
+        assertEquals(expRes.getElementCount(), res.getElementCount());
+
         assertEquals(expRes, res);
         assertEquals(expObs.getResult(), obs.getResult());
         assertEquals(expObs, obs);

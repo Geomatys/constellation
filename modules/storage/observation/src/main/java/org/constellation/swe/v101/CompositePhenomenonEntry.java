@@ -135,13 +135,13 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
                     }
                 } else return false;
             } 
-        
             return Utilities.equals(this.getId(),             that.getId()) &&
                    Utilities.equals(this.getDescription(),    that.getDescription()) &&
                    Utilities.equals(this.getName(),           that.getName()) &&
                    Utilities.equals(this.base,                that.base) && 
                    Utilities.equals(this.component,           that.component);
-       } 
+       }
+        System.out.println("super not equalw");
        return false;
         
         
@@ -162,8 +162,10 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
         if (component != null) {
             Iterator i =  component.iterator();
             s.append("components :").append('\n');
+            int j = 0;
             while (i.hasNext()) {
-                s.append(i.next().toString()).append('\n');
+                s.append("component[").append(j).append("]:").append(i.next().toString()).append('\n');
+                j++;
             }
         } else {
              s.append("COMPONENT IS NULL");

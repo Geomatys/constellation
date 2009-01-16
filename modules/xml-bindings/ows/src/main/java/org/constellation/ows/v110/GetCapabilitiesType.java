@@ -82,6 +82,17 @@ public class GetCapabilitiesType extends AbstractGetCapabilities {
         this.sections       = sections;
         this.updateSequence = updateSequence;
     }
+
+
+    /**
+     * Build a new GetCapabilities base request.
+     */
+    public GetCapabilitiesType(String acceptVersions, String acceptFormats){
+        this.acceptFormats  = new AcceptFormatsType(acceptFormats);
+        this.acceptVersions = new AcceptVersionsType(acceptVersions);
+        this.sections       = new SectionsType("All");
+        this.updateSequence = null;
+    }
     
     /**
      * Gets the value of the acceptVersions property.

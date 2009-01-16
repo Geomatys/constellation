@@ -71,6 +71,14 @@ public class GetCapabilities extends GetCapabilitiesType {
         super(acceptVersions, sections, acceptFormats, updateSequence);
         this.service = service;
     }
+
+     /**
+     * Build a new getCapabilities (simplified version).
+     */
+    public  GetCapabilities(String acceptVersions, String acceptFormats) {
+        super(acceptVersions, acceptFormats);
+        this.service = "SOS";
+    }
     
     /**
      * Return the value of the service property (often "SOS").

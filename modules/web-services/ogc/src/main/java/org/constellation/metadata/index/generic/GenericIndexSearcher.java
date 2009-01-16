@@ -60,9 +60,8 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
      */
     @Override
     public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
-        TermQuery query      = new TermQuery(new Term("identifier_sort", id));
+        TermQuery query      = new TermQuery(new Term("id", id));
         List<String> results = new ArrayList<String>();
-        initSearcher();
         int maxRecords       = searcher.maxDoc();
 
         logger.info("TermQuery: " + query.toString());

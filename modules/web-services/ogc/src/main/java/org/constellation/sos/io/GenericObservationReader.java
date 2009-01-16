@@ -206,9 +206,9 @@ public class GenericObservationReader extends ObservationReader {
 
         Values values;
         if (isThreadEnabled) {
-            values = paraleleLoading(value, singleStatements.keySet(), multipleStatements.keySet());
+            values = paraleleLoading(value, subSingleStmts, subMultiStmts);
         } else {
-            values = sequentialLoading(value, singleStatements.keySet(), multipleStatements.keySet());
+            values = sequentialLoading(value, subSingleStmts, subMultiStmts);
         }
         return values;
     }
@@ -349,7 +349,7 @@ public class GenericObservationReader extends ObservationReader {
 
     private void fillMultipleValues(PreparedStatement stmt, Values values) throws SQLException {
         ResultSet result = stmt.executeQuery();
-        System.out.println("QUERY:" + stmt.toString());
+        logger.finer("QUERY:" + stmt.toString());
         for (String varName : multipleStatements.get(stmt)) {
             values.createNewMultipleValue(varName);
         }
@@ -482,13 +482,22 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException {
-        Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var15", "var16", "var17", "var18"), offeringName);
+        Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18"), offeringName);
         List<String> srsName = getVariables("var07", values);
         
         // event time
+        TimePeriodType time;
         String offeringBegin = getVariable("var08", values);
+        if (offeringBegin != null)
+            offeringBegin        = offeringBegin.replace(' ', 'T');
         String offeringEnd   = getVariable("var09", values);
-        TimePeriodType time  = new TimePeriodType(offeringBegin, offeringEnd);
+        if (offeringEnd != null) {
+            offeringEnd          = offeringEnd.replace(' ', 'T');
+            time  = new TimePeriodType(offeringBegin, offeringEnd);
+        } else {
+            time  = new TimePeriodType(offeringBegin);
+        }
+
 
         // procedure
         List<ReferenceEntry> procedures = new ArrayList<ReferenceEntry>();
@@ -498,21 +507,27 @@ public class GenericObservationReader extends ObservationReader {
 
         // phenomenon
         List<PhenomenonEntry> observedProperties = new ArrayList<PhenomenonEntry>();
-        for (String phenomenonId : getVariables("var11", values)) {
-            PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
-            observedProperties.add(phenomenon);
-        }
         for (String phenomenonId : getVariables("var12", values)) {
-            List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
-            for (String componentID : getVariables("var17", values)) {
-                components.add(getPhenomenon(componentID));
+            if (phenomenonId!= null && !phenomenonId.equals("")) {
+                Values compositeValues = loadData(Arrays.asList("var17"), phenomenonId);
+                List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
+                for (String componentID : getVariables("var17", compositeValues)) {
+                    components.add(getPhenomenon(componentID));
+                }
+                compositeValues = loadData(Arrays.asList("var15", "var16"), phenomenonId);
+                CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
+                                                                                   getVariable("var15", compositeValues),
+                                                                                   getVariable("var16", compositeValues),
+                                                                                   null,
+                                                                                   components);
+                observedProperties.add(phenomenon);
             }
-            CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
-                                                                               getVariable("var15", values),
-                                                                               getVariable("var16", values),
-                                                                               null,
-                                                                               components);
-            observedProperties.add(phenomenon);
+        }
+        for (String phenomenonId : getVariables("var11", values)) {
+            if (phenomenonId != null && !phenomenonId.equals("")) {
+                PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
+                observedProperties.add(phenomenon);
+            }
         }
 
         // feature of interest
@@ -625,7 +640,6 @@ public class GenericObservationReader extends ObservationReader {
 
     @Override
     public AnyResultEntry getResult(String identifier) throws WebServiceException {
-        System.out.println("getresutttttttttttttttttttttttttttttttttttttt:" + identifier);
         Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                 "var40", "var41", "var42", "var43"), identifier);
         int count = Integer.parseInt(getVariable("var32", values));
@@ -652,7 +666,7 @@ public class GenericObservationReader extends ObservationReader {
             String uomCode    = uomCodes.get(i);
             if (typeName != null) {
                 if (typeName.equals("Quantity")) {
-                    component = new QuantityType(definition, uomCode, "");
+                    component = new QuantityType(definition, uomCode, null);
                 } else if (typeName.equals("Time")) {
                     component = new TimeType(definition, uomCode, null);
                 } else if (typeName.equals("Boolean")) {
@@ -668,7 +682,7 @@ public class GenericObservationReader extends ObservationReader {
         SimpleDataRecordEntry elementType = new SimpleDataRecordEntry(blockId, dataRecordId, null, false, fields);
 
         String dataValues = getVariable("var33", values);
-        DataArrayEntry result = new DataArrayEntry(identifier, count, elementType, encoding, dataValues);
+        DataArrayEntry result = new DataArrayEntry(blockId, count, elementType, encoding, dataValues);
         return new AnyResultEntry(identifier, result);
     }
 

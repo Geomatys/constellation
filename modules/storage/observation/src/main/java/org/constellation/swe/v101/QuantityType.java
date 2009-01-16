@@ -106,7 +106,7 @@ public class QuantityType extends AbstractDataComponentEntry {
                Utilities.equals(this.referenceFrame, that.referenceFrame) &&
                Utilities.equals(this.uom,            that.uom)            &&
                Utilities.equals(this.value,          that.value);
-        } 
+        }
         return false;
     }
 

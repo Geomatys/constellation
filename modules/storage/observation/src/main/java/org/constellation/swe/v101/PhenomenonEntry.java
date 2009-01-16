@@ -100,7 +100,7 @@ public class PhenomenonEntry extends DefinitionType implements Phenomenon {
      */
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return getId().hashCode();
     }
 
     /**
@@ -110,7 +110,7 @@ public class PhenomenonEntry extends DefinitionType implements Phenomenon {
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
-        } else return super.equals(object);
+        } else return (object instanceof PhenomenonEntry && super.equals(object));
     }
     
     /**
@@ -118,7 +118,7 @@ public class PhenomenonEntry extends DefinitionType implements Phenomenon {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[phenomenonEntry]").append(super.toString());
+        StringBuilder s = new StringBuilder(super.toString());
         return s.toString();
     }
 }

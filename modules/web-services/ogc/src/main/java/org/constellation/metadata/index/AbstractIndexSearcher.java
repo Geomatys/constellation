@@ -109,7 +109,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     /**
      * Returns the IndexSearcher of this index.
      */
-    public void initSearcher() throws CorruptIndexException, IOException {
+    private void initSearcher() throws CorruptIndexException, IOException {
         File indexDirectory = getFileDirectory();
         IndexReader ireader = IndexReader.open(indexDirectory);
         searcher   = new IndexSearcher(ireader);

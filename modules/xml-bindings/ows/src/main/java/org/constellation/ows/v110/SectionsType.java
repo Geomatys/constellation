@@ -17,6 +17,7 @@
 package org.constellation.ows.v110;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -89,7 +90,13 @@ public class SectionsType {
     public SectionsType(List<String> section){
         this.section = section;
     }
-    
+
+     /**
+     * Build a new list of Section.
+     */
+    public SectionsType(String section){
+        this.section = Arrays.asList(section);
+    }
     /**
      * Gets the value of the section property.
      */

@@ -516,6 +516,11 @@ public class SOSworker {
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
+
+        if (staticCapabilities == null) {
+            throw new WebServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
+        }
+
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
 

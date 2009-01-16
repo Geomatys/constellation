@@ -98,7 +98,14 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
         this.beginPosition = beginPosition;
         this.endPosition   = new TimePositionType(TimeIndeterminateValueType.NOW);
     }
-    
+
+    /**
+     * Build a new Time period bounded by the begin and end time specified.
+     */
+    public TimePeriodType(String beginValue){
+        this.beginPosition = new TimePositionType(beginValue);
+        this.endPosition   = new TimePositionType(TimeIndeterminateValueType.NOW);
+    }
     /**
      * Build a new Time period bounded by an indeterminate time at begin. 
      */
