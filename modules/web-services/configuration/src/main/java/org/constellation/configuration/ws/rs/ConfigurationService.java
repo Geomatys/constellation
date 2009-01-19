@@ -17,6 +17,9 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 // Jersey dependencies
+import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -34,8 +38,9 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
-import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
+
+// constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
@@ -49,12 +54,12 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.geotools.factory.FactoryNotFoundException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // geotools dependencies
 import org.geotools.metadata.note.Anchors;
 import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.FactoryNotFoundException;
 
 /**
  * Web service for administration and configuration operations.
@@ -131,7 +136,7 @@ public class ConfigurationService extends WebService  {
                 request = (String) getParameter("REQUEST", true);
             }
             
-            if ("RESTART".equalsIgnoreCase(request)) {
+            if ("Restart".equalsIgnoreCase(request)) {
                 marshaller.marshal(restartService(), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             }
@@ -157,6 +162,26 @@ public class ConfigurationService extends WebService  {
                     String id          = getParameter("ID", false);
                 
                     marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
+                    return Response.ok(sw.toString(), "text/xml").build();
+                } else {
+                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                }
+            }
+
+            if ("AddToIndex".equalsIgnoreCase(request)) {
+                if (CSWFunctionEnabled) {
+                    String service           = getParameter("SERVICE", false);
+                    String id                = getParameter("ID", false);
+                    List<String> identifiers = new ArrayList<String>();
+                    String identifierList    = getParameter("IDENTIFIERS", true);
+                    StringTokenizer tokens   = new StringTokenizer(identifierList, ",;");
+                    while (tokens.hasMoreTokens()) {
+                        final String token = tokens.nextToken().trim();
+                        identifiers.add(token);
+                    }
+
+                    marshaller.marshal(cswConfigurer.addToIndex(service, id, identifiers), sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
                      throw new WebServiceException("This specific CSW operation " + request + " is not activated",

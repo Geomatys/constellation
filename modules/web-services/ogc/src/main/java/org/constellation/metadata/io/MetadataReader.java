@@ -18,7 +18,6 @@
 
 package org.constellation.metadata.io;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,7 @@ public abstract class MetadataReader {
      * @return A marshallable metadata object.
      * @throws java.sql.SQLException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException;
     
     /**
      * Return a list of values for each specific fields specified as a coma separated String.

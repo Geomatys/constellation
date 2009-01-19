@@ -64,6 +64,8 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataReader(MDConnection, configDir);
             case FILESYSTEM:
+                if (MDConnection != null)
+                    MDConnection.close();
                 return new FileMetadataReader(dataDirectory, unmarshaller);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + configuration.getType());
@@ -84,6 +86,8 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataWriter(MDConnection, indexer);
             case FILESYSTEM:
+                if (MDConnection != null)
+                    MDConnection.close();
                 return new FileMetadataWriter(indexer, marshaller, dataDirectory);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);

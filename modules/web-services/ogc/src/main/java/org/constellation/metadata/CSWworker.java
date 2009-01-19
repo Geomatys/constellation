@@ -796,115 +796,109 @@ public class CSWworker {
         }
         logger.info("local max = " + max + " distributed max = " + maxDistributed);
         
-        
-        try {
-            if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
-            
-                // we return only the number of result matching
-                if (resultType.equals(ResultType.HITS)) {
-                    searchResults = new SearchResultsType(ID, set, results.size(), nextRecord);
-                
-                // we return a list of Record
-                } else if (resultType.equals(ResultType.RESULTS)) {
-                
-                    List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-                    
-                    for (int i = startPos -1; i < max; i++) {
-                        Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
-                        if (obj == null && (max + 1) < results.size()) {
-                            max++;
-                        
-                        } else {
-                            records.add((AbstractRecordType)obj);
-                        }
-                    }
-                    
-                    //we add additional distributed result
-                    for (int i = 0; i < maxDistributed; i++) {
-                        
-                        Object additionalResult = distributedResults.additionalResults.get(i);
-                        if (additionalResult instanceof AbstractRecordType) {
-                            records.add((AbstractRecordType) additionalResult);
-                        }
-                    }
-                    
-                    searchResults = new SearchResultsType(ID, 
-                                                          set, 
-                                                          totalMatched,
-                                                          records,
-                                                          records.size(),
-                                                          nextRecord);
-                        
-                //we return an Acknowledgement if the request is valid. 
-                } else if (resultType.equals(ResultType.VALIDATE)) {
-                   try {
-                       EchoedRequestType echoRequest = new EchoedRequestType(request);
-                       return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
-                    
-                    } catch(DatatypeConfigurationException ex) {
-                        throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                      NO_APPLICABLE_CODE);
-                    }
-                }
-                
-            } else {
-            
-                int mode;
-                if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
-                    mode = ISO_19115;
-                } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")  || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
-                    mode = EBRIM;
-                } else {
-                    mode = DUBLINCORE;
-                }
-                    
-                // we return only the number of result matching
-                if (resultType.equals(ResultType.HITS)) {
-                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size(), nextRecord);
-                
-                } else if (resultType.equals(ResultType.RESULTS)) {
-                
-                    List<Object> records = new ArrayList<Object>();
-                    
-                    for (int i = startPos -1; i < max; i++) {
+        if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
 
-                        Object obj = MDReader.getMetadata(results.get(i), mode, set, elementName);
-                        if (obj == null && (max + 1) < results.size()) {
-                            max++;
-                        } else {
-                            records.add(obj);
-                        }
-                    }
-                    
-                     //we add additional distributed result
-                    for (int i = 0; i < maxDistributed; i++) {
-                        
-                        Object additionalResult = distributedResults.additionalResults.get(i);
-                        records.add(additionalResult);
-                    }
-                    
-                    searchResults = new SearchResultsType(ID, 
-                                                          set, 
-                                                          totalMatched,
-                                                          records.size(),
-                                                          records);
-                    
-                //we return an Acknowledgement if the request is valid.
-                } else if (resultType.equals(ResultType.VALIDATE)) {
-                    try {
-                        EchoedRequestType echoRequest = new EchoedRequestType(request);
-                        return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
-                    
-                    } catch(DatatypeConfigurationException ex) {
-                        throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                      NO_APPLICABLE_CODE);
+            // we return only the number of result matching
+            if (resultType.equals(ResultType.HITS)) {
+                searchResults = new SearchResultsType(ID, set, results.size(), nextRecord);
+
+            // we return a list of Record
+            } else if (resultType.equals(ResultType.RESULTS)) {
+
+                List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
+
+                for (int i = startPos -1; i < max; i++) {
+                    Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
+                    if (obj == null && (max + 1) < results.size()) {
+                        max++;
+
+                    } else {
+                        records.add((AbstractRecordType)obj);
                     }
                 }
-        
+
+                //we add additional distributed result
+                for (int i = 0; i < maxDistributed; i++) {
+
+                    Object additionalResult = distributedResults.additionalResults.get(i);
+                    if (additionalResult instanceof AbstractRecordType) {
+                        records.add((AbstractRecordType) additionalResult);
+                    }
+                }
+
+                searchResults = new SearchResultsType(ID,
+                                                      set,
+                                                      totalMatched,
+                                                      records,
+                                                      records.size(),
+                                                      nextRecord);
+
+            //we return an Acknowledgement if the request is valid.
+            } else if (resultType.equals(ResultType.VALIDATE)) {
+               try {
+                   EchoedRequestType echoRequest = new EchoedRequestType(request);
+                   return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
+
+                } catch(DatatypeConfigurationException ex) {
+                    throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                  NO_APPLICABLE_CODE);
+                }
             }
-        } catch (SQLException ex) {
-            throw new WebServiceException("The service has throw an SQLException:" + ex.getMessage(),
-                                              NO_APPLICABLE_CODE);
+
+        } else {
+
+            int mode;
+            if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+                mode = ISO_19115;
+            } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")  || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+                mode = EBRIM;
+            } else {
+                mode = DUBLINCORE;
+            }
+
+            // we return only the number of result matching
+            if (resultType.equals(ResultType.HITS)) {
+                searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size(), nextRecord);
+
+            } else if (resultType.equals(ResultType.RESULTS)) {
+
+                List<Object> records = new ArrayList<Object>();
+
+                for (int i = startPos -1; i < max; i++) {
+
+                    Object obj = MDReader.getMetadata(results.get(i), mode, set, elementName);
+                    if (obj == null && (max + 1) < results.size()) {
+                        max++;
+                    } else {
+                        records.add(obj);
+                    }
+                }
+
+                 //we add additional distributed result
+                for (int i = 0; i < maxDistributed; i++) {
+
+                    Object additionalResult = distributedResults.additionalResults.get(i);
+                    records.add(additionalResult);
+                }
+
+                searchResults = new SearchResultsType(ID,
+                                                      set,
+                                                      totalMatched,
+                                                      records.size(),
+                                                      records);
+
+            //we return an Acknowledgement if the request is valid.
+            } else if (resultType.equals(ResultType.VALIDATE)) {
+                try {
+                    EchoedRequestType echoRequest = new EchoedRequestType(request);
+                    return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
+
+                } catch(DatatypeConfigurationException ex) {
+                    throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                                  NO_APPLICABLE_CODE);
+                }
+            }
+
         }
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), request.getVersion(), searchResults);
         logger.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
@@ -1010,14 +1004,9 @@ public class CSWworker {
                     continue;
                 }
                 //we get the metadata object
-                try {
-                    Object o = MDReader.getMetadata(id, DUBLINCORE, set, null);
-                    if (o instanceof AbstractRecordType) 
-                        records.add((AbstractRecordType)o);
-                } catch (SQLException e) {
-                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                  NO_APPLICABLE_CODE, "id");
-                }
+                Object o = MDReader.getMetadata(id, DUBLINCORE, set, null);
+                if (o instanceof AbstractRecordType)
+                    records.add((AbstractRecordType)o);
             }
             if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1039,16 +1028,11 @@ public class CSWworker {
                 }
                 
                 //we get the metadata object
-                try {
-                    Object o = MDReader.getMetadata(id, ISO_19115, set, null);
-                    if (o instanceof MetaDataImpl) {
-                        records.add((MetaDataImpl)o);
-                    } else {
-                        logger.severe("the form " + id + " is not a ISO object");
-                    }
-                } catch (SQLException e) {
-                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                  NO_APPLICABLE_CODE, "id");
+                Object o = MDReader.getMetadata(id, ISO_19115, set, null);
+                if (o instanceof MetaDataImpl) {
+                    records.add((MetaDataImpl)o);
+                } else {
+                    logger.severe("the form " + id + " is not a ISO object");
                 }
            }
            if (records.size() == 0) {
@@ -1072,16 +1056,11 @@ public class CSWworker {
                 }
                 
                 //we get the metadata object 
-                try {
-                    Object o = MDReader.getMetadata(id, ISO_19115, set, null);
-                    if (o != null) {
-                        records.add(o);
-                    } else {
-                        logger.severe("GFC object is null");
-                    }
-                } catch (SQLException e) {
-                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                  NO_APPLICABLE_CODE, "id");
+                Object o = MDReader.getMetadata(id, ISO_19115, set, null);
+                if (o != null) {
+                    records.add(o);
+                } else {
+                    logger.severe("GFC object is null");
                 }
            }
            if (records.size() == 0) {
@@ -1105,16 +1084,11 @@ public class CSWworker {
                 }
                 
                 //we get the metadata object 
-                try {
-                    Object o = MDReader.getMetadata(id, EBRIM, set, null);
-                    if (o instanceof IdentifiableType) {
-                        records.add(o);
-                    } else {
-                        logger.severe("The form " + id + " is not a EBRIM v3.0 object");
-                    }
-                } catch (SQLException e) {
-                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                      NO_APPLICABLE_CODE, "id");
+                Object o = MDReader.getMetadata(id, EBRIM, set, null);
+                if (o instanceof IdentifiableType) {
+                    records.add(o);
+                } else {
+                    logger.severe("The form " + id + " is not a EBRIM v3.0 object");
                 }
            }
            if (records.size() == 0) {
@@ -1138,19 +1112,14 @@ public class CSWworker {
                 }
                 
                 //we get the metadata object 
-                try {
-                    Object o = MDReader.getMetadata(id, EBRIM, set, null);
-                    if (o instanceof org.constellation.ebrim.v250.RegistryObjectType) {
-                        records.add(o);
-                    } else {
-                        if (o == null)
-                            logger.severe("The form " + id + " has not be read is null.");
-                        else
-                            logger.severe("The form " + id + " is not a EBRIM v2.5 object.");
-                    }
-                } catch (SQLException e) {
-                    throw new WebServiceException("This service has throw an SQLException: " + e.getMessage(),
-                                                  NO_APPLICABLE_CODE, "id");
+                Object o = MDReader.getMetadata(id, EBRIM, set, null);
+                if (o instanceof org.constellation.ebrim.v250.RegistryObjectType) {
+                    records.add(o);
+                } else {
+                    if (o == null)
+                        logger.severe("The form " + id + " has not be read is null.");
+                    else
+                        logger.severe("The form " + id + " is not a EBRIM v2.5 object.");
                 }
            }
            if (records.size() == 0) {

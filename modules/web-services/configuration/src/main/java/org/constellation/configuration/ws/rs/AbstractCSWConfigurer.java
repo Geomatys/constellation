@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -35,6 +37,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
+import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
@@ -75,7 +78,7 @@ public abstract class AbstractCSWConfigurer {
     private ContainerNotifierImpl containerNotifier;
     
     /**
-     * A lucene Index used to pre-build a CSW index.
+     * A Map of service configuration.
      */
     private Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
     
@@ -92,7 +95,7 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Build a new CSW configurer.
      * 
-     * @param cn
+     * @param cn a injected container notifier allowing to reload all the jersey web-services.
      * @throws org.constellation.configuration.exception.ConfigurationException
      */
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
@@ -128,11 +131,13 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Build a new Indexer for the specified service ID.
      * 
-     * @param serviceID
-     * @return
+     * @param serviceID the service identifier (form multiple CSW) default: ""
+     * @param cswConfigDir the CSW configuration directory.
+     *
+     * @return A lucene Indexer
      * @throws org.constellation.ws.WebServiceException
      */
-    protected AbstractIndexer initIndexer(String serviceID) throws WebServiceException {
+    protected AbstractIndexer initIndexer(String serviceID, File cswConfigDir, MetadataReader currentReader) throws WebServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
@@ -143,9 +148,9 @@ public abstract class AbstractCSWConfigurer {
                 throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
             } else {
                 try {
-                    File cswConfigDir            = getConfigurationDirectory();
                     Connection MDConnection      = db.getConnection();
-                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
+                    if (currentReader == null)
+                        currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
                     AbstractIndexer indexer      = CSWfactory.getIndexer(config.getType(), currentReader, MDConnection, cswConfigDir, serviceID);
                     return indexer;
                     
@@ -163,11 +168,13 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Build a new Metadata reader for the specified service ID.
      *
-     * @param serviceID
-     * @return
+     * @param serviceID the service identifier (form multiple CSW) default: ""
+     * @param cswConfigDir the CSW configuration directory.
+     *
+     * @return A metadata reader.
      * @throws org.constellation.ws.WebServiceException
      */
-    protected MetadataReader initReader(String serviceID) throws WebServiceException {
+    protected MetadataReader initReader(String serviceID, File cswConfigDir) throws WebServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
@@ -178,7 +185,6 @@ public abstract class AbstractCSWConfigurer {
                 throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
             } else {
                 try {
-                    File cswConfigDir            = getConfigurationDirectory();
                     Connection MDConnection      = db.getConnection();
                     MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
                     return currentReader;
@@ -194,6 +200,11 @@ public abstract class AbstractCSWConfigurer {
         }
     }
 
+    /**
+     * Return all the founded CSW service identifiers.
+     * 
+     * @return all the founded CSW service identifiers.
+     */
     public Set<String> getAllServiceIDs() {
         return serviceConfiguration.keySet();
     }
@@ -237,16 +248,23 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Destroy the CSW index directory in order that it will be recreated.
      * 
-     * @param asynchrone
+     * @param asynchrone a flag for indexation mode.
+     * @param service The service type (CSW, MDSearch, ...)
+     * @param id The service identifier.
+     * 
      * @return
      * @throws WebServiceException
      */
     public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws WebServiceException {
         LOGGER.info("refresh index requested");
         String msg;
+
+        // MDWeb Search indexation
         if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
             GlobalUtils.resetLuceneIndex();
             msg = "MDWeb search index succefully deleted";
+
+        // CSW indexation
         } else {
             
             File cswConfigDir = getConfigurationDirectory();
@@ -264,7 +282,9 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Delete The index folder and call the restart() method.
      *
-     * @param configurationDirectory
+     * @param configurationDirectory The CSW configuration directory.
+     * @param id The service identifier.
+     *
      * @throws org.constellation.ws.WebServiceException
      */
     private void synchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
@@ -286,7 +306,9 @@ public abstract class AbstractCSWConfigurer {
      * Build a new Index in a new folder.
      * This index will be used at the next restart of the server.
      *
-     * @param configurationDirectory
+     * @param id The service identifier.
+     * @param configurationDirectory  The CSW configuration directory.
+     * 
      * @throws org.constellation.ws.WebServiceException
      */
     private void asynchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
@@ -312,14 +334,14 @@ public abstract class AbstractCSWConfigurer {
             File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
             AbstractIndexer indexer = null;
             try {
-                indexer = initIndexer(currentId);
+                indexer = initIndexer(currentId, configurationDirectory, null);
                 if (indexer != null) {
                     nexIndexDir.mkdir();
                     indexer.setFileDirectory(nexIndexDir);
                     indexer.createIndex();
 
                 } else {
-                    throw new WebServiceException("There is no indexer for the id:" + id, NO_APPLICABLE_CODE);
+                    throw new WebServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                 }
             } finally {
                 if (indexer != null) {
@@ -327,6 +349,65 @@ public abstract class AbstractCSWConfigurer {
                 }
             }
         }
+    }
+
+    /**
+     * Add some csw record to the index.
+     *
+     * @param asynchrone
+     * @return
+     * @throws WebServiceException
+     */
+    public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws WebServiceException {
+        LOGGER.info("Add to index requested");
+        String msg;
+
+        if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
+            throw new WebServiceException("This method is not yet available for this service.", OPERATION_NOT_SUPPORTED);
+
+        // CSW indexation
+        } else {
+
+            File cswConfigDir = getConfigurationDirectory();
+            
+        /*
+         * then we create all the nextIndex directory and create the indexes
+         * if there is a specific id in parameter we only index the specified profile
+         */
+        for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
+            String currentId        = getConfigID(configFile);
+            AbstractIndexer indexer = null;
+            MetadataReader reader   = null;
+            try {
+                reader  = initReader(currentId, cswConfigDir);
+                List<Object> objectToIndex = new ArrayList<Object>();
+                if (reader != null) {
+                    for (String identifier : identifiers) {
+                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
+                    }
+                } else {
+                    throw new WebServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+                }
+
+                indexer = initIndexer(currentId, cswConfigDir, reader);
+                if (indexer != null) {
+                    for (Object obj : objectToIndex) {
+                        indexer.indexDocument(obj);
+                    }
+                } else {
+                    throw new WebServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                }
+            
+            } finally {
+                if (indexer != null) {
+                    indexer.destroy();
+                }
+            }
+        }
+
+            msg = "The specified record have been added to the CSW index";
+        }
+        return new AcknowlegementType("success", msg);
     }
 
     /**
@@ -349,7 +430,7 @@ public abstract class AbstractCSWConfigurer {
         }
         return "";
     }
-    
+
     public abstract AcknowlegementType updateContacts() throws WebServiceException;
     
     public abstract AcknowlegementType updateVocabularies() throws WebServiceException;

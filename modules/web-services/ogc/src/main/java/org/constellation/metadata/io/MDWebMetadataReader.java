@@ -242,7 +242,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException {
         int id;
         String catalogCode = "";
         
@@ -259,41 +259,46 @@ public class MDWebMetadataReader extends MetadataReader {
         } catch (NumberFormatException e) {
              throw new WebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
         }
-        
-        alreadyRead.clear();
-        Catalog catalog = MDReader.getCatalog(catalogCode);
-        
-        //we look for cached object
-        Object result = getFromCache(identifier);
-        if (mode == ISO_19115 || mode == EBRIM) {
-            
-            if (result == null) {
-                Form f = MDReader.getForm(catalog, id);
-                result = getObjectFromForm(identifier, f);
+
+        try {
+            alreadyRead.clear();
+            Catalog catalog = MDReader.getCatalog(catalogCode);
+
+            //we look for cached object
+            Object result = getFromCache(identifier);
+            if (mode == ISO_19115 || mode == EBRIM) {
+
+                if (result == null) {
+                    Form f = MDReader.getForm(catalog, id);
+                    result = getObjectFromForm(identifier, f);
+                }
+
+                result = applyElementSet(result, type, elementName);
+
+            } else if (mode == DUBLINCORE) {
+
+                Form form                  = MDReader.getForm(catalog, id);
+                Value top                  = form.getTopValue();
+                Standard recordStandard    = top.getType().getStandard();
+
+                /*
+                 * if the standard of the record is CSW and the record is cached we return it.
+                 * if the record is not yet cached we proccess.
+                 * if the record have to be transform from the orginal standard to CSW we process.
+                 */
+                if (!recordStandard.equals(Standard.CSW) || result == null)
+                    result = getRecordFromForm(identifier, form, type, elementName);
+
+                result = applyElementSet(result, type, elementName);
+
+            } else {
+                throw new IllegalArgumentException("Unknow standard mode: " + mode);
             }
-            
-            result = applyElementSet(result, type, elementName);
-            
-        } else if (mode == DUBLINCORE) {
-            
-            Form form                  = MDReader.getForm(catalog, id);
-            Value top                  = form.getTopValue();
-            Standard recordStandard    = top.getType().getStandard();
-            
-            /*
-             * if the standard of the record is CSW and the record is cached we return it.
-             * if the record is not yet cached we proccess.
-             * if the record have to be transform from the orginal standard to CSW we process.
-             */  
-            if (!recordStandard.equals(Standard.CSW) || result == null)
-                result = getRecordFromForm(identifier, form, type, elementName);
-            
-            result = applyElementSet(result, type, elementName);
-            
-        } else {
-            throw new IllegalArgumentException("Unknow standard mode: " + mode);
+            return result;
+
+        } catch (SQLException e) {
+             throw new WebServiceException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
         }
-        return result;
     }
     
     /**

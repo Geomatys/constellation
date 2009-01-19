@@ -63,7 +63,7 @@ public class FileMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws SQLException, WebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException {
         return getObjectFromFile(identifier);
     }
 

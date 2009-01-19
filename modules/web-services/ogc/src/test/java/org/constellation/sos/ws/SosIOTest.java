@@ -214,6 +214,19 @@ public class SosIOTest {
         ObservationCollectionEntry result3    = genericWorker.getObservation(request3);
 
         assertEquals(expResult3, result3);
+
+
+
+        TimePositionType position = new TimePositionType("2007-02-12T00:00:00.000-06:00");
+        TimeInstantType instant   = new TimeInstantType(position);
+        BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
+        timeFilter = new EventTime(tafter, null, null);
+        GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.INLINE, null);
+
+        ObservationCollectionEntry expResult4 = defaultWorker.getObservation(request4);
+        ObservationCollectionEntry result4    = genericWorker.getObservation(request4);
+
+        assertEquals(expResult4, result4);
     }
 
     /**
