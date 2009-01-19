@@ -141,6 +141,11 @@ import static org.constellation.query.wcs.WCSQuery.*;
 @Path("wcs")
 @Singleton
 public class WCSService extends OGCWebService {
+    /*
+     * Set to true for CITE tests.
+     */
+    private final static boolean CITE_TESTING = false;
+
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
      */
@@ -714,9 +719,11 @@ public class WCSService extends OGCWebService {
              * FOR CITE TEST we put the first data mars because of ifremer overlapping data
              * TODO delete when overlapping problem is solved
              */
-            CoverageSummaryType temp = summary.get(10);
-            summary.remove(10);
-            summary.add(0, temp);
+            if (CITE_TESTING) {
+		    CoverageSummaryType temp = summary.get(10);
+		    summary.remove(10);
+		    summary.add(0, temp);
+            }
 
             contents        = new Contents(summary, null, null, null);
             contentMetadata = new ContentMetadata("1.0.0", offBrief);
