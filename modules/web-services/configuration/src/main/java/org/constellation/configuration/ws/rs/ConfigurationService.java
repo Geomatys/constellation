@@ -131,6 +131,10 @@ public class ConfigurationService extends WebService  {
         try {
             String request  = "";
             StringWriter sw = new StringWriter();
+
+            if (cswConfigurer != null) {
+                cswConfigurer.setContainerNotifier(cn);
+            }
             
             if (objectRequest == null) {
                 request = (String) getParameter("REQUEST", true);

@@ -37,6 +37,10 @@
       <from-outcome>notAllowed</from-outcome>
       <to-view-id>/index.html</to-view-id>
     </navigation-case>
+    <navigation-case>
+      <from-outcome>configureCSW</from-outcome>
+      <to-view-id>/cswConfig.jsp</to-view-id>
+    </navigation-case>
   </navigation-rule>
   
 </faces-config>

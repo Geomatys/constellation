@@ -99,8 +99,8 @@
                             <h:outputText id="restart_label" value="Restart the services"/>
                         </t:commandLink>
                         
-                        <t:commandLink styleClass="button" id="generateIndex-id" action="#{configurationBean.generateIndex}">
-                            <h:outputText id="generate_label" value="Generate Index"/>
+                        <t:commandLink styleClass="button" id="csw-configure-id" action="configureCSW">
+                            <h:outputText id="csw_label" value="Configure CSW"/>
                         </t:commandLink>
                         
                     </h:panelGrid>

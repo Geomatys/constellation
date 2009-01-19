@@ -343,6 +343,8 @@ public abstract class AbstractCSWConfigurer {
                 } else {
                     throw new WebServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                 }
+            } catch (IllegalArgumentException ex) {
+                LOGGER.severe("unable to create an indexer for configuration file:" + configFile.getName());
             } finally {
                 if (indexer != null) {
                     indexer.destroy();
@@ -429,6 +431,14 @@ public abstract class AbstractCSWConfigurer {
             return ID;
         }
         return "";
+    }
+
+    /**
+     * Because the injectable fields are null at initialization time
+     * @param containerNotifier
+     */
+    public void setContainerNotifier(ContainerNotifierImpl containerNotifier) {
+        this.containerNotifier = containerNotifier;
     }
 
     public abstract AcknowlegementType updateContacts() throws WebServiceException;

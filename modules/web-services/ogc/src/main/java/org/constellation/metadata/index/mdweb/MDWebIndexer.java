@@ -240,7 +240,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(form));
-            logger.info("Form: " + form.getTitle() + " indexed");
+            logger.finer("Form: " + form.getTitle() + " indexed");
         
             writer.optimize();
             writer.close();
@@ -290,7 +290,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         // For an ISO 19115 form
         } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
             
-            logger.info("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
+            logger.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
             for (String term :ISO_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
