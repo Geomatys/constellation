@@ -21,6 +21,7 @@ package org.constellation.coverage.ws.rs;
 import com.sun.jersey.spi.resource.Singleton;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -745,7 +746,7 @@ public class WCSService extends OGCWebService {
      * Web service operation
      */
     public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException, WebServiceException {
-        String inputVersion = abstractRequest.getVersion();
+        final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new WebServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, getActingVersion(), "version");
@@ -754,15 +755,25 @@ public class WCSService extends OGCWebService {
            setActingVersion(inputVersion);
         }
 
-        final String format, coverage;
+        final String format;
+        final String coverage;
         final GeneralEnvelope objEnv;
         final CoordinateReferenceSystem crs;
-        final int width, height;
+        final int width;
+        final int height;
         
-        String time = null , interpolation = null, exceptions;
+        String time = null;
+        String interpolation = null;
+        String exceptions = null;
         String depth = null;
-        String resx  = null, resy   = null, resz  = null;
-        String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
+        String resx  = null;
+        String resy  = null;
+        String resz  = null;
+        String gridType;
+        String gridOrigin = "";
+        String gridOffsets = "";
+        String gridCS;
+        String gridBaseCrs;
         String responseCRS = null;
 
        if (getActingVersion().toString().equals("1.1.1")) {
@@ -786,20 +797,21 @@ public class WCSService extends OGCWebService {
              * temporal subSet: - timeSequence
              *
              */
-            org.constellation.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
+            final org.constellation.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
             if (domain == null) {
                 throw new WebServiceException("The DomainSubset must be specify",
                                MISSING_PARAMETER_VALUE, getActingVersion());
             }
-            BoundingBoxType boundingBox = null;
-            if (domain.getBoundingBox() != null) {
-                boundingBox = domain.getBoundingBox().getValue();
-            }
-            if (boundingBox != null && boundingBox.getLowerCorner() != null &&
-                boundingBox.getUpperCorner() != null     &&
+
+            final BoundingBoxType boundingBox = (domain.getBoundingBox() != null) ?
+                                                 domain.getBoundingBox().getValue() :
+                                                 null;
+            
+            if (boundingBox != null && 
+                boundingBox.getLowerCorner() != null &&
+                boundingBox.getUpperCorner() != null &&
                 boundingBox.getLowerCorner().size() >= 2 &&
-                boundingBox.getUpperCorner().size() >= 2)
-            {
+                boundingBox.getUpperCorner().size() >= 2){
                 final String crsName = boundingBox.getCrs();
                 try {
                     crs  = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
@@ -1011,22 +1023,27 @@ public class WCSService extends OGCWebService {
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
 
-        if (format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(NETCDF) ||
-            format.equalsIgnoreCase(GEOTIFF))
-        {
+        if ( format.equalsIgnoreCase(MATRIX) ) {
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(coverage);
-            final ImageOutputStream outputStream;
+            final RenderedImage image;
             try {
                 final GridCoverage2D gridCov = layer.getCoverage(objEnv, new Dimension(), null, null);
-                outputStream = ImageIO.createImageOutputStream(null);
-                Utils.writeImage(gridCov.getRenderedImage(), format, outputStream);
+                image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             } catch (CatalogException ex) {
                 throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             }
-            return Response.ok(outputStream, format).build();
+
+            final String mime = "application/matrix";
+            return Response.ok(image, mime).build();
+        } else if( format.equalsIgnoreCase(NETCDF) ){
+            throw new WebServiceException(new IllegalArgumentException(
+                        "Constellation doesnt support netcdf writing."), NO_APPLICABLE_CODE, getActingVersion());
+        } else if( format.equalsIgnoreCase(GEOTIFF) ){
+            throw new WebServiceException(new IllegalArgumentException(
+                        "Constellation doesnt support geotiff writing."), NO_APPLICABLE_CODE, getActingVersion());
         } else {
             // We are in the case of an image format requested.
             BufferedImage image = null;

@@ -18,22 +18,19 @@
 
 package org.constellation.ws.rs.provider;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import org.constellation.util.Utils;
 
 @Provider
 public class RenderedImageWriter implements MessageBodyWriter<RenderedImage> {
@@ -66,38 +63,7 @@ public class RenderedImageWriter implements MessageBodyWriter<RenderedImage> {
      */
     private static void writeImage(final RenderedImage image, final String mime, Object output)
             throws IOException {
-        if (image == null) {
-            throw new NullPointerException("Image can not be null");
-        }
-        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
-        while (writers.hasNext()) {
-            final ImageWriter writer = writers.next();
-            final ImageWriterSpi spi = writer.getOriginatingProvider();
-            if (spi.canEncodeImage(image)) {
-                ImageOutputStream stream = null;
-                if (!isValidType(spi.getOutputTypes(), output)) {
-                    stream = ImageIO.createImageOutputStream(output);
-                    output = stream;
-                }
-                writer.setOutput(output);
-                writer.write(image);
-                writer.dispose();
-                if (stream != null) {
-                    stream.close();
-                }
-                return;
-            }
-        }
-        throw new IOException("Unknowed image type");
-    }
-
-    private static boolean isValidType(final Class<?>[] validTypes, final Object type) {
-        for (final Class<?> t : validTypes) {
-            if (t.isInstance(type)) {
-                return true;
-            }
-        }
-        return false;
+        Utils.writeImage(image, mime, output);
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

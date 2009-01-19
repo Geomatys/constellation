@@ -375,9 +375,9 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             LOGGER.log(level,"", ex);
         }
         
-        
-        
-        
+
+
+
     }
     
 }
