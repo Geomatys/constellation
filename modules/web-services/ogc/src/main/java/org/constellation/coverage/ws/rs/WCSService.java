@@ -685,7 +685,7 @@ public class WCSService extends OGCWebService {
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
 
                 if(inputGeoBox != null) {
-                     String crs = "WGS84(DD)";
+                    final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
                     if (getActingVersion().toString().equals("1.1.1")){
                         WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
                                                      inputGeoBox.getWestBoundLongitude(),
@@ -695,6 +695,7 @@ public class WCSService extends OGCWebService {
 
                         cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                     } else {
+                        final SortedSet<Number> elevations = layer.getAvailableElevations();
                         List<Double> pos1 = new ArrayList<Double>();
                         pos1.add(inputGeoBox.getWestBoundLongitude());
                         pos1.add(inputGeoBox.getSouthBoundLatitude());
@@ -703,10 +704,29 @@ public class WCSService extends OGCWebService {
                         pos2.add(inputGeoBox.getEastBoundLongitude());
                         pos2.add(inputGeoBox.getNorthBoundLatitude());
 
+                        if (elevations != null && elevations.size() >= 2) {
+                            pos1.add(elevations.first().doubleValue());
+                            pos2.add(elevations.last().doubleValue());
+                        }
                         List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                         pos.add(new DirectPositionType(pos1));
                         pos.add(new DirectPositionType(pos2));
-                        LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, crs);
+                        LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, srsName);
+                        final SortedSet<Date> dates = layer.getAvailableTimes();
+                        if (dates != null && dates.size() >= 2) {
+                            /*
+                             * Adds the first and last date available, since in the WCS GetCapabilities,
+                             * it is a brief description of the capabilities.
+                             * To get the whole available values, the describeCoverage request has to be
+                             * done on a specific coverage.
+                             */
+                            final Date firstDate = dates.first();
+                            final Date lastDate = dates.last();
+                            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                            outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
+                            outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
+                        }
                         co.setLonLatEnvelope(outputBBox);
                     }
 
@@ -1001,7 +1021,7 @@ public class WCSService extends OGCWebService {
                 elevation = positions.get(2).getValue().get(0);
             }
 
-            if (temporalSubset == null && env.getPos().size() == 0) {
+            if (temporalSubset == null && positions.size() == 0) {
                         throw new WebServiceException("The parameters BBOX or TIME have to be specified",
                                        MISSING_PARAMETER_VALUE, getActingVersion());
             }
@@ -1132,9 +1152,15 @@ public class WCSService extends OGCWebService {
             } catch (CatalogException ex) {
                 throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
             }
+            final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
             LonLatEnvelopeType llenvelope = null;
             if (inputGeoBox != null) {
-                String crs = "WGS84(DD)";
+                final SortedSet<Number> elevations;
+                try {
+                    elevations = layer.getAvailableElevations();
+                } catch (CatalogException ex) {
+                    throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+                }
                 List<Double> pos1 = new ArrayList<Double>();
                 pos1.add(inputGeoBox.getWestBoundLongitude());
                 pos1.add(inputGeoBox.getSouthBoundLatitude());
@@ -1143,10 +1169,14 @@ public class WCSService extends OGCWebService {
                 pos2.add(inputGeoBox.getEastBoundLongitude());
                 pos2.add(inputGeoBox.getNorthBoundLatitude());
 
+                if (elevations != null && elevations.size() >= 2) {
+                    pos1.add(elevations.first().doubleValue());
+                    pos2.add(elevations.last().doubleValue());
+                }
                 List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                 pos.add(new DirectPositionType(pos1));
                 pos.add(new DirectPositionType(pos2));
-                llenvelope = new LonLatEnvelopeType(pos, crs);
+                llenvelope = new LonLatEnvelopeType(pos, srsName);
             }
             Keywords keywords = new Keywords("WCS", layer.getName(), Utils.cleanSpecialCharacter(layer.getThematic()));
 
