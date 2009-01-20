@@ -1006,6 +1006,8 @@ public class WCSService extends OGCWebService {
             final SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
             final EnvelopeEntry env = spatial.getEnvelope();
             final String crsName = env.getSrsName();
+            //TODO: This will fail when we start working with OGC urn ids
+            //      we will need to be much more sophisticated.
             try {
                 crs = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
             } catch (FactoryException ex) {
@@ -1017,6 +1019,10 @@ public class WCSService extends OGCWebService {
             final DirectPositionType latPos = positions.get(1);
             objEnv.setRange(0, lonPos.getValue().get(0), lonPos.getValue().get(1));
             objEnv.setRange(1, latPos.getValue().get(0), latPos.getValue().get(1));
+
+            //HACK: we actually need to build the envelope and then go find the
+            //      data which the envelope intersects. Only then can we make an
+            //      arbitrary choice.
             if (positions.size() > 2) {
                 elevation = positions.get(2).getValue().get(0);
             }
@@ -1069,10 +1075,12 @@ public class WCSService extends OGCWebService {
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
         if ( format.equalsIgnoreCase(MATRIX) ) {
-            final NamedLayerDP dp = NamedLayerDP.getInstance();
-            final LayerDetails layer = dp.get(coverage);
+
+            final NamedLayerDP dp        = NamedLayerDP.getInstance();
+            final LayerDetails layer     = dp.get(coverage);
+            final Dimension    dimension = new Dimension(width, height);
+
             final RenderedImage image;
-            final Dimension dimension = new Dimension(width, height);
             try {
                 final GridCoverage2D gridCov = layer.getCoverage(objEnv, dimension, elevation, date);
                 image = gridCov.getRenderedImage();
