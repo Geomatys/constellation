@@ -23,13 +23,13 @@ import java.util.Properties;
 import javax.sql.DataSource;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.DataSourceType;
+import org.constellation.sos.io.DefaultGenericObservationReader;
 import org.constellation.sos.io.DefaultObservationFilter;
 import org.constellation.sos.io.DefaultObservationReader;
 import org.constellation.sos.io.DefaultObservationWriter;
 import org.constellation.sos.io.FileSensorReader;
 import org.constellation.sos.io.FileSensorWriter;
 import org.constellation.sos.io.GenericObservationFilter;
-import org.constellation.sos.io.GenericObservationReader;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationFilter;
@@ -68,7 +68,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         switch (type) {
             case DEFAULT : return new DefaultObservationReader(dataSourceOM, observationIdBase);
 
-            case GENERIC : return new GenericObservationReader(observationIdBase, configuration);
+            case GENERIC : return new DefaultGenericObservationReader(observationIdBase, configuration);
 
             default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
         }
