@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,8 +40,6 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -80,6 +79,7 @@ import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.portrayal.CSTLPortrayalService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
+import org.constellation.query.QueryAdapter;
 import org.constellation.wcs.AbstractDescribeCoverage;
 import org.constellation.wcs.AbstractGetCoverage;
 import org.constellation.wcs.v111.Capabilities;
@@ -165,6 +165,7 @@ public class WCSService extends OGCWebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
+    @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
             final String request = (String) getParameter(KEY_REQUEST, true);
@@ -343,15 +344,15 @@ public class WCSService extends OGCWebService {
             final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
             final String bbox = getParameter(KEY_BBOX, true);
             if (bbox != null) {
-                final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-                final Double[] coordinates = new Double[tokens.countTokens()];
-                int i = 0;
-                    while (tokens.hasMoreTokens()) {
-                        coordinates[i] = parseDouble(tokens.nextToken());
-                        i++;
-                    }
-                    pos.add(new DirectPositionType(coordinates[0], coordinates[2]));
-                    pos.add(new DirectPositionType(coordinates[1], coordinates[3]));
+                final List<String> bboxValues = QueryAdapter.toStringList(bbox);
+                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(0)),
+                                               QueryAdapter.toDouble(bboxValues.get(2))));
+                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(1)),
+                                               QueryAdapter.toDouble(bboxValues.get(3))));
+                if (bboxValues.size() > 4) {
+                    pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(4)),
+                                                   QueryAdapter.toDouble(bboxValues.get(5))));
+                }
             }
             final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
 
@@ -768,11 +769,12 @@ public class WCSService extends OGCWebService {
         final CoordinateReferenceSystem crs;
         final int width;
         final int height;
+        final int depth;
+        Double elevation = null;
         
         String time = null;
         String interpolation = null;
         String exceptions = null;
-        String depth = null;
         String resx  = null;
         String resy  = null;
         String resz  = null;
@@ -990,8 +992,14 @@ public class WCSService extends OGCWebService {
                 throw new WebServiceException(ex, INVALID_CRS, getActingVersion());
             }
             objEnv = new GeneralEnvelope(crs);
-            objEnv.setRange(0, env.getPos().get(0).getValue().get(0), env.getPos().get(0).getValue().get(1));
-            objEnv.setRange(1, env.getPos().get(1).getValue().get(0), env.getPos().get(1).getValue().get(1));
+            final List<DirectPositionType> positions = env.getPos();
+            final DirectPositionType lonPos = positions.get(0);
+            final DirectPositionType latPos = positions.get(1);
+            objEnv.setRange(0, lonPos.getValue().get(0), lonPos.getValue().get(1));
+            objEnv.setRange(1, latPos.getValue().get(0), latPos.getValue().get(1));
+            if (positions.size() > 2) {
+                elevation = positions.get(2).getValue().get(0);
+            }
 
             if (temporalSubset == null && env.getPos().size() == 0) {
                         throw new WebServiceException("The parameters BBOX or TIME have to be specified",
@@ -1009,6 +1017,9 @@ public class WCSService extends OGCWebService {
 
                 width = Integer.parseInt(resx);
                 height = Integer.parseInt(resy);
+                if (grid.getDimension() > 2) {
+                    depth = Integer.parseInt(resz);
+                }
             } else {
                 GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();
                 if (gridEnv.getHigh().size() > 0) {
@@ -1016,7 +1027,7 @@ public class WCSService extends OGCWebService {
                     height        = gridEnv.getHigh().get(1).intValue();
                     
                     if (gridEnv.getHigh().size() == 3) {
-                        depth     = gridEnv.getHigh().get(2).toString();
+                        depth     = gridEnv.getHigh().get(2).intValue();
                     }
                 } else {
                      throw new WebServiceException("you must specify grid size or resolution",
@@ -1025,17 +1036,25 @@ public class WCSService extends OGCWebService {
             }
         }
 
+        Date date = null;
+        try {
+            date = QueryAdapter.toDate(time);
+        } catch (ParseException ex) {
+            LOGGER.log(Level.INFO, "Parsing of the date failed. Please verify that the specified" +
+                    " date is compliant with the ISO-8601 standard.", ex);
+        }
+
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
-
         if ( format.equalsIgnoreCase(MATRIX) ) {
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(coverage);
             final RenderedImage image;
+            final Dimension dimension = new Dimension(width, height);
             try {
-                final GridCoverage2D gridCov = layer.getCoverage(objEnv, new Dimension(), null, null);
+                final GridCoverage2D gridCov = layer.getCoverage(objEnv, dimension, elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new WebServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
@@ -1350,6 +1369,7 @@ public class WCSService extends OGCWebService {
      * TODO
      */
     @PreDestroy
+    @Override
     public void destroy() {
         LOGGER.info("Destroying WCS service");
     }
