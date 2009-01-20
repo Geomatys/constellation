@@ -278,18 +278,22 @@ public class MDWebMetadataReader extends MetadataReader {
             } else if (mode == DUBLINCORE) {
 
                 Form form                  = MDReader.getForm(catalog, id);
-                Value top                  = form.getTopValue();
-                Standard recordStandard    = top.getType().getStandard();
+                if (form != null) {
+                    Value top                  = form.getTopValue();
+                    Standard recordStandard    = top.getType().getStandard();
 
-                /*
-                 * if the standard of the record is CSW and the record is cached we return it.
-                 * if the record is not yet cached we proccess.
-                 * if the record have to be transform from the orginal standard to CSW we process.
-                 */
-                if (!recordStandard.equals(Standard.CSW) || result == null)
-                    result = getRecordFromForm(identifier, form, type, elementName);
+                    /*
+                     * if the standard of the record is CSW and the record is cached we return it.
+                     * if the record is not yet cached we proccess.
+                     * if the record have to be transform from the orginal standard to CSW we process.
+                     */
+                    if (!recordStandard.equals(Standard.CSW) || result == null)
+                        result = getRecordFromForm(identifier, form, type, elementName);
 
-                result = applyElementSet(result, type, elementName);
+                    result = applyElementSet(result, type, elementName);
+                } else {
+                    throw new WebServiceException("Unable to read the form: " + identifier, NO_APPLICABLE_CODE, "id");
+                }
 
             } else {
                 throw new IllegalArgumentException("Unknow standard mode: " + mode);
@@ -565,7 +569,7 @@ public class MDWebMetadataReader extends MetadataReader {
                                                          southValue,
                                                          westValue,
                                                          northValue);
-            logger.info("boundingBox created");
+            logger.finer("boundingBox created");
             return result;
         } else {
             logger.info("boundingBox null");
