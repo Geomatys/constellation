@@ -55,7 +55,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>api</module>
+    <module>base</module>
     <module>portrayal</module>
     <module>spatial-lucene</module>
     <module>xacml</module>
