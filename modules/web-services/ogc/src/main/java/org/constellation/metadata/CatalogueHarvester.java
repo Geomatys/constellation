@@ -68,7 +68,7 @@ import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
 import org.constellation.ows.v100.SectionsType;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -515,7 +515,7 @@ public class CatalogueHarvester {
             
             if (outputDomain != null) {
                 List<String> availableOutputSchema = new ArrayList<String>();
-                availableOutputSchema              = Utils.cleanStrings(outputDomain.getValue());
+                availableOutputSchema              = Util.cleanStrings(outputDomain.getValue());
                 String defaultValue                = outputDomain.getDefaultValue(); 
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
@@ -756,7 +756,7 @@ public class CatalogueHarvester {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
        s = s.replace("http://schemas.opengis.net/iso19115full", "http://www.isotc211.org/2005/gmd");
        s = s.replace("http://metadata.dgiwg.org/smXML", "http://www.isotc211.org/2005/gmd");
-       s = Utils.replacePrefix(s, "CharacterString", "gco");
+       s = Util.replacePrefix(s, "CharacterString", "gco");
        return s;
    } 
    

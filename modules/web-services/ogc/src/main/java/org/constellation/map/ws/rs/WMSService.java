@@ -47,7 +47,7 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
@@ -196,14 +196,14 @@ public class WMSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         } catch (NumberFormatException n) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
             LOGGER.log(Level.INFO, n.getLocalizedMessage(), n);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
     }
 

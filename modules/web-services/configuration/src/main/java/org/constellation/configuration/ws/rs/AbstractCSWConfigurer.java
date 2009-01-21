@@ -46,7 +46,7 @@ import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
@@ -222,7 +222,7 @@ public abstract class AbstractCSWConfigurer {
         File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
         Properties prop;
         try {
-            prop = Utils.getPropertiesFromFile(cascadingFile);
+            prop = Util.getPropertiesFromFile(cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while loading the cascading properties file",
                             NO_APPLICABLE_CODE, version);
@@ -236,7 +236,7 @@ public abstract class AbstractCSWConfigurer {
             prop.put(servName, request.getCascadedServices().get(servName));
         }
         try {
-            Utils.storeProperties(prop, cascadingFile);
+            Util.storeProperties(prop, cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("unable to store the cascading properties file",
                         NO_APPLICABLE_CODE, version);

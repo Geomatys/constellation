@@ -76,7 +76,7 @@ import org.constellation.ws.ServiceType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -206,7 +206,7 @@ public class CSWService extends OGCWebService {
             
             
             
-           return Utils.toArray(classeList);
+           return Util.toArray(classeList);
     }
     
      /**
@@ -401,7 +401,7 @@ public class CSWService extends OGCWebService {
                 ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(report, sw);
-                return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
                 return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
             }

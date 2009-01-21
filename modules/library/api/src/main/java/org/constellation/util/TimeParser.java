@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,14 +27,27 @@ import org.geotools.util.logging.LoggedFormat;
 
 
 /**
- * Parses the {@code time} parameter of the request. The date, time and period
- * are expected to be formatted according ISO-8601 standard.
+ * Utility methods to parse {@code java.lang.String} objects which describe 
+ * instants or periods in the ISO-8601 format 
+ * (e.g. {@code 2009-01-20T17:04:00Z} ) into {@link java.util.Date} objects.
+ * <p>
+ * TODO: Explain relationship to {@code DateFormat} and to {@code Util}.
+ * </p>
+ * 
+ * <p>
+ * TODO: Improve and extend to handle the simple cases.
+ * </p>
  *
- * @author Cédric Briançon
- * @author Martin Desruisseaux
+ * @author Cédric Briançon     (Geomatys)
+ * @author Martin Desruisseaux (Geomatys)
+ * @author Adrian Custer       (Geomatys)
+ * 
  * @version $Id$
+ * @see Util#getDateFromString(String)
+ * @since 0.2
  */
 public final class TimeParser {
+	
     /**
      * Amount of milliseconds in a day.
      */
@@ -112,10 +125,13 @@ public final class TimeParser {
         this.numTimeFields = numTimeFields;
         this.hasTimeZone   = hasTimeZone;
     }
-
+    
+    
+    
+    
     /**
      * Parses the date given in parameter. The date format should comply to ISO-8601 standard.
-     * The string may contains either a single date, or a start time, end time and a period.
+     * The string may contain either a single date or a start time, an end time and a period.
      * In the first case, this method returns a singleton containing only the parsed date. In
      * the second case, this method returns a list including all dates from start time up to
      * the end time with the interval specified in the {@code value} string.

@@ -59,7 +59,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
 import org.constellation.util.PeriodUtilities;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.wms.AbstractDCP;
 import org.constellation.wms.AbstractDimension;
 import org.constellation.wms.AbstractHTTP;
@@ -340,8 +340,8 @@ public class WMSWorker extends AbstractWMSWorker {
 
                 //we build the complete layer object
                 outputLayer = new org.constellation.wms.v111.Layer(layerName,
-                        Utils.cleanSpecialCharacter(layer.getRemarks()),
-                        Utils.cleanSpecialCharacter(layer.getThematic()), crs,
+                        Util.cleanSpecialCharacter(layer.getRemarks()),
+                        Util.cleanSpecialCharacter(layer.getThematic()), crs,
                         new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(),
                                               inputGeoBox.getSouthBoundLatitude(),
                                               inputGeoBox.getEastBoundLongitude(),
@@ -386,8 +386,8 @@ public class WMSWorker extends AbstractWMSWorker {
                 }
 
                 outputLayer = new org.constellation.wms.v130.Layer(layerName,
-                        Utils.cleanSpecialCharacter(layer.getRemarks()),
-                        Utils.cleanSpecialCharacter(layer.getThematic()), crs,
+                        Util.cleanSpecialCharacter(layer.getRemarks()),
+                        Util.cleanSpecialCharacter(layer.getThematic()), crs,
                         new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(),
                                                     inputGeoBox.getSouthBoundLatitude(),
                                                     inputGeoBox.getEastBoundLongitude(),

@@ -37,7 +37,7 @@ import javax.xml.bind.JAXBElement;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -258,7 +258,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         
                     } else if (object.getClass().isEnum()) {
                         
-                        codelistElement = Utils.getElementNameFromEnum(object);
+                        codelistElement = Util.getElementNameFromEnum(object);
                         
                     } else {
                         LOGGER.severe (object.getClass().getName() + " is not a codelist!");
@@ -309,7 +309,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
                 
-                    Method getter = Utils.getGetterFromName(prop.getName(), object.getClass());
+                    Method getter = Util.getGetterFromName(prop.getName(), object.getClass());
                     if (getter != null) {
                         try {
                             Object propertyValue = getter.invoke(object);

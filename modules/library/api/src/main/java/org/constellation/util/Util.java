@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -65,21 +65,35 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * A set of utilitie methods.
+ * Utility methods of general use.
+ * <p>
+ * TODO: this class needs review.
+ *   * methods should be re-ordered for coherence
+ *       -- String
+ *       -- Reflection
+ *       -- ...
+ * </p>
  * 
- * @author Mehdi Sidhoum, Legal Guilhem.
+ * @author Mehdi Sidhoum (Geomatys)
+ * @author Legal Guilhem (Geomatys)
+ * @author Adrian Custer (Geomatys)
+ * 
+ * @since 0.2
  */
-public class Utils {
-
+public final class Util {
+	
     private static Logger logger = Logger.getLogger("org.constellation.util");
-
+    
+    
     /**
-     * Returns true if the list contains a string in one of the list elements.
+     * Returns true if one of the {@code String} elements in a {@code List} 
+     * matches the given {@code String}, insensitive to case.
      * 
-     * @param list A list of Strings. 
-     * @param str  A single string.
+     * @param list A {@code List<String>} with elements to be tested. 
+     * @param str  The {@code String} to evaluate.
      * 
-     * @return true if at least an element of the list contains the specifieds string.
+     * @return {@code true}, if at least one element of the list matches the 
+     *           parameter, {@code false} otherwise.
      */
     public static boolean matchesStringfromList(List<String> list, String str) {
         boolean str_available = false;
@@ -94,12 +108,14 @@ public class Utils {
     }
     
     /**
-     * Return a string with the first character to upper casse.
-     * example : firstToUpper("hello") return "Hello".
+     * Generate a {@code String} whose first character will be in upper case.
+     * <p>
+     * For example: {@code firstToUpper("hello")} would return {@code "Hello"}, 
+     * while {@code firstToUpper("Hi!") would return {@code "Hi!"} unchanged.
      * 
-     * @param s the string to modifiy
+     * @param s The {@code String} to evaluate, not {@code null}.
      * 
-     * @return a string with the first character to upper casse.
+     * @return A {@code String} with the first character in upper case.
      */
     public static String firstToUpper(String s) {
         String first = s.substring(0, 1);
@@ -109,9 +125,17 @@ public class Utils {
     }
     
     /**
-     * Returns a Date object from an ISO-8601 representation string. (String defined with pattern yyyy-MM-dd'T'HH:mm:ss.SSSZ or yyyy-MM-dd).
-     * @param dateString
-     * @return
+     * Generate a {@code Date} object from a {@code String} which represents an 
+     * instant encoded in the ISO-8601 format, e.g. {@code 2009.01.20T17:04Z}.
+     * <p>
+     * The {@code String} can be defined in the pattern 
+     *   yyyy-MM-dd'T'HH:mm:ss.SSSZ 
+     * or 
+     *   yyyy-MM-dd.
+     * </p>
+     * @param dateString An instant encoded in the ISO-8601 format.
+     * @return A {@code java.util.Date} object representing the same instant.
+     * @see TimeParser
      */
     public static Date getDateFromString(String dateString) throws ParseException {
         final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
@@ -160,11 +184,16 @@ public class Utils {
     }
     
     /**
-     * This method extract the timezone from a date string.
-     * @param dateString
-     * @return
+     * Extract a description of the offset from GMT for an instant encoded in 
+     * ISO-8601 format (e.g. an input of {@code 2009-01-20T12:04:00Z-05} would
+     * yield the {@code String} "GMT-05").
+     * 
+     * @param dateString An instant encoded in ISO-8601 format, must not be 
+     *                     {@code null}.
+     * @return The offset from GMT for the parameter.
      */
     public static String getTimeZone(final String dateString) {
+    	
         if (dateString.endsWith("Z")) {
             return "GMT+" + 0;
         }
@@ -177,13 +206,22 @@ public class Utils {
         }
         return TimeZone.getDefault().getID();
     }
-       
-     /**
-     * Return a Date by parsing different kind of date format.
+    
+    /**
+     * Create a {@link Date} object from a date represented in a {@String} 
+     * object and a formatting rule described in a {@link DateFormat} object.
+     * <p>
+     * The input date parameter can have any of several different formats.
+     * </p>
+     * <p>
+     * TODO: Explain these formats.
+     * TODO: This is out of date since we no longer use the {@code DateFormat}
+     * objects to format the {@code Date}.
+     * </p>
      * 
-     * @param date a date representation (example 2002, 02-2007, 2004-03-04, ...)
-     * 
-     * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
+     * @param date A date representation, e.g. 2002, 02-2007, 2004-03-04, which 
+     *               may be null.
+     * @return A formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
      */
     public static Date createDate(String date, DateFormat dateFormat) throws ParseException {
         
@@ -221,7 +259,7 @@ public class Utils {
         Date tmp = getDateFromString("1900" + "-" + "01" + "-" + "01");
         if (date != null) {
             if (date.contains("/")) {
-                if (getOccurence(date, "/") == 2) {
+                if (getOccurenceFrequency(date, "/") == 2) {
                     day = date.substring(0, date.indexOf("/"));
                     date = date.substring(date.indexOf("/") + 1);
                     month = date.substring(0, date.indexOf("/"));
@@ -229,13 +267,13 @@ public class Utils {
 
                     tmp = getDateFromString(year + "-" + month + "-" + day);
                 } else {
-                    if (getOccurence(date, "/") == 1) {
+                    if (getOccurenceFrequency(date, "/") == 1) {
                         month = date.substring(0, date.indexOf("/"));
                         year = date.substring(date.indexOf("/") + 1);
                         tmp = getDateFromString(year + "-" + month + "-" + "01");
                     }
                 }
-            } else if (getOccurence(date, " ") == 2) {
+            } else if (getOccurenceFrequency(date, " ") == 2) {
                 if (!date.contains("?")) {
 
                     day = date.substring(0, date.indexOf(" "));
@@ -247,7 +285,7 @@ public class Utils {
                 } else {
                     tmp = getDateFromString("2000" + "-" + "01" + "-" + "01");
                 }
-            } else if (getOccurence(date, " ") == 1) {
+            } else if (getOccurenceFrequency(date, " ") == 1) {
                 try {
                     Date d = dateFormat.parse(date);
                     return new Date(d.getTime());
@@ -258,14 +296,14 @@ public class Utils {
                 tmp = getDateFromString(year + "-" + month + "-" + "01");
 
 
-            } else if (getOccurence(date, "-") == 1) {
+            } else if (getOccurenceFrequency(date, "-") == 1) {
 
                 month = date.substring(0, date.indexOf("-"));
                 year = date.substring(date.indexOf("-") + 1);
 
                 tmp = getDateFromString(year + "-" + month + "-" + "01");
 
-            } else if (getOccurence(date, "-") == 2) {
+            } else if (getOccurenceFrequency(date, "-") == 2) {
 
                 //if date is in format yyyy-mm-dd
                 if (date.substring(0, date.indexOf("-")).length() == 4) {
@@ -298,9 +336,18 @@ public class Utils {
     
         
     /**
-     * This method returns a number of occurences occ in the string s.
+     * Counts the number of occurences of the second parameter within the first.
+     * For example, {@code getOccurenceFrequency("Constellation","ll") yields 
+     * {@code 1}.
+     * 
+     * @param s   The {@code String} against which matches should be made, must 
+     *              not be null.
+     * @param occ The {@code String} whose frequency of occurrence in the first 
+     *              parameter should be counted, must not be null.
+     * @return The frequency of occurrences of the second parameter characters 
+     *           in the character sequence of the first.
      */
-    public static int getOccurence (String s, String occ){
+    public static int getOccurenceFrequency (String s, String occ){
         if (! s.contains(occ))
             return 0;
         else {
@@ -314,12 +361,17 @@ public class Utils {
     }
     
     /**
-     * Search in the librairies and the classes the child of the specified packages,
-     * and return all of them.
+     * Searches in the Context ClassLoader for the named packages and returns a 
+     * {@code List<String>} with, for each named package, 
+     *                                  ...TODO, read .scan(.)
+     * <p>
+     * TODO: verify this.
+     * </p>
      * 
-     * @param packages the packages to scan.
+     * @param packages The names of the packages to scan in Java format, i.e. 
+     *                   using the "." separator, may be null.
      * 
-     * @return a list of package names.
+     * @return A list of package names.
      */
     public static List<String> searchSubPackage(String... packages) {
         List<String> result = new ArrayList<String>();
@@ -422,7 +474,7 @@ public class Utils {
         return result;
     }
     
-    /*
+    /**
      * Encode the specified string with MD5 algorithm.
      * 
      * @param key :  the string to encode.
@@ -452,15 +504,20 @@ public class Utils {
         return hashString.toString();
     }
 
-     /**
-     * An utilities method which tansform a List of class in a Class[]
+    /**
+     * Transform a {@code List<Class<?>>} to an array of {@code Class<?>}.
      * 
-     * @param classes A java.util.List<Class>
+     * <p>
+     * TODO: Parameterizing this list needs to fix other code as well.
+     * </p>
+     * 
+     * @param classeList A {@code List<Class<?>>}, must not be null.
+     * @return An array of {@code Class<?>}.
      */
-    public static Class[] toArray(List<Class> classes) {
-        Class[] result = new Class[classes.size()];
+    public static Class<?>[] toArray(List<Class> classeList) {
+        Class<?>[] result = new Class<?>[classeList.size()];
         int i = 0;
-        for (Class classe : classes) {
+        for (Class<?> classe : classeList) {
             result[i] = classe;
             i++;
         }
@@ -468,10 +525,16 @@ public class Utils {
     }
     
     /**
-     * Delete a directory and all its sub-file/directory.
+     * Delete a directory and all its contents, both files and directories.
+     * <p>
+     * Note, if this is passed a file rather than a directory, the method will 
+     * not delete anything and return {@code false}.
+     * </p>
      * 
-     * @param directory a file.
-     * @return
+     * @param directory A {@code File} object, expected to reference a 
+     *                    directory.
+     * @return {@code true} if, and only if, the directory was successfully 
+     *           deleted, and {@code false} otherwise.
      */
     public static boolean deleteDirectory(File directory) {
         if (directory == null)
@@ -554,7 +617,7 @@ public class Utils {
             try {
                 response = unmarshaller.unmarshal(new StringReader(decodedString));
                 if (response != null && response instanceof JAXBElement) {
-                    response = ((JAXBElement) response).getValue();
+                    response = ((JAXBElement<?>) response).getValue();
                 }
             } catch (JAXBException ex) {
                 logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
@@ -568,191 +631,231 @@ public class Utils {
     }
     
     /**
-     * Call the empty constructor on the specified class and return the result.
+     * Call the empty constructor on the specified class and return the result, 
+     * handling most errors which could be expected by logging the cause and 
+     * returning {@code null}.
      * 
-     * @param classe
-     * @return
+     * @param classe An arbitrary class, expected to be instantiable with a 
+     *                 {@code null} argument constructor.
+     * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class classe) {
+    public static Object newInstance(Class<?> classe) {
         try {
             if (classe == null)
                 return null;
             
-            Constructor constructor = classe.getConstructor();
+            Constructor<?> constructor = classe.getConstructor();
 
             //we execute the constructor
             Object result = constructor.newInstance();
             return result;
             
         } catch (InstantiationException ex) {
-            logger.severe("the service can't instanciate the class: " + classe.getName() + "()");
+            logger.severe("The service can not instantiate the class: " + classe.getName() + "()");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can't access the constructor in class: " + classe.getName());
-        } catch (IllegalArgumentException ex) {
+            logger.severe("The service can not access the constructor in class: " + classe.getName());
+        } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
             logger.severe("Illegal Argument in empty constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception in empty constructor for class: " + classe.getName());
+            logger.severe("Invocation Target Exception in empty constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No such empty constructor in class: " + classe.getName());
+            logger.severe("There is no empty constructor for class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
     
     /**
-     * Call the constructor(String) on the specified class and return the result.
+     * Call the constructor which uses a {@code String} parameter for the given 
+     * class and return the result, handling most errors which could be expected 
+     * by logging the cause and returning {@code null}.
      * 
-     * @param classe
-     * @return
+     * @param classe    An arbitrary class, expected to be instantiable with a 
+     *                    single {@code String} argument.
+     * @param parameter The {@code String} to use as an argument to the 
+     *                    constructor.
+     * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class classe, String parameter) {
+    public static Object newInstance(Class<?> classe, String parameter) {
         try {
             if (classe == null)
                 return null;
-            Constructor constructor = classe.getConstructor(String.class);
+            Constructor<?> constructor = classe.getConstructor(String.class);
             
             //we execute the constructor
             Object result = constructor.newInstance(parameter);
             return result;
             
         } catch (InstantiationException ex) {
-            logger.severe("the service can't instanciate the class: " + classe.getName() + "(string)");
+            logger.severe("The service can not instantiate the class: " + classe.getName() + "(string)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
             logger.severe("Illegal Argument in string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception in string constructor for class: " + classe.getName());
+            logger.severe("Invocation target exception in string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No such string constructor in class: " + classe.getName());
+            logger.severe("No single string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
     
     /**
-     * Call the constructor(String) on the specified class and return the result.
+     * Call the constructor which uses two {@code String} parameters for the 
+     * given class and return the result, handling most errors which could be 
+     * expected by logging the cause and returning {@code null}.
      * 
-     * @param classe
-     * @return
+     * @param classe     An arbitrary class, expected to be instantiable with a 
+     *                     single {@code String} argument.
+     * @param parameter1 The first {@code String} to use as an argument to the 
+     *                     constructor.
+     * @param parameter2 The second {@code String} to use as an argument to the 
+     *                     constructor.
+     * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class classe, String parameter1, String parameter2) {
+    public static Object newInstance(Class<?> classe, String parameter1, String parameter2) {
         try {
             if (classe == null)
                 return null;
-            Constructor constructor = classe.getConstructor(String.class, String.class);
+            Constructor<?> constructor = classe.getConstructor(String.class, String.class);
+            
             //we execute the constructor
             Object result = constructor.newInstance(parameter1, parameter2);
             return result;
             
         } catch (InstantiationException ex) {
-            logger.severe("the service can't instanciate the class: " + classe.getName() + "(string, string)");
+            logger.severe("The service can't instantiate the class: " + classe.getName() + "(string, string)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
             logger.severe("Illegal Argument in double string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception in double string constructor for class: " + classe.getName());
+            logger.severe("Invocation target exception in double string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No such double string constructor in class: " + classe.getName());
+            logger.severe("No double string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
     
     /**
-     * Call the constructor(charSequence) on the specified class and return the result.
+     * Call the constructor which uses a character sequence parameter for the 
+     * given class and return the result, handling most errors which could be 
+     * expected by logging the cause and returning {@code null}.
      * 
-     * @param classe
-     * @return
+     * @param classe    An arbitrary class, expected to be instantiable with a 
+     *                    single {@code String} argument.
+     * @param parameter The character sequence to use as an argument to the 
+     *                    constructor.
+     * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class classe, CharSequence parameter) {
+    public static Object newInstance(Class<?> classe, CharSequence parameter) {
         try {
             if (classe == null)
                 return null;
-            Constructor constructor = classe.getConstructor(CharSequence.class);
+            Constructor<?> constructor = classe.getConstructor(CharSequence.class);
+            
             //we execute the constructor
             Object result = constructor.newInstance(parameter);
             return result;
             
         } catch (InstantiationException ex) {
-            logger.severe("the service can't instanciate the class: " + classe.getName() + "(CharSequence)");
+            logger.severe("The service can't instantiate the class: " + classe.getName() + "(CharSequence)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can't access the constructor in class: " + classe.getName());
+            logger.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
             logger.severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception in CharSequence constructor for class: " + classe.getName());
+            logger.severe("Invocation target exception in CharSequence constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
             logger.severe("No such CharSequence constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instanciating class: " + classe.getName());
+            logger.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
     
     /**
-     * Invoke a method with the specified parameter in the specified object.
+     * Invoke the given method on the specified object, handling most errors 
+     * which could be expected by logging the cause and returning {@code null}.
      * 
-     * @param method     The method to invoke
-     * @param object     The object on witch the method is invoked.
-     * @param parameter  The parameter of the method.
+     * <p>
+     * TODO: what happens if the method returns {@code void}?
+     * </p>
+     * 
+     * @param object     The object on which the method will be invoked.
+     * @param method     The method to invoke.
+     * @return The {@code Object} generated by the method call, or, if the 
+     *           method call resulted in a primitive, the auto-boxing 
+     *           equivalent, or null.
      */
-    public static Object invokeMethod(Method method, Object object) {
+    public static Object invokeMethod(Object object, Method method) {
         Object result = null;
-        String baseMessage = "unable to invoke setter: "; 
+        String baseMessage = "Unable to invoke the method " + method + ": "; 
         try {
             if (method != null) {
                 result = method.invoke(object);
             } else {
-                logger.severe(baseMessage + "The setter is null");
+                logger.severe(baseMessage + "the method reference is null.");
             }
 
         } catch (IllegalAccessException ex) {
-            logger.severe(baseMessage + "The class is not accessible");
+            logger.severe(baseMessage + "the class is not accessible.");
 
-        } catch (IllegalArgumentException ex) {
-            logger.severe(baseMessage + "The argument does not match with the method");
+        } catch (IllegalArgumentException ex) {//TODO: this cannot happen
+            logger.severe(baseMessage + "the argument does not match with the method.");
 
         } catch (InvocationTargetException ex) {
-            logger.severe(baseMessage + "Exception throw in the invokated method");
+            logger.severe(baseMessage + "an Exception was thrown by the invoked method.");
         }
         return result;
     }
     
     /**
-     * Invoke a method with the specified parameter in the specified object.
+     * Invoke a method with the specified parameter on the specified object, 
+     * handling most errors which could be expected by logging the cause and 
+     * returning {@code null}.
      * 
-     * @param method     The method to invoke
-     * @param object     The object on witch the method is invoked.
+     * <p>
+     * TODO: what happens if the method returns {@code void}?
+     * </p>
+     * 
+     * @param object     The object on which the method will be invoked.
+     * @param method     The method to invoke.
      * @param parameter  The parameter of the method.
+     * @return The {@code Object} generated by the method call, or, if the 
+     *           method call resulted in a primitive, the auto-boxing 
+     *           equivalent, or null.
      */
     public static Object invokeMethod(Method method, Object object, Object parameter) {
         Object result = null;
-        String baseMessage = "unable to invoke setter: "; 
+        String baseMessage = "Unable to invoke the method " + method + ": "; 
         try {
             if (method != null) {
                 result = method.invoke(object, parameter);
             } else {
-                logger.severe(baseMessage + "The setter is null");
+                logger.severe(baseMessage + "the method reference is null.");
             }
         } catch (IllegalAccessException ex) {
-            logger.severe(baseMessage + "The class is not accessible");
+            logger.severe(baseMessage + "the class is not accessible.");
 
         } catch (IllegalArgumentException ex) {
-            logger.severe(baseMessage + "The argument does not match with the method");
+            logger.severe(baseMessage + "the given argument does not match that requrired by the method.");
 
         } catch (InvocationTargetException ex) {
-            logger.severe(baseMessage + "Exception throw in the invokated method");
+            logger.severe(baseMessage + "an Exception was thrown in the invoked method.");
         }
         return result;
     }
     
+    //TODO: the methods below can be updated for varArgs.
+    
     /**
-      * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * Return a setter Method for the specified attribute (propertyName) of the type "classe"
      * in the class rootClass.
      * 
      * @param propertyName The attribute name.
@@ -761,7 +864,7 @@ public class Utils {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getMethod(String propertyName, Class classe) {
+    public static Method getMethod(String propertyName, Class<?> classe) {
         Method method = null;
         try {
             method = classe.getMethod(propertyName);
@@ -786,7 +889,7 @@ public class Utils {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getMethod(String propertyName, Class classe, Class parameterClass) {
+    public static Method getMethod(String propertyName, Class<?> classe, Class<?> parameterClass) {
         Method method = null;
         try {
             method = classe.getMethod(propertyName, parameterClass);
@@ -809,7 +912,7 @@ public class Utils {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getGetterFromName(String propertyName, Class rootClass) {
+    public static Method getGetterFromName(String propertyName, Class<?> rootClass) {
 
 
         //special case and corrections
@@ -844,7 +947,7 @@ public class Utils {
             return null;
         }
         
-        String methodName = "get" + Utils.firstToUpper(propertyName);
+        String methodName = "get" + Util.firstToUpper(propertyName);
         int occurenceType = 0;
         
         while (occurenceType < 4) {
@@ -894,7 +997,7 @@ public class Utils {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
+    public static Method getSetterFromName(String propertyName, Class<?> classe, Class<?> rootClass) {
         logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
@@ -904,17 +1007,17 @@ public class Utils {
             propertyName = "ending";
         } 
         
-        String methodName = "set" + Utils.firstToUpper(propertyName);
+        String methodName = "set" + Util.firstToUpper(propertyName);
         int occurenceType = 0;
         
         //TODO look all interfaces
-        Class interfacee = null;
+        Class<?> interfacee = null;
         if (classe.getInterfaces().length != 0) {
             interfacee = classe.getInterfaces()[0];
         }
         
-        Class argumentSuperClass     = classe;
-        Class argumentSuperInterface = null;
+        Class<?> argumentSuperClass     = classe;
+        Class<?> argumentSuperInterface = null;
         if (argumentSuperClass.getInterfaces().length > 0) {
             argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
         }

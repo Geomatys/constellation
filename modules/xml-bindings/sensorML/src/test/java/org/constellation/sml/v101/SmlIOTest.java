@@ -42,7 +42,7 @@ import org.constellation.swe.v101.QuantityRange;
 import org.constellation.swe.v101.QuantityType;
 import org.constellation.swe.v101.TimeRange;
 import org.constellation.swe.v101.UomPropertyType;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -109,7 +109,7 @@ public class SmlIOTest {
     @Test
     public void ComponentUnmarshallMarshalingTest() throws Exception {
         /*
-        InputStream is = Utils.getResourceAsStream("org/constellation/sml/component.xml");
+        InputStream is = Util.getResourceAsStream("org/constellation/sml/component.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
         if (unmarshalled instanceof JAXBElement) {
             unmarshalled = ((JAXBElement)unmarshalled).getValue();

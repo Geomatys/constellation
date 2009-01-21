@@ -51,7 +51,7 @@ import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ows.v100.BoundingBoxType;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -182,15 +182,15 @@ public class MDWebMetadataReader extends MetadataReader {
         this.MDReader        = new Reader20(Standard.ISO_19115,  MDConnection);
         this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
-        this.geotoolsPackage = Utils.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
+        this.geotoolsPackage = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
                                            "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
                                                 "org.constellation.metadata.fra");
-        this.opengisPackage  = Utils.searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
+        this.opengisPackage  = Util.searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.CSWPackage      = Utils.searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
+        this.CSWPackage      = Util.searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
                                                 "org.constellation.ogc");
-        this.ebrimV3Package  = Utils.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
-        this.ebrimV25Package = Utils.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+        this.ebrimV3Package  = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
+        this.ebrimV25Package = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
         this.classBinding    = initClassBinding(configDir);
         this.alreadyRead     = new HashMap<Value, Object>();
@@ -484,19 +484,19 @@ public class MDWebMetadataReader extends MetadataReader {
             RecordType result = new RecordType();
             for (QName qn : elementName) {
 
-                String getterName = "get" + Utils.firstToUpper(qn.getLocalPart());
-                String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
+                String getterName = "get" + Util.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + Util.firstToUpper(qn.getLocalPart());
                 try {
-                    Method getter = Utils.getMethod(getterName, RecordType.class);
-                    Object param  = Utils.invokeMethod(getter, fullResult);
+                    Method getter = Util.getMethod(getterName, RecordType.class);
+                    Object param  = Util.invokeMethod(fullResult, getter);
 
                     Method setter = null;
                     if (param != null) {
-                        setter = Utils.getMethod(setterName, RecordType.class, param.getClass());
+                        setter = Util.getMethod(setterName, RecordType.class, param.getClass());
                     }
 
                     if (setter != null) {
-                        Utils.invokeMethod(setter, result, param);
+                        Util.invokeMethod(setter, result, param);
                     }
 
                 } catch (IllegalArgumentException ex) {
@@ -645,16 +645,16 @@ public class MDWebMetadataReader extends MetadataReader {
         // for an element name mode    
         } else {
             Class recordClass = result.getClass();
-            Object filtredResult = Utils.newInstance(recordClass);
+            Object filtredResult = Util.newInstance(recordClass);
 
             for (QName qn : elementName) {
 
-                String getterName = "get" + Utils.firstToUpper(qn.getLocalPart());
-                String setterName = "set" + Utils.firstToUpper(qn.getLocalPart());
+                String getterName = "get" + Util.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + Util.firstToUpper(qn.getLocalPart());
                 String currentMethodName = getterName + "()";
                 try {
-                    Method getter = Utils.getMethod(getterName, recordClass);
-                    Object param = Utils.invokeMethod(getter, result);
+                    Method getter = Util.getMethod(getterName, recordClass);
+                    Object param = Util.invokeMethod(result, getter);
 
                     Method setter = null;
                     if (param != null) {
@@ -663,10 +663,10 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (paramClass.equals(ArrayList.class)) {
                             paramClass = List.class;
                         }
-                        setter = Utils.getMethod(setterName, recordClass, paramClass);
+                        setter = Util.getMethod(setterName, recordClass, paramClass);
                     }
                     if (setter != null) {
-                        Utils.invokeMethod(setter, filtredResult, param);
+                        Util.invokeMethod(setter, filtredResult, param);
                     }
 
                 } catch (IllegalArgumentException ex) {
@@ -727,16 +727,16 @@ public class MDWebMetadataReader extends MetadataReader {
                     
                         Method method;
                         if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class))) {
-                            method = Utils.getMethod("valueOf", classe, String.class);
+                            method = Util.getMethod("valueOf", classe, String.class);
                         } else if (classe.isEnum()) {
                             temp = "fromValue";
-                            method = Utils.getMethod("fromValue", classe, String.class);
+                            method = Util.getMethod("fromValue", classe, String.class);
                         } else {
                             logger.severe("unknow codelist type");
                             return null;
                         }
                         if (method != null && element != null) {
-                            result = Utils.invokeMethod(method, null, element.getName());
+                            result = Util.invokeMethod(method, null, element.getName());
                         } else {
                             logger.severe("Unable to invoke the method: " + temp + " on the class : " + classe.getName() + "(#" + textValue + ")");
                             return null;
@@ -750,12 +750,12 @@ public class MDWebMetadataReader extends MetadataReader {
                 // if the value is a date we call the static method parse 
                 // instead of a constructor (temporary patch: createDate method)  
                 } else if (classe.equals(Date.class)) {
-                    return Utils.createDate(textValue, dateFormat);
+                    return Util.createDate(textValue, dateFormat);
 
                 // else we use a String constructor    
                 } else {
                     //we execute the constructor
-                    result = Utils.newInstance(classe, textValue);
+                    result = Util.newInstance(classe, textValue);
                     
                     //fix a bug in MDWeb with the value attribute TODO remove
                     if (!form.asMoreChild(value)) {
@@ -791,7 +791,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     }
                     if (child != null) {
                         CharSequence cs = child.getValue();
-                        return Utils.newInstance(classe, cs);
+                        return Util.newInstance(classe, cs);
                     } else {
                         logger.severe("The localName is mal-formed");
                         return null;
@@ -815,7 +815,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         }
                     }
                     if (localPart != null && namespaceURI != null) {
-                        result = Utils.newInstance(classe, namespaceURI, localPart);
+                        result = Util.newInstance(classe, namespaceURI, localPart);
                         return result;
                     } else {
                         logger.severe("The QName is mal-formed");
@@ -826,7 +826,7 @@ public class MDWebMetadataReader extends MetadataReader {
                  * normal case
                  * we get the empty constructor
                  */ 
-                result = Utils.newInstance(classe);
+                result = Util.newInstance(classe);
                 alreadyRead.put(value, result);
             }
 
@@ -879,9 +879,9 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (isMeta) {
                               metaMap.put(attribName, param);
                         } else {
-                            Method setter = Utils.getSetterFromName(attribName, param.getClass(), classe);
+                            Method setter = Util.getSetterFromName(attribName, param.getClass(), classe);
                             if (setter != null)
-                                Utils.invokeMethod(setter, result, param);
+                                Util.invokeMethod(setter, result, param);
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {

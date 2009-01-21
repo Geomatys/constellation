@@ -102,7 +102,7 @@ import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.cat.csw.AbstractCswRequest;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -747,7 +747,7 @@ public class CSWworker {
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
-                String propertyName = Utils.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+                String propertyName = Util.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
             
                 Sort sortFilter;
                 if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
@@ -1202,7 +1202,7 @@ public class CSWworker {
 
             if (typeNames.contains(_Record_QNAME)) {
 
-                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/record.xsd");
+                InputStream in = Util.getResourceAsStream("org/constellation/metadata/record.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
                 components.add(component);
@@ -1210,21 +1210,21 @@ public class CSWworker {
             
             if (typeNames.contains(_Metadata_QNAME)) {
 
-                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/metadata.xsd");
+                InputStream in = Util.getResourceAsStream("org/constellation/metadata/metadata.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
             if (containsOneOfEbrim30(typeNames)) {
-                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
+                InputStream in = Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
             if (containsOneOfEbrim25(typeNames)) {
-                InputStream in = Utils.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
+                InputStream in = Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
                 Document d = constructor.parse(in);
                 SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, d.getDocumentElement());
                 components.add(component);

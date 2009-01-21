@@ -51,7 +51,7 @@ import org.constellation.sos.GetResult;
 import org.constellation.sos.InsertObservation;
 import org.constellation.sos.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -185,7 +185,7 @@ public class SOService extends OGCWebService {
                 StringWriter sw = new StringWriter();
                 ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
                 marshaller.marshal(report, sw);
-                return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
                 return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
             }

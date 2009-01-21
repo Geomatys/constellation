@@ -47,7 +47,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -634,12 +634,12 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             String getterId = object.getClass().getName() + ':' + attributeName;
             Method getter = getters.get(getterId);
             if (getter != null) {
-                result = Utils.invokeMethod(getter, object);
+                result = Util.invokeMethod(object, getter);
             } else {
-                getter = Utils.getGetterFromName(attributeName, object.getClass());
+                getter = Util.getGetterFromName(attributeName, object.getClass());
                 if (getter != null) {
                     getters.put(object.getClass().getName() + ':' + attributeName, getter);
-                    result = Utils.invokeMethod(getter, object);
+                    result = Util.invokeMethod(object, getter);
                 }
             }
         }

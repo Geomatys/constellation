@@ -46,7 +46,7 @@ import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.ServiceType;
@@ -223,7 +223,7 @@ public class ConfigurationService extends WebService  {
             
         
         } catch (CstlServiceException ex) {
-            final String code = Utils.transformCodeName(ex.getExceptionCode().name());
+            final String code = Util.transformCodeName(ex.getExceptionCode().name());
             ServiceVersion v = ex.getVersion();
             if (v == null)
                 v = version;
@@ -237,7 +237,7 @@ public class ConfigurationService extends WebService  {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Utils.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
         
     }
@@ -317,7 +317,7 @@ public class ConfigurationService extends WebService  {
                                           NO_APPLICABLE_CODE, version);
         }
         try {
-            Utils.storeProperties(prop, propertiesFile);
+            Util.storeProperties(prop, propertiesFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IOException xhile trying to store the properties files.",
                                           NO_APPLICABLE_CODE, version);

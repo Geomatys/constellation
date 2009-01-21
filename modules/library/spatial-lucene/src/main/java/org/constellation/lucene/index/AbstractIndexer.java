@@ -26,7 +26,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 
 // Constellation dependencies
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 /**
@@ -71,7 +71,7 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      */
     private void switchIndexDir(File preGeneratedDirectory, File indexDirectory) {
         if (indexDirectory.exists()) {
-            Utils.deleteDirectory(indexDirectory);
+            Util.deleteDirectory(indexDirectory);
         }
         preGeneratedDirectory.renameTo(indexDirectory);
     }

@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.constellation.util.Utils;
+import org.constellation.util.Util;
 
 @Provider
 public class RenderedImageWriter implements MessageBodyWriter<RenderedImage> {
@@ -63,7 +63,7 @@ public class RenderedImageWriter implements MessageBodyWriter<RenderedImage> {
      */
     private static void writeImage(final RenderedImage image, final String mime, Object output)
             throws IOException {
-        Utils.writeImage(image, mime, output);
+        Util.writeImage(image, mime, output);
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
