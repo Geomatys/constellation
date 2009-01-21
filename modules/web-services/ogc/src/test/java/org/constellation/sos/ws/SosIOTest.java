@@ -84,18 +84,22 @@ public class SosIOTest {
     }
 
     public SosIOTest() throws Exception {
-        File capabilitiesFile = new File("/home/guilhem/netbeans project/Constellation/sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
-        JAXBContext context = JAXBContext.newInstance("org.constellation.sos:org.constellation.ows.v110");
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        
-        Object obj = unmarshaller.unmarshal(capabilitiesFile);
+        File capabilitiesFile = new File("sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
         Capabilities staticCapabilities = null;
-        if (obj instanceof Capabilities) {
-            staticCapabilities = (Capabilities) obj;
-        }
+        if (capabilitiesFile.exists()) {
+            JAXBContext context = JAXBContext.newInstance("org.constellation.sos:org.constellation.ows.v110");
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
+            Object obj = unmarshaller.unmarshal(capabilitiesFile);
+            if (obj instanceof Capabilities) {
+                staticCapabilities = (Capabilities) obj;
+            }
+        } else {
+            configFilesExist = false;
+            return;
+        }
         File configDirectory1 = new File("sosDefaultConfig");
         if (configDirectory1.exists()) {
             defaultWorker = new SOSworker(DISCOVERY, configDirectory1);
