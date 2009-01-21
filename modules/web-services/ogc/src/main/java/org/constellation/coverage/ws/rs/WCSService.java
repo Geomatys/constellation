@@ -31,9 +31,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
@@ -119,6 +121,7 @@ import org.constellation.ws.rs.OGCWebService;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -1070,15 +1073,14 @@ public class WCSService extends OGCWebService {
                     " date is compliant with the ISO-8601 standard.", ex);
         }
 
+        final Dimension dimension = new Dimension(width, height);
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
         if ( format.equalsIgnoreCase(MATRIX) ) {
-
-            final NamedLayerDP dp        = NamedLayerDP.getInstance();
-            final LayerDetails layer     = dp.get(coverage);
-            final Dimension    dimension = new Dimension(width, height);
+            final NamedLayerDP dp    = NamedLayerDP.getInstance();
+            final LayerDetails layer = dp.get(coverage);
 
             final RenderedImage image;
             try {
@@ -1101,8 +1103,16 @@ public class WCSService extends OGCWebService {
         } else {
             // We are in the case of an image format requested.
             BufferedImage image = null;
+            final ReferencedEnvelope refEnv = new ReferencedEnvelope(objEnv);
+            final List<String> coverages = new ArrayList<String>();
+            coverages.add(coverage);
+            final Map<String, Object> params = new HashMap<String, Object>();
+            params.put(KEY_TIME, date);
+            params.put("ELEVATION", elevation);
             try {
-                image = WCSPortrayalAdapter.portray(abstractRequest);
+                image = CSTLPortrayalService.getInstance().portray(
+                        refEnv, 0, null, dimension, coverages, null, null, params, getActingVersion());
+                //WCSPortrayalAdapter.portray(abstractRequest);
             } catch (PortrayalException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                     image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
