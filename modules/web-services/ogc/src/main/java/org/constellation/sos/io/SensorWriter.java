@@ -40,5 +40,10 @@ public abstract class SensorWriter {
     
     public abstract void endTransaction() throws WebServiceException;
 
+    /**
+     * Create a new identifier for a sensor.
+     */
+    public abstract int getNewSensorId() throws WebServiceException;
+
     public abstract void destroy();
 }

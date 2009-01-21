@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 
@@ -80,6 +82,11 @@ public class MDWebSensorWriter extends SensorWriter {
     private Savepoint currentSavePoint;
 
     /**
+     * An SQL satetement finding the last sensor ID recorded
+     */
+    private final PreparedStatement newSensorIdStmt;
+    
+    /**
      * A JAXB marshaller used to provide xml to the XMLReader.
      */
     private Marshaller marshaller;
@@ -91,6 +98,9 @@ public class MDWebSensorWriter extends SensorWriter {
             sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
             SMLCatalog     = sensorMLReader.getCatalog("SMLC");
             mainUser       = sensorMLReader.getUser("admin");
+
+             //we build the prepared Statement
+            newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
 
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
@@ -190,8 +200,30 @@ public class MDWebSensorWriter extends SensorWriter {
                                              NO_APPLICABLE_CODE);
         }
     }
+
+    /**
+     * Create a new identifier for a sensor.
+     */
+    @Override
+    public int getNewSensorId() throws WebServiceException {
+        try {
+            ResultSet res = newSensorIdStmt.executeQuery();
+            int id = -1;
+            while (res.next()) {
+                id = res.getInt(1);
+            }
+            res.close();
+            return (id + 1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
+    }
+    
     public void destroy() {
         try {
+            newSensorIdStmt.close();
             sensorMLWriter.dispose();
         } catch (SQLException ex) {
             logger.severe("SQLException while closing SOSWorker");

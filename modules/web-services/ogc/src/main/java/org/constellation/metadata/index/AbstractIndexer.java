@@ -19,9 +19,13 @@ package org.constellation.metadata.index;
 
 import java.io.File;
 import java.sql.SQLException;
+
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+
+// Constellation dependencies
 import org.constellation.util.Utils;
 import org.constellation.ws.WebServiceException;
 

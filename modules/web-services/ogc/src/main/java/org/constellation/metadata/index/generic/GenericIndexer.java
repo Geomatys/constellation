@@ -218,7 +218,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
+               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
             }
         }
         

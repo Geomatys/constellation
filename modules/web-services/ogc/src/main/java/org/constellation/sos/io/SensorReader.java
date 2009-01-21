@@ -42,11 +42,6 @@ public abstract class SensorReader {
     public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
     
     /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    public abstract int getNewSensorId() throws WebServiceException;
-
-    /**
      * Destroy and free the resource used by the reader.
      */
     public abstract void destroy();

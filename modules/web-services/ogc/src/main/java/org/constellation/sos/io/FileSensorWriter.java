@@ -41,7 +41,10 @@ public class FileSensorWriter extends SensorWriter {
 
     private List<File> uncommittedFiles;
 
-    public FileSensorWriter(File dataDirectory) throws WebServiceException {
+    private String sensorIdBase;
+
+    public FileSensorWriter(File dataDirectory, String sensorIdBase) throws WebServiceException {
+        this.sensorIdBase = sensorIdBase;
         uncommittedFiles = new ArrayList<File>();
         this.dataDirectory = dataDirectory;
     }
@@ -77,6 +80,25 @@ public class FileSensorWriter extends SensorWriter {
     @Override
     public void endTransaction() throws WebServiceException {
         uncommittedFiles = new ArrayList<File>();
+    }
+
+    @Override
+    public int getNewSensorId() throws WebServiceException {
+        int maxID = 0;
+        for (File f : dataDirectory.listFiles()) {
+            String id = f.getName();
+            id = id.substring(0, id.indexOf(".xml"));
+            id = id.substring(id.indexOf(sensorIdBase) + sensorIdBase.length());
+            try {
+                int curentID = Integer.parseInt(id);
+                if (curentID > maxID) {
+                    maxID = curentID;
+                }
+            } catch (NumberFormatException ex) {
+                throw new WebServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
+            }
+        }
+        return maxID + 1;
     }
 
     @Override

@@ -19,8 +19,6 @@ package org.constellation.sos.io;
 
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import javax.xml.bind.JAXBContext;
@@ -62,11 +60,6 @@ public class MDWebSensorReader extends SensorReader {
     private final Catalog SMLCatalog;
 
     /**
-     * An SQL satetement finding the last sensor ID recorded
-     */
-    private final PreparedStatement newSensorIdStmt;
-
-    /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */
     private final Properties map;
@@ -101,9 +94,6 @@ public class MDWebSensorReader extends SensorReader {
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
             unmarshaller        = context.createUnmarshaller();
-
-            //we build the prepared Statement
-            newSensorIdStmt    = sensorMLConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
@@ -152,30 +142,9 @@ public class MDWebSensorReader extends SensorReader {
         }
     }
     
-    /**
-     * Create a new identifier for an observation by searching in the O&M database.
-     */
-    @Override
-    public int getNewSensorId() throws WebServiceException {
-        try {
-            ResultSet res = newSensorIdStmt.executeQuery();
-            int id = -1;
-            while (res.next()) {
-                id = res.getInt(1);
-            }
-            res.close();
-            return (id + 1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
-        }
-    }
-
     @Override
     public void destroy() {
         try {
-            newSensorIdStmt.close();
             sensorMLConnection.close();
             sensorMLReader.dispose();
 

@@ -82,7 +82,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     @Override
     public SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws WebServiceException {
         switch (type) {
-            case FILE_SYSTEM: return new FileSensorReader(dataDirectory, sensorIdBase);
+            case FILE_SYSTEM: return new FileSensorReader(dataDirectory);
 
             case MDWEB: return new MDWebSensorReader(connection, sensorIdBase, map);
 
@@ -93,7 +93,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     @Override
     public SensorWriter getSensorWriter(DataSourceType type,  File dataDirectory, Connection connection, String sensorIdBase) throws WebServiceException {
         switch (type) {
-            case FILE_SYSTEM: return new FileSensorWriter(dataDirectory);
+            case FILE_SYSTEM: return new FileSensorWriter(dataDirectory, sensorIdBase);
 
             case MDWEB: return new MDWebSensorWriter(connection, sensorIdBase);
 

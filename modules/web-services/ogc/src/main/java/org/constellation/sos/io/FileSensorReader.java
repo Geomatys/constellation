@@ -44,10 +44,7 @@ public class FileSensorReader extends SensorReader {
 
     private File dataDirectory;
     
-    private String sensorIdBase;
-
-    public FileSensorReader(File dataDirectory, String sensorIdBase) throws WebServiceException  {
-        this.sensorIdBase = sensorIdBase;
+    public FileSensorReader(File dataDirectory) throws WebServiceException  {
         try {
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
@@ -82,25 +79,6 @@ public class FileSensorReader extends SensorReader {
             throw new WebServiceException("this sensor is not registered in the database!",
                         INVALID_PARAMETER_VALUE, "procedure");
         }
-    }
-
-    @Override
-    public int getNewSensorId() throws WebServiceException {
-        int maxID = 0;
-        for (File f : dataDirectory.listFiles()) {
-            String id = f.getName();
-            id = id.substring(0, id.indexOf(".xml"));
-            id = id.substring(id.indexOf(sensorIdBase) + sensorIdBase.length());
-            try {
-                int curentID = Integer.parseInt(id);
-                if (curentID > maxID) {
-                    maxID = curentID;
-                }
-            } catch (NumberFormatException ex) {
-                throw new WebServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
-            }
-        }
-        return maxID + 1;
     }
 
     @Override

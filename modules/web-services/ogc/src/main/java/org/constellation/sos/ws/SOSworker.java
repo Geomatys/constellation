@@ -1189,7 +1189,7 @@ public class SOSworker {
             }
             
             //we create a new Identifier from the SensorML database
-            int num = SMLReader.getNewSensorId();
+            int num = SMLWriter.getNewSensorId();
             id = sensorIdBase + num;
             
             //and we write it in the sensorML Database

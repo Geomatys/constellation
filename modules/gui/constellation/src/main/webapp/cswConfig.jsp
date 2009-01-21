@@ -22,42 +22,43 @@
             <h:form id="form_1">
                 <div id="configuration" class="content">
                     
-                    <h:outputText value="Web Services configuration and maintenance for Constellation" style="font-size:17px;font-weight:bold;"/>
+                    <h:outputText value="Configuration and maintenance for Constellation CSW" style="font-size:17px;font-weight:bold;"/>
                     <br/>
-                    <h:panelGrid id="maintenance_grid" columns="2" cellpadding="2" cellspacing="30" width="100%">
+                    <h:panelGrid id="maintenance_grid" columns="1" cellpadding="2" cellspacing="30" width="100%">
                         <t:commandLink styleClass="button" id="restart-id" onclick="" action="#{configurationBean.restartServices}">
                             <h:outputText id="restart_label" value="Restart the services"/>
                         </t:commandLink>
-
-                        <h:outputLabel value=""/>
 
                         <t:commandLink styleClass="button" id="generate_index-id" action="#{configurationBean.generateIndex}">
                             <h:outputText id="generate_label" value="Generate Index"/>
                         </t:commandLink>
 
-			<h:outputLabel value=""/>
-
 			<h:panelGrid id="generate_parameters_grid" columns="3" cellpadding="2" cellspacing="30" width="100%">    	
-			    <h:outputLabel value="service ID"/>
+			    <h:outputLabel value="service ID:"/>
 			    <h:inputText id="service_id" value="#{configurationBean.serviceIdentifier}" />			    
 			    <h:selectOneRadio value="#{configurationBean.currentSynchroneMode}">
 				<f:selectItems value="#{configurationBean.synchroneMode}" />
 		            </h:selectOneRadio>
 			</h:panelGrid>
-			<h:outputLabel value=""/>
-			
-			<t:commandLink styleClass="button" id="addToIndex-id" action="#{configurationBean.addToIndex}">
-                            <h:outputText id="add_to_label" value="Add to Index"/>
-                        </t:commandLink>
-			
-			<h:outputLabel value=""/>
 
+			<h:panelGrid id="add_parameters_grid" columns="3" cellpadding="2" cellspacing="30" width="100%">    			
+			    <t:commandLink styleClass="button" id="addToIndex-id" action="#{configurationBean.addToIndex}">
+	                        <h:outputText id="add_to_label" value="Add to Index"/>
+	                    </t:commandLink>
+                            <h:outputLabel value="records identifiers:"/>
+			    <h:inputText id="records_ids" value="#{configurationBean.recordIdentifiers}" />
+			</h:panelGrid>
+			
 			<t:commandLink styleClass="button" id="refresh_contact-id" action="#{configurationBean.resfreshContact}">
                             <h:outputText id="refresh_contact_label" value="Refresh Contacts"/>
                         </t:commandLink>
 	
 			<t:commandLink styleClass="button" id="refresh_vocabulary-id" action="#{configurationBean.resfreshVocabulary}">
                             <h:outputText id="refresh_vocabulary_label" value="Refresh vocabulary"/>
+                        </t:commandLink>
+			
+			<t:commandLink styleClass="button" id="config-back" action="authentified">
+                            <h:outputText id="config-back-lable" value="Back"/>
                         </t:commandLink>
                         
                     </h:panelGrid>
