@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "base" module from Constellation project.
+  Configuration for the "xacml-security" module of Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>web-services</artifactId>
+    <artifactId>library</artifactId>
     <version>0.3-SNAPSHOT</version>
   </parent>
 
@@ -17,12 +17,12 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-base</artifactId>
+  <groupId>org.constellation.library</groupId>
+  <artifactId>cstl-lib-api</artifactId>
   <packaging>jar</packaging>
-  <name>Common implementations of web services</name>
+  <name>API library</name>
   <description>
-    Common classes used by different web services.
+    The Application Programming Interface (API) for constellation.
   </description>
 
 
@@ -31,6 +31,28 @@
     Developers and contributors.
   -->
   <developers>
+    <developer>
+      <id>acuster</id>
+      <name>Adrian Custer</name>
+      <email>adrian.custer@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>    
+    <developer>
+      <id>cedricbr</id>
+      <name>Briançon Cédric</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>    
     <developer>
       <id>glegal</id>
       <name>Guilhem Legal</name>
@@ -42,72 +64,33 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>cedricbr</id>
-      <name>Cédric Briançon</name>
-      <email>cedric.briancon@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <id>jboss</id>
+      <name>jboss xacml</name>
+      <url>http://repository.jboss.com/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
   <!--
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.ws</groupId>
-      <artifactId>jaxws-rt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.ws</groupId>
-      <artifactId>jaxws-api</artifactId>
-    </dependency>
+    <!-- 
     <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi</artifactId>
     </dependency>
+    -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-metadata</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
