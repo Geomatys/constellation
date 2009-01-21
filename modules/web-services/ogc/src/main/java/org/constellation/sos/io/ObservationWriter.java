@@ -27,7 +27,7 @@ import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -40,21 +40,21 @@ public abstract class ObservationWriter {
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.io");
     
-    public ObservationWriter() throws WebServiceException {
+    public ObservationWriter() throws CstlServiceException {
     }
    
-    public abstract String writeObservation(ObservationEntry observation) throws WebServiceException;
+    public abstract String writeObservation(ObservationEntry observation) throws CstlServiceException;
     
-    public abstract String writeMeasurement(MeasurementEntry measurement) throws WebServiceException;
+    public abstract String writeMeasurement(MeasurementEntry measurement) throws CstlServiceException;
     
-    public abstract String writeOffering(ObservationOfferingEntry offering) throws WebServiceException;
+    public abstract String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
     
     public abstract void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
-            OfferingSamplingFeatureEntry offSF) throws WebServiceException;
+            OfferingSamplingFeatureEntry offSF) throws CstlServiceException;
     
     public abstract void updateOfferings();
     
-    public abstract void recordProcedureLocation(String physicalID, DirectPositionType position) throws WebServiceException;
+    public abstract void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
     
     public abstract void destroy();
 }

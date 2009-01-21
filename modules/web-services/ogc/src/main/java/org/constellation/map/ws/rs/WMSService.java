@@ -53,7 +53,7 @@ import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -179,10 +179,10 @@ public class WMSService extends OGCWebService {
                 marshaller.marshal(response, sw);
                 return Response.ok(sw.toString(), TEXT_XML).build();
             }
-            throw new WebServiceException("The operation " + request +
+            throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
 
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
@@ -212,9 +212,9 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return The DescribeLayer request.
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private DescribeLayer adaptDescribeLayer() throws WebServiceException {
+    private DescribeLayer adaptDescribeLayer() throws CstlServiceException {
         final String strLayer  = getParameter(KEY_LAYERS,  true );
         final String strVersion = getParameter(KEY_VERSION, false);
         final List<String> layers = QueryAdapter.toStringList(strLayer);
@@ -227,9 +227,9 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return A GetCapabilities request.
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private GetCapabilities adaptGetCapabilities() throws WebServiceException {
+    private GetCapabilities adaptGetCapabilities() throws CstlServiceException {
         final String version = getParameter(KEY_VERSION, false);
         if (version == null) {
             setActingVersion("1.1.1");
@@ -238,7 +238,7 @@ public class WMSService extends OGCWebService {
         final ServiceVersion bestVersion = getBestVersion(version);
         final String service = getParameter(KEY_SERVICE, true);
         if (!ServiceType.WMS.toString().equalsIgnoreCase(service)) {
-            throw new WebServiceException("Invalid service specified. Should be WMS.",
+            throw new CstlServiceException("Invalid service specified. Should be WMS.",
                     INVALID_PARAMETER_VALUE, bestVersion, "service");
         }
         String format = getParameter(KEY_FORMAT, false);
@@ -255,9 +255,9 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return A GetFeatureInfo request.
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private GetFeatureInfo adaptGetFeatureInfo() throws WebServiceException, NumberFormatException {
+    private GetFeatureInfo adaptGetFeatureInfo() throws CstlServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap(false);
         final String version = getParameter(KEY_VERSION, true);
         setActingVersion(version);
@@ -284,9 +284,9 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return The GetLegendGraphic request.
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private GetLegendGraphic adaptGetLegendGraphic() throws WebServiceException {
+    private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
         final String strLayer  = getParameter(KEY_LAYER,  true );
         final String strFormat = getParameter(KEY_FORMAT, true );
         final String strWidth  = getParameter(KEY_WIDTH,  false);
@@ -295,7 +295,7 @@ public class WMSService extends OGCWebService {
         try {
             format = QueryAdapter.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
-            throw new WebServiceException(i, INVALID_FORMAT,
+            throw new CstlServiceException(i, INVALID_FORMAT,
                     new ServiceVersion(ServiceType.WMS, "1.1.0"));
         }
         if (strWidth == null || strHeight == null) {
@@ -307,7 +307,7 @@ public class WMSService extends OGCWebService {
                 width  = QueryAdapter.toInt(strWidth);
                 height = QueryAdapter.toInt(strHeight);
             } catch (NumberFormatException n) {
-                throw new WebServiceException(n, INVALID_PARAMETER_VALUE,
+                throw new CstlServiceException(n, INVALID_PARAMETER_VALUE,
                         new ServiceVersion(ServiceType.WMS, "1.1.0"));
             }
             return new GetLegendGraphic(strLayer, format, width, height);
@@ -321,9 +321,9 @@ public class WMSService extends OGCWebService {
      * @param fromGetMap {@code true} if the request is done for a GetMap, {@code false}
      *                   otherwise (in the case of a GetFeatureInfo for example).
      * @return The GetMap request.
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private GetMap adaptGetMap(final boolean fromGetMap) throws WebServiceException {
+    private GetMap adaptGetMap(final boolean fromGetMap) throws CstlServiceException {
         final String version         = getParameter(KEY_VERSION,         true);
         setActingVersion(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
@@ -350,7 +350,7 @@ public class WMSService extends OGCWebService {
         try {
             crs = QueryAdapter.toCRS(strCRS);
         } catch (FactoryException ex) {
-            throw new WebServiceException(ex, INVALID_CRS, getActingVersion());
+            throw new CstlServiceException(ex, INVALID_CRS, getActingVersion());
         }
         final ImmutableEnvelope env;
         try {
@@ -358,13 +358,13 @@ public class WMSService extends OGCWebService {
             //TODO change to this method when renderer will support 4D BBox
 //            env = QueryAdapter.toEnvelope(strBBox, crs, strElevation, strTime,wmsVersion);
         } catch (IllegalArgumentException i) {
-            throw new WebServiceException(i, INVALID_PARAMETER_VALUE, getActingVersion());
+            throw new CstlServiceException(i, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final String format;
         try {
             format = QueryAdapter.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
-            throw new WebServiceException(i, INVALID_FORMAT, getActingVersion());
+            throw new CstlServiceException(i, INVALID_FORMAT, getActingVersion());
         }
         final List<String> layers  = QueryAdapter.toStringList(strLayers);
         final List<String> styles = QueryAdapter.toStringList(strStyles);
@@ -373,14 +373,14 @@ public class WMSService extends OGCWebService {
         try {
             elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
         } catch (NumberFormatException n) {
-            throw new WebServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
+            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
             date = QueryAdapter.toDate(strTime);
         } catch (ParseException ex) {
-            throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final int width;
         final int height;
@@ -388,7 +388,7 @@ public class WMSService extends OGCWebService {
             width  = QueryAdapter.toInt(strWidth);
             height = QueryAdapter.toInt(strHeight);
         } catch (NumberFormatException n) {
-            throw new WebServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
+            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final Dimension size = new Dimension(width, height);
         final Color background = QueryAdapter.toColor(strBGColor);
@@ -399,28 +399,28 @@ public class WMSService extends OGCWebService {
             try {
                 in = new FileInputStream(new File(strRemoteOwsUrl));
             } catch (FileNotFoundException ex) {
-                throw new WebServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
+                throw new CstlServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
             }
             final XMLUtilities sldparser = new XMLUtilities();
             try {
                 sld = sldparser.readSLD(in,
                         org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
-                throw new WebServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
+                throw new CstlServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
             }
             if (sld == null) {
                 try {
                     sld = sldparser.readSLD(in,
                             org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
                 } catch (JAXBException ex) {
-                    throw new WebServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
+                    throw new CstlServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
                 }
             }
         } else {
             try {
                 sld = QueryAdapter.toSLD(urlSLD);
             } catch (MalformedURLException ex) {
-                throw new WebServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
+                throw new CstlServiceException(ex, STYLE_NOT_DEFINED, getActingVersion());
             }
         }
 
@@ -428,7 +428,7 @@ public class WMSService extends OGCWebService {
         try {
             azimuth = (strAzimuth == null) ? 0.0 : QueryAdapter.toDouble(strAzimuth);
         } catch(NumberFormatException ex) {
-            throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
         }
 
         // Builds the request.

@@ -29,7 +29,7 @@ import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.PhenomenonEntry;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -52,41 +52,41 @@ public abstract class ObservationReader {
      * @param dataSourceOM
      * @param observationIdBase
      */
-    public ObservationReader(String observationIdBase) throws WebServiceException {
+    public ObservationReader(String observationIdBase) throws CstlServiceException {
         this.observationIdBase = observationIdBase;
     }
     
-    public abstract Collection<String> getOfferingNames() throws WebServiceException;
+    public abstract Collection<String> getOfferingNames() throws CstlServiceException;
     
-    public abstract ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException;
+    public abstract ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
 
-    public abstract List<ObservationOfferingEntry> getObservationOfferings() throws WebServiceException;
+    public abstract List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
     
-    public abstract Collection<String> getProcedureNames() throws WebServiceException;
+    public abstract Collection<String> getProcedureNames() throws CstlServiceException;
     
-    public abstract Collection<String> getPhenomenonNames() throws WebServiceException;
+    public abstract Collection<String> getPhenomenonNames() throws CstlServiceException;
     
-    public abstract PhenomenonEntry getPhenomenon(String phenomenonName) throws WebServiceException;
+    public abstract PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException;
     
-    public abstract Collection<String> getFeatureOfInterestNames() throws WebServiceException;
+    public abstract Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
     
-    public abstract SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws WebServiceException;
+    public abstract SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
     
-    public abstract ObservationEntry getObservation(String identifier) throws WebServiceException;
+    public abstract ObservationEntry getObservation(String identifier) throws CstlServiceException;
 
-    public abstract AnyResultEntry getResult(String identifier) throws WebServiceException;
+    public abstract AnyResultEntry getResult(String identifier) throws CstlServiceException;
     
-    public abstract ReferenceEntry getReference(String href) throws WebServiceException;
+    public abstract ReferenceEntry getReference(String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation by searching in the O&M database.
      */
-    public abstract String getNewObservationId() throws WebServiceException;
+    public abstract String getNewObservationId() throws CstlServiceException;
     
     /**
      * Return the minimal value for the offering event Time
      */
-    public abstract String getMinimalEventTime() throws WebServiceException;
+    public abstract String getMinimalEventTime() throws CstlServiceException;
 
     public abstract void destroy();
 }

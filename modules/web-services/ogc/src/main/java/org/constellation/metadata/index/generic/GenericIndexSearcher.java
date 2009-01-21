@@ -36,7 +36,7 @@ import org.apache.lucene.search.TopDocs;
 
 // constellation dependencies
 import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  * A Lucene searcher for a Generic index.
@@ -45,7 +45,7 @@ import org.constellation.ws.WebServiceException;
  */
 public class GenericIndexSearcher extends AbstractIndexSearcher {
 
-    public GenericIndexSearcher(File configDir, String serviceID) throws WebServiceException  {
+    public GenericIndexSearcher(File configDir, String serviceID) throws CstlServiceException  {
         super(configDir, serviceID);
     }
     

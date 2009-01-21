@@ -52,7 +52,7 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
 import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.NotType;
 import org.constellation.ogc.PropertyIsLikeType;
@@ -227,10 +227,10 @@ public class CatalogueHarvester {
      * 
      * @return the number of inserted Record.
      */
-    protected int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
+    protected int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException {
         
         if (metadataWriter == null)
-            throw new WebServiceException("The Service can not write into the database",
+            throw new CstlServiceException("The Service can not write into the database",
                                           OPERATION_NOT_SUPPORTED, "Harvest");
         
         //first we make a getCapabilities(GET) request to see what service version we have
@@ -253,7 +253,7 @@ public class CatalogueHarvester {
             getRecordRequest = fullGetRecordsRequestv200;
             
         } else {
-            throw new WebServiceException("This service if it is one is not requestable by constellation",
+            throw new CstlServiceException("This service if it is one is not requestable by constellation",
                                           OPERATION_NOT_SUPPORTED, "ResponseHandler");
         }
         
@@ -269,7 +269,7 @@ public class CatalogueHarvester {
         boolean secondTry    = false;
         
         //we prepare to store the distant serviceException and send it later if this is necessary
-        List<WebServiceException> distantException = new ArrayList<WebServiceException>();
+        List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();
         
         //we request all the records for the best outputSchema supported
         
@@ -287,7 +287,7 @@ public class CatalogueHarvester {
         
                 // if the service respond with non xml or unstandardized response
                 if (harvested == null) {
-                    WebServiceException exe = new WebServiceException("The distant service does not respond correctly.",
+                    CstlServiceException exe = new CstlServiceException("The distant service does not respond correctly.",
                                                      NO_APPLICABLE_CODE);
                     logger.severe("The distant service does not respond correctly");
                     distantException.add(exe);
@@ -389,7 +389,7 @@ public class CatalogueHarvester {
                                 msg = msg + s + '\n';
                         }
                     }
-                    WebServiceException exe = new WebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                    CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
                     logger.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
                     distantException.add(exe);
@@ -397,7 +397,7 @@ public class CatalogueHarvester {
                 
                 // if we obtain an object that we don't expect    
                 } else {
-                    throw new WebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
+                    throw new CstlServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
                                                  NO_APPLICABLE_CODE);
                 }
                 
@@ -653,9 +653,9 @@ public class CatalogueHarvester {
      * 
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, WebServiceException, IOException {
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, CstlServiceException, IOException {
         
         
         URL source         = new URL(sourceURL);
@@ -675,7 +675,7 @@ public class CatalogueHarvester {
                     
                     marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
-                    throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                    throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE);
                 }
                 String XMLRequest = sw.toString();
@@ -859,7 +859,7 @@ public class CatalogueHarvester {
 
             } catch (MalformedURLException ex) {
                 logger.severe(serverURL + " is a malformed URL. unable to request that service");
-            } catch (WebServiceException ex) {
+            } catch (CstlServiceException ex) {
                 logger.severe(ex.getMessage());
             } catch (IOException ex) {
                 logger.info("IO exeception while distibuting the request: " + ex.getMessage());

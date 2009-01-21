@@ -29,7 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -63,11 +63,11 @@ public class FileMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         return getObjectFromFile(identifier);
     }
 
-    private Object getObjectFromFile(String identifier) throws WebServiceException {
+    private Object getObjectFromFile(String identifier) throws CstlServiceException {
         File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
             try {
@@ -78,17 +78,17 @@ public class FileMetadataReader extends MetadataReader {
                 addInCache(identifier, metadata);
                 return metadata;
             } catch (JAXBException ex) {
-                throw new WebServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
+                throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             }
         } else {
-            throw new WebServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
     }
 
     @Override
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
-        throw new WebServiceException("GetDomain operation are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+        throw new CstlServiceException("GetDomain operation are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
     @Override
@@ -97,12 +97,12 @@ public class FileMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
-        throw new WebServiceException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
+        throw new CstlServiceException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
     @Override
-    public List<? extends Object> getAllEntries() throws WebServiceException {
+    public List<? extends Object> getAllEntries() throws CstlServiceException {
         List<Object> results = new ArrayList<Object>();
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
@@ -115,11 +115,11 @@ public class FileMetadataReader extends MetadataReader {
                     addInCache(identifier, metadata);
                     results.add(metadata);
                 } catch (JAXBException ex) {
-                    throw new WebServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
+                    throw new CstlServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 }
             } else {
-                throw new WebServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
             }
         }
         return results;

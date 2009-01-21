@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.provider.LayerDetails;
@@ -116,7 +116,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             final List<String> layers, final List<String> styles,
             final MutableStyledLayerDescriptor sld, final Map<String, Object> params,
             final ServiceVersion version, Shape selectedArea, GraphicVisitor visitor)
-            throws PortrayalException,WebServiceException {
+            throws PortrayalException,CstlServiceException {
 
         updateContext(layers, version, styles, sld, params);
 
@@ -131,8 +131,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         }catch(Exception ex){
             if(ex instanceof PortrayalException){
                 throw (PortrayalException)ex;
-            }else if( ex instanceof WebServiceException){
-                throw (WebServiceException) ex;
+            }else if( ex instanceof CstlServiceException){
+                throw (CstlServiceException) ex;
             }else{
                 throw new PortrayalException(ex);
             }
@@ -149,7 +149,7 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
             final Color background, final Dimension canvasDimension,
             final List<String> layers, final List<String> styles, 
             final MutableStyledLayerDescriptor sld, final Map<String, Object> params,
-            final ServiceVersion version) throws PortrayalException,WebServiceException {
+            final ServiceVersion version) throws PortrayalException,CstlServiceException {
 
         updateContext(layers, version, styles, sld, params);
 
@@ -162,8 +162,8 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
         } catch (Exception ex) {
             if (ex instanceof PortrayalException) {
                 throw (PortrayalException)ex;
-            } else if(ex instanceof WebServiceException) {
-                throw (WebServiceException) ex;
+            } else if(ex instanceof CstlServiceException) {
+                throw (CstlServiceException) ex;
             } else {
                 throw new PortrayalException(ex);
             }
@@ -242,14 +242,14 @@ public class CSTLPortrayalService extends DefaultPortrayalService {
     private void updateContext(final List<String> layers, final ServiceVersion version,
                                     final List<String> styles, final MutableStyledLayerDescriptor sld,
                                     final Map<String, Object> params)
-                                    throws PortrayalException, WebServiceException{
+                                    throws PortrayalException, CstlServiceException{
         context.layers().clear();
 
         for (int index=0, n=layers.size(); index<n; index++) {
             final String layerName = layers.get(index);
             final LayerDetails details = LAYERDP.get(layerName);
             if (details == null) {
-                throw new WebServiceException("Layer "+layerName+" could not be found.",
+                throw new CstlServiceException("Layer "+layerName+" could not be found.",
                         ExceptionCode.LAYER_NOT_DEFINED, version, "layer");
             }
             final Object style;

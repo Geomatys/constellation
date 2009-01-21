@@ -43,7 +43,7 @@ import org.apache.lucene.search.TopDocs;
 // constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -88,7 +88,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * @param configDir The configuration Directory where to build the indexDirectory.
      * @param serviceID the "ID" of the service (allow multiple index in the same directory). The value "" is allowed.
      */
-    public AbstractIndexSearcher(File configDir, String serviceID) throws WebServiceException {
+    public AbstractIndexSearcher(File configDir, String serviceID) throws CstlServiceException {
         super();
         try {
             setFileDirectory(new File(configDir, serviceID + "index"));
@@ -97,11 +97,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             initIdentifiersList();
 
         } catch (CorruptIndexException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         } catch (ParseException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         
     }

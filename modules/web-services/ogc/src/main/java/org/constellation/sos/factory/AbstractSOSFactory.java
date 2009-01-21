@@ -30,7 +30,7 @@ import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.factory.AbstractFactory;
 
 /**
@@ -43,14 +43,14 @@ public abstract class AbstractSOSFactory extends AbstractFactory {
         super(priority);
     }
 
-    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDirectory) throws WebServiceException;
+    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDirectory) throws CstlServiceException;
 
-    public abstract ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws WebServiceException;
+    public abstract ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws CstlServiceException;
 
-    public abstract ObservationWriter getObservationWriter(DataSource dataSourceOM) throws WebServiceException;
+    public abstract ObservationWriter getObservationWriter(DataSource dataSourceOM) throws CstlServiceException;
 
-    public abstract SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws WebServiceException;
+    public abstract SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws CstlServiceException;
 
-    public abstract SensorWriter getSensorWriter(DataSourceType type, File dataDirectory, Connection connection, String sensorIdBase) throws WebServiceException;
+    public abstract SensorWriter getSensorWriter(DataSourceType type, File dataDirectory, Connection connection, String sensorIdBase) throws CstlServiceException;
 
 }

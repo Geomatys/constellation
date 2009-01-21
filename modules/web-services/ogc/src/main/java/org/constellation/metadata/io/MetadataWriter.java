@@ -32,7 +32,7 @@ import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -196,7 +196,7 @@ public abstract class MetadataWriter {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
-    public abstract boolean storeMetadata(Object obj) throws SQLException, WebServiceException;
+    public abstract boolean storeMetadata(Object obj) throws SQLException, CstlServiceException;
     
     /**
      * Destoy all the resource and close connection.

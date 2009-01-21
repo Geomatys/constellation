@@ -30,7 +30,7 @@ import org.constellation.security.wms.WmsClient;
 import org.constellation.security.wms.WmsRestClient;
 import org.constellation.security.wms.WmsSoapClient;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
@@ -98,30 +98,30 @@ public class WmsDispatcher {
 	
     
 	public DescribeLayerResponseType describeLayer(DescribeLayer descLayer)
-			throws WebServiceException {
+			throws CstlServiceException {
         return wmsClient.describeLayer(descLayer);
 	}
 	
 	
 	public AbstractWMSCapabilities getCapabilities(GetCapabilities getCapabilities) 
-	                                                    throws WebServiceException {
+	                                                    throws CstlServiceException {
         return wmsClient.getCapabilities(getCapabilities);
 	}
 	
 	
 	public String getFeatureInfo(GetFeatureInfo getFeatureInfo)
-			throws WebServiceException {
+			throws CstlServiceException {
 		return wmsClient.getFeatureInfo(getFeatureInfo);
 	}
 	
 	
 	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend)
-			throws WebServiceException {
+			throws CstlServiceException {
 		return wmsClient.getLegendGraphic(getLegend);
 	}
 	
 	
-	public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+	public BufferedImage getMap(GetMap getMap) throws CstlServiceException {
         return wmsClient.getMap(getMap);
 	}
 }

@@ -51,7 +51,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.AbstractRequest;
 
 import static org.constellation.ws.ExceptionCode.*;
@@ -354,10 +354,10 @@ public abstract class WebService {
      * @param mandatory true if this parameter is mandatory, false if its optional.
       *
      * @return the parameter, or {@code null} if not specified and not mandatory.
-     * @throw WebServiceException
+     * @throw CstlServiceException
      */
     protected String getParameter(final String parameterName, final boolean mandatory)
-                                                            throws WebServiceException
+                                                            throws CstlServiceException
     {
         final MultivaluedMap parameters = uriContext.getQueryParameters();
         final Set<String> keySet = parameters.keySet();
@@ -375,7 +375,7 @@ public abstract class WebService {
         }
         if (notFound) {
             if (mandatory) {
-                throw new WebServiceException("The parameter " + parameterName + " must be specified",
+                throw new CstlServiceException("The parameter " + parameterName + " must be specified",
                         MISSING_PARAMETER_VALUE);
             }
             return null;
@@ -395,7 +395,7 @@ public abstract class WebService {
                     parameterName.equalsIgnoreCase("STYLES")) {
                     return value;
                 }
-                throw new WebServiceException("The parameter " + parameterName + " should have a value",
+                throw new CstlServiceException("The parameter " + parameterName + " should have a value",
                         INVALID_PARAMETER_VALUE);
             } else {
                 return value;
@@ -408,7 +408,7 @@ public abstract class WebService {
      * It is a debug method.
      *
      */
-    protected void logParameters() throws WebServiceException {
+    protected void logParameters() throws CstlServiceException {
         final MultivaluedMap parameters = uriContext.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
@@ -423,9 +423,9 @@ public abstract class WebService {
      * @param mandatory true if this parameter is mandatory, false if its optional.
      *
      * @return the parameter or null if not specified
-     * @throw WebServiceException
+     * @throw CstlServiceException
      */
-    protected Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException {
+    protected Object getComplexParameter(String parameterName, boolean mandatory) throws CstlServiceException {
 
         try {
             MultivaluedMap parameters = uriContext.getQueryParameters();
@@ -436,7 +436,7 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throw new WebServiceException("The parameter " + parameterName + " must be specified",
+                        throw new CstlServiceException("The parameter " + parameterName + " must be specified",
                                        MISSING_PARAMETER_VALUE);
 
                     }
@@ -446,7 +446,7 @@ public abstract class WebService {
             Object result = unmarshaller.unmarshal(sr);
             return result;
         } catch (JAXBException ex) {
-             throw new WebServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
+             throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
         }
     }

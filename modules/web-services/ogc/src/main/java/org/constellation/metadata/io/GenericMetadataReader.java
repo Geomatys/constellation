@@ -49,7 +49,7 @@ import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.concurrent.BoundedCompletionService;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
@@ -538,7 +538,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return A metadata Object (dublin core Record / geotools metadata)
      * 
      * @throws java.sql.SQLException
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) {
         Object result = null;
@@ -803,7 +803,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    public List<MetaDataImpl> getAllEntries() throws WebServiceException {
+    public List<MetaDataImpl> getAllEntries() throws CstlServiceException {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
         List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
@@ -817,7 +817,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @return
      */
-    private List<String> getAllIdentifiers() throws WebServiceException {
+    private List<String> getAllIdentifiers() throws CstlServiceException {
         List<String> result = new ArrayList<String>();
         try {
             ResultSet res = mainStatement.executeQuery();
@@ -825,7 +825,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 result.add(res.getString(1));
             }
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while getting all the identifiers: " + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQL Exception while getting all the identifiers: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return result;
     }
@@ -834,9 +834,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Return all the contact identifiers used in this database
      * 
      * @return
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public List<String> getAllContactID() throws WebServiceException {
+    public List<String> getAllContactID() throws CstlServiceException {
         List<String> results = new ArrayList<String>();
         List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
@@ -860,11 +860,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return results;
     }
     
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
          throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

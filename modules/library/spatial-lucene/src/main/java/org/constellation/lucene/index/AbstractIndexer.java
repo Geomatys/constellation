@@ -27,7 +27,7 @@ import org.apache.lucene.index.IndexWriter;
 
 // Constellation dependencies
 import org.constellation.util.Utils;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  * An abstract lucene Indexer used to create and writer lucene index.
@@ -81,7 +81,7 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      *
      * @throws java.sql.SQLException
      */
-    public abstract void createIndex() throws WebServiceException;
+    public abstract void createIndex() throws CstlServiceException;
 
     /**
      * Index a document from the specified object with the specified index writer.

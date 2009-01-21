@@ -50,7 +50,7 @@ import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -100,7 +100,7 @@ public class DefaultObservationReader extends ObservationReader {
      * @param dataSourceOM
      * @param observationIdBase
      */
-    public DefaultObservationReader(DataSource dataSourceOM, String observationIdBase) throws WebServiceException {
+    public DefaultObservationReader(DataSource dataSourceOM, String observationIdBase) throws CstlServiceException {
         super(observationIdBase);
         try {
             OMDatabase = new Database(dataSourceOM);
@@ -113,47 +113,47 @@ public class DefaultObservationReader extends ObservationReader {
             observationExistStmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
             getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (NoSuchTableException ex) {
-            throw new WebServiceException("NoSuchTable Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-             throw new WebServiceException("IO Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
+             throw new CstlServiceException("IO Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
 
 
     }
 
-    public Set<String> getOfferingNames() throws WebServiceException {
+    public Set<String> getOfferingNames() throws CstlServiceException {
         try {
             return offTable.getIdentifiers();
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException {
+    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public List<ObservationOfferingEntry> getObservationOfferings() throws WebServiceException {
+    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         try {
             List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
             Set<ObservationOfferingEntry> set = offTable.getEntries();
@@ -161,33 +161,33 @@ public class DefaultObservationReader extends ObservationReader {
             return loo;
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public Set<String> getProcedureNames() throws WebServiceException {
+    public Set<String> getProcedureNames() throws CstlServiceException {
         try {
             ProcessTable procTable = OMDatabase.getTable(ProcessTable.class);
             return procTable.getIdentifiers();
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public Set<String> getPhenomenonNames() throws WebServiceException {
+    public Set<String> getPhenomenonNames() throws CstlServiceException {
         try {
             PhenomenonTable phenoTable = OMDatabase.getTable(PhenomenonTable.class);
             Set<String> phenoNames = phenoTable.getIdentifiers();
@@ -198,17 +198,17 @@ public class DefaultObservationReader extends ObservationReader {
             return phenoNames;
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public PhenomenonEntry getPhenomenon(String phenomenonName) throws WebServiceException {
+    public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         try {
             CompositePhenomenonTable compositePhenomenonTable = OMDatabase.getTable(CompositePhenomenonTable.class);
             CompositePhenomenonEntry cphen = null;
@@ -225,17 +225,17 @@ public class DefaultObservationReader extends ObservationReader {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public Set<String> getFeatureOfInterestNames() throws WebServiceException {
+    public Set<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
             SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
             Set<String> featureNames = featureTable.getIdentifiers();
@@ -245,64 +245,64 @@ public class DefaultObservationReader extends ObservationReader {
             return featureNames;
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws WebServiceException {
+    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         try {
             SamplingPointTable foiTable = OMDatabase.getTable(SamplingPointTable.class);
             return foiTable.getEntry(samplingFeatureName);
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
-            throw new WebServiceException("Catalog exception while getting the feature of interest",
+            throw new CstlServiceException("Catalog exception while getting the feature of interest",
                     NO_APPLICABLE_CODE, "featureOfInterest");
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public ObservationEntry getObservation(String identifier) throws WebServiceException {
+    public ObservationEntry getObservation(String identifier) throws CstlServiceException {
         try {
             return (ObservationEntry) obsTable.getEntry(identifier);
         } catch (CatalogException ex) {
-            throw new WebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
+            throw new CstlServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getObservation");
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public AnyResultEntry getResult(String identifier) throws WebServiceException {
+    public AnyResultEntry getResult(String identifier) throws CstlServiceException {
         try {
             AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
             Integer id = Integer.parseInt(identifier);
             return resTable.getEntry(id);
         } catch (CatalogException ex) {
-            throw new WebServiceException("Catalog exception while getting the results: " + ex.getMessage(),
+            throw new CstlServiceException("Catalog exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
         } catch (NumberFormatException ex) {
-            throw new WebServiceException("Number format exception while getting the results: " + ex.getMessage(),
+            throw new CstlServiceException("Number format exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
 
-    public ReferenceEntry getReference(String href) throws WebServiceException {
+    public ReferenceEntry getReference(String href) throws CstlServiceException {
         try {
             Set<ReferenceEntry> references = refTable.getEntries();
             if (references != null) {
@@ -322,12 +322,12 @@ public class DefaultObservationReader extends ObservationReader {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                 NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }
@@ -351,7 +351,7 @@ public class DefaultObservationReader extends ObservationReader {
     /**
      * Create a new identifier for an observation by searching in the O&M database.
      */
-    public String getNewObservationId() throws WebServiceException {
+    public String getNewObservationId() throws CstlServiceException {
         try {
             ResultSet res = newObservationIDStmt.executeQuery();
             int id = -1;
@@ -370,7 +370,7 @@ public class DefaultObservationReader extends ObservationReader {
             return observationIdBase + id;
         } catch( SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("The service has throw a SQLException:" + e.getMessage(),
+            throw new CstlServiceException("The service has throw a SQLException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }
@@ -378,7 +378,7 @@ public class DefaultObservationReader extends ObservationReader {
     /**
      * Return the minimal value for the offering event Time
      */
-    public String getMinimalEventTime() throws WebServiceException {
+    public String getMinimalEventTime() throws CstlServiceException {
         String ret = null;
         try {
             ResultSet res = getMinEventTimeOffering.executeQuery();
@@ -394,7 +394,7 @@ public class DefaultObservationReader extends ObservationReader {
 
         } catch (SQLException ex) {
            ex.printStackTrace();
-           throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+           throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
         return ret;

@@ -32,7 +32,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 import org.geotools.display.canvas.GraphicVisitor;
 import org.geotools.display.exception.PortrayalException;
@@ -60,10 +60,10 @@ public class WMSPortrayalAdapter {
      * @param query A {@link GetMap} query. Should not be {@code null}.
      *
      * @throws PortrayalException
-     * @throws WebServiceException if an error occurs during the creation of the map context
+     * @throws CstlServiceException if an error occurs during the creation of the map context
      */
     public static BufferedImage portray(final GetMap query)
-                            throws PortrayalException, WebServiceException {
+                            throws PortrayalException, CstlServiceException {
 
         if (query == null) {
             throw new NullPointerException("The GetMap query cannot be null. The portray() method" +
@@ -123,7 +123,7 @@ public class WMSPortrayalAdapter {
     }
 
     public static void hit(final GetFeatureInfo query, final GraphicVisitor visitor)
-                            throws PortrayalException, WebServiceException{
+                            throws PortrayalException, CstlServiceException{
 
         if (query == null) {
             throw new NullPointerException("The GetMap query cannot be null. The portray() method" +

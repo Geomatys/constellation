@@ -534,7 +534,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
      *
      * @param envelope : query envelope
      * @return The grid geometry, or {@code null}.
-     * @throws WebServiceException if an error occured while querying the layer.
+     * @throws CstlServiceException if an error occured while querying the layer.
      */
     private GeneralGridGeometry getGridGeometry(GeneralEnvelope envelope, final Layer layer, GridEnvelope gridRange) throws CatalogException{
         GeneralGridGeometry gridGeometry = null;

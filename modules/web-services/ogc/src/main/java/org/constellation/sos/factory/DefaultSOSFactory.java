@@ -39,7 +39,7 @@ import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -52,7 +52,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDir) throws WebServiceException {
+    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDir) throws CstlServiceException {
       switch (type) {
             case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, connection);
 
@@ -64,7 +64,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws WebServiceException {
+    public ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws CstlServiceException {
         switch (type) {
             case DEFAULT : return new DefaultObservationReader(dataSourceOM, observationIdBase);
 
@@ -75,12 +75,12 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationWriter getObservationWriter(DataSource dataSourceOM) throws WebServiceException {
+    public ObservationWriter getObservationWriter(DataSource dataSourceOM) throws CstlServiceException {
         return new DefaultObservationWriter(dataSourceOM);
     }
 
     @Override
-    public SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws WebServiceException {
+    public SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws CstlServiceException {
         switch (type) {
             case FILE_SYSTEM: return new FileSensorReader(dataDirectory);
 
@@ -91,7 +91,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public SensorWriter getSensorWriter(DataSourceType type,  File dataDirectory, Connection connection, String sensorIdBase) throws WebServiceException {
+    public SensorWriter getSensorWriter(DataSourceType type,  File dataDirectory, Connection connection, String sensorIdBase) throws CstlServiceException {
         switch (type) {
             case FILE_SYSTEM: return new FileSensorWriter(dataDirectory, sensorIdBase);
 

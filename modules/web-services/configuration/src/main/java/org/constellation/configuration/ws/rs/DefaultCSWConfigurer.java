@@ -21,7 +21,7 @@ package org.constellation.configuration.ws.rs;
 import java.io.File;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.configuration.ws.rs.ConfigurationService.*;
@@ -39,15 +39,15 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     /**
      * Update all the vocabularies skos files and the list of contact.
      */
-    public AcknowlegementType updateVocabularies() throws WebServiceException {
-        throw new WebServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+    public AcknowlegementType updateVocabularies() throws CstlServiceException {
+        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
     
     /**
      * Update all the contact retrieved from files and the list of contact.
      */
-    public AcknowlegementType updateContacts() throws WebServiceException {
-        throw new WebServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+    public AcknowlegementType updateContacts() throws CstlServiceException {
+        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
     
     @Override

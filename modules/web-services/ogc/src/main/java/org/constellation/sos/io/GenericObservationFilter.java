@@ -37,7 +37,7 @@ import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.sos.ResponseModeType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ResponseModeType.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -57,7 +57,7 @@ public class GenericObservationFilter extends ObservationFilter {
     private final Connection connection;
 
     public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection,
-            File configDir) throws WebServiceException {
+            File configDir) throws CstlServiceException {
         super(observationIdBase, observationTemplateIdBase, map);
         try {
             JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
@@ -68,13 +68,13 @@ public class GenericObservationFilter extends ObservationFilter {
                 if (object instanceof Query)
                     this.configurationQuery = (Query) object;
                 else
-                    throw new WebServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
             } else {
-                throw new WebServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
             this.connection = connection;
         } catch (JAXBException ex) {
-            throw new WebServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
         }
     }
     
@@ -183,10 +183,10 @@ public class GenericObservationFilter extends ObservationFilter {
      * Add a TM_Equals filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public void setTimeEquals(Object time) throws WebServiceException {
+    public void setTimeEquals(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             TimePeriodType tp = (TimePeriodType) time;
             String begin = getTimeValue(tp.getBeginPosition());
@@ -207,7 +207,7 @@ public class GenericObservationFilter extends ObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new WebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, "eventTime");
         }
     }
@@ -216,10 +216,10 @@ public class GenericObservationFilter extends ObservationFilter {
      * Add a TM_Before filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public void setTimeBefore(Object time) throws WebServiceException  {
+    public void setTimeBefore(Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) time;
@@ -230,7 +230,7 @@ public class GenericObservationFilter extends ObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new WebServiceException("TM_Before operation require timeInstant!",
+            throw new CstlServiceException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, "eventTime");
         }
     }
@@ -239,10 +239,10 @@ public class GenericObservationFilter extends ObservationFilter {
      * Add a TM_After filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public void setTimeAfter(Object time) throws WebServiceException {
+    public void setTimeAfter(Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             TimeInstantType ti = (TimeInstantType) time;
@@ -253,7 +253,7 @@ public class GenericObservationFilter extends ObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new WebServiceException("TM_After operation require timeInstant!",
+            throw new CstlServiceException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, "eventTime");
         }
     }
@@ -262,10 +262,10 @@ public class GenericObservationFilter extends ObservationFilter {
      * Add a TM_During filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public void setTimeDuring(Object time) throws WebServiceException {
+    public void setTimeDuring(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             TimePeriodType tp = (TimePeriodType) time;
             String begin = getTimeValue(tp.getBeginPosition());
@@ -277,13 +277,13 @@ public class GenericObservationFilter extends ObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new WebServiceException("TM_During operation require TimePeriod!",
+            throw new CstlServiceException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, "eventTime");
         }
     }
 
     @Override
-    public List<ObservationFilter.ObservationResult> filterResult() throws WebServiceException {
+    public List<ObservationFilter.ObservationResult> filterResult() throws CstlServiceException {
         String request = currentQuery.buildSQLQuery();
         logger.info("request:" + request);
         try {
@@ -301,14 +301,14 @@ public class GenericObservationFilter extends ObservationFilter {
 
         } catch (SQLException ex) {
             logger.severe("SQLExcpetion while executing the query: " + request);
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
 
     }
 
     @Override
-    public List<String> filterObservation() throws WebServiceException {
+    public List<String> filterObservation() throws CstlServiceException {
         String request = currentQuery.buildSQLQuery();
         logger.info("request:" + request);
         try {
@@ -323,7 +323,7 @@ public class GenericObservationFilter extends ObservationFilter {
             return results;
         } catch (SQLException ex) {
             logger.severe("SQLException while executing the query: " + request);
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
 

@@ -43,7 +43,7 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -77,7 +77,7 @@ public abstract class GenericObservationReader extends ObservationReader {
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
-    public GenericObservationReader(String observationIdBase, Automatic configuration) throws WebServiceException {
+    public GenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         super(observationIdBase);
         try {
             BDD bdd = configuration.getBdd();
@@ -85,10 +85,10 @@ public abstract class GenericObservationReader extends ObservationReader {
                 Connection connection = bdd.getConnection();
                 initStatement(connection, configuration);
             } else {
-                throw new WebServiceException("The database par of the generic configuration file is null", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The database par of the generic configuration file is null", NO_APPLICABLE_CODE);
             }
         } catch (SQLException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         isThreadEnabled = false;
     }

@@ -24,7 +24,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.apache.lucene.search.Filter;
 import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
 import org.constellation.gml.v311.PointType;
@@ -96,7 +96,7 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public SQLQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws WebServiceException {
+    public SQLQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
         this.setVariables(variables);
         this.setPrefixs(prefixs);
         FilterType filter = null;
@@ -105,10 +105,10 @@ public class SQLFilterParser extends FilterParser {
             return new SQLQuery("Select identifier, catalog from Form where catalog != 'MDATA");
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
-            throw new WebServiceException("The query constraint must be in Filter or CQL but not both.",
+            throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
         } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
-            throw new WebServiceException("The query constraint must contain a Filter or a CQL query.",
+            throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
         
@@ -118,10 +118,10 @@ public class SQLFilterParser extends FilterParser {
 
             } catch (JAXBException ex) {
                 ex.printStackTrace();
-                throw new WebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
+                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE, "QueryConstraint");
             } catch (CQLException ex) {
-                throw new WebServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
+                throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
                                                  + "syntax Error: " + ex.getSyntaxError(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
@@ -138,7 +138,7 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public SQLQuery getSqlQuery(final FilterType filter) throws WebServiceException {
+    public SQLQuery getSqlQuery(final FilterType filter) throws CstlServiceException {
         
         SQLQuery response = null;
         executeSelect     = true;
@@ -170,9 +170,9 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected SQLQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
+    protected SQLQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException {
         List<SQLQuery> subQueries     = new ArrayList<SQLQuery>();
         StringBuilder queryBuilder    = new StringBuilder();
         LogicOpsType logicOps         = JBlogicOps.getValue();
@@ -342,9 +342,9 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
+    protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws CstlServiceException {
         StringBuilder response = new StringBuilder();
         
         ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
@@ -358,7 +358,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append(".path ='").append(transformSyntax(propertyName)).append("' AND ");
                 response.append('v').append(nbField).append("value LIKE '");
             } else {
-                throw new WebServiceException("An operator propertyIsLike must specified the propertyName.",
+                throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
@@ -381,7 +381,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append(" AND v").append(nbField).append(".form=identifier ");
                 
             } else {
-                throw new WebServiceException("An operator propertyIsLike must specified the literal value.",
+                throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
@@ -393,7 +393,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append(".value IS NULL ");
                 response.append(" AND v").append(nbField).append(".form=identifier ");
             } else {
-                throw new WebServiceException("An operator propertyIsNull must specified the propertyName.",
+                throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
@@ -409,7 +409,7 @@ public class SQLFilterParser extends FilterParser {
             String operator           = JBComparisonOps.getName().getLocalPart(); 
             
             if (propertyName == null || literal == null) {
-                throw new WebServiceException("A binary comparison operator must be constitued of a literal and a property name.",
+                throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
@@ -430,7 +430,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
@@ -438,7 +438,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append('v').append(nbField).append(".value >= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new WebServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
+                        throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 
@@ -449,7 +449,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
@@ -457,7 +457,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append('v').append(nbField).append(".value > '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new WebServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
+                        throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 
@@ -469,7 +469,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
@@ -477,7 +477,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append('v').append(nbField).append(".value < '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                        throw new WebServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
+                        throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                     
@@ -488,7 +488,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new WebServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
                                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
                         }
                         dateValue = dateValue.replace("Z", "");
@@ -496,11 +496,11 @@ public class SQLFilterParser extends FilterParser {
                         response.append('v').append(nbField).append(".value <= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
-                         throw new WebServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
+                         throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, "QueryConstraint");
                     }
                 } else {
-                    throw new WebServiceException("Unkwnow comparison operator: " + operator,
+                    throw new CstlServiceException("Unkwnow comparison operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
             }
@@ -514,9 +514,9 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param JBlogicOps
      * @return
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
+    protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws CstlServiceException {
         SpatialFilter spatialfilter = null;
         
         SpatialOpsType spatialOps = JBSpatialOps.getValue();
@@ -528,18 +528,18 @@ public class SQLFilterParser extends FilterParser {
             
             //we verify that all the parameters are specified
             if (propertyName == null) {
-                throw new WebServiceException("An operator BBOX must specified the propertyName.",
+                throw new CstlServiceException("An operator BBOX must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } else if (!propertyName.contains("BoundingBox")) {
-                throw new WebServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
+                throw new CstlServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
-                throw new WebServiceException("An operator BBOX must specified an envelope.",
+                throw new CstlServiceException("An operator BBOX must specified an envelope.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (CRSName == null) {
-                throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+                throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
@@ -553,13 +553,13 @@ public class SQLFilterParser extends FilterParser {
                 spatialfilter = new BBOXFilter(envelope, CRSName);
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
-                throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
@@ -573,15 +573,15 @@ public class SQLFilterParser extends FilterParser {
            
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
-                 throw new WebServiceException("An distanceBuffer operator must specified the propertyName.",
+                 throw new CstlServiceException("An distanceBuffer operator must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (units == null) {
-                 throw new WebServiceException("An distanceBuffer operator must specified the ditance units.",
+                 throw new CstlServiceException("An distanceBuffer operator must specified the ditance units.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             if (JBgeom == null || JBgeom.getValue() == null) {
-                 throw new WebServiceException("An distanceBuffer operator must specified a geometric object.",
+                 throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
                                                   INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
            
@@ -611,18 +611,18 @@ public class SQLFilterParser extends FilterParser {
                 } else if (operator.equals("Beyond")) {
                     spatialfilter = new BeyondFilter(geometry, CRSName, distance, units);
                 } else {
-                    throw new WebServiceException("Unknow DistanceBuffer operator.",
+                    throw new CstlServiceException("Unknow DistanceBuffer operator.",
                             INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
                
             } catch (NoSuchAuthorityCodeException e) {
-                    throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                    throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
-                    throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                    throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                    throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                    throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
                                                       INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
            
@@ -667,7 +667,7 @@ public class SQLFilterParser extends FilterParser {
             }
             
             if (propertyName == null && geometry == null) {
-                throw new WebServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
+                throw new CstlServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             SpatialFilterType filterType = null;
@@ -677,7 +677,7 @@ public class SQLFilterParser extends FilterParser {
                 logger.severe("unknow spatial filter Type");
             }
             if (filterType == null) {
-                throw new WebServiceException("Unknow FilterType: " + operator,
+                throw new CstlServiceException("Unknow FilterType: " + operator,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
@@ -714,13 +714,13 @@ public class SQLFilterParser extends FilterParser {
                 }
 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new WebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
-                throw new WebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (IllegalArgumentException e) {
-                throw new WebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             

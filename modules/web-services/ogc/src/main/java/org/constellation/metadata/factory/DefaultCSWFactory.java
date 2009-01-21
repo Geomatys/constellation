@@ -43,7 +43,7 @@ import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import static org.constellation.generic.database.Automatic.*;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -123,9 +123,9 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @param MDConnection A connecton to the database (used only for MDWeb database).
      * @param configDir
      * @return
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException {
+    public AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws CstlServiceException {
         switch (dbType) {
             case MDWEB:
                 return new MDWebIndexer(MDConnection, configDir, serviceID);
@@ -137,7 +137,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     }
     
      @Override
-    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws WebServiceException {
+    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws CstlServiceException {
         switch (dbType) {
             case MDWEB:
                 return new MDWebIndexSearcher(configDir, serviceID);

@@ -23,7 +23,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -43,31 +43,31 @@ public class FileSensorWriter extends SensorWriter {
 
     private String sensorIdBase;
 
-    public FileSensorWriter(File dataDirectory, String sensorIdBase) throws WebServiceException {
+    public FileSensorWriter(File dataDirectory, String sensorIdBase) throws CstlServiceException {
         this.sensorIdBase = sensorIdBase;
         uncommittedFiles = new ArrayList<File>();
         this.dataDirectory = dataDirectory;
     }
 
     @Override
-    public void writeSensor(String id, AbstractSensorML sensor) throws WebServiceException {
+    public void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
         try {
             File currentFile = new File(dataDirectory, id + ".xml");
             marshaller.marshal(sensor, currentFile);
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
     @Override
-    public void startTransaction() throws WebServiceException {
+    public void startTransaction() throws CstlServiceException {
         uncommittedFiles = new ArrayList<File>();
     }
 
     @Override
-    public void abortTransaction() throws WebServiceException {
+    public void abortTransaction() throws CstlServiceException {
         for (File f: uncommittedFiles) {
             boolean delete = f.delete();
             if (!delete) {
@@ -78,12 +78,12 @@ public class FileSensorWriter extends SensorWriter {
     }
 
     @Override
-    public void endTransaction() throws WebServiceException {
+    public void endTransaction() throws CstlServiceException {
         uncommittedFiles = new ArrayList<File>();
     }
 
     @Override
-    public int getNewSensorId() throws WebServiceException {
+    public int getNewSensorId() throws CstlServiceException {
         int maxID = 0;
         for (File f : dataDirectory.listFiles()) {
             String id = f.getName();
@@ -95,7 +95,7 @@ public class FileSensorWriter extends SensorWriter {
                     maxID = curentID;
                 }
             } catch (NumberFormatException ex) {
-                throw new WebServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
             }
         }
         return maxID + 1;

@@ -50,7 +50,7 @@ import org.constellation.util.Utils;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -135,9 +135,9 @@ public abstract class AbstractCSWConfigurer {
      * @param cswConfigDir the CSW configuration directory.
      *
      * @return A lucene Indexer
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    protected AbstractIndexer initIndexer(String serviceID, File cswConfigDir, MetadataReader currentReader) throws WebServiceException {
+    protected AbstractIndexer initIndexer(String serviceID, File cswConfigDir, MetadataReader currentReader) throws CstlServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
@@ -145,7 +145,7 @@ public abstract class AbstractCSWConfigurer {
         if (config != null) {
             BDD db = config.getBdd();
             if (db == null) {
-                throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
             } else {
                 try {
                     Connection MDConnection      = db.getConnection();
@@ -155,13 +155,13 @@ public abstract class AbstractCSWConfigurer {
                     return indexer;
                     
                 } catch (JAXBException ex) {
-                    throw new WebServiceException("JAXBException while initializing the indexer!", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("JAXBException while initializing the indexer!", NO_APPLICABLE_CODE);
                 } catch (SQLException ex) {
-                    throw new WebServiceException("SQLException while initializing the indexer!", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("SQLException while initializing the indexer!", NO_APPLICABLE_CODE);
                 }
             }
         } else {
-            throw new WebServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
         }
     }
 
@@ -172,9 +172,9 @@ public abstract class AbstractCSWConfigurer {
      * @param cswConfigDir the CSW configuration directory.
      *
      * @return A metadata reader.
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    protected MetadataReader initReader(String serviceID, File cswConfigDir) throws WebServiceException {
+    protected MetadataReader initReader(String serviceID, File cswConfigDir) throws CstlServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
@@ -182,7 +182,7 @@ public abstract class AbstractCSWConfigurer {
         if (config != null) {
             BDD db = config.getBdd();
             if (db == null) {
-                throw new WebServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
             } else {
                 try {
                     Connection MDConnection      = db.getConnection();
@@ -190,13 +190,13 @@ public abstract class AbstractCSWConfigurer {
                     return currentReader;
 
                 } catch (JAXBException ex) {
-                    throw new WebServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
                 } catch (SQLException ex) {
-                    throw new WebServiceException("SQLException while initializing the reader!", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("SQLException while initializing the reader!", NO_APPLICABLE_CODE);
                 }
             }
         } else {
-            throw new WebServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
         }
     }
 
@@ -214,9 +214,9 @@ public abstract class AbstractCSWConfigurer {
      * 
      * @param request
      * @return
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    public AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws WebServiceException {
+    public AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws CstlServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
         File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
@@ -224,7 +224,7 @@ public abstract class AbstractCSWConfigurer {
         try {
             prop = Utils.getPropertiesFromFile(cascadingFile);
         } catch (IOException ex) {
-            throw new WebServiceException("IO exception while loading the cascading properties file",
+            throw new CstlServiceException("IO exception while loading the cascading properties file",
                             NO_APPLICABLE_CODE, version);
         }
         
@@ -238,7 +238,7 @@ public abstract class AbstractCSWConfigurer {
         try {
             Utils.storeProperties(prop, cascadingFile);
         } catch (IOException ex) {
-            throw new WebServiceException("unable to store the cascading properties file",
+            throw new CstlServiceException("unable to store the cascading properties file",
                         NO_APPLICABLE_CODE, version);
         }
         
@@ -253,9 +253,9 @@ public abstract class AbstractCSWConfigurer {
      * @param id The service identifier.
      * 
      * @return
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws WebServiceException {
+    public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws CstlServiceException {
         LOGGER.info("refresh index requested");
         String msg;
 
@@ -285,16 +285,16 @@ public abstract class AbstractCSWConfigurer {
      * @param configurationDirectory The CSW configuration directory.
      * @param id The service identifier.
      *
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    private void synchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
+    private void synchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
         //we delete each index directory
         for (File indexDir : configurationDirectory.listFiles(new IndexDirectoryFilter(id))) {
             for (File f : indexDir.listFiles()) {
                 f.delete();
             }
             if (!indexDir.delete()) {
-                throw new WebServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
             }
         }
         //then we restart the services
@@ -309,9 +309,9 @@ public abstract class AbstractCSWConfigurer {
      * @param id The service identifier.
      * @param configurationDirectory  The CSW configuration directory.
      * 
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    private void asynchroneIndexRefresh(File configurationDirectory, String id) throws WebServiceException {
+    private void asynchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
         /*
          * we delete each pre-builded index directory.
          * if there is a specific id in parameter we only delete the specified profile
@@ -321,7 +321,7 @@ public abstract class AbstractCSWConfigurer {
                 f.delete();
             }
             if (!indexDir.delete()) {
-                throw new WebServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE);
             }
         }
 
@@ -341,7 +341,7 @@ public abstract class AbstractCSWConfigurer {
                     indexer.createIndex();
 
                 } else {
-                    throw new WebServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                 }
             } catch (IllegalArgumentException ex) {
                 LOGGER.severe("unable to create an indexer for configuration file:" + configFile.getName());
@@ -358,14 +358,14 @@ public abstract class AbstractCSWConfigurer {
      *
      * @param asynchrone
      * @return
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws WebServiceException {
+    public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws CstlServiceException {
         LOGGER.info("Add to index requested");
         String msg;
 
         if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
-            throw new WebServiceException("This method is not yet available for this service.", OPERATION_NOT_SUPPORTED);
+            throw new CstlServiceException("This method is not yet available for this service.", OPERATION_NOT_SUPPORTED);
 
         // CSW indexation
         } else {
@@ -388,7 +388,7 @@ public abstract class AbstractCSWConfigurer {
                         objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
                     }
                 } else {
-                    throw new WebServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
                 }
 
                 indexer = initIndexer(currentId, cswConfigDir, reader);
@@ -397,7 +397,7 @@ public abstract class AbstractCSWConfigurer {
                         indexer.indexDocument(obj);
                     }
                 } else {
-                    throw new WebServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                 }
             
             } finally {
@@ -441,9 +441,9 @@ public abstract class AbstractCSWConfigurer {
         this.containerNotifier = containerNotifier;
     }
 
-    public abstract AcknowlegementType updateContacts() throws WebServiceException;
+    public abstract AcknowlegementType updateContacts() throws CstlServiceException;
     
-    public abstract AcknowlegementType updateVocabularies() throws WebServiceException;
+    public abstract AcknowlegementType updateVocabularies() throws CstlServiceException;
 
     protected abstract File getConfigurationDirectory();
 

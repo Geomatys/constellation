@@ -27,7 +27,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 /**
@@ -59,34 +59,34 @@ public class WmsSoapClient implements WmsClient {
 
 	@Override
 	public DescribeLayerResponseType describeLayer(DescribeLayer descLayer)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public AbstractWMSCapabilities getCapabilities(
-			GetCapabilities getCapabilities) throws WebServiceException {
+			GetCapabilities getCapabilities) throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getFeatureInfo(GetFeatureInfo getFeatureInfo)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+	public BufferedImage getMap(GetMap getMap) throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}

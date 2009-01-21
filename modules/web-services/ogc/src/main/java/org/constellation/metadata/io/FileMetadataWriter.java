@@ -25,7 +25,7 @@ import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -58,7 +58,7 @@ public class FileMetadataWriter extends MetadataWriter {
     }
 
     @Override
-    public boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
+    public boolean storeMetadata(Object obj) throws SQLException, CstlServiceException {
         File f = null;
         try {
             //TODO find indentifier
@@ -68,9 +68,9 @@ public class FileMetadataWriter extends MetadataWriter {
             marshaller.marshal(obj, f);
             indexer.indexDocument(obj);
         } catch (JAXBException ex) {
-            throw new WebServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new WebServiceException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
         }
         return true;
     }

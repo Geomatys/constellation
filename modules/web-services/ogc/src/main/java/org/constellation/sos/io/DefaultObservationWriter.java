@@ -37,7 +37,7 @@ import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.OfferingPhenomenonEntry;
 import org.constellation.sos.OfferingProcedureEntry;
 import org.constellation.sos.OfferingSamplingFeatureEntry;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -75,7 +75,7 @@ public class DefaultObservationWriter extends ObservationWriter {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public DefaultObservationWriter(DataSource dataSourceOM) throws WebServiceException {
+    public DefaultObservationWriter(DataSource dataSourceOM) throws CstlServiceException {
         try {
             OMDatabase   = new Database(dataSourceOM);
 
@@ -85,58 +85,58 @@ public class DefaultObservationWriter extends ObservationWriter {
             refTable = OMDatabase.getTable(ReferenceTable.class);
 
         } catch (NoSuchTableException ex) {
-            throw new WebServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-             throw new WebServiceException("IO Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
+             throw new CstlServiceException("IO Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
 
     }
 
-    public String writeObservation(ObservationEntry observation) throws WebServiceException {
+    public String writeObservation(ObservationEntry observation) throws CstlServiceException {
         try {
             if (obsTable != null) {
                 return obsTable.getIdentifier(observation);
             }
             return null;
         } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public String writeMeasurement(MeasurementEntry measurement) throws WebServiceException {
+    public String writeMeasurement(MeasurementEntry measurement) throws CstlServiceException {
         try {
             MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
             return measTable.getIdentifier(measurement);
         } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public String writeOffering(ObservationOfferingEntry offering) throws WebServiceException {
+    public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException {
         try {
             return offTable.getIdentifier(offering);
 
         } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws WebServiceException {
+    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws CstlServiceException {
         try {
             if (offProc != null)
                 offTable.getProcedures().getIdentifier(offProc);
@@ -146,11 +146,11 @@ public class DefaultObservationWriter extends ObservationWriter {
                 offTable.getStations().getIdentifier(offSF);
 
         } catch (CatalogException ex) {
-            throw new WebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -159,7 +159,7 @@ public class DefaultObservationWriter extends ObservationWriter {
         offTable.flush();
     }
 
-    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws WebServiceException {
+    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
         if (position == null || position.getValue().size() < 2)
             return;
         try {
@@ -190,7 +190,7 @@ public class DefaultObservationWriter extends ObservationWriter {
                     logger.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
                 }
             } else {
-                throw new WebServiceException("This CRS " + SRSName + " is not supported", INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException("This CRS " + SRSName + " is not supported", INVALID_PARAMETER_VALUE);
             }
             logger.info(request);
             if (insert) {
@@ -200,7 +200,7 @@ public class DefaultObservationWriter extends ObservationWriter {
             stmt2.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }

@@ -38,7 +38,7 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 import static org.constellation.query.wms.WMSQuery.*;
@@ -87,13 +87,13 @@ public class WmsRestClient implements WmsClient {
     
     
 	@Override
-	public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws WebServiceException {
+	public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
 		final URLConnection connec;
         try {
             final URL connectionURL = new URL(baseURL +"?"+ descLayer.toKvp());
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         connec.setDoOutput(true);
         connec.setRequestProperty("Content-Type", TEXT_XML);
@@ -103,7 +103,7 @@ public class WmsRestClient implements WmsClient {
         try {
             in = connec.getInputStream();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 
         //Unmarshall response
@@ -111,16 +111,16 @@ public class WmsRestClient implements WmsClient {
         try {
             response = unmarshaller.unmarshal(in);
         } catch (JAXBException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 
         try {
             in.close();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         if (!(response instanceof DescribeLayerResponseType)) {
-            throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
+            throw new CstlServiceException("The respone is not unmarshallable, since it is not an" +
                     " instance of DescribeLayerResponseType", ExceptionCode.NO_APPLICABLE_CODE);
         }
 
@@ -128,14 +128,14 @@ public class WmsRestClient implements WmsClient {
 	}
 
 	@Override
-	public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities) throws WebServiceException {//Connect to URL and get result
+	public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities) throws CstlServiceException {//Connect to URL and get result
         
 		final URLConnection connec;
         try {
             final URL connectionURL = new URL(baseURL +"?"+ getCapabilities.toKvp());
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         connec.setDoOutput(true);
         connec.setRequestProperty("Content-Type", TEXT_XML);
@@ -145,7 +145,7 @@ public class WmsRestClient implements WmsClient {
         try {
             in = connec.getInputStream();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 
         //Unmarshall response
@@ -153,15 +153,15 @@ public class WmsRestClient implements WmsClient {
         try {
             response = unmarshaller.unmarshal(in);
         } catch (JAXBException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         try {
             in.close();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         if (!(response instanceof AbstractWMSCapabilities)) {
-            throw new WebServiceException("The respone is not unmarshallable, since it is not an" +
+            throw new CstlServiceException("The respone is not unmarshallable, since it is not an" +
                     " instance of AbstractWMSCapabilities", ExceptionCode.NO_APPLICABLE_CODE);
         }
 
@@ -169,13 +169,13 @@ public class WmsRestClient implements WmsClient {
 	}
 
 	@Override
-	public String getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws WebServiceException {
+	public String getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException {
 		final URLConnection connec;
         try {
             final URL connectionURL = new URL(baseURL +"?"+ getFeatureInfo.toKvp());
             connec = connectionURL.openConnection();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         connec.setDoOutput(true);
         String infoFormat = getFeatureInfo.getInfoFormat();
@@ -189,7 +189,7 @@ public class WmsRestClient implements WmsClient {
         try {
             in = connec.getInputStream();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         final BufferedReader buff = new BufferedReader(new InputStreamReader(in));
         final StringWriter writer = new StringWriter();
@@ -203,42 +203,42 @@ public class WmsRestClient implements WmsClient {
             result = writer.toString();
             writer.close();
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
         return result;
 	}
 
 	@Override
-	public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
+	public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final URL connectionURL;
 
         try {
             connectionURL = new URL(baseURL + "?" + getLegend.toKvp());
         } catch (MalformedURLException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 
         try {
             return ImageIO.read(connectionURL);
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 	}
 
     @Override
-    public BufferedImage getMap(final GetMap getMap) throws WebServiceException {
+    public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
         final URL connectionURL;
 
         try {
             connectionURL = new URL(baseURL + "?" + getMap.toKvp());
         } catch (MalformedURLException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
 
         try {
             return ImageIO.read(connectionURL);
         } catch (IOException ex) {
-            throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
         }
     }
 }

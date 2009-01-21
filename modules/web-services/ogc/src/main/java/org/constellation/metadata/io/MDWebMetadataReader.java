@@ -49,7 +49,7 @@ import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.util.Utils;
 import org.constellation.ows.v100.BoundingBoxType;
@@ -242,7 +242,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         int id;
         String catalogCode = "";
         
@@ -257,7 +257,7 @@ public class MDWebMetadataReader extends MetadataReader {
             }
             
         } catch (NumberFormatException e) {
-             throw new WebServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new CstlServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
         }
 
         try {
@@ -292,7 +292,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
                     result = applyElementSet(result, type, elementName);
                 } else {
-                    throw new WebServiceException("Unable to read the form: " + identifier, NO_APPLICABLE_CODE, "id");
+                    throw new CstlServiceException("Unable to read the form: " + identifier, NO_APPLICABLE_CODE, "id");
                 }
 
             } else {
@@ -301,7 +301,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return result;
 
         } catch (SQLException e) {
-             throw new WebServiceException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new CstlServiceException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
         }
     }
     
@@ -1096,7 +1096,7 @@ public class MDWebMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException {
+    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
         List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
         final StringTokenizer tokens = new StringTokenizer(propertyNames, ",");
         while (tokens.hasMoreTokens()) {
@@ -1112,15 +1112,15 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (false) throw new SQLException();
 
                     } catch (SQLException e) {
-                        throw new WebServiceException("The service has launch an SQL exeption:" + e.getMessage(),
+                        throw new CstlServiceException("The service has launch an SQL exeption:" + e.getMessage(),
                                 NO_APPLICABLE_CODE);
                     }
                 } else {
-                    throw new WebServiceException("The property " + token + " is not queryable for now",
+                    throw new CstlServiceException("The property " + token + " is not queryable for now",
                             INVALID_PARAMETER_VALUE, "propertyName");
                 }
             } else {
-                throw new WebServiceException("The property " + token + " is not queryable",
+                throw new CstlServiceException("The property " + token + " is not queryable",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
         }
@@ -1128,11 +1128,11 @@ public class MDWebMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException {
+    public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
         try {
             return MDReader.executeFilterQuery(SQLQuery);
         } catch (SQLException ex) {
-           throw new WebServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
+           throw new CstlServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
                                          "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
@@ -1149,7 +1149,7 @@ public class MDWebMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<? extends Object> getAllEntries() throws WebServiceException {
+    public List<? extends Object> getAllEntries() throws CstlServiceException {
         List<Object> results = new ArrayList<Object>();
         try {
             List<Catalog> catalogs = MDReader.getCatalogs(); 
@@ -1158,7 +1158,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 results.add(getObjectFromForm("no cache", f));
             }
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return results;
     }

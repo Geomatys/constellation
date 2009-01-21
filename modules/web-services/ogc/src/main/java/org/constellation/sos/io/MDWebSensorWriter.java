@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 
 // Constellation dependencies
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -91,7 +91,7 @@ public class MDWebSensorWriter extends SensorWriter {
      */
     private Marshaller marshaller;
 
-    public MDWebSensorWriter(Connection connection, String sensorIdBase) throws WebServiceException {
+    public MDWebSensorWriter(Connection connection, String sensorIdBase) throws CstlServiceException {
         try {
             smlConnection  = connection;
             sensorMLWriter = new Writer20(smlConnection);
@@ -111,13 +111,13 @@ public class MDWebSensorWriter extends SensorWriter {
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            throw new WebServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
-     public void writeSensor(String id, AbstractSensorML process) throws WebServiceException {
+     public void writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
         try {
 
             //we create a new Tempory File SensorML
@@ -134,48 +134,48 @@ public class MDWebSensorWriter extends SensorWriter {
 
         } catch (ParserConfigurationException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("The service has throw a ParserException:" + ex.getMessage(),
+            throw new CstlServiceException("The service has throw a ParserException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (SAXException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("The service has throw a SAXException:" + ex.getMessage(),
+            throw new CstlServiceException("The service has throw a SAXException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (MalFormedDocumentException ex) {
             ex.printStackTrace();
             logger.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new WebServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
+            throw new CstlServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
                                           INVALID_PARAMETER_VALUE, "sensorDescription");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("The service cannot build the temporary file",
+            throw new CstlServiceException("The service cannot build the temporary file",
                                           NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw an IOException:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw an JAXBException:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw an JAXBException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }
 
-    public void startTransaction() throws WebServiceException {
+    public void startTransaction() throws CstlServiceException {
         try {
             smlConnection.setAutoCommit(false);
             currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public void abortTransaction() throws WebServiceException {
+    public void abortTransaction() throws CstlServiceException {
         try {
             if (currentSavePoint != null)
                 smlConnection.rollback(currentSavePoint);
@@ -183,12 +183,12 @@ public class MDWebSensorWriter extends SensorWriter {
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
 
-    public void endTransaction() throws WebServiceException {
+    public void endTransaction() throws CstlServiceException {
         try {
             if (currentSavePoint != null)
                 smlConnection.releaseSavepoint(currentSavePoint);
@@ -196,7 +196,7 @@ public class MDWebSensorWriter extends SensorWriter {
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -205,7 +205,7 @@ public class MDWebSensorWriter extends SensorWriter {
      * Create a new identifier for a sensor.
      */
     @Override
-    public int getNewSensorId() throws WebServiceException {
+    public int getNewSensorId() throws CstlServiceException {
         try {
             ResultSet res = newSensorIdStmt.executeQuery();
             int id = -1;
@@ -216,7 +216,7 @@ public class MDWebSensorWriter extends SensorWriter {
             return (id + 1);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }

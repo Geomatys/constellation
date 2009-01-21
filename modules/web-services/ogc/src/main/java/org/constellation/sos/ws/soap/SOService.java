@@ -38,7 +38,7 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.sos.Capabilities;
@@ -102,7 +102,7 @@ public class SOService {
     /**
      * Initialize the database connection.
      */
-    public SOService() throws JAXBException, WebServiceException {
+    public SOService() throws JAXBException, CstlServiceException {
        worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
@@ -124,7 +124,7 @@ public class SOService {
             worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
              
             return worker.getCapabilities(requestCapabilities);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -144,7 +144,7 @@ public class SOService {
         try {
             logger.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -164,7 +164,7 @@ public class SOService {
         try {
             logger.info("received SOAP getObservation request");
             return worker.getObservation(requestObservation);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -180,7 +180,7 @@ public class SOService {
         try {
             logger.info("received SOAP getResult request");
             return worker.getResult(requestResult);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -200,7 +200,7 @@ public class SOService {
         try {
             logger.info("received SOAP registerSensor request");
             return worker.registerSensor(requestRegSensor);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -219,7 +219,7 @@ public class SOService {
         try {
             logger.info("received SOAP insertObservation request");
             return worker.insertObservation(requestInsObs);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;

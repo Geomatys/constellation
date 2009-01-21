@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.sos.ObservationOfferingEntry;
 import org.constellation.sos.ResponseModeType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -103,55 +103,55 @@ public abstract class ObservationFilter {
      * Add a TM_Equals filter to the current request.
      * 
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract void setTimeEquals(Object time) throws WebServiceException;
+    public abstract void setTimeEquals(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_Before filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract void setTimeBefore(Object time) throws WebServiceException;
+    public abstract void setTimeBefore(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_After filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract void setTimeAfter(Object time) throws WebServiceException;
+    public abstract void setTimeAfter(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_During filter to the current request.
      *
      * @param time
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract void setTimeDuring(Object time) throws WebServiceException;
+    public abstract void setTimeDuring(Object time) throws CstlServiceException;
 
     /**
      * Execute the current query and return a list of observation result.
      * 
      * @return
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract List<ObservationResult> filterResult() throws WebServiceException;
+    public abstract List<ObservationResult> filterResult() throws CstlServiceException;
 
     /**
      * Execute the current query and return a list of observation ID.
      * @return
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract List<String> filterObservation() throws WebServiceException;
+    public abstract List<String> filterObservation() throws CstlServiceException;
     
     /**
      * return a SQL formatted timestamp
      *
      * @param time a GML time position object.
      */
-    protected String getTimeValue(TimePositionType time) throws WebServiceException {
+    protected String getTimeValue(TimePositionType time) throws CstlServiceException {
         if (time != null && time.getValue() != null) {
             String value = time.getValue();
             value = value.replace("T", " ");
@@ -166,7 +166,7 @@ public abstract class ObservationFilter {
                  return t.toString();
 
              } catch(IllegalArgumentException e) {
-                throw new WebServiceException("Unable to parse the value: " + value + '\n' +
+                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
                                                  "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
                                                  INVALID_PARAMETER_VALUE, "eventTime");
              }
@@ -176,7 +176,7 @@ public abstract class ObservationFilter {
                 locator = "Timeposition";
             else
                 locator = "TimePosition value";
-            throw new  WebServiceException("bad format of time, " + locator + " mustn't be null",
+            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
     }

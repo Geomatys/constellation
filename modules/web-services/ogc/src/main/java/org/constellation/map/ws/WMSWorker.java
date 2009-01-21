@@ -73,7 +73,7 @@ import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.wms.v130.OperationType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
@@ -141,10 +141,10 @@ public class WMSWorker extends AbstractWMSWorker {
      *
      * @param descLayer The {@linkplain DescribeLayer describe layer} request.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     @Override
-    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws WebServiceException {
+    public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
         final OnlineResourceType or = new OnlineResourceType();
         or.setHref(uriContext.getBaseUri().toString() + "wcs?");
 
@@ -164,10 +164,10 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     @Override
-    public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws WebServiceException {
+    public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
         final ServiceVersion queryVersion = getCapab.getVersion();
 
         //we build the list of accepted crs
@@ -180,10 +180,10 @@ public class WMSWorker extends AbstractWMSWorker {
             inCapabilities = (AbstractWMSCapabilities) getCapabilitiesObject(getCapab.getVersion(),
                     servletContext.getRealPath("WEB-INF"));
         } catch (IOException e) {
-            throw new WebServiceException("IO exception while getting Services Metadata:" +
+            throw new CstlServiceException("IO exception while getting Services Metadata:" +
                     e.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
         } catch (JAXBException ex) {
-            throw new WebServiceException("IO exception while getting Services Metadata:" +
+            throw new CstlServiceException("IO exception while getting Services Metadata:" +
                     ex.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
         }
         final String url = uriContext.getBaseUri().toString();
@@ -218,7 +218,7 @@ public class WMSWorker extends AbstractWMSWorker {
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
             } catch (CatalogException exception) {
-                throw new WebServiceException(exception, NO_APPLICABLE_CODE, queryVersion);
+                throw new CstlServiceException(exception, NO_APPLICABLE_CODE, queryVersion);
             }
 
             // List of elevations, times and dim_range values.
@@ -465,10 +465,10 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
      * @return text, HTML , XML or GML code.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     @Override
-    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws WebServiceException {
+    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws CstlServiceException {
 
         String infoFormat = gfi.getInfoFormat();
         if (infoFormat == null) {
@@ -491,7 +491,7 @@ public class WMSWorker extends AbstractWMSWorker {
             // GML
             visitor = new GMLGraphicVisitor(gfi);
         } else {
-            throw new WebServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
+            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
                     ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
                     INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
@@ -501,7 +501,7 @@ public class WMSWorker extends AbstractWMSWorker {
         try {
             WMSPortrayalAdapter.hit(gfi, visitor);
         } catch (PortrayalException ex) {
-            throw new WebServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
         }
 
         return visitor.getResult();
@@ -532,15 +532,15 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     @Override
-    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws WebServiceException {
+    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final ServiceVersion version = getLegend.getVersion();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final LayerDetails layer = dp.get(getLegend.getLayer());
         if (layer == null) {
-            throw new WebServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
+            throw new CstlServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
                     version, "layer");
         }
         final Integer width  = getLegend.getWidth();
@@ -556,10 +556,10 @@ public class WMSWorker extends AbstractWMSWorker {
      * @param getMap The {@linkplain GetMap get map} request.
      * @return The map requested, or an error.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
     @Override
-    public synchronized BufferedImage getMap(final GetMap getMap) throws WebServiceException {
+    public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
         final ServiceVersion queryVersion = getMap.getVersion();
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
@@ -572,14 +572,14 @@ public class WMSWorker extends AbstractWMSWorker {
                 final Dimension dim = getMap.getSize();
                 image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
             } else {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             if (errorInImage) {
                 final Dimension dim = getMap.getSize();
                 image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
             } else {
-                throw new WebServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
+                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
         }
 

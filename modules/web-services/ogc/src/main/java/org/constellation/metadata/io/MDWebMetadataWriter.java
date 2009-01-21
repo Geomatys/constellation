@@ -38,7 +38,7 @@ import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Utils;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -618,7 +618,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
-    public boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
+    public boolean storeMetadata(Object obj) throws SQLException, CstlServiceException {
         // profiling operation
         long start     = System.currentTimeMillis();
         long transTime = 0;
@@ -636,7 +636,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             transTime = System.currentTimeMillis() - start_trans;
             
         } catch (IllegalArgumentException e) {
-             throw new WebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
+             throw new CstlServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
         }
         

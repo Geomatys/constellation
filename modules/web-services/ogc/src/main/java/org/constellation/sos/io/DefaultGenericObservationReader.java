@@ -47,7 +47,7 @@ import org.constellation.swe.v101.QuantityType;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
 import org.constellation.swe.v101.TextBlockEntry;
 import org.constellation.swe.v101.TimeType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSworker.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -57,36 +57,36 @@ import static org.constellation.ows.OWSExceptionCode.*;
  */
 public class DefaultGenericObservationReader extends GenericObservationReader {
 
-    public DefaultGenericObservationReader(String observationIdBase, Automatic configuration) throws WebServiceException {
+    public DefaultGenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         super(observationIdBase, configuration);
     }
 
     @Override
-    public List<String> getOfferingNames() throws WebServiceException {
+    public List<String> getOfferingNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var01"), null);
         return getVariables("var01", values);
     }
 
     @Override
-    public List<String> getProcedureNames() throws WebServiceException {
+    public List<String> getProcedureNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var02"), null);
         return getVariables("var02", values);
     }
 
     @Override
-    public List<String> getPhenomenonNames() throws WebServiceException {
+    public List<String> getPhenomenonNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var03"), null);
         return getVariables("var03", values);
     }
 
     @Override
-    public List<String> getFeatureOfInterestNames() throws WebServiceException {
+    public List<String> getFeatureOfInterestNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var04"), null);
         return getVariables("var04", values);
     }
 
     @Override
-    public String getNewObservationId() throws WebServiceException {
+    public String getNewObservationId() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var05"), null);
         int id = Integer.parseInt(getVariable("var05", values));
 
@@ -101,13 +101,13 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     }
 
     @Override
-    public String getMinimalEventTime() throws WebServiceException {
+    public String getMinimalEventTime() throws CstlServiceException {
          Values values = loadData(Arrays.asList("var06"), null);
         return getVariable("var06", values);
     }
 
     @Override
-    public ObservationOfferingEntry getObservationOffering(String offeringName) throws WebServiceException {
+    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18"), offeringName);
         List<String> srsName = getVariables("var07", values);
 
@@ -183,7 +183,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     }
 
     @Override
-    public List<ObservationOfferingEntry> getObservationOfferings() throws WebServiceException {
+    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var01"), null);
         List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
         List<String> offeringNames = getVariables("var01", values);
@@ -197,14 +197,14 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
      *  TODO return composite phenomenon
      */
     @Override
-    public PhenomenonEntry getPhenomenon(String phenomenonName) throws WebServiceException {
+    public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var13", "var14"), phenomenonName);
         PhenomenonEntry phenomenon = new PhenomenonEntry(phenomenonName, getVariable("var13", values), getVariable("var14", values));
         return phenomenon;
     }
 
     @Override
-    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws WebServiceException {
+    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24"), samplingFeatureId);
         String name            = getVariable("var19", values);
         String description     = getVariable("var20", values);
@@ -228,7 +228,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
         return foi;
     }
 
-    private List<Double> getCoordinates(String samplingFeatureId) throws WebServiceException {
+    private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var25"), samplingFeatureId);
         List<Double> result = new ArrayList<Double>();
         List<String> coordinates = getVariables("var25", values);
@@ -236,14 +236,14 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
             try {
                 result.add(Double.parseDouble(coordinate));
             } catch (NumberFormatException ex) {
-                throw new WebServiceException(ex, NO_APPLICABLE_CODE);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
         }
         return result;
     }
 
     @Override
-    public ObservationEntry getObservation(String identifier) throws WebServiceException {
+    public ObservationEntry getObservation(String identifier) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
         SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(getVariable("var26", values));
         PhenomenonEntry observedProperty = getPhenomenon(getVariable("var27", values));
@@ -265,7 +265,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     }
 
     @Override
-    public AnyResultEntry getResult(String identifier) throws WebServiceException {
+    public AnyResultEntry getResult(String identifier) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                 "var40", "var41", "var42", "var43"), identifier);
         int count = Integer.parseInt(getVariable("var32", values));
@@ -313,7 +313,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     }
 
     @Override
-    public ReferenceEntry getReference(String href) throws WebServiceException {
+    public ReferenceEntry getReference(String href) throws CstlServiceException {
         //TODO
         return new ReferenceEntry(null, href);
     }

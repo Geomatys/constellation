@@ -76,7 +76,7 @@ import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.cat.csw.v202.SchemaComponentType;
 import org.constellation.cat.csw.v202.EchoedRequestType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
@@ -334,7 +334,7 @@ public class CSWworker {
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause: The web service can't connect to the metadata database!");
             isStarted = false;
-        } catch (WebServiceException e) {
+        } catch (CstlServiceException e) {
             logger.severe(e.getMessage());
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause: The web service can't create the index!");
@@ -449,23 +449,23 @@ public class CSWworker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException {
+    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         logger.info("getCapabilities request processing" + '\n');
         long startTime = System.currentTimeMillis();
         
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("CSW")) {
-                throw new WebServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, "service");
+                throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, "service");
             }
         } else {
-            throw new WebServiceException("Service must be specified!",
+            throw new CstlServiceException("Service must be specified!",
                                              MISSING_PARAMETER_VALUE, "service");
         }
         AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("2.0.2")){
-                 throw new WebServiceException("version available : 2.0.2",
+                 throw new CstlServiceException("version available : 2.0.2",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
@@ -621,7 +621,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public Object getRecords(GetRecordsType request) throws WebServiceException {
+    public Object getRecords(GetRecordsType request) throws CstlServiceException {
         logger.info("GetRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -643,7 +643,7 @@ public class CSWworker {
                 for (String s: ACCEPTED_RESOURCE_TYPE) {
                     supportedOutput = supportedOutput  + s + '\n';
                 } 
-                throw new WebServiceException("The server does not support this output schema: " + outputSchema + '\n' +
+                throw new CstlServiceException("The server does not support this output schema: " + outputSchema + '\n' +
                                               " supported ones are: " + '\n' + supportedOutput,
                                               INVALID_PARAMETER_VALUE, "outputSchema");
             }
@@ -664,7 +664,7 @@ public class CSWworker {
             query = (QueryType)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
             if (typeNames == null || typeNames.size() == 0) {
-                throw new WebServiceException("The query must specify at least typeName.",
+                throw new CstlServiceException("The query must specify at least typeName.",
                                               INVALID_PARAMETER_VALUE, "TypeNames");
             } else {
                 for (QName type:typeNames) {
@@ -682,7 +682,7 @@ public class CSWworker {
                         String typeName = "null";
                         if (type != null)
                             typeName = type.getLocalPart();
-                        throw new WebServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
+                        throw new CstlServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
                                                       "supported one are:" + '\n' + supportedTypeNames(),
                                                       INVALID_PARAMETER_VALUE, "TypeNames");
                     }
@@ -701,7 +701,7 @@ public class CSWworker {
             }
             
         } else {
-            throw new WebServiceException("The request must contains a query.",
+            throw new CstlServiceException("The request must contains a query.",
                                           INVALID_PARAMETER_VALUE, "Query");
         }
         
@@ -719,7 +719,7 @@ public class CSWworker {
         Integer maxRecord = request.getMaxRecords();
         Integer startPos  = request.getStartPosition();
         if (startPos <= 0) {
-            throw new WebServiceException("The start position must be > 0.",
+            throw new CstlServiceException("The start position must be > 0.",
                                           NO_APPLICABLE_CODE, "startPosition");
         }
 
@@ -745,7 +745,7 @@ public class CSWworker {
             if (sortBy != null && sortBy.getSortProperty().size() > 0) {
                 SortPropertyType first = sortBy.getSortProperty().get(0);
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
-                    throw new WebServiceException("A SortBy filter must specify a propertyName.",
+                    throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
                 String propertyName = Utils.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
             
@@ -840,7 +840,7 @@ public class CSWworker {
                    return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
 
                 } catch(DatatypeConfigurationException ex) {
-                    throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                    throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
                                                   NO_APPLICABLE_CODE);
                 }
             }
@@ -894,7 +894,7 @@ public class CSWworker {
                     return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
 
                 } catch(DatatypeConfigurationException ex) {
-                    throw new WebServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                    throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
                                                   NO_APPLICABLE_CODE);
                 }
             }
@@ -910,20 +910,20 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    private List<String> executeLuceneQuery(SpatialQuery query) throws WebServiceException {
+    private List<String> executeLuceneQuery(SpatialQuery query) throws CstlServiceException {
         try {
             return indexSearcher.doSearch(query);
         
         } catch (CorruptIndexException ex) {
-            throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+            throw new CstlServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
                                              NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new WebServiceException("The service has throw an IO exception while making lucene request.",
+            throw new CstlServiceException("The service has throw an IO exception while making lucene request.",
                                              NO_APPLICABLE_CODE);
         } catch (ParseException ex) {
-            throw new WebServiceException("The service has throw an Parse exception while making lucene request.",
+            throw new CstlServiceException("The service has throw an Parse exception while making lucene request.",
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -933,20 +933,20 @@ public class CSWworker {
      * 
      * @param query
      * @return
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    private String executeIdentifierQuery(String id) throws WebServiceException {
+    private String executeIdentifierQuery(String id) throws CstlServiceException {
         try {
             return indexSearcher.identifierQuery(id);
         
         } catch (CorruptIndexException ex) {
-            throw new WebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+            throw new CstlServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
                                           NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new WebServiceException("The service has throw an IO exception while making lucene request.",
+            throw new CstlServiceException("The service has throw an IO exception while making lucene request.",
                                           NO_APPLICABLE_CODE);
         } catch (ParseException ex) {
-            throw new WebServiceException("The service has throw an Parse exception while making lucene request.",
+            throw new CstlServiceException("The service has throw an Parse exception while making lucene request.",
                                           NO_APPLICABLE_CODE);
         }
     }
@@ -957,7 +957,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws WebServiceException {
+    public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws CstlServiceException {
         logger.info("GetRecordById request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -977,13 +977,13 @@ public class CSWworker {
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!ACCEPTED_RESOURCE_TYPE.contains(outputSchema)) {
-                throw new WebServiceException("The server does not support this output schema: " + outputSchema,
+                throw new CstlServiceException("The server does not support this output schema: " + outputSchema,
                                                   INVALID_PARAMETER_VALUE, "outputSchema");
             }
         }
         
         if (request.getId().size() == 0)
-            throw new WebServiceException("You must specify at least one identifier",
+            throw new CstlServiceException("You must specify at least one identifier",
                                           MISSING_PARAMETER_VALUE, "id");
         
         //we begin to build the result
@@ -1141,9 +1141,9 @@ public class CSWworker {
      * Launch a service exception with th specified list of unexisting ID.
      *  
      * @param unexistingID
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    private void throwUnexistingIdentifierException(List<String> unexistingID) throws WebServiceException {
+    private void throwUnexistingIdentifierException(List<String> unexistingID) throws CstlServiceException {
         String identifiers = "";
         for (String s : unexistingID) {
             identifiers = identifiers + s + ',';
@@ -1152,11 +1152,11 @@ public class CSWworker {
             identifiers.substring(0, identifiers.length() - 1);
         }
         if (identifiers.equals("")) {
-            throw new WebServiceException("The record does not correspound to the specified outputSchema.",
+            throw new CstlServiceException("The record does not correspound to the specified outputSchema.",
                                              INVALID_PARAMETER_VALUE, "outputSchema");
         } else {
 
-            throw new WebServiceException("The identifiers " + identifiers + " does not exist",
+            throw new CstlServiceException("The identifiers " + identifiers + " does not exist",
                                              INVALID_PARAMETER_VALUE, "id");
         }
     }
@@ -1167,7 +1167,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws WebServiceException{
+    public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws CstlServiceException{
         logger.info("DescribeRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
@@ -1191,7 +1191,7 @@ public class CSWworker {
             
             } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
                
-                throw new WebServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
+                throw new CstlServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
                                               " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
                                               INVALID_PARAMETER_VALUE, "schemaLanguage"); 
             }
@@ -1234,13 +1234,13 @@ public class CSWworker {
             response  = new DescribeRecordResponseType(components);
             
         } catch (ParserConfigurationException ex) {
-            throw new WebServiceException("Parser Configuration Exception while creating the DocumentBuilder",
+            throw new CstlServiceException("Parser Configuration Exception while creating the DocumentBuilder",
                                           NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new WebServiceException("IO Exception when trying to access xsd file",
+            throw new CstlServiceException("IO Exception when trying to access xsd file",
                                           NO_APPLICABLE_CODE);
         } catch (SAXException ex) {
-            throw new WebServiceException("SAX Exception when trying to parse xsd file",
+            throw new CstlServiceException("SAX Exception when trying to parse xsd file",
                                           NO_APPLICABLE_CODE);
         }
         logger.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
@@ -1322,7 +1322,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetDomainResponseType getDomain(GetDomainType request) throws WebServiceException{
+    public GetDomainResponseType getDomain(GetDomainType request) throws CstlServiceException{
         logger.info("GetDomain request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1334,7 +1334,7 @@ public class CSWworker {
         
         // if the two parameter have been filled we launch an exception
         if (parameterName != null && propertyName != null) {
-            throw new WebServiceException("One of propertyName or parameterName must be null",
+            throw new CstlServiceException("One of propertyName or parameterName must be null",
                                              INVALID_PARAMETER_VALUE, "parameterName");
         }
         
@@ -1363,15 +1363,15 @@ public class CSWworker {
                             DomainValuesType value  = new DomainValuesType(token, null, values, type); 
                             responseList.add(value);
                         } else {
-                            throw new WebServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
+                            throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
                                                           INVALID_PARAMETER_VALUE, "parameterName");
                         }
                     } else {
-                        throw new WebServiceException("The operation " + operationName + " does not exist",
+                        throw new CstlServiceException("The operation " + operationName + " does not exist",
                                                       INVALID_PARAMETER_VALUE, "parameterName");
                     }
                 } else {
-                    throw new WebServiceException("ParameterName must be formed like this Operation.parameterName",
+                    throw new CstlServiceException("ParameterName must be formed like this Operation.parameterName",
                                                      INVALID_PARAMETER_VALUE, "parameterName");
                 }
             }
@@ -1384,7 +1384,7 @@ public class CSWworker {
             
         // if no parameter have been filled we launch an exception    
         } else {
-            throw new WebServiceException("One of propertyName or parameterName must be filled",
+            throw new CstlServiceException("One of propertyName or parameterName must be filled",
                                           MISSING_PARAMETER_VALUE, "parameterName, propertyName");
         }
         logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
@@ -1397,11 +1397,11 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(TransactionType request) throws WebServiceException {
+    public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
         logger.info("Transaction request processing" + '\n');
         
         if (profile == DISCOVERY) {
-            throw new WebServiceException("This method is not supported by this mode of CSW",
+            throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
         
@@ -1426,7 +1426,7 @@ public class CSWworker {
                         
                         } catch (SQLException ex) {
                             ex.printStackTrace();
-                            throw new WebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                            throw new CstlServiceException("The service has throw an SQLException: " + ex.getMessage(),
                                                           NO_APPLICABLE_CODE);
                         } catch (IllegalArgumentException e) {
                             logger.severe("already that title.");
@@ -1435,13 +1435,13 @@ public class CSWworker {
                 }
             } else if (transaction instanceof DeleteType) {
                 DeleteType deleteRequest = (DeleteType)transaction;
-                throw new WebServiceException("This kind of transaction (delete) is not yet supported by the service.",
+                throw new CstlServiceException("This kind of transaction (delete) is not yet supported by the service.",
                                                   NO_APPLICABLE_CODE, "TransactionType");
                 
                 
             } else if (transaction instanceof UpdateType) {
                 UpdateType updateRequest = (UpdateType)transaction;
-                throw new WebServiceException("This kind of transaction (update) is not yet supported by the service.",
+                throw new CstlServiceException("This kind of transaction (update) is not yet supported by the service.",
                                               NO_APPLICABLE_CODE, "TransactionType");
             
                 
@@ -1450,7 +1450,7 @@ public class CSWworker {
                 if (transaction != null) {
                     className = transaction.getClass().getName();
                 }
-                throw new WebServiceException("This kind of transaction is not supported by the service: " + className,
+                throw new CstlServiceException("This kind of transaction is not supported by the service: " + className,
                                               INVALID_PARAMETER_VALUE, "TransactionType");
             }
             
@@ -1470,10 +1470,10 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
+    public HarvestResponseType harvest(HarvestType request) throws CstlServiceException {
         logger.info("Harvest request processing" + '\n');
         if (profile == DISCOVERY) {
-            throw new WebServiceException("This method is not supported by this mode of CSW",
+            throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
         verifyBaseRequest(request);
@@ -1486,11 +1486,11 @@ public class CSWworker {
         //we verify the resource Type
         String resourceType = request.getResourceType();
         if (resourceType == null) {
-            throw new WebServiceException("The resource type to harvest must be specified",
+            throw new CstlServiceException("The resource type to harvest must be specified",
                                           MISSING_PARAMETER_VALUE, "resourceType");
         } else {
             if (!ACCEPTED_RESOURCE_TYPE.contains(resourceType)) {
-                throw new WebServiceException("This resource type is not allowed. ",
+                throw new CstlServiceException("This resource type is not allowed. ",
                                              MISSING_PARAMETER_VALUE, "resourceType");
             }
         }
@@ -1523,7 +1523,7 @@ public class CSWworker {
 
                         Object harvested = unmarshaller.unmarshal(fileToHarvest);
                         if (harvested == null) {
-                            throw new WebServiceException("The resource can not be parsed.",
+                            throw new CstlServiceException("The resource can not be parsed.",
                                                           INVALID_PARAMETER_VALUE, "Source");
                         }
                     
@@ -1547,16 +1547,16 @@ public class CSWworker {
                 }
                 
             } catch (SQLException ex) {
-                throw new WebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                throw new CstlServiceException("The service has throw an SQLException: " + ex.getMessage(),
                                               NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new WebServiceException("The resource can not be parsed: " + ex.getMessage(),
+                throw new CstlServiceException("The resource can not be parsed: " + ex.getMessage(),
                                               INVALID_PARAMETER_VALUE, "Source");
             } catch (MalformedURLException ex) {
-                throw new WebServiceException("The source URL is malformed",
+                throw new CstlServiceException("The source URL is malformed",
                                               INVALID_PARAMETER_VALUE, "Source");
             } catch (IOException ex) {
-                throw new WebServiceException("The service can't open the connection to the source",
+                throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, "Source");
             } 
             
@@ -1576,7 +1576,7 @@ public class CSWworker {
         } else {
             AcknowledgementType acknowledgement = null;
             response = new HarvestResponseType(acknowledgement);
-            throw new WebServiceException("This asynchronous mode for harvest is not yet supported by the service.",
+            throw new CstlServiceException("This asynchronous mode for harvest is not yet supported by the service.",
                                           OPERATION_NOT_SUPPORTED, "ResponseHandler");
         }
         
@@ -1626,32 +1626,32 @@ public class CSWworker {
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
-    private void verifyBaseRequest(RequestBaseType request) throws WebServiceException {
+    private void verifyBaseRequest(RequestBaseType request) throws CstlServiceException {
         if (!isStarted) {
-            throw new WebServiceException("The service is not running!",
+            throw new CstlServiceException("The service is not running!",
                                           NO_APPLICABLE_CODE);
         }
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("CSW"))  {
-                    throw new WebServiceException("service must be \"CSW\"!",
+                    throw new CstlServiceException("service must be \"CSW\"!",
                                                   INVALID_PARAMETER_VALUE, "service");
                 }
             } else {
-                throw new WebServiceException("service must be specified!",
+                throw new CstlServiceException("service must be specified!",
                                               MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().equals("2.0.2")) {
-                    throw new WebServiceException("version must be \"2.0.2\"!",
+                    throw new CstlServiceException("version must be \"2.0.2\"!",
                                                   VERSION_NEGOTIATION_FAILED, "version");
                 }
             } else {
-                throw new WebServiceException("version must be specified!",
+                throw new CstlServiceException("version must be specified!",
                                               MISSING_PARAMETER_VALUE, "version");
             }
          } else { 
-            throw new WebServiceException("The request is null!",
+            throw new CstlServiceException("The request is null!",
                                           NO_APPLICABLE_CODE);
          }  
         
@@ -1673,9 +1673,9 @@ public class CSWworker {
      * if the format is not supported it throws a WebService Exception.
      * 
      * @param request
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    private void initializeOutputFormat(AbstractCswRequest request) throws WebServiceException {
+    private void initializeOutputFormat(AbstractCswRequest request) throws CstlServiceException {
         
         // we initialize the output format of the response
         String format = request.getOutputFormat();
@@ -1686,7 +1686,7 @@ public class CSWworker {
             for (String s: ACCEPTED_OUTPUT_FORMATS) {
                 supportedFormat = supportedFormat  + s + '\n';
             } 
-            throw new WebServiceException("The server does not support this output format: " + format + '\n' +
+            throw new CstlServiceException("The server does not support this output format: " + format + '\n' +
                                              " supported ones are: " + '\n' + supportedFormat,
                                              INVALID_PARAMETER_VALUE, "outputFormat");
         }

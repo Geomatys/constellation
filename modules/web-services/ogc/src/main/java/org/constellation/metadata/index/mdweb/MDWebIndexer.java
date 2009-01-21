@@ -36,7 +36,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -83,7 +83,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndexer(Connection MDConnection, File configDirectory, String serviceID) throws WebServiceException {
+    public MDWebIndexer(Connection MDConnection, File configDirectory, String serviceID) throws CstlServiceException {
         super(serviceID, configDirectory);
         try {
             MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
@@ -92,7 +92,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             if (create)
                 createIndex();
         } catch (SQLException ex) {
-            throw new WebServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
     
@@ -164,7 +164,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws WebServiceException {
+    public void createIndex() throws CstlServiceException {
         logger.info("Creating lucene index for MDWeb database please wait...");
         
         long time = System.currentTimeMillis();

@@ -37,7 +37,7 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
@@ -67,7 +67,7 @@ public class SOService extends OGCWebService {
     /**
      * Build a new Restfull SOS service.
      */
-    public SOService() throws JAXBException, WebServiceException {
+    public SOService() throws JAXBException, CstlServiceException {
         super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
         worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
         setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
@@ -86,7 +86,7 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
-                    throw new WebServiceException("The operation GetObservation is only requestable in XML",
+                    throw new CstlServiceException("The operation GetObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, getActingVersion(), "GetObservation");
                 }
                 StringWriter sw = new StringWriter();
@@ -97,7 +97,7 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
-                    throw new WebServiceException("The operation DescribeSensor is only requestable in XML",
+                    throw new CstlServiceException("The operation DescribeSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, getActingVersion(), "DescribeSensor");
                 }
                 StringWriter sw = new StringWriter();
@@ -108,7 +108,7 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
                 InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
-                    throw new WebServiceException("The operation InsertObservation is only requestable in XML",
+                    throw new CstlServiceException("The operation InsertObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, getActingVersion(), "InsertObservation");
                 }
                 StringWriter sw = new StringWriter();
@@ -119,7 +119,7 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
                 GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
-                    throw new WebServiceException("The operation GetResult is only requestable in XML",
+                    throw new CstlServiceException("The operation GetResult is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, getActingVersion(), "GetResult");
                 }
                 StringWriter sw = new StringWriter();
@@ -130,7 +130,7 @@ public class SOService extends OGCWebService {
              } else if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
                 RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
-                    throw new WebServiceException("The operation RegisterSensor is only requestable in XML",
+                    throw new CstlServiceException("The operation RegisterSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, getActingVersion(), "RegisterSensor");
                 }
                 StringWriter sw = new StringWriter();
@@ -142,7 +142,7 @@ public class SOService extends OGCWebService {
                 try {
                     worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
                 } catch (IOException ex) {
-                    throw new WebServiceException("Unable to find change.properties",
+                    throw new CstlServiceException("Unable to find change.properties",
                                                      NO_APPLICABLE_CODE, getActingVersion());
                 }
                 GetCapabilities gc = (GetCapabilities)objectRequest;
@@ -160,11 +160,11 @@ public class SOService extends OGCWebService {
                 return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
             } else {
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "request");
             }
              
-         } catch (WebServiceException ex) {
+         } catch (CstlServiceException ex) {
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
@@ -195,7 +195,7 @@ public class SOService extends OGCWebService {
     /**
      * Build a new getCapabilities request from kvp encoding
      */
-    private GetCapabilities createNewGetCapabilities() throws WebServiceException, JAXBException {
+    private GetCapabilities createNewGetCapabilities() throws CstlServiceException, JAXBException {
         
         String version = getParameter("acceptVersions", false);
         AcceptVersionsType versions;
@@ -221,7 +221,7 @@ public class SOService extends OGCWebService {
                 if (SectionsType.getExistingSections("1.1.1").contains(token)){
                     requestedSections.add(token);
                 } else {
-                    throw new WebServiceException("The section " + token + " does not exist",
+                    throw new CstlServiceException("The section " + token + " does not exist",
                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "Sections");
                 }   
             }

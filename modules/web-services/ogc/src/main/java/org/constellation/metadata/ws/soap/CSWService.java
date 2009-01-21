@@ -61,7 +61,7 @@ import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
 
@@ -148,7 +148,7 @@ public class CSWService {
              
             return worker.getCapabilities(requestCapabilities);
             
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -166,7 +166,7 @@ public class CSWService {
         try {
             logger.info("received SOAP GetDomain request");
             return worker.getDomain(requestGetDomain);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
            ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -183,7 +183,7 @@ public class CSWService {
         try {
             logger.info("received SOAP getRecordById request");
             return worker.getRecordById(requestRecordById);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -199,7 +199,7 @@ public class CSWService {
         try {
             logger.info("received SOAP getRecords request");
             return worker.getRecords(requestRecords);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
            ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -215,7 +215,7 @@ public class CSWService {
         try {
             logger.info("received SOAP describeRecord request");
             return worker.describeRecord(requestDescribeRecord);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -231,7 +231,7 @@ public class CSWService {
         try {
             logger.info("received SOAP harvest request");
             return worker.harvest(requestHarvest);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;
@@ -247,7 +247,7 @@ public class CSWService {
         try {
             logger.info("received SOAP transaction request");
             return worker.transaction(requestTransaction);
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
                 exVersion = version;

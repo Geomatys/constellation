@@ -49,7 +49,7 @@ import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Utils;
 import org.constellation.metadata.io.MetadataReader;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotools dependencies
@@ -87,7 +87,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws WebServiceException {
+    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws CstlServiceException {
         super(serviceID, configDirectory);
         this.reader = reader;
         if (create)
@@ -99,7 +99,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws WebServiceException {
+    public void createIndex() throws CstlServiceException {
         logger.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;

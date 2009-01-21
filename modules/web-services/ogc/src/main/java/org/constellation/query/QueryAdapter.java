@@ -36,7 +36,7 @@ import javax.xml.bind.JAXBException;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.util.TimeParser;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.ImmutableEnvelope;
@@ -82,7 +82,7 @@ public class QueryAdapter {
      * @param queryLayers A list of requested layer names
      * @param version The version of the WMS service.
      * @return The same list as provided if all layers are queryable.
-     * @throws WebServiceException if a layer is not queryable.
+     * @throws CstlServiceException if a layer is not queryable.
      *
      * @todo The method {@link Layer#isQueryable} is not valid. It should verify in the
      *       database if a layer is queryable, meaning if a layer is queryable by a
@@ -309,7 +309,7 @@ public class QueryAdapter {
      */
     public static ImmutableEnvelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs,
                     final String strElevation, final String strTime, final ServiceVersion version)
-                    throws IllegalArgumentException, WebServiceException {
+                    throws IllegalArgumentException, CstlServiceException {
 
         final CoordinateReferenceSystem horizontalCRS = CRS.getHorizontalCRS(crs);
         final VerticalCRS               verticalCRS;
@@ -333,7 +333,7 @@ public class QueryAdapter {
                 try{
                     values[index] = toDouble(tokens.nextToken());
                 } catch (NumberFormatException n) {
-                    throw new WebServiceException(n, INVALID_PARAMETER_VALUE, version);
+                    throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, version);
                 }
                 if (index >= 4) {
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
@@ -357,7 +357,7 @@ public class QueryAdapter {
             try{
                 elevation = QueryAdapter.toDouble(strElevation);
             } catch (NumberFormatException n) {
-                throw new WebServiceException(n, INVALID_PARAMETER_VALUE, version);
+                throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, version);
             }
             dimZ[0] = dimZ[1] = elevation;
 
@@ -374,7 +374,7 @@ public class QueryAdapter {
             try {
                 date = QueryAdapter.toDate(strTime);
             } catch (ParseException ex) {
-                throw new WebServiceException(ex, INVALID_PARAMETER_VALUE, version);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, version);
             }
 
             final TemporalCRS tCRS = CRS.getTemporalCRS(crs);

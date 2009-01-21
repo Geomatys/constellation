@@ -26,7 +26,7 @@ import org.opengis.util.CodeList;
  * @author Guihlem Legal
  * @author Cédric Briançon
  */
-public class WebServiceException extends Exception {
+public class CstlServiceException extends Exception {
     /**
      * The exception code.
      */
@@ -49,7 +49,7 @@ public class WebServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
-    public WebServiceException(final String message, final CodeList exceptionCode,
+    public CstlServiceException(final String message, final CodeList exceptionCode,
                                final ServiceVersion version)
     {
         this(message, exceptionCode, version, null);
@@ -62,7 +62,7 @@ public class WebServiceException extends Exception {
      * @param message The detail message.
      * @param exceptionCode The exception code.
      */
-    public WebServiceException(final String message, final CodeList exceptionCode)
+    public CstlServiceException(final String message, final CodeList exceptionCode)
     {
         this(message, exceptionCode, (String)null);
     }
@@ -75,7 +75,7 @@ public class WebServiceException extends Exception {
      * @param version The service version.
      * @param locator What causes the exception.
      */
-    public WebServiceException(final String message, final CodeList exceptionCode,
+    public CstlServiceException(final String message, final CodeList exceptionCode,
                                final ServiceVersion version, final String locator)
     {
         super(message);
@@ -92,7 +92,7 @@ public class WebServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param locator What causes the exception.
      */
-    public WebServiceException(final String message, final CodeList exceptionCode, final String locator)
+    public CstlServiceException(final String message, final CodeList exceptionCode, final String locator)
     {
         this(message, exceptionCode, null, locator);
     }
@@ -105,7 +105,7 @@ public class WebServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
-    public WebServiceException(final Exception cause, final CodeList exceptionCode)
+    public CstlServiceException(final Exception cause, final CodeList exceptionCode)
     {
         this(cause, exceptionCode, null);
     }
@@ -117,7 +117,7 @@ public class WebServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
-    public WebServiceException(final Exception cause, final CodeList exceptionCode,
+    public CstlServiceException(final Exception cause, final CodeList exceptionCode,
             final ServiceVersion version)
     {
         super(cause);
@@ -134,7 +134,7 @@ public class WebServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
-    public WebServiceException(final String message, final Exception cause,
+    public CstlServiceException(final String message, final Exception cause,
                                final CodeList exceptionCode,  final ServiceVersion version)
     {
         super(message, cause);

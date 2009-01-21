@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -73,26 +73,26 @@ public abstract class MetadataReader {
      * @return A marshallable metadata object.
      * @throws java.sql.SQLException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws WebServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
     
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public abstract List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws WebServiceException;
+    public abstract List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
     
     /**
      * Execute a SQL query and return the result as a List of identifier;
      * 
      * @param query
      * @return
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    public abstract List<String> executeEbrimSQLQuery(String SQLQuery) throws WebServiceException;
+    public abstract List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException;
     
     /**
      * Return all the entries from the database
      */
-    public abstract List<? extends Object> getAllEntries() throws WebServiceException;
+    public abstract List<? extends Object> getAllEntries() throws CstlServiceException;
     
     /**
      * Return the list of supported data types.

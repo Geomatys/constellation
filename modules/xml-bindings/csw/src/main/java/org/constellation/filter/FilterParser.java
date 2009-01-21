@@ -29,7 +29,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.apache.lucene.search.Filter;
 import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.CoordinatesType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
@@ -99,10 +99,10 @@ public abstract class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    public Line2D GMLlineToline2d(LineStringType GMLline) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
+    public Line2D GMLlineToline2d(LineStringType GMLline) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
         String CRSName = GMLline.getSrsName();
         if (CRSName == null) {
-            throw new WebServiceException("A CRS (coordinate Reference system) must be specified for the line.",
+            throw new CstlServiceException("A CRS (coordinate Reference system) must be specified for the line.",
                                           INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
@@ -140,10 +140,10 @@ public abstract class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
+    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
         String CRSName = GMLenvelope.getSrsName();
         if (CRSName == null) {
-            throw new WebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
+            throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
                                           INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
@@ -172,22 +172,22 @@ public abstract class FilterParser {
      * 
      * @return A GeneralDirectPosition.
      * 
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    protected GeneralDirectPosition GMLpointToGeneralDirectPosition(PointType GMLpoint) throws WebServiceException, NoSuchAuthorityCodeException, FactoryException {
+    protected GeneralDirectPosition GMLpointToGeneralDirectPosition(PointType GMLpoint) throws CstlServiceException, NoSuchAuthorityCodeException, FactoryException {
         
         String CRSName = GMLpoint.getSrsName();
 
         if (CRSName == null) {
-            throw new WebServiceException("A GML point must specify Coordinate Reference System.",
+            throw new CstlServiceException("A GML point must specify Coordinate Reference System.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
         //we get the coordinate of the point (if they are present)
         if (GMLpoint.getCoordinates() == null && GMLpoint.getPos() == null) {
-            throw new WebServiceException("A GML point must specify coordinates or direct position.",
+            throw new CstlServiceException("A GML point must specify coordinates or direct position.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
@@ -200,7 +200,7 @@ public abstract class FilterParser {
             while (tokens.hasMoreTokens()) {
                 final double value = parseDouble(tokens.nextToken());
                 if (index >= coordinates.length) {
-                    throw new WebServiceException("This service support only 2D point.",
+                    throw new CstlServiceException("This service support only 2D point.",
                             INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
                 coordinates[index++] = value;
@@ -209,7 +209,7 @@ public abstract class FilterParser {
             coordinates[0] = GMLpoint.getPos().getValue().get(0);
             coordinates[0] = GMLpoint.getPos().getValue().get(1);
         } else {
-            throw new WebServiceException("The GML pointis malformed.",
+            throw new CstlServiceException("The GML pointis malformed.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
         GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
@@ -221,14 +221,14 @@ public abstract class FilterParser {
     /**
      * Parses a value as a floating point.
      *
-     * @throws WebServiceException if the value can't be parsed.
+     * @throws CstlServiceException if the value can't be parsed.
      */
-    private double parseDouble(String value) throws WebServiceException {
+    private double parseDouble(String value) throws CstlServiceException {
         value = value.trim();
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
-            throw new WebServiceException("The value:" + value + " is not a valid double coordinate.",
+            throw new CstlServiceException("The value:" + value + " is not a valid double coordinate.",
                                          INVALID_PARAMETER_VALUE, "Coordinates");
         }
     }
@@ -381,13 +381,13 @@ public abstract class FilterParser {
     
     
     
-    public abstract Object getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws WebServiceException;
+    public abstract Object getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
     
-    protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException;
+    protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException;
     
-    protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException;
+    protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws CstlServiceException;
     
-    protected abstract Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException;
+    protected abstract Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws CstlServiceException;
     
 
 }

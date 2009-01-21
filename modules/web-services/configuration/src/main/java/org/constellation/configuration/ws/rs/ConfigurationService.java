@@ -51,7 +51,7 @@ import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -168,7 +168,7 @@ public class ConfigurationService extends WebService  {
                     marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
-                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
             }
@@ -188,7 +188,7 @@ public class ConfigurationService extends WebService  {
                     marshaller.marshal(cswConfigurer.addToIndex(service, id, identifiers), sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
-                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
             }
@@ -203,7 +203,7 @@ public class ConfigurationService extends WebService  {
                 if (CSWFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
                 } else {
-                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
             }
@@ -212,17 +212,17 @@ public class ConfigurationService extends WebService  {
                 if (CSWFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
                 } else {
-                     throw new WebServiceException("This specific CSW operation " + request + " is not activated",
+                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, version, "Request");
                 }
             }
             
             
-            throw new WebServiceException("The operation " + request + " is not supported by the service",
+            throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, version, "Request");
             
         
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             final String code = Utils.transformCodeName(ex.getExceptionCode().name());
             ServiceVersion v = ex.getVersion();
             if (v == null)
@@ -273,9 +273,9 @@ public class ConfigurationService extends WebService  {
      * 
      * @param request
      * @return
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws WebServiceException {
+    private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws CstlServiceException {
         LOGGER.info("update properties file requested");
         
         String service  = request.getService();
@@ -283,7 +283,7 @@ public class ConfigurationService extends WebService  {
         Map<String, String> newProperties = request.getProperties();
         
         if ( service == null) {
-            throw new WebServiceException("You must specify the service parameter.",
+            throw new CstlServiceException("You must specify the service parameter.",
                                               MISSING_PARAMETER_VALUE, version, "service");
         } else if (!serviceDirectory.keySet().contains(service)) {
             String msg = "Invalid value for the service parameter: " + service + '\n' +
@@ -291,16 +291,16 @@ public class ConfigurationService extends WebService  {
             for (String s: serviceDirectory.keySet()) {
                 msg = msg + s + ',';
             }
-            throw new WebServiceException(msg, MISSING_PARAMETER_VALUE, version, "service");
+            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, version, "service");
             
         }
         
         if (fileName == null) {
-             throw new WebServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, version, "fileName");
+             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, version, "fileName");
         }
         
         if (newProperties == null || newProperties.size() == 0) {
-             throw new WebServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
+             throw new CstlServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
                      version, "properties");
         }
         
@@ -313,13 +313,13 @@ public class ConfigurationService extends WebService  {
                 prop.put(key, newProperties.get(key));
             }
         } else {
-            throw new WebServiceException("The file does not exist: " + propertiesFile.getPath(),
+            throw new CstlServiceException("The file does not exist: " + propertiesFile.getPath(),
                                           NO_APPLICABLE_CODE, version);
         }
         try {
             Utils.storeProperties(prop, propertiesFile);
         } catch (IOException ex) {
-            throw new WebServiceException("IOException xhile trying to store the properties files.",
+            throw new CstlServiceException("IOException xhile trying to store the properties files.",
                                           NO_APPLICABLE_CODE, version);
         }
         
@@ -343,7 +343,7 @@ public class ConfigurationService extends WebService  {
             System.out.println("LAYER= " + layer);
             // TODO: implement upload action here.
             in.close();
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             //must never happen in normal case
             LOGGER.severe("Webservice exception while get the layer parameter");
             return new AcknowlegementType("failed", "Webservice exception while get the layer parameter");
@@ -363,8 +363,8 @@ public class ConfigurationService extends WebService  {
      * @todo Not implemented. This is just a placeholder where we can customize the
      *       download action for some users. Will probably be removed in a future version.
      */
-    private File downloadFile() throws WebServiceException {
-        throw new WebServiceException("Not implemented", NO_APPLICABLE_CODE, version);
+    private File downloadFile() throws CstlServiceException {
+        throw new CstlServiceException("Not implemented", NO_APPLICABLE_CODE, version);
     }
 
     /**

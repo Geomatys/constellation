@@ -48,7 +48,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.util.Utils;
 import org.constellation.ws.rs.OGCWebService;
@@ -268,7 +268,7 @@ public class GeoDRMService extends OGCWebService {
                 marshaller.marshal(obj, sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             } 
-        } catch (WebServiceException ex) {
+        } catch (CstlServiceException ex) {
             StringWriter sw = new StringWriter();
             final String code = Utils.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion());
@@ -293,7 +293,7 @@ public class GeoDRMService extends OGCWebService {
         return allowRequest(objectRequest);
     }
 
-    private Response sendRequest(Object objectRequest) throws WebServiceException, MalformedURLException {
+    private Response sendRequest(Object objectRequest) throws CstlServiceException, MalformedURLException {
         Object response = null;
         String contentType = "";
         try {
@@ -312,7 +312,7 @@ public class GeoDRMService extends OGCWebService {
                     
                     marshaller.marshal(objectRequest, sw);
                 } catch (JAXBException ex) {
-                    throw new WebServiceException("Unable to marshall the request: " + ex.getMessage(),
+                    throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                   NO_APPLICABLE_CODE, getActingVersion());
                 }
                 String XMLRequest = sw.toString();

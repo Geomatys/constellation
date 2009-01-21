@@ -36,7 +36,7 @@ import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
@@ -130,12 +130,12 @@ public abstract class OGCWebService extends WebService {
      *            case 1: VERSION parameter for WMS version and SLD_VERSION for sld version.
      *            case 2: VERSION parameter for sld version.
      *
-     * @throws org.constellation.coverage.web.WebServiceException
+     * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected void verifyBaseParameter(int sld) throws WebServiceException {
+    protected void verifyBaseParameter(int sld) throws CstlServiceException {
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + sldVersion + " must be specified",
+                throw new CstlServiceException("The parameter VERSION=" + sldVersion + " must be specified",
                                MISSING_PARAMETER_VALUE);
             } else {
                 return;
@@ -151,13 +151,13 @@ public abstract class OGCWebService extends WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
-            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED);
+            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
         } else {
             setActingVersion(inputVersion);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
+                throw new CstlServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
                                VERSION_NEGOTIATION_FAILED);
             }
         }
@@ -169,7 +169,7 @@ public abstract class OGCWebService extends WebService {
      * If the version is not accepted we send an exception.
      * </p>
      */
-    protected void isVersionSupported(String versionNumber) throws WebServiceException {
+    protected void isVersionSupported(String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             String message = "The parameter ";
             for (ServiceVersion vers : supportedVersions) {
@@ -177,7 +177,7 @@ public abstract class OGCWebService extends WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
-            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED);
+            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
         }
     }
 

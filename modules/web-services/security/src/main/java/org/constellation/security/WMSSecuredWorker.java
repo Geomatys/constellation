@@ -49,7 +49,7 @@ import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.wms.v130.WMSCapabilities;
 import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -156,7 +156,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer)
-            throws WebServiceException
+            throws CstlServiceException
     {
         performAccessControlDecision(descLayer);
 
@@ -168,7 +168,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities)
-            throws WebServiceException
+            throws CstlServiceException
     {
 
     	//TODO: getCaps doesn't follow this pattern.
@@ -187,7 +187,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      * {@inheritDoc}
      */
     @Override
-    public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException {
+    public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws CstlServiceException {
         logsAuthentication();
         performAccessControlDecision(getFeatureInfo);
 
@@ -198,7 +198,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException {
+    public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws CstlServiceException {
         logsAuthentication();
         performAccessControlDecision(getLegend);
 
@@ -209,7 +209,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+    public BufferedImage getMap(GetMap getMap) throws CstlServiceException {
         logsAuthentication();
     	performAccessControlDecision(getMap);
 
@@ -299,12 +299,12 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      *
      * @param query
      */
-    private void performAccessControlDecision(WMSQuery query) throws WebServiceException {
+    private void performAccessControlDecision(WMSQuery query) throws CstlServiceException {
         if (isUserInRole(ROLE.PUBLIC_ONE.toString())) {
             //This case should not happen, because the web.xml has defined users in this role
             //should receive an error 403 before.
             LOGGER.info("WMS-sec: user in role PUBLIC.");
-            throw new WebServiceException("You haven't enough credential to perform the query you have done.",
+            throw new CstlServiceException("You haven't enough credential to perform the query you have done.",
                     ExceptionCode.NO_APPLICABLE_CODE);
         }
 
@@ -328,7 +328,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
         }
         //No known role has been found
         LOGGER.info("WMS-sec: user is not in defined roles.");
-        throw new WebServiceException("Your user role is not defined. Please log in with a valid user.",
+        throw new CstlServiceException("Your user role is not defined. Please log in with a valid user.",
                     ExceptionCode.NO_APPLICABLE_CODE);
     }
 
@@ -352,9 +352,9 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
     /**
      * Write in logs that a user has processed with the authentication.
      *
-     * @throws WebServiceException
+     * @throws CstlServiceException
      */
-    private void logsAuthentication() throws WebServiceException {
+    private void logsAuthentication() throws CstlServiceException {
 //        if (WMSusesREST) {
 //            final Principal principal = securityContext.getUserPrincipal();
 //            final String userName = principal.getName();
@@ -365,14 +365,14 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 //            try {
 //                urlOpensso = new URL("http", "strabo.geomatys.fr", 10080, "opensso");
 //            } catch (MalformedURLException ex) {
-//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//                throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
 //            }
 //            final AuthContext authContext;
 //            try {
 //                authContext = new AuthContext("Geomatys", urlOpensso);
 //                authContext.login(AuthContext.IndexType.MODULE_INSTANCE, "Application");//Cedric was failing here
 //            } catch (AuthLoginException ex) {
-//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//                throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
 //            }
 //            if (authContext.hasMoreRequirements()) {
 //                LOGGER.info("WMS-sec: authority context has more requirements! Now filling in.");
@@ -383,14 +383,14 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
 //                }
 //            }
 //            if (!authContext.getStatus().equals(AuthContext.Status.SUCCESS)) {
-//                throw new WebServiceException("The status code of the AuthContext is not succes." +
+//                throw new CstlServiceException("The status code of the AuthContext is not succes." +
 //                        " Still lacking something in the log-in process", ExceptionCode.NO_APPLICABLE_CODE);
 //            }
 //            final SSOToken token;
 //            try {
 //                token = authContext.getSSOToken();
 //            } catch (Exception ex) {
-//                throw new WebServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
+//                throw new CstlServiceException(ex, ExceptionCode.NO_APPLICABLE_CODE);
 //            }
 //
 //            //Get the logger, now we have the token
@@ -430,10 +430,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      *                  into a Java WMS Capabilities object.
      * @return The WMS Capabilities object without its {@code <Capability>}
      *           block.
-     * @throws WebServiceException if the given WMS Capabilities type does not
+     * @throws CstlServiceException if the given WMS Capabilities type does not
      *                               match the types supported by this facade.
      */
-    private AbstractWMSCapabilities removeCapabilitiesInfo(final Object wmsCaps) throws WebServiceException {
+    private AbstractWMSCapabilities removeCapabilitiesInfo(final Object wmsCaps) throws CstlServiceException {
         if (wmsCaps instanceof WMT_MS_Capabilities) {
             final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) wmsCaps;
             org.constellation.wms.v111.Capability capability =
@@ -448,7 +448,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
             cap.setCapability(capability);
             return cap;
         }
-        throw new WebServiceException("Capabilities response is not valid, because it does not match" +
+        throw new CstlServiceException("Capabilities response is not valid, because it does not match" +
                 " with JAXB classes.", ExceptionCode.NO_APPLICABLE_CODE);
     }
 
@@ -461,10 +461,10 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
      *                  supported by this facade.
      * @return The WMS Capabilities object with an {@code <AccessConstraints>}
      *           block appropriate for the OGC service protected by this gateway.
-     * @throws WebServiceException if the given WMS Capabilities type does not
+     * @throws CstlServiceException if the given WMS Capabilities type does not
      *                               match the types supported by this facade.
      */
-    private AbstractWMSCapabilities addAccessConstraints(final Object wmsCaps) throws WebServiceException {
+    private AbstractWMSCapabilities addAccessConstraints(final Object wmsCaps) throws CstlServiceException {
         if (wmsCaps instanceof WMT_MS_Capabilities) {
             final WMT_MS_Capabilities cap = (WMT_MS_Capabilities) wmsCaps;
             cap.getService().setAccessConstraints("Require an authentication !");
@@ -475,7 +475,7 @@ public final class WmsSecuredWorker extends AbstractWMSWorker {
             cap.getService().setAccessConstraints("Require an authentication !");
             return cap;
         }
-        throw new WebServiceException("Capabilities response is not valid, because it does not match" +
+        throw new CstlServiceException("Capabilities response is not valid, because it does not match" +
                 " with JAXB classes.", ExceptionCode.NO_APPLICABLE_CODE);
     }
 }

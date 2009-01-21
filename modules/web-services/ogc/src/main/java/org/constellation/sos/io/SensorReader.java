@@ -19,7 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.logging.Logger;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -37,9 +37,9 @@ public abstract class SensorReader {
      *
      * @param sensorID The identifier of the sensor.
      * @return
-     * @throws org.constellation.ws.WebServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract AbstractSensorML getSensor(String sensorID) throws WebServiceException;
+    public abstract AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
     
     /**
      * Destroy and free the resource used by the reader.

@@ -8,18 +8,18 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 public interface WmsClient {
 
-    public DescribeLayerResponseType describeLayer(DescribeLayer descLayer) throws WebServiceException;
+    public DescribeLayerResponseType describeLayer(DescribeLayer descLayer) throws CstlServiceException;
 	
-	public AbstractWMSCapabilities getCapabilities( GetCapabilities getCapabilities) throws WebServiceException ;
+	public AbstractWMSCapabilities getCapabilities( GetCapabilities getCapabilities) throws CstlServiceException ;
 	
-	public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws WebServiceException ;
+	public String getFeatureInfo(GetFeatureInfo getFeatureInfo) throws CstlServiceException ;
 	
-	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws WebServiceException ;
+	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend) throws CstlServiceException ;
 	
-	public BufferedImage getMap(GetMap getMap) throws WebServiceException ;
+	public BufferedImage getMap(GetMap getMap) throws CstlServiceException ;
 }

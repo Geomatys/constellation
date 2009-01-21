@@ -28,7 +28,7 @@ import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -83,7 +83,7 @@ public class MDWebSensorReader extends SensorReader {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public MDWebSensorReader(Connection connection, String sensorIdBase, Properties map) throws WebServiceException  {
+    public MDWebSensorReader(Connection connection, String sensorIdBase, Properties map) throws CstlServiceException  {
         try {
             sensorMLConnection = connection;
             sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
@@ -97,14 +97,14 @@ public class MDWebSensorReader extends SensorReader {
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            throw new WebServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
     @Override
-    public AbstractSensorML getSensor(String sensorId) throws WebServiceException {
+    public AbstractSensorML getSensor(String sensorId) throws CstlServiceException {
         try {
             String dbId = map.getProperty(sensorId);
             if (dbId == null) {
@@ -118,7 +118,7 @@ public class MDWebSensorReader extends SensorReader {
             Form f = sensorMLReader.getForm(SMLCatalog, id);
 
             if (f == null) {
-                throw new WebServiceException("this sensor is not registered in the database!",
+                throw new CstlServiceException("this sensor is not registered in the database!",
                         INVALID_PARAMETER_VALUE, "procedure");
             }
             //we transform the form into an XML string
@@ -130,15 +130,15 @@ public class MDWebSensorReader extends SensorReader {
            if (unmarshalled instanceof AbstractSensorML)
                return (AbstractSensorML) unmarshalled;
            else
-              throw new WebServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
+              throw new CstlServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
         }
     }
     

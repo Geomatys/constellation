@@ -33,7 +33,7 @@ import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
 import org.geotools.factory.AbstractFactory;
@@ -54,7 +54,7 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
     
     public abstract int getProfile(int dbType);
     
-    public abstract AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws WebServiceException;
+    public abstract AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws CstlServiceException;
     
-    public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws WebServiceException;
+    public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws CstlServiceException;
 }

@@ -29,7 +29,7 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.security.wms.WmsRestClient;
 import org.constellation.security.wms.WmsSoapClient;
 import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
@@ -100,34 +100,34 @@ public class XacmlDispatcher {
 
 	
 	public DescribeLayerResponseType describeLayer(DescribeLayer descLayer)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	public AbstractWMSCapabilities getCapabilities(
-			GetCapabilities getCapabilities) throws WebServiceException {
+			GetCapabilities getCapabilities) throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	public String getFeatureInfo(GetFeatureInfo getFeatureInfo)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
 	public BufferedImage getLegendGraphic(GetLegendGraphic getLegend)
-			throws WebServiceException {
+			throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	
-	public BufferedImage getMap(GetMap getMap) throws WebServiceException {
+	public BufferedImage getMap(GetMap getMap) throws CstlServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}

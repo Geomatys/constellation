@@ -28,7 +28,7 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -44,7 +44,7 @@ public class FileSensorReader extends SensorReader {
 
     private File dataDirectory;
     
-    public FileSensorReader(File dataDirectory) throws WebServiceException  {
+    public FileSensorReader(File dataDirectory) throws CstlServiceException  {
         try {
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
@@ -53,12 +53,12 @@ public class FileSensorReader extends SensorReader {
             this.dataDirectory  = dataDirectory;
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new WebServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
         } 
     }
 
     @Override
-    public AbstractSensorML getSensor(String sensorId) throws WebServiceException {
+    public AbstractSensorML getSensor(String sensorId) throws CstlServiceException {
         File sensorFile = new File(dataDirectory, sensorId + ".xml");
         if (sensorFile.exists()){
             try {
@@ -69,14 +69,14 @@ public class FileSensorReader extends SensorReader {
                 if (unmarshalled instanceof AbstractSensorML) {
                     return (AbstractSensorML) unmarshalled;
                 } else {
-                    throw new WebServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
                 }
             } catch (JAXBException ex) {
                 ex.printStackTrace();
-                throw new WebServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
             }
         } else {
-            throw new WebServiceException("this sensor is not registered in the database!",
+            throw new CstlServiceException("this sensor is not registered in the database!",
                         INVALID_PARAMETER_VALUE, "procedure");
         }
     }

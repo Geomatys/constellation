@@ -19,7 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.logging.Logger;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.ws.WebServiceException;
+import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -32,18 +32,18 @@ public abstract class SensorWriter {
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
 
-    public abstract void writeSensor(String id, AbstractSensorML sensor) throws WebServiceException;
+    public abstract void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
     
-    public abstract void startTransaction() throws WebServiceException;
+    public abstract void startTransaction() throws CstlServiceException;
     
-    public abstract void abortTransaction() throws WebServiceException;
+    public abstract void abortTransaction() throws CstlServiceException;
     
-    public abstract void endTransaction() throws WebServiceException;
+    public abstract void endTransaction() throws CstlServiceException;
 
     /**
      * Create a new identifier for a sensor.
      */
-    public abstract int getNewSensorId() throws WebServiceException;
+    public abstract int getNewSensorId() throws CstlServiceException;
 
     public abstract void destroy();
 }
