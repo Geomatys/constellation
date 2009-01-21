@@ -31,7 +31,7 @@ import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.v300.InternationalStringType;
 import org.constellation.ebrim.v250.RegistryObjectType;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
 
 //geotools dependencies

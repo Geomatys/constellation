@@ -16,7 +16,6 @@
  */
 package org.constellation.ogc;
 
-import org.opengis.filter.Filter;
 import org.opengis.filter.Not;
 
 /**

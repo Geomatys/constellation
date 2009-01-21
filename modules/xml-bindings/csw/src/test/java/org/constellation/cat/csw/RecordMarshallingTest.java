@@ -555,12 +555,12 @@ public class RecordMarshallingTest {
         
         /*
          * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
-         */
+         
         typeNames          = new ArrayList<QName>();
         pname              = new PropertyNameType("title");
         pil                = new PropertyIsLikeType(pname, "something", null, null, null);
         n                  = new NotType(pil);
-        FilterType filter2 = new FilterType(n);
+        FilterType filter2 = new FilterType(n);*/
         
         QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(_Record_QNAME);
@@ -575,6 +575,8 @@ public class RecordMarshallingTest {
         GetRecordsType gres = (GetRecordsType)result;
         QueryType expQT = (QueryType) expResult.getAbstractQuery();
         QueryType resQT = (QueryType) gres.getAbstractQuery();
+
+        assertEquals(expQT.getConstraint().getFilter().getLogicOps().getValue(), resQT.getConstraint().getFilter().getLogicOps().getValue());
         assertEquals(expQT.getConstraint().getFilter(), resQT.getConstraint().getFilter());
         assertEquals(expQT.getConstraint(), resQT.getConstraint());
         assertEquals(expResult.getAbstractQuery(), gres.getAbstractQuery());

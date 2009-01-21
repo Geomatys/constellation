@@ -21,15 +21,21 @@ package org.constellation.metadata.factory;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.AbstractIndexSearcher;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexSearcher;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.WebServiceException;
+
+// Geotools dependencies
 import org.geotools.factory.AbstractFactory;
 
 /**

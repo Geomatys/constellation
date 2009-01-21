@@ -48,7 +48,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Utils;
 import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;

@@ -834,11 +834,16 @@ public class CQLParserTest {
         assertTrue(filter.getSpatialOps()    == null);
         
         spaQuery = filterParser.getLuceneQuery(filter);
-        
+
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 1);
-        
+
+        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
+        SpatialFilter f3 = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(f3 instanceof BBOXFilter);
+        assertTrue(f3.getGeometry() instanceof GeneralEnvelope);
+
         assertTrue(spaQuery.getSubQueries().get(0).getSpatialFilter() instanceof SerialChainFilter);
         chainFilter = (SerialChainFilter) spaQuery.getSubQueries().get(0).getSpatialFilter();
 
@@ -849,31 +854,20 @@ public class CQLParserTest {
         //we verify each filter
         assertTrue(chainFilter.getChain().get(0) instanceof SerialChainFilter);
         cf1 = (SerialChainFilter) chainFilter.getChain().get(0);
-        assertEquals(cf1.getChain().size(), 2);
+        assertEquals(cf1.getChain().size(), 1);
         assertEquals(cf1.getActionType().length,  1);
-        assertEquals(cf1.getActionType()[0],      SerialChainFilter.AND);
-        
-        assertTrue(cf1.getChain().get(0) instanceof SerialChainFilter);
-        SerialChainFilter cf1_cf1 = (SerialChainFilter) cf1.getChain().get(0);
-        assertEquals(cf1_cf1.getChain().size(), 1);
-        assertEquals(cf1_cf1.getActionType().length,  1);
-        assertEquals(cf1_cf1.getActionType()[0],      SerialChainFilter.NOT);
-        
-        assertTrue(cf1_cf1.getChain().get(0) instanceof SpatialFilter);
-        SpatialFilter cf1_cf1_1 = (SpatialFilter) cf1_cf1.getChain().get(0);
+        assertEquals(cf1.getActionType()[0],    SerialChainFilter.NOT);
+
+        assertTrue(cf1.getChain().get(0) instanceof SpatialFilter);
+        SpatialFilter cf1_cf1_1 = (SpatialFilter) cf1.getChain().get(0);
         assertTrue(cf1_cf1_1 instanceof IntersectFilter);
         assertTrue  (cf1_cf1_1.getGeometry() instanceof GeneralEnvelope);
-        
-        assertTrue(cf1.getChain().get(1) instanceof SpatialFilter);
-        f2 = (SpatialFilter) cf1.getChain().get(1);
+
+        assertTrue(chainFilter.getChain().get(1) instanceof SpatialFilter);
+        f2 = (SpatialFilter) chainFilter.getChain().get(1);
         assertTrue(f2 instanceof ContainsFilter);
         assertTrue  (f2.getGeometry() instanceof GeneralDirectPosition);
-        
-        assertTrue( chainFilter.getChain().get(1) instanceof SpatialFilter);
-        SpatialFilter f3 = (SpatialFilter) chainFilter.getChain().get(1);
-        assertTrue(f3 instanceof BBOXFilter);
-        assertTrue(f3.getGeometry() instanceof GeneralEnvelope);
-        
+
         /**
          * Test 5: three spatial Filter NOT (F1 OR F2) AND F3
          */
@@ -906,7 +900,7 @@ public class CQLParserTest {
         assertEquals(cf1.getActionType()[0],      SerialChainFilter.NOT);
         assertTrue(cf1.getChain().get(0) instanceof SerialChainFilter);
         
-        cf1_cf1 =  (SerialChainFilter) cf1.getChain().get(0);
+        SerialChainFilter cf1_cf1 =  (SerialChainFilter) cf1.getChain().get(0);
         assertEquals(cf1_cf1.getChain().size(),   2);
         assertEquals(cf1_cf1.getActionType().length,  1);
         assertEquals(cf1_cf1.getActionType()[0],      SerialChainFilter.OR);

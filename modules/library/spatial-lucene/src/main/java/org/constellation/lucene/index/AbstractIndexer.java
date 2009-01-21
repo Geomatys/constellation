@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index;
+package org.constellation.lucene.index;
 
 import java.io.File;
 import java.sql.SQLException;

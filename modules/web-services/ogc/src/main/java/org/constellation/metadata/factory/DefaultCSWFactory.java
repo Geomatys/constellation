@@ -21,13 +21,17 @@ package org.constellation.metadata.factory;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
-import org.constellation.metadata.index.AbstractIndexSearcher;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexSearcher;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.generic.GenericIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;

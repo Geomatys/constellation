@@ -35,7 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.ows.OWSExceptionCode.*;

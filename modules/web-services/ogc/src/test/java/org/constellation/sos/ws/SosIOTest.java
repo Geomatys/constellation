@@ -65,6 +65,8 @@ public class SosIOTest {
 
     private Marshaller marshaller;
 
+    private final boolean configFilesExist;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -95,12 +97,22 @@ public class SosIOTest {
         }
 
         File configDirectory1 = new File("sosDefaultConfig");
-        defaultWorker = new SOSworker(DISCOVERY, configDirectory1);
-        defaultWorker.setStaticCapabilities(staticCapabilities);
+        if (configDirectory1.exists()) {
+            defaultWorker = new SOSworker(DISCOVERY, configDirectory1);
+            defaultWorker.setStaticCapabilities(staticCapabilities);
+        } else {
+            configFilesExist = false;
+            return;
+        }
 
         File configDirectory2 = new File("sosGenericConfig");
-        genericWorker = new SOSworker(DISCOVERY, configDirectory2);
-        genericWorker.setStaticCapabilities(staticCapabilities);
+        if (configDirectory2.exists()) {
+            genericWorker = new SOSworker(DISCOVERY, configDirectory2);
+            genericWorker.setStaticCapabilities(staticCapabilities);
+            configFilesExist = true;
+        } else {
+            configFilesExist = false;
+        }
     }
 
     /**
@@ -109,36 +121,42 @@ public class SosIOTest {
      */
     @Test
     public void GetCapabilitiesTest() throws Exception {
-        GetCapabilities request = new GetCapabilities("1.0.0", "application/xml");
-        Capabilities expResult  = defaultWorker.getCapabilities(request);
-        Capabilities result     = genericWorker.getCapabilities(request);
+        if (configFilesExist) {
+            
+            GetCapabilities request = new GetCapabilities("1.0.0", "application/xml");
+            Capabilities expResult  = defaultWorker.getCapabilities(request);
+            Capabilities result     = genericWorker.getCapabilities(request);
 
-        marshaller.marshal(expResult, new File("expectedCapabilities.xml"));
-        marshaller.marshal(result, new File("resultCapabilities.xml"));
+            marshaller.marshal(expResult, new File("expectedCapabilities.xml"));
+            marshaller.marshal(result, new File("resultCapabilities.xml"));
+
+            List<ObservationOfferingEntry> expOfferingList = expResult.getContents().getObservationOfferingList().getObservationOffering();
+            List<ObservationOfferingEntry> resOfferingList = result.getContents().getObservationOfferingList().getObservationOffering();
+            assertEquals(expOfferingList.size(), resOfferingList.size());
+            for (int i = 0; i <expOfferingList.size(); i++) {
+                ObservationOfferingEntry expOffering = expOfferingList.get(i);
+                ObservationOfferingEntry resOffering = resOfferingList.get(i);
+
+                assertEquals(expOffering.getObservedProperty().size(),  resOffering.getObservedProperty().size());
+                assertEquals(expOffering.getObservedProperty(),  resOffering.getObservedProperty());
+                assertEquals(expOffering.getFeatureOfInterest(), resOffering.getFeatureOfInterest());
+                assertEquals(expOffering.getProcedure(),         resOffering.getProcedure());
+                assertEquals(expOffering.getTime(),         resOffering.getTime());
+                assertEquals(expOffering, resOffering);
+            }
+            assertEquals(expOfferingList, resOfferingList);
+
+            assertEquals(expResult.getContents().getObservationOfferingList(), result.getContents().getObservationOfferingList());
+            assertEquals(expResult.getContents(), result.getContents());
+            assertEquals(expResult.getFilterCapabilities(), result.getFilterCapabilities());
+            assertEquals(expResult.getOperationsMetadata(), result.getOperationsMetadata());
+            assertEquals(expResult.getServiceIdentification(), result.getServiceIdentification());
+            assertEquals(expResult.getServiceProvider(), result.getServiceProvider());
+            assertEquals(expResult, result);
         
-        List<ObservationOfferingEntry> expOfferingList = expResult.getContents().getObservationOfferingList().getObservationOffering();
-        List<ObservationOfferingEntry> resOfferingList = result.getContents().getObservationOfferingList().getObservationOffering();
-        assertEquals(expOfferingList.size(), resOfferingList.size());
-        for (int i = 0; i <expOfferingList.size(); i++) {
-            ObservationOfferingEntry expOffering = expOfferingList.get(i);
-            ObservationOfferingEntry resOffering = resOfferingList.get(i);
-
-            assertEquals(expOffering.getObservedProperty().size(),  resOffering.getObservedProperty().size());
-            assertEquals(expOffering.getObservedProperty(),  resOffering.getObservedProperty());
-            assertEquals(expOffering.getFeatureOfInterest(), resOffering.getFeatureOfInterest());
-            assertEquals(expOffering.getProcedure(),         resOffering.getProcedure());
-            assertEquals(expOffering.getTime(),         resOffering.getTime());
-            assertEquals(expOffering, resOffering);
+        } else {
+            logger.info("configuration files missing skipping test");
         }
-        assertEquals(expOfferingList, resOfferingList);
-
-        assertEquals(expResult.getContents().getObservationOfferingList(), result.getContents().getObservationOfferingList());
-        assertEquals(expResult.getContents(), result.getContents());
-        assertEquals(expResult.getFilterCapabilities(), result.getFilterCapabilities());
-        assertEquals(expResult.getOperationsMetadata(), result.getOperationsMetadata());
-        assertEquals(expResult.getServiceIdentification(), result.getServiceIdentification());
-        assertEquals(expResult.getServiceProvider(), result.getServiceProvider());
-        assertEquals(expResult, result);
 
     }
     /**
@@ -148,85 +166,91 @@ public class SosIOTest {
     @Test
     public void GetObservationTest() throws Exception {
 
-        TimePositionType beginPosition = new TimePositionType("2007-02-11T00:00:00.000-06:00");
-        TimePositionType endPosition = new TimePositionType("2007-02-12T00:00:00.000-06:00");
-        TimePeriodType period = new TimePeriodType(beginPosition, endPosition);
-        BinaryTemporalOpType tduring = new BinaryTemporalOpType(period);
-        EventTime timeFilter = new EventTime(null, null, tduring);
+        if (configFilesExist) {
+            
+            TimePositionType beginPosition = new TimePositionType("2007-02-11T00:00:00.000-06:00");
+            TimePositionType endPosition = new TimePositionType("2007-02-12T00:00:00.000-06:00");
+            TimePeriodType period = new TimePeriodType(beginPosition, endPosition);
+            BinaryTemporalOpType tduring = new BinaryTemporalOpType(period);
+            EventTime timeFilter = new EventTime(null, null, tduring);
 
-        GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-        ObservationCollectionEntry expResult = defaultWorker.getObservation(request);
-        ObservationCollectionEntry result    = genericWorker.getObservation(request);
+            ObservationCollectionEntry expResult = defaultWorker.getObservation(request);
+            ObservationCollectionEntry result    = genericWorker.getObservation(request);
 
-        assertEquals(expResult.getMember().size(), result.getMember().size());
-        ObservationEntry expObs = expResult.getMember().iterator().next();
-        ObservationEntry obs    = result.getMember().iterator().next();
-        assertEquals(expObs.getDefinition(), obs.getDefinition());
-        assertEquals(expObs.getDistribution(), obs.getDistribution());
-        assertEquals(expObs.getFeatureOfInterest(), obs.getFeatureOfInterest());
-        assertEquals(expObs.getName(), obs.getName());
-        assertEquals(expObs.getObservedProperty(), obs.getObservedProperty());
-        assertEquals(expObs.getProcedure(), obs.getProcedure());
-        assertEquals(expObs.getProcedureParameter(), obs.getProcedureParameter());
-        assertEquals(expObs.getProcedureTime(), obs.getProcedureTime());
-        assertEquals(expObs.getPropertyFeatureOfInterest(), obs.getPropertyFeatureOfInterest());
-        assertEquals(expObs.getPropertyObservedProperty(), obs.getPropertyObservedProperty());
-        assertEquals(expObs.getQuality(), obs.getQuality());
-        DataArrayEntry expRes = ((DataArrayPropertyType)expObs.getResult()).getDataArray();
-        DataArrayEntry res    = ((DataArrayPropertyType)obs.getResult()).getDataArray();
-        assertEquals(expRes.getEncoding(), res.getEncoding());
-        assertEquals(expRes.getValues(), res.getValues());
+            assertEquals(expResult.getMember().size(), result.getMember().size());
+            ObservationEntry expObs = expResult.getMember().iterator().next();
+            ObservationEntry obs    = result.getMember().iterator().next();
+            assertEquals(expObs.getDefinition(), obs.getDefinition());
+            assertEquals(expObs.getDistribution(), obs.getDistribution());
+            assertEquals(expObs.getFeatureOfInterest(), obs.getFeatureOfInterest());
+            assertEquals(expObs.getName(), obs.getName());
+            assertEquals(expObs.getObservedProperty(), obs.getObservedProperty());
+            assertEquals(expObs.getProcedure(), obs.getProcedure());
+            assertEquals(expObs.getProcedureParameter(), obs.getProcedureParameter());
+            assertEquals(expObs.getProcedureTime(), obs.getProcedureTime());
+            assertEquals(expObs.getPropertyFeatureOfInterest(), obs.getPropertyFeatureOfInterest());
+            assertEquals(expObs.getPropertyObservedProperty(), obs.getPropertyObservedProperty());
+            assertEquals(expObs.getQuality(), obs.getQuality());
+            DataArrayEntry expRes = ((DataArrayPropertyType)expObs.getResult()).getDataArray();
+            DataArrayEntry res    = ((DataArrayPropertyType)obs.getResult()).getDataArray();
+            assertEquals(expRes.getEncoding(), res.getEncoding());
+            assertEquals(expRes.getValues(), res.getValues());
 
-        assertTrue(expRes.getElementType() instanceof SimpleDataRecordEntry);
-        assertTrue(res.getElementType()    instanceof SimpleDataRecordEntry);
-        SimpleDataRecordEntry expElementType = (SimpleDataRecordEntry) expRes.getElementType();
-        SimpleDataRecordEntry resElementType = (SimpleDataRecordEntry) res.getElementType();
+            assertTrue(expRes.getElementType() instanceof SimpleDataRecordEntry);
+            assertTrue(res.getElementType()    instanceof SimpleDataRecordEntry);
+            SimpleDataRecordEntry expElementType = (SimpleDataRecordEntry) expRes.getElementType();
+            SimpleDataRecordEntry resElementType = (SimpleDataRecordEntry) res.getElementType();
 
-        assertEquals(expElementType.getBlockId(), resElementType.getBlockId());
-        assertEquals(expElementType.getDefinition(), resElementType.getDefinition());
-        assertEquals(expElementType.getId(), resElementType.getId());
-        assertEquals(expElementType.getField().size(), resElementType.getField().size());
-        
-        assertEquals(expElementType.getField(), resElementType.getField());
-        assertEquals(expElementType, resElementType);
+            assertEquals(expElementType.getBlockId(), resElementType.getBlockId());
+            assertEquals(expElementType.getDefinition(), resElementType.getDefinition());
+            assertEquals(expElementType.getId(), resElementType.getId());
+            assertEquals(expElementType.getField().size(), resElementType.getField().size());
 
-        assertEquals(expRes.getElementType(), res.getElementType());
+            assertEquals(expElementType.getField(), resElementType.getField());
+            assertEquals(expElementType, resElementType);
 
-        assertEquals(expRes.getElementCount(), res.getElementCount());
+            assertEquals(expRes.getElementType(), res.getElementType());
 
-        assertEquals(expRes, res);
-        assertEquals(expObs.getResult(), obs.getResult());
-        assertEquals(expObs, obs);
-        assertEquals(expResult.getMember(), result.getMember());
-        assertEquals(expResult, result);
+            assertEquals(expRes.getElementCount(), res.getElementCount());
 
-        GetObservation request2 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            assertEquals(expRes, res);
+            assertEquals(expObs.getResult(), obs.getResult());
+            assertEquals(expObs, obs);
+            assertEquals(expResult.getMember(), result.getMember());
+            assertEquals(expResult, result);
 
-        ObservationCollectionEntry expResult2 = defaultWorker.getObservation(request2);
-        ObservationCollectionEntry result2    = genericWorker.getObservation(request2);
+            GetObservation request2 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-        assertEquals(expResult2, result2);
+            ObservationCollectionEntry expResult2 = defaultWorker.getObservation(request2);
+            ObservationCollectionEntry result2    = genericWorker.getObservation(request2);
 
-        GetObservation request3 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.INLINE, null);
+            assertEquals(expResult2, result2);
 
-        ObservationCollectionEntry expResult3 = defaultWorker.getObservation(request3);
-        ObservationCollectionEntry result3    = genericWorker.getObservation(request3);
+            GetObservation request3 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.INLINE, null);
 
-        assertEquals(expResult3, result3);
+            ObservationCollectionEntry expResult3 = defaultWorker.getObservation(request3);
+            ObservationCollectionEntry result3    = genericWorker.getObservation(request3);
+
+            assertEquals(expResult3, result3);
 
 
 
-        TimePositionType position = new TimePositionType("2007-02-12T00:00:00.000-06:00");
-        TimeInstantType instant   = new TimeInstantType(position);
-        BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
-        timeFilter = new EventTime(tafter, null, null);
-        GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.INLINE, null);
+            TimePositionType position = new TimePositionType("2007-02-12T00:00:00.000-06:00");
+            TimeInstantType instant   = new TimeInstantType(position);
+            BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
+            timeFilter = new EventTime(tafter, null, null);
+            GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.INLINE, null);
 
-        ObservationCollectionEntry expResult4 = defaultWorker.getObservation(request4);
-        ObservationCollectionEntry result4    = genericWorker.getObservation(request4);
+            ObservationCollectionEntry expResult4 = defaultWorker.getObservation(request4);
+            ObservationCollectionEntry result4    = genericWorker.getObservation(request4);
 
-        assertEquals(expResult4, result4);
+            assertEquals(expResult4, result4);
+
+        } else {
+            logger.info("configuration files missing skipping test");
+        }
     }
 
     /**
@@ -237,35 +261,39 @@ public class SosIOTest {
     @Test
     public void GetResultTest() throws Exception {
 
-        TimePositionType beginPosition = new TimePositionType("2007-02-11T00:00:00.000-06:00");
-        TimePositionType endPosition   = new TimePositionType("2007-02-12T00:00:00.000-06:00");
-        TimePeriodType period          = new TimePeriodType(beginPosition, endPosition);
-        BinaryTemporalOpType tduring   = new BinaryTemporalOpType(period);
-        EventTime timeFilter           = new EventTime(null, null, tduring);
+        if (configFilesExist) {
+            TimePositionType beginPosition = new TimePositionType("2007-02-11T00:00:00.000-06:00");
+            TimePositionType endPosition   = new TimePositionType("2007-02-12T00:00:00.000-06:00");
+            TimePeriodType period          = new TimePeriodType(beginPosition, endPosition);
+            BinaryTemporalOpType tduring   = new BinaryTemporalOpType(period);
+            EventTime timeFilter           = new EventTime(null, null, tduring);
 
-        GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", observation_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-        ObservationCollectionEntry expResult1 = defaultWorker.getObservation(request);
-        ObservationCollectionEntry result1    = genericWorker.getObservation(request);
+            ObservationCollectionEntry expResult1 = defaultWorker.getObservation(request);
+            ObservationCollectionEntry result1    = genericWorker.getObservation(request);
 
-        assertEquals(expResult1, result1);
-        System.out.println("default template ID:" + expResult1.getMember().iterator().next().getName());
-        System.out.println("generic template ID:" + result1.getMember().iterator().next().getName());
+            assertEquals(expResult1, result1);
+            System.out.println("default template ID:" + expResult1.getMember().iterator().next().getName());
+            System.out.println("generic template ID:" + result1.getMember().iterator().next().getName());
 
-        TimePositionType position   = new TimePositionType("2007-02-11T00:00:00.000-06:00");
-        TimeInstantType instant     = new TimeInstantType(position);
-        BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
-        EventTime timeFilter2       = new EventTime(tafter, null, null);
+            TimePositionType position   = new TimePositionType("2007-02-11T00:00:00.000-06:00");
+            TimeInstantType instant     = new TimeInstantType(position);
+            BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
+            EventTime timeFilter2       = new EventTime(tafter, null, null);
 
-        List<EventTime> eventTime   = new ArrayList<EventTime>();
-        eventTime.add(timeFilter2);
-        GetResult GRrequest = new GetResult("urn:ogc:object:observationTemplate:BRGM:3-0", eventTime);
+            List<EventTime> eventTime   = new ArrayList<EventTime>();
+            eventTime.add(timeFilter2);
+            GetResult GRrequest = new GetResult("urn:ogc:object:observationTemplate:BRGM:3-0", eventTime);
 
-        GetResultResponse expResult2 = defaultWorker.getResult(GRrequest);
-        GetResultResponse result2    = genericWorker.getResult(GRrequest);
+            GetResultResponse expResult2 = defaultWorker.getResult(GRrequest);
+            GetResultResponse result2    = genericWorker.getResult(GRrequest);
 
-        System.out.println("RESULT:"  + expResult2.getResult().getValue());
-        assertEquals(expResult2, result2);
+            System.out.println("RESULT:"  + expResult2.getResult().getValue());
+            assertEquals(expResult2, result2);
 
+        } else {
+            logger.info("configuration files missing skipping test");
+        }
     }
 }

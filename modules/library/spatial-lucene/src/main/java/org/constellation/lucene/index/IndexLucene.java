@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.index;
+package org.constellation.lucene.index;
 
 // J2SE dependencies
 import java.io.File;

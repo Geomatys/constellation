@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.WebServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 

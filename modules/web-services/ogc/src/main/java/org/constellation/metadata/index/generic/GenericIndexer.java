@@ -46,7 +46,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
-import org.constellation.metadata.index.AbstractIndexer;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Utils;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.WebServiceException;

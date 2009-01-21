@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 
@@ -177,6 +178,52 @@ public class UnaryLogicOpType extends LogicOpsType {
             return spatialOps.getValue();
         else return null;
         
+    }
+
+     /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof UnaryLogicOpType) {
+            final UnaryLogicOpType that = (UnaryLogicOpType) object;
+
+            boolean comp = false;
+            if (this.comparisonOps != null && that.comparisonOps != null) {
+                comp = Utilities.equals(this.comparisonOps.getValue(), that.comparisonOps.getValue());
+            } else if (this.comparisonOps == null && that.comparisonOps == null)
+                comp = true;
+
+            boolean log = false;
+            if (this.logicOps != null && that.logicOps != null) {
+                log = Utilities.equals(this.logicOps.getValue(), that.logicOps.getValue());
+            } else if (this.logicOps == null && that.logicOps == null)
+                log = true;
+
+            boolean spa = false;
+            if (this.spatialOps != null && that.spatialOps != null) {
+                spa = Utilities.equals(this.spatialOps.getValue(), that.spatialOps.getValue());
+            } else if (this.spatialOps == null && that.spatialOps == null) {
+                spa = true;
+            }
+            /**
+             * TODO ID
+             */
+            return  comp && spa && log;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.comparisonOps != null ? this.comparisonOps.hashCode() : 0);
+        hash = 97 * hash + (this.spatialOps != null ? this.spatialOps.hashCode() : 0);
+        hash = 97 * hash + (this.logicOps != null ? this.logicOps.hashCode() : 0);
+        return hash;
     }
     
      @Override

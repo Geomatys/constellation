@@ -64,6 +64,16 @@
       <artifactId>gt-epsg-hsql</artifactId>
       <scope>runtime</scope>
     </dependency>
+     <dependency>
+       <groupId>org.constellation.web-services</groupId>
+       <artifactId>cstl-web-base</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+       <groupId>org.constellation.xml-bindings</groupId>
+       <artifactId>cstl-xml-ows</artifactId>
+       <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

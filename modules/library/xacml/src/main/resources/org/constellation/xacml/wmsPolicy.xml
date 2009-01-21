@@ -66,5 +66,5 @@
       </Condition>
     </Rule>
     <!-- If none of the rules apply, permit the request -->
-    <Rule Effect="Permit" RuleId="PermitRule"/>
+    <Rule Effect="Deny" RuleId="DefaultRule"/>
 </Policy>

@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Expression;
@@ -138,6 +139,40 @@ public class PropertyIsLikeType extends ComparisonOpsType implements PropertyIsL
      */
     public String getWildCard() {
         return wildCard;
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof PropertyIsLikeType) {
+            final PropertyIsLikeType that = (PropertyIsLikeType) object;
+
+
+            return Utilities.equals(this.escapeChar,   that.escapeChar)   &&
+                   Utilities.equals(this.literal,      that.literal)      &&
+                   Utilities.equals(this.matchCase,    that.matchCase)    &&
+                   Utilities.equals(this.propertyName, that.propertyName) &&
+                   Utilities.equals(this.singleChar,   that.singleChar)   &&
+                   Utilities.equals(this.wildCard,     that.wildCard);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + (this.propertyName != null ? this.propertyName.hashCode() : 0);
+        hash = 29 * hash + (this.literal != null ? this.literal.hashCode() : 0);
+        hash = 29 * hash + (this.escapeChar != null ? this.escapeChar.hashCode() : 0);
+        hash = 29 * hash + (this.matchCase != null ? this.matchCase.hashCode() : 0);
+        hash = 29 * hash + (this.singleChar != null ? this.singleChar.hashCode() : 0);
+        hash = 29 * hash + (this.wildCard != null ? this.wildCard.hashCode() : 0);
+        return hash;
     }
     
     @Override

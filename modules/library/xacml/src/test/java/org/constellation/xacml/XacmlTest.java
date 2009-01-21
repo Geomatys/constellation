@@ -735,27 +735,27 @@ public class XacmlTest {
         String requestURI   = "http://demo.geomatys.fr/constellation/WS/wms";
         
         //Check PERMIT condition
-        RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer3");
+        RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "BlueMarble");
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
-        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer4");
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "GetCapabilities");
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
-        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer2");
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "Caraibes");
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check DENY condition
-        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "layer1");
+        request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "wathever");
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check PERMIT condition
-        request = pep.createXACMLRequest(requestURI, user, grp_admin, "layer2");
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "Caraibes");
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
-        request = pep.createXACMLRequest(requestURI, user, grp_admin, "layer1");
+        request = pep.createXACMLRequest(requestURI, user, grp_admin, "BlueMarble");
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         

@@ -313,7 +313,6 @@ public class FilterType implements Filter {
             /**
              * TODO ID
              */
-            
             return  comp && spa && log;
         }
         return false;

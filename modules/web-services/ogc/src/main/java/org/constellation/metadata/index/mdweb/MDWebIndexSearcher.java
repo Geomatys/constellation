@@ -35,7 +35,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 // Constellation dependencies
-import org.constellation.metadata.index.AbstractIndexSearcher;
+import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.ws.WebServiceException;
 
 /**

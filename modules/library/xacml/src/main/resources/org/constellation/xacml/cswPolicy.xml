@@ -134,5 +134,6 @@
       </Condition>
     </Rule>
     <!-- If none of the rules apply, deny the request -->
+    <Rule Effect="Deny" RuleId="defaultRule"/>
 </Policy>
 

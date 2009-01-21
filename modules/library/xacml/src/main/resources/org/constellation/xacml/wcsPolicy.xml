@@ -11,7 +11,7 @@
              </Resource>
         </Resources>
     </Target>
-   <!-- <Rule Effect="Permit" RuleId="PublicLayerRule">
+    <Rule Effect="Permit" RuleId="PublicLayerRule">
         <Target>
              <Actions>
                  <Action>
@@ -58,8 +58,8 @@
                <SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role" />
              </Apply>
       </Condition>
-    </Rule>-->
+    </Rule>
     <!-- If none of the rules apply, permit the request -->
-    <Rule Effect="Permit" RuleId="PermitRule"/>
+    <Rule Effect="Deny" RuleId="DefaultRule"/>
 </Policy>
 
