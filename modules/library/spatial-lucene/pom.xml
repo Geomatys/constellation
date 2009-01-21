@@ -65,8 +65,8 @@
       <scope>runtime</scope>
     </dependency>
      <dependency>
-       <groupId>org.constellation.web-services</groupId>
-       <artifactId>cstl-web-base</artifactId>
+       <groupId>org.constellation.library</groupId>
+       <artifactId>cstl-lib-api</artifactId>
        <version>${project.version}</version>
     </dependency>
     <dependency>
