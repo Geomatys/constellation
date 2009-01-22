@@ -271,7 +271,7 @@ public class GeoDRMService extends OGCWebService {
         } catch (CstlServiceException ex) {
             StringWriter sw = new StringWriter();
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
             marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();
         }  catch (IOException ex) {
