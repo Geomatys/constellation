@@ -118,6 +118,11 @@
       <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-sos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 

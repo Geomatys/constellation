@@ -17,7 +17,6 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.observation.*;
 
 /**
  * Textual encoding of data.

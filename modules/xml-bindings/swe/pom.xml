@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Configuration of "wms" module from Constellation project.
-  Version: $Id$
+  Version: $Id: pom.xml 1168 2008-12-14 18:34:48Z acuster $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>cstl-xml-sos</artifactId>
+  <artifactId>cstl-xml-swe</artifactId>
   <packaging>jar</packaging>
-  <name>Sensor Observation Service binding</name>
+  <name>Sensor Web Enablement binding</name>
   <description>
-    XML bindings for the OGC Sensor Observation Service schema.
+    XML bindings for the OGC Sensor Web Enablement schema.
   </description>
 
 
@@ -72,17 +72,12 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-ogc</artifactId>
+      <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-ows</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-om</artifactId>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

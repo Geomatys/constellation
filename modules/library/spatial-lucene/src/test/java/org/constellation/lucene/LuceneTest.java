@@ -85,6 +85,12 @@ public class LuceneTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        File directory = new File("luceneTest");
+        if (directory.exists()) {
+            for (File f : directory.listFiles()) {
+                f.delete();
+            }
+        }
     }
 
     @Before

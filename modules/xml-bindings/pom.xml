@@ -74,6 +74,8 @@
     <module>metadata-FRA</module>
     <module>skos</module>
     <module>sensorML</module>
+    <module>swe</module>
+    <module>observation</module>
   </modules>
 
 </project>
