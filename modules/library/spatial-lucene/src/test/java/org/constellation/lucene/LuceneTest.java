@@ -90,6 +90,7 @@ public class LuceneTest {
             for (File f : directory.listFiles()) {
                 f.delete();
             }
+            directory.delete();
         }
     }
 
