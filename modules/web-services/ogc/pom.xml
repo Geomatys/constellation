@@ -94,7 +94,7 @@
     <!-- import of the other web-service modules-->
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-api</artifactId>
+      <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
