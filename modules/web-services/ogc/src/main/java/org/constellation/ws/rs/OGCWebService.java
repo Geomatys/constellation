@@ -213,7 +213,7 @@ public abstract class OGCWebService extends WebService {
     protected Object launchException(final String message, final String codeName, final String locator) {
         if (getActingVersion().isOWS()) {
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getActingVersion());
+            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getActingVersion().toString());
             return report;
         } else {
             final ExceptionCode code = ExceptionCode.valueOf(codeName);

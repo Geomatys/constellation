@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.ws.ServiceVersion;
 import org.geotools.util.Utilities;
 
 
@@ -80,7 +79,7 @@ public class ExceptionReport {
      * @param exceptionText 
      * @param exceptionCode
      */
-    public ExceptionReport(String exceptionText, String exceptionCode, String locator, ServiceVersion version) {
+    public ExceptionReport(String exceptionText, String exceptionCode, String locator, String version) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
         if (version != null)

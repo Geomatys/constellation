@@ -227,7 +227,7 @@ public class ConfigurationService extends WebService  {
             ServiceVersion v = ex.getVersion();
             if (v == null)
                 v = version;
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), ex.getVersion());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), v.toString());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                     !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
@@ -252,7 +252,7 @@ public class ConfigurationService extends WebService  {
     @Override
     protected Object launchException(final String message, final String codeName, final String locator) {
         final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, new ServiceVersion(ServiceType.OTHER, "1.0"));
+        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, "1.0");
         return report;
     }
 

@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -77,11 +76,10 @@ public class ExceptionReport {
      * @param exceptionText 
      * @param exceptionCode
      */
-    public ExceptionReport(String exceptionText, String exceptionCode, String locator, ServiceVersion version) {
+    public ExceptionReport(String exceptionText, String exceptionCode, String locator, String version) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
-        if (version != null)
-            this.version = version.toString();
+        this.version = version;
     }
     
     /**

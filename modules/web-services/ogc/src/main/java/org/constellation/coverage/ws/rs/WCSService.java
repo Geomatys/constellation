@@ -231,7 +231,7 @@ public class WCSService extends OGCWebService {
             final Object report;
             if (getActingVersion().isOWS()) {
                 final String code = Util.transformCodeName(ex.getExceptionCode().name());
-                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion());
+                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
             } else {
                 report = new ServiceExceptionReport(getActingVersion(),
                         new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));

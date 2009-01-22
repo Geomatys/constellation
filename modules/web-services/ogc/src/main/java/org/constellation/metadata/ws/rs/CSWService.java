@@ -398,7 +398,7 @@ public class CSWService extends OGCWebService {
                 ServiceVersion version = ex.getVersion();
                 if (version == null)
                     version = getActingVersion();
-                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);   
+                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(report, sw);
                 return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();

@@ -44,7 +44,7 @@ public class SOAPServiceException extends WebServiceException {
             
     public SOAPServiceException(String message, String code, String v) {
         super(message);
-        this.exception = new ExceptionReport(message, code, null, new ServiceVersion(ServiceType.OWS, v));
+        this.exception = new ExceptionReport(message, code, null,  v);
         
         this.setStackTrace(new StackTraceElement[0]);
     }

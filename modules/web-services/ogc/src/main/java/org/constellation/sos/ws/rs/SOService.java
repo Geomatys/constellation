@@ -183,7 +183,7 @@ public class SOService extends OGCWebService {
                     version = getActingVersion();
                 }
                 StringWriter sw = new StringWriter();
-                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
                 marshaller.marshal(report, sw);
                 return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
