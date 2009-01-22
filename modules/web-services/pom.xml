@@ -76,6 +76,8 @@
     <module>base</module>
     <module>configuration</module>
     <module>ogc</module>
+    <module>sos</module>
+    <module>csw</module>
   </modules>
 
 </project>
