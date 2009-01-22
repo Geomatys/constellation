@@ -70,11 +70,6 @@
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
-   <dependency>
-     <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-gml</artifactId>

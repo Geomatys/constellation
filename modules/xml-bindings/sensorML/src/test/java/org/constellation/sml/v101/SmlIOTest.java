@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 //constellation
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.sml.v101.Classification.ClassifierList.Classifier;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
@@ -42,7 +41,6 @@ import org.constellation.swe.v101.QuantityRange;
 import org.constellation.swe.v101.QuantityType;
 import org.constellation.swe.v101.TimeRange;
 import org.constellation.swe.v101.UomPropertyType;
-import org.constellation.util.Util;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -81,7 +79,7 @@ public class SmlIOTest {
         unmarshaller           = jbcontext.createUnmarshaller();
         marshaller             = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+//        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
 
     }
 
