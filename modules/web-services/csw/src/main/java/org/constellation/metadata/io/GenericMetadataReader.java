@@ -91,6 +91,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         dateFormats = new ArrayList<DateFormat>();
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
+        dateFormats.add(new SimpleDateFormat("yyyy"));
     }
     
     /**
