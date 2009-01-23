@@ -25,7 +25,6 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,9 +41,9 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
-import javax.naming.NamingException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
@@ -117,7 +116,7 @@ import org.constellation.wcs.v111.RangeType;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.rs.OGCWebService;
 
-// GeoAPI dependencies
+// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -125,10 +124,12 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.opengis.metadata.extent.GeographicBoundingBox;
 
+// GeoAPI dependencies
+import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.wcs.WCSQuery.*;
 
@@ -151,8 +152,10 @@ public class WCSService extends OGCWebService {
 
     /**
      * Build a new instance of the webService and initialise the JAXB marshaller.
+     *
+     * @throws JAXBException if the initialisation of the {@link JAXBContext} fails.
      */
-    public WCSService() throws JAXBException, SQLException, IOException, NamingException {
+    public WCSService() throws JAXBException {
         super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"), new ServiceVersion(ServiceType.WCS, "1.0.0"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -165,8 +168,9 @@ public class WCSService extends OGCWebService {
     /**
      * Treat the incoming request and call the right function.
      *
+     * @param objectRequest the request received.
      * @return an image or xml response.
-     * @throw JAXBException
+     * @throws JAXBException
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
@@ -253,7 +257,11 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Build a new GetCapabilities request from a kvp request
+     * Build a new {@linkplain AbstractGetCapabilities GetCapabilities} request from
+     * a kvp request.
+     *
+     * @return a marshallable GetCapabilities request.
+     * @throws CstlServiceException
      */
     private AbstractGetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
 
@@ -309,7 +317,11 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Build a new DescribeCoverage request from a kvp request
+     * Build a new {@linkplain AbstractDescribeCoverage DescribeCoverage} request from
+     * a kvp request.
+     *
+     * @return a marshallable DescribeCoverage request.
+     * @throws CstlServiceException
      */
     private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws CstlServiceException {
         if (getActingVersion().toString().equals("1.0.0")) {
@@ -520,7 +532,7 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Describe the capabilities and the layers available for the WMS service.
+     * Describe the capabilities and the layers available for the WCS service.
      *
      * @param abstractRequest The request done by the user.
      * @return a WCSCapabilities XML document describing the capabilities of this service.
@@ -774,9 +786,30 @@ public class WCSService extends OGCWebService {
 
 
     /**
-     * Web service operation
+     * Get the coverage values for a specific coverage specified.
+     * According to the output format chosen, the response could be an
+     * {@linkplain RenderedImage image} or data representation.
+     *
+     * @param abstractRequest The request done by the user.
+     * @return An {@linkplain RenderedImage image}, or a data representation.
+     *
+     * @throws JAXBException
+     * @throws CstlServiceException
      */
-    public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException, CstlServiceException {
+    public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException,
+                                                                      CstlServiceException
+    {
+        final String format;
+        final String coverage;
+        final GeneralEnvelope objEnv;
+        final CoordinateReferenceSystem crs;
+        final Dimension dimension;
+        final int width;
+        final int height;
+        final int depth;
+        final Double elevation;
+        final String time;
+
         final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
@@ -786,16 +819,7 @@ public class WCSService extends OGCWebService {
            setActingVersion(inputVersion);
         }
 
-        final String format;
-        final String coverage;
-        final GeneralEnvelope objEnv;
-        final CoordinateReferenceSystem crs;
-        final int width;
-        final int height;
-        final int depth;
-        Double elevation = null;
-        
-        String time = null;
+        // TODO: better handle those parameters
         String interpolation = null;
         String exceptions = null;
         String resx  = null;
@@ -859,15 +883,23 @@ public class WCSService extends OGCWebService {
             }
 
             if (domain.getTemporalSubset() != null) {
-                List<Object> timeSeq = domain.getTemporalSubset().getTimePositionOrTimePeriod();
-                for (Object obj:timeSeq) {
-                    if (obj instanceof TimePositionType)
+                final List<Object> timeSeq = domain.getTemporalSubset().getTimePositionOrTimePeriod();
+                // TODO: handle period values
+                if (timeSeq != null && !timeSeq.isEmpty()) {
+                    final Object obj = timeSeq.get(0);
+                    if (obj instanceof TimePositionType) {
                         time = ((TimePositionType)obj).getValue();
-                    else if (obj instanceof org.constellation.wcs.v111.TimePeriodType) {
+                    } else if (obj instanceof org.constellation.wcs.v111.TimePeriodType) {
                         throw new CstlServiceException("The service does not handle time Period type",
                                        INVALID_PARAMETER_VALUE, getActingVersion());
+                    } else {
+                        time = null;
                     }
+                } else {
+                    time = null;
                 }
+            } else {
+                time = null;
             }
             /*
              * Range subSet.
@@ -973,6 +1005,9 @@ public class WCSService extends OGCWebService {
             height = Integer.parseInt(getParameter(KEY_HEIGHT, false));
             exceptions = getParameter(KEY_EXCEPTIONS, false);
 
+            // TODO: get the elevation value from the third dimension of the BBOX3D
+            elevation = null;
+
         } else {
 
             // parameter for 1.0.0 version
@@ -989,23 +1024,28 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameters SOURCECOVERAGE have to be specified",
                                                  MISSING_PARAMETER_VALUE, getActingVersion(), "sourceCoverage");
             }
-            if (request.getInterpolationMethod() != null) {
-                interpolation = request.getInterpolationMethod().value();
-            }
+            interpolation = (request.getInterpolationMethod() != null) ?
+                interpolation = request.getInterpolationMethod().value() : null;
+
             exceptions = getParameter(KEY_EXCEPTIONS, false);
             if (request.getOutput().getCrs() != null){
                 responseCRS   = request.getOutput().getCrs().getValue();
             }
 
             //for now we only handle one time parameter with timePosition type
-            org.constellation.wcs.v100.TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet();
+            final org.constellation.wcs.v100.TimeSequenceType temporalSubset =
+                    request.getDomainSubset().getTemporalSubSet();
             if (temporalSubset != null) {
-                for (Object timeObj:temporalSubset.getTimePositionOrTimePeriod()){
-                    if (timeObj instanceof TimePositionType) {
-                        time  = ((TimePositionType)timeObj).getValue();
-                    }
+                final Object timeObj = temporalSubset.getTimePositionOrTimePeriod().get(0);
+                if (timeObj instanceof TimePositionType) {
+                    time = ((TimePositionType) timeObj).getValue();
+                } else {
+                    time = null;
                 }
+            } else {
+                time = null;
             }
+
             final SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
             final EnvelopeEntry env = spatial.getEnvelope();
             final String crsName = env.getSrsName();
@@ -1028,6 +1068,8 @@ public class WCSService extends OGCWebService {
             //      arbitrary choice.
             if (positions.size() > 2) {
                 elevation = positions.get(2).getValue().get(0);
+            } else {
+                elevation = null;
             }
 
             if (temporalSubset == null && positions.size() == 0) {
@@ -1073,7 +1115,7 @@ public class WCSService extends OGCWebService {
                     " date is compliant with the ISO-8601 standard.", ex);
         }
 
-        final Dimension dimension = new Dimension(width, height);
+        dimension = new Dimension(width, height);
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
@@ -1132,35 +1174,50 @@ public class WCSService extends OGCWebService {
 
 
     /**
-     * Web service operation
+     * <p>The DescribeCoverage operation returns an XML file, containing the complete
+     * description of a specific coverage.
+     * </p>
+     * <p>This method retrieves lots of supplementaries coverage definitions, and come
+     * in addition to the GetCapabilities operation.
+     * </p>
+     *
+     * @param abstractRequest a {@linkplain AbstractDescribeCoverage describe coverage request}
+     *                        done by the user.
+     * @return an XML document giving the full description of a coverage.
+     *
+     * @throws JAXBException
+     * @throws CstlServiceException
      */
-    public String describeCoverage(AbstractDescribeCoverage abstractRequest) throws JAXBException, CstlServiceException {
-        //throw new UnsupportedOperationException();
-        // TODO: fix it
+    public String describeCoverage(AbstractDescribeCoverage abstractRequest)
+                                  throws JAXBException, CstlServiceException
+    {
         LOGGER.info("describeCoverage request processing");
 
-        //we begin by extract the base attribute
+        //we begin by extracting the base attribute
         String inputVersion = abstractRequest.getVersion();
-        if(inputVersion == null) {
+        if (inputVersion == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
                            MISSING_PARAMETER_VALUE, getActingVersion(), "version");
         } else {
            isVersionSupported(inputVersion);
            setActingVersion(inputVersion);
         }
+
         //we prepare the response object to return
         Object response;
 
         if (getActingVersion().toString().equals("1.0.0")) {
-            org.constellation.wcs.v100.DescribeCoverage request = (org.constellation.wcs.v100.DescribeCoverage) abstractRequest;
+            final org.constellation.wcs.v100.DescribeCoverage request =
+                    (org.constellation.wcs.v100.DescribeCoverage) abstractRequest;
             if (request.getCoverage().size() == 0) {
                 throw new CstlServiceException("The parameter COVERAGE must be specified.",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "coverage");
             }
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getCoverage().get(0));
-            List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-            if (layer.getSeries().size() == 0) {
+            final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
+            final Set<Series> series = layer.getSeries();
+            if (series == null || series.isEmpty()) {
                 throw new CstlServiceException("The coverage " + layer.getName() + " is not defined.",
                         LAYER_NOT_DEFINED, getActingVersion());
             }
@@ -1171,7 +1228,7 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
             }
             final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
-            LonLatEnvelopeType llenvelope = null;
+            final LonLatEnvelopeType llenvelope;
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations;
                 try {
@@ -1195,16 +1252,20 @@ public class WCSService extends OGCWebService {
                 pos.add(new DirectPositionType(pos1));
                 pos.add(new DirectPositionType(pos2));
                 llenvelope = new LonLatEnvelopeType(pos, srsName);
+            } else {
+                throw new CstlServiceException("The geographic bbox for the layer is null !", NO_APPLICABLE_CODE);
             }
-            Keywords keywords = new Keywords("WCS", layer.getName(), Util.cleanSpecialCharacter(layer.getThematic()));
+            final Keywords keywords = new Keywords("WCS", layer.getName(),
+                    Util.cleanSpecialCharacter(layer.getThematic()));
 
             //Spatial metadata
-            org.constellation.wcs.v100.SpatialDomainType spatialDomain = new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
+            final org.constellation.wcs.v100.SpatialDomainType spatialDomain =
+                    new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
 
             // temporal metadata
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            List<Object> times = new ArrayList<Object>();
+            final List<Object> times = new ArrayList<Object>();
             final SortedSet<Date> dates;
             try {
                dates = layer.getAvailableTimes();
@@ -1214,24 +1275,24 @@ public class WCSService extends OGCWebService {
             for (Date d : dates) {
                 times.add(new TimePositionType(df.format(d)));
             }
-            org.constellation.wcs.v100.TimeSequenceType temporalDomain = new org.constellation.wcs.v100.TimeSequenceType(times);
+            final org.constellation.wcs.v100.TimeSequenceType temporalDomain =
+                    new org.constellation.wcs.v100.TimeSequenceType(times);
 
-            DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
+            final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
 
             //TODO complete
-            RangeSetType rangeSetT = new RangeSetType(null,
-                    layer.getName(),
+            final RangeSetType rangeSetT = new RangeSetType(null, layer.getName(),
                     layer.getName(),
                     null,
                     null,
                     null,
                     null);
-            RangeSet rangeSet = new RangeSet(rangeSetT);
+            final RangeSet rangeSet = new RangeSet(rangeSetT);
             //supported CRS
-            SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
+            final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
 
             // supported formats
-            Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
+            final Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
             formats.add(new CodeListType("matrix"));
             formats.add(new CodeListType("jpeg"));
             formats.add(new CodeListType("png"));
@@ -1243,17 +1304,19 @@ public class WCSService extends OGCWebService {
                 Series s = it.next();
                 nativeFormat = s.getFormat().getImageFormat();
             }
-            SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
+            final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
 
             //supported interpolations
-            List<org.constellation.wcs.v100.InterpolationMethod> interpolations = new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
+            final List<org.constellation.wcs.v100.InterpolationMethod> interpolations =
+                    new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
             interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
             interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
             interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
-            SupportedInterpolationsType supInt = new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+            final SupportedInterpolationsType supInt =
+                    new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
             //we build the coverage offering for this layer/coverage
-            CoverageOfferingType coverage = new CoverageOfferingType(null,
+            final CoverageOfferingType coverage = new CoverageOfferingType(null,
                     layer.getName(),
                     layer.getName(),
                     Util.cleanSpecialCharacter(layer.getRemarks()),
@@ -1278,8 +1341,8 @@ public class WCSService extends OGCWebService {
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getIdentifier().get(0));
 
-            org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
-            List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
+            final org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
+            final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             if (layer.getSeries().size() == 0) {
                 throw new CstlServiceException("the coverage " + layer.getName() +
                         " is not defined", LAYER_NOT_DEFINED, getActingVersion());
@@ -1310,21 +1373,22 @@ public class WCSService extends OGCWebService {
             }
 
             //general metadata
-            List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+            final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
             title.add(new LanguageStringType(layer.getName()));
-            List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();
+            final List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();
             _abstract.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
-            List<KeywordsType> keywords = new ArrayList<KeywordsType>();
+            final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
             keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                     new LanguageStringType(layer.getName())));
 
             // spatial metadata
-            org.constellation.wcs.v111.SpatialDomainType spatial = new org.constellation.wcs.v111.SpatialDomainType(bboxs);
+            final org.constellation.wcs.v111.SpatialDomainType spatial =
+                    new org.constellation.wcs.v111.SpatialDomainType(bboxs);
 
             // temporal metadata
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            List<Object> times = new ArrayList<Object>();
+            final List<Object> times = new ArrayList<Object>();
             final SortedSet<Date> dates;
             try {
                dates = layer.getAvailableTimes();
@@ -1334,33 +1398,38 @@ public class WCSService extends OGCWebService {
             for (Date d : dates) {
                 times.add(new TimePositionType(df.format(d)));
             }
-            org.constellation.wcs.v111.TimeSequenceType temporalDomain = new org.constellation.wcs.v111.TimeSequenceType(times);
+            final org.constellation.wcs.v111.TimeSequenceType temporalDomain =
+                    new org.constellation.wcs.v111.TimeSequenceType(times);
 
-            CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
+            final CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
 
             //supported interpolations
-            List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
-            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
-            intList.add(new InterpolationMethodType(org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-            InterpolationMethods interpolations = new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-            RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(layer.getThematic()),
+            final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
+            intList.add(new InterpolationMethodType(
+                    org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
+            intList.add(new InterpolationMethodType(
+                    org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
+            intList.add(new InterpolationMethodType(
+                    org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+            final InterpolationMethods interpolations =
+                    new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+            final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(layer.getThematic()),
                     null,
                     new org.constellation.ows.v110.CodeType("0.0"),
                     interpolations));
 
             //supported CRS
-            List<String> supportedCRS = new ArrayList<String>();
+            final List<String> supportedCRS = new ArrayList<String>();
             supportedCRS.add("EPSG:4326");
 
             //supported formats
-            List<String> supportedFormat = new ArrayList<String>();
+            final List<String> supportedFormat = new ArrayList<String>();
             supportedFormat.add("application/matrix");
             supportedFormat.add("image/png");
             supportedFormat.add("image/jpeg");
             supportedFormat.add("image/bmp");
             supportedFormat.add("image/gif");
-            CoverageDescriptionType coverage = new CoverageDescriptionType(title,
+            final CoverageDescriptionType coverage = new CoverageDescriptionType(title,
                     _abstract,
                     keywords,
                     layer.getName(),
