@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Configuration of "sec-services" module from Constellation project.
-  Version: $Id$
+  Version: $Id: pom.xml 1167 2008-12-14 17:30:42Z acuster $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -18,13 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-security</artifactId>
+  <artifactId>cstl-web-wcs</artifactId>
   <packaging>jar</packaging>
-  <name>Security web services</name>
+  <name>Web Coverage Service</name>
   <description>
-    Web service facades to standardized services such as OGC Web Services. The 
-    facades act as the Policy Enforcement Point (PEP) in the OASIS architectural 
-    model for access control described in the XACML and SAMLv2 specifications.
+    HTTP facade to an OGC Web Coverage Service (WCS).
   </description>
 
 
@@ -55,17 +53,6 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>cedricbr</id>
-      <name>Cédric Briançon</name>
-      <email>cedric.briancon@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
   </developers>
 
 
@@ -78,20 +65,6 @@
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-wms</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-wcs</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.opensso</groupId>
-      <artifactId>openssoclientsdk</artifactId>
     </dependency>
   </dependencies>
 
