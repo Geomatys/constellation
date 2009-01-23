@@ -21,7 +21,8 @@ import org.constellation.query.QueryService;
 
 
 /**
- * WCS Query in java objects
+ * Handle the service type of a WCS query.
+ * Contains constants for WCS requests in version 1.0.0 and 1.1.1.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -35,17 +36,13 @@ public abstract class WCSQuery extends Query {
     public static final String GETCOVERAGE = "GetCoverage";
     public static final String GETCAPABILITIES = "GetCapabilities";
 
-    /** Parameter used in getMap, getLegendGraphic, getCapabilities */
-    public static final String KEY_FORMAT = "FORMAT";
-    /** Parameter used in getMap, describeLayer */
-    public static final String KEY_LAYERS = "LAYERS";
     /** Parameter used in getCoverage 1.1.1 */ 
     public static final String KEY_IDENTIFIER = "IDENTIFIER";
     /** Parameter used in getCoverage 1.0.0 */ 
-    public static final String KEY_COVERAGE = "COVERAGE";
+    public static final String KEY_COVERAGE   = "COVERAGE";
 
     /** BBOX for getCoverage in version 1.1.1 */ 
-    public static final String KEY_BOUNDINGBOX = "BoundingBox";
+    public static final String KEY_BOUNDINGBOX = "BOUNDINGBOX";
     /** BBOX for getCoverage in version 1.1.1 */
     public static final String KEY_STORE = "STORE";
     /** Parameter used in getCapabilities 1.0.0 */ 
@@ -61,43 +58,46 @@ public abstract class WCSQuery extends Query {
     /** Parameter used in getCoverage 1.0.0 */ 
     public static final String KEY_RESPONSE_CRS = "RESPONSE_CRS";
     /** Parameter used in getCoverage */
-    public static final String KEY_WIDTH = "WIDTH";
+    public static final String KEY_WIDTH  = "WIDTH";
     /** Parameter used in getCoverage */
     public static final String KEY_HEIGHT = "HEIGHT";
     /** Parameter used in getCoverage */
-    public static final String KEY_DEPTH = "DEPTH";
+    public static final String KEY_DEPTH  = "DEPTH";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESX = "RESX";
+    public static final String KEY_RESX   = "RESX";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESY = "RESY";
+    public static final String KEY_RESY   = "RESY";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESZ = "RESZ";
+    public static final String KEY_RESZ   = "RESZ";
     /** Parameter used in getCoverage */
     public static final String KEY_INTERPOLATION = "INTERPOLATION";
 
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDCS = "GRIDCS";
+    public static final String KEY_GRIDCS      = "GRIDCS";
     /** Parameter used in getCoverage 1.1.1 */
     public static final String KEY_GRIDOFFSETS = "GRIDOFFSETS";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDORIGIN = "GRIDORIGIN";
+    public static final String KEY_GRIDORIGIN  = "GRIDORIGIN";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDTYPE = "GRIDTYPE";
+    public static final String KEY_GRIDTYPE    = "GRIDTYPE";
     /** Parameter used in getCoverage 1.1.1 */
     public static final String KEY_GRIDBASECRS = "GRIDBASECRS";
     /** Parameter used in getCoverage 1.1.1 */
     public static final String KEY_RANGESUBSET = "RANGESUBSET";
 
+    /** Parameter used in getCoverage */
+    public static final String KEY_FORMAT = "FORMAT";
     /** Format value used in getCoverage */
-    public static final String MATRIX = "MATRIX";
+    public static final String MATRIX     = "MATRIX";
     /** Format value used in getCoverage */
-    public static final String GEOTIFF = "GEOTIFF";
+    public static final String GEOTIFF    = "GEOTIFF";
     /** Format value used in getCoverage */
-    public static final String NETCDF = "NETCDF";
+    public static final String NETCDF     = "NETCDF";
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final QueryService getService() {
         return new QueryService.WCS();
     }

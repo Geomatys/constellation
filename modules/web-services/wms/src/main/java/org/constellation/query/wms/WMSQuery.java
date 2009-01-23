@@ -22,21 +22,23 @@ import org.constellation.ws.ServiceVersion;
 
 
 /**
- * WMS Query in java objects
+ * Handle the service type and the version of a WMS query.
+ * Contains constants for WMS requests in version 1.1.1 and 1.3.0
  *
  * @version $Id$
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public abstract class WMSQuery extends Query {
     /**
      * Request parameters.
      */
-    public static final String GETMAP = "GetMap";
-    public static final String GETFEATUREINFO = "GetFeatureInfo";
-    public static final String GETCAPABILITIES = "GetCapabilities";
-    public static final String DESCRIBELAYER = "DescribeLayer";
+    public static final String GETMAP           = "GetMap";
+    public static final String GETFEATUREINFO   = "GetFeatureInfo";
+    public static final String GETCAPABILITIES  = "GetCapabilities";
+    public static final String DESCRIBELAYER    = "DescribeLayer";
     public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
-    public static final String GETORIGFILE = "GetOrigFile";
+    public static final String GETORIGFILE      = "GetOrigFile";
 
     /** Parameter used in getMap, getLegendGraphic, getCapabilities */
     public static final String KEY_FORMAT = "FORMAT";
@@ -108,6 +110,7 @@ public abstract class WMSQuery extends Query {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final QueryService getService() {
         return new QueryService.WMS();
     }
@@ -119,6 +122,10 @@ public abstract class WMSQuery extends Query {
         this.version = version;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final ServiceVersion getVersion() {
         return version;
     }
