@@ -62,6 +62,44 @@
   -->
   <dependencies>
     <dependency>
+      <groupId>org.mdweb</groupId>
+      <artifactId>model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-temporal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-skos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-spatial-lucene</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-ebrim</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-csw</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-metadata-FRA</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>

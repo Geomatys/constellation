@@ -90,6 +90,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+     <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-xacml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>net.java.dev.opensso</groupId>
       <artifactId>openssoclientsdk</artifactId>
     </dependency>
