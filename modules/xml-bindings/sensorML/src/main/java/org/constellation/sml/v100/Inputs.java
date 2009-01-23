@@ -281,6 +281,45 @@ public class Inputs {
     }
 
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Inputs]").append("\n");
+        if (inputList != null) {
+            sb.append("inputList: ").append(inputList).append('\n');
+        }
+        if (nilReason != null) {
+            sb.append("nilReason:").append('\n');
+            for (String k : nilReason) {
+                sb.append("nilReason: ").append(k).append('\n');
+            }
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+    
     /**
      * <p>Java class for anonymous complex type.
      * 
@@ -370,6 +409,21 @@ public class Inputs {
             hash = 29 * hash + (this.input != null ? this.input.hashCode() : 0);
             hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
             return hash;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("[OutputList]").append("\n");
+            if ( id != null) {
+                sb.append("id: ").append(id).append('\n');
+            }
+            if (input != null) {
+                sb.append("outputList:").append('\n');
+                for (IoComponentPropertyType k : input) {
+                    sb.append("output: ").append(k).append('\n');
+                }
+            }
+            return sb.toString();
         }
     }
 }

@@ -70,11 +70,19 @@ public abstract class AbstractGMLEntry extends Entry{
         this.description = description;
         this.descriptionReference = descriptionReference;
     }
+
     /**
      * Gets the value of the description property.
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Gets the value of the description property.
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

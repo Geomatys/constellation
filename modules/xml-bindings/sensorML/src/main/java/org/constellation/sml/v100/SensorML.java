@@ -416,7 +416,7 @@ public class SensorML extends AbstractSensorML {
         "documentList",
         "contactList"
     })
-    public static class Member implements SMLMember{
+    public static class Member implements SMLMember {
 
         @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
         private JAXBElement<? extends AbstractProcessType> process;
