@@ -76,6 +76,17 @@ public class IndexLuceneTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        File configDirectory = new File("config-test");
+        if (configDirectory.exists()) {
+            File indexDirectory = new File(configDirectory, "index");
+            if (indexDirectory.exists()) {
+                for (File f : indexDirectory.listFiles()) {
+                    f.delete();
+                }
+                indexDirectory.delete();
+            }
+            configDirectory.delete();
+        }
     }
 
     @Before
