@@ -109,6 +109,19 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <!--  For the embedded service. -->
+    <dependency>
+        <groupId>com.sun.grizzly</groupId>
+        <artifactId>grizzly-servlet-webserver</artifactId>
+        <version>1.8.6.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-epsg-hsql</artifactId>
+        <version>${geotools.version}</version>
+    </dependency>
+    
   </dependencies>
 
 </project>
