@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 
-import org.constellation.coverage.catalog.Layer;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.util.TimeParser;
 import org.constellation.ws.CstlServiceException;

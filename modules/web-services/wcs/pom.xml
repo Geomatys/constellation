@@ -66,6 +66,21 @@
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-portrayal</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-wcs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

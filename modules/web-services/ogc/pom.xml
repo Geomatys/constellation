@@ -91,27 +91,12 @@
     </dependency>
     <dependency>
      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-wcs</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-wms</artifactId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-provider</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-portrayal</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- web service-->
@@ -130,19 +115,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-go2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-shapefile</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gt-sld</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-postgis</artifactId>
     </dependency>
     
   </dependencies>
