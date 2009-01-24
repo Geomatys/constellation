@@ -44,7 +44,11 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * Simple extractor that handle basic graphic types, Feature and Coverage
+ * A visitor which can be applied to the 
+ * {@link org.opengis.display.primitive.Graphic} objects of a scene and through 
+ * the {@code Graphic} objects, the the underlying 
+ * {@link org.opengis.feature.Feature} or 
+ * {@link org.opengis.coverage.grid.GridCoverage}.
  *
  * @author Johann Sorel (Geomatys)
  */
@@ -97,8 +101,11 @@ public abstract class AbstractGraphicVisitor implements GraphicVisitor {
     }
 
     /**
-     * Returns the datas of the given coverage.
-     * if can not calculate values, then returns null.
+     * Returns the data values of the given coverage, or {@code null} if the 
+     * values can not be obtained.
+     * 
+     * TODO: flesh out this explanation. Is the area clipped? what's with the 
+     * columns?
      *
      * first column is the value : Float
      * second column is the unit : Unit
@@ -203,7 +210,10 @@ public abstract class AbstractGraphicVisitor implements GraphicVisitor {
         return null;
 
     }
-
+    
+    /*
+     * TODO: This really, absolutely needs definition.
+     */
     public abstract String getResult();
 
 }
