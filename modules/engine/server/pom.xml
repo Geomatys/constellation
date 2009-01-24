@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "portrayal" module from Constellation project.
+  Configuration of the "server" engine module from Constellation project.
   Version: $Id$
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+                             
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
@@ -14,24 +17,30 @@
 
 
 
-  <!--
-    Module description.
-  -->
+  <!--  Module description.  -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-portrayal</artifactId>
+  <artifactId>cstl-engine-server</artifactId>
   <packaging>jar</packaging>
-  <name>Portrayal Service</name>
+  <name>Constellation Server Engine</name>
   <description>
-    Portrayal utility classes used for rendering operations in several web 
-    services using the GO-2 renderer.
+    The Engine of the Constellation server provides the full API needed by services.
   </description>
 
 
 
-  <!--
-    Developers and contributors.
-  -->
+  <!--  Developers and contributors.  -->
   <developers>
+    <developer>
+      <id>acuster</id>
+      <name>Adrian Custer</name>
+      <email>adrian.custerl@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
     <developer>
       <id>jsorel</id>
       <name>Johann Sorel</name>
@@ -50,6 +59,7 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
+    <!-- TODO: is this necessary? -->
     <dependency>
         <groupId>org.constellation.web-services</groupId>
         <artifactId>cstl-web-base</artifactId>

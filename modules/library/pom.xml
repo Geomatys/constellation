@@ -56,7 +56,6 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
-    <module>portrayal</module>
     <module>spatial-lucene</module>
     <module>xacml</module>
   </modules>

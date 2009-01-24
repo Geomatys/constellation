@@ -68,7 +68,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-portrayal</artifactId>
+      <artifactId>cstl-engine-server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
