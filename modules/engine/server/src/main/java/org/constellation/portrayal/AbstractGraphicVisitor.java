@@ -188,7 +188,7 @@ public abstract class AbstractGraphicVisitor implements GraphicVisitor {
             for(int i=0; i<values.length; i++){
                 final float value = values[i];
                 final GridSampleDimension sample = coverage.getSampleDimension(i);
-                final Unit unit = sample.getUnits();
+                final Unit<?> unit = sample.getUnits();
                 results[i][0] = value;
                 results[i][1] = unit;
                 return results;
