@@ -135,8 +135,15 @@ import static org.constellation.query.wcs.WCSQuery.*;
 
 
 /**
- * WCS 1.1.1 / 1.0.0
- * web service implementing the operation getCoverage, describeCoverage and getCapabilities.
+ * The Web Coverage Service (WCS) for Constellation, this service implements the 
+ * {@code GetCoverage}, {@code DescribeCoverage}, and {@code GetCapabilities} 
+ * methods of the Open Geospatial Consortium (OGC) specifications.
+ * <p>
+ * This service follows the specification sof the Open Geospatial Consortium 
+ * (OGC). As of Constellation 0.3, this Web Coverage Service complies with the 
+ * specification version 1.0.0 (OGC document 03-065r6) and mostly complies with
+ * specification version 1.1.1 (OGC document 06-083r8).
+ * </p>
  *
  * @version $Id$
  * @author Guilhem Legal
@@ -151,15 +158,19 @@ public class WCSService extends OGCWebService {
     private final static boolean CITE_TESTING = false;
 
     /**
-     * Build a new instance of the webService and initialise the JAXB marshaller.
+     * Build a new instance of the webService and initialize the JAXB marshaller.
      *
-     * @throws JAXBException if the initialisation of the {@link JAXBContext} fails.
+     * @throws JAXBException if the initialization of the {@link JAXBContext} fails.
      */
     public WCSService() throws JAXBException {
-        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"), new ServiceVersion(ServiceType.WCS, "1.0.0"));
+        
+        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"), 
+                     new ServiceVersion(ServiceType.WCS, "1.0.0"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.ws:org.constellation.wcs.v100:org.constellation.wcs.v111",
+        setXMLContext( "org.constellation.ws" +
+                      ":org.constellation.wcs.v100" +
+                      ":org.constellation.wcs.v111",
                       "http://www.opengis.net/wcs");
 
         LOGGER.info("WCS service running");
@@ -230,7 +241,7 @@ public class WCSService extends OGCWebService {
                 return getCoverage(gc);
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                    OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
+                                           OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
         } catch (CstlServiceException ex) {
             final Object report;
             if (getActingVersion().isOWS()) {
@@ -238,7 +249,8 @@ public class WCSService extends OGCWebService {
                 report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
             } else {
                 report = new ServiceExceptionReport(getActingVersion(),
-                        new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
+                                                    new ServiceExceptionType(ex.getMessage(), 
+                                                    (ExceptionCode) ex.getExceptionCode()));
             }
             
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
@@ -620,7 +632,7 @@ public class WCSService extends OGCWebService {
 
             /*
              * In WCS 1.0.0 the user can request only one section
-             * ( or all by ommiting the parameter section)
+             * ( or all by omitting the parameter section)
              */
             String section = request.getSection();
             String requestedSection = null;
@@ -663,6 +675,9 @@ public class WCSService extends OGCWebService {
                 return Response.ok(sw.toString(), format).build();
             }
         }
+        
+        //TODO: document by what circumstances we are here.
+        
         Contents contents = null;
         ContentMetadata contentMetadata = null;
 
@@ -673,19 +688,44 @@ public class WCSService extends OGCWebService {
         org.constellation.wcs.v111.ObjectFactory wcs111Factory = new org.constellation.wcs.v111.ObjectFactory();
         org.constellation.wcs.v100.ObjectFactory wcs100Factory = new org.constellation.wcs.v100.ObjectFactory();
         org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
+        
+        /* ****************************************************************** * 
+         *   TODO: change this to a call to Cst.REGISTER.get***(.) call.
+         * ****************************************************************** */
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
+        final Set<String> keys = dp.getKeys();
+        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+        for (String key : keys) {
+            final LayerDetails layer = dp.get(key);
+            if (layer == null) {
+                LOGGER.warning("Missing layer : " + key);
+                continue;
+            }
+            if (!layer.isQueryable(ServiceType.WCS)) {
+                LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
+                continue;
+            }
+            layerRefs.add(layer);
+        }
+        /* ****************************************************************** * 
+         *   TODO: change this to a call to Cst.REGISTER.get***(.) call.
+         * ****************************************************************** */
+        
         try {
-            final NamedLayerDP dp = NamedLayerDP.getInstance();
-            final Set<String> keys = dp.getKeys();
-            for (String key : keys) {
-                final LayerDetails layer = dp.get(key);
-                if (layer == null) {
-                    LOGGER.warning("Missing layer : " + key);
-                    continue;
-                }
-                if (!layer.isQueryable(ServiceType.WCS)) {
-                    LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
-                    continue;
-                }
+//            final NamedLayerDP dp = NamedLayerDP.getInstance();
+//            final Set<String> keys = dp.getKeys();
+//            for (String key : keys) {
+//                final LayerDetails layer = dp.get(key);
+//                if (layer == null) {
+//                    LOGGER.warning("Missing layer : " + key);
+//                    continue;
+//                }
+//                if (!layer.isQueryable(ServiceType.WCS)) {
+//                    LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
+//                    continue;
+//                }
+            for (LayerDetails layer: layerRefs){
+                
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(layer.getName()));
                 List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
@@ -756,9 +796,9 @@ public class WCSService extends OGCWebService {
              * TODO delete when overlapping problem is solved
              */
             if (CITE_TESTING) {
-		    CoverageSummaryType temp = summary.get(10);
-		    summary.remove(10);
-		    summary.add(0, temp);
+            CoverageSummaryType temp = summary.get(10);
+            summary.remove(10);
+            summary.add(0, temp);
             }
 
             contents        = new Contents(summary, null, null, null);
@@ -914,18 +954,29 @@ public class WCSService extends OGCWebService {
              *              - key
              */
             org.constellation.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
+            
+            
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
+            final NamedLayerDP dp = NamedLayerDP.getInstance();
+            final LayerDetails currentLayer = dp.get(coverage);
+            if (currentLayer == null) {
+                throw new CstlServiceException("The coverage requested is not found.",
+                                               INVALID_PARAMETER_VALUE, 
+                                               getActingVersion());
+            }
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
+            
+            
             if (rangeSubset != null) {
                 List<String> requestedField = new ArrayList<String>();
-                final NamedLayerDP dp = NamedLayerDP.getInstance();
                 for(org.constellation.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
-                    final LayerDetails currentLayer = dp.get(coverage);
-                    if (currentLayer == null) {
-                        throw new CstlServiceException("The coverage requested is not found.",
-                                INVALID_PARAMETER_VALUE, getActingVersion());
-                    }
                     if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
                         interpolation = field.getInterpolationType();
-
+                        
                         //we look that the same field is not requested two times
                         if (!requestedField.contains(field.getIdentifier())) {
                             requestedField.add(field.getIdentifier());
@@ -1116,13 +1167,21 @@ public class WCSService extends OGCWebService {
         }
 
         dimension = new Dimension(width, height);
+        
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
         if ( format.equalsIgnoreCase(MATRIX) ) {
+
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
             final NamedLayerDP dp    = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(coverage);
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
 
             final RenderedImage image;
             try {
@@ -1136,14 +1195,25 @@ public class WCSService extends OGCWebService {
 
             final String mime = "application/matrix";
             return Response.ok(image, mime).build();
+            
         } else if( format.equalsIgnoreCase(NETCDF) ){
+            
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation doesnt support netcdf writing."), NO_APPLICABLE_CODE, getActingVersion());
+            
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
+            
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation doesnt support geotiff writing."), NO_APPLICABLE_CODE, getActingVersion());
+            
         } else {
             // We are in the case of an image format requested.
+            /* ************************************************************** *
+             *   TODO: CLEAN UP THIS REQUEST PATTERN.
+             * ************************************************************** */
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
             BufferedImage image = null;
             final ReferencedEnvelope refEnv = new ReferencedEnvelope(objEnv);
             final List<String> coverages = new ArrayList<String>();
@@ -1155,6 +1225,9 @@ public class WCSService extends OGCWebService {
                 image = CSTLPortrayalService.getInstance().portray(
                         refEnv, 0, null, dimension, coverages, null, null, params, getActingVersion());
                 //WCSPortrayalAdapter.portray(abstractRequest);
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
             } catch (PortrayalException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                     image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
@@ -1213,8 +1286,16 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter COVERAGE must be specified.",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "coverage");
             }
+
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getCoverage().get(0));
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
+            
             final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
             final Set<Series> series = layer.getSeries();
             if (series == null || series.isEmpty()) {
@@ -1338,8 +1419,15 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "identifier");
             }
+
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
             final NamedLayerDP dp = NamedLayerDP.getInstance();
             final LayerDetails layer = dp.get(request.getIdentifier().get(0));
+            /* ************************************************************** * 
+             *   TODO: change this to use Cstl
+             * ************************************************************** */
 
             final org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
             final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
@@ -1482,9 +1570,7 @@ public class WCSService extends OGCWebService {
         }
     }
 
-    /**
-     * TODO
-     */
+    
     @PreDestroy
     @Override
     public void destroy() {

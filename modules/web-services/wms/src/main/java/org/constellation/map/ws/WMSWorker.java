@@ -44,6 +44,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
+import org.constellation.Cstl;
 import org.constellation.catalog.CatalogException;
 import org.constellation.map.ws.rs.CSVGraphicVisitor;
 import org.constellation.map.ws.rs.GMLGraphicVisitor;
@@ -109,7 +110,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @since 0.3
  */
 public class WMSWorker extends AbstractWMSWorker {
-	
+    
     /**
      * The default debugging logger for the WMS service.
      */
@@ -124,7 +125,7 @@ public class WMSWorker extends AbstractWMSWorker {
      * The web service marshaller, which will use the web service name space.
      */
     @SuppressWarnings("unused")
-	private final Marshaller marshaller;
+    private final Marshaller marshaller;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
@@ -138,6 +139,9 @@ public class WMSWorker extends AbstractWMSWorker {
 
     /**
      * Return a description of layers specified in the user's request.
+     * 
+     * TODO: Does this actually do anything? why does this never access LayerDetails?
+     * TODO: Is this broken?
      *
      * @param descLayer The {@linkplain DescribeLayer describe layer} request.
      *
@@ -168,13 +172,22 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
+        
         final ServiceVersion queryVersion = getCapab.getVersion();
-
-        //we build the list of accepted crs
+        
+        
+        //Add accepted CRS codes
         final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");     crs.add("CRS:84");  crs.add("EPSG:3395");
-        crs.add("EPSG:27571"); crs.add("EPSG:27572"); crs.add("EPSG:27573"); crs.add("EPSG:27574");
-        //we update the url in the static part.
+        crs.add("EPSG:4326");  
+        crs.add("CRS:84");     
+        crs.add("EPSG:3395");
+        crs.add("EPSG:27571"); 
+        crs.add("EPSG:27572"); 
+        crs.add("EPSG:27573"); 
+        crs.add("EPSG:27574");
+        
+        
+        //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
             inCapabilities = (AbstractWMSCapabilities) getCapabilitiesObject(getCapab.getVersion(),
@@ -194,12 +207,16 @@ public class WMSWorker extends AbstractWMSWorker {
         updateURL(request.getGetFeatureInfo().getDCPType(), url);
         updateURL(request.getGetMap().getDCPType(), url);
         updateExtendedOperationURL(request, queryVersion, url);
-
-        //we get the list of layers
-        final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
-
+        
+        
+        
+        /* ****************************************************************** * 
+         *   TODO: make this call Cstl.*
+         * ****************************************************************** */
+//        final List<LayerDetails> layerRefs = Cstl.REGISTER.getLayerReferencesForWMS();
         final NamedLayerDP dp = NamedLayerDP.getInstance();
         final Set<String> keys = dp.getKeys();
+        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (String key : keys) {
             final LayerDetails layer = dp.get(key);
             if (layer == null) {
@@ -210,6 +227,16 @@ public class WMSWorker extends AbstractWMSWorker {
                 LOGGER.info("layer" + layer.getName() + " not queryable by WMS");
                 continue;
             }
+            layerRefs.add(layer);
+        }
+        /* ****************************************************************** * 
+         *   TODO: make this call Cstl.                                       *
+         * ****************************************************************** */
+        
+
+        //Build the list of layers
+        final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
+        for (LayerDetails layer : layerRefs){
             /*
              *  TODO
              * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
@@ -231,7 +258,7 @@ public class WMSWorker extends AbstractWMSWorker {
             try {
                 dates = layer.getAvailableTimes();
             } catch (CatalogException ex) {
-                LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ key, ex);
+                LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ layer.getName(), ex);
                 dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
@@ -252,7 +279,7 @@ public class WMSWorker extends AbstractWMSWorker {
             try {
                 elevations = layer.getAvailableElevations();
             } catch (CatalogException ex) {
-                LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ key, ex);
+                LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ layer.getName(), ex);
                 elevations = null;
             }
             if (elevations != null && !(elevations.isEmpty())) {
@@ -274,13 +301,13 @@ public class WMSWorker extends AbstractWMSWorker {
 
             //the dimension range
             defaut = null;
-            final MeasurementRange[] ranges = layer.getSampleValueRanges();
+            final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
             /* If the layer has only one sample dimension, then we can apply the dim_range
              * parameter. Otherwise it can be a multiple sample dimensions layer, and we
              * don't apply the dim_range.
              */
             if (ranges != null && ranges.length == 1 && ranges[0] != null) {
-                final MeasurementRange firstRange = ranges[0];
+                final MeasurementRange<?> firstRange = ranges[0];
                 final double minRange = firstRange.getMinimum();
                 final double maxRange = firstRange.getMaximum();
                 defaut = minRange + "," + maxRange;
@@ -295,9 +322,11 @@ public class WMSWorker extends AbstractWMSWorker {
             }
 
             // LegendUrl generation
+            //TODO: Use a StringBuilder or two
             final String layerName = layer.getName();
             final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
-                    "VERSION=1.1.0&FORMAT=";
+                                                    "VERSION=1.1.0&" +
+                                                    "FORMAT=";
             final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
             final int queryable = (layer.isQueryable(ServiceType.GETINFO) == true) ? 1 : 0;
@@ -460,54 +489,6 @@ public class WMSWorker extends AbstractWMSWorker {
     }
 
     /**
-     * Return the value of a point in a map.
-     *
-     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
-     * @return text, HTML , XML or GML code.
-     *
-     * @throws CstlServiceException
-     */
-    @Override
-    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws CstlServiceException {
-
-        String infoFormat = gfi.getInfoFormat();
-        if (infoFormat == null) {
-            //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
-            infoFormat = TEXT_PLAIN;
-        }
-
-        final AbstractGraphicVisitor visitor;
-
-        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
-            // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor(gfi);
-        } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
-            // TEXT / HTML
-            visitor = new HTMLGraphicVisitor(gfi);
-        } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                   infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                   infoFormat.equalsIgnoreCase(GML))
-        {
-            // GML
-            visitor = new GMLGraphicVisitor(gfi);
-        } else {
-            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
-                    "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
-                    ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
-                    INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
-        }
-
-        // We now build the response, according to the format chosen.
-        try {
-            WMSPortrayalAdapter.hit(gfi, visitor);
-        } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
-        }
-
-        return visitor.getResult();
-    }
-
-    /**
      * Return a file located in the home directory. In this implementation, it should be
      * the WEB-INF directory of the deployed service.
      *
@@ -522,68 +503,6 @@ public class WMSWorker extends AbstractWMSWorker {
          if (fileName != null)
             return new File(path, fileName);
          else return path;
-    }
-
-    /**
-     * Return the legend graphic for the current layer.
-     * <p>If no width or height have been specified, a default output
-     * size is adopted (140x15 pixels).</p>
-     *
-     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
-     * @return a file containing the legend graphic image.
-     *
-     * @throws CstlServiceException
-     */
-    @Override
-    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
-        final ServiceVersion version = getLegend.getVersion();
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final LayerDetails layer = dp.get(getLegend.getLayer());
-        if (layer == null) {
-            throw new CstlServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
-                    version, "layer");
-        }
-        final Integer width  = getLegend.getWidth();
-        final Integer height = getLegend.getHeight();
-        final Dimension dims = new Dimension((width == null) ? 140 : width,
-                                             (height == null) ? 15 : height);
-        return layer.getLegendGraphic(dims);
-    }
-
-    /**
-     * Return a map for the specified parameters in the query.
-     *
-     * @param getMap The {@linkplain GetMap get map} request.
-     * @return The map requested, or an error.
-     *
-     * @throws CstlServiceException
-     */
-    @Override
-    public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
-        final ServiceVersion queryVersion = getMap.getVersion();
-        final String errorType = getMap.getExceptionFormat();
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
-
-        BufferedImage image = null;
-        try {
-            image = WMSPortrayalAdapter.portray(getMap);
-        } catch (PortrayalException ex) {
-            if (errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
-            }
-        } catch (CstlServiceException ex) {
-            if (errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
-            } else {
-                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
-            }
-        }
-
-        return image;
     }
 
     /**
@@ -633,6 +552,117 @@ public class WMSWorker extends AbstractWMSWorker {
            if (op != null)
                 updateURL(op.getDCPType(), url);
         }
+    }
+
+    /**
+     * Return the value of a point in a map.
+     *
+     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
+     * @return text, HTML , XML or GML code.
+     *
+     * @throws CstlServiceException
+     */
+    @Override
+    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws CstlServiceException {
+
+        String infoFormat = gfi.getInfoFormat();
+        if (infoFormat == null) {
+            //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
+            infoFormat = TEXT_PLAIN;
+        }
+
+        final AbstractGraphicVisitor visitor;
+
+        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
+            // TEXT / PLAIN
+            visitor = new CSVGraphicVisitor(gfi);
+        } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
+            // TEXT / HTML
+            visitor = new HTMLGraphicVisitor(gfi);
+        } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
+                   infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+                   infoFormat.equalsIgnoreCase(GML))
+        {
+            // GML
+            visitor = new GMLGraphicVisitor(gfi);
+        } else {
+            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
+                    "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
+                    ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
+                    INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
+        }
+
+        // We now build the response, according to the format chosen.
+        try {
+            WMSPortrayalAdapter.hit(gfi, visitor);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
+        }
+
+        return visitor.getResult();
+    }
+
+    /**
+     * Return the legend graphic for the current layer.
+     * <p>If no width or height have been specified, a default output
+     * size is adopted (140x15 pixels).</p>
+     *
+     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
+     * @return a file containing the legend graphic image.
+     *
+     * @throws CstlServiceException
+     */
+    @Override
+    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
+        final ServiceVersion version = getLegend.getVersion();
+        final NamedLayerDP dp = NamedLayerDP.getInstance();
+        final LayerDetails layer = dp.get(getLegend.getLayer());
+        if (layer == null) {
+            throw new CstlServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
+                    version, "layer");
+        }
+        final Integer width  = getLegend.getWidth();
+        final Integer height = getLegend.getHeight();
+        final Dimension dims = new Dimension((width == null) ? 140 : width,
+                                             (height == null) ? 15 : height);
+        return layer.getLegendGraphic(dims);
+    }
+
+    /**
+     * Return a map for the specified parameters in the query.
+     *
+     * @param getMap The {@linkplain GetMap get map} request.
+     * @return The map requested, or an error.
+     *
+     * @throws CstlServiceException
+     */
+    @Override
+    public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
+        
+        final ServiceVersion queryVersion = getMap.getVersion();
+        final String errorType = getMap.getExceptionFormat();
+        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
+
+        BufferedImage image;
+        try {
+            image = WMSPortrayalAdapter.portray(getMap);
+        } catch (PortrayalException ex) {
+            if (errorInImage) {
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+            } else {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+            }
+        } catch (CstlServiceException ex) {
+            if (errorInImage) {
+                final Dimension dim = getMap.getSize();
+                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+            } else {
+                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
+            }
+        }
+
+        return image;
     }
 
 }

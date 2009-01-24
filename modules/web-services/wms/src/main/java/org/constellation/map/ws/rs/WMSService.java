@@ -85,7 +85,7 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Path("wms")
 @Singleton
 public class WMSService extends OGCWebService {
-	
+    
     /**
      * The worker which will perform the core logic for this service.
      */
