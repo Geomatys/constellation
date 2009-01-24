@@ -18,7 +18,7 @@
 
 
   <!--  Module description.  -->
-  <groupId>org.constellation.library</groupId>
+  <groupId>org.constellation.engine</groupId>
   <artifactId>cstl-engine-server</artifactId>
   <packaging>jar</packaging>
   <name>Constellation Server Engine</name>
@@ -60,11 +60,6 @@
   -->
   <dependencies>
     <!-- TODO: is this necessary? -->
-    <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-base</artifactId>
-        <version>${project.version}</version>
-    </dependency>
     <dependency>
         <groupId>org.constellation.storage</groupId>
         <artifactId>cstl-store-provider</artifactId>
