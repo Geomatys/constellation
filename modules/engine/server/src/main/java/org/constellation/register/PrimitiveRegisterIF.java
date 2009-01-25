@@ -28,10 +28,13 @@ import org.constellation.provider.LayerDetails;
  * a way of isolating the engine and documenting the functionality which will be 
  * needed.
  * <p>
- * <b>THIS IS A TEMPORARY INTERFACE!<b>
+ * <b>THIS IS A TEMPORARY INTERFACE!<b><br/>
+ * This interface is in the right place and our code should work through such 
+ * an interface but we have not actually designed anything yet. These methods
+ * exist only because we need them---we have no larger view of how to proceed.
  * </p>
  * 
- * @author acuster
+ * @author Adrian Custer (Geomatys)
  * @since 0.3
  *
  */

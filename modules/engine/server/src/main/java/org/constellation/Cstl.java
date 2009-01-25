@@ -17,10 +17,10 @@
 
 package org.constellation;
 
-import org.constellation.portrayal.CstlPortrayalService;
 import org.constellation.portrayal.PortrayalServiceIF;
-import org.constellation.register.PrimitiveRegister;
+import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.register.PrimitiveRegisterIF;
+import org.constellation.register.internal.PrimitiveRegister;
 
 /**
  * The root class of the Constellation server Engine, this class provides the
@@ -31,6 +31,7 @@ import org.constellation.register.PrimitiveRegisterIF;
  * </p>
  * 
  * @author Adrian Custer
+ * @since 0.3
  *
  */
 public final class Cstl {

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.portrayal;
+package org.constellation.portrayal.internal;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.constellation.portrayal.AbstractGraphicVisitor;
+import org.constellation.portrayal.Portrayal;
+import org.constellation.portrayal.PortrayalServiceIF;
 import org.constellation.provider.LayerDetails;
 import org.geotools.display.canvas.BufferedImageCanvas2D;
 import org.geotools.display.canvas.CanvasController2D;
@@ -48,10 +51,15 @@ import org.opengis.referencing.operation.TransformException;
 
 /**
  * Service class to portray or work with two dimensional scenes defined by a 
- * view definition, a canvas definition and a scene definition.
+ * scene definition, a view definition, and a canvas definition.
+ * <p>
+ * <b>Users should *not* call this class directly.</b><br/>
+ * Instead, the {@link Cstl.Portrayal} reference should be used.
+ * </p>
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @see Cst.Portrayal
  * @see Portrayal
  */
 public class CstlPortrayalService extends DefaultPortrayalService implements PortrayalServiceIF {

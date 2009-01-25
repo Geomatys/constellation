@@ -28,7 +28,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
 /**
- * Useful data structures for the portrayal system.
+ * Data structures used to simply method calls in the portrayal system.
  * 
  * @author Adrian Custer (Geomatys)
  * @since 0.3

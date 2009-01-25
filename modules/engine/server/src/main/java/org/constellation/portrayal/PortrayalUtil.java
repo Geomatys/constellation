@@ -30,6 +30,11 @@ import org.geotools.style.MutableStyle;
 
 /**
  * Utility methods for the Portrayal system.
+ * <p>
+ * <b>Waring</b><br/>
+ * None of these methods are currently used. This class is currently a 
+ * place holder and may be removed soon.
+ * </p>
  * 
  * @author Adrian Custer (Geomatys)
  * @since 0.3

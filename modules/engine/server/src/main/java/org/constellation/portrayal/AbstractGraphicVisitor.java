@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * A visitor which can be applied to the 
  * {@link org.opengis.display.primitive.Graphic} objects of a scene and through 
- * the {@code Graphic} objects, the the underlying 
+ * the {@code Graphic} objects, to the underlying 
  * {@link org.opengis.feature.Feature} or 
  * {@link org.opengis.coverage.grid.GridCoverage}.
  *

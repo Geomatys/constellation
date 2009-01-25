@@ -19,6 +19,12 @@ package org.constellation;
 
 /**
  * All the services known by Constellation, as a Name:Version pair.
+ * <p>
+ * <b>WARNING</b><br/>
+ * This class duplicates versionning information which is held elsewhere; this 
+ * will probably die a sudden death in the near future once we can review the 
+ * various systems in place.
+ * </p>
  * 
  * @author Adrian Custer (Geomatys)
  *

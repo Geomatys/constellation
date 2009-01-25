@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.register;
+package org.constellation.register.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +24,21 @@ import java.util.Set;
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerDP;
+import org.constellation.register.PrimitiveRegisterIF;
+import org.constellation.register.RegisterException;
 
 /**
  * First attempt at a Register, we merely want something functional for now.
+ * <p>
+ * <b>Users should not user this class directly!</b><br/>
+ * Instead, users should call {@link Cstl.Portrayal} and work through the 
+ * interface.
+ * </p>
  * 
  * 
  * @author Adrian Custer (Geomatys)
+ * @since 0.3
+ * @see Cstl.Portrayal
  *
  */
 public final class PrimitiveRegister implements PrimitiveRegisterIF {
