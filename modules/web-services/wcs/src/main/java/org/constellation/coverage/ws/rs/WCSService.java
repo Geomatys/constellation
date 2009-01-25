@@ -117,7 +117,6 @@ import org.constellation.ows.v110.SectionsType;
 import org.constellation.ows.v110.ServiceIdentification;
 import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.ows.v110.WGS84BoundingBoxType;
-import org.constellation.portrayal.CstlPortrayalService;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.query.QueryAdapter;
@@ -1230,10 +1229,10 @@ public class WCSService extends OGCWebService {
             // IMAGE
             BufferedImage img;
             try {
-                img = CstlPortrayalService.getInstance().portray(sdef, vdef, cdef);
+                img = Cstl.Portrayal.portray(sdef, vdef, cdef);
             } catch (PortrayalException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
-                    img = CstlPortrayalService.getInstance().writeInImage(ex, dimension);
+                    img = Cstl.Portrayal.writeInImage(ex, dimension);
                 } else {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
                 }

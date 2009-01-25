@@ -52,7 +52,6 @@ import org.constellation.map.ws.rs.CSVGraphicVisitor;
 import org.constellation.map.ws.rs.GMLGraphicVisitor;
 import org.constellation.map.ws.rs.HTMLGraphicVisitor;
 import org.constellation.portrayal.AbstractGraphicVisitor;
-import org.constellation.portrayal.CstlPortrayalService;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.query.wms.DescribeLayer;
@@ -674,7 +673,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
         // We now build the response, according to the format chosen.
         try {
-        	CstlPortrayalService.getInstance().visit(sdef,vdef,cdef,selectionArea,visitor);
+        	Cstl.Portrayal.visit(sdef,vdef,cdef,selectionArea,visitor);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getFI.getVersion());
         }
@@ -733,7 +732,7 @@ public class WMSWorker extends AbstractWMSWorker {
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
-                return CstlPortrayalService.getInstance().writeInImage(ex, getMap.getSize());
+                return Cstl.Portrayal.writeInImage(ex, getMap.getSize());
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
@@ -791,10 +790,10 @@ public class WMSWorker extends AbstractWMSWorker {
         // 4. IMAGE
         BufferedImage image;
         try {
-            image = CstlPortrayalService.getInstance().portray(sdef, vdef, cdef);;
+            image = Cstl.Portrayal.portray(sdef, vdef, cdef);;
         } catch (PortrayalException ex) {
             if (errorInImage) {
-                return CstlPortrayalService.getInstance().writeInImage(ex, getMap.getSize() );
+                return Cstl.Portrayal.writeInImage(ex, getMap.getSize() );
             } else {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
