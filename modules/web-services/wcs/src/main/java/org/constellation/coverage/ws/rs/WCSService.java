@@ -18,7 +18,51 @@
 package org.constellation.coverage.ws.rs;
 
 // J2SE dependencies
-import com.sun.jersey.spi.resource.Singleton;
+import static org.constellation.query.Query.APP_XML;
+import static org.constellation.query.Query.EXCEPTIONS_INIMAGE;
+import static org.constellation.query.Query.KEY_EXCEPTIONS;
+import static org.constellation.query.Query.KEY_REQUEST;
+import static org.constellation.query.Query.KEY_SERVICE;
+import static org.constellation.query.Query.KEY_VERSION;
+import static org.constellation.query.Query.TEXT_XML;
+import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
+import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
+import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
+import static org.constellation.query.wcs.WCSQuery.GETCOVERAGE;
+import static org.constellation.query.wcs.WCSQuery.KEY_BBOX;
+import static org.constellation.query.wcs.WCSQuery.KEY_BOUNDINGBOX;
+import static org.constellation.query.wcs.WCSQuery.KEY_COVERAGE;
+import static org.constellation.query.wcs.WCSQuery.KEY_CRS;
+import static org.constellation.query.wcs.WCSQuery.KEY_DEPTH;
+import static org.constellation.query.wcs.WCSQuery.KEY_FORMAT;
+import static org.constellation.query.wcs.WCSQuery.KEY_GRIDBASECRS;
+import static org.constellation.query.wcs.WCSQuery.KEY_GRIDCS;
+import static org.constellation.query.wcs.WCSQuery.KEY_GRIDOFFSETS;
+import static org.constellation.query.wcs.WCSQuery.KEY_GRIDORIGIN;
+import static org.constellation.query.wcs.WCSQuery.KEY_GRIDTYPE;
+import static org.constellation.query.wcs.WCSQuery.KEY_HEIGHT;
+import static org.constellation.query.wcs.WCSQuery.KEY_IDENTIFIER;
+import static org.constellation.query.wcs.WCSQuery.KEY_INTERPOLATION;
+import static org.constellation.query.wcs.WCSQuery.KEY_RANGESUBSET;
+import static org.constellation.query.wcs.WCSQuery.KEY_RESPONSE_CRS;
+import static org.constellation.query.wcs.WCSQuery.KEY_RESX;
+import static org.constellation.query.wcs.WCSQuery.KEY_RESY;
+import static org.constellation.query.wcs.WCSQuery.KEY_RESZ;
+import static org.constellation.query.wcs.WCSQuery.KEY_SECTION;
+import static org.constellation.query.wcs.WCSQuery.KEY_STORE;
+import static org.constellation.query.wcs.WCSQuery.KEY_TIME;
+import static org.constellation.query.wcs.WCSQuery.KEY_TIMESEQUENCE;
+import static org.constellation.query.wcs.WCSQuery.KEY_WIDTH;
+import static org.constellation.query.wcs.WCSQuery.MATRIX;
+import static org.constellation.query.wcs.WCSQuery.NETCDF;
+import static org.constellation.ws.ExceptionCode.INVALID_CRS;
+import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
+import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
+import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
+
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -40,6 +84,7 @@ import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
+
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -47,14 +92,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
-// Constellation dependencies
+import org.constellation.Cstl;
+import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -64,36 +105,31 @@ import org.constellation.gml.v311.GridLimitsType;
 import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.RectifiedGridType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.util.Util;
 import org.constellation.ows.AbstractGetCapabilities;
+import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;
-import org.constellation.ows.v110.LanguageStringType;
-import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ows.v110.KeywordsType;
-import org.constellation.ows.v110.WGS84BoundingBoxType;
+import org.constellation.ows.v110.LanguageStringType;
 import org.constellation.ows.v110.OperationsMetadata;
 import org.constellation.ows.v110.SectionsType;
 import org.constellation.ows.v110.ServiceIdentification;
 import org.constellation.ows.v110.ServiceProvider;
-import org.constellation.portrayal.CSTLPortrayalService;
+import org.constellation.ows.v110.WGS84BoundingBoxType;
+import org.constellation.portrayal.CstlPortrayalService;
+import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.QueryAdapter;
+import org.constellation.register.RegisterException;
+import org.constellation.util.Util;
 import org.constellation.wcs.AbstractDescribeCoverage;
 import org.constellation.wcs.AbstractGetCoverage;
-import org.constellation.wcs.v111.Capabilities;
 import org.constellation.wcs.v100.ContentMetadata;
 import org.constellation.wcs.v100.CoverageDescription;
-import org.constellation.wcs.v111.Contents;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
 import org.constellation.wcs.v100.CoverageOfferingType;
-import org.constellation.wcs.v111.CoverageSummaryType;
-import org.constellation.wcs.v100.WCSCapabilityType.Request;
 import org.constellation.wcs.v100.DCPTypeType;
-import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
-import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
 import org.constellation.wcs.v100.DomainSetType;
 import org.constellation.wcs.v100.Keywords;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
@@ -104,19 +140,28 @@ import org.constellation.wcs.v100.SupportedCRSsType;
 import org.constellation.wcs.v100.SupportedFormatsType;
 import org.constellation.wcs.v100.SupportedInterpolationsType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;
+import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
+import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
+import org.constellation.wcs.v100.WCSCapabilityType.Request;
+import org.constellation.wcs.v111.Capabilities;
+import org.constellation.wcs.v111.Contents;
 import org.constellation.wcs.v111.CoverageDescriptionType;
 import org.constellation.wcs.v111.CoverageDescriptions;
 import org.constellation.wcs.v111.CoverageDomainType;
+import org.constellation.wcs.v111.CoverageSummaryType;
 import org.constellation.wcs.v111.FieldType;
 import org.constellation.wcs.v111.GridCrsType;
 import org.constellation.wcs.v111.InterpolationMethodType;
 import org.constellation.wcs.v111.InterpolationMethods;
-import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
 import org.constellation.wcs.v111.RangeType;
+import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.ServiceExceptionReport;
+import org.constellation.ws.ServiceExceptionType;
+import org.constellation.ws.ServiceType;
+import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
-
-// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -124,14 +169,11 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-
-// GeoAPI dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import static org.constellation.ws.ExceptionCode.*;
-import static org.constellation.query.wcs.WCSQuery.*;
+import com.sun.jersey.spi.resource.Singleton;
 
 
 /**
@@ -353,7 +395,8 @@ public class WCSService extends OGCWebService {
 
         String resx = getParameter(KEY_RESX, false);
         String resy = getParameter(KEY_RESY, false);
-        String resz = getParameter(KEY_RESZ, false);
+        @SuppressWarnings("unused")
+		String resz = getParameter(KEY_RESZ, false);
 
         if (getActingVersion().toString().equals("1.0.0")) {
             // temporal subset
@@ -647,7 +690,7 @@ public class WCSService extends OGCWebService {
             }
             WCSCapabilitiesType staticCapabilities = null;
             try {
-                staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getStaticCapabilitiesObject()).getValue();
+                staticCapabilities = (WCSCapabilitiesType)((JAXBElement<?>)getStaticCapabilitiesObject()).getValue();
             } catch(IOException e)   {
                 throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                                INVALID_PARAMETER_VALUE, getActingVersion());
@@ -689,41 +732,12 @@ public class WCSService extends OGCWebService {
         org.constellation.wcs.v100.ObjectFactory wcs100Factory = new org.constellation.wcs.v100.ObjectFactory();
         org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
         
-        /* ****************************************************************** * 
-         *   TODO: change this to a call to Cst.REGISTER.get***(.) call.
-         * ****************************************************************** */
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final Set<String> keys = dp.getKeys();
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        for (String key : keys) {
-            final LayerDetails layer = dp.get(key);
-            if (layer == null) {
-                LOGGER.warning("Missing layer : " + key);
-                continue;
-            }
-            if (!layer.isQueryable(ServiceType.WCS)) {
-                LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
-                continue;
-            }
-            layerRefs.add(layer);
-        }
-        /* ****************************************************************** * 
-         *   TODO: change this to a call to Cst.REGISTER.get***(.) call.
-         * ****************************************************************** */
+        
+        //NOTE: ADRIAN HACKED HERE
+        final List<LayerDetails> layerRefs = getAllLayerReferences();
+        
         
         try {
-//            final NamedLayerDP dp = NamedLayerDP.getInstance();
-//            final Set<String> keys = dp.getKeys();
-//            for (String key : keys) {
-//                final LayerDetails layer = dp.get(key);
-//                if (layer == null) {
-//                    LOGGER.warning("Missing layer : " + key);
-//                    continue;
-//                }
-//                if (!layer.isQueryable(ServiceType.WCS)) {
-//                    LOGGER.info("layer" + layer.getName() + " not queryable by WCS");
-//                    continue;
-//                }
             for (LayerDetails layer: layerRefs){
                 
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
@@ -802,7 +816,7 @@ public class WCSService extends OGCWebService {
             }
 
             contents        = new Contents(summary, null, null, null);
-            contentMetadata = new ContentMetadata("1.0.0", offBrief);
+            contentMetadata = new ContentMetadata("1.0.0", offBrief);//TODO: really 1.0.0?
         } catch (CatalogException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE, getActingVersion());
         }
@@ -956,19 +970,8 @@ public class WCSService extends OGCWebService {
             org.constellation.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
             
             
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-            final NamedLayerDP dp = NamedLayerDP.getInstance();
-            final LayerDetails currentLayer = dp.get(coverage);
-            if (currentLayer == null) {
-                throw new CstlServiceException("The coverage requested is not found.",
-                                               INVALID_PARAMETER_VALUE, 
-                                               getActingVersion());
-            }
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
+            //NOTE ADRIAN HACKED HERE
+            final LayerDetails currentLayer = getLayerReference(coverage);
             
             
             if (rangeSubset != null) {
@@ -1045,7 +1048,7 @@ public class WCSService extends OGCWebService {
                     gridOrigin = gridOrigin.substring(0, gridOrigin.length() - 1);
                 }
             } else {
-                // TODO the default value for gridOffsets is temporary until we get the rigth treatment
+                // TODO the default value for gridOffsets is temporary until we get the right treatment
                 gridOffsets = "1.0,0.0,0.0,1.0"; // = null;
                 gridOrigin  = "0.0,0.0";
             }
@@ -1173,19 +1176,13 @@ public class WCSService extends OGCWebService {
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
         if ( format.equalsIgnoreCase(MATRIX) ) {
-
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-            final NamedLayerDP dp    = NamedLayerDP.getInstance();
-            final LayerDetails layer = dp.get(coverage);
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
+            
+            //NOTE ADRIAN HACKED HERE
+            final LayerDetails layerRef = getLayerReference(coverage);
 
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layer.getCoverage(objEnv, dimension, elevation, date);
+                final GridCoverage2D gridCov = layerRef.getCoverage(objEnv, dimension, elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
@@ -1199,49 +1196,50 @@ public class WCSService extends OGCWebService {
         } else if( format.equalsIgnoreCase(NETCDF) ){
             
             throw new CstlServiceException(new IllegalArgumentException(
-                        "Constellation doesnt support netcdf writing."), NO_APPLICABLE_CODE, getActingVersion());
+                        "Constellation does not support netcdf writing."), NO_APPLICABLE_CODE, getActingVersion());
             
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
             
             throw new CstlServiceException(new IllegalArgumentException(
-                        "Constellation doesnt support geotiff writing."), NO_APPLICABLE_CODE, getActingVersion());
+                        "Constellation does not support geotiff writing."), NO_APPLICABLE_CODE, getActingVersion());
             
         } else {
             // We are in the case of an image format requested.
-            /* ************************************************************** *
-             *   TODO: CLEAN UP THIS REQUEST PATTERN.
-             * ************************************************************** */
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-            BufferedImage image = null;
-            final ReferencedEnvelope refEnv = new ReferencedEnvelope(objEnv);
-            final List<String> coverages = new ArrayList<String>();
-            coverages.add(coverage);
-            final Map<String, Object> params = new HashMap<String, Object>();
-            params.put(KEY_TIME, date);
-            params.put("ELEVATION", elevation);
+        	// TODO: This should be the fall through, add formats.
+        	
+            //NOTE: ADRIAN HACKED HERE
+            
+            // SCENE
+            LayerDetails layerRef = getLayerReference(coverage);
+              //if styles were defined they should be handled here.
+            final Object style = null;
+              //final MutableStyledLayerDescriptor mutSLD= null;
+            final Map<String, Object> renderParameters = new HashMap<String, Object>();
+            renderParameters.put(KEY_TIME, date);
+            renderParameters.put("ELEVATION", elevation);
+            Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, style, renderParameters);
+            
+            // VIEW
+            final ReferencedEnvelope refEnvel = new ReferencedEnvelope(objEnv);
+            final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
+            Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel,azimuth);
+            
+            // CANVAS
+            Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(dimension,null);
+            
+            // IMAGE
+            BufferedImage img;
             try {
-                image = CSTLPortrayalService.getInstance().portray(
-                        refEnv, 0, null, dimension, coverages, null, null, params, getActingVersion());
-                //WCSPortrayalAdapter.portray(abstractRequest);
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
+                img = CstlPortrayalService.getInstance().portray(sdef, vdef, cdef);
             } catch (PortrayalException ex) {
                 if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
-                    image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
+                    img = CstlPortrayalService.getInstance().writeInImage(ex, dimension);
                 } else {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
                 }
-            } catch (CstlServiceException ex) {
-                if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
-                    image = CSTLPortrayalService.getInstance().writeInImage(ex, width, height);
-                } else {
-                    throw new CstlServiceException(ex, LAYER_NOT_DEFINED, getActingVersion());
-                }
             }
-            return Response.ok(image, format).build();
+            
+            return Response.ok(img, format).build();
         }
     }
 
@@ -1261,6 +1259,7 @@ public class WCSService extends OGCWebService {
      * @throws JAXBException
      * @throws CstlServiceException
      */
+    //TODO: need to handle a list of coverages.
     public String describeCoverage(AbstractDescribeCoverage abstractRequest)
                                   throws JAXBException, CstlServiceException
     {
@@ -1286,25 +1285,19 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter COVERAGE must be specified.",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "coverage");
             }
-
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-            final NamedLayerDP dp = NamedLayerDP.getInstance();
-            final LayerDetails layer = dp.get(request.getCoverage().get(0));
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
+            
+            //TODO: we should loop over the list
+            final LayerDetails layerRef = getLayerReference( request.getCoverage().get(0) );
             
             final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-            final Set<Series> series = layer.getSeries();
+            final Set<Series> series = layerRef.getSeries();
             if (series == null || series.isEmpty()) {
-                throw new CstlServiceException("The coverage " + layer.getName() + " is not defined.",
+                throw new CstlServiceException("The coverage " + layerRef.getName() + " is not defined.",
                         LAYER_NOT_DEFINED, getActingVersion());
             }
             final GeographicBoundingBox inputGeoBox;
             try {
-                inputGeoBox = layer.getGeographicBoundingBox();
+                inputGeoBox = layerRef.getGeographicBoundingBox();
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
             }
@@ -1313,7 +1306,7 @@ public class WCSService extends OGCWebService {
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations;
                 try {
-                    elevations = layer.getAvailableElevations();
+                    elevations = layerRef.getAvailableElevations();
                 } catch (CatalogException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
@@ -1336,8 +1329,8 @@ public class WCSService extends OGCWebService {
             } else {
                 throw new CstlServiceException("The geographic bbox for the layer is null !", NO_APPLICABLE_CODE);
             }
-            final Keywords keywords = new Keywords("WCS", layer.getName(),
-                    Util.cleanSpecialCharacter(layer.getThematic()));
+            final Keywords keywords = new Keywords("WCS", layerRef.getName(),
+                    Util.cleanSpecialCharacter(layerRef.getThematic()));
 
             //Spatial metadata
             final org.constellation.wcs.v100.SpatialDomainType spatialDomain =
@@ -1349,7 +1342,7 @@ public class WCSService extends OGCWebService {
             final List<Object> times = new ArrayList<Object>();
             final SortedSet<Date> dates;
             try {
-               dates = layer.getAvailableTimes();
+               dates = layerRef.getAvailableTimes();
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
             }
@@ -1362,8 +1355,8 @@ public class WCSService extends OGCWebService {
             final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
 
             //TODO complete
-            final RangeSetType rangeSetT = new RangeSetType(null, layer.getName(),
-                    layer.getName(),
+            final RangeSetType rangeSetT = new RangeSetType(null, layerRef.getName(),
+                    layerRef.getName(),
                     null,
                     null,
                     null,
@@ -1380,7 +1373,7 @@ public class WCSService extends OGCWebService {
             formats.add(new CodeListType("gif"));
             formats.add(new CodeListType("bmp"));
             String nativeFormat = "unknow";
-            Iterator<Series> it = layer.getSeries().iterator();
+            Iterator<Series> it = layerRef.getSeries().iterator();
             if (it.hasNext()) {
                 Series s = it.next();
                 nativeFormat = s.getFormat().getImageFormat();
@@ -1398,9 +1391,9 @@ public class WCSService extends OGCWebService {
 
             //we build the coverage offering for this layer/coverage
             final CoverageOfferingType coverage = new CoverageOfferingType(null,
-                    layer.getName(),
-                    layer.getName(),
-                    Util.cleanSpecialCharacter(layer.getRemarks()),
+                    layerRef.getName(),
+                    layerRef.getName(),
+                    Util.cleanSpecialCharacter(layerRef.getRemarks()),
                     llenvelope,
                     keywords,
                     domainSet,
@@ -1419,16 +1412,10 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "identifier");
             }
-
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-            final NamedLayerDP dp = NamedLayerDP.getInstance();
-            final LayerDetails layer = dp.get(request.getIdentifier().get(0));
-            /* ************************************************************** * 
-             *   TODO: change this to use Cstl
-             * ************************************************************** */
-
+            
+            //TODO: we should loop over the list
+            final LayerDetails layer = getLayerReference(request.getIdentifier().get(0));
+            
             final org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
             final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             if (layer.getSeries().size() == 0) {
@@ -1569,7 +1556,54 @@ public class WCSService extends OGCWebService {
                            exception.getMessage(), INVALID_PARAMETER_VALUE, getActingVersion());
         }
     }
+    
+    
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
 
+    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	try { // WE catch the exception from either service version
+	        if ( getActingVersion().toString().equals("1.0.0") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_0_0 );
+	        } else if ( getActingVersion().toString().equals("1.1.0") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_0 );
+	        } else if ( getActingVersion().toString().equals("1.1.1") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_1 );
+	        } else if ( getActingVersion().toString().equals("1.1.2") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_2 );
+	        } else {
+	        	throw new CstlServiceException("WCS acting according to no known version.", null, getActingVersion());
+	        }
+        } catch (RegisterException regex ){
+        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, getActingVersion());
+        }
+        return layerRefs;
+    }
+    
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getAllLayerReferences().
+    //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
+    private LayerDetails getLayerReference(String layerName) throws CstlServiceException {
+
+    	LayerDetails layerRef;
+    	try { // WE catch the exception from either service version
+        	if ( getActingVersion().toString().equals("1.0.0") ){
+        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_0_0, layerName);
+        	} else if ( getActingVersion().toString().equals("1.1.0") ) {
+        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_1_0, layerName);
+        	} else if ( getActingVersion().toString().equals("1.1.2") ) {
+        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_1_2, layerName);
+        	} else {
+        		throw new CstlServiceException("WCS acting according to no known version.", null, getActingVersion());
+        	}
+        } catch (RegisterException regex ){
+        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, getActingVersion());
+        }
+        return layerRef;
+    }
+    
+    
     
     @PreDestroy
     @Override

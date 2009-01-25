@@ -59,13 +59,11 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-    <!-- TODO: is this necessary? -->
     <dependency>
         <groupId>org.constellation.storage</groupId>
         <artifactId>cstl-store-provider</artifactId>
         <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-go2</artifactId>
