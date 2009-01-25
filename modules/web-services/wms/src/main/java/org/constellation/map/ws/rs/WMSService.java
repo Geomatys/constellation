@@ -99,11 +99,13 @@ public class WMSService extends OGCWebService {
         super("WMS", new ServiceVersion(ServiceType.WMS, "1.3.0"), new ServiceVersion(ServiceType.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.ws:org.constellation.wms.v111:" +
-                      "org.constellation.wms.v130:org.geotools.internal.jaxb.v110.sld",
+        setXMLContext("org.constellation.ws: " +
+        		      "org.constellation.wms.v111:" +
+                      "org.constellation.wms.v130:" +
+                      "org.geotools.internal.jaxb.v110.sld",
                       "http://www.opengis.net/wms");
 
-        worker = new WMSWorker(null, unmarshaller);
+        worker = new WMSWorker(null, unmarshaller, getActingVersion());
         LOGGER.info("WMS service running");
     }
 

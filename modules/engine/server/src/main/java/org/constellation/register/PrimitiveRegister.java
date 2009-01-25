@@ -47,22 +47,14 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	@Override
 	public List<LayerDetails> getAllLayerReferences( ServiceDef serviceDef ) throws RegisterException {
 		
-		if ( serviceDef.getName()=="WMS" && serviceDef.getOrganization()=="OGC"){
-			
-			List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-			Set<String> layerNames = NamedLayerDP.getInstance().getKeys();
-			for (String layerName : layerNames){
-				LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
-				
-				if ( null == layerRef) {
-		                throw new RegisterException("Unknown layer " + layerName);
-				}
-				
-				layerRefs.add( layerRef );
-			}
-			
-			return layerRefs;
+		if ( serviceDef.getName()=="WMS" && serviceDef.getOrganization()=="OGC" ){
+			return getAllLayerRefs();
 		}
+		
+		if ( serviceDef.getName()=="WCS" && serviceDef.getOrganization()=="OGC" ){
+			return getAllLayerRefs();
+		}
+		
 		/* SHOULD NOT REACH HERE */
 		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
 				                                                 + serviceDef.getVersion() + " " 
@@ -74,20 +66,13 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 			                                      List<String> layerNames)  throws RegisterException {
 
 		if ( serviceDef.getName() == "WMS" && serviceDef.getOrganization()=="OGC" ){
-			
-			List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-			for (String layerName : layerNames){
-				LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
-				
-				if ( null == layerRef) {
-		                throw new RegisterException("Unknown layer " + layerName);
-				}
-				
-				layerRefs.add( layerRef );
-			}
-			
-			return layerRefs;
+			return getLayerRefs(layerNames);
 		}
+		
+		if ( serviceDef.getName() == "WCS" && serviceDef.getOrganization()=="OGC" ){
+			return getLayerRefs(layerNames);
+		}
+		
 		/* SHOULD NOT REACH HERE */
 		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
                                                                  + serviceDef.getVersion() + " " 
@@ -99,22 +84,64 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	public LayerDetails getLayerReference( ServiceDef serviceDef, String layerName) throws RegisterException {
 
 		if ( serviceDef.getName() == "WMS" && serviceDef.getOrganization()=="OGC" ){
-			
-			LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
-			
-			if ( null == layerRef) {
-                throw new RegisterException("Unknown layer " + layerName);
-			}
-			
-			return layerRef;
+			return getLayerRef(layerName);
 		}
+		
+		if ( serviceDef.getName() == "WCS" && serviceDef.getOrganization()=="OGC" ){
+			return getLayerRef(layerName);
+		}
+		
 		/* SHOULD NOT REACH HERE */
 		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
                                                                  + serviceDef.getVersion() + " " 
                                                                  + serviceDef.getOrganization() );
 		
 	}
-
 	
+	
+	private List<LayerDetails> getAllLayerRefs() throws RegisterException {
+		
+		List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+		Set<String> layerNames = NamedLayerDP.getInstance().getKeys();
+		for (String layerName : layerNames){
+			LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+			
+			if ( null == layerRef) {
+	                throw new RegisterException("Unknown layer " + layerName);
+			}
+			
+			layerRefs.add( layerRef );
+		}
+		
+		return layerRefs;
+		
+	}
+	
+	private List<LayerDetails> getLayerRefs( List<String> layerNames ) throws RegisterException {
+
+		List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+		for (String layerName : layerNames){
+			LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+			
+			if ( null == layerRef) {
+	                throw new RegisterException("Unknown layer " + layerName);
+			}
+			
+			layerRefs.add( layerRef );
+		}
+		
+		return layerRefs;
+	}
+	
+	private LayerDetails getLayerRef( String layerName ) throws RegisterException {
+		
+		LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+		
+		if ( null == layerRef) {
+            throw new RegisterException("Unknown layer " + layerName);
+		}
+		
+		return layerRef;
+	}
 
 }

@@ -27,6 +27,7 @@ public enum ServiceDef {
 	
 	WMS_1_0_0("WMS", "1.0.0", "OGC"),
 	WMS_1_1_0_SLD("WMS", "1.1.0", "OGC"),
+	WMS_1_1_1_SLD("WMS", "1.1.0", "OGC"),
 	WMS_1_3_0("WMS", "1.3.0", "OGC"),
 	
 	WCS_1_0_0("WCS", "1.0.0", "OGC"),

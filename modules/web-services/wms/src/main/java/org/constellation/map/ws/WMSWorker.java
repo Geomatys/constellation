@@ -17,7 +17,9 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -45,20 +46,22 @@ import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.Cstl;
+import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.map.ws.rs.CSVGraphicVisitor;
 import org.constellation.map.ws.rs.GMLGraphicVisitor;
 import org.constellation.map.ws.rs.HTMLGraphicVisitor;
-import org.constellation.map.ws.rs.WMSPortrayalAdapter;
 import org.constellation.portrayal.AbstractGraphicVisitor;
-import org.constellation.portrayal.CSTLPortrayalService;
+import org.constellation.portrayal.CstlPortrayalService;
+import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
+import org.constellation.query.wms.WMSQuery;
+import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.Util;
 import org.constellation.wms.AbstractDCP;
@@ -79,10 +82,17 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
 import org.geotools.internal.jaxb.v110.sld.TypeNameType;
+import org.geotools.sld.MutableLayer;
+import org.geotools.sld.MutableLayerStyle;
+import org.geotools.sld.MutableNamedLayer;
+import org.geotools.sld.MutableNamedStyle;
+import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.Version;
 
@@ -126,15 +136,18 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @SuppressWarnings("unused")
     private final Marshaller marshaller;
+    
+    private final ServiceVersion actingVersion;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
      */
     private final Unmarshaller unmarshaller;
 
-    public WMSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller) {
+    public WMSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller, ServiceVersion actingVersion) {
         this.marshaller   = marshaller;
         this.unmarshaller = unmarshaller;
+        this.actingVersion = actingVersion;
     }
 
     /**
@@ -210,29 +223,29 @@ public class WMSWorker extends AbstractWMSWorker {
         
         
         
-        /* ****************************************************************** * 
-         *   TODO: make this call Cstl.*
-         * ****************************************************************** */
-//        final List<LayerDetails> layerRefs = Cstl.REGISTER.getLayerReferencesForWMS();
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final Set<String> keys = dp.getKeys();
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        for (String key : keys) {
-            final LayerDetails layer = dp.get(key);
-            if (layer == null) {
-                LOGGER.warning("Missing layer : " + key);
-                continue;
-            }
-            if (!layer.isQueryable(ServiceType.WMS)) {
-                LOGGER.info("layer" + layer.getName() + " not queryable by WMS");
-                continue;
-            }
-            layerRefs.add(layer);
-        }
-        /* ****************************************************************** * 
-         *   TODO: make this call Cstl.                                       *
-         * ****************************************************************** */
-        
+//        /* ****************************************************************** * 
+//         *   TODO: make this call Cstl.*
+//         * ****************************************************************** */
+////        final List<LayerDetails> layerRefs = Cstl.REGISTER.getLayerReferencesForWMS();
+//        final NamedLayerDP dp = NamedLayerDP.getInstance();
+//        final Set<String> keys = dp.getKeys();
+//        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+//        for (String key : keys) {
+//            final LayerDetails layer = dp.get(key);
+//            if (layer == null) {
+//                LOGGER.warning("Missing layer : " + key);
+//                continue;
+//            }
+//            if (!layer.isQueryable(ServiceType.WMS)) {
+//                LOGGER.info("layer" + layer.getName() + " not queryable by WMS");
+//                continue;
+//            }
+//            layerRefs.add(layer);
+//        }
+//        /* ****************************************************************** * 
+//         *   TODO: make this call Cstl.                                       *
+//         * ****************************************************************** */
+        final List<LayerDetails> layerRefs = getAllLayerReferences();
 
         //Build the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
@@ -563,40 +576,107 @@ public class WMSWorker extends AbstractWMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public synchronized String getFeatureInfo(final GetFeatureInfo gfi) throws CstlServiceException {
+    public synchronized String getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
+    	
+    	//
+    	// Note this is almost the same logic as in getMap
+    	//
+    	
+        // 1. SCENE
+        //       -- get the List of layer references
+        final List<String> layerNames = getFI.getLayers();
+        final List<LayerDetails> layerRefs;
+        layerRefs = getLayerReferences(layerNames);
+        
+        //       -- build an equivalent style List
+        //TODO: clean up the SLD vs. style logic
+        final List<String> styleNames          = getFI.getStyles();
+        final MutableStyledLayerDescriptor sld = getFI.getSld();
+        
+        final List<Object> styles = new ArrayList<Object>();
+        for (int i=0; i<layerRefs.size(); i++) {
 
-        String infoFormat = gfi.getInfoFormat();
+            final Object style;
+            if (sld != null) {
+                //try to use the provided SLD
+                style = extractStyle(layerRefs.get(i).getName(),sld);
+            } else if (styleNames != null && styles.size() > i) {
+                //try to grab the style if provided
+                //a style has been given for this layer, try to use it
+                style = styleNames.get(i);
+            } else {
+                //no defined styles, use the favorite one, let the layer get it himself.
+                style = null;
+            }
+            styles.add(style);
+        }
+        //       -- create the rendering parameter Map
+        final Double elevation                 = getFI.getElevation();
+        final Date time                        = getFI.getTime();
+        final MeasurementRange<?> dimRange     = getFI.getDimRange();
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        params.put(WMSQuery.KEY_ELEVATION, elevation);
+        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
+        params.put(WMSQuery.KEY_TIME, time);
+        Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
+        
+        
+        // 2. VIEW
+        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getFI.getEnvelope());
+        final double azimuth                   = getFI.getAzimuth();
+        Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        
+        
+        // 3. CANVAS
+        final Dimension canvasDimension        = getFI.getSize();
+        final Color background;
+        if (getFI.getTransparent()) {
+            background = null;
+        } else {
+            final Color color = getFI.getBackground();
+            background = (color == null) ? Color.WHITE : color;
+        }
+        Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+    	
+        // 4. SHAPE
+        //     a 
+        final int PIXEL_TOLERANCE = 3;
+        final Rectangle selectionArea = new Rectangle( getFI.getX()-PIXEL_TOLERANCE, 
+        		                                      getFI.getY()-PIXEL_TOLERANCE, 
+        		                                      PIXEL_TOLERANCE*2, 
+        		                                      PIXEL_TOLERANCE*2);
+        
+        // 5. VISITOR
+        String infoFormat = getFI.getInfoFormat();
         if (infoFormat == null) {
             //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
             infoFormat = TEXT_PLAIN;
         }
-
         final AbstractGraphicVisitor visitor;
-
         if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
             // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor(gfi);
+            visitor = new CSVGraphicVisitor(getFI);
         } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
             // TEXT / HTML
-            visitor = new HTMLGraphicVisitor(gfi);
+            visitor = new HTMLGraphicVisitor(getFI);
         } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
                    infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
                    infoFormat.equalsIgnoreCase(GML))
         {
             // GML
-            visitor = new GMLGraphicVisitor(gfi);
+            visitor = new GMLGraphicVisitor(getFI);
         } else {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
                     ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
-                    INVALID_PARAMETER_VALUE, gfi.getVersion(), "info_format");
+                    INVALID_PARAMETER_VALUE, getFI.getVersion(), "info_format");
         }
 
         // We now build the response, according to the format chosen.
         try {
-            WMSPortrayalAdapter.hit(gfi, visitor);
+        	CstlPortrayalService.getInstance().visit(sdef,vdef,cdef,selectionArea,visitor);
         } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, gfi.getVersion());
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getFI.getVersion());
         }
 
         return visitor.getResult();
@@ -614,13 +694,9 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
-        final ServiceVersion version = getLegend.getVersion();
-        final NamedLayerDP dp = NamedLayerDP.getInstance();
-        final LayerDetails layer = dp.get(getLegend.getLayer());
-        if (layer == null) {
-            throw new CstlServiceException("Layer requested not found.", INVALID_PARAMETER_VALUE,
-                    version, "layer");
-        }
+    	
+        final LayerDetails layer = getLayerReference( getLegend.getLayer());
+        
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
         final Dimension dims = new Dimension((width == null) ? 140 : width,
@@ -639,30 +715,183 @@ public class WMSWorker extends AbstractWMSWorker {
     @Override
     public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
         
+    	//
+    	// Note this is almost the same logic as in getFeatureInfo
+    	//
+    	
         final ServiceVersion queryVersion = getMap.getVersion();
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
-
-        BufferedImage image;
-        try {
-            image = WMSPortrayalAdapter.portray(getMap);
-        } catch (PortrayalException ex) {
-            if (errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
-            }
+        
+        
+        // 1. SCENE
+        //       -- get the List of layer references
+        final List<String> layerNames = getMap.getLayers();
+        final List<LayerDetails> layerRefs;
+        try{
+        	layerRefs = getLayerReferences(layerNames);
         } catch (CstlServiceException ex) {
+        	//TODO: distinguish
             if (errorInImage) {
-                final Dimension dim = getMap.getSize();
-                image = CSTLPortrayalService.getInstance().writeInImage(ex, dim.width, dim.height);
+                return CstlPortrayalService.getInstance().writeInImage(ex, getMap.getSize());
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
         }
+        //       -- build an equivalent style List
+        //TODO: clean up the SLD vs. style logic
+        final List<String> styleNames          = getMap.getStyles();
+        final MutableStyledLayerDescriptor sld = getMap.getSld();
+        
+        final List<Object> styles = new ArrayList<Object>();
+        for (int i=0; i<layerRefs.size(); i++) {
 
+            final Object style;
+            if (sld != null) {
+                //try to use the provided SLD
+                style = extractStyle(layerRefs.get(i).getName(),sld);
+            } else if (styleNames != null && styles.size() > i) {
+                //try to grab the style if provided
+                //a style has been given for this layer, try to use it
+                style = styleNames.get(i);
+            } else {
+                //no defined styles, use the favorite one, let the layer get it himself.
+                style = null;
+            }
+            styles.add(style);
+        }
+        //       -- create the rendering parameter Map
+        final Double elevation                 = getMap.getElevation();
+        final Date time                        = getMap.getTime();
+        final MeasurementRange<?> dimRange     = getMap.getDimRange();
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        params.put(WMSQuery.KEY_ELEVATION, elevation);
+        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
+        params.put(WMSQuery.KEY_TIME, time);
+        Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
+        
+        
+        // 2. VIEW
+        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getMap.getEnvelope());
+        final double azimuth                   = getMap.getAzimuth();
+        Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        
+        
+        // 3. CANVAS
+        final Dimension canvasDimension        = getMap.getSize();
+        final Color background;
+        if (getMap.getTransparent()) {
+            background = null;
+        } else {
+            final Color color = getMap.getBackground();
+            background = (color == null) ? Color.WHITE : color;
+        }
+        Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+        
+        // 4. IMAGE
+        BufferedImage image;
+        try {
+            image = CstlPortrayalService.getInstance().portray(sdef, vdef, cdef);;
+        } catch (PortrayalException ex) {
+            if (errorInImage) {
+                return CstlPortrayalService.getInstance().writeInImage(ex, getMap.getSize() );
+            } else {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+            }
+        }
+        
         return image;
+    }
+    
+    
+    
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
+
+    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	try { // WE catch the exception from either service version
+    		String version = actingVersion.toString();
+	        if (  version.equals("1.1.1") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
+	        } else if ( version.equals("1.3.0") ) {
+	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WMS_1_3_0 );
+	        } else {
+	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        }
+        } catch (RegisterException regex ){
+        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        }
+        return layerRefs;
+    }
+    
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private List<LayerDetails> getLayerReferences(List<String> layerNames) throws CstlServiceException {
+
+    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	try { // WE catch the exception from either service version
+    		String version = actingVersion.toString();
+	        if (  version.equals("1.1.1") ) {
+	        	layerRefs = Cstl.Register.getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
+	        } else if ( version.equals("1.3.0") ) {
+	        	layerRefs = Cstl.Register.getLayerReferences(ServiceDef.WMS_1_3_0, layerNames );
+	        } else {
+	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        }
+        } catch (RegisterException regex ){
+        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        }
+        return layerRefs;
+    }
+    
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private LayerDetails getLayerReference(String layerName) throws CstlServiceException {
+
+        LayerDetails layerRef;
+    	try { // WE catch the exception from either service version
+    		String version = actingVersion.toString();
+	        if (  version.equals("1.1.1") ) {
+	        	layerRef = Cstl.Register.getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
+	        } else if ( version.equals("1.3.0") ) {
+	        	layerRef = Cstl.Register.getLayerReference(ServiceDef.WMS_1_3_0, layerName );
+	        } else {
+	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        }
+        } catch (RegisterException regex ){
+        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        }
+        return layerRef;
+    }
+    
+
+
+    private Object extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
+        if(sld == null){
+            throw new NullPointerException("SLD should not be null");
+        }
+
+        for(final MutableLayer layer : sld.layers()){
+
+            if(layer instanceof MutableNamedLayer && layerName.equals(layer.getName()) ){
+                //we can only extract style from a NamedLayer that has the same name
+                final MutableNamedLayer mnl = (MutableNamedLayer) layer;
+
+                for(final MutableLayerStyle mls : mnl.styles()){
+                    if(mls instanceof MutableNamedStyle){
+                        final MutableNamedStyle mns = (MutableNamedStyle) mls;
+                        return mns.getName();
+                    }else if(mls instanceof MutableStyle){
+                        return mls;
+                    }
+
+                }
+            }
+        }
+
+        //no valid style found
+        return null;
     }
 
 }
