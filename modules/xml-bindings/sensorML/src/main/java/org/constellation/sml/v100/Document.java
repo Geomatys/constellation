@@ -148,6 +148,17 @@ public class Document {
         return this.onlineResource;
     }
 
+    public void setOnlineResource(OnlineResource onlineResource) {
+        if (this.onlineResource == null) {
+            this.onlineResource = new ArrayList<OnlineResource>();
+        }
+        this.onlineResource.add(onlineResource);
+    }
+
+    public void setOnlineResource(List<OnlineResource> onlineResource) {
+        this.onlineResource = onlineResource;
+    }
+
     /**
      * Gets the value of the version property.
      */

@@ -81,6 +81,10 @@ public class DocumentList {
     @XmlID
     private String id;
 
+    public DocumentList() {
+
+    }
+
     /**
      * Gets the value of the description property.
      */
@@ -103,6 +107,17 @@ public class DocumentList {
             member = new ArrayList<DocumentList.Member>();
         }
         return this.member;
+    }
+
+    public void setMember(DocumentList.Member member) {
+        if (this.member == null) {
+            this.member = new ArrayList<DocumentList.Member>();
+        }
+        this.member.add(member);
+    }
+
+    public void setMember(List<DocumentList.Member> member) {
+        this.member = member;
     }
 
     /**

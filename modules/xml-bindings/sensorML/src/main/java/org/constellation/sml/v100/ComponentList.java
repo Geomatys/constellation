@@ -14,76 +14,65 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.sml.v100;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.gml.v311.EngineeringCRSType;
-
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml}EngineeringCRS"/>
+ *         &lt;element name="component" maxOccurs="unbounded">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence minOccurs="0">
+ *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}_Process"/>
+ *                 &lt;/sequence>
+ *                 &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
+ *                 &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "engineeringCRS"
+    "component"
 })
-@XmlRootElement(name = "spatialReferenceFrame")
-public class SpatialReferenceFrame {
+public class ComponentList {
 
-    @XmlElement(name = "EngineeringCRS", namespace = "http://www.opengis.net/gml", required = true)
-    private EngineeringCRSType engineeringCRS;
-
-    public SpatialReferenceFrame() {
-
-    }
-
-    public SpatialReferenceFrame(EngineeringCRSType engineeringCRS) {
-        this.engineeringCRS = engineeringCRS;
-    }
+    @XmlElement(required = true)
+    private List<ComponentPropertyType> component;
 
     /**
-     * Gets the value of the engineeringCRS property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EngineeringCRSType }
-     *     
+     * Gets the value of the component property.
+     *
      */
-    public EngineeringCRSType getEngineeringCRS() {
-        return engineeringCRS;
-    }
-
-    /**
-     * Sets the value of the engineeringCRS property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EngineeringCRSType }
-     *     
-     */
-    public void setEngineeringCRS(EngineeringCRSType value) {
-        this.engineeringCRS = value;
+    public List<ComponentPropertyType> getComponent() {
+        if (component == null) {
+            component = new ArrayList<ComponentPropertyType>();
+        }
+        return this.component;
     }
 
 }
+

@@ -18,8 +18,10 @@ package org.constellation.gml.v311;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -51,4 +53,56 @@ import javax.xml.bind.annotation.XmlType;
     AbstractReferenceSystemType.class
 })
 public abstract class AbstractReferenceSystemBaseType extends DefinitionType {
+
+    @XmlElement(name = "srsName",  namespace = "http://www.opengis.net/gml")
+    private String srsName;
+
+    public AbstractReferenceSystemBaseType() {
+
+    }
+
+    /**
+     * super constructor to access to Entry constructor
+     */
+    public AbstractReferenceSystemBaseType(final String id, final String name, final String description, String srsName)  {
+        super(id, name, description);
+        this.srsName = srsName;
+    }
+
+    /**
+     * @return the srsName
+     */
+    public String getSrsName() {
+        return srsName;
+    }
+
+    /**
+     * @param srsName the srsName to set
+     */
+    public void setSrsName(String srsName) {
+        this.srsName = srsName;
+    }
+
+     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractReferenceSystemBaseType && super.equals(object)) {
+            final AbstractReferenceSystemBaseType that = (AbstractReferenceSystemBaseType) object;
+            return Utilities.equals(this.srsName, that.srsName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
+        return hash;
+    }
 }

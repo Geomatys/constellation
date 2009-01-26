@@ -46,4 +46,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "EngineeringDatumType")
 public class EngineeringDatumType extends AbstractDatumType {
 
+    public EngineeringDatumType() {
+
+    }
+    
+    public EngineeringDatumType(String id, String datumName, CodeType anchorPoint) {
+        super(id, datumName, anchorPoint);
+    }
+
 }

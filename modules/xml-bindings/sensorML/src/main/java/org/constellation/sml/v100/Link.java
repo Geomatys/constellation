@@ -23,8 +23,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -73,37 +71,37 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class Link {
 
     @XmlElement(required = true)
-    private Link.Source source;
+    private Source source;
     @XmlElement(required = true)
-    private Link.Destination destination;
+    private Destination destination;
     @XmlAttribute
     private String type;
 
     /**
      * Gets the value of the source property.
      */
-    public Link.Source getSource() {
+    public Source getSource() {
         return source;
     }
 
     /**
      * Sets the value of the source property.
      */
-    public void setSource(Link.Source value) {
+    public void setSource(Source value) {
         this.source = value;
     }
 
     /**
      * Gets the value of the destination property.
      */
-    public Link.Destination getDestination() {
+    public Destination getDestination() {
         return destination;
     }
 
     /**
      * Sets the value of the destination property.
      */
-    public void setDestination(Link.Destination value) {
+    public void setDestination(Destination value) {
         this.destination = value;
     }
 
@@ -119,90 +117,6 @@ public class Link {
      */
     public void setType(String value) {
         this.type = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" use="required" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class Destination {
-
-        @XmlAttribute(required = true)
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" use="required" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class Source {
-
-        @XmlAttribute(required = true)
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
     }
 
 }

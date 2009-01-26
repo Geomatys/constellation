@@ -68,6 +68,14 @@ public class OnlineResource {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public OnlineResource() {
+
+    }
+
+    public OnlineResource(String href) {
+        this.href = href;
+    }
+
     /**
      * Gets the value of the nilReason property.
      */

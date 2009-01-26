@@ -60,22 +60,29 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractDerivableComponentType", propOrder = {
     "rest",
-    "location"
+    "location",
+    "spatialReferenceFrame",
+    "position"
+
 })
 @XmlSeeAlso({AbstractComponentType.class, ComponentArrayType.class}) 
 public abstract class AbstractDerivableComponentType extends AbstractProcessType implements AbstractDerivableComponent {
 
     @XmlElementRefs({
         @XmlElementRef(name = "timePosition",           namespace = "http://www.opengis.net/sensorML/1.0", type = TimePosition.class),
-        @XmlElementRef(name = "position",               namespace = "http://www.opengis.net/sensorML/1.0", type = Position.class),
-        @XmlElementRef(name = "spatialReferenceFrame",  namespace = "http://www.opengis.net/sensorML/1.0", type = SpatialReferenceFrame.class),
         @XmlElementRef(name = "temporalReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0", type = TemporalReferenceFrame.class),
         @XmlElementRef(name = "interfaces",             namespace = "http://www.opengis.net/sensorML/1.0", type = Interfaces.class)
     })
     private List<Object> rest;
-    
+
+    @XmlElementRef(name = "spatialReferenceFrame",  namespace = "http://www.opengis.net/sensorML/1.0", type = SpatialReferenceFrame.class)
+    private SpatialReferenceFrame spatialReferenceFrame;
+
     @XmlElementRef(name = "location", namespace = "http://www.opengis.net/sensorML/1.0", type = Location.class)
     private Location location;
+
+    @XmlElementRef(name = "position", namespace = "http://www.opengis.net/sensorML/1.0", type = Position.class)
+    private Position position;
     
 
     /**
@@ -96,6 +103,34 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
     public void setSMLLocation(Location location) {
         this.location = location;
     }
+
+    /**
+     * @return the spatialReferenceFrame
+     */
+    public SpatialReferenceFrame getSpatialReferenceFrame() {
+        return spatialReferenceFrame;
+    }
+
+    /**
+     * @param spatialReferenceFrame the spatialReferenceFrame to set
+     */
+    public void setSpatialReferenceFrame(SpatialReferenceFrame spatialReferenceFrame) {
+        this.spatialReferenceFrame = spatialReferenceFrame;
+    }
+
+    /**
+     * @return the position
+     */
+    public Position getPosition() {
+        return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(Position position) {
+        this.position = position;
+    }
     
     /**
      * Verify if this entry is identical to specified object.
@@ -108,7 +143,10 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
 
         if (object instanceof AbstractDerivableComponentType && super.equals(object)) {
             final AbstractDerivableComponentType that = (AbstractDerivableComponentType) object;
-            return Utilities.equals(this.rest,     that.rest);
+            return Utilities.equals(this.rest,                  that.rest) &&
+                   Utilities.equals(this.spatialReferenceFrame, that.spatialReferenceFrame) &&
+                   Utilities.equals(this.location,              that.location) &&
+                   Utilities.equals(this.position,              that.position);
         }
         return false;
     }
@@ -117,7 +155,29 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
     public int hashCode() {
         int hash = 7;
         hash = 29 * hash + (this.rest != null ? this.rest.hashCode() : 0);
+        hash = 29 * hash + (this.spatialReferenceFrame != null ? this.spatialReferenceFrame.hashCode() : 0);
+        hash = 29 * hash + (this.location != null ? this.location.hashCode() : 0);
+        hash = 29 * hash + (this.position != null ? this.position.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append('\n');
+        if (location != null)
+            sb.append("location: ").append(location).append('\n');
+        if (position != null)
+            sb.append("position: ").append(position).append('\n');
+        if (spatialReferenceFrame != null)
+            sb.append("spatialReferenceFrame: ").append(spatialReferenceFrame).append('\n');
+        if (rest != null) {
+            sb.append("rest:").append('\n');
+            int i = 0;
+            for (Object r: rest) {
+                sb.append("rest n°").append(i).append(": ").append(r).append('\n');
+            }
+        }
+        return sb.toString();
     }
 
 }

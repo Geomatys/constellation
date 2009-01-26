@@ -73,6 +73,14 @@ public class StringOrRefType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public StringOrRefType() {
+
+    }
+
+    public StringOrRefType(String value) {
+        this.value = value;
+    }
+
     /**
      * Gets the value of the value property.
      */

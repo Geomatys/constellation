@@ -76,6 +76,15 @@ public abstract class AbstractDatumType extends AbstractDatumBaseType {
     private ExtentType validArea;
     private String scope;
 
+    public AbstractDatumType() {
+
+    }
+
+    public AbstractDatumType(String id, String datumName, CodeType anchorPoint) {
+        super(id, datumName);
+        this.anchorPoint = anchorPoint;
+    }
+
     /**
      * Set of alternative identifications of this datum.
      * The first datumID, if any, is normally the primary identification code, 

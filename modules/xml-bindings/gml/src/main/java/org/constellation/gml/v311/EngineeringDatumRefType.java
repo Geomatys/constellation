@@ -75,6 +75,18 @@ public class EngineeringDatumRefType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public EngineeringDatumRefType() {
+
+    }
+
+    public EngineeringDatumRefType(EngineeringDatumType engineeringDatum) {
+        this.engineeringDatum = engineeringDatum;
+    }
+
+    public EngineeringDatumRefType(String href) {
+        this.href = href;
+    }
+
     /**
      * Gets the value of the engineeringDatum property.
      */

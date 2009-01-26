@@ -17,8 +17,6 @@
 
 package org.constellation.sml.v100;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -63,61 +61,19 @@ import javax.xml.bind.annotation.XmlType;
 public class Connections {
 
     @XmlElement(name = "ConnectionList")
-    private Connections.ConnectionList connectionList;
+    private ConnectionList connectionList;
 
     /**
      * Gets the value of the connectionList property.
      */
-    public Connections.ConnectionList getConnectionList() {
+    public ConnectionList getConnectionList() {
         return connectionList;
     }
 
     /**
      * Sets the value of the connectionList property.
      */
-    public void setConnectionList(Connections.ConnectionList value) {
+    public void setConnectionList(ConnectionList value) {
         this.connectionList = value;
     }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}connection" maxOccurs="unbounded"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "connection"
-    })
-    public static class ConnectionList {
-
-        @XmlElement(required = true)
-        private List<Connection> connection;
-
-        /**
-         * Gets the value of the connection property.
-         */
-        public List<Connection> getConnection() {
-            if (connection == null) {
-                connection = new ArrayList<Connection>();
-            }
-            return this.connection;
-        }
-
-    }
-
 }

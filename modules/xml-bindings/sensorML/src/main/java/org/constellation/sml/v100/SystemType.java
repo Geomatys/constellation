@@ -19,6 +19,7 @@ package org.constellation.sml.v100;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -46,5 +47,54 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SystemType")
 public class SystemType extends AbstractComponentType {
+
+    @XmlElement(required = true)
+    private Components components;
+    @XmlElement(required = true)
+    private Positions positions;
+    @XmlElement(required = true)
+    private Connections connections;
+
+    /**
+     * @return the components
+     */
+    public Components getComponents() {
+        return components;
+    }
+
+    /**
+     * @param components the components to set
+     */
+    public void setComponents(Components components) {
+        this.components = components;
+    }
+
+    /**
+     * @return the positions
+     */
+    public Positions getPositions() {
+        return positions;
+    }
+
+    /**
+     * @param positions the positions to set
+     */
+    public void setPositions(Positions positions) {
+        this.positions = positions;
+    }
+
+    /**
+     * @return the connections
+     */
+    public Connections getConnections() {
+        return connections;
+    }
+
+    /**
+     * @param connections the connections to set
+     */
+    public void setConnections(Connections connections) {
+        this.connections = connections;
+    }
 
 }

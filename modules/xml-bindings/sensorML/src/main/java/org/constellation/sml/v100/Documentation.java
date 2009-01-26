@@ -79,6 +79,18 @@ public class Documentation {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public Documentation() {
+
+    }
+
+    public Documentation(Document document) {
+        this.document = document;
+    }
+
+    public Documentation(DocumentList documentList) {
+        this.documentList = documentList;
+    }
+
     /**
      * Gets the value of the document property.
      *     

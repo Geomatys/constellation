@@ -21,11 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -100,32 +97,32 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "ArrayLink")
 public class ArrayLink {
 
-    private ArrayLink.SourceArray sourceArray;
-    private List<ArrayLink.DestinationIndex> destinationIndex;
-    private ArrayLink.DestinationArray destinationArray;
-    private ArrayLink.SourceIndex sourceIndex;
+    private SourceArray sourceArray;
+    private List<DestinationIndex> destinationIndex;
+    private DestinationArray destinationArray;
+    private SourceIndex sourceIndex;
     private List<Connection> connection;
 
     /**
      * Gets the value of the sourceArray property.
      */
-    public ArrayLink.SourceArray getSourceArray() {
+    public SourceArray getSourceArray() {
         return sourceArray;
     }
 
     /**
      * Sets the value of the sourceArray property.
      */
-    public void setSourceArray(ArrayLink.SourceArray value) {
+    public void setSourceArray(SourceArray value) {
         this.sourceArray = value;
     }
 
     /**
      * Gets the value of the destinationIndex property.
      */
-    public List<ArrayLink.DestinationIndex> getDestinationIndex() {
+    public List<DestinationIndex> getDestinationIndex() {
         if (destinationIndex == null) {
-            destinationIndex = new ArrayList<ArrayLink.DestinationIndex>();
+            destinationIndex = new ArrayList<DestinationIndex>();
         }
         return this.destinationIndex;
     }
@@ -133,21 +130,21 @@ public class ArrayLink {
     /**
      * Gets the value of the destinationArray property.
      */
-    public ArrayLink.DestinationArray getDestinationArray() {
+    public DestinationArray getDestinationArray() {
         return destinationArray;
     }
 
     /**
      * Sets the value of the destinationArray property.
      */
-    public void setDestinationArray(ArrayLink.DestinationArray value) {
+    public void setDestinationArray(DestinationArray value) {
         this.destinationArray = value;
     }
 
     /**
      * Gets the value of the sourceIndex property.
      */
-    public ArrayLink.SourceIndex getSourceIndex() {
+    public SourceIndex getSourceIndex() {
         return sourceIndex;
     }
 
@@ -155,7 +152,7 @@ public class ArrayLink {
      * Sets the value of the sourceIndex property.
      * 
      */
-    public void setSourceIndex(ArrayLink.SourceIndex value) {
+    public void setSourceIndex(SourceIndex value) {
         this.sourceIndex = value;
     }
 
@@ -168,175 +165,6 @@ public class ArrayLink {
             connection = new ArrayList<Connection>();
         }
         return this.connection;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class DestinationArray {
-
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class DestinationIndex {
-
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class SourceArray {
-
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         * 
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="ref" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class SourceIndex {
-
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        private String ref;
-
-        /**
-         * Gets the value of the ref property.
-         */
-        public String getRef() {
-            return ref;
-        }
-
-        /**
-         * Sets the value of the ref property.
-         */
-        public void setRef(String value) {
-            this.ref = value;
-        }
-
     }
 
 }

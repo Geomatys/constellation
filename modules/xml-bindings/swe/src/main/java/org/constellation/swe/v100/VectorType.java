@@ -21,12 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -64,118 +60,34 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class VectorType extends AbstractVectorType {
 
     @XmlElement(required = true)
-    private List<VectorType.Coordinate> coordinate;
+    private List<CoordinateType> coordinate;
+
+    public VectorType() {
+
+    }
+
+    public VectorType(String referenceFrame, String localFrame, List<CoordinateType> coordinate) {
+        super(referenceFrame, localFrame);
+        this.coordinate = coordinate;
+    }
+
+    public VectorType(String definition, List<CoordinateType> coordinate) {
+        super(definition);
+        this.coordinate = coordinate;
+    }
+
+    public VectorType(List<CoordinateType> coordinate) {
+        this.coordinate = coordinate;
+    }
 
     /**
      * Gets the value of the coordinate property.
      */
-    public List<VectorType.Coordinate> getCoordinate() {
+    public List<CoordinateType> getCoordinate() {
         if (coordinate == null) {
-            coordinate = new ArrayList<VectorType.Coordinate>();
+            coordinate = new ArrayList<CoordinateType>();
         }
         return this.coordinate;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;group ref="{http://www.opengis.net/swe/1.0}AnyNumerical" minOccurs="0"/>
-     *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}token" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "count",
-        "quantity",
-        "time"
-    })
-    public static class Coordinate {
-
-        @XmlElement(name = "Count")
-        private Count count;
-        @XmlElement(name = "Quantity")
-        private QuantityType quantity;
-        @XmlElement(name = "Time")
-        private TimeType time;
-        @XmlAttribute(required = true)
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlSchemaType(name = "token")
-        private String name;
-
-        /**
-         * Gets the value of the count property.
-         */
-        public Count getCount() {
-            return count;
-        }
-
-        /**
-         * Sets the value of the count property.
-         */
-        public void setCount(Count value) {
-            this.count = value;
-        }
-
-        /**
-         * Gets the value of the quantity property.
-         */
-        public QuantityType getQuantity() {
-            return quantity;
-        }
-
-        /**
-         * Sets the value of the quantity property.
-         */
-        public void setQuantity(QuantityType value) {
-            this.quantity = value;
-        }
-
-        /**
-         * Gets the value of the time property.
-         */
-        public TimeType getTime() {
-            return time;
-        }
-
-        /**
-         * Sets the value of the time property.
-         * 
-         */
-        public void setTime(TimeType value) {
-            this.time = value;
-        }
-
-        /**
-         * Gets the value of the name property.
-          */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Sets the value of the name property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setName(String value) {
-            this.name = value;
-        }
-
     }
 
 }

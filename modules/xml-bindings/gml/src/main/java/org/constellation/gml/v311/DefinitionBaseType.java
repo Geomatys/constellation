@@ -54,7 +54,14 @@ public class DefinitionBaseType extends AbstractGMLEntry {
     DefinitionBaseType()  {
         
     }
-    
+
+    /**
+     * super constructor to access to Entry constructor
+     */
+    public DefinitionBaseType(final String id)  {
+        super(id);
+    }
+
     /**
      * super constructor to access to Entry constructor
      */

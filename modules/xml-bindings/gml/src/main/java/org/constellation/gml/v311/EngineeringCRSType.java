@@ -59,6 +59,16 @@ public class EngineeringCRSType extends AbstractReferenceSystemType {
     @XmlElement(required = true)
     private EngineeringDatumRefType usesEngineeringDatum;
 
+    public EngineeringCRSType() {
+
+    }
+
+    public EngineeringCRSType(String id, String srsName, CoordinateSystemRefType usesCS, EngineeringDatumRefType usesEngineeringDatum) {
+        super(id, null, null, srsName);
+        this.usesCS = usesCS;
+        this.usesEngineeringDatum = usesEngineeringDatum;
+    }
+
     /**
      * Gets the value of the usesCS property.
      * 

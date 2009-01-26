@@ -137,6 +137,16 @@ public class IoComponentPropertyType {
         this.observableProperty = observableProperty;
     }
 
+    public IoComponentPropertyType(String name, QuantityType quantity) {
+        this.name = name;
+        this.quantity = quantity;
+    }
+
+    public IoComponentPropertyType(String name, JAXBElement<? extends AbstractDataRecordType> abstractDataRecord) {
+        this.name = name;
+        this.abstractDataRecord = abstractDataRecord;
+    }
+
     /**
      * Gets the value of the count property.
      */

@@ -76,6 +76,14 @@ public class CoordinateSystemRefType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public CoordinateSystemRefType() {
+
+    }
+
+    public CoordinateSystemRefType(String href) {
+        this.href = href;
+    }
+
     /**
      * Gets the value of the coordinateSystem property.
      * 

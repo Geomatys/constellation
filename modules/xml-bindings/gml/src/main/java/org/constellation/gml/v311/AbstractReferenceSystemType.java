@@ -68,9 +68,16 @@ public abstract class AbstractReferenceSystemType extends AbstractReferenceSyste
     /**
      * Empty constructor used by JAXB
      */
-    AbstractReferenceSystemType() {
+    public AbstractReferenceSystemType() {
     }
-    
+
+    /**
+     * build an abstract reference system.
+     */
+    public AbstractReferenceSystemType(final String id, final String name, final String description, String srsName)  {
+        super(id, name, description, srsName);
+    }
+
     /**
      * build an abstract reference system.
      */

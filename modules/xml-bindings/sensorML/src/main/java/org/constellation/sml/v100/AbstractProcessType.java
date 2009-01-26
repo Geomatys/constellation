@@ -278,6 +278,25 @@ public abstract class AbstractProcessType extends AbstractSMLType implements Abs
     }
 
     /**
+     * Sets the value of the contact property.
+     *
+     */
+    public void setDocumention(Documentation documentation) {
+        if (this.documentation == null) {
+            this.documentation = new ArrayList<Documentation>();
+        }
+        this.documentation.add(documentation);
+    }
+
+    /**
+     * sets the value of the contact property.
+     *
+     */
+    public void setDocumentation(List<Documentation> documentation) {
+        this.documentation = documentation;
+    }
+
+    /**
      * Gets the value of the history property.
      * 
      */

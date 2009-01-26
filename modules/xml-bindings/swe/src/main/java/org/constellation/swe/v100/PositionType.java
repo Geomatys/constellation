@@ -71,6 +71,22 @@ public class PositionType extends AbstractVectorType {
     private VectorOrSquareMatrixPropertyType angularAcceleration;
     private VectorOrSquareMatrixPropertyType state;
 
+    public PositionType() {
+
+    }
+
+    public PositionType(String referenceFrame, String localFrame,VectorPropertyType location,
+            VectorOrSquareMatrixPropertyType orientation) {
+        super(referenceFrame, localFrame);
+        this.location    = location;
+        this.orientation = orientation;
+    }
+    
+    public PositionType(VectorPropertyType location, VectorOrSquareMatrixPropertyType orientation) {
+        this.location    = location;
+        this.orientation = orientation;
+    }
+
     /**
      * Gets the value of the time property.
      * 

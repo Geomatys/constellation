@@ -38,7 +38,7 @@ import org.geotools.util.Utilities;
     "descriptionReference",
     "name"
 })
-public abstract class AbstractGMLEntry extends Entry{
+public abstract class AbstractGMLEntry extends Entry {
 
     //private List<MetaDataPropertyType> metaDataProperty;
     //private CodeWithAuthorityType identifier;

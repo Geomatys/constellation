@@ -17,73 +17,48 @@
 
 package org.constellation.sml.v100;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.gml.v311.EngineeringCRSType;
-
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml}EngineeringCRS"/>
+ *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}connection" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "engineeringCRS"
+    "connection"
 })
-@XmlRootElement(name = "spatialReferenceFrame")
-public class SpatialReferenceFrame {
+public class ConnectionList {
 
-    @XmlElement(name = "EngineeringCRS", namespace = "http://www.opengis.net/gml", required = true)
-    private EngineeringCRSType engineeringCRS;
-
-    public SpatialReferenceFrame() {
-
-    }
-
-    public SpatialReferenceFrame(EngineeringCRSType engineeringCRS) {
-        this.engineeringCRS = engineeringCRS;
-    }
+    @XmlElement(required = true)
+    private List<Connection> connection;
 
     /**
-     * Gets the value of the engineeringCRS property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EngineeringCRSType }
-     *     
+     * Gets the value of the connection property.
      */
-    public EngineeringCRSType getEngineeringCRS() {
-        return engineeringCRS;
+    public List<Connection> getConnection() {
+        if (connection == null) {
+            connection = new ArrayList<Connection>();
+        }
+        return this.connection;
     }
-
-    /**
-     * Sets the value of the engineeringCRS property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EngineeringCRSType }
-     *     
-     */
-    public void setEngineeringCRS(EngineeringCRSType value) {
-        this.engineeringCRS = value;
-    }
-
 }

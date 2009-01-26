@@ -67,8 +67,8 @@ public class ObjectFactory {
      * Create an instance of {@link DataSourceType.DataDefinition }
      * 
      */
-    public DataSourceType.DataDefinition createDataSourceTypeDataDefinition() {
-        return new DataSourceType.DataDefinition();
+    public DataDefinition createDataDefinition() {
+        return new DataDefinition();
     }
 
     /**
@@ -83,8 +83,8 @@ public class ObjectFactory {
      * Create an instance of {@link ContactInfo.Phone }
      * 
      */
-    public ContactInfo.Phone createContactInfoPhone() {
-        return new ContactInfo.Phone();
+    public PhoneType createContactInfoPhone() {
+        return new PhoneType();
     }
 
     /**
@@ -107,8 +107,8 @@ public class ObjectFactory {
      * Create an instance of {@link Components.ComponentList }
      * 
      */
-    public Components.ComponentList createComponentsComponentList() {
-        return new Components.ComponentList();
+    public ComponentList createComponentList() {
+        return new ComponentList();
     }
 
     /**
@@ -123,8 +123,8 @@ public class ObjectFactory {
      * Create an instance of {@link Connections.ConnectionList }
      * 
      */
-    public Connections.ConnectionList createConnectionsConnectionList() {
-        return new Connections.ConnectionList();
+    public ConnectionList createConnectionsConnectionList() {
+        return new ConnectionList();
     }
 
     /**
@@ -139,8 +139,8 @@ public class ObjectFactory {
      * Create an instance of {@link Keywords.KeywordList }
      * 
      */
-    public Keywords.KeywordList createKeywordsKeywordList() {
-        return new Keywords.KeywordList();
+    public KeywordList createKeywordList() {
+        return new KeywordList();
     }
 
     /**
@@ -219,24 +219,24 @@ public class ObjectFactory {
      * Create an instance of {@link Outputs.OutputList }
      * 
      */
-    public Outputs.OutputList createOutputsOutputList() {
-        return new Outputs.OutputList();
+    public OutputList createOutputList() {
+        return new OutputList();
     }
 
     /**
      * Create an instance of {@link Components.ComponentList.Component }
      * 
      */
-    public Components.ComponentList.Component createComponentsComponentListComponent() {
-        return new Components.ComponentList.Component();
+    public ComponentPropertyType createComponentPropertyType() {
+        return new ComponentPropertyType();
     }
 
     /**
-     * Create an instance of {@link Inputs.InputList }
+     * Create an instance of {@link InputList }
      * 
      */
-    public Inputs.InputList createInputsInputList() {
-        return new Inputs.InputList();
+    public InputList createInputList() {
+        return new InputList();
     }
 
     /**
@@ -323,16 +323,16 @@ public class ObjectFactory {
      * Create an instance of {@link DataSourceType.ObservationReference }
      * 
      */
-    public DataSourceType.ObservationReference createDataSourceTypeObservationReference() {
-        return new DataSourceType.ObservationReference();
+    public ObservationReference createObservationReference() {
+        return new ObservationReference();
     }
 
     /**
      * Create an instance of {@link Link.Destination }
      * 
      */
-    public Link.Destination createLinkDestination() {
-        return new Link.Destination();
+    public Destination createLinkDestination() {
+        return new Destination();
     }
 
     /**
@@ -347,8 +347,8 @@ public class ObjectFactory {
      * Create an instance of {@link Link.Source }
      * 
      */
-    public Link.Source createLinkSource() {
-        return new Link.Source();
+    public Source createLinkSource() {
+        return new Source();
     }
 
     /**
@@ -413,8 +413,8 @@ public class ObjectFactory {
      * Create an instance of {@link ArrayLink.SourceIndex }
      * 
      */
-    public ArrayLink.SourceIndex createArrayLinkSourceIndex() {
-        return new ArrayLink.SourceIndex();
+    public SourceIndex createArrayLinkSourceIndex() {
+        return new SourceIndex();
     }
 
     /**
@@ -437,8 +437,8 @@ public class ObjectFactory {
      * Create an instance of {@link ArrayLink.DestinationIndex }
      * 
      */
-    public ArrayLink.DestinationIndex createArrayLinkDestinationIndex() {
-        return new ArrayLink.DestinationIndex();
+    public DestinationIndex createArrayLinkDestinationIndex() {
+        return new DestinationIndex();
     }
 
     /**
@@ -557,8 +557,8 @@ public class ObjectFactory {
      * Create an instance of {@link ArrayLink.DestinationArray }
      * 
      */
-    public ArrayLink.DestinationArray createArrayLinkDestinationArray() {
-        return new ArrayLink.DestinationArray();
+    public DestinationArray createArrayLinkDestinationArray() {
+        return new DestinationArray();
     }
 
     /**
@@ -653,8 +653,8 @@ public class ObjectFactory {
      * Create an instance of {@link ContactInfo.Address }
      * 
      */
-    public ContactInfo.Address createContactInfoAddress() {
-        return new ContactInfo.Address();
+    public AddressType createContactInfoAddress() {
+        return new AddressType();
     }
 
     /**
@@ -701,8 +701,8 @@ public class ObjectFactory {
      * Create an instance of {@link ArrayLink.SourceArray }
      * 
      */
-    public ArrayLink.SourceArray createArrayLinkSourceArray() {
-        return new ArrayLink.SourceArray();
+    public SourceArray createArrayLinkSourceArray() {
+        return new SourceArray();
     }
 
     /**
@@ -897,10 +897,10 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "keyword", scope = Keywords.KeywordList.class)
+    @XmlElementDecl(namespace = "http://www.opengis.net/sensorML/1.0", name = "keyword", scope = KeywordList.class)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     public JAXBElement<String> createKeywordsKeywordListKeyword(String value) {
-        return new JAXBElement<String>(_KeywordsKeywordListKeyword_QNAME, String.class, Keywords.KeywordList.class, value);
+        return new JAXBElement<String>(_KeywordsKeywordListKeyword_QNAME, String.class, KeywordList.class, value);
     }
 
 }

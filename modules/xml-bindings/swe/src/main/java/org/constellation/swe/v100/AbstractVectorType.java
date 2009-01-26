@@ -60,6 +60,19 @@ public abstract class AbstractVectorType extends AbstractDataRecordType {
     @XmlSchemaType(name = "anyURI")
     private String localFrame;
 
+    public AbstractVectorType() {
+
+    }
+
+    public AbstractVectorType(String definition) {
+        super(definition);
+    }
+
+    public AbstractVectorType(String referenceFrame, String localFrame) {
+        this.localFrame = localFrame;
+        this.referenceFrame = referenceFrame;
+    }
+
     /**
      * Gets the value of the referenceFrame property.
      */

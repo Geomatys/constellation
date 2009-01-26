@@ -18,6 +18,7 @@ package org.constellation.gml.v311;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
@@ -51,5 +52,31 @@ import javax.xml.bind.annotation.XmlType;
     AbstractDatumType.class
 })
 public abstract class AbstractDatumBaseType extends DefinitionType {
+
+    @XmlElement(name = "datumName",  namespace = "http://www.opengis.net/gml")
+    private String datumName;
+
+    public AbstractDatumBaseType() {
+
+    }
+
+    public AbstractDatumBaseType(String id, String datumName) {
+        super(id);
+        this.datumName = datumName;
+    }
+
+    /**
+     * @return the datumName
+     */
+    public String getDatumName() {
+        return datumName;
+    }
+
+    /**
+     * @param datumName the datumName to set
+     */
+    public void setDatumName(String datumName) {
+        this.datumName = datumName;
+    }
 
 }

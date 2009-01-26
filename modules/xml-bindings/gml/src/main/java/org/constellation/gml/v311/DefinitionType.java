@@ -55,7 +55,14 @@ public class DefinitionType extends DefinitionBaseType {
     protected DefinitionType()  {
         
     }
-    
+
+    /**
+     * super constructor to access to Entry constructor
+     */
+    public DefinitionType(final String id)  {
+        super(id);
+    }
+
     /**
      * super constructor to access to Entry constructor
      */

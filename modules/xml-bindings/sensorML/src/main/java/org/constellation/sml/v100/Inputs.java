@@ -23,11 +23,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.geotools.util.Utilities;
 
 
@@ -70,7 +67,7 @@ import org.geotools.util.Utilities;
 public class Inputs {
 
     @XmlElement(name = "InputList")
-    private Inputs.InputList inputList;
+    private InputList inputList;
     @XmlAttribute
     private List<String> nilReason;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
@@ -101,14 +98,14 @@ public class Inputs {
     /**
      * Gets the value of the inputList property.
      */
-    public Inputs.InputList getInputList() {
+    public InputList getInputList() {
         return inputList;
     }
 
     /**
      * Sets the value of the inputList property.
      */
-    public void setInputList(Inputs.InputList value) {
+    public void setInputList(InputList value) {
         this.inputList = value;
     }
 
@@ -320,110 +317,4 @@ public class Inputs {
         return sb.toString();
     }
     
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="input" type="{http://www.opengis.net/sensorML/1.0}IoComponentPropertyType" maxOccurs="unbounded"/>
-     *       &lt;/sequence>
-     *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "input"
-    })
-    public static class InputList {
-
-        @XmlElement(required = true)
-        private List<IoComponentPropertyType> input;
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlID
-        private String id;
-
-        public InputList() {
-
-        }
-
-        public InputList(List<IoComponentPropertyType> input) {
-            this.input = input;
-        }
-
-        /**
-         * Gets the value of the input property.
-         */
-        public List<IoComponentPropertyType> getInput() {
-            if (input == null) {
-                input = new ArrayList<IoComponentPropertyType>();
-            }
-            return this.input;
-        }
-
-        /**
-         * Gets the value of the id property.
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Sets the value of the id property.
-         */
-        public void setId(String value) {
-            this.id = value;
-        }
-
-        /**
-         * Verify if this entry is identical to specified object.
-         */
-        @Override
-        public boolean equals(final Object object) {
-            if (object == this) {
-                return true;
-            }
-
-            if (object instanceof InputList) {
-                final InputList that = (InputList) object;
-
-                return Utilities.equals(this.input, that.input) &&
-                       Utilities.equals(this.id, that.id);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 29 * hash + (this.input != null ? this.input.hashCode() : 0);
-            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
-            return hash;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder("[OutputList]").append("\n");
-            if ( id != null) {
-                sb.append("id: ").append(id).append('\n');
-            }
-            if (input != null) {
-                sb.append("outputList:").append('\n');
-                for (IoComponentPropertyType k : input) {
-                    sb.append("output: ").append(k).append('\n');
-                }
-            }
-            return sb.toString();
-        }
-    }
 }

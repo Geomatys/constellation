@@ -19,71 +19,47 @@ package org.constellation.sml.v100;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.gml.v311.EngineeringCRSType;
-
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml}EngineeringCRS"/>
- *       &lt;/sequence>
+ *       &lt;attribute name="ref" type="{http://www.opengis.net/sensorML/1.0}linkRef" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "engineeringCRS"
-})
-@XmlRootElement(name = "spatialReferenceFrame")
-public class SpatialReferenceFrame {
+@XmlType(name = "")
+public class DestinationIndex {
 
-    @XmlElement(name = "EngineeringCRS", namespace = "http://www.opengis.net/gml", required = true)
-    private EngineeringCRSType engineeringCRS;
+    @XmlAttribute
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String ref;
 
-    public SpatialReferenceFrame() {
-
-    }
-
-    public SpatialReferenceFrame(EngineeringCRSType engineeringCRS) {
-        this.engineeringCRS = engineeringCRS;
+    /**
+     * Gets the value of the ref property.
+     */
+    public String getRef() {
+        return ref;
     }
 
     /**
-     * Gets the value of the engineeringCRS property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EngineeringCRSType }
-     *     
+     * Sets the value of the ref property.
      */
-    public EngineeringCRSType getEngineeringCRS() {
-        return engineeringCRS;
+    public void setRef(String value) {
+        this.ref = value;
     }
-
-    /**
-     * Sets the value of the engineeringCRS property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EngineeringCRSType }
-     *     
-     */
-    public void setEngineeringCRS(EngineeringCRSType value) {
-        this.engineeringCRS = value;
-    }
-
 }
