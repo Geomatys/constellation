@@ -209,9 +209,9 @@ public class WCSService extends OGCWebService {
                      new ServiceVersion(ServiceType.WCS, "1.0.0"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext( "org.constellation.ws" +
-                      ":org.constellation.wcs.v100" +
-                      ":org.constellation.wcs.v111",
+        setXMLContext("org.constellation.ws:" +
+                      "org.constellation.wcs.v100:" +
+                      "org.constellation.wcs.v111",
                       "http://www.opengis.net/wcs");
 
         LOGGER.info("WCS service running");

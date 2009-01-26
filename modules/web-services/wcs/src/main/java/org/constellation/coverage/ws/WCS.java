@@ -40,7 +40,9 @@ public class WCS extends CstlEmbeddedService {
 	 */
 	public WCS(String[] args) {
 		super(args);
-		GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages", "org.constellation.coverage.ws.rs");
+		GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
+                "org.constellation.coverage.ws.rs;" +
+                "org.constellation.ws.rs.provider");
 	}
 
 	/**
