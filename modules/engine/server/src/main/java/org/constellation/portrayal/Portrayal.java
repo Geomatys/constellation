@@ -72,6 +72,11 @@ public final class Portrayal {
 			this.envelope = env;
 			this.azimuth  = azimuth;
 		}
+
+        @Override
+        public String toString() {
+            return "ViewDef[envelope=" + envelope +", azimuth=" + azimuth + "]";
+        }
 	}
 	
 	
@@ -83,6 +88,11 @@ public final class Portrayal {
 			this.dimension = dimension;
 			this.background = background;
 		}
+
+        @Override
+        public String toString() {
+            return "CanvasDef[dimension=" + dimension + ", background=" + background +"]";
+        }
 	}
 	
 	
@@ -119,7 +129,7 @@ public final class Portrayal {
 			this.styleRefs.add(styleRef);
 			this.renderingParameters = renderingParameters;
 		}
-		
+
 	}
 
 }

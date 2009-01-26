@@ -34,7 +34,6 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReadParam;
 import org.geotools.coverage.io.CoverageReader;
 import org.geotools.coverage.processing.Operations;
-import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -161,7 +160,7 @@ public class PostGridReader implements CoverageReader{
             
             if(ref != null) coverage = ref.getCoverage(null);
             else{
-                LOGGER.log(Level.WARNING, "No coverage reference found for layer : " + getTable().getLayer().getName());
+                throw new CatalogException("No coverage reference found for layer : " + getTable().getLayer().getName());
             }
 
         } catch (CatalogException ex) {

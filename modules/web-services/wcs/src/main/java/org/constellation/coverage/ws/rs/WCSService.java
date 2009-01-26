@@ -1105,7 +1105,7 @@ public class WCSService extends OGCWebService {
             //TODO: This will fail when we start working with OGC urn ids
             //      we will need to be much more sophisticated.
             try {
-                crs = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
+                crs = CRS.decode(crsName);
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_CRS, getActingVersion());
             }
