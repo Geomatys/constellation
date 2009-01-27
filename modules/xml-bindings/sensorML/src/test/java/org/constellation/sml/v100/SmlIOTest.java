@@ -29,8 +29,6 @@ import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.sml.v100.Identification.IdentifierList;
 import org.constellation.sml.v100.Identification.IdentifierList.Identifier;
-import org.constellation.sml.v100.Inputs.InputList;
-import org.constellation.sml.v100.Outputs.OutputList;
 import org.constellation.sml.v100.Parameters.ParameterList;
 import org.constellation.swe.v100.AbstractDataRecordType;
 import org.constellation.swe.v100.CodeSpacePropertyType;
@@ -127,7 +125,7 @@ public class SmlIOTest {
         kw.add(sml100Factory.createKeywordsKeywordListKeyword("piezometer"));
         kw.add(sml100Factory.createKeywordsKeywordListKeyword("geosciences"));
         kw.add(sml100Factory.createKeywordsKeywordListKeyword("point d'eau"));
-        Keywords keywords = new Keywords(new Keywords.KeywordList("urn:x-brgm:def:gcmd:keywords", kw));
+        Keywords keywords = new Keywords(new KeywordList("urn:x-brgm:def:gcmd:keywords", kw));
         component.setKeywords(keywords);
 
         Classifier cl1 = new Classification.ClassifierList.Classifier("intendedApplication", new Term("eaux souterraines", "urn:x-ogc:def:classifier:OGC:application"));
