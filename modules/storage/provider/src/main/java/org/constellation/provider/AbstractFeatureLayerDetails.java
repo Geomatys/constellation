@@ -180,7 +180,8 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             }
 
         }catch(Exception e){
-            LOGGER.log(Level.WARNING , "Could not evaluate bounding box",e);
+            LOGGER.log(Level.WARNING , "Could not evaluate the bounding box for the layer \"" +getName() +"\". " +
+                    "The selected one by defaut will be: " + DUMMY_BBOX, e);
         }
 
         return DUMMY_BBOX;
