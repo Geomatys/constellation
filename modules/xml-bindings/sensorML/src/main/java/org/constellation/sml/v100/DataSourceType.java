@@ -17,18 +17,10 @@
 
 package org.constellation.sml.v100;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
-import org.w3c.dom.Element;
-
 
 /**
  * <p>Java class for DataSourceType complex type.
@@ -91,7 +83,7 @@ import org.w3c.dom.Element;
 public class DataSourceType extends AbstractProcessType {
 
     private DataDefinition dataDefinition;
-    private DataSourceType.Values values;
+    private Values values;
     private ObservationReference observationReference;
 
     /**
@@ -111,14 +103,14 @@ public class DataSourceType extends AbstractProcessType {
     /**
      * Gets the value of the values property.
      */
-    public DataSourceType.Values getValues() {
+    public Values getValues() {
         return values;
     }
 
     /**
      * Sets the value of the values property.
      */
-    public void setValues(DataSourceType.Values value) {
+    public void setValues(Values value) {
         this.values = value;
     }
 
@@ -134,53 +126,6 @@ public class DataSourceType extends AbstractProcessType {
      */
     public void setObservationReference(ObservationReference value) {
         this.observationReference = value;
-    }
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;extension base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *     &lt;/extension>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "any"
-    })
-    public static class Values {
-
-        @XmlAnyElement
-        private List<Element> any;
-        @XmlAnyAttribute
-        private Map<QName, String> otherAttributes = new HashMap<QName, String>();
-
-        /**
-         * Gets the value of the any property.
-         * 
-         */
-        public List<Element> getAny() {
-            if (any == null) {
-                any = new ArrayList<Element>();
-            }
-            return this.any;
-        }
-
-        /**
-         * Gets a map that contains attributes that aren't bound to any typed property on this class.
-         */
-        public Map<QName, String> getOtherAttributes() {
-            return otherAttributes;
-        }
-
     }
 
 }

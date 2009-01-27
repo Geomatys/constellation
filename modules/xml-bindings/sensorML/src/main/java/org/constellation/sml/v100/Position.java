@@ -291,6 +291,57 @@ public class Position {
         this.type = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Position]").append("\n");
+        if (actuate != null) {
+            sb.append("name: ").append(name).append('\n');
+        }
+        if (position != null) {
+            sb.append("position: ").append(position).append('\n');
+        }
+
+        if (process != null) {
+            sb.append("process: ").append(process.getValue()).append('\n');
+        }
+
+        if (vector != null) {
+            sb.append("vector: ").append(vector).append('\n');
+        }
+
+        if (nilReason != null) {
+            sb.append("nilReason:").append('\n');
+            for (String k : nilReason) {
+                sb.append("nilReason: ").append(k).append('\n');
+            }
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+
     /**
      * Verify if this entry is identical to specified object.
      */

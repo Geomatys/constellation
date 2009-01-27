@@ -23,14 +23,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.sml.AbstractClassification;
-import org.constellation.sml.AbstractClassifier;
-import org.constellation.sml.AbstractClassifierList;
 import org.geotools.util.Utilities;
 
 
@@ -84,7 +79,7 @@ import org.geotools.util.Utilities;
 public class Classification implements AbstractClassification {
 
     @XmlElement(name = "ClassifierList")
-    private Classification.ClassifierList classifierList;
+    private ClassifierList classifierList;
     @XmlAttribute
     private List<String> nilReason;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
@@ -115,14 +110,14 @@ public class Classification implements AbstractClassification {
     /**
      * Gets the value of the classifierList property.
      */
-    public Classification.ClassifierList getClassifierList() {
+    public ClassifierList getClassifierList() {
         return classifierList;
     }
 
     /**
      * Sets the value of the classifierList property.
      */
-    public void setClassifierList(Classification.ClassifierList value) {
+    public void setClassifierList(ClassifierList value) {
         this.classifierList = value;
     }
 
@@ -333,233 +328,6 @@ public class Classification implements AbstractClassification {
         hash = 23 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 23 * hash + (this.type != null ? this.type.hashCode() : 0);
         return hash;
-    }
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="classifier" maxOccurs="unbounded">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}Term"/>
-     *                 &lt;/sequence>
-     *                 &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}token" />
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *       &lt;/sequence>
-     *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "classifier"
-    })
-    public static class ClassifierList implements AbstractClassifierList {
-
-        @XmlElement(required = true)
-        private List<Classification.ClassifierList.Classifier> classifier;
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlID
-        private String id;
-
-        public ClassifierList() {
-
-        }
-
-        public ClassifierList(String id, List<Classifier> classifier) {
-            this.classifier = classifier;
-            this.id         = id;
-        }
-
-        /**
-         * Gets the value of the classifier property.
-         * 
-         */
-        public List<Classification.ClassifierList.Classifier> getClassifier() {
-            if (classifier == null) {
-                classifier = new ArrayList<Classification.ClassifierList.Classifier>();
-            }
-            return this.classifier;
-        }
-
-        /**
-         * Gets the value of the id property.
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Sets the value of the id property.
-         */
-        public void setId(String value) {
-            this.id = value;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder("[ClassifierList]").append("\n");
-            if (classifier != null) {
-                sb.append("classifier: ").append(classifier).append('\n');
-            }
-            if (id != null) {
-                sb.append("id: ").append(id).append('\n');
-            }
-            return sb.toString();
-        }
-
-        /**
-         * Verify if this entry is identical to specified object.
-         */
-        @Override
-        public boolean equals(final Object object) {
-            if (object == this) {
-                return true;
-            }
-
-            if (object instanceof ClassifierList) {
-                final ClassifierList that = (ClassifierList) object;
-
-                return Utilities.equals(this.classifier, that.classifier) &&
-                       Utilities.equals(this.id, that.id);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 29 * hash + (this.classifier != null ? this.classifier.hashCode() : 0);
-            hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
-            return hash;
-        }
-
-        /**
-         * <p>Java class for anonymous complex type.
-         * 
-         * <p>The following schema fragment specifies the expected content contained within this class.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}Term"/>
-         *       &lt;/sequence>
-         *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}token" />
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "term"
-        })
-        public static class Classifier implements AbstractClassifier {
-
-            @XmlElement(name = "Term", required = true)
-            private Term term;
-            @XmlAttribute
-            @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-            private String name;
-
-            public Classifier() {
-
-            }
-            
-            public Classifier(String name, Term term) {
-                this.name = name;
-                this.term = term;
-            }
-
-            /**
-             * Gets the value of the term property.
-            */
-            public Term getTerm() {
-                return term;
-            }
-
-            /**
-             * Sets the value of the term property.
-             */
-            public void setTerm(Term value) {
-                this.term = value;
-            }
-
-            /**
-             * Gets the value of the name property.
-             */
-            public String getName() {
-                return name;
-            }
-
-            /**
-             * Sets the value of the name property.
-             */
-            public void setName(String value) {
-                this.name = value;
-            }
-
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder("[Classifier]").append("\n");
-                if (term != null) {
-                    sb.append("term: ").append(term).append('\n');
-                }
-                if (name != null) {
-                    sb.append("name: ").append(name).append('\n');
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Verify if this entry is identical to specified object.
-             */
-            @Override
-            public boolean equals(final Object object) {
-                if (object == this) {
-                    return true;
-                }
-
-                if (object instanceof Classifier) {
-                    final Classifier that = (Classifier) object;
-
-                    return Utilities.equals(this.name, that.name) &&
-                           Utilities.equals(this.term, that.term);
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode() {
-                int hash = 3;
-                hash = 79 * hash + (this.term != null ? this.term.hashCode() : 0);
-                hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
-                return hash;
-            }
-
-        }
-
     }
 
 }

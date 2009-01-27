@@ -23,14 +23,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.sml.AbstractIdentification;
-import org.constellation.sml.AbstractIdentifier;
-import org.constellation.sml.AbstractIdentifierList;
 import org.geotools.util.Utilities;
 
 
@@ -84,7 +79,7 @@ import org.geotools.util.Utilities;
 public class Identification implements AbstractIdentification {
 
     @XmlElement(name = "IdentifierList")
-    private Identification.IdentifierList identifierList;
+    private IdentifierList identifierList;
     @XmlAttribute
     private List<String> nilReason;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
@@ -115,14 +110,14 @@ public class Identification implements AbstractIdentification {
     /**
      * Gets the value of the identifierList property.
      */
-    public Identification.IdentifierList getIdentifierList() {
+    public IdentifierList getIdentifierList() {
         return identifierList;
     }
 
     /**
      * Sets the value of the identifierList property.
      */
-    public void setIdentifierList(Identification.IdentifierList value) {
+    public void setIdentifierList(IdentifierList value) {
         this.identifierList = value;
     }
 
@@ -332,235 +327,6 @@ public class Identification implements AbstractIdentification {
         hash = 67 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 67 * hash + (this.type != null ? this.type.hashCode() : 0);
         return hash;
-    }
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="identifier" maxOccurs="unbounded">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element ref="{http://www.opengis.net/sensorML/1.0}Term"/>
-     *                 &lt;/sequence>
-     *                 &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}token" />
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *       &lt;/sequence>
-     *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "identifier"
-    })
-    public static class IdentifierList implements AbstractIdentifierList {
-
-        @XmlElement(required = true)
-        private List<Identification.IdentifierList.Identifier> identifier;
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlID
-        private String id;
-
-        public IdentifierList() {
-
-        }
-
-        public IdentifierList(String id, List<Identifier> identifiers) {
-            this.id         = id;
-            this.identifier = identifiers;
-        }
-
-        /**
-         * Gets the value of the identifier property.
-         */
-        public List<Identification.IdentifierList.Identifier> getIdentifier() {
-            if (identifier == null) {
-                identifier = new ArrayList<Identification.IdentifierList.Identifier>();
-            }
-            return this.identifier;
-        }
-
-        /**
-         * Gets the value of the id property.
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Sets the value of the id property.
-         */
-        public void setId(String value) {
-            this.id = value;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder("[IdentifierList]").append("\n");
-            if (identifier != null) {
-                for (Identification.IdentifierList.Identifier k: identifier) {
-                    sb.append("identifier:").append(k).append('\n');
-                }
-            }
-            if (id != null) {
-                sb.append("id: ").append(id).append('\n');
-            }
-            return sb.toString();
-        }
-
-        /**
-         * Verify if this entry is identical to specified object.
-         */
-        @Override
-        public boolean equals(final Object object) {
-            if (object == this) {
-                return true;
-            }
-
-            if (object instanceof IdentifierList) {
-                final IdentifierList that = (IdentifierList) object;
-
-                return Utilities.equals(this.identifier, that.identifier) &&
-                       Utilities.equals(this.id, that.id);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 53 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
-            hash = 53 * hash + (this.id != null ? this.id.hashCode() : 0);
-            return hash;
-        }
-
-
-        /**
-         * <p>Java class for anonymous complex type.
-         * 
-         * <p>The following schema fragment specifies the expected content contained within this class.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}Term"/>
-         *       &lt;/sequence>
-         *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}token" />
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "term"
-        })
-        public static class Identifier implements AbstractIdentifier{
-
-            @XmlElement(name = "Term", required = true)
-            private Term term;
-            @XmlAttribute
-            @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-            private String name;
-
-            public Identifier() {
-
-            }
-
-            public Identifier(String name, Term term) {
-                this.name = name;
-                this.term = term;
-            }
-
-            /**
-             * Gets the value of the term property.
-             */
-            public Term getTerm() {
-                return term;
-            }
-
-            /**
-             * Sets the value of the term property.
-             */
-            public void setTerm(Term value) {
-                this.term = value;
-            }
-
-            /**
-             * Gets the value of the name property.
-             */
-            public String getName() {
-                return name;
-            }
-
-            /**
-             * Sets the value of the name property.
-             */
-            public void setName(String value) {
-                this.name = value;
-            }
-
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder("[Identifier]").append("\n");
-                if (term != null) {
-                    sb.append("term:").append(term).append('\n');
-                }
-                if (name != null) {
-                    sb.append("name: ").append(name).append('\n');
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Verify if this entry is identical to specified object.
-             */
-            @Override
-            public boolean equals(final Object object) {
-                if (object == this) {
-                    return true;
-                }
-
-                if (object instanceof Identifier) {
-                    final Identifier that = (Identifier) object;
-
-                    return Utilities.equals(this.name, that.name) &&
-                           Utilities.equals(this.term, that.term);
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode() {
-                int hash = 5;
-                hash = 13 * hash + (this.term != null ? this.term.hashCode() : 0);
-                hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
-                return hash;
-            }
-
-        }
-
     }
 
 }

@@ -17,12 +17,9 @@
 
 package org.constellation.sml.v100;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractDerivableComponent;
@@ -59,21 +56,16 @@ import org.geotools.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractDerivableComponentType", propOrder = {
-    "rest",
     "location",
     "spatialReferenceFrame",
-    "position"
+    "position",
+    "timePosition",
+    "temporalReferenceFrame",
+    "interfaces"
 
 })
 @XmlSeeAlso({AbstractComponentType.class, ComponentArrayType.class}) 
 public abstract class AbstractDerivableComponentType extends AbstractProcessType implements AbstractDerivableComponent {
-
-    @XmlElementRefs({
-        @XmlElementRef(name = "timePosition",           namespace = "http://www.opengis.net/sensorML/1.0", type = TimePosition.class),
-        @XmlElementRef(name = "temporalReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0", type = TemporalReferenceFrame.class),
-        @XmlElementRef(name = "interfaces",             namespace = "http://www.opengis.net/sensorML/1.0", type = Interfaces.class)
-    })
-    private List<Object> rest;
 
     @XmlElementRef(name = "spatialReferenceFrame",  namespace = "http://www.opengis.net/sensorML/1.0", type = SpatialReferenceFrame.class)
     private SpatialReferenceFrame spatialReferenceFrame;
@@ -83,18 +75,17 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
 
     @XmlElementRef(name = "position", namespace = "http://www.opengis.net/sensorML/1.0", type = Position.class)
     private Position position;
-    
 
-    /**
-     * Gets the rest of the content model. 
-     * 
-     */
-    public List<Object> getRest() {
-        if (rest == null) {
-            rest = new ArrayList<Object>();
-        }
-        return this.rest;
-    }
+    @XmlElementRef(name = "timePosition", namespace = "http://www.opengis.net/sensorML/1.0", type = TimePosition.class)
+    private TimePosition timePosition;
+
+    @XmlElementRef(name = "temporalReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0", type = TemporalReferenceFrame.class)
+    private TemporalReferenceFrame temporalReferenceFrame;
+
+    @XmlElementRef(name = "interfaces", namespace = "http://www.opengis.net/sensorML/1.0", type = Interfaces.class)
+    private Interfaces interfaces;
+
+    
 
     public Location getSMLLocation() {
         return location;
@@ -143,23 +134,29 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
 
         if (object instanceof AbstractDerivableComponentType && super.equals(object)) {
             final AbstractDerivableComponentType that = (AbstractDerivableComponentType) object;
-            return Utilities.equals(this.rest,                  that.rest) &&
-                   Utilities.equals(this.spatialReferenceFrame, that.spatialReferenceFrame) &&
-                   Utilities.equals(this.location,              that.location) &&
-                   Utilities.equals(this.position,              that.position);
+            return Utilities.equals(this.interfaces,             that.interfaces) &&
+                   Utilities.equals(this.temporalReferenceFrame, that.temporalReferenceFrame) &&
+                   Utilities.equals(this.timePosition,           that.timePosition) &&
+                   Utilities.equals(this.spatialReferenceFrame,  that.spatialReferenceFrame) &&
+                   Utilities.equals(this.location,               that.location) &&
+                   Utilities.equals(this.position,               that.position);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + (this.rest != null ? this.rest.hashCode() : 0);
-        hash = 29 * hash + (this.spatialReferenceFrame != null ? this.spatialReferenceFrame.hashCode() : 0);
-        hash = 29 * hash + (this.location != null ? this.location.hashCode() : 0);
-        hash = 29 * hash + (this.position != null ? this.position.hashCode() : 0);
+        int hash = 5;
+        hash = 73 * hash + (this.spatialReferenceFrame != null ? this.spatialReferenceFrame.hashCode() : 0);
+        hash = 73 * hash + (this.location != null ? this.location.hashCode() : 0);
+        hash = 73 * hash + (this.position != null ? this.position.hashCode() : 0);
+        hash = 73 * hash + (this.timePosition != null ? this.timePosition.hashCode() : 0);
+        hash = 73 * hash + (this.temporalReferenceFrame != null ? this.temporalReferenceFrame.hashCode() : 0);
+        hash = 73 * hash + (this.interfaces != null ? this.interfaces.hashCode() : 0);
         return hash;
     }
+
+    
 
     @Override
     public String toString() {
@@ -170,14 +167,55 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
             sb.append("position: ").append(position).append('\n');
         if (spatialReferenceFrame != null)
             sb.append("spatialReferenceFrame: ").append(spatialReferenceFrame).append('\n');
-        if (rest != null) {
-            sb.append("rest:").append('\n');
-            int i = 0;
-            for (Object r: rest) {
-                sb.append("rest n°").append(i).append(": ").append(r).append('\n');
-            }
-        }
+        if (timePosition != null)
+            sb.append("timePosition: ").append(timePosition).append('\n');
+        if (interfaces != null)
+            sb.append("timePosition: ").append(timePosition).append('\n');
+        if (temporalReferenceFrame != null)
+            sb.append("temporalReferenceFrame: ").append(temporalReferenceFrame).append('\n');
         return sb.toString();
+    }
+
+    /**
+     * @return the timePosition
+     */
+    public TimePosition getTimePosition() {
+        return timePosition;
+    }
+
+    /**
+     * @param timePosition the timePosition to set
+     */
+    public void setTimePosition(TimePosition timePosition) {
+        this.timePosition = timePosition;
+    }
+
+    /**
+     * @return the temporalReferenceFrame
+     */
+    public TemporalReferenceFrame getTemporalReferenceFrame() {
+        return temporalReferenceFrame;
+    }
+
+    /**
+     * @param temporalReferenceFrame the temporalReferenceFrame to set
+     */
+    public void setTemporalReferenceFrame(TemporalReferenceFrame temporalReferenceFrame) {
+        this.temporalReferenceFrame = temporalReferenceFrame;
+    }
+
+    /**
+     * @return the interfaces
+     */
+    public Interfaces getInterfaces() {
+        return interfaces;
+    }
+
+    /**
+     * @param interfaces the interfaces to set
+     */
+    public void setInterfaces(Interfaces interfaces) {
+        this.interfaces = interfaces;
     }
 
 }

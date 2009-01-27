@@ -24,12 +24,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 //constellation
-import org.constellation.sml.v100.Classification.ClassifierList.Classifier;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.sml.v100.Identification.IdentifierList;
-import org.constellation.sml.v100.Identification.IdentifierList.Identifier;
-import org.constellation.sml.v100.Parameters.ParameterList;
 import org.constellation.swe.v100.AbstractDataRecordType;
 import org.constellation.swe.v100.CodeSpacePropertyType;
 import org.constellation.swe.v100.DataComponentPropertyType;
@@ -128,13 +124,13 @@ public class SmlIOTest {
         Keywords keywords = new Keywords(new KeywordList("urn:x-brgm:def:gcmd:keywords", kw));
         component.setKeywords(keywords);
 
-        Classifier cl1 = new Classification.ClassifierList.Classifier("intendedApplication", new Term("eaux souterraines", "urn:x-ogc:def:classifier:OGC:application"));
+        Classifier cl1 = new Classifier("intendedApplication", new Term("eaux souterraines", "urn:x-ogc:def:classifier:OGC:application"));
         CodeSpacePropertyType cs = new CodeSpacePropertyType("urn:x-brgm:def:GeoPoint:bss");
-        Classifier cl2 = new Classification.ClassifierList.Classifier("sensorType", new Term(cs, "Profondeur", "urn:sensor:classifier:sensorType"));
+        Classifier cl2 = new Classifier("sensorType", new Term(cs, "Profondeur", "urn:sensor:classifier:sensorType"));
         List<Classifier> cls = new ArrayList<Classifier>();
         cls.add(cl1);
         cls.add(cl2);
-        Classification.ClassifierList claList = new Classification.ClassifierList(null, cls);
+        ClassifierList claList = new ClassifierList(null, cls);
         Classification classification = new Classification(claList);
         component.setClassification(classification);
 
@@ -164,7 +160,7 @@ public class SmlIOTest {
         component.SetContact(contact);
 
         Position position = new Position("conductivitePosition", "piezometer#piezoPosition");
-        component.getRest().add(position);
+        component.setPosition(position);
 
         IoComponentPropertyType io = new IoComponentPropertyType("level", new ObservableProperty("urn:x-ogc:def:phenomenon:OGC:level"));
         InputList inputList = new InputList(Arrays.asList(io));
@@ -191,6 +187,8 @@ public class SmlIOTest {
         ParameterList paramList = new ParameterList(params);
         Parameters parameters = new Parameters(paramList);
         component.setParameters(parameters);
+
+        component.setPosition(new Position("conductivitePosition", "piezometer#piezoPosition"));
 
         member.setProcess(sml100Factory.createComponent(component));
         SensorML expectedResult = new SensorML("1.0", Arrays.asList(member));
@@ -231,6 +229,16 @@ public class SmlIOTest {
         assertEquals(resultProcess.getInputs(), component.getInputs());
 
         assertEquals(resultProcess.getOutputs(), component.getOutputs());
+
+        assertEquals(resultProcess.getSMLLocation(), component.getSMLLocation());
+
+        assertEquals(resultProcess.getPosition(), component.getPosition());
+
+        assertEquals(resultProcess.getSpatialReferenceFrame(), component.getSpatialReferenceFrame());
+
+        assertEquals(resultProcess.getDocumentation(), component.getDocumentation());
+
+        
 
         assertEquals(resultProcess, component);
 

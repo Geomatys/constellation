@@ -99,8 +99,8 @@ public class ObjectFactory {
      * Create an instance of {@link Interfaces.InterfaceList }
      * 
      */
-    public Interfaces.InterfaceList createInterfacesInterfaceList() {
-        return new Interfaces.InterfaceList();
+    public InterfaceList createInterfacesInterfaceList() {
+        return new InterfaceList();
     }
 
     /**
@@ -259,8 +259,8 @@ public class ObjectFactory {
      * Create an instance of {@link Classification.ClassifierList.Classifier }
      * 
      */
-    public Classification.ClassifierList.Classifier createClassificationClassifierListClassifier() {
-        return new Classification.ClassifierList.Classifier();
+    public Classifier createClassificationClassifierListClassifier() {
+        return new Classifier();
     }
 
     /**
@@ -493,8 +493,8 @@ public class ObjectFactory {
      * Create an instance of {@link Identification.IdentifierList }
      * 
      */
-    public Identification.IdentifierList createIdentificationIdentifierList() {
-        return new Identification.IdentifierList();
+    public IdentifierList createIdentifierList() {
+        return new IdentifierList();
     }
 
     /**
@@ -589,8 +589,8 @@ public class ObjectFactory {
      * Create an instance of {@link Identification.IdentifierList.Identifier }
      * 
      */
-    public Identification.IdentifierList.Identifier createIdentificationIdentifierListIdentifier() {
-        return new Identification.IdentifierList.Identifier();
+    public Identifier createIdentifier() {
+        return new Identifier();
     }
 
     /**
@@ -629,8 +629,8 @@ public class ObjectFactory {
      * Create an instance of {@link DataSourceType.Values }
      * 
      */
-    public DataSourceType.Values createDataSourceTypeValues() {
-        return new DataSourceType.Values();
+    public Values createDataSourceTypeValues() {
+        return new Values();
     }
 
     /**
@@ -693,8 +693,8 @@ public class ObjectFactory {
      * Create an instance of {@link Classification.ClassifierList }
      * 
      */
-    public Classification.ClassifierList createClassificationClassifierList() {
-        return new Classification.ClassifierList();
+    public ClassifierList createClassifierList() {
+        return new ClassifierList();
     }
 
     /**
@@ -725,8 +725,8 @@ public class ObjectFactory {
      * Create an instance of {@link Parameters.ParameterList }
      * 
      */
-    public Parameters.ParameterList createParametersParameterList() {
-        return new Parameters.ParameterList();
+    public ParameterList createParametersParameterList() {
+        return new ParameterList();
     }
 
     /**
