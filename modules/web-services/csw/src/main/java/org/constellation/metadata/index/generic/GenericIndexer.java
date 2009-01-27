@@ -76,6 +76,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
     private Map<String, Method> getters = new HashMap<String, Method>();
 
+    private final Map<String, List<String>> additionalQueryable;
     /**
      * Shared Thread Pool for parralele execution
      */
@@ -90,8 +91,25 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws CstlServiceException {
         super(serviceID, configDirectory);
         this.reader = reader;
+        if (reader != null)
+            additionalQueryable = reader.getAdditionalQueryablePathMap();
+        else
+            additionalQueryable = null;
         if (create)
             createIndex();
+    }
+
+    /**
+     * Creates a new Lucene Index into the specified directory with the specified list of object to index.
+     *
+     * @param configDirectory A directory where the index can write indexation file.
+     */
+    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws CstlServiceException {
+        super(serviceID, configDirectory);
+        this.reader = null;
+        this.additionalQueryable = additionalQueryable;
+        if (create)
+            createIndex(toIndex);
     }
     
     /** 
@@ -112,6 +130,39 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             logger.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
             for (Object entry : ids) {
+                indexDocument(writer, entry);
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (LockObtainFailedException ex) {
+            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+                " documents indexed: " + nbEntries);
+    }
+
+    /**
+     * Create a new Index from a generic database.
+     *
+     * @throws java.sql.SQLException
+     */
+    public void createIndex(List<? extends Object> toIndex) throws CstlServiceException {
+        logger.info("Creating lucene index for Generic database please wait...");
+        long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbEntries = 0;
+        try {
+            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            nbEntries = toIndex.size();
+            for (Object entry : toIndex) {
                 indexDocument(writer, entry);
             }
             writer.optimize();
@@ -195,7 +246,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         // make a new, empty document
         final Document doc = new Document();
-        CompletionService<String> cs = new BoundedCompletionService<String>(this.pool, 5);
+        CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
         doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
@@ -203,18 +254,18 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         logger.finer("indexing ISO 19119 MD_Metadata");
         //TODO add ANyText
         for (final String term : ISO_QUERYABLE.keySet()) {
-             cs.submit(new Callable<String>() {
-                public String call() {
-                    return getValues(metadata, ISO_QUERYABLE.get(term));
+             cs.submit(new Callable<TermValue>() {
+                public TermValue call() {
+                    return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
                 }
            });
         }
 
-        for (String term : ISO_QUERYABLE.keySet()) {
+        for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
             try {
-                String values = cs.take().get();
-                doc.add(new Field(term, values, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                TermValue values = cs.take().get();
+                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
@@ -279,28 +330,28 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
             
          // All metadata types must be compatible with dublinCore.
-        cs = new BoundedCompletionService<String>(this.pool, 5);
+        cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         final StringBuilder anyText = new StringBuilder();
         for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-            cs.submit(new Callable<String>() {
+            cs.submit(new Callable<TermValue>() {
 
-                public String call() {
-                    return getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term));
+                public TermValue call() {
+                    return new TermValue(term, getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term)));
                 }
             });
         }
 
-        for (String term : DUBLIN_CORE_QUERYABLE.keySet()) {
+        for (int i = 0; i < DUBLIN_CORE_QUERYABLE.size(); i++) {
             try {
-                String values = cs.take().get();
-                if (!values.equals("null")) {
+                TermValue values = cs.take().get();
+                if (!values.value.equals("null")) {
                     anyText.append(values).append(" ");
                 }
-                if (term.equals("date") || term.equals("modified")) {
-                    values = values.replaceAll("-", "");
+                if (values.term.equals("date") || values.term.equals("modified")) {
+                    values.value = values.value.replaceAll("-", "");
                 }
-                doc.add(new Field(term, values, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
@@ -369,19 +420,20 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
 
         // we add to the index the special queryable element of the metadata reader
-        Map<String, List<String>> additionalQueryable = reader.getAdditionalQueryablePathMap();
-        for (String term : additionalQueryable.keySet()) {
+        if (additionalQueryable != null) {
+            for (String term : additionalQueryable.keySet()) {
 
-            String values = getValues(metadata, additionalQueryable.get(term));
-            if (!values.equals("null")) {
-                logger.finer("put " + term + " values: " + values);
-                anyText.append(values).append(" ");
+                String values = getValues(metadata, additionalQueryable.get(term));
+                if (!values.equals("null")) {
+                    logger.finer("put " + term + " values: " + values);
+                    anyText.append(values).append(" ");
+                }
+                if (term.equals("date") || term.equals("modified")) {
+                    values = values.replaceAll("-","");
+                }
+                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
-            if (term.equals("date") || term.equals("modified")) {
-                values = values.replaceAll("-","");
-            }
-            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
         // add a default meta field to make searching all documents easy 
@@ -651,5 +703,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         if (reader != null)
             reader.destroy();
         pool.shutdown();
+    }
+
+    private static class TermValue {
+        public String term;
+
+        public String value;
+
+        public TermValue(String term, String value) {
+            this.term  = term;
+            this.value = value;
+        }
     }
 }

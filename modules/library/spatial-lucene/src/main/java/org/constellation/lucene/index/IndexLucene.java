@@ -22,7 +22,7 @@ import java.io.File;
 // Lucene dependencies
 import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 
 // Constellation dependencies
 import org.apache.lucene.store.RAMDirectory;
@@ -56,7 +56,7 @@ public abstract class IndexLucene {
      * @param configDirectory A directory where the index can write indexation file. 
      */
     public IndexLucene() {
-        analyzer = new SimpleAnalyzer();
+        analyzer = new KeywordAnalyzer();
     }
 
     /**

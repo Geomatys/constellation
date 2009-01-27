@@ -19,6 +19,7 @@ package org.constellation.lucene.index;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.List;
 
 // Apache Lucene dependencies
 import org.apache.lucene.document.Document;
@@ -82,6 +83,13 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      * @throws java.sql.SQLException
      */
     public abstract void createIndex() throws CstlServiceException;
+
+    /**
+     * Create a new Index with the specified list of object.
+     *
+     * @throws java.sql.SQLException
+     */
+    public abstract void createIndex(List<? extends Object> toIndex) throws CstlServiceException;
 
     /**
      * Index a document from the specified object with the specified index writer.

@@ -202,6 +202,45 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
     }
+
+    /**
+     * Create a new Index from a list of Form object.
+     *
+     * @throws java.sql.SQLException
+     */
+    public void createIndex(List<? extends Object> forms) throws CstlServiceException {
+        logger.info("Creating lucene index for MDWeb database please wait...");
+
+        long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbCatalogs = 0;
+        int nbForms = 0;
+        try {
+            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+
+            nbForms = forms.size();
+            for (Object form : forms) {
+                if (form instanceof Form)
+                    indexDocument(writer, (Form)form);
+                else
+                    throw new IllegalArgumentException("The objects must be forms");
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (LockObtainFailedException ex) {
+            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+                "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
+    }
     
     /**
      * This method add to index of lucene a new document based on Form object.

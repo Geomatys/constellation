@@ -2666,7 +2666,7 @@ public class LuceneTest {
         }
         nbResults = results.size();
         logger.finer("QnS: name like point* OR BBOX 1: nb Results: " + nbResults);
-        logger.info(resultString.toString());
+        logger.finer(resultString.toString());
                 
         //we verify that we obtain the correct results
         assertEquals(nbResults, 12);

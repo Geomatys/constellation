@@ -999,7 +999,7 @@ public class CSWworker {
                 String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null){
-                    unexistingID.add(id);
+                    unexistingID.add(saved);
                     logger.severe("unexisting metadata id: " + saved);
                     continue;
                 }
@@ -1022,7 +1022,7 @@ public class CSWworker {
                String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
-                    unexistingID.add(id);
+                    unexistingID.add(saved);
                     logger.severe("unexisting metadata id:" + saved);
                     continue;
                 }
@@ -1050,7 +1050,7 @@ public class CSWworker {
                String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
-                    unexistingID.add(id);
+                    unexistingID.add(saved);
                     logger.severe("unexisting id:" + saved);
                     continue;
                 }
@@ -1078,7 +1078,7 @@ public class CSWworker {
                String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
-                    unexistingID.add(id);
+                    unexistingID.add(saved);
                     logger.severe("unexisting metadata id: " + saved);
                     continue;
                 }
@@ -1106,7 +1106,7 @@ public class CSWworker {
                String saved = id;
                 id = executeIdentifierQuery(id);
                 if (id == null) {
-                    unexistingID.add(id);
+                    unexistingID.add(saved);
                     logger.severe("unexisting id:" + saved);
                     continue;
                 }

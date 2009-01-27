@@ -148,7 +148,7 @@ public class IndexLuceneTest {
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("1:catalogTest");
         
-        // TODO fix it assertEquals(expectedResult, result);
+        assertEquals(expectedResult, result);
         
         /**
          * Test 2 simple search: title like tit*
