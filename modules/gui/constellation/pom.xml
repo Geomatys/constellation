@@ -53,23 +53,6 @@
   </developers>
   
 
-  
-  <!--
-    Dependency added if the -Psec property is specified, in order to add this
-    dependency to the generated WAR.
-  -->
-  <profiles>
-    <profile>
-      <id>sec</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.constellation.web-services</groupId>
-          <artifactId>cstl-web-security</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 
   <!--
     Dependencies required only for compilation. These dependencies will be

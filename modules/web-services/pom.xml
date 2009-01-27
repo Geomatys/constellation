@@ -57,18 +57,6 @@
 
 
 
-  <!--
-    Module built if the -Psec property is specified at building-time.
-  -->
-  <profiles>
-     <profile>
-       <id>sec</id>
-       <modules>
-         <module>security</module>
-       </modules>
-     </profile>
-  </profiles>
-
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
