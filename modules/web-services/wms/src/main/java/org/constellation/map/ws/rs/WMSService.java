@@ -234,7 +234,7 @@ public class WMSService extends OGCWebService {
     private GetCapabilities adaptGetCapabilities() throws CstlServiceException {
         final String version = getParameter(KEY_VERSION, false);
         if (version == null) {
-            setActingVersion("1.1.1");
+            setActingVersion(getBestVersion(null).toString());
             return new GetCapabilities(getActingVersion());
         }
         final ServiceVersion bestVersion = getBestVersion(version);

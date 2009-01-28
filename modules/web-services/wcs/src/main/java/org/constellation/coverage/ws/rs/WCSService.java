@@ -176,12 +176,12 @@ import com.sun.jersey.spi.resource.Singleton;
 
 
 /**
- * The Web Coverage Service (WCS) for Constellation, this service implements the 
- * {@code GetCoverage}, {@code DescribeCoverage}, and {@code GetCapabilities} 
+ * The Web Coverage Service (WCS) for Constellation, this service implements the
+ * {@code GetCoverage}, {@code DescribeCoverage}, and {@code GetCapabilities}
  * methods of the Open Geospatial Consortium (OGC) specifications.
  * <p>
- * This service follows the specification sof the Open Geospatial Consortium 
- * (OGC). As of Constellation 0.3, this Web Coverage Service complies with the 
+ * This service follows the specification sof the Open Geospatial Consortium
+ * (OGC). As of Constellation 0.3, this Web Coverage Service complies with the
  * specification version 1.0.0 (OGC document 03-065r6) and mostly complies with
  * specification version 1.1.1 (OGC document 06-083r8).
  * </p>
@@ -204,8 +204,8 @@ public class WCSService extends OGCWebService {
      * @throws JAXBException if the initialization of the {@link JAXBContext} fails.
      */
     public WCSService() throws JAXBException {
-        
-        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"), 
+
+        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"),
                      new ServiceVersion(ServiceType.WCS, "1.0.0"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -248,11 +248,11 @@ public class WCSService extends OGCWebService {
                  * we build a request object with this parameter.
                  */
                 if (dc == null) {
-                    dc = createNewDescribeCoverageRequest();
+                    dc = adaptDescribeCoverageRequest();
                 }
                 return Response.ok(describeCoverage(dc), TEXT_XML).build();
             }
-            if (GETCAPABILITIES.equalsIgnoreCase(request) || 
+            if (GETCAPABILITIES.equalsIgnoreCase(request) ||
                     (objectRequest instanceof AbstractGetCapabilities))
             {
                 AbstractGetCapabilities gc = (AbstractGetCapabilities)objectRequest;
@@ -261,11 +261,11 @@ public class WCSService extends OGCWebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    gc = createNewGetCapabilitiesRequest();
+                    gc = adaptGetCapabilitiesRequest();
                 }
                 return getCapabilities(gc);
             }
-            if (GETCOVERAGE.equalsIgnoreCase(request) || 
+            if (GETCOVERAGE.equalsIgnoreCase(request) ||
                     (objectRequest instanceof AbstractGetCoverage))
             {
                 AbstractGetCoverage gc = (AbstractGetCoverage)objectRequest;
@@ -275,9 +275,7 @@ public class WCSService extends OGCWebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-
-                    gc = createNewGetCoverageRequest();
-
+                    gc = adaptGetCoverageRequest();
                 }
                 return getCoverage(gc);
             }
@@ -290,13 +288,15 @@ public class WCSService extends OGCWebService {
                 report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
             } else {
                 report = new ServiceExceptionReport(getActingVersion(),
-                                                    new ServiceExceptionType(ex.getMessage(), 
+                                                    new ServiceExceptionType(ex.getMessage(),
                                                     (ExceptionCode) ex.getExceptionCode()));
             }
-            
+
+            // We do not want to log the full stack trace if this is an error that seems to
+            // be done by the user.
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
             {
                 LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
@@ -316,7 +316,7 @@ public class WCSService extends OGCWebService {
      * @return a marshallable GetCapabilities request.
      * @throws CstlServiceException
      */
-    private AbstractGetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
+    private AbstractGetCapabilities adaptGetCapabilitiesRequest() throws CstlServiceException {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameters SERVICE=WCS must be specified",
@@ -326,7 +326,7 @@ public class WCSService extends OGCWebService {
         if (inputVersion == null) {
             inputVersion = getParameter("acceptversions", false);
             if (inputVersion == null) {
-                inputVersion = "1.1.1";
+                inputVersion = getBestVersion(null).toString();
             } else {
                 //we verify that the version id supported
                 isVersionSupported(inputVersion);
@@ -335,10 +335,11 @@ public class WCSService extends OGCWebService {
 
         this.setActingVersion(getBestVersion(inputVersion).toString());
 
-        if (getActingVersion().toString().equals("1.0.0")) {
+        final String version = getActingVersion().toString();
+        if (version.equals("1.0.0")) {
             return new org.constellation.wcs.v100.GetCapabilities(getParameter(KEY_SECTION, false),
                                                            null);
-        } else {
+        } else if (version.equals("1.1.1")) {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
             //We transform the String of sections in a list.
@@ -362,10 +363,10 @@ public class WCSService extends OGCWebService {
             }
             SectionsType sections = new SectionsType(requestedSections);
             AcceptVersionsType versions = new AcceptVersionsType("1.1.1");
-            return new org.constellation.wcs.v111.GetCapabilities(versions,
-                                                           sections,
-                                                           formats,
-                                                           null);
+            return new org.constellation.wcs.v111.GetCapabilities(versions, sections, formats, null);
+        } else {
+            throw new CstlServiceException("The version number specified for this GetCoverage request " +
+                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
         }
     }
 
@@ -376,213 +377,254 @@ public class WCSService extends OGCWebService {
      * @return a marshallable DescribeCoverage request.
      * @throws CstlServiceException
      */
-    private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws CstlServiceException {
-        if (getActingVersion().toString().equals("1.0.0")) {
+    private AbstractDescribeCoverage adaptDescribeCoverageRequest() throws CstlServiceException {
+        final String version = getActingVersion().toString();
+        if (version.equals("1.0.0")) {
             return new org.constellation.wcs.v100.DescribeCoverage(getParameter(KEY_COVERAGE, true));
-        } else {
+        } else if (version.equals("1.1.1")) {
             return new org.constellation.wcs.v111.DescribeCoverage(getParameter(KEY_IDENTIFIER, true));
+        } else {
+            throw new CstlServiceException("The version number specified for this GetCoverage request " +
+                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
         }
     }
 
     /**
-     * Build a new DescribeCoverage request from a kvp request
+     * Build a new {@linkplain AbstractGetCoverage GetCoverage} request from a kvp request.
+     *
+     * @return a marshallable GetCoverage request.
+     * @throws CstlServiceException
      */
-    private AbstractGetCoverage createNewGetCoverageRequest() throws CstlServiceException {
-        String width  = getParameter(KEY_WIDTH,  false);
+    private AbstractGetCoverage adaptGetCoverageRequest() throws CstlServiceException {
+        final String version = getActingVersion().toString();
+        if (version.equals("1.0.0")) {
+            return adaptGetCoverageRequest100();
+         } else if (version.equals("1.1.1")) {
+            return adaptGetCoverageRequest111();
+         } else {
+            throw new CstlServiceException("The version number specified for this GetCoverage request " +
+                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
+         }
+    }
+
+    /**
+     * Generate a marshallable {@linkplain org.constellation.wcs.v100.GetCoverage GetCoverage}
+     * request in version 1.0.0, from what the user specified.
+     *
+     * @return The GetCoverage request in version 1.0.0
+     * @throws CstlServiceException
+     */
+    private org.constellation.wcs.v100.GetCoverage adaptGetCoverageRequest100()
+                                                    throws CstlServiceException
+    {
+        String width = getParameter(KEY_WIDTH, false);
         String height = getParameter(KEY_HEIGHT, false);
-        String depth  = getParameter(KEY_DEPTH,  false);
+        String depth = getParameter(KEY_DEPTH, false);
 
         String resx = getParameter(KEY_RESX, false);
         String resy = getParameter(KEY_RESY, false);
         @SuppressWarnings("unused")
-		String resz = getParameter(KEY_RESZ, false);
+        String resz = getParameter(KEY_RESZ, false);
 
-        if (getActingVersion().toString().equals("1.0.0")) {
-            // temporal subset
-            org.constellation.wcs.v100.TimeSequenceType temporal = null;
-            final String timeParameter = getParameter(KEY_TIME, false);
-            if (timeParameter != null) {
-                final TimePositionType time = new TimePositionType(timeParameter);
-                temporal = new org.constellation.wcs.v100.TimeSequenceType(time);
+        // temporal subset
+        org.constellation.wcs.v100.TimeSequenceType temporal = null;
+        final String timeParameter = getParameter(KEY_TIME, false);
+        if (timeParameter != null) {
+            final TimePositionType time = new TimePositionType(timeParameter);
+            temporal = new org.constellation.wcs.v100.TimeSequenceType(time);
+        }
+
+        /*
+         * spatial subset
+         */
+        // the boundingBox/envelope
+        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        final String bbox = getParameter(KEY_BBOX, true);
+        if (bbox != null) {
+            final List<String> bboxValues = QueryAdapter.toStringList(bbox);
+            pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(0)),
+                    QueryAdapter.toDouble(bboxValues.get(2))));
+            pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(1)),
+                    QueryAdapter.toDouble(bboxValues.get(3))));
+            if (bboxValues.size() > 4) {
+                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(4)),
+                        QueryAdapter.toDouble(bboxValues.get(5))));
             }
+        }
+        final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
 
-            /*
-             * spatial subset
-             */
-            // the boundingBox/envelope
-            final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-            final String bbox = getParameter(KEY_BBOX, true);
-            if (bbox != null) {
-                final List<String> bboxValues = QueryAdapter.toStringList(bbox);
-                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(0)),
-                                               QueryAdapter.toDouble(bboxValues.get(2))));
-                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(1)),
-                                               QueryAdapter.toDouble(bboxValues.get(3))));
-                if (bboxValues.size() > 4) {
-                    pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(4)),
-                                                   QueryAdapter.toDouble(bboxValues.get(5))));
-                }
-            }
-            final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
+        if ((width == null || height == null) && (resx == null || resy == null)) {
+            throw new CstlServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified",
+                    INVALID_PARAMETER_VALUE, getActingVersion());
+        }
 
-            if ((width == null || height == null) && (resx == null || resy == null)) {
-                    throw new CstlServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" ,
-                                   INVALID_PARAMETER_VALUE, getActingVersion());
-            }
-
-            final List<String> axis = new ArrayList<String>();
-            axis.add("width");
-            axis.add("height");
-            final List<BigInteger> low = new ArrayList<BigInteger>();
+        final List<String> axis = new ArrayList<String>();
+        axis.add("width");
+        axis.add("height");
+        final List<BigInteger> low = new ArrayList<BigInteger>();
+        low.add(new BigInteger("0"));
+        low.add(new BigInteger("0"));
+        final List<BigInteger> high = new ArrayList<BigInteger>();
+        high.add(new BigInteger(width));
+        high.add(new BigInteger(height));
+        if (depth != null) {
+            axis.add("depth");
             low.add(new BigInteger("0"));
-            low.add(new BigInteger("0"));
-            final List<BigInteger> high = new ArrayList<BigInteger>();
-            high.add(new BigInteger(width));
-            high.add(new BigInteger(height));
-            if (depth != null) {
-                axis.add("depth");
-                low.add(new BigInteger("0"));
-                high.add(new BigInteger(depth));
+            high.add(new BigInteger(depth));
+        }
+        final GridLimitsType limits = new GridLimitsType(low, high);
+        final GridType grid = new GridType(limits, axis);
+
+        //spatial subset
+        final org.constellation.wcs.v100.SpatialSubsetType spatial =
+                new org.constellation.wcs.v100.SpatialSubsetType(envelope, grid);
+
+        //domain subset
+        final org.constellation.wcs.v100.DomainSubsetType domain =
+                new org.constellation.wcs.v100.DomainSubsetType(temporal, spatial);
+
+        //range subset (not yet used)
+        final org.constellation.wcs.v100.RangeSubsetType range = null;
+
+        //interpolation method
+        final org.constellation.wcs.v100.InterpolationMethod interpolation =
+                org.constellation.wcs.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
+
+        //output
+        final org.constellation.wcs.v100.OutputType output =
+                new org.constellation.wcs.v100.OutputType(getParameter(KEY_FORMAT, true),
+                                                          getParameter(KEY_RESPONSE_CRS, false));
+
+        return new org.constellation.wcs.v100.GetCoverage(
+                getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
+    }
+
+    /**
+     * Generate a marshallable {@linkplain org.constellation.wcs.v111.GetCoverage GetCoverage}
+     * request in version 1.1.1, from what the user specified.
+     *
+     * @return The GetCoverage request in version 1.1.1
+     * @throws CstlServiceException
+     */
+    private org.constellation.wcs.v111.GetCoverage adaptGetCoverageRequest111()
+                                                    throws CstlServiceException
+    {
+        // temporal subset
+        org.constellation.wcs.v111.TimeSequenceType temporal = null;
+        String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
+        if (timeParameter != null) {
+            if (timeParameter.indexOf('/') == -1) {
+                temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
+            } else {
+                throw new CstlServiceException("The service does not handle TimePeriod",
+                        INVALID_PARAMETER_VALUE, getActingVersion());
             }
-            final GridLimitsType limits = new GridLimitsType(low, high);
-            final GridType grid = new GridType(limits, axis);
+        }
 
-            org.constellation.wcs.v100.SpatialSubsetType spatial = new org.constellation.wcs.v100.SpatialSubsetType(envelope, grid);
+        /*
+         * spatial subset
+         */
+        // the boundingBox/envelope
+        String bbox = getParameter(KEY_BOUNDINGBOX, true);
+        final String crs;
+        if (bbox.indexOf(',') != -1) {
+            crs = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
+            bbox = bbox.substring(0, bbox.lastIndexOf(','));
+        } else {
+            throw new CstlServiceException("The correct pattern for BoundingBox parameter are" +
+                    " crs,minX,minY,maxX,maxY,CRS",
+                    INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
+        }
+        BoundingBoxType envelope = null;
 
-            //domain subset
-            org.constellation.wcs.v100.DomainSubsetType domain   = new org.constellation.wcs.v100.DomainSubsetType(temporal, spatial);
-
-            //range subset (not yet used)
-            org.constellation.wcs.v100.RangeSubsetType  range    = null;
-
-            //interpolation method
-            org.constellation.wcs.v100.InterpolationMethod interpolation =
-                    org.constellation.wcs.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
-
-            //output
-            org.constellation.wcs.v100.OutputType output         = new org.constellation.wcs.v100.OutputType(getParameter(KEY_FORMAT, true),
-                                                                                                     getParameter(KEY_RESPONSE_CRS, false));
-
-            return new org.constellation.wcs.v100.GetCoverage(getParameter(KEY_COVERAGE, true),
-                                                       domain,
-                                                       range,
-                                                       interpolation,
-                                                       output);
-         } else {
-
-            // temporal subset
-            org.constellation.wcs.v111.TimeSequenceType temporal = null;
-            String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
-            if (timeParameter != null) {
-                if (timeParameter.indexOf('/') == -1) {
-                    temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
-                } else {
-                    throw new CstlServiceException("The service does not handle TimePeriod" ,
-                                   INVALID_PARAMETER_VALUE, getActingVersion());
-                }
+        if (bbox != null) {
+            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+            final Double[] coordinates = new Double[tokens.countTokens()];
+            int i = 0;
+            while (tokens.hasMoreTokens()) {
+                coordinates[i] = parseDouble(tokens.nextToken());
+                i++;
             }
-
-            /*
-             * spatial subset
-             */
-             // the boundingBox/envelope
-             String bbox          = getParameter(KEY_BOUNDINGBOX, true);
-             final String crs;
-             if (bbox.indexOf(',') != -1) {
-                crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
-                bbox = bbox.substring(0, bbox.lastIndexOf(','));
-             } else {
+            if (i < 4) {
                 throw new CstlServiceException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS",
-                                INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
-             }
-             BoundingBoxType envelope = null;
+                        INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
+            }
+            envelope = new BoundingBoxType(crs, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+        }
 
-             if (bbox != null) {
-                final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-                final Double[] coordinates   = new Double[tokens.countTokens()];
-                int i = 0;
-                while (tokens.hasMoreTokens()) {
-                    coordinates[i] = parseDouble(tokens.nextToken());
-                    i++;
-                }
-                 if (i < 4) {
-                     throw new CstlServiceException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS",
-                             INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
-                 }
-                envelope = new BoundingBoxType(crs, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
-             }
+        //domain subset
+        final org.constellation.wcs.v111.DomainSubsetType domain =
+                new org.constellation.wcs.v111.DomainSubsetType(temporal, envelope);
 
-             //domain subset
-             org.constellation.wcs.v111.DomainSubsetType domain   = new org.constellation.wcs.v111.DomainSubsetType(temporal, envelope);
-
-             //range subset.
-             org.constellation.wcs.v111.RangeSubsetType  range = null;
-             String rangeSubset = getParameter(KEY_RANGESUBSET, false);
-             if (rangeSubset != null) {
-                //for now we don't handle Axis Identifiers
-                if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
-                    throw new CstlServiceException("The service does not handle axis identifiers",
-                            INVALID_PARAMETER_VALUE, getActingVersion(), "axis");
-                }
-
-                final StringTokenizer tokens = new StringTokenizer(rangeSubset, ";");
-                final List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
-                while (tokens.hasMoreTokens()) {
-                    final String value = tokens.nextToken();
-                    String interpolation = null;
-                    String rangeIdentifier = null;
-                    if (value.indexOf(':') != -1) {
-                        rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
-                        interpolation = value.substring(rangeSubset.indexOf(':') + 1);
-                    } else {
-                        rangeIdentifier = value;
-                    }
-                    fields.add(new FieldSubset(rangeIdentifier, interpolation));
-                }
-
-                range = new org.constellation.wcs.v111.RangeSubsetType(fields);
+        //range subset.
+        org.constellation.wcs.v111.RangeSubsetType range = null;
+        String rangeSubset = getParameter(KEY_RANGESUBSET, false);
+        if (rangeSubset != null) {
+            //for now we don't handle Axis Identifiers
+            if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
+                throw new CstlServiceException("The service does not handle axis identifiers",
+                        INVALID_PARAMETER_VALUE, getActingVersion(), "axis");
             }
 
+            final StringTokenizer tokens = new StringTokenizer(rangeSubset, ";");
+            final List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
+            while (tokens.hasMoreTokens()) {
+                final String value = tokens.nextToken();
+                String interpolation = null;
+                String rangeIdentifier = null;
+                if (value.indexOf(':') != -1) {
+                    rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
+                    interpolation = value.substring(rangeSubset.indexOf(':') + 1);
+                } else {
+                    rangeIdentifier = value;
+                }
+                fields.add(new FieldSubset(rangeIdentifier, interpolation));
+            }
 
-            String gridType = getParameter(KEY_GRIDTYPE, false);
-            if (gridType == null) {
-                gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
-            }
-            String gridOrigin = getParameter(KEY_GRIDORIGIN, false);
-            if (gridOrigin == null) {
-                gridOrigin = "0.0,0.0";
-            }
-            
-            StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
-            final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
+            range = new org.constellation.wcs.v111.RangeSubsetType(fields);
+        }
+
+
+        String gridType = getParameter(KEY_GRIDTYPE, false);
+        if (gridType == null) {
+            gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
+        }
+        String gridOrigin = getParameter(KEY_GRIDORIGIN, false);
+        if (gridOrigin == null) {
+            gridOrigin = "0.0,0.0";
+        }
+
+        StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
+        final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
+        while (tokens.hasMoreTokens()) {
+            Double value = parseDouble(tokens.nextToken());
+            origin.add(value);
+        }
+
+        String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
+        List<Double> offset = new ArrayList<Double>();
+        if (gridOffsets != null) {
+            tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
                 Double value = parseDouble(tokens.nextToken());
-                origin.add(value);
+                offset.add(value);
             }
-
-            String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
-            List<Double> offset = new ArrayList<Double>();
-            if (gridOffsets != null) {
-                tokens = new StringTokenizer(gridOffsets, ",;");
-                while (tokens.hasMoreTokens()) {
-                    Double value = parseDouble(tokens.nextToken());
-                    offset.add(value);
-                }
-            }
-            String gridCS = getParameter(KEY_GRIDCS, false);
-            if (gridCS == null) {
-                gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
-            }
-
-            //output
-            final CodeType codeCRS = new CodeType(crs);
-            final GridCrsType grid = new GridCrsType(codeCRS, getParameter(KEY_GRIDBASECRS, false), gridType,
-                    origin, offset, gridCS, "");
-            org.constellation.wcs.v111.OutputType output = new org.constellation.wcs.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
-
-            return new org.constellation.wcs.v111.GetCoverage(new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
-                    domain, range, output);
         }
+        String gridCS = getParameter(KEY_GRIDCS, false);
+        if (gridCS == null) {
+            gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
+        }
+
+        //output
+        final CodeType codeCRS = new CodeType(crs);
+        final GridCrsType grid = new GridCrsType(codeCRS, getParameter(KEY_GRIDBASECRS, false), gridType,
+                origin, offset, gridCS, "");
+        final org.constellation.wcs.v111.OutputType output =
+                new org.constellation.wcs.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
+
+        return new org.constellation.wcs.v111.GetCoverage(
+                new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
+                domain, range, output);
     }
 
     /**
@@ -594,7 +636,9 @@ public class WCSService extends OGCWebService {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public Response getCapabilities(AbstractGetCapabilities abstractRequest) throws JAXBException, CstlServiceException {
+    public Response getCapabilities(AbstractGetCapabilities abstractRequest)
+                                  throws JAXBException, CstlServiceException
+    {
         //we begin by extract the base attribute
         String inputVersion = abstractRequest.getVersion();
         if (inputVersion == null) {
@@ -603,205 +647,250 @@ public class WCSService extends OGCWebService {
            isVersionSupported(inputVersion);
            setActingVersion(inputVersion);
         }
-        Capabilities        responsev111 = null;
-        WCSCapabilitiesType responsev100 = null;
-        boolean contentMeta              = false;
-        String format                    = TEXT_XML;
+
+        final String format;
+        StringWriter sw = new StringWriter();
         if (getActingVersion().toString().equals("1.1.1")) {
-
-            org.constellation.wcs.v111.GetCapabilities request = (org.constellation.wcs.v111.GetCapabilities) abstractRequest;
-
             // if the user have specified one format accepted (only one for now != spec)
-            AcceptFormatsType formats = request.getAcceptFormats();
+            final AcceptFormatsType formats =
+                    ((org.constellation.wcs.v111.GetCapabilities)abstractRequest).getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
                 format = TEXT_XML;
             } else {
                 format = formats.getOutputFormat().get(0);
-                if (!format.equals(TEXT_XML) && !format.equals(APP_XML)){
+                if (!format.equals(TEXT_XML) && !format.equals(APP_XML)) {
                     throw new CstlServiceException("This format " + format + " is not allowed",
-                                   INVALID_PARAMETER_VALUE, getActingVersion(), "format");
+                            INVALID_PARAMETER_VALUE, getActingVersion(), "format");
                 }
             }
 
-            //if the user have requested only some sections
-            List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
-
-            if (request.getSections() != null && request.getSections().getSection().size() > 0) {
-                requestedSections = request.getSections().getSection();
-                for (String sec:requestedSections) {
-                    if (!SectionsType.getExistingSections("1.1.1").contains(sec)){
-                       throw new CstlServiceException("This sections " + sec + " is not allowed",
-                                       INVALID_PARAMETER_VALUE, getActingVersion());
-                    }
-                }
-            }
-
-            // we unmarshall the static capabilities document
-            Capabilities staticCapabilities = null;
-            try {
-                staticCapabilities = (Capabilities)getStaticCapabilitiesObject();
-            } catch(IOException e)   {
-                throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                               INVALID_PARAMETER_VALUE, getActingVersion());
-
-            }
-            ServiceIdentification si = null;
-            ServiceProvider       sp = null;
-            OperationsMetadata    om = null;
-
-            //we add the static sections if the are included in the requested sections
-            if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All"))
-                sp = staticCapabilities.getServiceProvider();
-            if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All"))
-                si = staticCapabilities.getServiceIdentification();
-            if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
-                om = staticCapabilities.getOperationsMetadata();
-                //we update the url in the static part.
-                updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
-            }
-            responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
-
-            // if the user does not request the contents section we can return the result.
-            if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(responsev111, sw);
-                return Response.ok(sw.toString(), format).build();
-            }
-
+            final Capabilities capabilities111 = getCapabilities111(
+                    (org.constellation.wcs.v111.GetCapabilities) abstractRequest);
+            marshaller.marshal(capabilities111, sw);
         } else {
+            final WCSCapabilitiesType capabilities100 = getCapabilities100(
+                    (org.constellation.wcs.v100.GetCapabilities) abstractRequest);
+            marshaller.marshal(capabilities100, sw);
+            format = TEXT_XML;
+        }
 
-            org.constellation.wcs.v100.GetCapabilities request = (org.constellation.wcs.v100.GetCapabilities) abstractRequest;
+        return Response.ok(sw.toString(), format).build();
+    }
 
-            /*
-             * In WCS 1.0.0 the user can request only one section
-             * ( or all by omitting the parameter section)
-             */
-            String section = request.getSection();
-            String requestedSection = null;
-            if (section != null) {
-                if (SectionsType.getExistingSections("1.0.0").contains(section)){
-                    requestedSection = section;
-                } else {
-                    throw new CstlServiceException("The section " + section + " does not exist",
-                                   INVALID_PARAMETER_VALUE, getActingVersion());
-               }
-               contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
-            }
-            WCSCapabilitiesType staticCapabilities = null;
-            try {
-                staticCapabilities = (WCSCapabilitiesType)((JAXBElement<?>)getStaticCapabilitiesObject()).getValue();
-            } catch(IOException e)   {
-                throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                               INVALID_PARAMETER_VALUE, getActingVersion());
-
-            }
-            if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
-                //we update the url in the static part.
-                Request req = staticCapabilities.getCapability().getRequest();
-                updateURL(req.getGetCapabilities().getDCPType());
-                updateURL(req.getDescribeCoverage().getDCPType());
-                updateURL(req.getGetCoverage().getDCPType());
-            }
-
-            if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
-                responsev100 = staticCapabilities;
+    /**
+     * Returns the {@linkplain WCSCapabilitiesType GetCapabilities} response of the request given
+     * by parameter, in version 1.0.0 of WCS.
+     *
+     * @param request The request done by the user, in version 1.0.0.
+     * @return a WCSCapabilities XML document describing the capabilities of this service.
+     *
+     * @throws CstlServiceException
+     * @throws JAXBException when unmarshalling the default GetCapabilities file.
+     */
+    private WCSCapabilitiesType getCapabilities100(org.constellation.wcs.v100.GetCapabilities request)
+                                                            throws CstlServiceException, JAXBException
+    {
+        /*
+         * In WCS 1.0.0 the user can request only one section
+         * ( or all by omitting the parameter section)
+         */
+        final String section = request.getSection();
+        String requestedSection = null;
+        boolean contentMeta = false;
+        if (section != null) {
+            if (SectionsType.getExistingSections("1.0.0").contains(section)) {
+                requestedSection = section;
             } else {
-                if (requestedSection.equals("/WCS_Capabilities/Capability")) {
-                    responsev100 = new WCSCapabilitiesType(staticCapabilities.getCapability());
-                } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
-                    responsev100 = new WCSCapabilitiesType(staticCapabilities.getService());
-                }
+                throw new CstlServiceException("The section " + section + " does not exist",
+                        INVALID_PARAMETER_VALUE, getActingVersion());
+            }
+            contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
+        }
 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(responsev100, sw);
-                return Response.ok(sw.toString(), format).build();
+        // We unmarshall the static capabilities document.
+        final WCSCapabilitiesType staticCapabilities;
+        try {
+            staticCapabilities = (WCSCapabilitiesType) ((JAXBElement<?>) getStaticCapabilitiesObject()).getValue();
+        } catch (IOException e) {
+            throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
+                    INVALID_PARAMETER_VALUE, getActingVersion());
+        }
+        if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
+            //we update the url in the static part.
+            final Request req = staticCapabilities.getCapability().getRequest();
+            updateURL(req.getGetCapabilities().getDCPType());
+            updateURL(req.getDescribeCoverage().getDCPType());
+            updateURL(req.getGetCoverage().getDCPType());
+        }
+
+        final WCSCapabilitiesType responsev100;
+        if (requestedSection == null || contentMeta || requestedSection.equals("/")) {
+            responsev100 = staticCapabilities;
+        } else {
+            if (requestedSection.equals("/WCS_Capabilities/Capability")) {
+                return new WCSCapabilitiesType(staticCapabilities.getCapability());
+            } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
+                return new WCSCapabilitiesType(staticCapabilities.getService());
+            } else {
+                throw new CstlServiceException("Not a valid section requested: "+ requestedSection, NO_APPLICABLE_CODE);
             }
         }
-        
-        //TODO: document by what circumstances we are here.
-        
-        Contents contents = null;
-        ContentMetadata contentMetadata = null;
 
-        //we get the list of layers
-        List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
-        List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
+        final ContentMetadata contentMetadata;
+        final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
+        final org.constellation.wcs.v100.ObjectFactory wcs100Factory =
+                new org.constellation.wcs.v100.ObjectFactory();
 
-        org.constellation.wcs.v111.ObjectFactory wcs111Factory = new org.constellation.wcs.v111.ObjectFactory();
-        org.constellation.wcs.v100.ObjectFactory wcs100Factory = new org.constellation.wcs.v100.ObjectFactory();
-        org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
-        
-        
         //NOTE: ADRIAN HACKED HERE
         final List<LayerDetails> layerRefs = getAllLayerReferences();
-        
-        
         try {
-            for (LayerDetails layer: layerRefs){
-                
-                List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-                title.add(new LanguageStringType(layer.getName()));
-                List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
-
-                CoverageSummaryType       cs = new CoverageSummaryType(title, remark);
-                CoverageOfferingBriefType co = new CoverageOfferingBriefType();
-
+            for (LayerDetails layer : layerRefs) {
+                final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
                 co.addRest(wcs100Factory.createName(layer.getName()));
                 co.addRest(wcs100Factory.createLabel(layer.getName()));
 
-                GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-
-                if(inputGeoBox != null) {
+                final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+                if (inputGeoBox != null) {
                     final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
-                    if (getActingVersion().toString().equals("1.1.1")){
-                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
-                                                     inputGeoBox.getWestBoundLongitude(),
-                                                     inputGeoBox.getSouthBoundLatitude(),
-                                                     inputGeoBox.getEastBoundLongitude(),
-                                                     inputGeoBox.getNorthBoundLatitude());
 
-                        cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
-                    } else {
-                        final SortedSet<Number> elevations = layer.getAvailableElevations();
-                        List<Double> pos1 = new ArrayList<Double>();
-                        pos1.add(inputGeoBox.getWestBoundLongitude());
-                        pos1.add(inputGeoBox.getSouthBoundLatitude());
+                    final SortedSet<Number> elevations = layer.getAvailableElevations();
+                    final List<Double> pos1 = new ArrayList<Double>();
+                    pos1.add(inputGeoBox.getWestBoundLongitude());
+                    pos1.add(inputGeoBox.getSouthBoundLatitude());
+                    final List<Double> pos2 = new ArrayList<Double>();
+                    pos2.add(inputGeoBox.getEastBoundLongitude());
+                    pos2.add(inputGeoBox.getNorthBoundLatitude());
 
-                        List<Double> pos2 = new ArrayList<Double>();
-                        pos2.add(inputGeoBox.getEastBoundLongitude());
-                        pos2.add(inputGeoBox.getNorthBoundLatitude());
-
-                        if (elevations != null && elevations.size() >= 2) {
-                            pos1.add(elevations.first().doubleValue());
-                            pos2.add(elevations.last().doubleValue());
-                        }
-                        List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-                        pos.add(new DirectPositionType(pos1));
-                        pos.add(new DirectPositionType(pos2));
-                        LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, srsName);
-                        final SortedSet<Date> dates = layer.getAvailableTimes();
-                        if (dates != null && dates.size() >= 2) {
-                            /*
-                             * Adds the first and last date available, since in the WCS GetCapabilities,
-                             * it is a brief description of the capabilities.
-                             * To get the whole available values, the describeCoverage request has to be
-                             * done on a specific coverage.
-                             */
-                            final Date firstDate = dates.first();
-                            final Date lastDate = dates.last();
-                            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                            outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
-                            outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
-                        }
-                        co.setLonLatEnvelope(outputBBox);
+                    if (elevations != null && elevations.size() >= 2) {
+                        pos1.add(elevations.first().doubleValue());
+                        pos2.add(elevations.last().doubleValue());
                     }
+                    final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                    pos.add(new DirectPositionType(pos1));
+                    pos.add(new DirectPositionType(pos2));
+                    final LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, srsName);
+                    final SortedSet<Date> dates = layer.getAvailableTimes();
+                    if (dates != null && dates.size() >= 2) {
+                        /*
+                         * Adds the first and last date available, since in the WCS GetCapabilities,
+                         * it is a brief description of the capabilities.
+                         * To get the whole available values, the describeCoverage request has to be
+                         * done on a specific coverage.
+                         */
+                        final Date firstDate = dates.first();
+                        final Date lastDate = dates.last();
+                        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
+                        outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
+                    }
+                    co.setLonLatEnvelope(outputBBox);
+                }
 
+                offBrief.add(co);
+            }
+            contentMetadata = new ContentMetadata("1.0.0", offBrief);
+        } catch (CatalogException exception) {
+            throw new CstlServiceException(exception, NO_APPLICABLE_CODE, getActingVersion());
+        }
+
+        // The ContentMetadata has finally been filled, we can now return the response.
+        if (contentMeta) {
+            return new WCSCapabilitiesType(contentMetadata);
+        } else {
+            responsev100.setContentMetadata(contentMetadata);
+            return responsev100;
+        }
+    }
+
+    /**
+     * Returns the {@linkplain Capabilities GetCapabilities} response of the request given
+     * by parameter, in version 1.1.1 of WCS.
+     *
+     * @param request The request done by the user, in version 1.1.1.
+     * @return a WCSCapabilities XML document describing the capabilities of this service.
+     *
+     * @throws CstlServiceException
+     * @throws JAXBException when unmarshalling the default GetCapabilities file.
+     */
+    private Capabilities getCapabilities111(org.constellation.wcs.v111.GetCapabilities request)
+                                                     throws CstlServiceException, JAXBException
+    {
+        // First we try to extract only the requested section.
+        List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
+
+        if (request.getSections() != null && request.getSections().getSection().size() > 0) {
+            requestedSections = request.getSections().getSection();
+            for (String sec : requestedSections) {
+                if (!SectionsType.getExistingSections("1.1.1").contains(sec)) {
+                    throw new CstlServiceException("This sections " + sec + " is not allowed",
+                            INVALID_PARAMETER_VALUE, getActingVersion());
+                }
+            }
+        }
+
+        // We unmarshall the static capabilities document.
+        final Capabilities staticCapabilities;
+        try {
+            staticCapabilities = (Capabilities) getStaticCapabilitiesObject();
+        } catch (IOException e) {
+            throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
+                    INVALID_PARAMETER_VALUE, getActingVersion());
+
+        }
+
+        ServiceIdentification si = null;
+        ServiceProvider sp = null;
+        OperationsMetadata om = null;
+        //we add the static sections if the are included in the requested sections
+        if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All")) {
+            sp = staticCapabilities.getServiceProvider();
+        }
+        if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All")) {
+            si = staticCapabilities.getServiceIdentification();
+        }
+        if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
+            om = staticCapabilities.getOperationsMetadata();
+            //we update the url in the static part.
+            updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
+        }
+        final Capabilities responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
+
+        // if the user does not request the contents section we can return the result.
+        if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
+            return responsev111;
+        }
+
+        // Generate the Contents part of the GetCapabilities.
+        final Contents contents;
+        List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
+        org.constellation.wcs.v111.ObjectFactory wcs111Factory = new org.constellation.wcs.v111.ObjectFactory();
+        org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
+
+        //NOTE: ADRIAN HACKED HERE
+        final List<LayerDetails> layerRefs = getAllLayerReferences();
+        try {
+            for (LayerDetails layer : layerRefs) {
+                final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+                title.add(new LanguageStringType(layer.getName()));
+                final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
+                remark.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
+
+                final CoverageSummaryType cs = new CoverageSummaryType(title, remark);
+
+                final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+
+                if (inputGeoBox != null) {
+                    //final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
+                    final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
+                            inputGeoBox.getWestBoundLongitude(),
+                            inputGeoBox.getSouthBoundLatitude(),
+                            inputGeoBox.getEastBoundLongitude(),
+                            inputGeoBox.getNorthBoundLatitude());
+                    cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                 }
                 cs.addRest(wcs111Factory.createIdentifier(layer.getName()));
                 summary.add(cs);
-                offBrief.add(co);
             }
 
             /**
@@ -809,34 +898,20 @@ public class WCSService extends OGCWebService {
              * TODO delete when overlapping problem is solved
              */
             if (CITE_TESTING) {
-            CoverageSummaryType temp = summary.get(10);
-            summary.remove(10);
-            summary.add(0, temp);
+                CoverageSummaryType temp = summary.get(10);
+                summary.remove(10);
+                summary.add(0, temp);
             }
 
-            contents        = new Contents(summary, null, null, null);
-            contentMetadata = new ContentMetadata("1.0.0", offBrief);//TODO: really 1.0.0?
+            contents = new Contents(summary, null, null, null);
         } catch (CatalogException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE, getActingVersion());
         }
 
-
-        StringWriter sw = new StringWriter();
-        if (getActingVersion().toString().equals("1.1.1")) {
-            responsev111.setContents(contents);
-            marshaller.marshal(responsev111, sw);
-        } else {
-            if (contentMeta) {
-                responsev100 = new WCSCapabilitiesType(contentMetadata);
-            } else {
-                responsev100.setContentMetadata(contentMetadata);
-            }
-            marshaller.marshal(responsev100, sw);
-        }
-        return Response.ok(sw.toString(), format).build();
-
+        // Finally set the contents and return the full response.
+        responsev111.setContents(contents);
+        return responsev111;
     }
-
 
     /**
      * Get the coverage values for a specific coverage specified.
@@ -915,8 +990,8 @@ public class WCSService extends OGCWebService {
             final BoundingBoxType boundingBox = (domain.getBoundingBox() != null) ?
                                                  domain.getBoundingBox().getValue() :
                                                  null;
-            
-            if (boundingBox != null && 
+
+            if (boundingBox != null &&
                 boundingBox.getLowerCorner() != null &&
                 boundingBox.getUpperCorner() != null &&
                 boundingBox.getLowerCorner().size() >= 2 &&
@@ -967,18 +1042,18 @@ public class WCSService extends OGCWebService {
              *              - key
              */
             org.constellation.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
-            
-            
+
+
             //NOTE ADRIAN HACKED HERE
             final LayerDetails currentLayer = getLayerReference(coverage);
-            
-            
+
+
             if (rangeSubset != null) {
                 List<String> requestedField = new ArrayList<String>();
                 for(org.constellation.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
                     if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
                         interpolation = field.getInterpolationType();
-                        
+
                         //we look that the same field is not requested two times
                         if (!requestedField.contains(field.getIdentifier())) {
                             requestedField.add(field.getIdentifier());
@@ -1149,7 +1224,7 @@ public class WCSService extends OGCWebService {
                 if (gridEnv.getHigh().size() > 0) {
                     width         = gridEnv.getHigh().get(0).intValue();
                     height        = gridEnv.getHigh().get(1).intValue();
-                    
+
                     if (gridEnv.getHigh().size() == 3) {
                         depth     = gridEnv.getHigh().get(2).intValue();
                     }
@@ -1169,13 +1244,13 @@ public class WCSService extends OGCWebService {
         }
 
         dimension = new Dimension(width, height);
-        
+
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
         if ( format.equalsIgnoreCase(MATRIX) ) {
-            
+
             //NOTE ADRIAN HACKED HERE
             final LayerDetails layerRef = getLayerReference(coverage);
 
@@ -1191,23 +1266,23 @@ public class WCSService extends OGCWebService {
 
             final String mime = "application/matrix";
             return Response.ok(image, mime).build();
-            
+
         } else if( format.equalsIgnoreCase(NETCDF) ){
-            
+
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation does not support netcdf writing."), NO_APPLICABLE_CODE, getActingVersion());
-            
+
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
-            
+
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation does not support geotiff writing."), NO_APPLICABLE_CODE, getActingVersion());
-            
+
         } else {
             // We are in the case of an image format requested.
         	// TODO: This should be the fall through, add formats.
-        	
+
             //NOTE: ADRIAN HACKED HERE
-            
+
             // SCENE
             LayerDetails layerRef = getLayerReference(coverage);
               //if styles were defined they should be handled here.
@@ -1217,15 +1292,15 @@ public class WCSService extends OGCWebService {
             renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);
             Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, style, renderParameters);
-            
+
             // VIEW
             final ReferencedEnvelope refEnvel = new ReferencedEnvelope(objEnv);
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
             Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel,azimuth);
-            
+
             // CANVAS
             Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(dimension,null);
-            
+
             // IMAGE
             BufferedImage img;
             try {
@@ -1237,7 +1312,7 @@ public class WCSService extends OGCWebService {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getActingVersion());
                 }
             }
-            
+
             return Response.ok(img, format).build();
         }
     }
@@ -1284,10 +1359,10 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter COVERAGE must be specified.",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "coverage");
             }
-            
+
             //TODO: we should loop over the list
             final LayerDetails layerRef = getLayerReference( request.getCoverage().get(0) );
-            
+
             final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
             final Set<Series> series = layerRef.getSeries();
             if (series == null || series.isEmpty()) {
@@ -1411,10 +1486,10 @@ public class WCSService extends OGCWebService {
                 throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                         MISSING_PARAMETER_VALUE, getActingVersion(), "identifier");
             }
-            
+
             //TODO: we should loop over the list
             final LayerDetails layer = getLayerReference(request.getIdentifier().get(0));
-            
+
             final org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
             final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             if (layer.getSeries().size() == 0) {
@@ -1555,8 +1630,8 @@ public class WCSService extends OGCWebService {
                            exception.getMessage(), INVALID_PARAMETER_VALUE, getActingVersion());
         }
     }
-    
-    
+
+
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
     private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
@@ -1579,7 +1654,7 @@ public class WCSService extends OGCWebService {
         }
         return layerRefs;
     }
-    
+
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getAllLayerReferences().
     //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
@@ -1601,9 +1676,9 @@ public class WCSService extends OGCWebService {
         }
         return layerRef;
     }
-    
-    
-    
+
+
+
     @PreDestroy
     @Override
     public void destroy() {

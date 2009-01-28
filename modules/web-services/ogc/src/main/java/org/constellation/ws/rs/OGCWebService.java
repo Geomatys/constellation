@@ -108,6 +108,8 @@ public abstract class OGCWebService extends WebService {
      *
      * @param serviceType The initials of the web serviceType (CSW, WMS, WCS, SOS, ...)
      * @param supportedVersions A list of the supported version of this serviceType.
+     *                          The first version specified <strong>MUST</strong> be the highest
+     *                          one, the best one.
      */
     public OGCWebService(String service, ServiceVersion... supportedVersions) {
         super();
@@ -116,10 +118,13 @@ public abstract class OGCWebService extends WebService {
         for (final ServiceVersion element : supportedVersions) {
             this.supportedVersions.add(element);
         }
-        if (this.supportedVersions.size() == 0)
-             throw new IllegalArgumentException("A web service must have at least one version");
-        else
-            this.actingVersion = this.supportedVersions.get(0);
+        if (this.supportedVersions.size() == 0) {
+            throw new IllegalArgumentException("It is compulsory for a web service to have " +
+                    "at least one version specified.");
+        }
+        // We set that the current version is probably the highest one, the best one, which should
+        // be the first in the list of supported version.
+        this.actingVersion = this.supportedVersions.get(0);
         unmarshaller = null;//TODO: explain this. We are freeing the un-needed resource?
     }
 
@@ -302,23 +307,29 @@ public abstract class OGCWebService extends WebService {
     /**
      * If the requested version number is not available we choose the best version to return.
      *
-     * @param A serviceType version number.
+     * @param number A version number, which will be compared to the ones specified.
+     *               Can be {@code null}, in this case the best version specified is just returned.
+     * @return The best version (the highest one) specified for this web service.
      */
-    protected ServiceVersion getBestVersion(String number) {
+    protected ServiceVersion getBestVersion(final String number) {
         for (ServiceVersion v : supportedVersions) {
             if (v.toString().equals(number)){
                 return v;
             }
         }
-        ServiceVersion wrongVersion = new ServiceVersion(null, number);
-        if (wrongVersion.compareTo(supportedVersions.get(0)) < 0) {
-            return this.supportedVersions.get(0);
+        final ServiceVersion firstSpecifiedVersion = supportedVersions.get(0);
+        if (number == null || number.equals("")) {
+            return firstSpecifiedVersion;
+        }
+        final ServiceVersion wrongVersion = new ServiceVersion(null, number);
+        if (wrongVersion.compareTo(firstSpecifiedVersion) < 0) {
+            return firstSpecifiedVersion;
         } else {
             if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1)) > 0) {
                 return supportedVersions.get(supportedVersions.size() - 1);
             }
         }
-        return supportedVersions.get(0);
+        return firstSpecifiedVersion;
     }
 
     /**
