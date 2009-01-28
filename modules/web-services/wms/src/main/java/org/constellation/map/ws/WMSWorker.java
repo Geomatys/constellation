@@ -136,7 +136,7 @@ public class WMSWorker extends AbstractWMSWorker {
     @SuppressWarnings("unused")
     private final Marshaller marshaller;
     
-    private final ServiceVersion actingVersion;
+    private ServiceVersion actingVersion;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
@@ -161,6 +161,7 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
+        this.actingVersion = descLayer.getVersion();
         final OnlineResourceType or = new OnlineResourceType();
         or.setHref(uriContext.getBaseUri().toString() + "wcs?");
 
@@ -186,7 +187,7 @@ public class WMSWorker extends AbstractWMSWorker {
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
         
         final ServiceVersion queryVersion = getCapab.getVersion();
-        
+        this.actingVersion = queryVersion;
         
         //Add accepted CRS codes
         final List<String> crs = new ArrayList<String>();
@@ -580,7 +581,9 @@ public class WMSWorker extends AbstractWMSWorker {
     	//
     	// Note this is almost the same logic as in getMap
     	//
-    	
+    	// 0. FIX WORKER VERSION
+        this.actingVersion = getFI.getVersion();
+
         // 1. SCENE
         //       -- get the List of layer references
         final List<String> layerNames = getFI.getLayers();
@@ -693,7 +696,7 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
-    	
+    	this.actingVersion = getLegend.getVersion();
         final LayerDetails layer = getLayerReference( getLegend.getLayer());
         
         final Integer width  = getLegend.getWidth();
@@ -717,8 +720,10 @@ public class WMSWorker extends AbstractWMSWorker {
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
-    	
+
+        // 0. FIX THE ACTING VERSION
         final ServiceVersion queryVersion = getMap.getVersion();
+        this.actingVersion = queryVersion;
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
         
@@ -790,7 +795,7 @@ public class WMSWorker extends AbstractWMSWorker {
         // 4. IMAGE
         BufferedImage image;
         try {
-            image = Cstl.Portrayal.portray(sdef, vdef, cdef);;
+            image = Cstl.Portrayal.portray(sdef, vdef, cdef);
         } catch (PortrayalException ex) {
             if (errorInImage) {
                 return Cstl.Portrayal.writeInImage(ex, getMap.getSize() );

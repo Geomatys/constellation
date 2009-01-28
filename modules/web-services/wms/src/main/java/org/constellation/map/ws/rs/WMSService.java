@@ -198,14 +198,14 @@ public class WMSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         } catch (NumberFormatException n) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
             LOGGER.log(Level.INFO, n.getLocalizedMessage(), n);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         }
     }
 
@@ -221,6 +221,7 @@ public class WMSService extends OGCWebService {
         final String strVersion = getParameter(KEY_VERSION, false);
         final List<String> layers = QueryAdapter.toStringList(strLayer);
         setActingVersion(strVersion);
+        isVersionSupported(strVersion);
         return new DescribeLayer(layers, getActingVersion());
    }
 
@@ -263,6 +264,7 @@ public class WMSService extends OGCWebService {
         final GetMap getMap  = adaptGetMap(false);
         final String version = getParameter(KEY_VERSION, true);
         setActingVersion(version);
+        isVersionSupported(version);
         final String strX    = getParameter(version.equals("1.1.1") ? KEY_I_v111 : KEY_I_v130, true);
         final String strY    = getParameter(version.equals("1.1.1") ? KEY_J_v111 : KEY_J_v130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
@@ -328,6 +330,7 @@ public class WMSService extends OGCWebService {
     private GetMap adaptGetMap(final boolean fromGetMap) throws CstlServiceException {
         final String version         = getParameter(KEY_VERSION,         true);
         setActingVersion(version);
+        isVersionSupported(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         final String strCRS          = getParameter((version.equals("1.1.1")) ?
                                             KEY_CRS_v111 : KEY_CRS_v130, true);

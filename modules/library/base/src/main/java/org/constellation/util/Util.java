@@ -1300,14 +1300,16 @@ public final class Util {
      */
     public static String transformCodeName(String code) {
         String result = "";
-        final String prefix = code.charAt(0) + "";
+        char prefix;
         while (code.indexOf('_') != -1) {
             final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
-            result += tmp.replace(tmp.charAt(0), prefix.charAt(0));
+            prefix = code.charAt(0);
+            result += tmp.replace(tmp.charAt(0), prefix);
             code = code.substring(code.indexOf('_') + 1, code.length());
         }
+        prefix = code.charAt(0);
         code = code.toLowerCase();
-        result += code.replace(code.charAt(0), prefix.charAt(0));
+        result += code.replace(code.charAt(0), prefix);
         return result;
     }
 }

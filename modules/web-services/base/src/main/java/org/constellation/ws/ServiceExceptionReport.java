@@ -80,7 +80,7 @@ public final class ServiceExceptionReport {
         for (final ServiceExceptionType element : details) {
             serviceExceptions.add(element);
         }
-        this.version = version.toString();
+        this.version = (version != null) ? version.toString() : null;
     }
 
     /**
