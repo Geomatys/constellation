@@ -146,7 +146,42 @@
   -->
   <properties>
     <geotools.version>2.9-SNAPSHOT</geotools.version>
+    <constellation.config>org.constellation.configuration.ws</constellation.config>
+    <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
+    <constellation.map>org.constellation.map.ws.rs</constellation.map>
+    <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
+    <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
+    <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
+    <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage}</constellation.services.packages>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>wms</id>
+      <properties>
+        <constellation.services.packages>${constellation.config};${constellation.map};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+    <profile>
+      <id>wcs</id>
+      <properties>
+        <constellation.services.packages>${constellation.config};${constellation.coverage};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+    <profile>
+      <id>sos</id>
+      <properties>
+        <constellation.services.packages>${constellation.config};${constellation.sensor};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+    <profile>
+      <id>csw</id>
+      <properties>
+        <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+  </profiles>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -465,6 +500,12 @@
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <warName>constellation</warName>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>${basedir}/src/main/webapp</directory>
+            </resource>
+          </webResources>
         </configuration>
       </plugin>
       <plugin>
