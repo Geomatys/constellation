@@ -20,6 +20,7 @@ package org.constellation.coverage.ws.rs;
 import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
+import static org.constellation.query.Query.APP_XML;
 import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
@@ -237,7 +238,7 @@ public class WCSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
     }
 

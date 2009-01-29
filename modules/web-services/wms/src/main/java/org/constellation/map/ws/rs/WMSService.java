@@ -198,14 +198,14 @@ public class WMSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         } catch (NumberFormatException n) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
             LOGGER.log(Level.INFO, n.getLocalizedMessage(), n);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
     }
 
