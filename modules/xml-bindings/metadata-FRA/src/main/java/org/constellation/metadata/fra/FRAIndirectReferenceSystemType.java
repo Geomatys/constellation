@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.referencing.ReferenceSystemImpl;
+import org.geotools.referencing.DefaultReferenceSystem;
 
 
 /**
@@ -43,7 +43,7 @@ import org.constellation.referencing.ReferenceSystemImpl;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name= "FRA_IndirectReferenceSystem")
-public class FRAIndirectReferenceSystemType extends ReferenceSystemImpl {
+public class FRAIndirectReferenceSystemType extends DefaultReferenceSystem {
     @Override
     public String toString() {
         return super.toString();

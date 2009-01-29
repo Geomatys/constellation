@@ -478,7 +478,11 @@ public class CSWworker {
                                              version);
              */ 
         }
-        
+
+        // if the static capabilities are null we send an exception
+        if (staticCapabilities == null)
+            throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+
         //we prepare the response document
         Capabilities c = null; 
         
@@ -1347,9 +1351,13 @@ public class CSWworker {
                 final String token = tokens.nextToken().trim();
                 int pointLocation = token.indexOf('.');
                 if (pointLocation != -1) {
+
+                    if (staticCapabilities == null)
+                        throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+
                     String operationName = token.substring(0, pointLocation);
                     String parameter     = token.substring(pointLocation + 1);
-                    Operation o          = staticCapabilities.getOperationsMetadata().getOperation(operationName);
+                    Operation o  = staticCapabilities.getOperationsMetadata().getOperation(operationName);
                     if (o != null) {
                         DomainType param        = o.getParameter(parameter);
                         QName type;

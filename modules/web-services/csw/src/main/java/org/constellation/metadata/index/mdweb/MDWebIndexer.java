@@ -361,7 +361,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             
          // For an ebrim v 3.0 form    
         } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
-            logger.info("indexing Ebrim 3.0 Record");
+            logger.finer("indexing Ebrim 3.0 Record");
             
            /* for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
@@ -370,7 +370,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         
              // For an ebrim v 2.5 form    
         } else if (form.getTopValue().getType().isSubClassOf(registryObject)) {
-            logger.info("indexing Ebrim 2.5 Record");
+            logger.finer("indexing Ebrim 2.5 Record");
             
             /*for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
@@ -380,7 +380,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             
         // For a csw:Record (indexing is made in next generic indexing bloc)
         } else if (form.getTopValue().getType().getName().equals("Record")){
-            logger.info("indexing CSW Record");
+            logger.finer("indexing CSW Record");
             
         } else {
             logger.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());

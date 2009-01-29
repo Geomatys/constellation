@@ -232,7 +232,7 @@ public abstract class OGCWebService extends WebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getStaticCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
+    public Object getStaticCapabilitiesObject() throws JAXBException {
         return getStaticCapabilitiesObject(getActingVersion());
     }
 
@@ -242,7 +242,7 @@ public abstract class OGCWebService extends WebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getStaticCapabilitiesObject(final Version version) throws JAXBException, FileNotFoundException, IOException {
+    public Object getStaticCapabilitiesObject(final Version version) throws JAXBException {
         String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
         File changeFile = getFile("change.properties");
         Properties p    = new Properties();

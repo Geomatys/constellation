@@ -21,11 +21,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import org.constellation.referencing.ReferenceSystemImpl;
 import org.geotools.metadata.iso.constraint.ConstraintsImpl;
 import org.geotools.metadata.iso.constraint.LegalConstraintsImpl;
 import org.geotools.metadata.iso.constraint.SecurityConstraintsImpl;
 import org.geotools.metadata.iso.identification.DataIdentificationImpl;
+import org.geotools.referencing.DefaultReferenceSystem;
 
 
 /**
@@ -135,8 +135,8 @@ public class ObjectFactory {
      * 
      */
     @XmlElementDecl(namespace = "http://www.isotc211.org/2005/gmd", name = "MD_ReferenceSystem")
-    public JAXBElement<ReferenceSystemImpl> createReferenceSystem(ReferenceSystemImpl value) {
-        return new JAXBElement<ReferenceSystemImpl>(_ReferenceSystem_QNAME, ReferenceSystemImpl.class, null, value);
+    public JAXBElement<DefaultReferenceSystem> createReferenceSystem(DefaultReferenceSystem value) {
+        return new JAXBElement<DefaultReferenceSystem>(_ReferenceSystem_QNAME, DefaultReferenceSystem.class, null, value);
     }
     
     /**

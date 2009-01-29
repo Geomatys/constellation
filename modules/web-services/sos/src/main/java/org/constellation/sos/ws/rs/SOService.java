@@ -139,12 +139,7 @@ public class SOService extends OGCWebService {
                 return Response.ok(sw.toString(), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                try {
-                    worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
-                } catch (IOException ex) {
-                    throw new CstlServiceException("Unable to find change.properties",
-                                                     NO_APPLICABLE_CODE, getActingVersion());
-                }
+                worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,

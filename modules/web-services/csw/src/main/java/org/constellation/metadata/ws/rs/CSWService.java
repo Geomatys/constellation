@@ -248,13 +248,7 @@ public class CSWService extends OGCWebService {
                           */
                         gc = createNewGetCapabilitiesRequest();
                     }
-                    try {
-                        worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
-                    } catch(IOException e)   {
-                        throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, getActingVersion());
-            
-                    }
+                    worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
                 
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getCapabilities(gc), sw);
@@ -323,13 +317,8 @@ public class CSWService extends OGCWebService {
                         */
                         gd = createNewGetDomainRequest();
                     }
-                    try {
-                        worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
-                    } catch(IOException e)   {
-                        throw new CstlServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
-                                                         INVALID_PARAMETER_VALUE, getActingVersion());
-            
-                    }
+                    worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
+                    
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getDomain(gd), sw);
         
