@@ -43,8 +43,23 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ComponentType")
-
 public class ComponentType extends AbstractComponentType {
+
+    private MethodPropertyType method;
+
+    /**
+     * @return the method
+     */
+    public MethodPropertyType getMethod() {
+        return method;
+    }
+
+    /**
+     * @param method the method to set
+     */
+    public void setMethod(MethodPropertyType method) {
+        this.method = method;
+    }
 
 
 }

@@ -52,6 +52,14 @@ public class ConnectionList {
     @XmlElement(required = true)
     private List<Connection> connection;
 
+    public ConnectionList() {
+
+    }
+
+    public ConnectionList(List<Connection> connection) {
+        this.connection = connection;
+    }
+
     /**
      * Gets the value of the connection property.
      */

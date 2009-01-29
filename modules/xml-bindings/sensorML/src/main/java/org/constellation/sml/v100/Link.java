@@ -77,6 +77,16 @@ public class Link {
     @XmlAttribute
     private String type;
 
+    public Link() {
+
+    }
+
+    public Link(String type, Source source, Destination destination) {
+        this.destination = destination;
+        this.source      = source;
+        this.type        = type;
+    }
+
     /**
      * Gets the value of the source property.
      */

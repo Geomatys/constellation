@@ -73,6 +73,18 @@ public class MethodPropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public MethodPropertyType() {
+
+    }
+
+    public MethodPropertyType(String href) {
+        this.href = href;
+    }
+
+    public MethodPropertyType(ProcessMethodType processMethod) {
+        this.processMethod = processMethod;
+    }
+
     /**
      * Gets the value of the processMethod property.
      */

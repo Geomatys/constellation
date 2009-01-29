@@ -78,6 +78,15 @@ public class ComponentPropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public ComponentPropertyType() {
+
+    }
+
+    public ComponentPropertyType(String name, JAXBElement<? extends AbstractProcessType> process) {
+        this.name    = name;
+        this.process = process;
+    }
+
     /**
      * Gets the value of the process property.
      */

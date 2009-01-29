@@ -64,6 +64,20 @@ public class Connection {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String name;
 
+    public Connection() {
+
+    }
+
+    public Connection(String name, Link link) {
+        this.name = name;
+        this.link = link;
+    }
+
+    public Connection(String name, ArrayLink arraylink) {
+        this.name      = name;
+        this.arrayLink = arraylink;
+    }
+
     /**
      * Gets the value of the link property.
      */

@@ -48,6 +48,14 @@ public class Destination {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String ref;
 
+    public Destination() {
+
+    }
+
+    public Destination(String ref) {
+        this.ref = ref;
+    }
+
     /**
      * Gets the value of the ref property.
      */

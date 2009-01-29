@@ -63,6 +63,13 @@ public class Connections {
     @XmlElement(name = "ConnectionList")
     private ConnectionList connectionList;
 
+    public Connections() {
+        
+    }
+
+    public Connections(ConnectionList connectionList) {
+        this.connectionList = connectionList;
+    }
     /**
      * Gets the value of the connectionList property.
      */

@@ -63,6 +63,14 @@ public class ComponentList {
     @XmlElement(required = true)
     private List<ComponentPropertyType> component;
 
+    public ComponentList() {
+
+    }
+
+    public ComponentList(List<ComponentPropertyType> component) {
+        this.component = component;
+    }
+
     /**
      * Gets the value of the component property.
      *

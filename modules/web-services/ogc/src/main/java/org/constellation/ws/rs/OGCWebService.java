@@ -243,18 +243,22 @@ public abstract class OGCWebService extends WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getStaticCapabilitiesObject(final Version version) throws JAXBException, FileNotFoundException, IOException {
-       String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
-       File changeFile = getFile("change.properties");
-       Properties p = new Properties();
+        String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
+        File changeFile = getFile("change.properties");
+        Properties p    = new Properties();
 
-       // if the flag file is present we load the properties
-       if (changeFile != null && changeFile.exists()) {
-           FileInputStream in    = new FileInputStream(changeFile);
-           p.load(in);
-           in.close();
-       } else {
-           p.put("update", "false");
-       }
+        // if the flag file is present we load the properties
+        if (changeFile != null && changeFile.exists()) {
+            try {
+                FileInputStream in = new FileInputStream(changeFile);
+                p.load(in);
+                in.close();
+            } catch (IOException ex) {
+                LOGGER.warning("Unable to read the change.properties file");
+            }
+        } else {
+            p.put("update", "false");
+        }
 
        //we recup the capabilities file and unmarshall it
        if (fileName == null) {
@@ -278,9 +282,13 @@ public abstract class OGCWebService extends WebService {
 
                // if the flag file is present we store the properties
                if (changeFile != null && changeFile.exists()) {
+                   try {
                    FileOutputStream out = new FileOutputStream(changeFile);
                    p.store(out, "updated from WebService");
                    out.close();
+                   } catch (IOException ex) {
+                        LOGGER.warning("Unable to write the change.properties file");
+                   }
                }
            }
 

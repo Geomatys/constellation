@@ -97,6 +97,14 @@ public class Components {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    public Components() {
+
+    }
+
+    public Components(ComponentList componentList) {
+        this.componentList = componentList;
+    }
+
     /**
      * Gets the value of the componentList property.
      */
