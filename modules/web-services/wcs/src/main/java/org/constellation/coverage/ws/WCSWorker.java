@@ -137,6 +137,7 @@ import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
+import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
 
 
 /**
@@ -1259,11 +1260,11 @@ public class WCSWorker {
 	        } else if ( actingVersion.toString().equals("1.1.2") ) {
 	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_2 );
 	        } else {
-	        	throw new CstlServiceException("WCS acting according to no known version.", null);
+	        	throw new CstlServiceException("WCS acting according to no known version.",
+                        VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException("Could not obtain the requested coverage.",
-                    INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
         }
         return layerRefs;
     }
@@ -1283,11 +1284,10 @@ public class WCSWorker {
         		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_1_2, layerName);
         	} else {
         		throw new CstlServiceException("WCS acting according to no known version.",
-                        NO_APPLICABLE_CODE, actingVersion);
+                        VERSION_NEGOTIATION_FAILED);
         	}
         } catch (RegisterException regex ){
-        	throw new CstlServiceException("Could not obtain the requested coverage.",
-                    INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
         }
         return layerRef;
     }

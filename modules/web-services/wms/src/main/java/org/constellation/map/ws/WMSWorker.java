@@ -821,10 +821,11 @@ public class WMSWorker extends AbstractWMSWorker {
 	        } else if ( version.equals("1.3.0") ) {
 	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WMS_1_3_0 );
 	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        	throw new CstlServiceException("WMS acting according to no known version.",
+                        VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
         }
         return layerRefs;
     }
@@ -841,10 +842,11 @@ public class WMSWorker extends AbstractWMSWorker {
 	        } else if ( version.equals("1.3.0") ) {
 	        	layerRefs = Cstl.Register.getLayerReferences(ServiceDef.WMS_1_3_0, layerNames );
 	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        	throw new CstlServiceException("WMS acting according to no known version.",
+                        VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
         }
         return layerRefs;
     }
@@ -861,10 +863,11 @@ public class WMSWorker extends AbstractWMSWorker {
 	        } else if ( version.equals("1.3.0") ) {
 	        	layerRef = Cstl.Register.getLayerReference(ServiceDef.WMS_1_3_0, layerName );
 	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.", null, actingVersion);
+	        	throw new CstlServiceException("WMS acting according to no known version.",
+                        VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException("Could not obtain the requested coverage.", INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
         }
         return layerRef;
     }

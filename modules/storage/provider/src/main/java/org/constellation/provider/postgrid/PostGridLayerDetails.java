@@ -154,8 +154,11 @@ class PostGridLayerDetails implements LayerDetails {
         } catch (SQLException ex) {
             throw new CatalogException(ex);
         }
-        final GridCoverage2D coverage = coverageRef.getCoverage(null);
-        return coverage;
+        if (coverageRef == null) {
+            throw new CatalogException("The request done is not in the domain of validity of the coverage. " +
+                    "Either the envelope or the date (or both) is/are not defined for this coverage.");
+        }
+        return coverageRef.getCoverage(null);
     }
 
 
