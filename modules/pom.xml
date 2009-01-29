@@ -51,24 +51,26 @@
     </developer>
   </developers>
 
+
   <!--
     If you don't want to build the GUI modules add -PnoWar.
     Else it will be build by default.
   -->
   <profiles>
-     <profile>
-        <id>defaultProfile</id>
-        <activation>
-		    <activeByDefault>true</activeByDefault>
-		</activation>
-        <modules>
-         <module>gui</module>
-       </modules>
-     </profile>
-     <profile>
-        <id>noWar</id>
-     </profile>
+    <profile>
+      <id>defaultProfile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>gui</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>noWar</id>
+    </profile>
   </profiles>
+
 
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
@@ -79,7 +81,6 @@
     <module>storage</module>
     <module>xml-bindings</module>
     <module>library</module>
-    <!--module>to-move</module-->
   </modules>
 
 </project>
