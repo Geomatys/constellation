@@ -342,6 +342,7 @@ public class GetMap extends WMSQuery {
      * Returns the exception format specified, or {@code "application/vnd.ogc.se_xml"}
      * if {@code null}.
      */
+    @Override
     public String getExceptionFormat() {
         if (exceptions != null) {
             return exceptions;
@@ -353,6 +354,7 @@ public class GetMap extends WMSQuery {
     /**
      * {@inheritDoc}
      */
+    @Override
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_MAP;
     }
@@ -360,6 +362,7 @@ public class GetMap extends WMSQuery {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters

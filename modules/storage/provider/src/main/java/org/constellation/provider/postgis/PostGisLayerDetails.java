@@ -52,6 +52,7 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
         super(name,fs,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
 
+    @Override
     protected MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{
         MapLayer layer = null;
 

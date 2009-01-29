@@ -109,7 +109,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * Largeur et hauteur minimale des images, en pixels. Si l'utilisateur demande une région plus
      * petite, la région demandée sera agrandie pour que l'image fasse cette taille.
      */
-    private static final int MIN_SIZE = 64;
+    private static final int MIN_SIZE = 8;
 
     /** The file name.               */ private final String filename;
     /** Image start time, inclusive. */ private final long   startTime;

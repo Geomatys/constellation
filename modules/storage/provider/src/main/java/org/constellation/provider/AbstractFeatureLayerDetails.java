@@ -132,6 +132,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) throws PortrayalException{
         try {
             return createMapLayer(style, params);
@@ -143,6 +144,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -150,6 +152,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<String> getFavoriteStyles() {
         return favorites;
     }
@@ -157,6 +160,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isQueryable(ServiceType service) {
         return true;
     }
@@ -164,6 +168,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         //TODO handle this correctly
         try{
@@ -190,6 +195,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         final SortedSet<Date> dates = new TreeSet<Date>();
         
@@ -237,6 +243,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         final SortedSet<Number> elevations = new TreeSet<Number>();
         
@@ -284,6 +291,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MeasurementRange<?>[] getSampleValueRanges() {
         return new MeasurementRange<?>[0];
     }
@@ -291,6 +299,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRemarks() {
         //TODO we should get this from metadata associated to the layer.
         return "Vector datas";
@@ -299,6 +308,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getThematic() {
         //TODO we should get this from metadata associated to the layer.
         return "Vector datas";
@@ -307,11 +317,13 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final GlyphLegendFactory sldFact = new GlyphLegendFactory();
         return sldFact.create(RANDOM_FACTORY.createDefaultVectorStyle(fs), dimension);
     }
 
+    @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
             final Double elevation, final Date time) throws CatalogException, IOException
     {
@@ -321,6 +333,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     /**
      * Should not have been called in this implementation.
      */
+    @Override
     public Set<Series> getSeries() {
         throw new UnsupportedOperationException();
     }

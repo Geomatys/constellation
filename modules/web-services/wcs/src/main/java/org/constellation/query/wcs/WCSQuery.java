@@ -18,6 +18,7 @@ package org.constellation.query.wcs;
 
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
+import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -94,11 +95,28 @@ public abstract class WCSQuery extends Query {
     /** Format value used in getCoverage */
     public static final String NETCDF     = "NETCDF";
 
+    protected final ServiceVersion version;
+
+    protected WCSQuery(final ServiceVersion version) {
+        if (version == null) {
+            throw new NullPointerException("Version should not be null !");
+        }
+        this.version = version;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public final QueryService getService() {
         return new QueryService.WCS();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final ServiceVersion getVersion() {
+        return version;
     }
 }

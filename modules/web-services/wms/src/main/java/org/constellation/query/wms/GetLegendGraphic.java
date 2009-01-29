@@ -93,6 +93,7 @@ public class GetLegendGraphic extends WMSQuery {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getExceptionFormat() {
         return "application/vnd.ogc.se_xml";
     }
@@ -100,6 +101,7 @@ public class GetLegendGraphic extends WMSQuery {
     /**
      * {@inheritDoc}
      */
+    @Override
     public QueryRequest getRequest() {
         return WMSQueryRequest.GET_LEGEND_GRAPHIC;
     }
@@ -107,6 +109,7 @@ public class GetLegendGraphic extends WMSQuery {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters

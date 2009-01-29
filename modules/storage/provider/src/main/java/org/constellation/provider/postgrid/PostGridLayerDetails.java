@@ -34,6 +34,7 @@ import javax.measure.unit.Unit;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
+import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
@@ -108,6 +109,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
             final Double elevation, final Date time) throws CatalogException, IOException
     {
@@ -146,12 +148,13 @@ class PostGridLayerDetails implements LayerDetails {
         } else {
             table.setVerticalRange(null);
         }
-        GridCoverage2D coverage = null;
+        final CoverageReference coverageRef;
         try {
-            coverage = table.getEntry().getCoverage(null);
+            coverageRef = table.getEntry();
         } catch (SQLException ex) {
             throw new CatalogException(ex);
         }
+        final GridCoverage2D coverage = coverageRef.getCoverage(null);
         return coverage;
     }
 
@@ -159,6 +162,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
         return createMapLayer(style, params);
     }
@@ -166,6 +170,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return reader.getTable().getLayer().getName();
     }
@@ -173,6 +178,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<String> getFavoriteStyles(){
         return favorites;
     }
@@ -180,6 +186,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isQueryable(ServiceType service) {
         return reader.getTable().getLayer().isQueryable(service);
     }
@@ -187,6 +194,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         return reader.getTable().getLayer().getGeographicBoundingBox();
     }
@@ -194,6 +202,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         return reader.getTable().getLayer().getAvailableTimes();
     }
@@ -201,6 +210,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         return reader.getTable().getLayer().getAvailableElevations();
     }
@@ -208,6 +218,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         return reader.getTable().getLayer().getLegend((dimension != null) ? dimension : LEGEND_SIZE);
     }
@@ -215,6 +226,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MeasurementRange<?>[] getSampleValueRanges() {
         return reader.getTable().getLayer().getSampleValueRanges();
     }
@@ -222,6 +234,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Series> getSeries() {
         return reader.getTable().getLayer().getSeries();
     }
@@ -229,6 +242,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRemarks() {
         return reader.getTable().getLayer().getRemarks();
     }
@@ -236,6 +250,7 @@ class PostGridLayerDetails implements LayerDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getThematic() {
         return reader.getTable().getLayer().getThematic();
     }
