@@ -21,7 +21,6 @@ import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.Query.APP_XML;
-import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
 import static org.constellation.query.wcs.WCSQuery.GETCOVERAGE;
@@ -109,7 +108,7 @@ import org.geotools.resources.i18n.Errors;
  * {@code GetCoverage}, {@code DescribeCoverage}, and {@code GetCapabilities}
  * methods of the Open Geospatial Consortium (OGC) specifications.
  * <p>
- * This service follows the specification sof the Open Geospatial Consortium
+ * This service follows the specifications of the Open Geospatial Consortium
  * (OGC). As of Constellation 0.3, this Web Coverage Service complies with the
  * specification version 1.0.0 (OGC document 03-065r6) and mostly complies with
  * specification version 1.1.1 (OGC document 06-083r8).
@@ -121,7 +120,8 @@ import org.geotools.resources.i18n.Errors;
  */
 @Path("wcs")
 @Singleton
-public class WCSService extends OGCWebService {
+public final class WCSService extends OGCWebService {
+	
     /**
      * The worker which will perform the core logic for this service.
      */
@@ -149,84 +149,80 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Treat the incoming request and call the right function.
+     * Treat the incoming request, contained either in the {@link UriInfo} 
+     * injected context variable or in the parameter, then call the right 
+     * function in the worker.
      *
-     * @param objectRequest the request received.
-     * @return an image or xml response.
+     * @param objectRequest An object holding the request received, if this is 
+     *                        not in the {@code UriInfo} variable.
+     * @return The response to the request, either an image or an XML response.
      * @throws JAXBException
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    	
         try {
+        	
             final String request = (String) getParameter(KEY_REQUEST, true);
             LOGGER.info("New request: " + request);
             logParameters();
-
-            if (DESCRIBECOVERAGE.equalsIgnoreCase(request) ||
-                    (objectRequest instanceof AbstractDescribeCoverage))
+            
+            if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCapabilities) )
             {
-                AbstractDescribeCoverage dc = (AbstractDescribeCoverage)objectRequest;
+                AbstractGetCapabilities getcaps = (AbstractGetCapabilities)objectRequest;
+                
+                if (getcaps == null) {
+                    getcaps = adaptKvpGetCapabilitiesRequest();
+                }
+                worker.internal_initServletContext(servletContext);
+                worker.internal_initUriContext(uriContext);
+                return worker.getCapabilities(getcaps);
+            }
+            
+            if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractDescribeCoverage) )
+            {
+                AbstractDescribeCoverage desccov = (AbstractDescribeCoverage)objectRequest;
                 verifyBaseParameter(0);
 
-                //this wcs does not implement "store" mechanism
+                //The Constellation WCS does not currently implement the "store" mechanism.
                 String store = getParameter(KEY_STORE, false);
-                if (store!= null && store.trim().equalsIgnoreCase("true")) {
-                    throw new CstlServiceException("The service does not implement the store mechanism",
+                if (  store != null  &&  store.trim().equalsIgnoreCase("true")  ) {
+                    throw new CstlServiceException("The service does not implement the store mechanism.",
                                    NO_APPLICABLE_CODE, getActingVersion(), "store");
                 }
-                /*
-                 * if the parameters have been send by GET or POST kvp,
-                 * we build a request object with this parameter.
-                 */
-                if (dc == null) {
-                    dc = adaptDescribeCoverageRequest();
+                
+                if (desccov == null) {
+                    desccov = adaptKvpDescribeCoverageRequest();
                 }
-                return Response.ok(worker.describeCoverage(dc), TEXT_XML).build();
+                
+                return worker.describeCoverage(desccov);
             }
-            if (GETCAPABILITIES.equalsIgnoreCase(request) ||
-                    (objectRequest instanceof AbstractGetCapabilities))
+            
+            if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCoverage) )
             {
-                AbstractGetCapabilities gc = (AbstractGetCapabilities)objectRequest;
-                /*
-                 * if the parameters have been send by GET or POST kvp,
-                 * we build a request object with this parameter.
-                 */
-                if (gc == null) {
-                    gc = adaptGetCapabilitiesRequest();
-                }
-                worker.initServletContext(servletContext);
-                worker.initUriContext(uriContext);
-                return worker.getCapabilities(gc);
-            }
-            if (GETCOVERAGE.equalsIgnoreCase(request) ||
-                    (objectRequest instanceof AbstractGetCoverage))
-            {
-                AbstractGetCoverage gc = (AbstractGetCoverage)objectRequest;
+                AbstractGetCoverage getcov = (AbstractGetCoverage)objectRequest;
                 verifyBaseParameter(0);
-                /*
-                 * if the parameters have been send by GET or POST kvp,
-                 * we build a request object with this parameter.
-                 */
-                if (gc == null) {
-                    gc = adaptGetCoverageRequest();
+                
+                if (getcov == null) {
+                    getcov = adaptKvpGetCoverageRequest();
                 }
-                return worker.getCoverage(gc);
+                return worker.getCoverage(getcov);
             }
-            throw new CstlServiceException("The operation " + request + " is not supported by the service",
+            
+            throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
                                            OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
+            
         } catch (CstlServiceException ex) {
-            final Object report;
-            if (getActingVersion().isOWS()) {
-                final String code = Util.transformCodeName(ex.getExceptionCode().name());
-                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
-            } else {
-                report = new ServiceExceptionReport(getActingVersion(),
-                                                    new ServiceExceptionType(ex.getMessage(),
-                                                    (ExceptionCode) ex.getExceptionCode()));
-            }
-
-            // We do not want to log the full stack trace if this is an error that seems to
-            // be done by the user.
+        	/*
+        	 * This block handles all the exceptions which have been generated 
+        	 * anywhere in the service and transforms them to a response message 
+        	 * for the protocol stream which JAXB, in this case, will then 
+        	 * marshall and serialize into an XML message HTTP response.
+        	 */
+        	
+        	// LOG THE EXCEPTION
+            //   We do not want to log the full stack trace if this is an error 
+            //   which seems to have been caused by the user.
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&&
@@ -236,6 +232,41 @@ public class WCSService extends OGCWebService {
             } else {
                 LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
             }
+            
+            // SEND AN HTTP RESPONSE
+            final Object report;
+            if (getActingVersion().isOWS()) {
+                final String code = Util.transformCodeName(ex.getExceptionCode().name());
+                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
+            } else {
+                report = new ServiceExceptionReport( getActingVersion(),
+                                                     new ServiceExceptionType(ex.getMessage(),
+                                                     (ExceptionCode) ex.getExceptionCode()));
+            }
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+        } catch (Exception ex) {
+            /*
+             * /!\ This exception should not occur, if the WCS service is well implemented. /!\
+             * But in facts, sometimes an unexpected exception could happen, due to a neglecting
+             * source code. In this case the client who emits the request should get a generic
+             * error message, and the full trace has to be logged, for debugging purpose.
+             */
+
+            // LOG THE EXCEPTION
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+
+            // SEND AN HTTP RESPONSE
+            final Object report;
+            if (getActingVersion().isOWS()) {
+                report = new ExceptionReport(ex.getMessage(), NO_APPLICABLE_CODE.name(), null,
+                                             getActingVersion().toString());
+            } else {
+                report = new ServiceExceptionReport(getActingVersion(),
+                                                    new ServiceExceptionType(
+                                                        ex.getMessage(), NO_APPLICABLE_CODE));
+            }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
@@ -244,24 +275,26 @@ public class WCSService extends OGCWebService {
 
     /**
      * Build a new {@linkplain AbstractGetCapabilities GetCapabilities} request from
-     * a kvp request.
+     * from a request formulated as a Key-Value Pair either in the URL or as a 
+     * plain text message body.
      *
      * @return a marshallable GetCapabilities request.
      * @throws CstlServiceException
      */
-    private AbstractGetCapabilities adaptGetCapabilitiesRequest() throws CstlServiceException {
+    private AbstractGetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
-            throw new CstlServiceException("The parameters SERVICE=WCS must be specified",
+            throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
                     MISSING_PARAMETER_VALUE, getActingVersion(), "service");
         }
+        
         String inputVersion = getParameter(KEY_VERSION, false);
         if (inputVersion == null) {
             inputVersion = getParameter("acceptversions", false);
             if (inputVersion == null) {
                 inputVersion = getBestVersion(null).toString();
             } else {
-                //we verify that the version id supported
+                //we verify that the version is supported
                 isVersionSupported(inputVersion);
             }
         }
@@ -304,13 +337,13 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Build a new {@linkplain AbstractDescribeCoverage DescribeCoverage} request from
-     * a kvp request.
+     * Build a new {@linkplain AbstractDescribeCoverage DescribeCoverage} 
+     * request from a Key-Value Pair request.
      *
      * @return a marshallable DescribeCoverage request.
      * @throws CstlServiceException
      */
-    private AbstractDescribeCoverage adaptDescribeCoverageRequest() throws CstlServiceException {
+    private AbstractDescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
         final String version = getActingVersion().toString();
         if (version.equals("1.0.0")) {
             return new org.constellation.wcs.v100.DescribeCoverage(getParameter(KEY_COVERAGE, true));
@@ -321,24 +354,27 @@ public class WCSService extends OGCWebService {
                     "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
         }
     }
+    
 
     /**
-     * Build a new {@linkplain AbstractGetCoverage GetCoverage} request from a kvp request.
+     * Build a new {@linkplain AbstractGetCoverage GetCoverage} request from a 
+     * Key-Value Pair request.
      *
      * @return a marshallable GetCoverage request.
      * @throws CstlServiceException
      */
-    private AbstractGetCoverage adaptGetCoverageRequest() throws CstlServiceException {
+    private AbstractGetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
         final String version = getActingVersion().toString();
         if (version.equals("1.0.0")) {
-            return adaptGetCoverageRequest100();
+            return adaptKvpGetCoverageRequest100();
          } else if (version.equals("1.1.1")) {
-            return adaptGetCoverageRequest111();
+            return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
          }
     }
+    
 
     /**
      * Generate a marshallable {@linkplain org.constellation.wcs.v100.GetCoverage GetCoverage}
@@ -347,7 +383,7 @@ public class WCSService extends OGCWebService {
      * @return The GetCoverage request in version 1.0.0
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v100.GetCoverage adaptGetCoverageRequest100()
+    private org.constellation.wcs.v100.GetCoverage adaptKvpGetCoverageRequest100()
                                                     throws CstlServiceException
     {
         String width = getParameter(KEY_WIDTH, false);
@@ -431,6 +467,7 @@ public class WCSService extends OGCWebService {
         return new org.constellation.wcs.v100.GetCoverage(
                 getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
     }
+    
 
     /**
      * Generate a marshallable {@linkplain org.constellation.wcs.v111.GetCoverage GetCoverage}
@@ -439,7 +476,7 @@ public class WCSService extends OGCWebService {
      * @return The GetCoverage request in version 1.1.1
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v111.GetCoverage adaptGetCoverageRequest111()
+    private org.constellation.wcs.v111.GetCoverage adaptKvpGetCoverageRequest111()
                                                     throws CstlServiceException
     {
         // temporal subset
@@ -559,6 +596,7 @@ public class WCSService extends OGCWebService {
                 new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
                 domain, range, output);
     }
+    
 
     /**
      * Parses a value as a floating point.

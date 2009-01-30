@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,30 @@
  */
 package org.constellation.wcs.v100;
 
+import java.awt.Dimension;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
+import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.EnvelopeEntry;
+import org.constellation.gml.v311.GridEnvelopeType;
+import org.constellation.gml.v311.TimePositionType;
 import org.constellation.wcs.AbstractGetCoverage;
+
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.crs.DefaultVerticalCRS;
+
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.VerticalCRS;
 
 
 /**
@@ -49,6 +66,7 @@ import org.constellation.wcs.AbstractGetCoverage;
  * </pre>
  * 
  * @author Guilhem Legal
+ * @author Cédric Briançon (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -147,7 +165,141 @@ public class GetCoverage extends AbstractGetCoverage {
     /**
      * Gets the value of the version property.
      */
+    @Override
     public String getVersion() {
         return version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CoordinateReferenceSystem getCRS() throws FactoryException {
+        if (domainSubset == null || domainSubset.getSpatialSubSet() == null ||
+            domainSubset.getSpatialSubSet().getEnvelope() == null)
+        {
+            return null;
+        }
+        final CoordinateReferenceSystem objCrs = CRS.decode(domainSubset.getSpatialSubSet().getEnvelope().getSrsName());
+        final List<DirectPositionType> positions = domainSubset.getSpatialSubSet().getEnvelope().getPos();
+
+        /*
+         * If the bounding box contains at least 3 dimensions and the CRS specified is just
+         * a 2D one, then we have to add a VerticalCRS to the one gotten by the crs decoding step.
+         * Otherwise the CRS decoded is already fine, and we just return it.
+         */
+        if (positions.size() > 2 && objCrs.getCoordinateSystem().getDimension() < 3) {
+            final VerticalCRS verticalCRS = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+            return new DefaultCompoundCRS(objCrs.getName().getCode() + " (3D)", objCrs, verticalCRS);
+        } else {
+            return objCrs;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCoverage() {
+        return sourceCoverage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Envelope getEnvelope() throws FactoryException {
+        if (domainSubset == null || domainSubset.getSpatialSubSet() == null ||
+            domainSubset.getSpatialSubSet().getEnvelope() == null)
+        {
+            return null;
+        }
+        final EnvelopeEntry env = domainSubset.getSpatialSubSet().getEnvelope();
+        final List<DirectPositionType> positions = env.getPos();
+        final DirectPositionType lonPos = positions.get(0);
+        final DirectPositionType latPos = positions.get(1);
+        final CoordinateReferenceSystem crs = getCRS();
+        final GeneralEnvelope objEnv = new GeneralEnvelope(crs);
+        objEnv.setRange(0, lonPos.getValue().get(0), lonPos.getValue().get(1));
+        objEnv.setRange(1, latPos.getValue().get(0), latPos.getValue().get(1));
+
+        // If the CRS has a vertical part, then the envelope to return should be a 3D one.
+        if (CRS.getVerticalCRS(crs) != null) {
+            final DirectPositionType elevPos = positions.get(2);
+            objEnv.setRange(2, elevPos.getValue().get(0), elevPos.getValue().get(1));
+        }
+        return objEnv;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFormat() {
+        if (output == null || output.getFormat() == null) {
+            return null;
+        }
+        return output.getFormat().getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CoordinateReferenceSystem getResponseCRS() throws FactoryException {
+        if (output == null || output.getCrs() == null) {
+            return null;
+        }
+        final CoordinateReferenceSystem objCrs = CRS.decode(output.getCrs().getValue());
+        final List<DirectPositionType> positions = domainSubset.getSpatialSubSet().getEnvelope().getPos();
+
+        /*
+         * If the bounding box contains at least 3 dimensions and the CRS specified is just
+         * a 2D one, then we have to add a VerticalCRS to the one gotten by the crs decoding step.
+         * Otherwise the CRS decoded is already fine, and we just return it.
+         */
+        if (positions.size() > 2 && objCrs.getCoordinateSystem().getDimension() < 3) {
+            final VerticalCRS verticalCRS = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+            return new DefaultCompoundCRS(objCrs.getName().getCode() + " (3D)", objCrs, verticalCRS);
+        } else {
+            return objCrs;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dimension getSize() {
+        if (domainSubset == null || domainSubset.getSpatialSubSet() == null                 ||
+            domainSubset.getSpatialSubSet().getGrid() == null                               ||
+            domainSubset.getSpatialSubSet().getGrid().getLimits() == null                   ||
+            domainSubset.getSpatialSubSet().getGrid().getLimits().getGridEnvelope() == null)
+        {
+            return null;
+        }
+        final GridEnvelopeType gridEnv = domainSubset.getSpatialSubSet().getGrid().getLimits().getGridEnvelope();
+        final int width  = gridEnv.getHigh().get(0).intValue();
+        final int height = gridEnv.getHigh().get(1).intValue();
+        return new Dimension(width, height);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTime() {
+        if (domainSubset == null || domainSubset.getTemporalSubSet() == null ||
+            domainSubset.getTemporalSubSet().getTimePositionOrTimePeriod() == null)
+        {
+            return null;
+        }
+        final List<Object> times = domainSubset.getTemporalSubSet().getTimePositionOrTimePeriod();
+        final Object timeObj = times.get(0);
+        if (timeObj instanceof TimePositionType) {
+            return ((TimePositionType) timeObj).getValue();
+        } else {
+            return null;
+        }
     }
 }

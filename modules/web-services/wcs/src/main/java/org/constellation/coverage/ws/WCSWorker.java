@@ -17,7 +17,6 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -56,9 +55,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.GridEnvelopeType;
-import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.ows.AbstractDCP;
 import org.constellation.ows.AbstractGetCapabilities;
@@ -92,7 +88,6 @@ import org.constellation.wcs.v100.Keywords;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
 import org.constellation.wcs.v100.RangeSet;
 import org.constellation.wcs.v100.RangeSetType;
-import org.constellation.wcs.v100.SpatialSubsetType;
 import org.constellation.wcs.v100.SupportedCRSsType;
 import org.constellation.wcs.v100.SupportedFormatsType;
 import org.constellation.wcs.v100.SupportedInterpolationsType;
@@ -105,7 +100,6 @@ import org.constellation.wcs.v111.CoverageDescriptions;
 import org.constellation.wcs.v111.CoverageDomainType;
 import org.constellation.wcs.v111.CoverageSummaryType;
 import org.constellation.wcs.v111.FieldType;
-import org.constellation.wcs.v111.GridCrsType;
 import org.constellation.wcs.v111.InterpolationMethodType;
 import org.constellation.wcs.v111.InterpolationMethods;
 import org.constellation.wcs.v111.RangeType;
@@ -117,38 +111,34 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.WebService;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 
 // GeoAPI dependencies
+import org.geotools.referencing.CRS;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.constellation.query.Query.APP_XML;
-import static org.constellation.query.Query.EXCEPTIONS_INIMAGE;
 import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
-import static org.constellation.ws.ExceptionCode.INVALID_CRS;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
 import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
+import org.opengis.referencing.FactoryException;
 
 
 /**
- * A WCS worker for a local WCS service which handles requests from either REST
- * or SOAP facades and issues appropriate responses.
+ * Worker for the WCS services in Constellation which services both the REST and 
+ * SOAP facades by issuing appropriate responses.
  * <p>
  * The classes implementing the REST or SOAP facades to this service will have
  * processed the requests sufficiently to ensure that all the information
- * conveyed by the HTTP request is either in the method call parameters or is
- * in one of the fields of the parent class which holds instances of the
- * injectible interface {@code Context} objects created by the JEE container.
+ * conveyed by the HTTP request is in one of the fields of the object passed 
+ * to the worker methods as a parameter.
  * </p>
  *
  * @version $Id$
@@ -156,7 +146,7 @@ import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WCSWorker {
+public final class WCSWorker {
 
     /**
      * The default debugging logger for the WCS service.
@@ -202,21 +192,21 @@ public class WCSWorker {
     }
 
     /**
-     * <p>The DescribeCoverage operation returns an XML file, containing the complete
-     * description of a specific coverage.
-     * </p>
-     * <p>This method retrieves lots of supplementaries coverage definitions, and come
-     * in addition to the GetCapabilities operation.
+     * The DescribeCoverage operation returns an XML file, containing the 
+     * complete description of the specific coverages requested.
+     * <p>
+     * This method extends the definition of each coverage given in the 
+     * Capabilities document with supplementary information.
      * </p>
      *
-     * @param abstractRequest a {@linkplain AbstractDescribeCoverage describe coverage request}
-     *                        done by the user.
-     * @return an XML document giving the full description of a coverage.
-     *
+     * @param abstractRequest A {@linkplain AbstractDescribeCoverage request}
+     *                        with the parameters of the user message.
+     * @return An XML document giving the full description of the requested 
+     *           coverages.
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public String describeCoverage(AbstractDescribeCoverage abstractRequest)
+    public Response describeCoverage(AbstractDescribeCoverage abstractRequest)
                                   throws JAXBException, CstlServiceException
     {
         LOGGER.info("describeCoverage request processing");
@@ -242,15 +232,7 @@ public class WCSWorker {
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
-        return sw.toString();
-    }
-
-    public void initServletContext(final ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
-    public void initUriContext(final UriInfo uriContext) {
-        this.uriContext = uriContext;
+        return Response.ok(sw.toString(), TEXT_XML).build();
     }
 
     /**
@@ -797,17 +779,6 @@ public class WCSWorker {
     public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException,
                                                                       CstlServiceException
     {
-        final String format;
-        final String coverage;
-        final GeneralEnvelope objEnv;
-        final CoordinateReferenceSystem crs;
-        final Dimension dimension;
-        final int width;
-        final int height;
-        final int depth;
-        final Double elevation;
-        final String time;
-
         final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
@@ -815,324 +786,52 @@ public class WCSWorker {
         }
         this.actingVersion = new ServiceVersion(ServiceType.WCS, inputVersion);
 
-        // TODO: better handle those parameters
-        String interpolation = null;
-        String exceptions = null;
-        String resx  = null;
-        String resy  = null;
-        String resz  = null;
-        String gridType;
-        String gridOrigin = "";
-        String gridOffsets = "";
-        String gridCS;
-        String gridBaseCrs;
-        String responseCRS = null;
-
-       if (actingVersion.toString().equals("1.1.1")) {
-            final org.constellation.wcs.v111.GetCoverage request = (org.constellation.wcs.v111.GetCoverage)abstractRequest;
-
-            if (request.getIdentifier() != null) {
-                coverage = request.getIdentifier().getValue();
-            } else {
-                throw new CstlServiceException("The parameter identifier must be specified",
-                               MISSING_PARAMETER_VALUE, actingVersion, "identifier");
-            }
-
-            /*
-             * Domain subset: - spatial subSet
-             *                - temporal subset
-             *
-             * spatial subset: - BoundingBox
-             * here the boundingBox parameter contain the crs.
-             * we must extract it before calling webServiceWorker.setBoundingBox(...)
-             *
-             * temporal subSet: - timeSequence
-             *
-             */
-            final org.constellation.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
-            if (domain == null) {
-                throw new CstlServiceException("The DomainSubset must be specify",
-                               MISSING_PARAMETER_VALUE, actingVersion);
-            }
-
-            final BoundingBoxType boundingBox = (domain.getBoundingBox() != null) ?
-                                                 domain.getBoundingBox().getValue() :
-                                                 null;
-
-            if (boundingBox != null &&
-                boundingBox.getLowerCorner() != null &&
-                boundingBox.getUpperCorner() != null &&
-                boundingBox.getLowerCorner().size() >= 2 &&
-                boundingBox.getUpperCorner().size() >= 2){
-                final String crsName = boundingBox.getCrs();
-                try {
-                    crs  = CRS.decode((crsName.startsWith("EPSG:")) ? crsName : "EPSG:" + crsName);
-                } catch (FactoryException ex) {
-                    throw new CstlServiceException(ex, INVALID_CRS, actingVersion);
-                }
-                objEnv = new GeneralEnvelope(crs);
-                objEnv.setRange(0, boundingBox.getLowerCorner().get(0), boundingBox.getUpperCorner().get(0));
-                objEnv.setRange(1, boundingBox.getLowerCorner().get(1), boundingBox.getUpperCorner().get(1));
-            } else {
-                throw new CstlServiceException("The BoundingBox is not well-formed",
-                               INVALID_PARAMETER_VALUE, actingVersion, "boundingbox");
-            }
-
-            if (domain.getTemporalSubset() != null) {
-                final List<Object> timeSeq = domain.getTemporalSubset().getTimePositionOrTimePeriod();
-                // TODO: handle period values
-                if (timeSeq != null && !timeSeq.isEmpty()) {
-                    final Object obj = timeSeq.get(0);
-                    if (obj instanceof TimePositionType) {
-                        time = ((TimePositionType)obj).getValue();
-                    } else if (obj instanceof org.constellation.wcs.v111.TimePeriodType) {
-                        throw new CstlServiceException("The service does not handle time Period type",
-                                       INVALID_PARAMETER_VALUE, actingVersion);
-                    } else {
-                        time = null;
-                    }
-                } else {
-                    time = null;
-                }
-            } else {
-                time = null;
-            }
-            /*
-             * Range subSet.
-             * contain the sub fields : fieldSubset
-             * for now we handle only one field to change the interpolation method.
-             *
-             * FieldSubset: - identifier
-             *              - interpolationMethodType
-             *              - axisSubset (not yet used)
-             *
-             * AxisSubset:  - identifier
-             *              - key
-             */
-            org.constellation.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
-
-
-            //NOTE ADRIAN HACKED HERE
-            final LayerDetails currentLayer = getLayerReference(coverage);
-
-
-            if (rangeSubset != null) {
-                List<String> requestedField = new ArrayList<String>();
-                for(org.constellation.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
-                    if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
-                        interpolation = field.getInterpolationType();
-
-                        //we look that the same field is not requested two times
-                        if (!requestedField.contains(field.getIdentifier())) {
-                            requestedField.add(field.getIdentifier());
-                        } else {
-                            throw new CstlServiceException("The field " + field.getIdentifier() + " is already present in the request",
-                                       INVALID_PARAMETER_VALUE, actingVersion);
-                        }
-
-                        //if there is some AxisSubset we send an exception
-                        if (field.getAxisSubset().size() != 0) {
-                            throw new CstlServiceException("The service does not handle AxisSubset",
-                                       INVALID_PARAMETER_VALUE, actingVersion);
-                        }
-                    } else {
-                        throw new CstlServiceException("The field " + field.getIdentifier() + " is not present in this coverage",
-                                       INVALID_PARAMETER_VALUE, actingVersion);
-                    }
-                }
-
-            } else {
-                interpolation = null;
-            }
-
-            /*
-             * output subSet:  - format
-             *                 - GridCRS
-             *
-             * Grid CRS: - GridBaseCRS (not yet used)
-             *           - GridOffsets
-             *           - GridType (not yet used)
-             *           - GridOrigin
-             *           - GridCS (not yet used)
-             *
-             */
-
-            org.constellation.wcs.v111.OutputType output = request.getOutput();
-            if (output == null) {
-                throw new CstlServiceException("The OUTPUT must be specify" ,
-                               MISSING_PARAMETER_VALUE, actingVersion, "output");
-            }
-            format = output.getFormat();
-            if (format == null) {
-                throw new CstlServiceException("The FORMAT must be specify" ,
-                               MISSING_PARAMETER_VALUE, actingVersion, "format");
-            }
-
-            final GridCrsType grid = output.getGridCRS();
-            if (grid != null) {
-                gridBaseCrs = grid.getGridBaseCRS();
-                gridType = grid.getGridType();
-                gridCS = grid.getGridCS();
-
-                for (Double d: grid.getGridOffsets()) {
-                    gridOffsets += d.toString() + ',';
-                }
-                if (gridOffsets.length() > 0) {
-                    gridOffsets = gridOffsets.substring(0, gridOffsets.length() - 1);
-                } else {
-                    gridOffsets = null;
-                }
-
-                for (Double d: grid.getGridOrigin()) {
-                    gridOrigin += d.toString() + ',';
-                }
-                if (gridOrigin.length() > 0) {
-                    gridOrigin = gridOrigin.substring(0, gridOrigin.length() - 1);
-                }
-            } else {
-                // TODO the default value for gridOffsets is temporary until we get the right treatment
-                gridOffsets = "1.0,0.0,0.0,1.0"; // = null;
-                gridOrigin  = "0.0,0.0";
-            }
-            /* TODO: get the width and height parameter from the calculation using the grid origin, the size
-             * of the envelope and the grid offsets.
-             */
-            width = 0;
-            height = 0;
-            // TODO: get the exception parameter properly
-            //exceptions = getParameter(KEY_EXCEPTIONS, false);
-
-            // TODO: get the elevation value from the third dimension of the BBOX3D
-            elevation = null;
-
-        } else {
-
-            // parameter for 1.0.0 version
-            org.constellation.wcs.v100.GetCoverage request = (org.constellation.wcs.v100.GetCoverage)abstractRequest;
-            if (request.getOutput().getFormat()!= null) {
-                format = request.getOutput().getFormat().getValue();
-            } else {
-                throw new CstlServiceException("The parameters FORMAT have to be specified",
-                                                 MISSING_PARAMETER_VALUE, actingVersion, "format");
-            }
-
-            coverage = request.getSourceCoverage();
-            if (coverage == null) {
-                throw new CstlServiceException("The parameters SOURCECOVERAGE have to be specified",
-                                                 MISSING_PARAMETER_VALUE, actingVersion, "sourceCoverage");
-            }
-            interpolation = (request.getInterpolationMethod() != null) ?
-                interpolation = request.getInterpolationMethod().value() : null;
-
-            // TODO: get the exception code properly
-            //exceptions = getParameter(KEY_EXCEPTIONS, false);
-            if (request.getOutput().getCrs() != null){
-                responseCRS   = request.getOutput().getCrs().getValue();
-            }
-
-            //for now we only handle one time parameter with timePosition type
-            final org.constellation.wcs.v100.TimeSequenceType temporalSubset =
-                    request.getDomainSubset().getTemporalSubSet();
-            if (temporalSubset != null) {
-                final Object timeObj = temporalSubset.getTimePositionOrTimePeriod().get(0);
-                if (timeObj instanceof TimePositionType) {
-                    time = ((TimePositionType) timeObj).getValue();
-                } else {
-                    time = null;
-                }
-            } else {
-                time = null;
-            }
-
-            final SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
-            final EnvelopeEntry env = spatial.getEnvelope();
-            final String crsName = env.getSrsName();
-            //TODO: This will fail when we start working with OGC urn ids
-            //      we will need to be much more sophisticated.
-            try {
-                crs = CRS.decode(crsName);
-            } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_CRS, actingVersion);
-            }
-            objEnv = new GeneralEnvelope(crs);
-            final List<DirectPositionType> positions = env.getPos();
-            final DirectPositionType lonPos = positions.get(0);
-            final DirectPositionType latPos = positions.get(1);
-            objEnv.setRange(0, lonPos.getValue().get(0), lonPos.getValue().get(1));
-            objEnv.setRange(1, latPos.getValue().get(0), latPos.getValue().get(1));
-
-            //HACK: we actually need to build the envelope and then go find the
-            //      data which the envelope intersects. Only then can we make an
-            //      arbitrary choice.
-            if (positions.size() > 2) {
-                elevation = positions.get(2).getValue().get(0);
-            } else {
-                elevation = null;
-            }
-
-            if (temporalSubset == null && positions.size() == 0) {
-                        throw new CstlServiceException("The parameters BBOX or TIME have to be specified",
-                                       MISSING_PARAMETER_VALUE, actingVersion);
-            }
-            /* here the parameter width and height (and depth for 3D matrix)
-             *  have to be fill. If not they can be replace by resx and resy
-             * (resz for 3D grid)
-             */
-            final GridType grid = spatial.getGrid();
-            // TODO: test if grid is instanceof RectifiedGrid.
-
-            final GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();
-            if (gridEnv.getHigh().size() > 0) {
-                width = gridEnv.getHigh().get(0).intValue();
-                height = gridEnv.getHigh().get(1).intValue();
-
-                if (gridEnv.getHigh().size() >= 3) {
-                    depth = gridEnv.getHigh().get(2).intValue();
-                }
-            } else {
-                throw new CstlServiceException("you must specify grid size or resolution",
-                        MISSING_PARAMETER_VALUE, actingVersion);
-            }
-        }
-
         Date date = null;
         try {
-            date = QueryAdapter.toDate(time);
+            date = QueryAdapter.toDate(abstractRequest.getTime());
         } catch (ParseException ex) {
             LOGGER.log(Level.INFO, "Parsing of the date failed. Please verify that the specified" +
                     " date is compliant with the ISO-8601 standard.", ex);
         }
 
-        dimension = new Dimension(width, height);
-
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
-        if ( format.equalsIgnoreCase(MATRIX) ) {
+        if ( abstractRequest.getFormat().equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
-            final LayerDetails layerRef = getLayerReference(coverage);
+            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage());
 
+            final Envelope envelope;
+            try {
+                envelope = abstractRequest.getEnvelope();
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+            }
+            final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layerRef.getCoverage(objEnv, dimension, elevation, date);
+                final GridCoverage2D gridCov = layerRef.getCoverage(abstractRequest.getEnvelope(),
+                        abstractRequest.getSize(), elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
             } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+            } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
             }
 
             final String mime = "application/matrix";
             return Response.ok(image, mime).build();
 
-        } else if( format.equalsIgnoreCase(NETCDF) ){
+        } else if( abstractRequest.getFormat().equalsIgnoreCase(NETCDF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation does not support netcdf writing."), NO_APPLICABLE_CODE, actingVersion);
 
-        } else if( format.equalsIgnoreCase(GEOTIFF) ){
+        } else if( abstractRequest.getFormat().equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                         "Constellation does not support geotiff writing."), NO_APPLICABLE_CODE, actingVersion);
@@ -1144,36 +843,57 @@ public class WCSWorker {
             //NOTE: ADRIAN HACKED HERE
 
             // SCENE
-            LayerDetails layerRef = getLayerReference(coverage);
-              //if styles were defined they should be handled here.
-            final Object style = null;
-              //final MutableStyledLayerDescriptor mutSLD= null;
+            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage());
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
+            final Envelope envelope;
+            try {
+                envelope = abstractRequest.getEnvelope();
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+            }
+            final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             renderParameters.put("TIME", date);
             renderParameters.put("ELEVATION", elevation);
-            Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, style, renderParameters);
+            final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, null, renderParameters);
 
             // VIEW
-            final ReferencedEnvelope refEnvel = new ReferencedEnvelope(objEnv);
+            final ReferencedEnvelope refEnvel;
+            try {
+                if (envelope.getDimension() > 2) {
+                    refEnvel = new ReferencedEnvelope(
+                            envelope.getMinimum(0), envelope.getMaximum(0),
+                            envelope.getMinimum(1), envelope.getMaximum(1),
+                            CRS.getHorizontalCRS(abstractRequest.getCRS()));
+                } else {
+                    refEnvel = new ReferencedEnvelope(envelope);
+                }
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+            }
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
-            Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel,azimuth);
+            final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(dimension,null);
+            final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(abstractRequest.getSize(), null);
 
             // IMAGE
-            BufferedImage img;
+            final BufferedImage img;
             try {
                 img = Cstl.Portrayal.portray(sdef, vdef, cdef);
             } catch (PortrayalException ex) {
-                if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
-                    img = Cstl.Portrayal.writeInImage(ex, dimension);
-                } else {
+                /*
+                 * TODO: the binding xml for WCS and GML do not support the exceptions format,
+                 * consequently we can't extract the exception output mime-type information from
+                 * the request. Maybe a more recent version of the GML 3 spec has fixed this bug ...
+                 */
+                //if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
+                //    img = Cstl.Portrayal.writeInImage(ex, abstractRequest.getSize());
+                //} else {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
-                }
+                //}
             }
 
-            return Response.ok(img, format).build();
+            return Response.ok(img, abstractRequest.getFormat()).build();
         }
     }
 
@@ -1183,7 +903,7 @@ public class WCSWorker {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
+    private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
        final String fileName = "WCSCapabilities" + actingVersion.toString() + ".xml";
        final File changeFile = getFile("change.properties", home);
        Properties p = new Properties();
@@ -1247,7 +967,7 @@ public class WCSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    public List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
+    private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
@@ -1272,7 +992,7 @@ public class WCSWorker {
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getAllLayerReferences().
     //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
-    public LayerDetails getLayerReference(String layerName) throws CstlServiceException {
+    private LayerDetails getLayerReference(String layerName) throws CstlServiceException {
 
     	LayerDetails layerRef;
     	try { // WE catch the exception from either service version
@@ -1323,6 +1043,20 @@ public class WCSWorker {
                }
            }
         }
+    }
+    
+    /**
+     * This method should be considered private.
+     */
+    public void internal_initServletContext(final ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+    
+    /**
+     * This method should be considered private.
+     */
+    public void internal_initUriContext(final UriInfo uriContext) {
+        this.uriContext = uriContext;
     }
 
 }
