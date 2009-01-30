@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -69,4 +70,37 @@ public class ConnectionList {
         }
         return this.connection;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ConnectionList) {
+            final ConnectionList that = (ConnectionList) object;
+            return Utilities.equals(this.connection, that.connection)  ;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 11 * hash + (this.connection != null ? this.connection.hashCode() : 0);
+        return hash;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ConnectionList]").append("\n");
+        if (connection != null) {
+            sb.append("connection: ").append('\n');
+            for (Connection c : connection) {
+                sb.append(c).append('\n');
+            }
+        }
+        return sb.toString();
+     }
 }

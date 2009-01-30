@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -166,5 +167,51 @@ public class ArrayLink {
         }
         return this.connection;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof ArrayLink) {
+            final ArrayLink that = (ArrayLink) object;
+            return Utilities.equals(this.connection, that.connection)             &&
+                   Utilities.equals(this.destinationArray, that.destinationArray) &&
+                   Utilities.equals(this.sourceArray, that.sourceArray)           &&
+                   Utilities.equals(this.sourceIndex, that.sourceIndex) &&
+                   Utilities.equals(this.destinationIndex, that.destinationIndex);
+
+
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ArrayLink]").append("\n");
+        if (connection != null) {
+            sb.append("connection: ").append('\n');
+            for (Connection c : connection) {
+                sb.append(connection).append('\n');
+            }
+        }
+        if (destinationIndex != null) {
+            sb.append("destination index: ").append('\n');
+            for (DestinationIndex c : destinationIndex) {
+                sb.append(c).append('\n');
+            }
+        }
+        if (destinationArray != null) {
+            sb.append("destination Array: ").append(destinationArray).append('\n');
+        }
+        if (sourceArray != null) {
+            sb.append("source Array: ").append(sourceArray).append('\n');
+        }
+        if (sourceIndex != null) {
+            sb.append("source Index: ").append(sourceIndex).append('\n');
+        }
+        return sb.toString();
+     }
 
 }

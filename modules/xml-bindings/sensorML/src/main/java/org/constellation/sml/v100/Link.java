@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -128,5 +129,44 @@ public class Link {
     public void setType(String value) {
         this.type = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Link) {
+            final Link that = (Link) object;
+            return Utilities.equals(this.destination, that.destination) &&
+                   Utilities.equals(this.source, that.source)           &&
+                   Utilities.equals(this.type, that.type);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + (this.source != null ? this.source.hashCode() : 0);
+        hash = 71 * hash + (this.destination != null ? this.destination.hashCode() : 0);
+        hash = 71 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Link]").append("\n");
+        if (source != null) {
+            sb.append("source: ").append(source).append('\n');
+        }
+        if (destination != null) {
+            sb.append("destination: ").append(destination).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+     }
 
 }

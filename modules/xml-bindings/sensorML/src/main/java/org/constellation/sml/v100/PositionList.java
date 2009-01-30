@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -60,6 +61,20 @@ public class PositionList {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;
+
+    public PositionList() {
+
+    }
+
+    public PositionList(String id , TimePosition timePosition) {
+        this.id           = id;
+        this.timePosition = timePosition;
+    }
+
+    public PositionList(String id , List<Position> position) {
+        this.position = position;
+        this.id       = id;
+    }
 
     /**
      * Gets the value of the position property.
@@ -117,6 +132,54 @@ public class PositionList {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof PositionList) {
+            final PositionList that = (PositionList) object;
+
+            return Utilities.equals(this.position, that.position) &&
+                   Utilities.equals(this.timePosition, that.timePosition) &&
+                   Utilities.equals(this.id, that.id);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 47 * hash + (this.position != null ? this.position.hashCode() : 0);
+        hash = 47 * hash + (this.timePosition != null ? this.timePosition.hashCode() : 0);
+        hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[OutputList]").append("\n");
+        if (id != null) {
+            sb.append("id: ").append(id).append('\n');
+        }
+        if (timePosition != null) {
+            sb.append("timePosition: ").append(timePosition).append('\n');
+        }
+        if (position != null) {
+            sb.append("positionList:").append('\n');
+            for (Position k : position) {
+                sb.append("position: ").append(k).append('\n');
+            }
+        }
+        return sb.toString();
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- *    Constellation - An open source and standard compliant SDI
+ *    Constellation - An open Destination and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
  *    (C) 2007 - 2008, Geomatys
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -69,4 +70,34 @@ public class Destination {
     public void setRef(String value) {
         this.ref = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Destination) {
+            final Destination that = (Destination) object;
+            return Utilities.equals(this.ref, that.ref);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 13 * hash + (this.ref != null ? this.ref.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Destination]").append("\n");
+        if (ref != null) {
+            sb.append("ref: ").append(ref).append('\n');
+        }
+        return sb.toString();
+     }
 }

@@ -200,7 +200,7 @@ public class AddressType {
             return true;
         }
 
-        if (object instanceof AddressType && super.equals(object)) {
+        if (object instanceof AddressType) {
             final AddressType that = (AddressType) object;
             return Utilities.equals(this.administrativeArea, that.administrativeArea) &&
                     Utilities.equals(this.city, that.city) &&

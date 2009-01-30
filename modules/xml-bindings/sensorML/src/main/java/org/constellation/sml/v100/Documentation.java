@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -246,6 +247,50 @@ public class Documentation {
     public void setType(String value) {
         this.type = value;
     }
+
+     /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Documentation) {
+            final Documentation that = (Documentation) object;
+            return Utilities.equals(this.actuate,      that.actuate)       &&
+                   Utilities.equals(this.arcrole,      that.arcrole)       &&
+                   Utilities.equals(this.href,         that.href)          &&
+                   Utilities.equals(this.nilReason,    that.nilReason)     &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                   Utilities.equals(this.role,         that.role)          &&
+                   Utilities.equals(this.show,         that.show)          &&
+                   Utilities.equals(this.title,        that.title)         &&
+                   Utilities.equals(this.document,     that.document)   &&
+                   Utilities.equals(this.documentList, that.documentList) &&
+                   Utilities.equals(this.type,         that.type);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + (this.document != null ? this.document.hashCode() : 0);
+        hash = 43 * hash + (this.documentList != null ? this.documentList.hashCode() : 0);
+        hash = 43 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 43 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 43 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 43 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 43 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 43 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 43 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 43 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 43 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+
 
     @Override
     public String toString() {

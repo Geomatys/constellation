@@ -150,7 +150,7 @@ public class XacmlTest {
     @Test
     public void ObjectModelPDPTest() throws Exception {
 
-        logger.info('\n' + "-------- Object Model PDP Test --------" + '\n');
+        logger.finer('\n' + "-------- Object Model PDP Test --------" + '\n');
         
         PDP = new CstlPDP();
         PolicyType examplePolicy = getExamplePolicy();
@@ -183,27 +183,27 @@ public class XacmlTest {
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_developer, "read");
         if (debug) {
-            logger.info("Positive Web Binding request: role='developer' action='read'");
+            logger.finer("Positive Web Binding request: role='developer' action='read'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "read");
         if (debug) {
-            logger.info("Positive Web Binding request: role='adminr' action='write'");
+            logger.finer("Positive Web Binding request: role='adminr' action='write'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "write");
         if (debug) {
-            logger.info("Positive Web Binding request: role='adminr' action='write'");
+            logger.finer("Positive Web Binding request: role='adminr' action='write'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
@@ -211,9 +211,9 @@ public class XacmlTest {
         request = pep.createXACMLRequest(requestURI, user, grp_imposter, "read");
         
         if (debug) {
-            logger.info("Negative Web Binding request: role= 'imposter' action='read' ");
+            logger.finer("Negative Web Binding request: role= 'imposter' action='read' ");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals(XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
@@ -221,13 +221,13 @@ public class XacmlTest {
         request = pep.createXACMLRequest(requestURI, user, grp_developer, "write");
         
         if (debug) {
-            logger.info("Negative Web Binding request: role= 'developer' action='write' ");
+            logger.finer("Negative Web Binding request: role= 'developer' action='write' ");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin Object Model PDP Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin Object Model PDP Test --------" + '\n');
     }
     
     /**
@@ -239,7 +239,7 @@ public class XacmlTest {
     @Test
     public void testPositiveWebBinding() throws Exception {
         
-        logger.info('\n' + "-------- Positive Web Binding Test --------" + '\n');
+        logger.finer('\n' + "-------- Positive Web Binding Test --------" + '\n');
         assertNotNull(PDP);
 
         String requestURI   = "http://test/developer-guide.html";
@@ -247,31 +247,31 @@ public class XacmlTest {
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_developer, "read");
         if (debug) {
-            logger.info("Positive Web Binding request: role='developer' action='read'");
+            logger.finer("Positive Web Binding request: role='developer' action='read'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "read");
         if (debug) {
-            logger.info("Positive Web Binding request: role='adminr' action='write'");
+            logger.finer("Positive Web Binding request: role='adminr' action='write'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "write");
         if (debug) {
-            logger.info("Positive Web Binding request: role='adminr' action='write'");
+            logger.finer("Positive Web Binding request: role='adminr' action='write'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin Positive Web Binding Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin Positive Web Binding Test --------" + '\n');
     }
     
     /**
@@ -283,7 +283,7 @@ public class XacmlTest {
     @Test
     public void testNegativeAccessWebBinding() throws Exception {
         
-        logger.info('\n' + "-------- Negative Web Binding Test --------" + '\n');
+        logger.finer('\n' + "-------- Negative Web Binding Test --------" + '\n');
         assertNotNull(PDP);
         
         String requestURI = "http://test/developer-guide.html";
@@ -292,9 +292,9 @@ public class XacmlTest {
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_imposter, "read");
         
         if (debug) {
-            logger.info("Negative Web Binding request: role= 'imposter' action='read' ");
+            logger.finer("Negative Web Binding request: role= 'imposter' action='read' ");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals(XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
@@ -302,13 +302,13 @@ public class XacmlTest {
         request = pep.createXACMLRequest(requestURI, user, grp_developer, "write");
         
         if (debug) {
-            logger.info("Negative Web Binding request: role= 'developer' action='write' ");
+            logger.finer("Negative Web Binding request: role= 'developer' action='write' ");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals("Access Disallowed?", XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin Negative Web Binding Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin Negative Web Binding Test --------" + '\n');
     }
 
 
@@ -320,7 +320,7 @@ public class XacmlTest {
     @Test
     public void testCSWPolicy() throws Exception {
         
-        logger.info('\n' + "-------- CSW Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- CSW Policy Test --------" + '\n');
         
         assertNotNull(PDP);
 
@@ -329,76 +329,76 @@ public class XacmlTest {
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='getCapabilities'");
+            logger.finer("csw request: role='anonymous' action='getCapabilities'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getrecords");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='getRecords'");
+            logger.finer("csw request: role='anonymous' action='getRecords'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "transaction");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='transaction'");
+            logger.finer("csw request: role='anonymous' action='transaction'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "transaction");
         if (debug) {
-            logger.info("csw request: role='admin' action='transaction'");
+            logger.finer("csw request: role='admin' action='transaction'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "harvest");
         if (debug) {
-            logger.info("csw request: role='admin' action='harvest'");
+            logger.finer("csw request: role='admin' action='harvest'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
          //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "getcapabilities");
         if (debug) {
-            logger.info("csw request: role='admin' action='harvest'");
+            logger.finer("csw request: role='admin' action='harvest'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "whatever");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='whatever'");
+            logger.finer("csw request: role='anonymous' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
          //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "whatever");
         if (debug) {
-            logger.info("csw request: role='admin' action='whatever'");
+            logger.finer("csw request: role='admin' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin CSW Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin CSW Policy Test --------" + '\n');
     }
     
     /**
@@ -409,7 +409,7 @@ public class XacmlTest {
     @Test
     public void testCSWPolicy2() throws Exception {
         
-        logger.info('\n' + "-------- CSW Policy Test 2--------" + '\n');
+        logger.finer('\n' + "-------- CSW Policy Test 2--------" + '\n');
         
         initializePolicyDecisionPoint();
                 
@@ -420,67 +420,67 @@ public class XacmlTest {
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='getCapabilities'");
+            logger.finer("csw request: role='anonymous' action='getCapabilities'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getrecords");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='getRecords'");
+            logger.finer("csw request: role='anonymous' action='getRecords'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "transaction");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='transaction'");
+            logger.finer("csw request: role='anonymous' action='transaction'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "transaction");
         if (debug) {
-            logger.info("csw request: role='admin' action='transaction'");
+            logger.finer("csw request: role='admin' action='transaction'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "harvest");
         if (debug) {
-            logger.info("csw request: role='admin' action='harvest'");
+            logger.finer("csw request: role='admin' action='harvest'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "whatever");
         if (debug) {
-            logger.info("csw request: role='anonymous' action='whatever'");
+            logger.finer("csw request: role='anonymous' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
          //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "whatever");
         if (debug) {
-            logger.info("csw request: role='admin' action='whatever'");
+            logger.finer("csw request: role='admin' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin CSW Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin CSW Policy Test --------" + '\n');
     }
     
     /**
@@ -540,7 +540,7 @@ public class XacmlTest {
         } catch (FactoryException e) {
             logger.severe("Factory exception while initializing Policy Decision Point: " + e.getMessage());
         }
-        logger.info("PDP succesfully initialized");
+        logger.finer("PDP succesfully initialized");
     }
     
     /**
@@ -551,7 +551,7 @@ public class XacmlTest {
     @Test
     public void testSOSPolicy() throws Exception {
         
-        logger.info('\n' + "-------- SOS Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- SOS Policy Test --------" + '\n');
         
         assertNotNull(PDP);
                                
@@ -560,36 +560,36 @@ public class XacmlTest {
         //Check PERMIT condition
         RequestContext request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getcapabilities");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='getCapabilities'");
+            logger.finer("sos request: role='anonymous' action='getCapabilities'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "describesensor");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='describesensor'");
+            logger.finer("sos request: role='anonymous' action='describesensor'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "getobservation");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='getobservation'");
+            logger.finer("sos request: role='anonymous' action='getobservation'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "getobservation");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='getobservation'");
+            logger.finer("sos request: role='anonymous' action='getobservation'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
@@ -597,58 +597,58 @@ public class XacmlTest {
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "registersensor");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='registersensor'");
+            logger.finer("sos request: role='anonymous' action='registersensor'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "registersensor");
         if (debug) {
-            logger.info("sos request: role='admin' action='registersensor'");
+            logger.finer("sos request: role='admin' action='registersensor'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check PERMIT condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "insertobservation");
         if (debug) {
-            logger.info("sos request: role='admin' action='insertObservation'");
+            logger.finer("sos request: role='admin' action='insertObservation'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "insertobservation");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='insertObservation'");
+            logger.finer("sos request: role='anonymous' action='insertObservation'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
         //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_anomymous, "whatever");
         if (debug) {
-            logger.info("sos request: role='anonymous' action='whatever'");
+            logger.finer("sos request: role='anonymous' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
          //Check DENY condition
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "whatever");
         if (debug) {
-            logger.info("sos request: role='admin' action='whatever'");
+            logger.finer("sos request: role='admin' action='whatever'");
             request.marshall(System.out);
-            logger.info("");
+            logger.finer("");
         }
         assertEquals( XACMLConstants.DECISION_DENY, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin SOS Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin SOS Policy Test --------" + '\n');
     }
     
     
@@ -660,7 +660,7 @@ public class XacmlTest {
     @Test
     public void testWMSPolicy() throws Exception {
         
-        logger.info('\n' + "-------- WMS Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- WMS Policy Test --------" + '\n');
         
          //we get the coverage policySet
          List<PolicyType> WservicePolicies = getWebServicePolicies("wmsPolicy.xml");
@@ -700,7 +700,7 @@ public class XacmlTest {
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
         
-        logger.info('\n' + "-------- Fin WMS Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin WMS Policy Test --------" + '\n');
     }
     
     
@@ -712,7 +712,7 @@ public class XacmlTest {
     @Test
     public void testCoveragePolicy() throws Exception {
         
-        logger.info('\n' + "-------- Coverage Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Coverage Policy Test --------" + '\n');
         
          //we get the coverage policySet
          List<PolicyType> WservicePolicies = getWebServicePolicies("wmsPolicy.xml", "wcsPolicy.xml");
@@ -788,7 +788,7 @@ public class XacmlTest {
         request = pep.createXACMLRequest(requestURI, user, grp_admin, "layer4");
         assertEquals( XACMLConstants.DECISION_PERMIT, pep.getDecision(request));
         
-        logger.info('\n' + "-------- Fin Coverage Policy Test --------" + '\n');
+        logger.finer('\n' + "-------- Fin Coverage Policy Test --------" + '\n');
     }
 
     /**

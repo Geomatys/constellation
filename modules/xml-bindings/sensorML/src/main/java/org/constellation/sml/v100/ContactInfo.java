@@ -202,7 +202,7 @@ public class ContactInfo {
             return true;
         }
 
-        if (object instanceof ContactInfo && super.equals(object)) {
+        if (object instanceof ContactInfo) {
             final ContactInfo that = (ContactInfo) object;
             return Utilities.equals(this.address,             that.address)             &&
                    Utilities.equals(this.contactInstructions, that.contactInstructions) &&

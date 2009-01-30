@@ -294,7 +294,7 @@ public class Position {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[Position]").append("\n");
-        if (actuate != null) {
+        if (name != null) {
             sb.append("name: ").append(name).append('\n');
         }
         if (position != null) {

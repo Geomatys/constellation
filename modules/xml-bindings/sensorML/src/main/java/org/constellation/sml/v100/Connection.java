@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -119,5 +120,48 @@ public class Connection {
     public void setName(String value) {
         this.name = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Connection) {
+            final Connection that = (Connection) object;
+            return Utilities.equals(this.arrayLink, that.arrayLink) &&
+                   Utilities.equals(this.link, that.link)           &&
+                   Utilities.equals(this.name, that.name);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.link != null ? this.link.hashCode() : 0);
+        hash = 97 * hash + (this.arrayLink != null ? this.arrayLink.hashCode() : 0);
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+
+    
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Connection]").append("\n");
+        if (name != null) {
+            sb.append("name: ").append(name).append('\n');
+        }
+        if (arrayLink != null) {
+            sb.append("arrayLink: ").append(arrayLink).append('\n');
+        }
+        if (link != null) {
+            sb.append("link: ").append(link).append('\n');
+        }
+        return sb.toString();
+     }
 
 }

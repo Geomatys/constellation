@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.gml.v311.StringOrRefType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -186,5 +187,74 @@ public class Document {
     public void setId(String value) {
         this.id = value;
     }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Document) {
+            final Document that = (Document) object;
+            return Utilities.equals(this.contact,        that.contact)        &&
+                   Utilities.equals(this.date,           that.date)           &&
+                   Utilities.equals(this.description,    that.description)    &&
+                   Utilities.equals(this.format,         that.format)         &&
+                   Utilities.equals(this.id,             that.id)             &&
+                   Utilities.equals(this.onlineResource, that.onlineResource) &&
+                   Utilities.equals(this.version,         that.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.description != null ? this.description.hashCode() : 0);
+        hash = 89 * hash + (this.date != null ? this.date.hashCode() : 0);
+        hash = 89 * hash + (this.contact != null ? this.contact.hashCode() : 0);
+        hash = 89 * hash + (this.format != null ? this.format.hashCode() : 0);
+        hash = 89 * hash + (this.onlineResource != null ? this.onlineResource.hashCode() : 0);
+        hash = 89 * hash + (this.version != null ? this.version.hashCode() : 0);
+        hash = 89 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Document]").append("\n");
+        if (id != null) {
+            sb.append("id: ").append(id).append('\n');
+        }
+        if (contact != null) {
+            sb.append("contact: ").append(contact).append('\n');
+        }
+        if (onlineResource != null) {
+            sb.append("onlineResource:").append('\n');
+            for (OnlineResource k : onlineResource) {
+                sb.append("onlineResource: ").append(k).append('\n');
+            }
+        }
+        if (date != null) {
+            sb.append("date: ").append(date).append('\n');
+        }
+        if (description != null) {
+            sb.append("description: ").append(description).append('\n');
+        }
+        if (format != null) {
+            sb.append("format: ").append(format).append('\n');
+        }
+        if (version != null) {
+            sb.append("version: ").append(version).append('\n');
+        }
+        return sb.toString();
+    }
+
 
 }

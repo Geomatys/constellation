@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -83,4 +84,33 @@ public class Connections {
     public void setConnectionList(ConnectionList value) {
         this.connectionList = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Connections) {
+            final Connections that = (Connections) object;
+            return Utilities.equals(this.connectionList, that.connectionList)  ;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + (this.connectionList != null ? this.connectionList.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Connections]").append("\n");
+        if (connectionList != null) {
+            sb.append("connectionList: ").append(connectionList).append('\n');
+        }
+        return sb.toString();
+     }
 }

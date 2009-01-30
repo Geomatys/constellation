@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -100,5 +101,40 @@ public class EngineeringCRSType extends AbstractReferenceSystemType {
     public void setUsesEngineeringDatum(EngineeringDatumRefType value) {
         this.usesEngineeringDatum = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof EngineeringCRSType) {
+            final EngineeringCRSType that = (EngineeringCRSType) object;
+            return Utilities.equals(this.usesCS, that.usesCS) &&
+                   Utilities.equals(this.usesEngineeringDatum, that.usesEngineeringDatum);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + (this.usesCS != null ? this.usesCS.hashCode() : 0);
+        hash = 43 * hash + (this.usesEngineeringDatum != null ? this.usesEngineeringDatum.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[EngineeringCRSType]").append("\n");
+        if (usesCS != null) {
+            sb.append("usesCS: ").append(usesCS).append('\n');
+        }
+        if (usesEngineeringDatum != null) {
+            sb.append("usesEngineeringDatum: ").append(usesEngineeringDatum).append('\n');
+        }
+        return sb.toString();
+     }
 
 }

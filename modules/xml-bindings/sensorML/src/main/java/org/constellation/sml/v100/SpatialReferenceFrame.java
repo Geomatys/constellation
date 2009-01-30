@@ -1,5 +1,5 @@
 /*
- *    Constellation - An open source and standard compliant SDI
+ *    Constellation - An open SpatialReferenceFrame and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
  *    (C) 2007 - 2008, Geomatys
@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.EngineeringCRSType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -86,4 +87,35 @@ public class SpatialReferenceFrame {
         this.engineeringCRS = value;
     }
 
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof SpatialReferenceFrame) {
+            final SpatialReferenceFrame that = (SpatialReferenceFrame) object;
+            return Utilities.equals(this.engineeringCRS, that.engineeringCRS);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.engineeringCRS != null ? this.engineeringCRS.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[SpatialReferenceFrame]").append("\n");
+        if (engineeringCRS != null) {
+            sb.append("engineeringCRS: ").append(engineeringCRS).append('\n');
+        }
+        return sb.toString();
+     }
 }

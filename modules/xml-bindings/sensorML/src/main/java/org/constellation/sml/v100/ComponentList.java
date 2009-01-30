@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -81,6 +82,40 @@ public class ComponentList {
         }
         return this.component;
     }
+
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ComponentList) {
+            final ComponentList that = (ComponentList) object;
+            return Utilities.equals(this.component, that.component);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + (this.component != null ? this.component.hashCode() : 0);
+        return hash;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ComponentList]").append("\n");
+        if (component != null) {
+            sb.append("component:").append('\n');
+            for (ComponentPropertyType k : component) {
+                sb.append("component: ").append(k).append('\n');
+            }
+        }
+        return sb.toString();
+     }
 
 }
 

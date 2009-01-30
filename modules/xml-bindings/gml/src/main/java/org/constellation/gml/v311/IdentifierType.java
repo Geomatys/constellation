@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -88,5 +89,50 @@ public class IdentifierType {
     public void setRemarks(StringOrRefType value) {
         this.remarks = value;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof IdentifierType) {
+            IdentifierType that = (IdentifierType) object;
+            boolean proc = false;
+            if (this.name != null && that.name != null) {
+                proc = Utilities.equals(this.name.getValue(), that.name.getValue());
+            } else if (this.name == null && that.name == null) {
+                proc = true;
+            }
+
+            return Utilities.equals(this.remarks, that.remarks)  &&
+                   proc                                          &&
+                   Utilities.equals(this.version, that.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 97 * hash + (this.version != null ? this.version.hashCode() : 0);
+        hash = 97 * hash + (this.remarks != null ? this.remarks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[IdentifierType]").append("\n");
+        if (name != null) {
+            sb.append("name: ").append(name.getValue()).append('\n');
+        }
+        if (remarks != null) {
+            sb.append("remarks: ").append(remarks).append('\n');
+        }
+        if (version != null) {
+            sb.append("version: ").append(version).append('\n');
+        }
+        return sb.toString();
+     }
 
 }

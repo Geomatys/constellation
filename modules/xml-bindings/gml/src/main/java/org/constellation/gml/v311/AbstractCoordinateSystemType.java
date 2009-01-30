@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -100,5 +101,44 @@ public abstract class AbstractCoordinateSystemType extends AbstractCoordinateSys
         }
         return Collections.unmodifiableList(usesAxis);
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractCoordinateSystemType) {
+            final AbstractCoordinateSystemType that = (AbstractCoordinateSystemType) object;
+            return Utilities.equals(this.csID, that.csID) &&
+                   Utilities.equals(this.usesAxis, that.usesAxis);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 19 * hash + (this.csID != null ? this.csID.hashCode() : 0);
+        hash = 19 * hash + (this.usesAxis != null ? this.usesAxis.hashCode() : 0);
+        return hash;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[AbstractCoordinateSystemType]").append("\n");
+        if (csID != null) {
+            sb.append("csID: ").append(csID).append('\n');
+        }
+        if (usesAxis != null) {
+            sb.append("usesAxis:").append('\n');
+            for (CoordinateSystemAxisRefType k : usesAxis) {
+                sb.append(k).append('\n');
+            }
+        }
+        return sb.toString();
+     }
 
 }

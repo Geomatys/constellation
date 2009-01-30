@@ -107,7 +107,7 @@ public class PhoneType {
             return true;
         }
 
-        if (object instanceof PhoneType && super.equals(object)) {
+        if (object instanceof PhoneType) {
             final PhoneType that = (PhoneType) object;
             return Utilities.equals(this.facsimile, that.facsimile) &&
                     Utilities.equals(this.voice, that.voice);

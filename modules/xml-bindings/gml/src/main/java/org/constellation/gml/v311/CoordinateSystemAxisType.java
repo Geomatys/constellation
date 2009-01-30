@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -106,4 +107,51 @@ public class CoordinateSystemAxisType extends CoordinateSystemAxisBaseType {
     public String getUom() {
         return uom;
     }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof CoordinateSystemAxisType) {
+            final CoordinateSystemAxisType that = (CoordinateSystemAxisType) object;
+            return Utilities.equals(this.axisAbbrev, that.axisAbbrev) &&
+                   Utilities.equals(this.axisDirection, that.axisDirection) &&
+                   Utilities.equals(this.axisID, that.axisID) &&
+                   Utilities.equals(this.uom, that.uom);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        hash = 97 * hash + (this.axisAbbrev != null ? this.axisAbbrev.hashCode() : 0);
+        hash = 97 * hash + (this.axisDirection != null ? this.axisDirection.hashCode() : 0);
+        hash = 97 * hash + (this.uom != null ? this.uom.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[CoordinateSystemAxisType]").append("\n");
+        if (axisAbbrev != null) {
+            sb.append("axisAbbrev: ").append(axisAbbrev).append('\n');
+        }
+        if (axisDirection != null) {
+            sb.append("axisDirection: ").append(axisDirection).append('\n');
+        }
+        if (axisID != null) {
+            sb.append("axisID: ").append(axisID).append('\n');
+        }
+        if (uom != null) {
+            sb.append("uom: ").append(uom).append('\n');
+        }
+        return sb.toString();
+     }
  }

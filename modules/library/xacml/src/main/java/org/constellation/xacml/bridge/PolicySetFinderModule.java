@@ -86,15 +86,15 @@ public class PolicySetFinderModule extends PolicyFinderModule {
         
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
-            logger.info("undeterminate matching");
+            logger.finer("undeterminate matching");
             return new PolicyFinderResult(match.getStatus());        // see if the target matched
         }
         if (result == MatchResult.MATCH) {
-            logger.info("succefull matching");
+            logger.finer("succefull matching");
             return new PolicyFinderResult(selectedPolicy);
         }
         if (result == MatchResult.NO_MATCH) {
-            logger.info("no match: ");
+            logger.finer("no match: ");
             return new PolicyFinderResult(match.getStatus());  
         }
 
