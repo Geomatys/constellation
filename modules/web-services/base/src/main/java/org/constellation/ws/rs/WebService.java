@@ -339,7 +339,11 @@ public abstract class WebService {
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         LOGGER.severe("request POST plain sending Exception");
-        Object obj = launchException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
+        Object obj = launchException("The plain text content type is not allowed. Send " + 
+        		                     "a message body with key=value pairs in the " +
+        		                     "application/x-www-form-urlencoded MIME type, or " +
+        		                     "an XML file using an application/xml or text/xml " +
+        		                     "MIME type.",
                                           INVALID_REQUEST.name(), null);
         return Response.ok(obj, "text/xml").build();
     }
@@ -359,7 +363,7 @@ public abstract class WebService {
     protected String getParameter(final String parameterName, final boolean mandatory)
                                                             throws CstlServiceException
     {
-        final MultivaluedMap parameters = uriContext.getQueryParameters();
+        final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
         final Set<String> keySet = parameters.keySet();
         final Iterator<String> it = keySet.iterator();
 
@@ -380,7 +384,7 @@ public abstract class WebService {
             }
             return null;
         } else {
-            final String value = (String) ((LinkedList) parameters.get(s)).get(0);
+            final String value = (String) ((LinkedList<String>) parameters.get(s)).get(0);
             if ((value == null || value.equals("")) && mandatory) {
                 /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
                  * Nevertheless we do not know what to put in for raster, that's why for these
@@ -409,7 +413,7 @@ public abstract class WebService {
      *
      */
     protected void logParameters() throws CstlServiceException {
-        final MultivaluedMap parameters = uriContext.getQueryParameters();
+        final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
         if (!parameters.isEmpty())
             LOGGER.info(parameters.toString());
     }
@@ -428,10 +432,10 @@ public abstract class WebService {
     protected Object getComplexParameter(String parameterName, boolean mandatory) throws CstlServiceException {
 
         try {
-            MultivaluedMap parameters = uriContext.getQueryParameters();
-            LinkedList<String> list = (LinkedList) parameters.get(parameterName);
+            MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
+            LinkedList<String> list = (LinkedList<String>) parameters.get(parameterName);
             if (list == null) {
-                list = (LinkedList) parameters.get(parameterName.toLowerCase());
+                list = (LinkedList<String>) parameters.get(parameterName.toLowerCase());
                 if (list == null) {
                     if (!mandatory) {
                         return null;
