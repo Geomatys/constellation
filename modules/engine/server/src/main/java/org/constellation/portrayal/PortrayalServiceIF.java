@@ -77,25 +77,6 @@ public interface PortrayalServiceIF {
 			throws PortrayalException;
 
 	/**
-	 * Writes into the {@link File} passed as argument an image of the given 
-	 * {@link Exception}. This is useful for several OGC web services which need 
-	 * to record that an exception has occurred but only return an image in the 
-	 * message exchange protocol.
-	 * 
-	 * @param e      The exception to document in the generated image.
-	 * @param dim    The dimension in pixels of the generated image.
-	 * @param output The {@link File} in which to write the image.
-	 * @param mime   The mime type name which will define the image type.
-	 * @return       The File passed in, which will contain the image. TODO: verify this.
-	 * @throws IOException
-	 */
-	public File writeInImage( Exception e, 
-							  Dimension dim, 
-							  File output, 
-							  String mime) 
-			throws IOException;
-
-	/**
 	 * Creates an image of the given {@link Exception}. This is useful for 
 	 * several OGC web services which need to record that an exception has 
 	 * occurred but only return an image in the message exchange protocol.

@@ -301,14 +301,6 @@ public class OldCSTLPortrayalService extends DefaultPortrayalService {
         return null;
     }
 
-    public File writeInImage(Exception e, int width, int height, File output, String mime)
-                    throws IOException{
-        Logger.getLogger(OldCSTLPortrayalService.class.getName()).log(Level.WARNING, "Error image created : " + output,e);
-        final BufferedImage img = writeInImage(e, width, height);
-        writeImage(img, mime, output);
-        return output;
-    }
-
     public BufferedImage writeInImage(Exception e, int width, int height){
 
         final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
