@@ -52,58 +52,52 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 		return instance;
 	}
 	
+	private boolean isServiceAllowed(String action, ServiceDef serviceDef){
+		//For now we allow all actions.
+		//  this should be extended to handle user permissions
+		if (    serviceDef == ServiceDef.WMS_1_0_0     || serviceDef == ServiceDef.WMS_1_3_0 
+			 || serviceDef == ServiceDef.WMS_1_0_0_SLD || serviceDef == ServiceDef.WMS_1_3_0_SLD 
+			 || serviceDef == ServiceDef.WCS_1_0_0     || serviceDef == ServiceDef.WCS_1_1_1 ){
+				
+				return true;
+			}
+		return false;
+	}
+	
 	//TODO: only handling providers for now.
 	@Override
 	public List<LayerDetails> getAllLayerReferences( ServiceDef serviceDef ) throws RegisterException {
 		
-		if ( serviceDef.getName()=="WMS" && serviceDef.getOrganization()=="OGC" ){
-			return getAllLayerRefs();
-		}
-		
-		if ( serviceDef.getName()=="WCS" && serviceDef.getOrganization()=="OGC" ){
+		if (  isServiceAllowed( "read all files", serviceDef)  ){
 			return getAllLayerRefs();
 		}
 		
 		/* SHOULD NOT REACH HERE */
-		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
-				                                                 + serviceDef.getVersion() + " " 
-				                                                 + serviceDef.getOrganization() );
+		throw new RegisterException("Unsupported service type: " + serviceDef );
 	}
 
 	@Override
 	public List<LayerDetails> getLayerReferences( ServiceDef serviceDef,
 			                                      List<String> layerNames)  throws RegisterException {
 
-		if ( serviceDef.getName() == "WMS" && serviceDef.getOrganization()=="OGC" ){
-			return getLayerRefs(layerNames);
-		}
-		
-		if ( serviceDef.getName() == "WCS" && serviceDef.getOrganization()=="OGC" ){
+		if (  isServiceAllowed( "read all files", serviceDef)  ){
 			return getLayerRefs(layerNames);
 		}
 		
 		/* SHOULD NOT REACH HERE */
-		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
-                                                                 + serviceDef.getVersion() + " " 
-                                                                 + serviceDef.getOrganization() );
+		throw new RegisterException("Unsupported service type: " + serviceDef );
 		
 	}
 
 	@Override
 	public LayerDetails getLayerReference( ServiceDef serviceDef, String layerName) throws RegisterException {
 
-		if ( serviceDef.getName() == "WMS" && serviceDef.getOrganization()=="OGC" ){
-			return getLayerRef(layerName);
-		}
-		
-		if ( serviceDef.getName() == "WCS" && serviceDef.getOrganization()=="OGC" ){
+		if (  isServiceAllowed( "read all files", serviceDef)  ){
 			return getLayerRef(layerName);
 		}
 		
 		/* SHOULD NOT REACH HERE */
-		throw new RegisterException("Unsupported service type: " + serviceDef.getName() + " " 
-                                                                 + serviceDef.getVersion() + " " 
-                                                                 + serviceDef.getOrganization() );
+		throw new RegisterException("Unsupported service type: " + serviceDef );
 		
 	}
 	
