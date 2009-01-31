@@ -84,6 +84,7 @@ import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.SectionsType;
+import org.constellation.query.Query;
 import org.constellation.query.QueryAdapter;
 import org.constellation.util.Util;
 import org.constellation.wcs.AbstractDescribeCoverage;
@@ -104,12 +105,16 @@ import org.geotools.resources.i18n.Errors;
 
 
 /**
- * The Web Coverage Service (WCS) for Constellation, this service implements the
- * {@code GetCoverage}, {@code DescribeCoverage}, and {@code GetCapabilities}
- * methods of the Open Geospatial Consortium (OGC) specifications.
+ * The Web Coverage Service (WCS) REST facade for Constellation.
  * <p>
- * This service follows the specifications of the Open Geospatial Consortium
- * (OGC). As of Constellation 0.3, this Web Coverage Service complies with the
+ * This service implements the following methods:
+ * <ul>
+ *   <li>{@code GetCoverage(.)}</li>
+ *   <li>{@code DescribeCoverage(.)}</li>
+ *   <li>{@code GetCapabilities(.)}</li>
+ * </ul>
+ * of the Open Geospatial Consortium (OGC) WCS specifications. As of 
+ * Constellation version 0.3, this Web Coverage Service complies with the
  * specification version 1.0.0 (OGC document 03-065r6) and mostly complies with
  * specification version 1.1.1 (OGC document 06-083r8).
  * </p>
@@ -117,6 +122,7 @@ import org.geotools.resources.i18n.Errors;
  * @version $Id$
  * @author Guilhem Legal
  * @author Cédric Briançon
+ * @since 0.3
  */
 @Path("wcs")
 @Singleton
@@ -163,27 +169,39 @@ public final class WCSService extends OGCWebService {
     	
         try {
         	
+        	// Handle an empty request by sending a basic web page.
+        	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
+        		return Response.ok(getIndexPage(), Query.TEXT_HTML).build();
+        	}
+        	
             final String request = (String) getParameter(KEY_REQUEST, true);
+            
+            //TODO: fix logging of request, which may be in the objectRequest 
+            //      and not in the parameter.
             LOGGER.info("New request: " + request);
             logParameters();
             
             if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCapabilities) )
             {
                 AbstractGetCapabilities getcaps = (AbstractGetCapabilities)objectRequest;
-                
                 if (getcaps == null) {
                     getcaps = adaptKvpGetCapabilitiesRequest();
                 }
+                
+                //TODO: is this necessary?
                 worker.internal_initServletContext(servletContext);
                 worker.internal_initUriContext(uriContext);
+                
                 return worker.getCapabilities(getcaps);
             }
             
             if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractDescribeCoverage) )
             {
                 AbstractDescribeCoverage desccov = (AbstractDescribeCoverage)objectRequest;
+                
+                //TODO: move me into the worker.
                 verifyBaseParameter(0);
-
+                //TODO: move me into the worker.
                 //The Constellation WCS does not currently implement the "store" mechanism.
                 String store = getParameter(KEY_STORE, false);
                 if (  store != null  &&  store.trim().equalsIgnoreCase("true")  ) {
@@ -201,6 +219,7 @@ public final class WCSService extends OGCWebService {
             if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCoverage) )
             {
                 AbstractGetCoverage getcov = (AbstractGetCoverage)objectRequest;
+                //TODO: move me into the worker.
                 verifyBaseParameter(0);
                 
                 if (getcov == null) {
@@ -213,7 +232,8 @@ public final class WCSService extends OGCWebService {
                                            OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
             
         } catch (CstlServiceException ex) {
-        	/*
+        	
+        	/* 
         	 * This block handles all the exceptions which have been generated 
         	 * anywhere in the service and transforms them to a response message 
         	 * for the protocol stream which JAXB, in this case, will then 
@@ -221,11 +241,11 @@ public final class WCSService extends OGCWebService {
         	 */
         	
         	// LOG THE EXCEPTION
-            //   We do not want to log the full stack trace if this is an error 
-            //   which seems to have been caused by the user.
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&&
+              // We do not want to log the full stack trace if this is an error 
+              // which seems to have been caused by the user.
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
             {
                 LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
@@ -233,7 +253,7 @@ public final class WCSService extends OGCWebService {
                 LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
             }
             
-            // SEND AN HTTP RESPONSE
+            // SEND THE HTTP RESPONSE
             final Object report;
             if (getActingVersion().isOWS()) {
                 final String code = Util.transformCodeName(ex.getExceptionCode().name());
@@ -245,7 +265,9 @@ public final class WCSService extends OGCWebService {
             }
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
+            
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            
         } catch (Exception ex) {
             /*
              * /!\ This exception should not occur, if the WCS service is well implemented. /!\
@@ -611,6 +633,32 @@ public final class WCSService extends OGCWebService {
             throw new CstlServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value) + "cause:" +
                            exception.getMessage(), INVALID_PARAMETER_VALUE, getActingVersion());
         }
+    }
+    
+    /**
+     * Get an html page for the root resource.
+     */
+    private String getIndexPage(){
+    	
+    	String indexhtml = 
+    		"<html>\n" +
+    		"  <title>Constellation WCS</title>\n" +
+    		"  <body>\n" +
+    		"    <h1><i>Constellation:</i></h1>\n" +
+    		"    <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Web Coverage Service</h1>\n" +
+    		"    <p>\n" +
+    		"      In order to access this service, you must form a valid request.\n" +
+    		"    </p\n" + 
+    		"    <p>\n" +
+    		"      Try using a <a href=\"" + uriContext.getBaseUri() + "wcs" 
+    		                             + "?service=WCS&version=1.0.0&request=GetCapabilities&version=1.0.0\""
+    		                             + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n" +
+    		"      document which describes the resources available on this server.\n" +
+    		"    </p>\n" + 
+    		"  </body>\n" +
+    		"</html>\n";
+    	
+    	return indexhtml;
     }
 
 
