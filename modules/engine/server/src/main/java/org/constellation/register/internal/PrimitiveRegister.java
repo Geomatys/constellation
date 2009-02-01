@@ -45,7 +45,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	
 	private static PrimitiveRegister instance = null;
 
-	public static PrimitiveRegister getInstance() {
+	public static PrimitiveRegister internal_getInstance() {
 		if ( null == instance ){
 			instance = new PrimitiveRegister();
 		}

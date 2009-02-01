@@ -36,7 +36,7 @@ import org.constellation.register.internal.PrimitiveRegister;
  */
 public final class Cstl {
 	
-	public static final PrimitiveRegisterIF Register = PrimitiveRegister.getInstance();
+	public static final PrimitiveRegisterIF Register = PrimitiveRegister.internal_getInstance();
 	
 	public static final PortrayalServiceIF Portrayal = CstlPortrayalService.internal_getInstance();
 	
