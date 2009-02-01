@@ -38,7 +38,7 @@ public final class Cstl {
 	
 	public static final PrimitiveRegisterIF Register = PrimitiveRegister.getInstance();
 	
-	public static final PortrayalServiceIF Portrayal = CstlPortrayalService.getInstance();
+	public static final PortrayalServiceIF Portrayal = CstlPortrayalService.internal_getInstance();
 	
 	
 	

@@ -79,6 +79,18 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
         }
     };
     
+    /**
+     * An internal method which provides the instance for the thread in which 
+     * the caller is running.
+     * <p>
+     * In this design, each CstlPortrayalService instance runs in its own thread, 
+     * </p>
+     * @return
+     */
+    public static CstlPortrayalService internal_getInstance(){
+        return instances.get();
+    }
+    
     private final ReportMonitor monitor = new ReportMonitor();
     private final BufferedImageCanvas2D canvas;
     private final ContextRenderer2D renderer;
@@ -103,19 +115,6 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
         canvas.getController().setAxisProportions(Double.NaN);
         
         renderer.setContext(context);
-    }
-    
-    
-    
-    /**
-     * Provides the instance for the thread in which the caller is running.
-     * <p>
-     * In this design, each CstlPortrayalService instance runs in its own thread, 
-     * </p>
-     * @return
-     */
-    public static CstlPortrayalService getInstance(){
-        return instances.get();
     }
     
     /**
