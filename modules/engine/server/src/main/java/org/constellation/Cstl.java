@@ -36,15 +36,29 @@ import org.constellation.register.internal.PrimitiveRegister;
  */
 public final class Cstl {
 	
-	public static final PrimitiveRegisterIF Register = PrimitiveRegister.internal_getInstance();
-	
-	public static final PortrayalServiceIF Portrayal = CstlPortrayalService.internal_getInstance();
-	
-	
-	
 	//We don't want any instances of this class.
 	private Cstl(){}
 	
+	/**
+	 * Provides access to the interface through which to interact with the 
+	 * local register; the interface is currently experimental.
+	 * 
+	 * @return An implementation of the primitive {@link PrimitiveRegisterIF 
+	 *           Register Interface}.
+	 */
+	public static PrimitiveRegisterIF getRegister() {
+		return PrimitiveRegister.internal_getInstance();
+	}
 	
-
+	/**
+	 * Provides access to the portrayal service through which internal resources 
+	 * can be rendered onto a two dimensional image.
+	 * 
+	 * @return An implementation of the {@link PortrayalSerivceIF Portrayal 
+	 *           Service Interface}.
+	 */
+	public static PortrayalServiceIF getPortrayalService() {
+		return CstlPortrayalService.internal_getInstance();
+	}
+	
 }

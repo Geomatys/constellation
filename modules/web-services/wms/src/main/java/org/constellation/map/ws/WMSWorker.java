@@ -676,7 +676,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
         // We now build the response, according to the format chosen.
         try {
-        	Cstl.Portrayal.visit(sdef,vdef,cdef,selectionArea,visitor);
+        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,selectionArea,visitor);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getFI.getVersion());
         }
@@ -737,7 +737,7 @@ public class WMSWorker extends AbstractWMSWorker {
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
-                return Cstl.Portrayal.writeInImage(ex, getMap.getSize());
+                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
             }
@@ -795,10 +795,10 @@ public class WMSWorker extends AbstractWMSWorker {
         // 4. IMAGE
         BufferedImage image;
         try {
-            image = Cstl.Portrayal.portray(sdef, vdef, cdef);
+            image = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
         } catch (PortrayalException ex) {
             if (errorInImage) {
-                return Cstl.Portrayal.writeInImage(ex, getMap.getSize() );
+                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
             } else {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
             }
@@ -817,9 +817,9 @@ public class WMSWorker extends AbstractWMSWorker {
     	try { // WE catch the exception from either service version
     		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WMS_1_3_0 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0 );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
@@ -838,9 +838,9 @@ public class WMSWorker extends AbstractWMSWorker {
     	try { // WE catch the exception from either service version
     		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
-	        	layerRefs = Cstl.Register.getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
+	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRefs = Cstl.Register.getLayerReferences(ServiceDef.WMS_1_3_0, layerNames );
+	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0, layerNames );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
@@ -859,9 +859,9 @@ public class WMSWorker extends AbstractWMSWorker {
     	try { // WE catch the exception from either service version
     		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
-	        	layerRef = Cstl.Register.getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
+	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRef = Cstl.Register.getLayerReference(ServiceDef.WMS_1_3_0, layerName );
+	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0, layerName );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);

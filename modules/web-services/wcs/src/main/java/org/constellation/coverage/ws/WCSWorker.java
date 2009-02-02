@@ -879,7 +879,7 @@ public final class WCSWorker {
             // IMAGE
             final BufferedImage img;
             try {
-                img = Cstl.Portrayal.portray(sdef, vdef, cdef);
+                img = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
             } catch (PortrayalException ex) {
                 /*
                  * TODO: the binding xml for WCS and GML do not support the exceptions format,
@@ -972,13 +972,13 @@ public final class WCSWorker {
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
 	        if ( actingVersion.toString().equals("1.0.0") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_0_0 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0 );
 	        } else if ( actingVersion.toString().equals("1.1.0") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_0 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_0 );
 	        } else if ( actingVersion.toString().equals("1.1.1") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_1 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_1 );
 	        } else if ( actingVersion.toString().equals("1.1.2") ) {
-	        	layerRefs = Cstl.Register.getAllLayerReferences(ServiceDef.WCS_1_1_2 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_2 );
 	        } else {
 	        	throw new CstlServiceException("WCS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
@@ -997,11 +997,11 @@ public final class WCSWorker {
     	LayerDetails layerRef;
     	try { // WE catch the exception from either service version
         	if ( actingVersion.toString().equals("1.0.0") ){
-        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_0_0, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_0_0, layerName);
         	} else if ( actingVersion.toString().equals("1.1.1") ) {
-        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_1_1, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_1, layerName);
         	} else if ( actingVersion.toString().equals("1.1.2") ) {
-        		layerRef = Cstl.Register.getLayerReference(ServiceDef.WCS_1_1_2, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, layerName);
         	} else {
         		throw new CstlServiceException("WCS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
