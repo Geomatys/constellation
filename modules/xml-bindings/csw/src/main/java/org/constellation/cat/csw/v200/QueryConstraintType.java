@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ogc.FilterType;
 
 
@@ -55,7 +56,7 @@ import org.constellation.ogc.FilterType;
     "filter",
     "cqlText"
 })
-public class QueryConstraintType {
+public class QueryConstraintType implements QueryConstraint {
 
     @XmlElement(name = "Filter", namespace = "http://www.opengis.net/ogc")
     private FilterType filter;

@@ -28,7 +28,7 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import javax.xml.namespace.QName;
-import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
@@ -92,7 +92,7 @@ public class LuceneFilterParser extends FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public SpatialQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+    public SpatialQuery getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
         FilterType filter = null;
         //if the constraint is null we make a null filter
         if (constraint == null)  {

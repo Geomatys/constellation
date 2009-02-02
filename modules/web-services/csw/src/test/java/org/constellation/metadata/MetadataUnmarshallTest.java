@@ -18,6 +18,8 @@
 
 package org.constellation.metadata;
 
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -31,10 +33,18 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-//Junit dependencies
+// Junit dependencies
+import org.junit.*;
+import static org.junit.Assert.*;
+
+// Constellation dependencies
 import org.constellation.util.Util;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+
+// geotools dependencies
 import org.geotools.metadata.iso.ExtendedElementInformationImpl;
 import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.metadata.iso.MetaDataImpl;
@@ -60,6 +70,7 @@ import org.geotools.metadata.iso.identification.DataIdentificationImpl;
 import org.geotools.metadata.iso.identification.KeywordsImpl;
 import org.geotools.metadata.iso.spatial.GeometricObjectsImpl;
 import org.geotools.metadata.iso.spatial.VectorSpatialRepresentationImpl;
+import org.geotools.metadata.note.Anchors;
 import org.geotools.referencing.DefaultReferenceSystem;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.crs.DefaultVerticalCRS;
@@ -70,7 +81,8 @@ import org.geotools.temporal.object.DefaultInstant;
 import org.geotools.temporal.object.DefaultPeriod;
 import org.geotools.temporal.object.DefaultPosition;
 import org.geotools.util.SimpleInternationalString;
-import org.junit.*;
+
+// GeoAPI dependencies
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.DateType;
@@ -91,7 +103,6 @@ import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.InternationalString;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -102,8 +113,10 @@ public class MetadataUnmarshallTest {
     private Logger logger = Logger.getLogger("org.constellation.metadata");
 
     private Unmarshaller unmarshaller;
+    private Marshaller marshaller;
 
-    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -118,6 +131,10 @@ public class MetadataUnmarshallTest {
     public void setUp() throws Exception {
         JAXBContext context = JAXBContext.newInstance(MetaDataImpl.class, org.constellation.metadata.fra.ObjectFactory.class);
         unmarshaller        = context.createUnmarshaller();
+        marshaller          = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
 
     @After
@@ -234,7 +251,7 @@ public class MetadataUnmarshallTest {
         ExtendedElementInformation edmo =  createExtensionInfo("SDN:EDMO::");
         elements.add(edmo);
 
-        //L021
+        /*L021
         ExtendedElementInformation L021 = createExtensionInfo("SDN:L021:1:");
         elements.add(L021);
 
@@ -256,7 +273,7 @@ public class MetadataUnmarshallTest {
 
         //L241
         ExtendedElementInformation L241 = createExtensionInfo("SDN:L241:1:");
-        elements.add(L241);
+        elements.add(L241);*/
 
         extensionInfo.setExtendedElementInformation(elements);
 
@@ -354,7 +371,7 @@ public class MetadataUnmarshallTest {
         //parameter
         Set<String> keys = new HashSet<String>();
         keys.add("Transmittance and attenuance of the water column");
-        keys.add("Electrical conductivity of the water column");
+        /*keys.add("Electrical conductivity of the water column");
         keys.add("Dissolved oxygen parameters in the water column");
         keys.add("Light extinction and diffusion coefficients");
         keys.add("Dissolved noble gas concentration parameters in the water column");
@@ -363,7 +380,7 @@ public class MetadataUnmarshallTest {
         keys.add("Dissolved concentration parameters for 'other' gases in the water column");
         keys.add("Temperature of the water column");
         keys.add("Visible waveband radiance and irradiance measurements in the atmosphere");
-        keys.add("Visible waveband radiance and irradiance measurements in the water column");
+        keys.add("Visible waveband radiance and irradiance measurements in the water column");*/
         Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T02:00:04", "35");
         keywords.add(keyword);
 
@@ -810,6 +827,603 @@ public class MetadataUnmarshallTest {
          GeographicExtent geo = new GeographicBoundingBoxImpl(west, east, south, north);
          result.add(geo);
          return result;
+    }
+
+
+     /**
+     * Tests the unmarshall of a metadata.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void marshallTest() throws Exception {
+
+        MetaDataImpl metadata     = new MetaDataImpl();
+
+        /*
+         * static part
+         */
+        metadata.setFileIdentifier("42292_5p_19900609195600");
+        metadata.setLanguage(Locale.ENGLISH);
+        metadata.setCharacterSet(CharacterSet.UTF_8);
+        Set set = new HashSet();
+        set.add(ScopeCode.DATASET);
+        metadata.setHierarchyLevels(set);
+        set = new HashSet();
+        set.add("Common Data Index record");
+        metadata.setHierarchyLevelNames(set);
+        /*
+         * contact parts
+         */
+        ResponsiblePartyImpl author = new ResponsiblePartyImpl(Role.AUTHOR);
+        author.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
+        ContactImpl contact = new ContactImpl();
+        TelephoneImpl t = new TelephoneImpl();
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.49.16");
+        t.setVoices(set);
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.46.44");
+        t.setFacsimiles(set);
+        contact.setPhone(t);
+        AddressImpl add = new AddressImpl();
+        set = new HashSet();
+        set.add("Centre IFREMER de Brest BP 70");
+        add.setDeliveryPoints(set);
+        add.setCity(new SimpleInternationalString("PLOUZANE"));
+        add.setPostalCode("29280");
+        add.setCountry(new SimpleInternationalString("France"));
+        set = new HashSet();
+        set.add("sismer@ifremer.fr");
+        add.setElectronicMailAddresses(set);
+        contact.setAddress(add);
+        OnLineResourceImpl o = new OnLineResourceImpl(new URI("http://www.ifremer.fr/sismer/"));
+        contact.setOnLineResource(o);
+        author.setContactInfo(contact);
+        set = new HashSet();
+        set.add(author);
+        metadata.setContacts(set);
+
+        /*
+         * creation date
+         */
+        metadata.setDateStamp(df.parse("2009-01-01T00:00:00"));
+
+        /*
+         * Spatial representation info
+         */
+        VectorSpatialRepresentationImpl spatialRep = new VectorSpatialRepresentationImpl();
+        GeometricObjectsImpl geoObj = new GeometricObjectsImpl(GeometricObjectType.valueOf("point"));
+        set = new HashSet();
+        set.add(geoObj);
+        spatialRep.setGeometricObjects(set);
+
+        set = new HashSet();
+        set.add(spatialRep);
+        metadata.setSpatialRepresentationInfo(set);
+
+        /*
+         * Reference system info
+         */
+        String code = "World Geodetic System 84";
+
+        CitationImpl RScitation = new CitationImpl();
+
+        RScitation.setTitle(new SimpleInternationalString("SeaDataNet geographic co-ordinate reference frames"));
+        set = new HashSet();
+        set.add(new SimpleInternationalString("L101"));
+        RScitation.setAlternateTitles(set);
+        set = new HashSet();
+        set.add(new IdentifierImpl("http://www.seadatanet.org/urnurl/"));
+        RScitation.setIdentifiers(set);
+        RScitation.setEdition(new SimpleInternationalString("2"));
+
+        NamedIdentifier Nidentifier = new NamedIdentifier(RScitation, code);
+        DefaultReferenceSystem rs = new DefaultReferenceSystem(Nidentifier);
+        set = new HashSet();
+        set.add(rs);
+        metadata.setReferenceSystemInfo(set);
+
+
+        /*
+         * extension information
+         */
+        MetadataExtensionInformationImpl extensionInfo = new MetadataExtensionInformationImpl();
+        Set<ExtendedElementInformation> elements = new HashSet<ExtendedElementInformation>();
+
+        //we only keep one element for test purpose (unordered list)
+        //EDMO
+        ExtendedElementInformation edmo =  createExtensionInfo("SDN:EDMO::");
+        elements.add(edmo);
+
+        /*L021
+        ExtendedElementInformation L021 = createExtensionInfo("SDN:L021:1:");
+        elements.add(L021);
+
+        //L031
+        ExtendedElementInformation L031 = createExtensionInfo("SDN:L031:2:");
+        elements.add(L031);
+
+        //L071
+        ExtendedElementInformation L071 = createExtensionInfo("SDN:L071:1:");
+        elements.add(L071);
+
+        //L081
+        ExtendedElementInformation L081 = createExtensionInfo("SDN:L081:1:");
+        elements.add(L081);
+
+        //L231
+        ExtendedElementInformation L231 = createExtensionInfo("SDN:L231:3:");
+        elements.add(L231);
+
+        //L241
+        ExtendedElementInformation L241 = createExtensionInfo("SDN:L241:1:");
+        elements.add(L241);*/
+
+        extensionInfo.setExtendedElementInformation(elements);
+
+        set = new HashSet();
+        set.add(extensionInfo);
+        metadata.setMetadataExtensionInfo(set);
+
+        /*
+         * Data indentification
+         */
+        DataIdentificationImpl dataIdentification = new DataIdentificationImpl();
+
+        CitationImpl citation = new CitationImpl();
+        citation.setTitle(new SimpleInternationalString("90008411.ctd"));
+        set = new HashSet();
+        set.add(new SimpleInternationalString("42292_5p_19900609195600"));
+        citation.setAlternateTitles(set);
+
+        CitationDateImpl revisionDate = new CitationDateImpl();
+        revisionDate.setDateType(DateType.REVISION);
+        Date d = df.parse("1990-06-05T00:00:00");
+        revisionDate.setDate(d);
+        set = new HashSet();
+        set.add(revisionDate);
+        citation.setDates(set);
+
+
+        Set<ResponsibleParty> originators = new HashSet<ResponsibleParty>();
+        ResponsiblePartyImpl originator = new ResponsiblePartyImpl(Role.ORIGINATOR);
+        originator.setOrganisationName(new SimpleInternationalString("UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. BIOGEOCHIMIE - LUMINY"));
+        contact = new ContactImpl();
+        t = new TelephoneImpl();
+        set = new HashSet();
+        set.add("+33(0)4 91 82 91 15");
+        t.setVoices(set);
+        set = new HashSet();
+        set.add("+33(0)4 91.82.65.48");
+        t.setFacsimiles(set);
+        contact.setPhone(t);
+        add = new AddressImpl();
+        set = new HashSet();
+        set.add("UFR Centre Oceanologique de Marseille Campus de Luminy Case 901");
+        add.setDeliveryPoints(set);
+        add.setCity(new SimpleInternationalString("Marseille cedex 9"));
+        add.setPostalCode("13288");
+        add.setCountry(new SimpleInternationalString("France"));
+        set = new HashSet();
+        add.setElectronicMailAddresses(set);
+        contact.setAddress(add);
+        o = new OnLineResourceImpl(new URI("http://www.com.univ-mrs.fr/LOB/"));
+        contact.setOnLineResource(o);
+        originator.setContactInfo(contact);
+        originators.add(originator);
+        citation.setCitedResponsibleParties(originators);
+
+        dataIdentification.setCitation(citation);
+
+
+        dataIdentification.setAbstract(new SimpleInternationalString("Donnees CTD NEDIPROD VI 120"));
+
+        ResponsiblePartyImpl custodian = new ResponsiblePartyImpl(Role.CUSTODIAN);
+        custodian.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
+        contact = new ContactImpl();
+        t = new TelephoneImpl();
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.49.16");
+        t.setVoices(set);
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.46.44");
+        t.setFacsimiles(set);
+        contact.setPhone(t);
+        add = new AddressImpl();
+        set = new HashSet();
+        set.add("Centre IFREMER de Brest BP 70");
+        add.setDeliveryPoints(set);
+        add.setCity(new SimpleInternationalString("PLOUZANE"));
+        add.setPostalCode("29280");
+        add.setCountry(new SimpleInternationalString("France"));
+        set = new HashSet();
+        set.add("sismer@ifremer.fr");
+        add.setElectronicMailAddresses(set);
+        contact.setAddress(add);
+        o = new OnLineResourceImpl(new URI("http://www.ifremer.fr/sismer/"));
+        contact.setOnLineResource(o);
+        custodian.setContactInfo(contact);
+        set = new HashSet();
+        set.add(custodian);
+        dataIdentification.setPointOfContacts(set);
+
+        /*
+         * keywords
+         */
+        Set<Keywords> keywords = new HashSet<Keywords>();
+
+        //parameter
+        Set<String> keys = new HashSet<String>();
+        keys.add("Transmittance and attenuance of the water column");
+        /*keys.add("Electrical conductivity of the water column");
+        keys.add("Dissolved oxygen parameters in the water column");
+        keys.add("Light extinction and diffusion coefficients");
+        keys.add("Dissolved noble gas concentration parameters in the water column");
+        keys.add("Optical backscatter");
+        keys.add("Salinity of the water column");
+        keys.add("Dissolved concentration parameters for 'other' gases in the water column");
+        keys.add("Temperature of the water column");
+        keys.add("Visible waveband radiance and irradiance measurements in the atmosphere");
+        keys.add("Visible waveband radiance and irradiance measurements in the water column");*/
+        Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T02:00:04", "35");
+        keywords.add(keyword);
+
+        /*
+        set = new HashSet();
+        set.add("CTD profilers");
+        keyword = createKeyword(set, "instrument", "SeaDataNet device categories", "L05", "2008-01-11T02:00:04", "4");
+        keywords.add(keyword);
+
+        //platform
+        set = new HashSet();
+        set.add("research vessel");
+        keyword = createKeyword(set, "platform_class", "SeaDataNet Platform Classes", "L061", "2008-02-21T10:55:40", "6");
+        keywords.add(keyword);*/
+
+        //projects
+
+
+        dataIdentification.setDescriptiveKeywords(keywords);
+
+        /*
+         * resource constraint
+         */
+        Set<String> resConsts = new HashSet<String>();
+        resConsts.add("licence");
+        LegalConstraintsImpl constraint = new LegalConstraintsImpl();
+        Set<Restriction> restrictions  = new HashSet<Restriction>();
+        for (String resConst : resConsts) {
+            restrictions.add(Restriction.valueOf(resConst));
+        }
+        constraint.setAccessConstraints(restrictions);
+        set = new HashSet();
+        set.add(constraint);
+        dataIdentification.setResourceConstraints(set);
+
+        /*
+         * Aggregate info
+         */
+        Set<AggregateInformationImpl> aggregateInfos = new HashSet<AggregateInformationImpl>();
+
+        //cruise
+        AggregateInformationImpl aggregateInfo = new AggregateInformationImpl();
+        citation = new CitationImpl();
+        citation.setTitle(new SimpleInternationalString("MEDIPROD VI"));
+        set = new HashSet();
+        set.add(new SimpleInternationalString("90008411"));
+        citation.setAlternateTitles(set);
+        revisionDate = new CitationDateImpl();
+        revisionDate.setDateType(DateType.REVISION);
+        d = df.parse("1990-06-05T00:00:00");
+        revisionDate.setDate(d);
+        set = new HashSet();
+        set.add(revisionDate);
+        citation.setDates(set);
+        aggregateInfo.setAggregateDataSetName(citation);
+        aggregateInfo.setInitiativeType(InitiativeType.CAMPAIGN);
+        aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
+        aggregateInfos.add(aggregateInfo);
+
+        /* station
+        aggregateInfo = new AggregateInformationImpl();
+        citation = new CitationImpl();
+        citation.setTitle(new SimpleInternationalString("5p"));
+        set = new HashSet();
+        set.add(new SimpleInternationalString("5p"));
+        citation.setAlternateTitles(set);
+        revisionDate = new CitationDateImpl();
+        revisionDate.setDateType(DateType.REVISION);
+        d = df.parse("1990-06-09T00:00:00");
+        revisionDate.setDate(d);
+        set = new HashSet();
+        set.add(revisionDate);
+        citation.setDates(set);
+        aggregateInfo.setAggregateDataSetName(citation);
+        aggregateInfo.setInitiativeType(InitiativeType.CAMPAIGN);
+        aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
+        aggregateInfos.add(aggregateInfo);*/
+
+        dataIdentification.setAggregationInfo(aggregateInfos);
+
+        /*
+         * data scale TODO UOM
+
+        String scale = getVariable("var21");
+        String uom   = getVariable("var22");
+        if (scale != null) {
+            try {
+                ResolutionImpl resolution = new ResolutionImpl();
+                resolution.setDistance(Double.parseDouble(scale));
+                resolution.setUnitOfMeasure(uom);
+                dataIdentification.setSpatialResolutions(Arrays.asList(resolution));
+            }  catch (NumberFormatException ex) {
+                logger.severe("parse exception while parsing scale => scale:" + scale + " for record: " + identifier);
+            }
+        }*/
+
+        //static part
+        set = new HashSet();
+        set.add(Locale.ENGLISH);
+        dataIdentification.setLanguage(set);
+        set = new HashSet();
+        set.add(TopicCategory.OCEANS);
+        dataIdentification.setTopicCategories(set);
+
+        /*
+         * Extent
+         */
+        ExtentImpl extent = new ExtentImpl();
+
+        // geographic extent
+        extent.setGeographicElements(createGeographicExtent("1.1667", "1.1667", "36.6", "36.6"));
+
+        //temporal extent
+        TemporalExtentImpl tempExtent = new TemporalExtentImpl();
+
+        Date start = df.parse("1990-06-05T00:00:00");
+        Date stop  = df.parse("1990-07-02T00:00:00");
+
+        DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
+        DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));
+        DefaultPeriod period = new DefaultPeriod(begin, end);
+        tempExtent.setExtent(period);
+
+        set = new HashSet();
+        set.add(tempExtent);
+        extent.setTemporalElements(set);
+
+
+
+        //vertical extent
+        VerticalExtentImpl vertExtent = new VerticalExtentImpl();
+        String miv = null;
+        String mav = null;
+
+        if (miv != null) {
+            vertExtent.setMinimumValue(Double.parseDouble(miv));
+        }
+        if (mav != null) {
+            vertExtent.setMaximumValue(Double.parseDouble(mav));
+        }
+
+        // vertical datum
+        String datumID = "D28";
+        DefaultVerticalCRS vcrs = null;
+
+        Map<String, String> prop = new HashMap<String, String>();
+        prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
+        prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
+        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.ELLIPSOIDAL);
+
+
+        // vertical coordinate system  TODO var 32 uom?
+        DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis("meters", AxisDirection.DOWN, Unit.valueOf("m"));
+        DefaultVerticalCS cs = new DefaultVerticalCS(axis);
+
+        prop = new HashMap<String, String>();
+        prop.put(DefaultVerticalCRS.NAME_KEY, "idvertCRS");
+        prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
+        vcrs = new DefaultVerticalCRS(prop, datum, cs);
+
+
+        // TODO vertical limit? var 35
+        vertExtent.setVerticalCRS(vcrs);
+
+        set = new HashSet();
+        set.add(vertExtent);
+        extent.setVerticalElements(set);
+
+        set = new HashSet();
+        set.add(extent);
+        dataIdentification.setExtent(set);
+
+        set = new HashSet();
+        set.add(dataIdentification);
+        metadata.setIdentificationInfo(set);
+
+        /*
+         * Distribution info
+         */
+        DistributionImpl distributionInfo = new DistributionImpl();
+
+        //distributor
+        DistributorImpl distributor       = new DistributorImpl();
+
+        ResponsiblePartyImpl distributorContact = new ResponsiblePartyImpl(Role.DISTRIBUTOR);
+        distributorContact.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
+        contact = new ContactImpl();
+        t = new TelephoneImpl();
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.49.16");
+        t.setVoices(set);
+        set = new HashSet();
+        set.add("+33 (0)2 98.22.46.44");
+        t.setFacsimiles(set);
+        contact.setPhone(t);
+        add = new AddressImpl();
+        set = new HashSet();
+        set.add("Centre IFREMER de Brest BP 70");
+        add.setDeliveryPoints(set);
+        add.setCity(new SimpleInternationalString("PLOUZANE"));
+        add.setPostalCode("29280");
+        add.setCountry(new SimpleInternationalString("France"));
+        set = new HashSet();
+        set.add("sismer@ifremer.fr");
+        add.setElectronicMailAddresses(set);
+        contact.setAddress(add);
+        o = new OnLineResourceImpl(new URI("http://www.ifremer.fr/sismer/"));
+        contact.setOnLineResource(o);
+        distributorContact.setContactInfo(contact);
+
+        distributor.setDistributorContact(distributorContact);
+        set = new HashSet();
+        set.add(distributor);
+        distributionInfo.setDistributors(set);
+
+        //format
+        Set<Format> formats  = new HashSet<Format>();
+
+        FormatImpl format = new FormatImpl();
+        String name = "MEDATLAS ASCII";
+        format.setName(new SimpleInternationalString(name));
+        format.setVersion(new SimpleInternationalString("1.0"));
+        formats.add(format);
+
+        distributionInfo.setDistributionFormats(formats);
+
+        //transfert options
+        DigitalTransferOptionsImpl digiTrans = new DigitalTransferOptionsImpl();
+
+        digiTrans.setTransferSize(2.431640625);
+
+        OnLineResourceImpl onlines = new OnLineResourceImpl();
+
+        String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
+        if (uri != null) {
+            onlines.setLinkage(new URI(uri));
+        }
+
+        onlines.setDescription(new SimpleInternationalString("CTDF02"));
+        onlines.setFunction(OnLineFunction.DOWNLOAD);
+        set = new HashSet();
+        set.add(onlines);
+        digiTrans.setOnLines(set);
+
+        set = new HashSet();
+        set.add(digiTrans);
+        distributionInfo.setTransferOptions(set);
+
+        metadata.setDistributionInfo(distributionInfo);
+
+        //before marshalling we need to fill the anchor
+        Anchors.create("Common Data Index record", new URI("SDN:L231:3:CDI"));
+        Anchors.create("France", new URI("SDN:C320:2:FR"));
+        Anchors.create("World Geodetic System 84", new URI("SDN:L101:2:4326"));
+        Anchors.create("2", new URI("SDN:C371:1:2"));
+        Anchors.create("35", new URI("SDN:C371:1:35"));
+        Anchors.create("Transmittance and attenuance of the water column", new URI("SDN:P021:35:ATTN"));
+        Anchors.create("Electrical conductivity of the water column", new URI("SDN:P021:35:CNDC"));
+        Anchors.create("Dissolved oxygen parameters in the water column", new URI("SDN:P021:35:DOXY"));
+        Anchors.create("Light extinction and diffusion coefficients", new URI("SDN:P021:35:EXCO"));
+        Anchors.create("Dissolved noble gas concentration parameters in the water column", new URI("SDN:P021:35:HEXC"));
+        Anchors.create("Optical backscatter", new URI("SDN:P021:35:OPBS"));
+        Anchors.create("Salinity of the water column", new URI("SDN:P021:35:PSAL"));
+        Anchors.create("Dissolved concentration parameters for 'other' gases in the water column", new URI("SDN:P021:35:SCOX"));
+        Anchors.create("Temperature of the water column", new URI("SDN:P021:35:TEMP"));
+        Anchors.create("Visible waveband radiance and irradiance measurements in the atmosphere", new URI("SDN:P021:35:VSRA"));
+        Anchors.create("Visible waveband radiance and irradiance measurements in the water column", new URI("SDN:P021:35:VSRW"));
+        Anchors.create("MEDATLAS ASCII", new URI("SDN:L241:1:MEDATLAS"));
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(metadata, sw);
+        String result = sw.toString();
+
+        InputStream in = Util.getResourceAsStream("org/constellation/metadata/meta1.xml");
+        StringWriter out = new StringWriter();
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            out.write(new String(buffer, 0, size));
+        }
+
+        String expResult = out.toString();
+
+        //we remove the header (variable)
+        expResult = expResult.substring(expResult.indexOf("<gmd:fileIdentifier>"));
+        result    = result.substring(result.indexOf("<gmd:fileIdentifier>"));
+
+        //we split the result into several piece to easier debug
+        int startPosition = 0;
+        String expResult1 = expResult.substring(startPosition, expResult.indexOf("<gmd:contact>"));
+        String result1    =    result.substring(startPosition, result.indexOf("<gmd:contact>"));
+
+        assertEquals(expResult1, result1);
+
+        startPosition     = expResult1.length();
+        String expResult2 = expResult.substring(startPosition, expResult.indexOf("</gmd:dateStamp>"));
+        String result2    =    result.substring(startPosition, result.indexOf("</gmd:dateStamp>"));
+
+        assertEquals(expResult2, result2);
+
+        startPosition     = startPosition + expResult2.length();
+        String expResult3 = expResult.substring(startPosition, expResult.indexOf("</gmd:referenceSystemInfo>"));
+        String result3    =    result.substring(startPosition, result.indexOf("</gmd:referenceSystemInfo>"));
+
+        assertEquals(expResult3, result3);
+
+        startPosition     = startPosition + expResult3.length();
+        String expResult4 = expResult.substring(startPosition, expResult.indexOf("<gmd:identificationInfo>"));
+        String result4    =    result.substring(startPosition, result.indexOf("<gmd:identificationInfo>"));
+
+        assertEquals(expResult4, result4);
+
+        startPosition     = startPosition + expResult4.length();
+        String expResult5 = expResult.substring(startPosition, expResult.indexOf("</gmd:abstract>"));
+        String result5    =    result.substring(startPosition, result.indexOf("</gmd:abstract>"));
+
+        assertEquals(expResult5, result5);
+
+        startPosition     = startPosition + expResult5.length();
+        String expResult6 = expResult.substring(startPosition, expResult.indexOf("<gmd:descriptiveKeywords>"));
+        String result6    =    result.substring(startPosition, result.indexOf("<gmd:descriptiveKeywords>"));
+
+        assertEquals(expResult6, result6);
+
+        startPosition     = startPosition + expResult6.length();
+        String expResult7 = expResult.substring(startPosition, expResult.indexOf("</gmd:descriptiveKeywords>"));
+        String result7    =    result.substring(startPosition, result.indexOf("</gmd:descriptiveKeywords>"));
+
+        assertEquals(expResult7, result7);
+
+        startPosition     = startPosition + expResult7.length();
+        String expResult8 = expResult.substring(startPosition, expResult.indexOf("</gmd:aggregationInfo>"));
+        String result8    =    result.substring(startPosition, result.indexOf("</gmd:aggregationInfo>"));
+
+        assertEquals(expResult8, result8);
+
+        startPosition     = startPosition + expResult8.length();
+        String expResult9 = expResult.substring(startPosition, expResult.indexOf("</gmd:temporalElement>"));
+        String result9    =    result.substring(startPosition, result.indexOf("</gmd:temporalElement>"));
+
+        assertEquals(expResult9, result9);
+
+        startPosition     = startPosition + expResult9.length();
+        String expResult10 = expResult.substring(startPosition, expResult.indexOf("</gmd:identificationInfo>"));
+        String result10    =    result.substring(startPosition, result.indexOf("</gmd:identificationInfo>"));
+
+        assertEquals(expResult10, result10);
+
+        startPosition     = startPosition + expResult10.length();
+        String expResult11 = expResult.substring(startPosition, expResult.indexOf("</gmd:distributor>"));
+        String result11    =    result.substring(startPosition, result.indexOf("</gmd:distributor>"));
+
+
+        assertEquals(expResult11, result11);
+
+        assertEquals(expResult, result);
+
     }
 
 }

@@ -72,14 +72,6 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-cql</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-ogc</artifactId>
       <version>${project.version}</version>

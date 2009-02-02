@@ -75,6 +75,10 @@
       <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

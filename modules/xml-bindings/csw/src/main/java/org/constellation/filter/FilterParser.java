@@ -24,11 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
+// Apache Lucene dependencies
 import org.apache.lucene.search.Filter;
-import org.constellation.cat.csw.v202.QueryConstraintType;
+
+// constellation dependencies
+import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.CoordinatesType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -38,15 +44,19 @@ import org.constellation.ogc.ComparisonOpsType;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.LogicOpsType;
 import org.constellation.ogc.SpatialOpsType;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+// Geotools dependencies
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+
+// GeoAPI dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -381,7 +391,7 @@ public abstract class FilterParser {
     
     
     
-    public abstract Object getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
+    public abstract Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
     
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException;
     

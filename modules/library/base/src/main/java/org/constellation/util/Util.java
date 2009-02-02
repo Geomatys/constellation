@@ -1172,7 +1172,7 @@ public final class Util {
         ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
-    
+
     /**
      * Remove the prefix on propertyName.
      * example : removePrefix(csw:GetRecords) return "GetRecords".

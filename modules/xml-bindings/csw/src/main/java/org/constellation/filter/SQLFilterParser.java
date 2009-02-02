@@ -20,11 +20,19 @@ package org.constellation.filter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import java.text.ParseException;
+
+// Apache Lucene dependencies
 import org.apache.lucene.search.Filter;
-import org.constellation.cat.csw.v202.QueryConstraintType;
+
+// constellation dependencies
 import org.constellation.ws.CstlServiceException;
+import org.constellation.gml.v311.AbstractGeometryType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
 import org.constellation.gml.v311.PointType;
@@ -40,14 +48,12 @@ import org.constellation.ogc.PropertyIsLikeType;
 import org.constellation.ogc.PropertyIsNullType;
 import org.constellation.ogc.SpatialOpsType;
 import org.constellation.ogc.UnaryLogicOpType;
-import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralEnvelope;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import static org.constellation.ows.OWSExceptionCode.*;
-import java.text.ParseException;
-import javax.xml.namespace.QName;
-import org.constellation.gml.v311.AbstractGeometryType;
+import org.constellation.ogc.AbstractIdType;
+import org.constellation.ogc.BBOXType;
+import org.constellation.ogc.BinarySpatialOpType;
+import org.constellation.ogc.DistanceBufferType;
+import org.constellation.ogc.PropertyNameType;
+import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.BeyondFilter;
 import org.constellation.lucene.filter.ContainsFilter;
@@ -61,14 +67,20 @@ import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialFilterType;
 import org.constellation.lucene.filter.TouchesFilter;
 import org.constellation.lucene.filter.WithinFilter;
-import org.constellation.ogc.AbstractIdType;
-import org.constellation.ogc.BBOXType;
-import org.constellation.ogc.BinarySpatialOpType;
-import org.constellation.ogc.DistanceBufferType;
-import org.constellation.ogc.PropertyNameType;
+import static org.constellation.ows.OWSExceptionCode.*;
+
+// Geotools dependencies
 import org.geotools.referencing.CRS;
+import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.geometry.GeneralEnvelope;
+
+// MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
+
+// GeoAPI dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
@@ -96,7 +108,7 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public SQLQuery getQuery(final QueryConstraintType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+    public SQLQuery getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
         this.setVariables(variables);
         this.setPrefixs(prefixs);
         FilterType filter = null;
@@ -745,12 +757,12 @@ public class SQLFilterParser extends FilterParser {
     private String transformSyntax(String s) {
         if (s.indexOf(':') != -1) {
             String prefix = s.substring(0, s.indexOf(':'));
-            s = s.replace(prefix, getStandardFromPrefix(prefix).getName());
+            s = s.replace(prefix, getStandardFromPrefix(prefix));
         }
         // we replace the variableName
         for (String varName : variables.keySet()) {
             QName var =  variables.get(varName);
-            String mdwebVar = getStandardFromNamespace(var.getNamespaceURI()).getName() + ':' + var.getLocalPart();
+            String mdwebVar = getStandardFromNamespace(var.getNamespaceURI()) + ':' + var.getLocalPart();
             s = s.replace("$" + varName,  mdwebVar);
         }
         // we replace the ebrim separator /@ by :
@@ -758,24 +770,25 @@ public class SQLFilterParser extends FilterParser {
         return s;
     }
     
-    private Standard getStandardFromNamespace(String namespace) {
+    private String getStandardFromNamespace(String namespace) {
         if (namespace.equals("http://www.opengis.net/cat/wrs/1.0"))
-            return Standard.WRS;
+            return Standard.WRS.getName();
         else if (namespace.equals("http://www.opengis.net/cat/wrs"))
-            return Standard.WRS_V09;
+            return Standard.WRS_V09.getName();
         else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5"))
-            return Standard.EBRIM_V2_5;
+            return Standard.EBRIM_V2_5.getName();
         else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"))
-            return Standard.EBRIM_V3;
+            return Standard.EBRIM_V3.getName();
         else 
             throw new IllegalArgumentException("unexpected namespace: " + namespace);
     }
     
-    private Standard getStandardFromPrefix(String prefix) {
+    private String getStandardFromPrefix(String prefix) {
         if (prefixs != null) {
             String namespace = prefixs.get(prefix);
             return getStandardFromNamespace(namespace);
-        } return null;
+        } 
+        return null;
     }
 
     public void setVariables(Map<String, QName> variables) {
