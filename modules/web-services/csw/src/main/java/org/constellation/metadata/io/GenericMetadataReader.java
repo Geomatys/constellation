@@ -51,6 +51,7 @@ import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
@@ -142,37 +143,81 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * A connection to the database.
      */
-    private final Connection connection;
-    
+    private Connection connection;
+
+    /**
+     * The configuration Object
+     */
+    private final Automatic configuration;
+
+    /**
+     * A flag indicating that the service is trying to reconnect the database.
+     */
+    private boolean isReconnecting = false;
+
     /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic configuration, Connection connection, File configDir) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, File configDir) throws CstlServiceException {
         super(false, true);
-        this.connection        = connection;
-        initStatement(configuration);
-        singleValue            = new HashMap<String, String>();
-        multipleValue          = new HashMap<String, List<String>>();
-        JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
-        unmarshaller           = context.createUnmarshaller();
-        contacts               = loadContacts(new File(configDir, "contacts"));
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        this.configuration = configuration;
+        try {
+            this.connection        = db.getConnection();
+            initStatement();
+            singleValue            = new HashMap<String, String>();
+            multipleValue          = new HashMap<String, List<String>>();
+            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
+            unmarshaller           = context.createUnmarshaller();
+            contacts = loadContacts(new File(configDir, "contacts"));
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
     
     /**
      * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
      * @param genericConfiguration
      */
-    public GenericMetadataReader(Automatic configuration, Connection connection, File configDir, boolean fillAnchor) throws SQLException, JAXBException {
+    public GenericMetadataReader(Automatic configuration, File configDir, boolean fillAnchor) throws CstlServiceException {
         super(false, true);
-        this.connection        = connection;
-        initStatement(configuration);
-        singleValue            = new HashMap<String, String>();
-        multipleValue          = new HashMap<String, List<String>>();
-        contacts               = new HashMap<String, ResponsibleParty>();
-        JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
-        unmarshaller           = context.createUnmarshaller();
-        contacts               = loadContacts(new File(configDir, "contacts"));
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        this.configuration = configuration;
+        try {
+            this.connection        = db.getConnection();
+            initStatement();
+            singleValue            = new HashMap<String, String>();
+            multipleValue          = new HashMap<String, List<String>>();
+            contacts               = new HashMap<String, ResponsibleParty>();
+            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
+            unmarshaller           = context.createUnmarshaller();
+            contacts               = loadContacts(new File(configDir, "contacts"));
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
     
     /**
@@ -180,7 +225,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    private final void initStatement(Automatic configuration) throws SQLException {
+    private final void initStatement() throws SQLException {
         // we initialize the main query
         if (configuration.getQueries() != null           &&
             configuration.getQueries().getMain() != null &&
@@ -346,11 +391,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSetType type) {
+    private void loadData(String identifier, int mode, ElementSetType type) throws CstlServiceException {
         logger.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
-        
+
         // we get a sub list of all the statement
         Set<PreparedStatement> subSingleStmts;
         Set<PreparedStatement> subMultiStmts;
@@ -393,19 +438,44 @@ public abstract class GenericMetadataReader extends MetadataReader {
     }
 
     /**
+     * Try to reconnect to the database if the connection have been lost.
+     * 
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void reloadConnection() throws CstlServiceException {
+        if (!isReconnecting) {
+            try {
+               logger.info("refreshing the connection");
+               BDD db          = configuration.getBdd();
+               this.connection = db.getConnection();
+               initStatement();
+               isReconnecting = false;
+
+            } catch(SQLException ex) {
+                logger.severe("SQLException while restarting the connection:" + ex);
+                isReconnecting = false;
+            }
+        }
+        throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
+    }
+
+    /**
      * Execute the list of single and multiple statement sequentially.
      *
      * @param identifier
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
             try {
                 fillStatement(stmt, identifier);
                 fillSingleValues(stmt);
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 17008) {
+                    reloadConnection();
+                }
                 logSqlError(singleStatements.get(stmt), ex);
             }
         }
@@ -416,6 +486,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 fillStatement(stmt, identifier);
                 fillMultipleValues(stmt);
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 17008) {
+                    reloadConnection();
+                }
                 logSqlError(multipleStatements.get(stmt), ex);
             }
 
@@ -428,18 +501,21 @@ public abstract class GenericMetadataReader extends MetadataReader {
      *
      * @param identifier
      */
-    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
         //we extract the single values
         CompletionService cs = new BoundedCompletionService(this.pool, 5);
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
-                public Object call() {
+                public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, identifier);
                         fillSingleValues(stmt);
 
                     } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 17008) {
+                            reloadConnection();
+                        }
                         logSqlError(singleStatements.get(stmt), ex);
 
                     }
@@ -454,7 +530,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                    throw (CstlServiceException) ex.getCause();
+                } else {
+                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                }
             }
         }
         //we extract the multiple values
@@ -462,12 +542,15 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (final PreparedStatement stmt : subMultiStmts) {
             cs.submit(new Callable() {
 
-                public Object call() {
+                public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, identifier);
                         fillMultipleValues(stmt);
                         
                     } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 17008) {
+                            reloadConnection();
+                        }
                         logSqlError(multipleStatements.get(stmt), ex);
                     }
                     return null;
@@ -481,7 +564,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                    throw (CstlServiceException) ex.getCause();
+                } else {
+                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                }
             }
         }
     }
@@ -541,7 +628,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      * @throws CstlServiceException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         Object result = null;
         
         //TODO we verify that the identifier exists
@@ -666,7 +753,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
         while (i < dateFormats.size()) {
             DateFormat dateFormat = dateFormats.get(i);
             try {
-                Date d = dateFormat.parse(date);
+                Date d;
+                synchronized (dateFormat) {
+                    d = dateFormat.parse(date);
+                }
                 return d;
             } catch (ParseException ex) {
                 i++;

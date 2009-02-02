@@ -221,7 +221,7 @@ public class SOSworker {
     /**
      * A date formater used to parse datablock.
      */
-    private DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     
     /**
      * The Observation database reader
@@ -1100,7 +1100,9 @@ public class SOSworker {
                     samplingTimeValue = samplingTimeValue.replace('T', ' ');
                     Date d;
                     try {
-                        d = dateformat.parse(samplingTimeValue);
+                        synchronized (dateformat) {
+                            d = dateformat.parse(samplingTimeValue);
+                        }
                     } catch (ParseException ex) {
                         logger.severe("unable to parse the value: " + samplingTimeValue);
                         continue;

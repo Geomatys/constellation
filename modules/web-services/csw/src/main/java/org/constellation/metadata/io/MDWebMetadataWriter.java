@@ -36,6 +36,8 @@ import javax.xml.bind.JAXBElement;
 // constellation dependencies
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -70,7 +72,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * A MDWeb catalogs where write the form.
      */
     private Catalog MDCatalog;
-    
     
     /**
      * The MDWeb user who owe the inserted form.
@@ -108,17 +109,34 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MDWebMetadataWriter(Connection MDConnection, AbstractIndexer index) throws SQLException {
+    public MDWebMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
         super(index);
-        MDReader = new Reader20(Standard.ISO_19115, MDConnection);
-        MDCatalog = MDReader.getCatalog("CSWCat");
-        if (MDCatalog == null) {
-            MDCatalog = new Catalog("CSWCat", "CSW Data Catalog");
-            MDWriter.writeCatalog(MDCatalog);
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
-        user              = MDReader.getUser("admin");
-        this.MDReader     = new Reader20(Standard.ISO_19115,  MDConnection);  
-        this.MDWriter     = new Writer20(MDConnection);
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        try {
+
+            Connection MDConnection = db.getConnection();
+            MDReader = new Reader20(Standard.ISO_19115, MDConnection);
+            MDCatalog = MDReader.getCatalog("CSWCat");
+            if (MDCatalog == null) {
+                MDCatalog = new Catalog("CSWCat", "CSW Data Catalog");
+                MDWriter.writeCatalog(MDCatalog);
+            }
+            this.user     = MDReader.getUser("admin");
+            this.MDReader = new Reader20(Standard.ISO_19115, MDConnection);
+            this.MDWriter = new Writer20(MDConnection);
+
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the MDWeb writer:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+        
         this.classBinding = new HashMap<Class, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
@@ -130,7 +148,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @return an MDWeb form representing the metadata object.
      */
     private Form getFormFromObject(Object object) throws SQLException {
-
         
         if (object != null) {
             //we try to find a title for the from
@@ -281,7 +298,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
             String value;
             if (object instanceof java.util.Date) {
-                value = dateFormat.format(object);
+                synchronized (dateFormat) {
+                    value = dateFormat.format(object);
+                }
             } else {
                 value = object + "";
             }
@@ -618,7 +637,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
-    public boolean storeMetadata(Object obj) throws SQLException, CstlServiceException {
+    public boolean storeMetadata(Object obj) throws CstlServiceException {
         // profiling operation
         long start     = System.currentTimeMillis();
         long transTime = 0;
@@ -638,6 +657,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
         } catch (IllegalArgumentException e) {
              throw new CstlServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
+        } catch (SQLException e) {
+             throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
+                                            NO_APPLICABLE_CODE);
         }
         
         // and we store it in the database
@@ -650,6 +672,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 //TODO restore catching at this point
                 throw e;
                 //return false;
+            } catch (SQLException e) {
+             throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
+                                            NO_APPLICABLE_CODE);
             }
             
             long time = System.currentTimeMillis() - start; 

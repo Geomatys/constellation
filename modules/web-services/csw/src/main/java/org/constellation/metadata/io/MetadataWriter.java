@@ -20,7 +20,6 @@ package org.constellation.metadata.io;
 // J2SE dependencies
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -54,7 +53,7 @@ public abstract class MetadataWriter {
     /**
      * Record the date format in the metadata.
      */
-    protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    protected final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
     /**
      * An indexer lucene to add object into the index.
@@ -66,7 +65,7 @@ public abstract class MetadataWriter {
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MetadataWriter(AbstractIndexer indexer) throws SQLException {
+    public MetadataWriter(AbstractIndexer indexer) throws CstlServiceException {
         this.indexer        = indexer;
     }
 
@@ -196,7 +195,7 @@ public abstract class MetadataWriter {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
-    public abstract boolean storeMetadata(Object obj) throws SQLException, CstlServiceException;
+    public abstract boolean storeMetadata(Object obj) throws CstlServiceException;
     
     /**
      * Destoy all the resource and close connection.

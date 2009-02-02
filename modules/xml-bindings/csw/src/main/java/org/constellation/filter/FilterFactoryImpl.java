@@ -528,7 +528,9 @@ public class FilterFactoryImpl implements FilterFactory2 {
     public Literal literal(Object obj) {
         if (obj instanceof Date) {
             Date d = (Date) obj;
-            obj = dateFormat.format(d);
+            synchronized(dateFormat) {
+                obj = dateFormat.format(d);
+            }
         }
         return new LiteralType(obj);
     }

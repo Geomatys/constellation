@@ -51,6 +51,8 @@ import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ows.v100.BoundingBoxType;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -177,24 +179,68 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Connection MDConnection, File configDir) throws SQLException {
+    public MDWebMetadataReader(Automatic configuration, File configDir) throws CstlServiceException {
         super(true, false);
-        this.MDReader        = new Reader20(Standard.ISO_19115,  MDConnection);
-        this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        try {
+            Connection MDConnection = db.getConnection();
+            this.MDReader           = new Reader20(Standard.ISO_19115,  MDConnection);
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+        this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         
-        this.geotoolsPackage = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing"  , "org.constellation.temporal", 
-                                           "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog",
-                                                "org.constellation.metadata.fra");
-        this.opengisPackage  = Util.searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
-                                                "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.CSWPackage      = Util.searchSubPackage("org.constellation.cat.csw.v202"   , "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100", 
-                                                "org.constellation.ogc");
-        this.ebrimV3Package  = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
-        this.ebrimV25Package = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+        this.geotoolsPackage    = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing", "org.constellation.temporal",
+                                                        "org.geotools.service", "org.geotools.util", "org.geotools.feature.catalog",
+                                                        "org.constellation.metadata.fra");
+        this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
+                                                        "org.opengis.service", "org.opengis.feature.catalog");
+        this.CSWPackage         = Util.searchSubPackage("org.constellation.cat.csw.v202", "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100",
+                                                       "org.constellation.ogc");
+        this.ebrimV3Package     = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
+        this.ebrimV25Package    = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
-        this.classBinding    = initClassBinding(configDir);
-        this.alreadyRead     = new HashMap<Value, Object>();
-        this.classeNotFound  = new ArrayList<String>();
+        this.classBinding       = initClassBinding(configDir);
+        this.alreadyRead        = new HashMap<Value, Object>();
+        this.classeNotFound     = new ArrayList<String>();
+    }
+
+    /**
+     * A constructor used in profile Test .
+     *
+     * @param MDReader a reader to the MDWeb database.
+     */
+    protected MDWebMetadataReader(Connection MDConnection) throws CstlServiceException {
+        super(true, false);
+        try  {
+            this.MDReader           = new Reader20(Standard.ISO_19115,  MDConnection);
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+        this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
+
+        this.geotoolsPackage    = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing", "org.constellation.temporal",
+                                                        "org.geotools.service", "org.geotools.util", "org.geotools.feature.catalog",
+                                                        "org.constellation.metadata.fra");
+        this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
+                                                        "org.opengis.service", "org.opengis.feature.catalog");
+        this.CSWPackage         = Util.searchSubPackage("org.constellation.cat.csw.v202", "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100",
+                                                       "org.constellation.ogc");
+        this.ebrimV3Package     = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
+        this.ebrimV25Package    = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+
+        this.classBinding       = new HashMap<String, Class>();
+        this.alreadyRead        = new HashMap<Value, Object>();
+        this.classeNotFound     = new ArrayList<String>();
     }
 
     /**

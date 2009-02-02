@@ -95,7 +95,7 @@ public final class Util {
      * @return {@code true}, if at least one element of the list matches the 
      *           parameter, {@code false} otherwise.
      */
-    public static boolean matchesStringfromList(List<String> list, String str) {
+    public static boolean matchesStringfromList(final List<String> list,final String str) {
         boolean str_available = false;
         for (String s : list) {
             Pattern pattern = Pattern.compile(str,Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
@@ -117,7 +117,7 @@ public final class Util {
      * 
      * @return A {@code String} with the first character in upper case.
      */
-    public static String firstToUpper(String s) {
+    public static String firstToUpper(final String s) {
         String first = s.substring(0, 1);
         String result = s.substring(1);
         result = first.toUpperCase() + result;
@@ -223,7 +223,7 @@ public final class Util {
      *               may be null.
      * @return A formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
      */
-    public static Date createDate(String date, DateFormat dateFormat) throws ParseException {
+    public static Date createDate(String date, final DateFormat dateFormat) throws ParseException {
         
         Map<String, String> POOL = new HashMap<String, String>();
         POOL.put("janvier",   "01");
@@ -287,7 +287,10 @@ public final class Util {
                 }
             } else if (getOccurenceFrequency(date, " ") == 1) {
                 try {
-                    Date d = dateFormat.parse(date);
+                    Date d;
+                    synchronized(dateFormat) {
+                        d = dateFormat.parse(date);
+                    }
                     return new Date(d.getTime());
                 } catch (ParseException ex) {
                 }
@@ -347,7 +350,7 @@ public final class Util {
      * @return The frequency of occurrences of the second parameter characters 
      *           in the character sequence of the first.
      */
-    public static int getOccurenceFrequency (String s, String occ){
+    public static int getOccurenceFrequency (String s, final String occ){
         if (! s.contains(occ))
             return 0;
         else {
@@ -373,7 +376,7 @@ public final class Util {
      * 
      * @return A list of package names.
      */
-    public static List<String> searchSubPackage(String... packages) {
+    public static List<String> searchSubPackage(final String... packages) {
         List<String> result = new ArrayList<String>();
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         for (String p : packages) {
@@ -407,7 +410,7 @@ public final class Util {
      * @return a list of package names.
      * @throws java.io.IOException
      */
-    public static List<String> scan(URI u, String filePackageName) throws IOException {
+    public static List<String> scan(final URI u, final String filePackageName) throws IOException {
         List<String> result = new ArrayList<String>();
         String scheme = u.getScheme();
         if (scheme.equals("file")) {
@@ -438,7 +441,7 @@ public final class Util {
      * 
      * @return a list of package names.
      */
-    public static List<String> scanDirectory(File root, String parent) {
+    public static List<String> scanDirectory(final File root, final String parent) {
         List<String> result = new ArrayList<String>();
         for (File child : root.listFiles()) {
             if (child.isDirectory()) {
@@ -459,7 +462,7 @@ public final class Util {
      * @return a list of package names.
      * @throws java.io.IOException
      */
-    public static List<String> scanJar(File file, String parent) throws IOException {
+    public static List<String> scanJar(final File file, final String parent) throws IOException {
         List<String> result = new ArrayList<String>();
         final JarFile jar = new JarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
@@ -480,7 +483,7 @@ public final class Util {
      * @param key :  the string to encode.
      * @return the value (string) hexadecimal on 32 bits
      */
-    public static String MD5encode(String key) {
+    public static String MD5encode(final String key) {
 
         byte[] uniqueKey = key.getBytes();
         byte[] hash = null;
@@ -514,7 +517,7 @@ public final class Util {
      * @param classeList A {@code List<Class<?>>}, must not be null.
      * @return An array of {@code Class<?>}.
      */
-    public static Class<?>[] toArray(List<Class> classeList) {
+    public static Class<?>[] toArray(final List<Class> classeList) {
         Class<?>[] result = new Class<?>[classeList.size()];
         int i = 0;
         for (Class<?> classe : classeList) {
@@ -536,7 +539,7 @@ public final class Util {
      * @return {@code true} if, and only if, the directory was successfully 
      *           deleted, and {@code false} otherwise.
      */
-    public static boolean deleteDirectory(File directory) {
+    public static boolean deleteDirectory(final File directory) {
         if (directory == null)
             return false;
         if (!directory.exists())
@@ -561,7 +564,7 @@ public final class Util {
      * @param list
      * @return
      */
-    public static List<String> cleanStrings(List<String> list) {
+    public static List<String> cleanStrings(final List<String> list) {
         List<String> result = new ArrayList<String>();
         for (String s : list) {
             //we remove the bad character before the real value
@@ -580,7 +583,7 @@ public final class Util {
     * @param localPart
     * @return
     */ 
-    public static String replacePrefix(String s, String localPart, String prefix) {
+    public static String replacePrefix(final String s, final String localPart, final String prefix) {
 
         return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
     }
@@ -588,7 +591,7 @@ public final class Util {
     /**
      * Return an marshallable Object from an url
      */
-    public static Object getUrlContent(String URL, Unmarshaller unmarshaller) throws MalformedURLException, IOException {
+    public static Object getUrlContent(final String URL, final Unmarshaller unmarshaller) throws MalformedURLException, IOException {
         URL source         = new URL(URL);
         URLConnection conec = source.openConnection();
         Object response = null;
@@ -639,7 +642,7 @@ public final class Util {
      *                 {@code null} argument constructor.
      * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class<?> classe) {
+    public static Object newInstance(final Class<?> classe) {
         try {
             if (classe == null)
                 return null;
@@ -677,7 +680,7 @@ public final class Util {
      *                    constructor.
      * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class<?> classe, String parameter) {
+    public static Object newInstance(final Class<?> classe, final String parameter) {
         try {
             if (classe == null)
                 return null;
@@ -716,7 +719,7 @@ public final class Util {
      *                     constructor.
      * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class<?> classe, String parameter1, String parameter2) {
+    public static Object newInstance(final Class<?> classe, final String parameter1, final String parameter2) {
         try {
             if (classe == null)
                 return null;
@@ -753,7 +756,7 @@ public final class Util {
      *                    constructor.
      * @return The instantiated instance of the given class, or {@code null}.
      */
-    public static Object newInstance(Class<?> classe, CharSequence parameter) {
+    public static Object newInstance(final Class<?> classe, final CharSequence parameter) {
         try {
             if (classe == null)
                 return null;
@@ -793,7 +796,7 @@ public final class Util {
      *           method call resulted in a primitive, the auto-boxing 
      *           equivalent, or null.
      */
-    public static Object invokeMethod(Object object, Method method) {
+    public static Object invokeMethod(final Object object, final Method method) {
         Object result = null;
         String baseMessage = "Unable to invoke the method " + method + ": "; 
         try {
@@ -831,7 +834,7 @@ public final class Util {
      *           method call resulted in a primitive, the auto-boxing 
      *           equivalent, or null.
      */
-    public static Object invokeMethod(Method method, Object object, Object parameter) {
+    public static Object invokeMethod(final Method method, final Object object, final Object parameter) {
         Object result = null;
         String baseMessage = "Unable to invoke the method " + method + ": "; 
         try {
@@ -864,7 +867,7 @@ public final class Util {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getMethod(String propertyName, Class<?> classe) {
+    public static Method getMethod(final String propertyName, final Class<?> classe) {
         Method method = null;
         try {
             method = classe.getMethod(propertyName);
@@ -889,7 +892,7 @@ public final class Util {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getMethod(String propertyName, Class<?> classe, Class<?> parameterClass) {
+    public static Method getMethod(final String propertyName, final Class<?> classe, final Class<?> parameterClass) {
         Method method = null;
         try {
             method = classe.getMethod(propertyName, parameterClass);
@@ -912,7 +915,7 @@ public final class Util {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getGetterFromName(String propertyName, Class<?> rootClass) {
+    public static Method getGetterFromName(String propertyName, final Class<?> rootClass) {
 
 
         //special case and corrections
@@ -997,7 +1000,7 @@ public final class Util {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getSetterFromName(String propertyName, Class<?> classe, Class<?> rootClass) {
+    public static Method getSetterFromName(String propertyName, final Class<?> classe, final Class<?> rootClass) {
         logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
@@ -1131,7 +1134,7 @@ public final class Util {
      * @param enumeration
      * @return
      */
-    public static String getElementNameFromEnum(Object enumeration) {
+    public static String getElementNameFromEnum(final Object enumeration) {
         String value = "";
         try {
             Method getValue = enumeration.getClass().getDeclaredMethod("value");
@@ -1165,7 +1168,7 @@ public final class Util {
     /**
      * Return an input stream of the specified resource. 
      */
-    public static InputStream getResourceAsStream(String url) {
+    public static InputStream getResourceAsStream(final String url) {
         ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
@@ -1191,7 +1194,7 @@ public final class Util {
      * 
      * @return a Properties Object.
      */
-    public static Properties getPropertiesFromFile(File f) throws  IOException {
+    public static Properties getPropertiesFromFile(final File f) throws  IOException {
         if (f != null) {
             Properties prop = new Properties();
             if (f.exists()) {
@@ -1215,7 +1218,7 @@ public final class Util {
      * @param f    A file.
      * @throws org.constellation.coverage.web.WebServiceException
      */
-    public static void storeProperties(Properties prop, File f) throws IOException {
+    public static void storeProperties(final Properties prop, final File f) throws IOException {
         if (prop == null || f == null) {
             throw new IllegalArgumentException(" the properties or file can't be null");
         } else {

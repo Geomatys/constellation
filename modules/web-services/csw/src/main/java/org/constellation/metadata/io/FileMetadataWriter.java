@@ -50,7 +50,7 @@ public class FileMetadataWriter extends MetadataWriter {
      * @param marshaller
      * @throws java.sql.SQLException
      */
-    public FileMetadataWriter(AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws SQLException {
+    public FileMetadataWriter(AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws CstlServiceException {
         super(index);
         this.marshaller    = marshaller;
         this.dataDirectory = dataDirectory;
@@ -58,7 +58,7 @@ public class FileMetadataWriter extends MetadataWriter {
     }
 
     @Override
-    public boolean storeMetadata(Object obj) throws SQLException, CstlServiceException {
+    public boolean storeMetadata(Object obj) throws CstlServiceException {
         File f = null;
         try {
             //TODO find indentifier

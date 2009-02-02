@@ -35,6 +35,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -83,9 +85,18 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndexer(Connection MDConnection, File configDirectory, String serviceID) throws CstlServiceException {
+    public MDWebIndexer(Automatic configuration, File configDirectory, String serviceID) throws CstlServiceException {
         super(serviceID, configDirectory);
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
         try {
+            Connection MDConnection = db.getConnection();
             MDWebReader   = new Reader20(Standard.ISO_19115,  MDConnection);
             pathMap       = null;
             classeMap     = null;

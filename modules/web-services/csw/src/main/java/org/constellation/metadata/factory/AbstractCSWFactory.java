@@ -19,11 +19,8 @@
 package org.constellation.metadata.factory;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -48,13 +45,13 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
         super(priority);
     }
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration, Connection MDConnection, File dataDir, Unmarshaller unmarshaller, File configDir) throws SQLException, JAXBException;
+    public abstract MetadataReader getMetadataReader(Automatic configuration, File dataDir, Unmarshaller unmarshaller, File configDir) throws CstlServiceException;
 
-    public abstract MetadataWriter getMetadataWriter(int dbType, Connection MDConnection, AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws SQLException, JAXBException;
+    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws CstlServiceException;
     
     public abstract int getProfile(int dbType);
     
-    public abstract AbstractIndexer getIndexer(int dbType, MetadataReader reader, Connection MDConnection, File configDir, String serviceID) throws CstlServiceException;
+    public abstract AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, File configDir, String serviceID) throws CstlServiceException;
     
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws CstlServiceException;
 }

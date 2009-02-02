@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +95,6 @@ import org.constellation.ows.v100.ServiceProvider;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
@@ -274,15 +272,6 @@ public class CSWworker {
             } else {
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 
-                // we get the database informations
-                BDD db = config.getBdd();
-                if (db == null && config.getType() != FILESYSTEM) {
-                    logger.severe("The CSW service is not working!" + '\n' +
-                            "cause: The configuration file does not contains a BDD object");
-                    isStarted = false;
-                    return;
-                }
-                
                 // we get the data directory (if needed)
                 File dataDirectory = config.getdataDirectory();
                 if (dataDirectory != null && !dataDirectory.exists()) {
@@ -306,16 +295,14 @@ public class CSWworker {
                     isStarted = false;
                     return;
                 }
-                //we create a connection to the metadata database
-                Connection MDConnection = db.getConnection();
 
                 int datasourceType = config.getType();
                 //we initialize all the data retriever (reader/writer) and index worker
-                MDReader      = CSWfactory.getMetadataReader(config, MDConnection, dataDirectory, unmarshaller, configDir);
+                MDReader      = CSWfactory.getMetadataReader(config, dataDirectory, unmarshaller, configDir);
                 profile       = CSWfactory.getProfile(datasourceType);
-                AbstractIndexer indexer = CSWfactory.getIndexer(datasourceType, MDReader, MDConnection, configDir, serviceID);
+                AbstractIndexer indexer = CSWfactory.getIndexer(config, MDReader, configDir, serviceID);
                 indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
-                MDWriter      = CSWfactory.getMetadataWriter(datasourceType, MDConnection, indexer, marshaller, configDir);
+                MDWriter      = CSWfactory.getMetadataWriter(config, indexer, marshaller, configDir);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
@@ -329,15 +316,9 @@ public class CSWworker {
                     "cause: JAXBException while getting configuration");
             isStarted = false;
 
-        } catch (SQLException e) {
-            logger.severe(e.getMessage());
-            logger.severe("The CSW service is not working!" + '\n' +
-                    "cause: The web service can't connect to the metadata database!");
-            isStarted = false;
         } catch (CstlServiceException e) {
-            logger.severe(e.getMessage());
             logger.severe("The CSW service is not working!" + '\n' +
-                    "cause: The web service can't create the index!");
+                    "cause:" + e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
             logger.severe(e.getMessage());
@@ -1426,20 +1407,16 @@ public class CSWworker {
             if (transaction instanceof InsertType) {
                 InsertType insertRequest = (InsertType)transaction;
                 
-                for(Object record: insertRequest.getAny()) {
-                    
-                        try {
-                            MDWriter.storeMetadata(record);
-                            totalInserted++;
-                        
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                            throw new CstlServiceException("The service has throw an SQLException: " + ex.getMessage(),
-                                                          NO_APPLICABLE_CODE);
-                        } catch (IllegalArgumentException e) {
-                            logger.severe("already that title.");
-                            totalUpdated++;
-                        }
+                for (Object record : insertRequest.getAny()) {
+
+                    try {
+                        MDWriter.storeMetadata(record);
+                        totalInserted++;
+
+                    } catch (IllegalArgumentException e) {
+                        logger.severe("already that title.");
+                        totalUpdated++;
+                    }
                 }
             } else if (transaction instanceof DeleteType) {
                 DeleteType deleteRequest = (DeleteType)transaction;

@@ -21,8 +21,6 @@ package org.constellation.configuration.ws.rs;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +43,6 @@ import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.lucene.index.AbstractIndexer;
@@ -141,24 +138,17 @@ public abstract class AbstractCSWConfigurer {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
-
         if (config != null) {
-            BDD db = config.getBdd();
-            if (db == null) {
-                throw new CstlServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
-            } else {
-                try {
-                    Connection MDConnection      = db.getConnection();
-                    if (currentReader == null)
-                        currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
-                    AbstractIndexer indexer      = CSWfactory.getIndexer(config.getType(), currentReader, MDConnection, cswConfigDir, serviceID);
-                    return indexer;
-                    
-                } catch (JAXBException ex) {
-                    throw new CstlServiceException("JAXBException while initializing the indexer!", NO_APPLICABLE_CODE);
-                } catch (SQLException ex) {
-                    throw new CstlServiceException("SQLException while initializing the indexer!", NO_APPLICABLE_CODE);
+            try {
+                if (currentReader == null) {
+                    currentReader = CSWfactory.getMetadataReader(config, new File(cswConfigDir, "data"), null, cswConfigDir);
                 }
+                AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, cswConfigDir, serviceID);
+                return indexer;
+
+            } catch (CstlServiceException ex) {
+                throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
+                        "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
             }
         } else {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
@@ -178,23 +168,15 @@ public abstract class AbstractCSWConfigurer {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
-
         if (config != null) {
-            BDD db = config.getBdd();
-            if (db == null) {
-                throw new CstlServiceException("the configuration file does not contains a BDD object.", NO_APPLICABLE_CODE);
-            } else {
-                try {
-                    Connection MDConnection      = db.getConnection();
-                    MetadataReader currentReader = CSWfactory.getMetadataReader(config, MDConnection, new File(cswConfigDir, "data"), null, cswConfigDir);
-                    return currentReader;
+            try {
+                MetadataReader currentReader = CSWfactory.getMetadataReader(config, new File(cswConfigDir, "data"), null, cswConfigDir);
+                return currentReader;
 
-                } catch (JAXBException ex) {
-                    throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
-                } catch (SQLException ex) {
-                    throw new CstlServiceException("SQLException while initializing the reader!", NO_APPLICABLE_CODE);
-                }
+            } catch (CstlServiceException ex) {
+                throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
             }
+
         } else {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
         }

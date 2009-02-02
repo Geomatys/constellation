@@ -585,7 +585,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             result = obj.toString();
             
         } else if (obj instanceof Date) {
-            result = dateFormat.format((Date)obj);
+            synchronized (dateFormat){
+                result = dateFormat.format((Date)obj);
+            }
             
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
