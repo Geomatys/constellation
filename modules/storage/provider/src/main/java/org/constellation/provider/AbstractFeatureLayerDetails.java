@@ -41,7 +41,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.renderer.GlyphLegendFactory;
+import org.geotools.display.container.GlyphLegendFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.text.cql2.CQL;

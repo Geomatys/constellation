@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.constellation.provider.DataProvider;
 
-import org.geotools.display.renderer.GridMarkGraphicBuilder;
+import org.geotools.display.container.GridMarkGraphicBuilder;
 import org.geotools.map.GraphicBuilder;
 
 /**

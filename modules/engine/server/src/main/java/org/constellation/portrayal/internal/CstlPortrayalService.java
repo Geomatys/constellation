@@ -24,8 +24,6 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,9 +36,9 @@ import org.geotools.display.canvas.CanvasController2D;
 import org.geotools.display.canvas.GraphicVisitor;
 import org.geotools.display.canvas.VisitFilter;
 import org.geotools.display.canvas.control.FailOnErrorMonitor;
+import org.geotools.display.container.ContextContainer2D;
+import org.geotools.display.container.DefaultContextContainer2D;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.renderer.ContextRenderer2D;
-import org.geotools.display.renderer.DefaultContextRenderer2D;
 import org.geotools.display.renderer.Go2rendererHints;
 import org.geotools.display.service.DefaultPortrayalService;
 import org.geotools.map.MapContext;
@@ -93,7 +91,7 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
     
     private final ReportMonitor monitor = new ReportMonitor();
     private final BufferedImageCanvas2D canvas;
-    private final ContextRenderer2D renderer;
+    private final ContextContainer2D container;
     private final MapContext context;
     
     /*
@@ -101,11 +99,11 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
      */
     private CstlPortrayalService(){
     	
-        canvas = new  BufferedImageCanvas2D(new Dimension(1,1),null);
-        renderer = new DefaultContextRenderer2D(canvas, false);
+        canvas = new  BufferedImageCanvas2D(DefaultGeographicCRS.WGS84,new Dimension(1,1),null);
+        container = new DefaultContextContainer2D(canvas, false);
         context = MAP_BUILDER.createContext(DefaultGeographicCRS.WGS84);//TODO: why are we building a context here?
         
-        canvas.setRenderer(renderer);
+        canvas.setContainer(container);
         canvas.getController().setAutoRepaint(false);
         
         //disable multithread rendering, to avoid possibility of several buffers created
@@ -114,7 +112,7 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
         //we specifically say to not respect X/Y proportions
         canvas.getController().setAxisProportions(Double.NaN);
         
-        renderer.setContext(context);
+        container.setContext(context);
     }
     
     /**
@@ -153,7 +151,7 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
             }
         }finally{
             canvas.clearCache();
-            renderer.clearCache();
+            container.clearCache();
             context.layers().clear();
         }
 
@@ -199,7 +197,7 @@ public class CstlPortrayalService extends DefaultPortrayalService implements Por
         } finally {
             visitor.endVisit();
             canvas.clearCache();
-            renderer.clearCache();
+            container.clearCache();
             context.layers().clear();
         }
 

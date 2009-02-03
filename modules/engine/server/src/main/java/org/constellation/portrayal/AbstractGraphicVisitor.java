@@ -129,10 +129,8 @@ public abstract class AbstractGraphicVisitor implements GraphicVisitor {
             ex.printStackTrace();
             return null;
         }
-
-        if(layer.getGridCoverage2D() != null){
-            coverage = layer.getGridCoverage2D();
-        }else if(layer.getCoverageReader() != null){
+        
+        if(layer.getCoverageReader() != null){
             CoverageReader reader = layer.getCoverageReader();
             final Rectangle2D displayRect = canvas.getDisplayBounds().getBounds2D();
             final Rectangle2D objectiveRect;
