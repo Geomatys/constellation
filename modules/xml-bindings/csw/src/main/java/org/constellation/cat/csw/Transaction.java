@@ -17,23 +17,16 @@
 
 package org.constellation.cat.csw;
 
+import java.util.List;
+
 /**
- * An interface containing the common methods to the different version of the operation GetRecords.
  *
- *  * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractCswRequest {
+public interface Transaction extends RequestBase {
 
-    /**
-     * Gets the value of the outputFormat property.
-     *
-     */
-    public String getOutputFormat();
+    public String getRequestId();
 
-    /**
-     * Sets the value of the outputFormat property.
-     *
-     */
-    public void setOutputFormat(String value);
+    public List<Object> getInsertOrUpdateOrDelete();
 
 }

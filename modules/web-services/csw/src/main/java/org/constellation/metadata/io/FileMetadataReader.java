@@ -27,8 +27,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.cat.csw.v202.DomainValuesType;
-import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.DomainValues;
+import org.constellation.cat.csw.ElementSet;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -63,7 +63,7 @@ public class FileMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         return getObjectFromFile(identifier);
     }
 
@@ -87,7 +87,7 @@ public class FileMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
         throw new CstlServiceException("GetDomain operation are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 

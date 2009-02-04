@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.GetDomain;
 
 
 /**
@@ -54,7 +55,7 @@ import javax.xml.namespace.QName;
     "propertyName",
     "parameterName"
 })
-public class GetDomainType extends RequestBaseType {
+public class GetDomainType extends RequestBaseType implements GetDomain {
 
     @XmlElement(name = "PropertyName")
     private QName propertyName;
@@ -65,8 +66,10 @@ public class GetDomainType extends RequestBaseType {
      * Gets the value of the propertyName property.
      * 
      */
-    public QName getPropertyName() {
-        return propertyName;
+    public String getPropertyName() {
+        if (propertyName != null)
+            return propertyName.getPrefix() + ":" + propertyName.getLocalPart();
+        return null;
     }
 
     /**
@@ -81,8 +84,10 @@ public class GetDomainType extends RequestBaseType {
      * Gets the value of the parameterName property.
      * 
      */
-    public QName getParameterName() {
-        return parameterName;
+    public String getParameterName() {
+        if (parameterName != null)
+            return parameterName.getPrefix() + ":" + parameterName.getLocalPart();
+        return null;
     }
 
     /**
@@ -92,5 +97,11 @@ public class GetDomainType extends RequestBaseType {
     public void setParameterName(QName value) {
         this.parameterName = value;
     }
+
+    public String getOutputFormat() {
+        return "application/xml";
+    }
+
+    public void setOutputFormat(String value) {}
 
 }

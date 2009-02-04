@@ -16,18 +16,20 @@
  */
 package org.constellation.cat.csw.v200;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.GetRecordById;
 
 
 /**
- * 
- *             Requests the default representation of a catalogue object
- *             Id - object idenitifier (a URI)
- *             ElementSetName - one of "brief, "summary", or "full"
+ * Requests the default representation of a catalogue object
+ *  Id - object idenitifier (a URI)
+ *  ElementSetName - one of "brief, "summary", or "full"
  *          
  * 
  * <p>Java class for GetRecordByIdType complex type.
@@ -54,7 +56,7 @@ import javax.xml.bind.annotation.XmlType;
     "id",
     "elementSetName"
 })
-public class GetRecordByIdType extends RequestBaseType {
+public class GetRecordByIdType extends RequestBaseType implements GetRecordById {
 
     @XmlElement(name = "Id", required = true)
     @XmlSchemaType(name = "anyURI")
@@ -66,8 +68,8 @@ public class GetRecordByIdType extends RequestBaseType {
      * Gets the value of the id property.
      * 
      */
-    public String getId() {
-        return id;
+    public List<String> getId() {
+        return Arrays.asList(id);
     }
 
     /**
@@ -93,5 +95,15 @@ public class GetRecordByIdType extends RequestBaseType {
     public void setElementSetName(ElementSetNameType value) {
         this.elementSetName = value;
     }
+
+    public String getOutputSchema() {
+        return "http://www.opengis.net/cat/csw";
+    }
+
+    public String getOutputFormat() {
+        return "application/xml";
+    }
+
+    public void setOutputFormat(String value) {}
 
 }

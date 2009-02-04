@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 // constellation dependencies
-import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.Record;
 import org.constellation.dublincore.AbstractSimpleLiteral;
-import org.constellation.ebrim.v300.InternationalStringType;
-import org.constellation.ebrim.v250.RegistryObjectType;
+import org.constellation.ebrim.EbrimInternationalString;
+import org.constellation.ebrim.RegistryObject;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 
@@ -83,10 +83,10 @@ public abstract class MetadataWriter {
         //here we try to get the title
         AbstractSimpleLiteral titleSL = null;
         String title = "unknow title";
-        if (obj instanceof RecordType) {
-            titleSL = ((RecordType) obj).getTitle();
+        if (obj instanceof Record) {
+            titleSL = ((Record) obj).getTitle();
             if (titleSL == null) {
-                titleSL = ((RecordType) obj).getIdentifier();
+                titleSL = ((Record) obj).getIdentifier();
             }
                                
             if (titleSL == null) {
@@ -104,22 +104,14 @@ public abstract class MetadataWriter {
                     title = ident.getCitation().getTitle().toString();
                 } 
             }
-        } else if (obj instanceof org.constellation.ebrim.v300.RegistryObjectType) {
-            InternationalStringType ident = ((org.constellation.ebrim.v300.RegistryObjectType) obj).getName();
+        } else if (obj instanceof RegistryObject) {
+            EbrimInternationalString ident = ((RegistryObject) obj).getName();
             if (ident != null && ident.getLocalizedString().size() > 0) {
                 title = ident.getLocalizedString().get(0).getValue();
             } else {
-                title = ((RegistryObjectType) obj).getId();
+                title = ((RegistryObject) obj).getId();
             } 
         
-        } else if (obj instanceof org.constellation.ebrim.v250.RegistryObjectType) {
-            org.constellation.ebrim.v250.InternationalStringType ident = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getName();
-            if (ident != null && ident.getLocalizedString().size() > 0) {
-                title = ident.getLocalizedString().get(0).getValue();
-            } else {
-                title = ((org.constellation.ebrim.v250.RegistryObjectType) obj).getId();
-            } 
-            
         } else {
             Method nameGetter = null;
             String methodName = "";

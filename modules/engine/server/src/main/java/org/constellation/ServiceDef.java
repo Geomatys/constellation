@@ -42,7 +42,7 @@ public enum ServiceDef {
 	
 	CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO),
 
-    SOS_1_0_0(Specification.CSW, Organization.OGC, "1.0.1", Profile.NONE),
+    SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE),
 	
 	PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE),
 	PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE);

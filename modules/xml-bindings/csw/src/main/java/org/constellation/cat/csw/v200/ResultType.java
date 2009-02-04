@@ -19,6 +19,7 @@ package org.constellation.cat.csw.v200;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.AbstractResultType;
 
 
 /**
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "ResultType")
 @XmlEnum
-public enum ResultType {
+public enum ResultType implements AbstractResultType {
 
     @XmlEnumValue("results")
     RESULTS("results"),

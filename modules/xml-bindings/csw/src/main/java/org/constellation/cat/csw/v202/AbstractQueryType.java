@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.AbstractQuery;
 
 
 /**
@@ -45,7 +46,7 @@ import javax.xml.namespace.QName;
 @XmlSeeAlso({
     QueryType.class
 })
-public abstract class AbstractQueryType {
+public abstract class AbstractQueryType implements AbstractQuery {
 
     public abstract void setTypeNames(List<QName> typeNames);
     

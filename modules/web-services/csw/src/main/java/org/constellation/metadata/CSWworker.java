@@ -44,43 +44,47 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
 //Constellation dependencies
-import org.constellation.ws.rs.WebService;
+import org.constellation.cat.csw.AbstractCswRequest;
+import org.constellation.cat.csw.ElementSet;
+import org.constellation.cat.csw.GetDomain;
+import org.constellation.cat.csw.GetRecordById;
+import org.constellation.cat.csw.RequestBase;
+import org.constellation.cat.csw.AbstractResultType;
+import org.constellation.cat.csw.GetRecordsRequest;
+import org.constellation.cat.csw.Harvest;
+import org.constellation.cat.csw.Transaction;
+import org.constellation.cat.csw.DescribeRecord;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DeleteType;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
-import org.constellation.cat.csw.v202.DescribeRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetCapabilities;
 import org.constellation.cat.csw.v202.GetDomainResponseType;
-import org.constellation.cat.csw.v202.GetDomainType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
-import org.constellation.cat.csw.v202.GetRecordByIdType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
-import org.constellation.cat.csw.v202.GetRecordsType;
 import org.constellation.cat.csw.v202.HarvestResponseType;
-import org.constellation.cat.csw.v202.HarvestType;
 import org.constellation.cat.csw.v202.InsertType;
 import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.QueryType;
-import org.constellation.cat.csw.v202.RequestBaseType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionSummaryType;
-import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.cat.csw.v202.SchemaComponentType;
 import org.constellation.cat.csw.v202.EchoedRequestType;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.lucene.IndexingException;
+import org.constellation.lucene.index.AbstractIndexSearcher;
+import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ogc.FilterCapabilities;
 import org.constellation.ogc.SortByType;
 import org.constellation.ogc.SortPropertyType;
@@ -98,11 +102,11 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.constellation.cat.csw.AbstractCswRequest;
+import org.constellation.ws.rs.WebService;
+
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -128,7 +132,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // GeoAPI dependencies
-import org.constellation.lucene.IndexingException;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -611,7 +614,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public Object getRecords(GetRecordsType request) throws CstlServiceException {
+    public Object getRecords(GetRecordsRequest request) throws CstlServiceException {
         logger.info("GetRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -640,7 +643,7 @@ public class CSWworker {
         }
         
         //We get the resultType
-        ResultType resultType = ResultType.HITS;
+        AbstractResultType resultType = ResultType.HITS;
         if (request.getResultType() != null) {
             resultType = request.getResultType();
         }
@@ -947,7 +950,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws CstlServiceException {
+    public GetRecordByIdResponseType getRecordById(GetRecordById request) throws CstlServiceException {
         logger.info("GetRecordById request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -957,7 +960,7 @@ public class CSWworker {
         
         
         // we get the level of the record to return (Brief, summary, full)
-        ElementSetType set = ElementSetType.SUMMARY;
+        ElementSet set = ElementSetType.SUMMARY;
         if (request.getElementSetName() != null && request.getElementSetName().getValue() != null) {
             set = request.getElementSetName().getValue();
         }
@@ -1157,7 +1160,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws CstlServiceException{
+    public DescribeRecordResponseType describeRecord(DescribeRecord request) throws CstlServiceException{
         logger.info("DescribeRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
@@ -1169,7 +1172,7 @@ public class CSWworker {
             initializeOutputFormat(request);
         
             // we initialize the type names
-            List<QName> typeNames = request.getTypeName();
+            List<QName> typeNames = (List<QName>)request.getTypeName();
             if (typeNames == null || typeNames.size() == 0) {
                 typeNames = SUPPORTED_TYPE_NAME;
             }
@@ -1312,7 +1315,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetDomainResponseType getDomain(GetDomainType request) throws CstlServiceException{
+    public GetDomainResponseType getDomain(GetDomain request) throws CstlServiceException{
         logger.info("GetDomain request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1374,7 +1377,7 @@ public class CSWworker {
          * "PropertyName" return a list of metadata for a specific field.
          */  
         } else if (propertyName != null) {
-            responseList = MDReader.getFieldDomainofValues(propertyName);
+            responseList = (List<DomainValuesType>) MDReader.getFieldDomainofValues(propertyName);
             
         // if no parameter have been filled we launch an exception    
         } else {
@@ -1391,7 +1394,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
+    public TransactionResponseType transaction(Transaction request) throws CstlServiceException {
         logger.info("Transaction request processing" + '\n');
         
         if (profile == DISCOVERY) {
@@ -1460,7 +1463,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(HarvestType request) throws CstlServiceException {
+    public HarvestResponseType harvest(Harvest request) throws CstlServiceException {
         logger.info("Harvest request processing" + '\n');
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
@@ -1616,7 +1619,7 @@ public class CSWworker {
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
-    private void verifyBaseRequest(RequestBaseType request) throws CstlServiceException {
+    private void verifyBaseRequest(RequestBase request) throws CstlServiceException {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!",
                                           NO_APPLICABLE_CODE);

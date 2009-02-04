@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.ebrim.LocalizedString;
 
 
 /**
@@ -48,7 +49,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LocalizedStringType")
-public class LocalizedStringType {
+public class LocalizedStringType implements LocalizedString {
 
     @XmlAttribute(namespace = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

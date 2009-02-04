@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.DistributedSearch;
 
 
 /**
@@ -50,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DistributedSearchType")
-public class DistributedSearchType {
+public class DistributedSearchType implements DistributedSearch {
 
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")

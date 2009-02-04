@@ -18,7 +18,6 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,26 +41,24 @@ import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.cat.csw.DescribeRecord;
+import org.constellation.cat.csw.GetDomain;
+import org.constellation.cat.csw.GetRecordById;
+import org.constellation.cat.csw.GetRecordsRequest;
+import org.constellation.cat.csw.Transaction;
 import org.constellation.cat.csw.v202.Capabilities;
-import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
 import org.constellation.cat.csw.v202.DistributedSearchType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetCapabilities;
-import org.constellation.cat.csw.v202.GetDomainResponseType;
 import org.constellation.cat.csw.v202.GetDomainType;
-import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
-import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.GetRecordsType;
-import org.constellation.cat.csw.v202.HarvestResponseType;
 import org.constellation.cat.csw.v202.HarvestType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
-import org.constellation.cat.csw.v202.TransactionResponseType;
-import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.wrs.v100.ExtrinsicObjectType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
@@ -148,47 +145,13 @@ public class CSWService extends OGCWebService {
         classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
 
         //CSW 2.0.2 classes
-        classeList.addAll(Arrays.asList(Capabilities.class,
-                                        DescribeRecordType.class,
-                                        DistributedSearchType.class,
-                                        ElementSetNameType.class,
-                                        ElementSetType.class,
-                                        GetCapabilities.class,
-                                        GetDomainType.class,
-                                        GetRecordByIdType.class,
-                                        GetRecordsType.class,
-                                        HarvestType.class,
-                                        QueryConstraintType.class,
-                                        QueryType.class,
-                                        ResultType.class,
-                                        TransactionType.class,
-                                        GetRecordsResponseType.class,
-                                        GetRecordByIdResponseType.class,
-                                        DescribeRecordResponseType.class,
-                                        GetDomainResponseType.class,
-                                        TransactionResponseType.class,
-                                        HarvestResponseType.class,
+        classeList.addAll(Arrays.asList(org.constellation.cat.csw.v202.ObjectFactory.class,
                                         ExceptionReport.class,
                                         org.constellation.ows.v110.ExceptionReport.class,  // TODO remove
                                         org.constellation.dublincore.v2.terms.ObjectFactory.class));
             
            //CSW 2.0.0 classes
-           classeList.addAll(Arrays.asList(org.constellation.cat.csw.v200.CapabilitiesType.class, 
-                                           org.constellation.cat.csw.v200.DescribeRecordType.class,
-                                           org.constellation.cat.csw.v200.DistributedSearchType.class, 
-                                           org.constellation.cat.csw.v200.ElementSetNameType.class, 
-                                           org.constellation.cat.csw.v200.ElementSetType.class,
-                                           org.constellation.cat.csw.v200.GetCapabilitiesType.class,
-                                           org.constellation.cat.csw.v200.GetDomainType.class, 
-                                           org.constellation.cat.csw.v200.GetRecordByIdType.class,
-                                           org.constellation.cat.csw.v200.GetRecordsType.class, 
-                                           org.constellation.cat.csw.v200.QueryConstraintType.class,
-                                           org.constellation.cat.csw.v200.QueryType.class, 
-                                           org.constellation.cat.csw.v200.ResultType.class, 
-                                           org.constellation.cat.csw.v200.GetRecordsResponseType.class,
-                                           org.constellation.cat.csw.v200.GetRecordByIdResponseType.class,
-                                           org.constellation.cat.csw.v200.DescribeRecordResponseType.class, 
-                                           org.constellation.cat.csw.v200.GetDomainResponseType.class,
+           classeList.addAll(Arrays.asList(org.constellation.cat.csw.v200.ObjectFactory.class,
                                            org.constellation.dublincore.v1.terms.ObjectFactory.class));
            
            //Ebrim classes
@@ -255,9 +218,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
-                } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsType)) {
+                } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsRequest)) {
                 
-                    GetRecordsType gr = (GetRecordsType)objectRequest;
+                    GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
                 
                     if (gr == null) {
                         /*
@@ -272,9 +235,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordByIdType)) {
+                } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordById)) {
                 
-                    GetRecordByIdType grbi = (GetRecordByIdType)objectRequest;
+                    GetRecordById grbi = (GetRecordById)objectRequest;
                 
                     if (grbi == null) {
                         /*
@@ -289,9 +252,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
+                } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecord)) {
                 
-                    DescribeRecordType dr = (DescribeRecordType)objectRequest;
+                    DescribeRecord dr = (DescribeRecord)objectRequest;
                 
                     if (dr == null) {
                         /*
@@ -306,9 +269,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomainType)) {
+                } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
                 
-                    GetDomainType gd = (GetDomainType)objectRequest;
+                    GetDomain gd = (GetDomain)objectRequest;
                 
                     if (gd == null) {
                         /*
@@ -324,9 +287,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
+                } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
                 
-                    TransactionType t = (TransactionType)objectRequest;
+                    Transaction t = (Transaction)objectRequest;
                 
                     if (t == null) {
                          throw new CstlServiceException("The Operation transaction is not available in KVP",

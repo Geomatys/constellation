@@ -2,6 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
+ *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -15,25 +16,18 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.cat.csw;
+package org.constellation.ebrim;
 
 /**
- * An interface containing the common methods to the different version of the operation GetRecords.
  *
- *  * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractCswRequest {
+public interface LocalizedString {
 
-    /**
-     * Gets the value of the outputFormat property.
-     *
-     */
-    public String getOutputFormat();
+    public String getValue();
 
-    /**
-     * Sets the value of the outputFormat property.
-     *
-     */
-    public void setOutputFormat(String value);
+    public String getCharset();
+
+    public String getLang();
 
 }

@@ -27,12 +27,13 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.Transaction;
 
 
 /**
- * 
- *  Users may insert, update, or delete catalogue entries. If the verboseResponse attribute has the value "true", 
- *  then one or more csw:InsertResult elements must be included in the response.
+ * Users may insert, update, or delete catalogue entries. 
+ * If the verboseResponse attribute has the value "true", then one or more
+ * csw:InsertResult elements must be included in the response.
  *          
  * 
  * <p>Java class for TransactionType complex type.
@@ -64,7 +65,7 @@ import javax.xml.bind.annotation.XmlType;
     "insertOrUpdateOrDelete"
 })
 @XmlRootElement(name = "Transaction")
-public class TransactionType extends RequestBaseType {
+public class TransactionType extends RequestBaseType implements Transaction {
 
     @XmlElements({
         @XmlElement(name = "Insert", type = InsertType.class),
@@ -123,4 +124,10 @@ public class TransactionType extends RequestBaseType {
     public String getRequestId() {
         return requestId;
     }
+
+    public String getOutputFormat() {
+        return "application/xml";
+    }
+
+    public void setOutputFormat(String value) {}
 }

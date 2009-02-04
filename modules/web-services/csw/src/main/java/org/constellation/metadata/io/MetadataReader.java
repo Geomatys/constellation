@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-import org.constellation.cat.csw.v202.DomainValuesType;
-import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.DomainValues;
+import org.constellation.cat.csw.ElementSet;
 import org.constellation.ws.CstlServiceException;
 
 /**
@@ -73,12 +73,12 @@ public abstract class MetadataReader {
      * @return A marshallable metadata object.
      * @throws java.sql.SQLException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException;
     
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public abstract List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
+    public abstract List<? extends DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
     
     /**
      * Execute a SQL query and return the result as a List of identifier;

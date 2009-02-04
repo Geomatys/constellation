@@ -813,7 +813,7 @@ public class CatalogueHarvester {
      * 
      * @return
      */
-    public DistributedResults transferGetRecordsRequest(GetRecordsType request, List<String> distributedServers,
+    public DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers,
             int startPosition, int maxRecords) {
         List<Object> additionalResults = new ArrayList<Object>();
         int matched = 0;

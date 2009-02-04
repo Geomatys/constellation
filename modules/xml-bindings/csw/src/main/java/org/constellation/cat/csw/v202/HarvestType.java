@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
+import org.constellation.cat.csw.Harvest;
 
 
 /**
@@ -74,7 +75,7 @@ import javax.xml.datatype.Duration;
     "responseHandler"
 })
 @XmlRootElement(name = "Harvest")
-public class HarvestType extends RequestBaseType {
+public class HarvestType extends RequestBaseType implements Harvest {
 
     @XmlElement(name = "Source", required = true)
     @XmlSchemaType(name = "anyURI")
@@ -185,5 +186,11 @@ public class HarvestType extends RequestBaseType {
         }
         return Collections.unmodifiableList(responseHandler);
     }
+
+    public String getOutputFormat() {
+        return "application/xml";
+    }
+
+    public void setOutputFormat(String value) {}
 
 }

@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.ElementSetName;
 
 
 /**
@@ -47,7 +48,7 @@ import javax.xml.namespace.QName;
 @XmlType(name = "ElementSetNameType", propOrder = {
     "value"
 })
-public class ElementSetNameType {
+public class ElementSetNameType implements ElementSetName {
 
     @XmlValue
     private ElementSetType value;

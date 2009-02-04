@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import org.constellation.cat.csw.DomainValues;
 
 
 /**
@@ -62,7 +63,7 @@ import javax.xml.namespace.QName;
     "conceptualScheme",
     "rangeOfValues"
 })
-public class DomainValuesType {
+public class DomainValuesType implements DomainValues {
 
     @XmlElement(name = "PropertyName")
     @XmlSchemaType(name = "anyURI")

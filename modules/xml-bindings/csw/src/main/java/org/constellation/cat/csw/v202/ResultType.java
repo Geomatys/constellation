@@ -19,6 +19,7 @@ package org.constellation.cat.csw.v202;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.AbstractResultType;
 
 
 /**
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "ResultType")
 @XmlEnum
-public enum ResultType {
+public enum ResultType implements AbstractResultType {
 
 
     /**
@@ -57,8 +58,8 @@ public enum ResultType {
     HITS("hits"),
 
     /**
-     * Validate the request and return an Acknowledgement message if it 
-     * 	      is valid. Continue processing the request asynchronously.
+     * Validate the request and return an Acknowledgement message if it is valid.
+     * Continue processing the request asynchronously.
      * 
      */
     @XmlEnumValue("validate")

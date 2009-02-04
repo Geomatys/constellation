@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.GetDomain;
 
 
 /**
@@ -55,7 +56,7 @@ import javax.xml.bind.annotation.XmlType;
     "parameterName"
 })
 @XmlRootElement(name="GetDomain")
-public class GetDomainType extends RequestBaseType {
+public class GetDomainType extends RequestBaseType implements GetDomain {
 
     @XmlElement(name = "PropertyName")
     @XmlSchemaType(name = "anyURI")
@@ -101,4 +102,10 @@ public class GetDomainType extends RequestBaseType {
     public String getParameterName() {
         return parameterName;
     }
+
+    public String getOutputFormat() {
+        return "application/xml";
+    }
+
+    public void setOutputFormat(String value) {}
 }

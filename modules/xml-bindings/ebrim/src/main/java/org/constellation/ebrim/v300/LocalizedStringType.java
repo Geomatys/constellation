@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ebrim.LocalizedString;
 
 
 /**
@@ -46,7 +47,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LocalizedStringType")
-public class LocalizedStringType {
+public class LocalizedStringType implements LocalizedString {
 
     @XmlAttribute(namespace = "http://www.w3.org/XML/1998/namespace")
     private String lang;

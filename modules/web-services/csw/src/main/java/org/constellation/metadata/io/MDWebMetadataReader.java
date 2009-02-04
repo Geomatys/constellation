@@ -41,6 +41,8 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
+import org.constellation.cat.csw.DomainValues;
+import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.Settable;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
@@ -288,7 +290,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         int id;
         String catalogCode = "";
         
@@ -357,7 +359,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSetType type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSet type, List<QName> elementName) throws SQLException {
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
         
@@ -386,7 +388,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDFormInRecord(Form form, ElementSetType type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType transformMDFormInRecord(Form form, ElementSet type, List<QName> elementName) throws SQLException {
         
         Value top                   = form.getTopValue();
         Standard  recordStandard    = top.getType().getStandard();
@@ -657,7 +659,7 @@ public class MDWebMetadataReader extends MetadataReader {
         }
     }
     
-    private Object applyElementSet(Object result, ElementSetType type, List<QName> elementName) {
+    private Object applyElementSet(Object result, ElementSet type, List<QName> elementName) {
 
          if (type == null)
             type = ElementSetType.FULL;
@@ -1142,8 +1144,8 @@ public class MDWebMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
-        List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+        List<DomainValues> responseList = new ArrayList<DomainValues>();
         final StringTokenizer tokens = new StringTokenizer(propertyNames, ",");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();

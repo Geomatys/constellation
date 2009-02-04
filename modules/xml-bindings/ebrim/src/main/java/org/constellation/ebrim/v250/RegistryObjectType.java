@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.ebrim.RegistryObject;
 
 
 /**
@@ -105,7 +106,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     Subscription.class
 })
 @XmlRootElement(name = "RegistryObject")
-public class RegistryObjectType {
+public class RegistryObjectType implements RegistryObject {
 
     @XmlElement(name = "Name")
     private InternationalStringType name;

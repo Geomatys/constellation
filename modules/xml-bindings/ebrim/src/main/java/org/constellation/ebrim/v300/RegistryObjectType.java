@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.Settable;
+import org.constellation.ebrim.RegistryObject;
 
 
 /**
@@ -88,7 +89,7 @@ import org.constellation.cat.csw.Settable;
     PersonType.class
 })
 @XmlRootElement(name = "RegistryObject")
-public class RegistryObjectType extends IdentifiableType implements Settable {
+public class RegistryObjectType extends IdentifiableType implements RegistryObject, Settable {
 
     @XmlElement(name = "Name")
     private InternationalStringType name;

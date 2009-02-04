@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.RequestBase;
 
 
 /**
@@ -53,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
     GetRecordByIdType.class,
     GetRecordsType.class
 })
-public abstract class RequestBaseType {
+public abstract class RequestBaseType implements RequestBase {
 
     @XmlAttribute
     private String service;

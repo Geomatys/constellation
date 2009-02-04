@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ebrim.EbrimInternationalString;
 
 
 /**
@@ -48,7 +49,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "InternationalStringType", propOrder = {
     "localizedString"
 })
-public class InternationalStringType {
+public class InternationalStringType implements EbrimInternationalString {
 
     @XmlElement(name = "LocalizedString")
     private List<LocalizedStringType> localizedString;

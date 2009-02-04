@@ -25,7 +25,7 @@ import org.constellation.ogc.FilterType;
  * An interface containing the common methods to the different version of the operation GetRecords.
  * 
  */
-public interface GetRecordsRequest extends AbstractCswRequest {
+public interface GetRecordsRequest extends RequestBase {
 
     
     /**
@@ -104,10 +104,22 @@ public interface GetRecordsRequest extends AbstractCswRequest {
      * @param filter FilterType
      */
     public void setFilterConstraint(FilterType filter);
-    
+
+    /**
+     * Get the output result type.
+     */
+    public AbstractResultType getResultType();
+
+    /**
+     * Get the query filter of the request.
+     */
+    public AbstractQuery getAbstractQuery();
+
     /**
      * Sets the value of the resultType property.
      */
     public void setResultType(String resultType);
+
+    public DistributedSearch getDistributedSearch();
 
 }

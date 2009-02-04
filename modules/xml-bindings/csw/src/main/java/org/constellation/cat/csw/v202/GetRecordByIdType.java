@@ -25,17 +25,15 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.cat.csw.AbstractCswRequest;
+import org.constellation.cat.csw.GetRecordById;
 
 
 /**
- * 
- *             Convenience operation to retrieve default record representations 
- *             by identifier.
- *             Id - object identifier (a URI) that provides a reference to a 
- *                  catalogue item (or a result set if the catalogue supports 
- *                  persistent result sets).
- *             ElementSetName - one of "brief, "summary", or "full"
+ * Convenience operation to retrieve default record representations by identifier.
+ *    Id - object identifier (a URI) that provides a reference to a catalogue item
+ *         (or a result set if the catalogue supports persistent result sets).
+ *
+ *    ElementSetName - one of "brief, "summary", or "full"
  *          
  * 
  * <p>Java class for GetRecordByIdType complex type.
@@ -64,7 +62,7 @@ import org.constellation.cat.csw.AbstractCswRequest;
     "id",
     "elementSetName"
 })
-public class GetRecordByIdType extends RequestBaseType implements AbstractCswRequest {
+public class GetRecordByIdType extends RequestBaseType implements GetRecordById {
 
     @XmlElement(name = "Id", required = true)
     @XmlSchemaType(name = "anyURI")
