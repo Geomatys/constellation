@@ -40,8 +40,7 @@ import org.constellation.lucene.filter.WithinFilter;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -49,7 +48,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -104,8 +102,11 @@ public class LuceneTest {
                 f.delete();
             }
         }
-        IndexWriter writer = new IndexWriter(directory, new SimpleAnalyzer());
+        IndexWriter writer = new IndexWriter(directory, new KeywordAnalyzer(), IndexWriter.MaxFieldLength.UNLIMITED);
         fillTestData(writer);
+        writer.commit();
+        writer.close();
+        
         IndexReader reader = IndexReader.open(directory);
         searcher = new IndexSearcher(reader);
         //create a term query to search against all documents
@@ -171,14 +172,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(spaFilter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BBOX:BBOX 1 CRS= 3395: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -206,14 +208,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(spaFilter);
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
         
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BBOX:BBOX 2 CRS= 4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -240,14 +243,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(spaFilter);
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
         
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BBOX:BBOX 3 CRS= 4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -275,14 +279,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("INTER:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -311,14 +316,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("INTER:BBOX 1 CRS= 3395: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -344,14 +350,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("INTER:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -371,14 +378,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("INTER:Line 1 CRS=3395: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -398,14 +406,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("INTER:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -423,14 +432,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("INTER:Line 2 CRS=3395: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -459,14 +469,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("EQ:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -484,14 +495,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("EQ:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -512,14 +524,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("EQ:Point 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -547,14 +560,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("CT:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -571,14 +585,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CT:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -596,14 +611,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CT:Point 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -621,14 +637,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CT:Point 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -647,14 +664,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CT:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -682,14 +700,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("DJ:Point 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -722,14 +741,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DJ:Point 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -758,14 +778,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DJ:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -791,14 +812,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DJ:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -829,14 +851,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DJ:BBox 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -861,14 +884,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DJ:BBox 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -905,14 +929,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("TO:Point 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -934,14 +959,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Point 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -960,14 +986,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Point 3 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -986,14 +1013,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Point 4 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1012,14 +1040,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Point 5 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1037,14 +1066,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1063,14 +1093,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1089,14 +1120,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1121,14 +1153,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO:BBox 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1162,14 +1195,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("WT:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1195,14 +1229,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("WT:BBOX 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1222,14 +1257,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("WT:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1255,14 +1291,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("CR:Line 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1281,14 +1318,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CR:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1309,14 +1347,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CR:Line 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1337,14 +1376,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CR:Point 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1366,14 +1406,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CR:Point 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1395,14 +1436,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("CR:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1443,14 +1485,15 @@ public class LuceneTest {
         
         
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, serialFilter);
+        TopDocs docs = searcher.search(simpleQuery, serialFilter, 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("TO || BBOX: BBox 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1474,14 +1517,15 @@ public class LuceneTest {
         serialFilter = new SerialChainFilter(filters, filterType2); 
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, serialFilter);
+        docs = searcher.search(simpleQuery, serialFilter, 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("TO && BBOX: BBox 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1503,14 +1547,15 @@ public class LuceneTest {
         serialFilter              = new SerialChainFilter(filters3, filterType3); 
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, serialFilter);
+        docs = searcher.search(simpleQuery, serialFilter, 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("NOT INTER:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1547,14 +1592,15 @@ public class LuceneTest {
         serialFilter              = new SerialChainFilter(filters4, filterType4); 
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, serialFilter);
+        docs = searcher.search(simpleQuery, serialFilter, 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("NOT INTER:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1574,14 +1620,15 @@ public class LuceneTest {
         serialFilter      = new SerialChainFilter(filters4, filterType5); 
         
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, serialFilter);
+        docs = searcher.search(simpleQuery, serialFilter, 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("NOT INTER:Line 1 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1609,14 +1656,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 5km CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1638,14 +1686,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 1500km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1670,14 +1719,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 1500000m CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1702,14 +1752,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 2000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1737,14 +1788,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 4000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1773,14 +1825,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 5000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1811,14 +1864,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Point 1 dist: 6000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1852,14 +1906,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:BBOX 1 dist: 5km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1885,14 +1940,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:BBOX 1 dist: 1500km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1918,14 +1974,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:BBOX 1 dist: 3000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1957,14 +2014,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Line 1 dist: 5km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -1981,14 +2039,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Line 1 dist: 4000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2008,14 +2067,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Line 1 dist: 5000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2040,14 +2100,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("DW:Line 1 dist: 6000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2088,14 +2149,15 @@ public class LuceneTest {
         SpatialQuery spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("BY:Point 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2124,14 +2186,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 1500km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2157,14 +2220,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 1500000m CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2191,14 +2255,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 2000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2221,14 +2286,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 4000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2250,14 +2316,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 5000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2277,14 +2344,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Point 1 dist: 6000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2303,14 +2371,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:BBOX 1 dist: 5km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2331,14 +2400,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:BBOX 1 dist: 1500km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2358,14 +2428,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:BBOX 1 dist: 3000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2382,14 +2453,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Line 1 dist: 5km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2419,14 +2491,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Line 1 dist: 4000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2454,14 +2527,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Line 1 dist: 5000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2483,14 +2557,15 @@ public class LuceneTest {
         spatialQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("BY:Line 1 dist: 6000km CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2519,14 +2594,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("OL:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2546,14 +2622,15 @@ public class LuceneTest {
         bboxQuery = new SpatialQuery(filter);
 
         //we perform a lucene query
-        hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("OL:BBOX 2 CRS=4326: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2584,14 +2661,15 @@ public class LuceneTest {
         SpatialQuery bboxQuery = new SpatialQuery(bboxFilter);
 
         //we perform a lucene query
-        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs docs = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
 
-        int nbResults = hits.length();
+        int nbResults = docs.totalHits;
         logger.finer("QnS:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2614,18 +2692,19 @@ public class LuceneTest {
          */ 
         
         //we perform a lucene query
-        Analyzer analyzer    = new StandardAnalyzer();
+        Analyzer analyzer    = new KeywordAnalyzer();
         QueryParser parser  = new QueryParser("metafile", analyzer);
         Query query         = parser.parse("name:point*");
         
-        hits = searcher.search(query, bboxQuery.getSpatialFilter());
+        docs = searcher.search(query, bboxQuery.getSpatialFilter(), 15);
 
-        nbResults = hits.length();
+        nbResults = docs.totalHits;
         logger.finer("QnS: title like point* AND BBOX 1: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
-            String name = hits.doc(i).get("name");
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
+            String name =  doc.get("name");
             results.add(name);
             logger.finer('\t' + "Name: " +  name);
         }
@@ -2642,23 +2721,24 @@ public class LuceneTest {
          */ 
         
         //we perform two lucene query
-        analyzer    = new StandardAnalyzer();
+        analyzer    = new KeywordAnalyzer();
         parser  = new QueryParser("metafile", analyzer);
         query         = parser.parse("name:point*");
         
-        Hits hits1 = searcher.search(query);
-        Hits hits2 = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        TopDocs hits1 = searcher.search(query, 15);
+        TopDocs hits2 = searcher.search(simpleQuery, bboxQuery.getSpatialFilter(), 15);
         
         
         results = new ArrayList<String>();
         StringBuilder resultString = new StringBuilder();
-        for (int i = 0; i < hits1.length(); i++) {
-            String name = hits1.doc(i).get("name");
+        for (int i = 0; i < hits1.totalHits; i++) {
+
+            String name = searcher.doc(hits1.scoreDocs[i].doc).get("name");
             results.add(name);
             resultString.append('\t').append("Name: ").append(name).append('\n');
         }
-        for (int i = 0; i < hits2.length(); i++) {
-            String name = hits2.doc(i).get("name");
+        for (int i = 0; i < hits2.totalHits; i++) {
+            String name = searcher.doc(hits2.scoreDocs[i].doc).get("name");
             if (!results.contains(name)) {
                 results.add(name);
                 resultString.append('\t').append("Name: ").append(name).append('\n');
@@ -2689,7 +2769,7 @@ public class LuceneTest {
          */ 
         
         //we perform two lucene query
-        analyzer                = new StandardAnalyzer();
+        analyzer                = new KeywordAnalyzer();
         parser                  = new QueryParser("metafile", analyzer);
         Query query1            = parser.parse("name:point*");
         Query query2            = parser.parse("name:box*");
@@ -2697,19 +2777,19 @@ public class LuceneTest {
         IntersectFilter intFilter = new IntersectFilter(line, "EPSG:4326");
         SpatialQuery interQuery = new SpatialQuery(intFilter);
         
-        hits1 = searcher.search(query1, bboxQuery.getSpatialFilter());
-        hits2 = searcher.search(query2, interQuery.getSpatialFilter());
+        hits1 = searcher.search(query1, bboxQuery.getSpatialFilter(), 15);
+        hits2 = searcher.search(query2, interQuery.getSpatialFilter(), 15);
         
         
         results      = new ArrayList<String>();
         resultString = new StringBuilder();
-        for (int i = 0; i < hits1.length(); i++) {
-            String name = hits1.doc(i).get("name");
+        for (int i = 0; i < hits1.totalHits; i++) {
+            String name = searcher.doc(hits1.scoreDocs[i].doc).get("name");
             results.add(name);
             resultString.append('\t').append("Name: ").append(name).append('\n');
         }
-        for (int i = 0; i < hits2.length(); i++) {
-            String name = hits2.doc(i).get("name");
+        for (int i = 0; i < hits2.totalHits; i++) {
+            String name = searcher.doc(hits2.scoreDocs[i].doc).get("name");
             if (!results.contains(name)) {
                 results.add(name);
                 resultString.append('\t').append("Name: ").append(name).append('\n');
@@ -2791,7 +2871,6 @@ public class LuceneTest {
         doc.add(new Field("name", "line 2", Field.Store.YES, Field.Index.ANALYZED));
         addLine       (doc,             0,                  0,             0,               -15, "EPSG:4326");
         writer.addDocument(doc);
-        writer.close();
     }
 
     /**

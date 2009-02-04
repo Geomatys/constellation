@@ -877,6 +877,14 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 if (n.get(i) != null) {
                     north = Double.parseDouble(n.get(i));
                 }
+
+                // for point BBOX we replace the westValue equals to 0 by the eastValue (respectively for  north/south)
+                if (east == 0) {
+                    east = west;
+                }
+                if (north == 0) {
+                    north = south;
+                }
             } catch (NumberFormatException ex) {
                 logger.severe("Number format exception while parsing boundingBox: " + '\n' +
                         "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));

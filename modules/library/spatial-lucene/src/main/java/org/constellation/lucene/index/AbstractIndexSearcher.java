@@ -172,21 +172,26 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
+        logger.finer("Analyzer used:" + analyzer.getClass().getSimpleName());
 
         // we enable the leading wildcard mode if the first character of the query is a '*'
-        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ) {
+        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ||
+            spatialQuery.getQuery().indexOf(":(*") != -1) {
             parser.setAllowLeadingWildcard(true);
             BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
         }
 
         Query query   = parser.parse(spatialQuery.getQuery());
-        Filter f      = spatialQuery.getSpatialFilter();
+        Filter filter      = spatialQuery.getSpatialFilter();
         int operator  = spatialQuery.getLogicalOperator();
         Sort sort     = spatialQuery.getSort();
-        String sorted = "";
+        String sorted = "no Sorted";
         if (sort != null)
             sorted = "order by: " + sort.toString();
 
+        String f = "no Filter";
+        if (filter != null)
+            f = filter.toString();
         logger.info("Searching for: "    + query.toString(field) + '\n' +
                     SerialChainFilter.ValueOf(operator)          + '\n' +
                     f                                            + '\n' +
@@ -194,13 +199,13 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                     "max records: " + maxRecords);
 
         // simple query with an AND
-        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
+        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
 
             TopDocs docs;
             if (sort != null) {
-                docs = searcher.search(query, f, maxRecords, sort);
+                docs = searcher.search(query, filter, maxRecords, sort);
             } else {
-                docs = searcher.search(query, f, maxRecords);
+                docs = searcher.search(query, filter, maxRecords);
             }
 
             for (ScoreDoc doc :docs.scoreDocs) {
@@ -234,9 +239,9 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         } else if (operator == SerialChainFilter.NOT) {
             TopDocs hits1;
             if (sort != null)
-                hits1 = searcher.search(query, f, maxRecords, sort);
+                hits1 = searcher.search(query, filter, maxRecords, sort);
             else
-                hits1 = searcher.search(query, f, maxRecords);
+                hits1 = searcher.search(query, filter, maxRecords);
 
             List<String> unWanteds = new ArrayList<String>();
             for (ScoreDoc doc :hits1.scoreDocs) {
