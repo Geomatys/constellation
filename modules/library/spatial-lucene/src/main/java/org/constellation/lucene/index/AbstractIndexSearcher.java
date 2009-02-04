@@ -41,10 +41,9 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 // constellation dependencies
+import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.ws.CstlServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -88,7 +87,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * @param configDir The configuration Directory where to build the indexDirectory.
      * @param serviceID the "ID" of the service (allow multiple index in the same directory). The value "" is allowed.
      */
-    public AbstractIndexSearcher(File configDir, String serviceID) throws CstlServiceException {
+    public AbstractIndexSearcher(File configDir, String serviceID) throws IndexingException {
         super();
         try {
             setFileDirectory(new File(configDir, serviceID + "index"));
@@ -97,11 +96,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             initIdentifiersList();
 
         } catch (CorruptIndexException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new IndexingException("Corruption encountered during indexing", ex);
         } catch (ParseException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new IndexingException("Failure to parse during indexing", ex);
         } catch (IOException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new IndexingException("IO Exception during indexing", ex);
         }
         
     }
@@ -121,7 +120,6 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * Fill the list of identifiers ordered by doc ID
      */
     public final void initIdentifiersList() throws IOException, CorruptIndexException, ParseException {
-        long start = System.currentTimeMillis();
         identifiers = new ArrayList<String>();
         for (int i = 0; i < searcher.maxDoc(); i++) {
             String metadataID = getMatchingID(searcher.doc(i));

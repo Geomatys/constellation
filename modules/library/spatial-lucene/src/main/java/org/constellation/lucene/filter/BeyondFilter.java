@@ -36,6 +36,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class BeyondFilter extends DistanceFilter {
 
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 4117233294936318913L;
+
+    /**
      * initialize the filter with the specified geometry and filterType.
      *
      * @param geometry   A geometry object, supported types are: GeneralEnvelope, GeneralDirectPosition, Line2D.

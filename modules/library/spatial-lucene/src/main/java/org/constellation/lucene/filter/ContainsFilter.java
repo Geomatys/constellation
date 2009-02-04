@@ -24,7 +24,6 @@ import java.util.BitSet;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -34,6 +33,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @author Guilhem Legal
  */
 public class ContainsFilter extends SpatialFilter {
+
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -7000676093878228433L;
 
     /**
      * Initialize the filter with the specified geometry and filterType.

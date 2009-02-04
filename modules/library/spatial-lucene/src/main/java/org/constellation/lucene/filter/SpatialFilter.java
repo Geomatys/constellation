@@ -49,6 +49,11 @@ import org.opengis.referencing.operation.TransformException;
  */
 public abstract class SpatialFilter extends Filter {
     
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -1337271653030261124L;
+
     Logger logger = Logger.getLogger("org.constellation.lucene.filter");
     
     /**
@@ -336,13 +341,18 @@ public abstract class SpatialFilter extends Filter {
 
     private class BboxFieldSelector implements FieldSelector {
 
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 6425032295868468704L;
+
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("fullBBOX")) {
                     return FieldSelectorResult.LOAD_AND_BREAK;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
                 }
+                return FieldSelectorResult.NO_LOAD;
+                
             }
             return FieldSelectorResult.NO_LOAD;
         }
@@ -350,13 +360,18 @@ public abstract class SpatialFilter extends Filter {
 
     private class LineFieldSelector implements FieldSelector {
 
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 7538448359239289388L;
+
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("fullLine")) {
                     return FieldSelectorResult.LOAD_AND_BREAK;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
                 }
+                return FieldSelectorResult.NO_LOAD;
+                
             }
             return FieldSelectorResult.NO_LOAD;
         }
@@ -364,13 +379,18 @@ public abstract class SpatialFilter extends Filter {
 
     private class PointFieldSelector implements FieldSelector {
 
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 3971433534031015795L;
+
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("fullPoint")) {
                     return FieldSelectorResult.LOAD_AND_BREAK;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
                 }
+                return FieldSelectorResult.NO_LOAD;
+                
             }
             return FieldSelectorResult.NO_LOAD;
         }

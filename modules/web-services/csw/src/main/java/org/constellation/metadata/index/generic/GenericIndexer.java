@@ -46,6 +46,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
+import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
@@ -88,7 +89,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws CstlServiceException {
+    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory);
         this.reader = reader;
         if (reader != null)
@@ -104,7 +105,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws CstlServiceException {
+    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory);
         this.reader = null;
         this.additionalQueryable = additionalQueryable;
@@ -117,7 +118,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws CstlServiceException {
+    public void createIndex() throws IndexingException {
         logger.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -137,13 +138,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         } catch (CorruptIndexException ex) {
             logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
         } catch (LockObtainFailedException ex) {
             logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("LockObtainException while indexing documents.", ex);
         } catch (IOException ex) {
             logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("IOException while indexing documents.", ex);
+        } catch (CstlServiceException ex) {
+            logger.severe("CstlServiceException while indexing document: " + ex.getMessage());
+            throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
@@ -154,7 +158,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @throws java.sql.SQLException
      */
-    public void createIndex(List<? extends Object> toIndex) throws CstlServiceException {
+    public void createIndex(List<? extends Object> toIndex) throws IndexingException {
         logger.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;

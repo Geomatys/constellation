@@ -43,6 +43,7 @@ import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
+import org.constellation.lucene.IndexingException;
 import org.constellation.util.Util;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.lucene.index.AbstractIndexer;
@@ -146,7 +147,7 @@ public abstract class AbstractCSWConfigurer {
                 AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, cswConfigDir, serviceID);
                 return indexer;
 
-            } catch (CstlServiceException ex) {
+            } catch (IndexingException ex) {
                 throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
                         "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
             }
@@ -327,6 +328,9 @@ public abstract class AbstractCSWConfigurer {
                 }
             } catch (IllegalArgumentException ex) {
                 LOGGER.severe("unable to create an indexer for configuration file:" + configFile.getName());
+            } catch (IndexingException ex) {
+                throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
+                        "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
             } finally {
                 if (indexer != null) {
                     indexer.destroy();

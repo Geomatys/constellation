@@ -26,6 +26,7 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
+import org.constellation.lucene.IndexingException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.lucene.index.AbstractIndexer;
@@ -118,7 +119,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, File configDir, String serviceID) throws CstlServiceException {
+    public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, File configDir, String serviceID) throws IndexingException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -133,7 +134,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     }
     
      @Override
-    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws CstlServiceException {
+    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException {
         switch (dbType) {
             case MDWEB:
                 return new MDWebIndexSearcher(configDir, serviceID);

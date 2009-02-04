@@ -33,6 +33,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  */
 public abstract class DistanceFilter extends SpatialFilter {
 
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8080362347861156199L;
+
     private final static List<String> SUPPORTED_UNITS;
     static {
         SUPPORTED_UNITS = new ArrayList<String>();

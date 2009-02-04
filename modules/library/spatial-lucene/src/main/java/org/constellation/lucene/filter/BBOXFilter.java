@@ -36,6 +36,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class BBOXFilter extends SpatialFilter {
 
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -6627972757721839224L;
+
+    /**
      * Initialize the filter with the specified geometry and filterType.
      *
      * @param geometry   A geometry object, supported types are: GeneralEnvelope, GeneralDirectPosition, Line2D.

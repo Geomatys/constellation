@@ -36,6 +36,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class IntersectFilter extends SpatialFilter {
 
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 6321075266624897993L;
+
+    /**
      * Initialize the filter with the specified geometry and filterType.
      *
      * @param geometry   A geometry object, supported types are: GeneralEnvelope, GeneralDirectPosition, Line2D.

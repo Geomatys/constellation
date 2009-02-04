@@ -40,7 +40,9 @@ public enum ServiceDef {
 	WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE),
 	WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE),
 	
-	CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.NONE),
+	CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO),
+
+    SOS_1_0_0(Specification.CSW, Organization.OGC, "1.0.1", Profile.NONE),
 	
 	PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE),
 	PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE);
@@ -110,6 +112,7 @@ public enum ServiceDef {
 	public enum Profile {
 		
 		NONE    ("None", new Version(""), Organization.NONE),
+        CSW_ISO ("Catalog Services for the Web, ISO profile", new Version("1.0.0"), Organization.OGC),
 		WMS_SLD ("Styled Layer Descriptor profile of the Web Map Service", 
 				   new Version("1.1.0"), Organization.OGC);
 		

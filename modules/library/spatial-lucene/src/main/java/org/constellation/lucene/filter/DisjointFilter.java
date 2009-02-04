@@ -36,6 +36,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class DisjointFilter extends SpatialFilter {
 
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -9069011044553014806L;
+
+    /**
      * Initialize the filter with the specified geometry and filterType.
      *
      * @param geometry   A geometry object, supported types are: GeneralEnvelope, GeneralDirectPosition, Line2D.

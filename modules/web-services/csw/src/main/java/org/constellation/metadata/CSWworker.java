@@ -128,6 +128,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // GeoAPI dependencies
+import org.constellation.lucene.IndexingException;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -317,6 +318,10 @@ public class CSWworker {
             isStarted = false;
 
         } catch (CstlServiceException e) {
+            logger.severe("The CSW service is not working!" + '\n' +
+                    "cause:" + e.getMessage());
+            isStarted = false;
+        } catch (IndexingException e) {
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause:" + e.getMessage());
             isStarted = false;

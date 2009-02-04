@@ -42,6 +42,11 @@ import org.apache.lucene.search.Filter;
  */
 public class SerialChainFilter extends Filter {
 
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8132561537335553911L;
+
     private List<Filter> chain;
     
     public static final int AND     = 1;	     

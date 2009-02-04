@@ -36,6 +36,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class CrossesFilter extends SpatialFilter {
 
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 7771991329201130114L;
+
+    /**
      * Initialize the filter with the specified geometry and filterType.
      *
      * @param geometry   A geometry object, supported types are: GeneralEnvelope, GeneralDirectPosition, Line2D.

@@ -37,10 +37,9 @@ import org.apache.lucene.store.LockObtainFailedException;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDweb dependencies
 import org.mdweb.model.schemas.Classe;
@@ -85,15 +84,15 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param reader An mdweb reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public MDWebIndexer(Automatic configuration, File configDirectory, String serviceID) throws CstlServiceException {
+    public MDWebIndexer(Automatic configuration, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new IndexingException("The configuration object is null");
         }
         // we get the database informations
         BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new IndexingException("The configuration file does not contains a BDD object");
         }
         try {
             Connection MDConnection = db.getConnection();
@@ -103,7 +102,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             if (create)
                 createIndex();
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQL Exception while creating mdweb reader: " +ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new IndexingException("SQL Exception while creating mdweb reader: " +ex.getMessage());
         }
     }
     
@@ -116,7 +115,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param paths The list of path used in the forms (necesary because of there is no reader)
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws SQLException {
+    protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws IndexingException {
         super("", configDirectory);
         MDWebReader   = null;
 
@@ -155,13 +154,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 
             } catch (CorruptIndexException ex) {
                 logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
+                throw new IndexingException("CorruptIndexException while indexing documents.", ex);
             } catch (LockObtainFailedException ex) {
                 logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
+                throw new IndexingException("LockObtainException while indexing documents.", ex);
             } catch (IOException ex) {
                 logger.severe("IOException while indexing document: " + ex.getMessage());
-                ex.printStackTrace();
+                throw new IndexingException("IOException while indexing documents.", ex);
             }
             logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
                         "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
@@ -175,7 +174,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * 
      * @throws java.sql.SQLException
      */
-    public void createIndex() throws CstlServiceException {
+    public void createIndex() throws IndexingException {
         logger.info("Creating lucene index for MDWeb database please wait...");
         
         long time = System.currentTimeMillis();
@@ -199,16 +198,16 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         } catch (CorruptIndexException ex) {
             logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
         } catch (LockObtainFailedException ex) {
             logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("LockObtainException while indexing documents.", ex);
         } catch (IOException ex) {
             logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("IOException while indexing documents.", ex);
         } catch (SQLException ex) {
             logger.severe("SQLException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("SQLException while indexing documents.", ex);
         }
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
@@ -219,7 +218,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      *
      * @throws java.sql.SQLException
      */
-    public void createIndex(List<? extends Object> forms) throws CstlServiceException {
+    public void createIndex(List<? extends Object> forms) throws IndexingException {
         logger.info("Creating lucene index for MDWeb database please wait...");
 
         long time = System.currentTimeMillis();
@@ -241,13 +240,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         } catch (CorruptIndexException ex) {
             logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
         } catch (LockObtainFailedException ex) {
             logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("LockObtainException while indexing documents.", ex);
         } catch (IOException ex) {
             logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            throw new IndexingException("SQLException while indexing documents.", ex);
         }
         logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");

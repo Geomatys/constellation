@@ -35,8 +35,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 // Constellation dependencies
+import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.ws.CstlServiceException;
 
 /**
  *
@@ -44,7 +44,7 @@ import org.constellation.ws.CstlServiceException;
  */
 public class MDWebIndexSearcher extends AbstractIndexSearcher {
 
-    public MDWebIndexSearcher(File configDir, String serviceID) throws CstlServiceException {
+    public MDWebIndexSearcher(File configDir, String serviceID) throws IndexingException {
         super(configDir, serviceID);
     }
 

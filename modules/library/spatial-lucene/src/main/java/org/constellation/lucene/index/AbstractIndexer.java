@@ -27,8 +27,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 
 // Constellation dependencies
+import org.constellation.lucene.IndexingException;
 import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
 
 /**
  * An abstract lucene Indexer used to create and writer lucene index.
@@ -82,14 +82,14 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      *
      * @throws java.sql.SQLException
      */
-    public abstract void createIndex() throws CstlServiceException;
+    public abstract void createIndex() throws IndexingException;
 
     /**
      * Create a new Index with the specified list of object.
      *
      * @throws java.sql.SQLException
      */
-    public abstract void createIndex(List<? extends Object> toIndex) throws CstlServiceException;
+    public abstract void createIndex(List<? extends Object> toIndex) throws IndexingException;
 
     /**
      * Index a document from the specified object with the specified index writer.
