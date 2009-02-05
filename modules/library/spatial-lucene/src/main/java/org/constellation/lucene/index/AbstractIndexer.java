@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 // Apache Lucene dependencies
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -43,8 +44,16 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      */
     protected boolean create;
 
-    public AbstractIndexer(String serviceID, File configDirectory) {
-        super();
+    /**
+     * Build a new Indexer witch create an index in the specified directory,
+     * with the specified analyzer.
+     *
+     * @param serviceID
+     * @param configDirectory
+     * @param analyzer
+     */
+    public AbstractIndexer(String serviceID, File configDirectory, Analyzer analyzer) {
+        super(analyzer);
         //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
         File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
 
@@ -65,6 +74,17 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
                 create = false;
             }
         }
+    }
+
+    /**
+     * Build a new Indexer witch create an index in the specified directory,
+     * with a Keyword analyzer.
+     *
+     * @param serviceID
+     * @param configDirectory
+     */
+    public AbstractIndexer(String serviceID, File configDirectory) {
+        this(serviceID, configDirectory, null);
     }
 
     /**

@@ -25,12 +25,15 @@ import java.util.List;
 import java.util.Map;
 
 // Apache Lucene dependencies
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
@@ -86,9 +89,10 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      *
      * @param configDir The configuration Directory where to build the indexDirectory.
      * @param serviceID the "ID" of the service (allow multiple index in the same directory). The value "" is allowed.
+     * @param analizer  A lucene Analyzer
      */
-    public AbstractIndexSearcher(File configDir, String serviceID) throws IndexingException {
-        super();
+    public AbstractIndexSearcher(File configDir, String serviceID, Analyzer analyzer) throws IndexingException {
+        super(analyzer);
         try {
             setFileDirectory(new File(configDir, serviceID + "index"));
             isCacheEnabled = true;
@@ -103,6 +107,10 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             throw new IndexingException("IO Exception during indexing", ex);
         }
         
+    }
+
+    public AbstractIndexSearcher(File configDir, String serviceID) throws IndexingException {
+        this(configDir, serviceID, null);
     }
 
     /**
@@ -164,17 +172,17 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             return results;
         }
         
-        //we initialize the indexSearcher
-        initSearcher();
         int maxRecords = searcher.maxDoc();
 
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
-        logger.finer("Analyzer used:" + analyzer.getClass().getSimpleName());
+        parser.setDefaultOperator(Operator.AND);
+        logger.info("Analyzer used:" + analyzer.getClass().getSimpleName());
 
         // we enable the leading wildcard mode if the first character of the query is a '*'
         if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ||
-            spatialQuery.getQuery().indexOf(":(*") != -1) {
+            spatialQuery.getQuery().indexOf(":(*") != -1 || spatialQuery.getQuery().indexOf(":(+*") != -1 ||
+            spatialQuery.getQuery().indexOf(":+*") != -1) {
             parser.setAllowLeadingWildcard(true);
             BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
         }

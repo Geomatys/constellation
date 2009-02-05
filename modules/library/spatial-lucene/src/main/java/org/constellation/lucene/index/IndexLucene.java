@@ -22,8 +22,8 @@ import java.io.File;
 // Lucene dependencies
 import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.KeywordAnalyzer;
-
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+        
 // Constellation dependencies
 import org.apache.lucene.store.RAMDirectory;
 
@@ -56,7 +56,19 @@ public abstract class IndexLucene {
      * @param configDirectory A directory where the index can write indexation file. 
      */
     public IndexLucene() {
-        analyzer = new KeywordAnalyzer();
+        analyzer = new StandardAnalyzer();
+    }
+
+    /**
+     * Creates a new Lucene Index with the specified Analyzer.
+     *
+     * @param configDirectory A directory where the index can write indexation file.
+     */
+    public IndexLucene(final Analyzer analyzer) {
+        if (analyzer == null)
+            this.analyzer = new StandardAnalyzer();
+        else
+            this.analyzer = analyzer;
     }
 
     /**
@@ -71,7 +83,7 @@ public abstract class IndexLucene {
      *
      * @param RAMDirectory a RAMDirectory object.
      */
-    public void setRAMdirectory(RAMDirectory RAMdirectory) {
+    public void setRAMdirectory(final RAMDirectory RAMdirectory) {
         this.RAMdirectory = RAMdirectory;
     }
 
@@ -87,7 +99,7 @@ public abstract class IndexLucene {
      *
      * @param aFileDirectory a FileDirectory object.
      */
-    public void setFileDirectory(File aFileDirectory) {
+    public void setFileDirectory(final File aFileDirectory) {
         FileDirectory = aFileDirectory;
     }
 

@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // apache Lucene dependencies
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -98,6 +99,19 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             additionalQueryable = null;
         if (create)
             createIndex();
+    }
+
+    /**
+     * Creates a new Lucene Index into the specified directory with the specified list of object to index.
+     *
+     * @param configDirectory A directory where the index can write indexation file.
+     */
+    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer) throws IndexingException {
+        super(serviceID, configDirectory, analyzer);
+        this.reader = null;
+        this.additionalQueryable = additionalQueryable;
+        if (create)
+            createIndex(toIndex);
     }
 
     /**

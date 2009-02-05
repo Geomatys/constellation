@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Apache Lucene dependencies
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
@@ -47,6 +48,10 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
 
     public GenericIndexSearcher(File configDir, String serviceID) throws IndexingException  {
         super(configDir, serviceID);
+    }
+
+    public GenericIndexSearcher(File configDir, String serviceID, Analyzer analyzer) throws IndexingException  {
+        super(configDir, serviceID, analyzer);
     }
     
     /**

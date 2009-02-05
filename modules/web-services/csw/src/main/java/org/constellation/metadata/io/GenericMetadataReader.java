@@ -45,6 +45,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
+import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
@@ -391,7 +392,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSetType type) throws CstlServiceException {
+    private void loadData(String identifier, int mode, ElementSet type) throws CstlServiceException {
         logger.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
@@ -628,7 +629,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      * @throws CstlServiceException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         Object result = null;
         
         //TODO we verify that the identifier exists
@@ -654,7 +655,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param elementName
      * @return
      */
-    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName);
+    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSet type, List<QName> elementName);
     
     /**
      * return a metadata in ISO representation.
@@ -668,7 +669,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Return a list of variables name used for the dublicore representation.
      * @return
      */
-    protected abstract List<String> getVariablesForDublinCore(ElementSetType type);
+    protected abstract List<String> getVariablesForDublinCore(ElementSet type);
        
     /**
      * Return a list of contact id used in this database.
