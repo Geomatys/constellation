@@ -35,10 +35,10 @@ import org.constellation.generic.filter.Where;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.ResponseModeType;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.sos.ResponseModeType.*;
+import static org.constellation.sos.v100.ResponseModeType.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**

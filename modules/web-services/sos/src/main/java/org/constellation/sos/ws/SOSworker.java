@@ -51,8 +51,6 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.OGCWebService;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -79,27 +77,27 @@ import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingPointEntry;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.sos.Capabilities;
-import org.constellation.sos.Contents;
-import org.constellation.sos.Contents.ObservationOfferingList;
-import org.constellation.sos.DescribeSensor;
-import org.constellation.sos.EventTime;
-import org.constellation.sos.GetCapabilities;
-import org.constellation.sos.GetObservation;
-import org.constellation.sos.GetResult;
-import org.constellation.sos.GetResultResponse;
-import org.constellation.sos.InsertObservation;
-import org.constellation.sos.InsertObservationResponse;
-import org.constellation.sos.RegisterSensor;
-import org.constellation.sos.RegisterSensorResponse;
-import org.constellation.sos.RequestBaseType;
-import org.constellation.sos.FilterCapabilities;
-import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.ObservationTemplate;
-import org.constellation.sos.OfferingPhenomenonEntry;
-import org.constellation.sos.OfferingProcedureEntry;
-import org.constellation.sos.OfferingSamplingFeatureEntry;
-import org.constellation.sos.ResponseModeType;
+import org.constellation.sos.v100.Capabilities;
+import org.constellation.sos.v100.Contents;
+import org.constellation.sos.v100.Contents.ObservationOfferingList;
+import org.constellation.sos.v100.DescribeSensor;
+import org.constellation.sos.v100.EventTime;
+import org.constellation.sos.v100.GetCapabilities;
+import org.constellation.sos.v100.GetObservation;
+import org.constellation.sos.v100.GetResult;
+import org.constellation.sos.v100.GetResultResponse;
+import org.constellation.sos.v100.InsertObservation;
+import org.constellation.sos.v100.InsertObservationResponse;
+import org.constellation.sos.v100.RegisterSensor;
+import org.constellation.sos.v100.RegisterSensorResponse;
+import org.constellation.sos.v100.RequestBaseType;
+import org.constellation.sos.v100.FilterCapabilities;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.ObservationTemplate;
+import org.constellation.sos.v100.OfferingPhenomenonEntry;
+import org.constellation.sos.v100.OfferingProcedureEntry;
+import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
@@ -109,31 +107,36 @@ import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.constellation.swe.v101.AbstractEncodingEntry;
-import org.constellation.swe.v101.AbstractEncodingPropertyType;
-import org.constellation.swe.v101.AnyResultEntry;
-import org.constellation.swe.v101.DataArrayEntry;
-import org.constellation.swe.v101.DataArrayPropertyType;
-import org.constellation.swe.v101.DataComponentPropertyType;
+import org.constellation.swe.AbstractEncoding;
+import org.constellation.swe.AbstractEncodingProperty;
+import org.constellation.swe.DataArray;
+import org.constellation.swe.DataArrayProperty;
+import org.constellation.swe.DataComponentProperty;
+import org.constellation.swe.TextBlock;
+import org.constellation.swe.AnyResult;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
-import org.constellation.swe.v101.TextBlockEntry;
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.OGCWebService;
+
 import static org.constellation.ows.OWSExceptionCode.*;
-import static org.constellation.sos.ResponseModeType.*;
+import static org.constellation.sos.v100.ResponseModeType.*;
 import static org.constellation.sos.ws.SensorMLUtils.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
+
+//geotools dependencies
+import org.geotools.factory.FactoryNotFoundException;
+import org.geotools.factory.FactoryRegistry;
 
 // postgres driver
 import org.postgresql.ds.PGSimpleDataSource;
 
 /**
  *
- * @author Guilhem Legal.
+ * @author Guilhem Legal (Geomatys).
  */
 public class SOSworker {
 
@@ -982,9 +985,9 @@ public class SOSworker {
         for (ObservationFilter.ObservationResult result: results) {
             Timestamp tBegin = result.beginTime;
             Timestamp tEnd   = result.endTime;
-            AnyResultEntry a = OMReader.getResult(result.resultID);
+            AnyResult a = OMReader.getResult(result.resultID);
             if (a != null) {
-                DataArrayEntry array = a.getArray();
+                DataArray array = a.getArray();
                 if (array != null) {
                     String values = getResultValues(tBegin, tEnd, array, times);
                     datablock.append(values).append('\n');
@@ -999,7 +1002,7 @@ public class SOSworker {
         return response;
     }
     
-    private String getResultValues(Timestamp tBegin, Timestamp tEnd, DataArrayEntry array, List<EventTime> eventTimes) throws CstlServiceException {
+    private String getResultValues(Timestamp tBegin, Timestamp tEnd, DataArray array, List<EventTime> eventTimes) throws CstlServiceException {
         String values = null;
         
         //for multiple observations we parse the brut values (if we got a time constraint)
@@ -1086,10 +1089,10 @@ public class SOSworker {
      *
      * @return a datablock containing only the matching observations.
      */
-    private String parseDataBlock(String brutValues, AbstractEncodingEntry abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
+    private String parseDataBlock(String brutValues, AbstractEncoding abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
         String values = "";
-        if (abstractEncoding instanceof TextBlockEntry) {
-                TextBlockEntry encoding = (TextBlockEntry) abstractEncoding;
+        if (abstractEncoding instanceof TextBlock) {
+                TextBlock encoding = (TextBlock) abstractEncoding;
                 StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
                 int i = 1;
                 while (tokenizer.hasMoreTokens()) {
@@ -1689,8 +1692,8 @@ public class SOSworker {
         
         List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
         List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
-        List<AbstractEncodingPropertyType> encAlreadySee   = new ArrayList<AbstractEncodingPropertyType>();
-        List<DataComponentPropertyType>    dataAlreadySee  = new ArrayList<DataComponentPropertyType>();
+        List<AbstractEncodingProperty>     encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
+        List<DataComponentProperty>        dataAlreadySee  = new ArrayList<DataComponentProperty>();
         int index = 0;
         for (ObservationEntry observation: collection.getMember()) {
             //we do this for the feature of interest
@@ -1718,11 +1721,11 @@ public class SOSworker {
                 phenoAlreadySee.add(phenomenon);
             }
             //for the result : textBlock encoding and element type
-            if (observation.getResult() instanceof DataArrayPropertyType) {
-                DataArrayEntry array = ((DataArrayPropertyType)observation.getResult()).getDataArray();
+            if (observation.getResult() instanceof DataArrayProperty) {
+                DataArray array = ((DataArrayProperty)observation.getResult()).getDataArray();
                 
                 //element type
-                DataComponentPropertyType elementType = array.getPropertyElementType();
+                DataComponentProperty elementType = array.getPropertyElementType();
                 if (dataAlreadySee.contains(elementType)){
                     elementType.setToHref();
                 } else {
@@ -1730,7 +1733,7 @@ public class SOSworker {
                 }
                 
                 //encoding
-                AbstractEncodingPropertyType encoding = array.getPropertyEncoding();
+                AbstractEncodingProperty encoding = array.getPropertyEncoding();
                 if (encAlreadySee.contains(encoding)){
                     encoding.setToHref();
                                         

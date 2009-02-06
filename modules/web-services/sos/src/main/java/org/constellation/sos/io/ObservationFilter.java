@@ -23,8 +23,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.ResponseModeType;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 

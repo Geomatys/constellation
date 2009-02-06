@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.DataArrayProperty;
 import org.geotools.util.Utilities;
 
 
@@ -51,7 +52,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "DataArrayPropertyType", propOrder = {
     "dataArray"
 })
-public class DataArrayPropertyType {
+public class DataArrayPropertyType implements DataArrayProperty {
 
     @XmlElementRef(name = "DataArray", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends DataArrayEntry> dataArray;

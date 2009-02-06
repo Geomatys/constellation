@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.AbstractEncodingProperty;
 import org.geotools.util.Utilities;
 
 /**
@@ -36,7 +37,7 @@ import org.geotools.util.Utilities;
     "encoding"
 })
 
-public class AbstractEncodingPropertyType {
+public class AbstractEncodingPropertyType implements AbstractEncodingProperty {
     
     /**
      * Decribe the data encoding.
@@ -120,7 +121,7 @@ public class AbstractEncodingPropertyType {
         
     }
     
-    public void setToHref(){
+    public void setToHref() {
         if (encoding != null) {
             this.href = encoding.getValue().getId();
             hiddenEncoding = encoding;

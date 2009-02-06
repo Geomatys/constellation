@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.DataArray;
 import org.geotools.util.Utilities;
 
 
@@ -50,7 +51,7 @@ import org.geotools.util.Utilities;
     "encoding",
     "values"
 })
-public class DataArrayEntry extends AbstractDataArrayEntry {
+public class DataArrayEntry extends AbstractDataArrayEntry implements DataArray {
 
     @XmlElement(required = true)
     private DataComponentPropertyType elementType;

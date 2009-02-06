@@ -142,7 +142,7 @@ public class BlockEncodingPropertyType {
      *     {@link TextBlock }
      *     
      */
-    public TextBlock getTextBlock() {
+    public TextBlockEntry getTextBlock() {
         return textBlock;
     }
 

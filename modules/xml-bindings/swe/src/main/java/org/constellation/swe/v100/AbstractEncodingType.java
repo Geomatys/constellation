@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.swe.AbstractEncoding;
 
 
 /**
@@ -55,7 +56,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     TextBlock.class,
     BinaryBlock.class
 })
-public class AbstractEncodingType {
+public class AbstractEncodingType implements AbstractEncoding {
 
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

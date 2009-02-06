@@ -17,8 +17,9 @@
 
 package org.constellation.configuration.ws.rs;
 
-// Constellation dependencies
 import java.io.File;
+
+// Constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.ws.CstlServiceException;

@@ -17,12 +17,15 @@
 
 package org.constellation.swe.v100;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.AbstractEncodingProperty;
 
 
 /**
@@ -55,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
     "textBlock",
     "xmlBlock"
 })
-public class BlockEncodingPropertyType {
+public class BlockEncodingPropertyType implements AbstractEncodingProperty {
 
     @XmlElement(name = "StandardFormat")
     private StandardFormat standardFormat;
@@ -65,6 +68,10 @@ public class BlockEncodingPropertyType {
     private TextBlock textBlock;
     @XmlElement(name = "XMLBlock")
     private XMLBlockType xmlBlock;
+
+    @XmlTransient
+    private AbstractEncodingType hiddenEncoding;
+
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -85,6 +92,34 @@ public class BlockEncodingPropertyType {
     private String show;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
+
+
+    public AbstractEncodingType getEncoding() {
+        if (standardFormat != null)
+            return standardFormat;
+        else if (binaryBlock != null)
+            return binaryBlock;
+        else if (textBlock != null)
+            return textBlock;
+        else if (xmlBlock != null)
+            return xmlBlock;
+        return null;
+    }
+
+    public void setToHref(){
+        if (getEncoding() != null) {
+            this.href = getEncoding().getId();
+            hiddenEncoding = getEncoding();
+            clearEncoding();
+        }
+    }
+
+    private void clearEncoding() {
+        standardFormat = null;
+        binaryBlock    = null;
+        textBlock      = null;
+        xmlBlock       = null;
+    }
 
     /**
      * Gets the value of the standardFormat property.

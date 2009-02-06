@@ -17,7 +17,6 @@
  */
 package org.constellation.sos.ws.rs;
 
-import java.io.IOException;
 import java.io.StringWriter;
 
 // Jersey dependencies
@@ -43,13 +42,13 @@ import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ows.v110.SectionsType;
-import org.constellation.sos.Capabilities;
-import org.constellation.sos.DescribeSensor;
-import org.constellation.sos.GetCapabilities;
-import org.constellation.sos.GetObservation;
-import org.constellation.sos.GetResult;
-import org.constellation.sos.InsertObservation;
-import org.constellation.sos.RegisterSensor;
+import org.constellation.sos.v100.Capabilities;
+import org.constellation.sos.v100.DescribeSensor;
+import org.constellation.sos.v100.GetCapabilities;
+import org.constellation.sos.v100.GetObservation;
+import org.constellation.sos.v100.GetResult;
+import org.constellation.sos.v100.InsertObservation;
+import org.constellation.sos.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.util.Util;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -70,7 +69,7 @@ public class SOService extends OGCWebService {
     public SOService() throws JAXBException, CstlServiceException {
         super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
         worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
-        setXMLContext("org.constellation.sos:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
+        setXMLContext("org.constellation.sos.v100:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
                 "org.constellation.observation:org.constellation.sml.v100:org.constellation.sml.v101", "");
     }
 

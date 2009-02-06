@@ -39,6 +39,13 @@ import org.constellation.gml.v311.TimeIndeterminateValueType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
+import org.constellation.sos.v100.NamespacePrefixMapperImpl;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.OfferingPhenomenonEntry;
+import org.constellation.sos.v100.OfferingProcedureEntry;
+import org.constellation.sos.v100.OfferingResponseModeEntry;
+import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
+import org.constellation.sos.v100.ResponseModeType;
 
 /**
  *

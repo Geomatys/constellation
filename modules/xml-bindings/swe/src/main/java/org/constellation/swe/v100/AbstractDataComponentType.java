@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractGMLEntry;
+import org.constellation.swe.AbstractDataComponent;
 
 
 /**
@@ -63,7 +64,7 @@ import org.constellation.gml.v311.AbstractGMLEntry;
     QuantityRange.class,
     CountRange.class
 })
-public abstract class AbstractDataComponentType extends AbstractGMLEntry {
+public abstract class AbstractDataComponentType extends AbstractGMLEntry implements AbstractDataComponent {
 
     @XmlAttribute
     private java.lang.Boolean fixed;

@@ -29,13 +29,18 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.SerialChainFilter;
+import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.util.Util;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.MetaDataImpl;
 
 //Junit dependencies
+import org.geotools.referencing.CRS;
 import org.junit.*;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 
 /**
@@ -99,7 +104,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SimpleSearch 1:" + '\n' + resultReport);
+        logger.finer("SimpleSearch 1:" + '\n' + resultReport);
 
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
@@ -123,7 +128,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SimpleSearch 2:" + '\n' + resultReport);
+        logger.finer("SimpleSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -148,7 +153,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("simpleSearch 3:" + '\n' + resultReport);
+        logger.finer("simpleSearch 3:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -175,7 +180,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("wildCharSearch 1:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -195,7 +200,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("wildCharSearch 2:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -212,7 +217,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("WilCharSearch 3:" + '\n' + resultReport);
+        logger.finer("WilCharSearch 3:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -236,7 +241,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("wildCharSearch 4:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 4:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -263,7 +268,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("DateSearch 1:" + '\n' + resultReport);
+        logger.finer("DateSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -298,7 +303,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SortedSearch 1:" + '\n' + resultReport);
+        logger.finer("SortedSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -321,7 +326,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SortedSearch 2:" + '\n' + resultReport);
+        logger.finer("SortedSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -344,7 +349,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SortedSearch 3:" + '\n' + resultReport);
+        logger.finer("SortedSearch 3:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -367,7 +372,7 @@ public class SimpleAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SortedSearch 4:" + '\n' + resultReport);
+        logger.finer("SortedSearch 4:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -379,14 +384,12 @@ public class SimpleAnalyzerTest {
         assertEquals(expectedResult, result);
     }
 
-    /**
-     *
-     *           TODO
+   /**
      *
      * Test spatial lucene search.
      *
      * @throws java.lang.Exception
-
+     */
     @Test
     public void spatialSearchTest() throws Exception {
 
@@ -394,7 +397,7 @@ public class SimpleAnalyzerTest {
 
         /**
          * Test 1 spatial search: BBOX filter
-
+         */
         double min1[] = {-20, -20};
         double max1[] = { 20,  20};
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
@@ -411,18 +414,19 @@ public class SimpleAnalyzerTest {
         logger.info("spatialSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
 
         /**
          * Test 1 spatial search: NOT BBOX filter
-
+         */
         resultReport = "";
         List<Filter> lf = new ArrayList<Filter>();
-        sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
+        //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
+        sf           = new BBOXFilter(bbox, "EPSG:4326");
+        
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};
         SerialChainFilter f = new SerialChainFilter(lf, op);
@@ -436,11 +440,12 @@ public class SimpleAnalyzerTest {
         logger.info("spatialSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:catalogTest");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
-    }*/
-
+    }
 
     public static List<MetaDataImpl> fillTestData() throws JAXBException {
         List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();

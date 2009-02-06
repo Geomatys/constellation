@@ -32,7 +32,7 @@ import org.constellation.sml.v101.Identification.IdentifierList.Identifier;
 import org.constellation.sml.v101.Inputs.InputList;
 import org.constellation.sml.v101.Outputs.OutputList;
 import org.constellation.sml.v101.Parameters.ParameterList;
-import org.constellation.swe.v101.AbstractDataRecord;
+
 import org.constellation.swe.v101.CodeSpacePropertyType;
 import org.constellation.swe.v101.DataComponentPropertyType;
 import org.constellation.swe.v101.DataRecordType;

@@ -42,7 +42,7 @@ import org.constellation.observation.ProcessTable;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
-import org.constellation.sos.ObservationOfferingEntry;
+import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;

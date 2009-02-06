@@ -23,10 +23,10 @@ import java.util.logging.Logger;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.observation.MeasurementEntry;
 import org.constellation.observation.ObservationEntry;
-import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.sos.OfferingPhenomenonEntry;
-import org.constellation.sos.OfferingProcedureEntry;
-import org.constellation.sos.OfferingSamplingFeatureEntry;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.OfferingPhenomenonEntry;
+import org.constellation.sos.v100.OfferingProcedureEntry;
+import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
 
 /**

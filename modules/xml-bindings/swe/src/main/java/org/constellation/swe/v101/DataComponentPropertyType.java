@@ -24,13 +24,14 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.swe.DataComponentProperty;
 import org.geotools.util.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal (Geomatys).
  */
-public class DataComponentPropertyType {
+public class DataComponentPropertyType implements DataComponentProperty {
 
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractDataRecordEntry> abstractDataRecord;

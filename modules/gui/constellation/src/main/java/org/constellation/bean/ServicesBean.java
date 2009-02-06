@@ -239,7 +239,7 @@ public class ServicesBean {
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
                                                         WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
                                                         org.constellation.cat.csw.v202.Capabilities.class, UserData.class,
-                                                        org.constellation.sos.Capabilities.class);
+                                                        org.constellation.sos.v100.Capabilities.class);
 
         unmarshaller = JBcontext.createUnmarshaller();
         marshaller = JBcontext.createMarshaller();

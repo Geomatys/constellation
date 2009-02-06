@@ -24,9 +24,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.swe.DataComponentProperty;
 import org.geotools.util.Utilities;
 
 
@@ -65,7 +67,7 @@ import org.geotools.util.Utilities;
     "abstractDataRecord",
     "abstractDataArray"
 })
-public class DataComponentPropertyType {
+public class DataComponentPropertyType implements DataComponentProperty {
 
     @XmlElement(name = "Count")
     private Count count;
@@ -87,6 +89,10 @@ public class DataComponentPropertyType {
     private TimeRange timeRange;
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
     private JAXBElement<? extends AbstractDataRecordType> abstractDataRecord;
+
+    @XmlTransient
+    private JAXBElement<? extends AbstractDataRecordType> hiddenAbstractDataRecord;
+
     @XmlElementRef(name = "AbstractDataArray", namespace = "http://www.opengis.net/swe/1.0", type = JAXBElement.class)
     private JAXBElement<? extends AbstractDataArrayType> abstractDataArray;
     @XmlAttribute(required = true)
@@ -134,6 +140,14 @@ public class DataComponentPropertyType {
         this.name      = name;
         this.role      = role;
         this.quantityRange = quantityRange;
+    }
+
+    public void setToHref() {
+        if (abstractDataRecord != null) {
+            this.href = abstractDataRecord.getValue().getId();
+            hiddenAbstractDataRecord = abstractDataRecord;
+            abstractDataRecord       = null;
+        }
     }
 
     /**

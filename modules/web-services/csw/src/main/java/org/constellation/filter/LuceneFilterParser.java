@@ -25,9 +25,9 @@ import java.util.Map;
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import javax.xml.namespace.QName;
 import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.gml.v311.EnvelopeEntry;

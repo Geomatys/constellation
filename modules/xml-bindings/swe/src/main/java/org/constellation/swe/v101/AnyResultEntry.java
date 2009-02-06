@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
+import org.constellation.swe.AnyResult;
 import org.geotools.util.Utilities;
 
 /**
@@ -35,7 +36,7 @@ import org.geotools.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Any")
-public class AnyResultEntry extends Entry {
+public class AnyResultEntry extends Entry implements AnyResult {
     
     /**
      * The result identifier.

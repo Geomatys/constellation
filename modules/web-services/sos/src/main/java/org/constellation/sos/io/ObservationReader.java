@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.observation.ObservationEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
-import org.constellation.sos.ObservationOfferingEntry;
-import org.constellation.swe.v101.AnyResultEntry;
+import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.swe.AnyResult;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.ws.CstlServiceException;
 
@@ -74,7 +74,7 @@ public abstract class ObservationReader {
     
     public abstract ObservationEntry getObservation(String identifier) throws CstlServiceException;
 
-    public abstract AnyResultEntry getResult(String identifier) throws CstlServiceException;
+    public abstract AnyResult getResult(String identifier) throws CstlServiceException;
     
     public abstract ReferenceEntry getReference(String href) throws CstlServiceException;
     

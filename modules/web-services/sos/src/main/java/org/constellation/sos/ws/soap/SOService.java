@@ -41,16 +41,16 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.sos.Capabilities;
-import org.constellation.sos.DescribeSensor;
-import org.constellation.sos.GetCapabilities;
-import org.constellation.sos.GetObservation;
-import org.constellation.sos.GetResult;
-import org.constellation.sos.GetResultResponse;
-import org.constellation.sos.InsertObservation;
-import org.constellation.sos.InsertObservationResponse;
-import org.constellation.sos.RegisterSensor;
-import org.constellation.sos.RegisterSensorResponse;
+import org.constellation.sos.v100.Capabilities;
+import org.constellation.sos.v100.DescribeSensor;
+import org.constellation.sos.v100.GetCapabilities;
+import org.constellation.sos.v100.GetObservation;
+import org.constellation.sos.v100.GetResult;
+import org.constellation.sos.v100.GetResultResponse;
+import org.constellation.sos.v100.InsertObservation;
+import org.constellation.sos.v100.InsertObservationResponse;
+import org.constellation.sos.v100.RegisterSensor;
+import org.constellation.sos.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
 
 
@@ -104,7 +104,7 @@ public class SOService {
      */
     public SOService() throws JAXBException, CstlServiceException {
        worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
-       JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos:org.constellation.observation");
+       JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");

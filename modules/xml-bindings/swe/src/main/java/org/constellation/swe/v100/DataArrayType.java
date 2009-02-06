@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.DataArray;
 
 
 /**
@@ -49,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
     "encoding",
     "values"
 })
-public class DataArrayType extends AbstractDataArrayType {
+public class DataArrayType extends AbstractDataArrayType implements DataArray {
 
     @XmlElement(required = true)
     private DataComponentPropertyType elementType;
@@ -58,23 +59,17 @@ public class DataArrayType extends AbstractDataArrayType {
 
     /**
      * Gets the value of the elementType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DataComponentPropertyType }
-     *     
      */
     public DataComponentPropertyType getElementType() {
         return elementType;
     }
 
+    public DataComponentPropertyType getPropertyElementType(){
+        return elementType;
+    }
+
     /**
      * Sets the value of the elementType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DataComponentPropertyType }
-     *     
      */
     public void setElementType(DataComponentPropertyType value) {
         this.elementType = value;
@@ -82,23 +77,20 @@ public class DataArrayType extends AbstractDataArrayType {
 
     /**
      * Gets the value of the encoding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BlockEncodingPropertyType }
-     *     
      */
-    public BlockEncodingPropertyType getEncoding() {
+    public AbstractEncodingType getEncoding() {
+        if (encoding != null) {
+            return encoding.getEncoding();
+        }
+        return null;
+    }
+
+    public BlockEncodingPropertyType getPropertyEncoding(){
         return encoding;
     }
 
     /**
      * Sets the value of the encoding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BlockEncodingPropertyType }
-     *     
      */
     public void setEncoding(BlockEncodingPropertyType value) {
         this.encoding = value;
@@ -106,23 +98,22 @@ public class DataArrayType extends AbstractDataArrayType {
 
     /**
      * Gets the value of the values property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DataValuePropertyType }
-     *     
      */
-    public DataValuePropertyType getValues() {
+    public String getValues() {
+
+        //TODO
+        return "";
+    }
+
+    /**
+     * Gets the value of the values property.
+     */
+    public DataValuePropertyType getDataValues() {
         return values;
     }
 
     /**
      * Sets the value of the values property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DataValuePropertyType }
-     *     
      */
     public void setValues(DataValuePropertyType value) {
         this.values = value;

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.util.Utilities;
 import org.constellation.catalog.Entry;
+import org.constellation.swe.AbstractDataComponent;
 /**
  *
  * @version $Id:
@@ -30,7 +31,7 @@ import org.constellation.catalog.Entry;
  */
 @XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class})
 @XmlType(name="AbstractDataComponent")
-public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
+public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent {
     
     /**
      * The identifier of the component (override from abstractGML Type).

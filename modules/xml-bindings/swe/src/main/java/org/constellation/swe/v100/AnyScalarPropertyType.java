@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.swe.AnyScalar;
 
 
 /**
@@ -57,7 +58,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "category",
     "text"
 })
-public class AnyScalarPropertyType {
+public class AnyScalarPropertyType implements AnyScalar {
 
     @XmlElement(name = "Count")
     private Count count;

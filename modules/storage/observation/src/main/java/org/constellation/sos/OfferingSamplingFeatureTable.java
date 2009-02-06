@@ -25,6 +25,7 @@ import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.ReferenceTable;
+import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.geotools.util.Utilities;
 
 /**
