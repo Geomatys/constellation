@@ -20,9 +20,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
-import org.constellation.ows.v100.GetCapabilitiesType;
 import org.constellation.ows.v100.SectionsType;
 
 
@@ -50,7 +50,7 @@ import org.constellation.ows.v100.SectionsType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "GetCapabilities")
-public class GetCapabilities extends GetCapabilitiesType {
+public class GetCapabilitiesType extends org.constellation.ows.v100.GetCapabilitiesType implements GetCapabilities {
 
     @XmlAttribute
     private String service;
@@ -58,7 +58,7 @@ public class GetCapabilities extends GetCapabilitiesType {
     /**
      * An empty constructor used by JAXB
      */
-    GetCapabilities() {
+    GetCapabilitiesType() {
     }
     
     /**
@@ -71,7 +71,7 @@ public class GetCapabilities extends GetCapabilitiesType {
      * @param updateSequence not used yet.
      * @param service MUST be CSW.
      */
-    public  GetCapabilities(AcceptVersionsType acceptVersions, SectionsType sections,
+    public GetCapabilitiesType(AcceptVersionsType acceptVersions, SectionsType sections,
             AcceptFormatsType acceptFormats, String updateSequence, String service) {
         super(acceptVersions, sections, acceptFormats, updateSequence);
         this.service = service;

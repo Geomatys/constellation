@@ -45,7 +45,7 @@ import org.constellation.cat.csw.v202.DescribeRecordType;
 import org.constellation.cat.csw.v202.DistributedSearchType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.GetDomainResponseType;
 import org.constellation.cat.csw.v202.GetDomainType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
@@ -118,7 +118,7 @@ public class CSWService {
        
        JAXBContext jbcontext = JAXBContext.newInstance(MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
-                        ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
+                        ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
                         ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
                         ,QueryType.class, ResultType.class, TransactionType.class
                         ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
@@ -141,7 +141,7 @@ public class CSWService {
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     @WebMethod(action="getCapabilities")
-    public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOAPServiceException  {
+    public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
             logger.info("received SOAP getCapabilities request");
             worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());

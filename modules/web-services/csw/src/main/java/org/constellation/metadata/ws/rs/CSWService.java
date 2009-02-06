@@ -42,6 +42,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.cat.csw.DescribeRecord;
+import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.cat.csw.GetDomain;
 import org.constellation.cat.csw.GetRecordById;
 import org.constellation.cat.csw.GetRecordsRequest;
@@ -51,7 +52,7 @@ import org.constellation.cat.csw.v202.DescribeRecordType;
 import org.constellation.cat.csw.v202.DistributedSearchType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.GetDomainType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
 import org.constellation.cat.csw.v202.GetRecordsType;
@@ -399,11 +400,11 @@ public class CSWService extends OGCWebService {
             requestedSections = SectionsType.getExistingSections();
         }
         SectionsType sections     = new SectionsType(requestedSections);
-        return new GetCapabilities(versions,
-                                   sections,
-                                   formats,
-                                   null,
-                                   getParameter("SERVICE", true));
+        return new GetCapabilitiesType(versions,
+                                       sections,
+                                       formats,
+                                       null,
+                                       getParameter("SERVICE", true));
         
     }
     

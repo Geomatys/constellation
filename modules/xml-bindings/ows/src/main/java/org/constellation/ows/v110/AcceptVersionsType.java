@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "AcceptVersionsType", propOrder = {
     "version"
 })
-public class AcceptVersionsType {
+public class AcceptVersionsType implements org.constellation.ows.AcceptVersions {
 
     @XmlElement(name = "Version", required = true)
     private List<String> version;

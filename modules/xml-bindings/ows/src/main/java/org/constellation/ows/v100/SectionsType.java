@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ows.Sections;
 import org.geotools.util.Utilities;
 
 
@@ -51,7 +52,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "SectionsType", propOrder = {
     "section"
 })
-public class SectionsType {
+public class SectionsType implements Sections {
 
     @XmlElement(name = "Section")
     private List<String> section = new ArrayList<String>();

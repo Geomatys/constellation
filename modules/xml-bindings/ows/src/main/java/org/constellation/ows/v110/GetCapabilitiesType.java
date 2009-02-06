@@ -55,7 +55,7 @@ import org.geotools.util.Utilities;
     "sections",
     "acceptFormats"
 })
-public class GetCapabilitiesType extends AbstractGetCapabilities {
+public class GetCapabilitiesType implements AbstractGetCapabilities {
 
     @XmlElement(name = "AcceptVersions")
     private AcceptVersionsType acceptVersions;

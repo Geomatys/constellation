@@ -21,7 +21,7 @@ package org.constellation.ws;
  * 
  * @author Guilhem Legal
  */
-public abstract class AbstractRequest {
+public interface AbstractRequest {
 
-    public abstract String getVersion();
+    public String getVersion();
 }

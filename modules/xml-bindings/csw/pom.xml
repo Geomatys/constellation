@@ -81,15 +81,6 @@
       <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-spatial-lucene</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mdweb</groupId>
-      <artifactId>model</artifactId>
-    </dependency>
   </dependencies>
 
 </project>

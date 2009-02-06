@@ -16,6 +16,10 @@
  */
 package org.constellation.wcs.v100;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -23,6 +27,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.AbstractGetCapabilities;
+import org.constellation.ows.AcceptFormats;
+import org.constellation.ows.AcceptVersions;
+import org.constellation.ows.Sections;
 
 
 /**
@@ -52,7 +59,7 @@ import org.constellation.ows.AbstractGetCapabilities;
     "section"
 })
 @XmlRootElement(name = "GetCapabilities")
-public class GetCapabilities extends AbstractGetCapabilities{
+public class GetCapabilities implements AbstractGetCapabilities {
 
     @XmlElement(defaultValue = "/")
     private String section;
@@ -118,4 +125,50 @@ public class GetCapabilities extends AbstractGetCapabilities{
     public String getUpdateSequence() {
         return updateSequence;
     }
+
+    /*
+     *
+     *  method added for compatibility with the upper version
+     *
+     */
+
+
+    public AcceptVersions getAcceptVersions() {
+        return new AcceptVersions() {
+
+            public List<String> getVersion() {
+                return Arrays.asList(version);
+            }
+        };
+    }
+
+    public Sections getSections() {
+        return new Sections() {
+
+            public List<String> getSection() {
+                final StringTokenizer tokens = new StringTokenizer(section, ",");
+                List<String> sections = new ArrayList<String>();
+                while (tokens.hasMoreTokens()) {
+                    final String token = tokens.nextToken().trim();
+                    sections.add(token);
+                }
+                return sections;
+            }
+
+            public void add(String sec) {
+                if (sec != null)
+                    section = section + ',' + sec;
+            }
+        };
+    }
+
+    public AcceptFormats getAcceptFormats() {
+        return new AcceptFormats() {
+
+            public List<String> getOutputFormat() {
+                return Arrays.asList("application/xml");
+            }
+        };
+    }
+
 }

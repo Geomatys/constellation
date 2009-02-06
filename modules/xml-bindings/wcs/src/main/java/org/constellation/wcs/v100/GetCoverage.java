@@ -77,7 +77,7 @@ import org.opengis.referencing.crs.VerticalCRS;
     "output"
 })
 @XmlRootElement(name = "GetCoverage")
-public class GetCoverage extends AbstractGetCoverage {
+public class GetCoverage implements AbstractGetCoverage {
 
     @XmlElement(required = true)
     private String sourceCoverage;

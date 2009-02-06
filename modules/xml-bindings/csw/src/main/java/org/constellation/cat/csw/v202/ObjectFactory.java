@@ -367,8 +367,8 @@ public class ObjectFactory {
      * Create an instance of {@link GetCapabilities }
      * 
      */
-    public GetCapabilities createGetCapabilities() {
-        return new GetCapabilities();
+    public GetCapabilitiesType createGetCapabilitiesType() {
+        return new GetCapabilitiesType();
     }
 
     /**

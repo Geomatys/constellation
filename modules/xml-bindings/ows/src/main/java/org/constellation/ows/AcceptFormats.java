@@ -17,18 +17,14 @@
 
 package org.constellation.ows;
 
-import org.constellation.ws.AbstractRequest;
+import java.util.List;
 
 /**
- *  Super abstract type for all the different versions of GetCapabilities request.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractGetCapabilities extends AbstractRequest {
+public interface AcceptFormats {
 
-    public AcceptVersions getAcceptVersions();
+    public List<String> getOutputFormat();
 
-    public Sections getSections();
-
-    public AcceptFormats getAcceptFormats();
 }

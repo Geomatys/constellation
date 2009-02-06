@@ -45,12 +45,13 @@ import org.w3c.dom.Document;
 
 //Constellation dependencies
 import org.constellation.cat.csw.AbstractCswRequest;
+import org.constellation.cat.csw.AbstractResultType;
 import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.GetDomain;
 import org.constellation.cat.csw.GetRecordById;
 import org.constellation.cat.csw.RequestBase;
-import org.constellation.cat.csw.AbstractResultType;
 import org.constellation.cat.csw.GetRecordsRequest;
+import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.cat.csw.Harvest;
 import org.constellation.cat.csw.Transaction;
 import org.constellation.cat.csw.DescribeRecord;
@@ -62,7 +63,6 @@ import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilities;
 import org.constellation.cat.csw.v202.GetDomainResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
@@ -77,35 +77,35 @@ import org.constellation.cat.csw.v202.TransactionSummaryType;
 import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.cat.csw.v202.SchemaComponentType;
 import org.constellation.cat.csw.v202.EchoedRequestType;
+import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
+import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.ogc.FilterCapabilities;
-import org.constellation.ogc.SortByType;
-import org.constellation.ogc.SortPropertyType;
-import org.constellation.ows.v100.AcceptFormatsType;
-import org.constellation.ows.v100.AcceptVersionsType;
-import org.constellation.ows.v100.DomainType;
-import org.constellation.ows.v100.Operation;
-import org.constellation.ows.v100.OperationsMetadata;
-import org.constellation.ows.v100.SectionsType;
-import org.constellation.ows.v100.ServiceIdentification;
-import org.constellation.ows.v100.ServiceProvider;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ebrim.v300.IdentifiableType;
-import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.util.Util;
+import org.constellation.ogc.FilterCapabilities;
+import org.constellation.ogc.SortByType;
+import org.constellation.ogc.SortPropertyType;
+import org.constellation.ows.AcceptFormats;
+import org.constellation.ows.AcceptVersions;
+import org.constellation.ows.Sections;
+import org.constellation.ows.v100.DomainType;
+import org.constellation.ows.v100.Operation;
+import org.constellation.ows.v100.OperationsMetadata;
+import org.constellation.ows.v100.ServiceIdentification;
+import org.constellation.ows.v100.ServiceProvider;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.ws.rs.WebService;
+import org.constellation.util.Util;
 
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
@@ -451,14 +451,14 @@ public class CSWworker {
             throw new CstlServiceException("Service must be specified!",
                                              MISSING_PARAMETER_VALUE, "service");
         }
-        AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
+        AcceptVersions versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("2.0.2")){
                  throw new CstlServiceException("version available : 2.0.2",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-        AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
+        AcceptFormats formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
             /*
              * Acording to the CITE test this case does not return an exception
@@ -480,7 +480,7 @@ public class CSWworker {
         OperationsMetadata    om = null;
         FilterCapabilities    fc = null;
             
-        SectionsType sections = requestCapabilities.getSections();
+        Sections sections = requestCapabilities.getSections();
         
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
         if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All"))

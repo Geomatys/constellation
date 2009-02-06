@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ows.AbstractGetCapabilities;
 import org.geotools.util.Utilities;
 
 
@@ -59,7 +60,7 @@ import org.geotools.util.Utilities;
     "sections",
     "acceptFormats"
 })
-public class GetCapabilitiesType {
+public class GetCapabilitiesType implements AbstractGetCapabilities {
 
     @XmlElement(name = "AcceptVersions")
     private AcceptVersionsType acceptVersions;

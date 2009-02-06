@@ -23,6 +23,6 @@ import org.constellation.ws.AbstractRequest;
  *
  * @author Guilhem Legal
  */
-public abstract class AbstractDescribeCoverage extends AbstractRequest {
+public interface AbstractDescribeCoverage extends AbstractRequest {
 
 }

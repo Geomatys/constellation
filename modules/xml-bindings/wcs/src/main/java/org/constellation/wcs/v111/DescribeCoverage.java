@@ -53,7 +53,7 @@ import org.constellation.wcs.AbstractDescribeCoverage;
     "identifier"
 })
 @XmlRootElement(name = "DescribeCoverage")
-public class DescribeCoverage extends AbstractDescribeCoverage {
+public class DescribeCoverage implements AbstractDescribeCoverage {
 
     @XmlAttribute(required = true)
     private String service;

@@ -39,12 +39,11 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.cat.csw.GetRecordsRequest;
-import org.constellation.cat.csw.v200.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilities;
+import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.GetRecordsType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
@@ -100,12 +99,12 @@ public class CatalogueHarvester {
     /**
      * A getCapabilities request used request another csw(2.0.2)
      */
-    private GetCapabilities getCapabilitiesRequestv202;
+    private GetCapabilitiesType getCapabilitiesRequestv202;
     
     /**
      * A getCapabilities request used request another csw(2.0.0)
      */
-    private GetCapabilitiesType getCapabilitiesRequestv200;
+    private org.constellation.cat.csw.v200.GetCapabilitiesType getCapabilitiesRequestv200;
     
     /**
      * A global variable used during the harvest of a distant CSW.
@@ -213,10 +212,10 @@ public class CatalogueHarvester {
         AcceptVersionsType versions = new AcceptVersionsType("2.0.2", "2.0.0");
         SectionsType sections       = new SectionsType("All");
         AcceptFormatsType formats   = new AcceptFormatsType("text/xml", "application/xml");
-        getCapabilitiesRequestv202  = new GetCapabilities(versions, sections, formats, null, "CSW");
+        getCapabilitiesRequestv202  = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.0)
-        getCapabilitiesRequestv200  = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
+        getCapabilitiesRequestv200  = new org.constellation.cat.csw.v200.GetCapabilitiesType(versions, sections, formats, null, "CSW");
     }
     
     

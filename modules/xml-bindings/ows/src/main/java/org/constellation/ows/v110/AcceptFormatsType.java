@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ows.AcceptFormats;
 import org.geotools.util.Utilities;
 
 
@@ -51,7 +52,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "AcceptFormatsType", propOrder = {
     "outputFormat"
 })
-public class AcceptFormatsType {
+public class AcceptFormatsType implements AcceptFormats {
 
     @XmlElement(name = "OutputFormat")
     private List<String> outputFormat;

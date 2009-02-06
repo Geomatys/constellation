@@ -15,20 +15,16 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ows;
+package org.constellation.cat.csw;
 
-import org.constellation.ws.AbstractRequest;
+import org.constellation.ows.AbstractGetCapabilities;
 
 /**
- *  Super abstract type for all the different versions of GetCapabilities request.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractGetCapabilities extends AbstractRequest {
+public interface GetCapabilities extends AbstractGetCapabilities {
 
-    public AcceptVersions getAcceptVersions();
+    public String getService();
 
-    public Sections getSections();
-
-    public AcceptFormats getAcceptFormats();
 }
