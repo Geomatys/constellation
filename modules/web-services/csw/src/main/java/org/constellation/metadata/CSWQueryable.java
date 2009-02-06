@@ -53,9 +53,8 @@ public class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
         ISO_QUERYABLE.put("Abstract", paths);
         
-        //MANDATORY TODO tout les valeur
+        //MANDATORY
         paths = new ArrayList<String>();
-        paths.add("*");
         ISO_QUERYABLE.put("AnyText", paths);
         
         paths = new ArrayList<String>();

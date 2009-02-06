@@ -58,6 +58,7 @@ public class GenericindexTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        deleteIndex();
         File configDirectory = new File("GenericIndexTest");
         List<MetaDataImpl> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "");
@@ -66,6 +67,10 @@ public class GenericindexTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        deleteIndex();
+    }
+
+    public static void deleteIndex() {
         File configDirectory = new File("GenericIndexTest");
         if (configDirectory.exists()) {
             File indexDirectory = new File(configDirectory, "index");
@@ -258,7 +263,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("SimpleSearch 1:" + '\n' + resultReport);
+        logger.info("DateSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -267,6 +272,41 @@ public class GenericindexTest {
         expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
+        
+        /**
+         * Test 2 date search: TempExtent_begin before 01/01/1985
+         */
+        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 19850101}", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.info("DateSearch 2:" + '\n' + resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 3 date search: TempExtent_end after 01/01/1991
+         */
+        spatialQuery = new SpatialQuery("TempExtent_end:{19910101 30000101}", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.info("DateSearch 3:" + '\n' + resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+
     }
 
     /**

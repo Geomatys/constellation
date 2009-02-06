@@ -268,9 +268,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
+
+        final StringBuilder anyText = new StringBuilder();
         
         logger.finer("indexing ISO 19119 MD_Metadata");
-        //TODO add ANyText
         for (final String term : ISO_QUERYABLE.keySet()) {
              cs.submit(new Callable<TermValue>() {
                 public TermValue call() {
@@ -282,8 +283,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
             try {
                 TermValue values = cs.take().get();
-                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                if (values.term != null && !values.term.equals("AnyText")) {
+                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    if (values.value != null && !values.value.equals("null") && anyText.indexOf(values.value) == -1) {
+                        anyText.append(values.value).append(" ");
+                    }
+                }
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
@@ -349,7 +355,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             
          // All metadata types must be compatible with dublinCore.
         cs = new BoundedCompletionService<TermValue>(this.pool, 5);
-        final StringBuilder anyText = new StringBuilder();
         for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
             cs.submit(new Callable<TermValue>() {
 
@@ -362,24 +367,18 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         for (int i = 0; i < DUBLIN_CORE_QUERYABLE.size(); i++) {
             try {
                 TermValue values = cs.take().get();
-                if (!values.value.equals("null")) {
-                    anyText.append(values).append(" ");
-                }
-                if (values.term.equals("date") || values.term.equals("modified")) {
-                    values.value = values.value.replaceAll("-", "");
-                }
                 doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-
+                if (values.value != null && !values.value.equals("null") && anyText.indexOf(values.value) == -1) {
+                    anyText.append(values.value).append(" ");
+                }
+                
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
                logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
             }
         }
-            
-        //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
             
         //we add the geometry parts
         coord = "null";
@@ -457,6 +456,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         // add a default meta field to make searching all documents easy 
         doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
         
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
         return doc;
     }
     
@@ -492,7 +494,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
                 if (conditionalAttribute == null) {
                     String value = getValuesFromPath(pathID, metadata);
-                    if (value != null && !value.equals(""))
+                    if (value != null && !value.equals("") && !value.equals("null"))
                         response.append(value).append(',');
                 } else {
                     response.append(getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata)).append(',');
@@ -597,10 +599,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             result = ((org.opengis.util.CodeList)obj).name();
         
         } else if (obj instanceof DefaultPosition) {
-            result = obj.toString();
+            DefaultPosition pos = (DefaultPosition) obj;
+            result = dateFormat.format(pos.getDate());
             
         } else if (obj instanceof DefaultInstant) {
-            result = obj.toString();
+            DefaultInstant inst = (DefaultInstant)obj;
+            if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
+                result = dateFormat.format(inst.getPosition().getDate());
+            } else {
+                result = "null";
+            }
             
         } else if (obj instanceof Date) {
             synchronized (dateFormat){
