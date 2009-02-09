@@ -99,10 +99,6 @@ import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
-// Geotools dependencies
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-
 
 /**
  * The Web Coverage Service (WCS) REST facade for Constellation.
@@ -535,7 +531,7 @@ public final class WCSService extends OGCWebService {
             final Double[] coordinates = new Double[tokens.countTokens()];
             int i = 0;
             while (tokens.hasMoreTokens()) {
-                coordinates[i] = parseDouble(tokens.nextToken());
+                coordinates[i] = QueryAdapter.toDouble(tokens.nextToken());
                 i++;
             }
             if (i < 4) {
@@ -590,7 +586,7 @@ public final class WCSService extends OGCWebService {
         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
         final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
-            Double value = parseDouble(tokens.nextToken());
+            Double value = QueryAdapter.toDouble(tokens.nextToken());
             origin.add(value);
         }
 
@@ -599,7 +595,7 @@ public final class WCSService extends OGCWebService {
         if (gridOffsets != null) {
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
-                Double value = parseDouble(tokens.nextToken());
+                Double value = QueryAdapter.toDouble(tokens.nextToken());
                 offset.add(value);
             }
         }
@@ -619,23 +615,7 @@ public final class WCSService extends OGCWebService {
                 new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
                 domain, range, output);
     }
-    
 
-    /**
-     * Parses a value as a floating point.
-     *
-     * @throws CstlServiceException if the value can't be parsed.
-     */
-    private double parseDouble(String value) throws CstlServiceException {
-        value = value.trim();
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException exception) {
-            throw new CstlServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value) + "cause:" +
-                           exception.getMessage(), INVALID_PARAMETER_VALUE, getActingVersion());
-        }
-    }
-    
     /**
      * Get an html page for the root resource.
      */

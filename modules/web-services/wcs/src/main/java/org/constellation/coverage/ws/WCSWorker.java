@@ -168,6 +168,9 @@ public final class WCSWorker {
      */
     private final Unmarshaller unmarshaller;
 
+    /**
+     * The current version of the service, as asked into the request.
+     */
     private ServiceVersion actingVersion;
 
     /**
@@ -185,7 +188,9 @@ public final class WCSWorker {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public WCSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller, final ServiceVersion actingVersion) {
+    public WCSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller,
+                                               final ServiceVersion actingVersion)
+    {
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
         this.actingVersion = actingVersion;
@@ -206,13 +211,13 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response describeCoverage(AbstractDescribeCoverage abstractRequest)
-                                  throws JAXBException, CstlServiceException
+    public Response describeCoverage(final AbstractDescribeCoverage abstractRequest)
+                                          throws JAXBException, CstlServiceException
     {
         LOGGER.info("describeCoverage request processing");
         this.actingVersion = new ServiceVersion(ServiceType.WCS, abstractRequest.getVersion());
         //we begin by extracting the base attribute
-        String version = abstractRequest.getVersion();
+        final String version = abstractRequest.getVersion();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
                            MISSING_PARAMETER_VALUE, actingVersion, "version");
@@ -230,7 +235,7 @@ public final class WCSWorker {
         }
 
         //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();
+        final StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
         return Response.ok(sw.toString(), TEXT_XML).build();
     }
@@ -245,8 +250,9 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    private CoverageDescription describeCoverage100(org.constellation.wcs.v100.DescribeCoverage request)
-                                                              throws JAXBException, CstlServiceException
+    private CoverageDescription describeCoverage100(
+            final org.constellation.wcs.v100.DescribeCoverage request)
+                            throws JAXBException, CstlServiceException
     {
         if (request.getCoverage().size() == 0) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
@@ -347,8 +353,8 @@ public final class WCSWorker {
         interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
         interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
         interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
-        final SupportedInterpolationsType supInt =
-                new SupportedInterpolationsType(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+        final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
+                org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
         //we build the coverage offering for this layer/coverage
         final CoverageOfferingType coverage = new CoverageOfferingType(null, layerRef.getName(),
@@ -368,8 +374,9 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    private CoverageDescriptions describeCoverage111(org.constellation.wcs.v111.DescribeCoverage request)
-                                                               throws JAXBException, CstlServiceException
+    private CoverageDescriptions describeCoverage111(
+            final org.constellation.wcs.v111.DescribeCoverage request)
+                            throws JAXBException, CstlServiceException
     {
         if (request.getIdentifier().size() == 0) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
@@ -379,7 +386,8 @@ public final class WCSWorker {
         //TODO: we should loop over the list
         final LayerDetails layer = getLayerReference(request.getIdentifier().get(0));
 
-        final org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
+        final org.constellation.ows.v110.ObjectFactory owsFactory =
+                new org.constellation.ows.v110.ObjectFactory();
         final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
         if (layer.getSeries().size() == 0) {
             throw new CstlServiceException("the coverage " + layer.getName() +
@@ -450,8 +458,8 @@ public final class WCSWorker {
                 org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
         intList.add(new InterpolationMethodType(
                 org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-        final InterpolationMethods interpolations =
-                new InterpolationMethods(intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+        final InterpolationMethods interpolations = new InterpolationMethods(
+                intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
         final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(layer.getThematic()),
                 null, new org.constellation.ows.v110.CodeType("0.0"), interpolations));
 
@@ -526,8 +534,8 @@ public final class WCSWorker {
     }
 
     /**
-     * Returns the {@linkplain WCSCapabilitiesType GetCapabilities} response of the request given
-     * by parameter, in version 1.0.0 of WCS.
+     * Returns the {@linkplain WCSCapabilitiesType GetCapabilities} response of the request
+     * given by parameter, in version 1.0.0 of WCS.
      *
      * @param request The request done by the user, in version 1.0.0.
      * @return a WCSCapabilities XML document describing the capabilities of this service.
@@ -535,8 +543,9 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private WCSCapabilitiesType getCapabilities100(org.constellation.wcs.v100.GetCapabilities request)
-                                                            throws CstlServiceException, JAXBException
+    private WCSCapabilitiesType getCapabilities100(
+            final org.constellation.wcs.v100.GetCapabilities request)
+                           throws CstlServiceException, JAXBException
     {
         /*
          * In WCS 1.0.0 the user can request only one section
@@ -564,7 +573,9 @@ public final class WCSWorker {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                     INVALID_PARAMETER_VALUE, actingVersion);
         }
-        if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
+        if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") ||
+                                        requestedSection.equals("/"))
+        {
             //we update the url in the static part.
             final Request req = staticCapabilities.getCapability().getRequest();
             updateURL(req.getGetCapabilities().getDCPType());
@@ -663,8 +674,8 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Capabilities getCapabilities111(org.constellation.wcs.v111.GetCapabilities request)
-                                                     throws CstlServiceException, JAXBException
+    private Capabilities getCapabilities111(final org.constellation.wcs.v111.GetCapabilities request)
+                                                           throws CstlServiceException, JAXBException
     {
         // First we try to extract only the requested section.
         List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
@@ -776,8 +787,8 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response getCoverage(AbstractGetCoverage abstractRequest) throws JAXBException,
-                                                                      CstlServiceException
+    public Response getCoverage(final AbstractGetCoverage abstractRequest) throws JAXBException,
+                                                                            CstlServiceException
     {
         final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
@@ -829,12 +840,14 @@ public final class WCSWorker {
         } else if( abstractRequest.getFormat().equalsIgnoreCase(NETCDF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
-                        "Constellation does not support netcdf writing."), NO_APPLICABLE_CODE, actingVersion);
+                                               "Constellation does not support netcdf writing."),
+                                           NO_APPLICABLE_CODE, actingVersion);
 
         } else if( abstractRequest.getFormat().equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
-                        "Constellation does not support geotiff writing."), NO_APPLICABLE_CODE, actingVersion);
+                                               "Constellation does not support geotiff writing."),
+                                           NO_APPLICABLE_CODE, actingVersion);
 
         } else {
             // We are in the case of an image format requested.
@@ -906,7 +919,7 @@ public final class WCSWorker {
     private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
        final String fileName = "WCSCapabilities" + actingVersion.toString() + ".xml";
        final File changeFile = getFile("change.properties", home);
-       Properties p = new Properties();
+       final Properties p = new Properties();
 
        // if the flag file is present we load the properties
        if (changeFile != null && changeFile.exists()) {
@@ -917,35 +930,30 @@ public final class WCSWorker {
            p.put("update", "false");
        }
 
-       //we recup the capabilities file and unmarshall it
-       if (fileName == null) {
-           return null;
+       //we get the capabilities file and unmarshalls it
+        //we look if we have already put it in cache
+        Object response = capabilities.get(fileName);
+        final boolean update = p.getProperty("update").equals("true");
 
-       } else {
+        if (response == null || update) {
+            if (update) {
+                LOGGER.info("updating metadata");
+            }
 
-           //we look if we have already put it in cache
-           Object response = capabilities.get(fileName);
-           boolean update  = p.getProperty("update").equals("true");
+            final File f = getFile(fileName, home);
+            response = unmarshaller.unmarshal(f);
+            capabilities.put(fileName, response);
+            p.put("update", "false");
 
-           if (response == null || update) {
-               if (update)
-                    LOGGER.info("updating metadata");
-
-               File f = getFile(fileName, home);
-               response = unmarshaller.unmarshal(f);
-               capabilities.put(fileName, response);
-               p.put("update", "false");
-
-               // if the flag file is present we store the properties
-               if (changeFile != null && changeFile.exists()) {
-                   FileOutputStream out = new FileOutputStream(changeFile);
-                   p.store(out, "updated from WebService");
-                   out.close();
-               }
-           }
-
-           return response;
+            // if the flag file is present we store the properties
+            if (changeFile != null && changeFile.exists()) {
+                final FileOutputStream out = new FileOutputStream(changeFile);
+                p.store(out, "updated from WebService");
+                out.close();
+            }
         }
+
+        return response;
     }
 
     /**
@@ -1017,7 +1025,8 @@ public final class WCSWorker {
      *
      * @param operations A list of OWS operation.
      * @param url The url of the web application.
-     * @param serviceType the initials of the web serviceType (WMS, SOS, WCS, CSW, ...). This string correspound to the resource name in lower case.
+     * @param serviceType the initials of the web serviceType (WMS, SOS, WCS, CSW, ...).
+     *        This string is the resource name in lower case.
      */
     private void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
         for (AbstractOperation op:operations) {
@@ -1035,10 +1044,10 @@ public final class WCSWorker {
         for(DCPTypeType dcp: dcpList) {
            for (Object obj: dcp.getHTTP().getGetOrPost()){
                if (obj instanceof Get){
-                   Get getMethod = (Get)obj;
+                   final Get getMethod = (Get)obj;
                    getMethod.getOnlineResource().setHref(uriContext.getBaseUri().toString() + "wcs?SERVICE=WCS&");
                } else if (obj instanceof Post){
-                   Post postMethod = (Post)obj;
+                   final Post postMethod = (Post)obj;
                    postMethod.getOnlineResource().setHref(uriContext.getBaseUri().toString() + "wcs?SERVICE=WCS&");
                }
            }
