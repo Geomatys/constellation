@@ -270,10 +270,11 @@ public final class WCSService extends OGCWebService {
             
         } catch (Exception ex) {
             /*
-             * /!\ This exception should not occur, if the WCS service is well implemented. /!\
-             * But in facts, sometimes an unexpected exception could happen, due to a neglecting
-             * source code. In this case the client who emits the request should get a generic
-             * error message, and the full trace has to be logged, for debugging purpose.
+             * /!\ This exception should not occur. /!\
+             * Sometimes an unexpected exception could happen, due to a source
+             * code error. In that case the client who emits the request will
+             * get a generic error message, and the full trace is logged for
+             * debugging purpose.
              */
 
             // LOG THE EXCEPTION

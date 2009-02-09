@@ -206,6 +206,26 @@ public class WMSService extends OGCWebService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+        } catch (Exception ex) {
+            /*
+             * /!\ This exception should not occur. /!\
+             * Sometimes an unexpected exception could happen, due to a source
+             * code error. In that case the client who emits the request will
+             * get a generic error message, and the full trace is logged for
+             * debugging purpose.
+             */
+
+            // LOG THE EXCEPTION
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+
+            // SEND AN HTTP RESPONSE
+            final ServiceExceptionReport report = new ServiceExceptionReport(
+                                                      getActingVersion(),
+                                                      new ServiceExceptionType(
+                                                          ex.getMessage(), NO_APPLICABLE_CODE));
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
         }
     }
 
