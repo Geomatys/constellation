@@ -29,6 +29,7 @@ package org.constellation;
 public enum ServiceDef {
 	
 	WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE),
+	WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE),
 	WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE),
 	
 	WMS_1_0_0_SLD(Specification.WMS, Organization.OGC, "1.0.0", Profile.WMS_SLD),
@@ -74,6 +75,7 @@ public enum ServiceDef {
 		return version.compareTo(new Version(str));
 	}
 	
+    @Override
 	public String toString(){
 		return specification.name() + ", v." + version + ", profile (" + profile.name() + ")";
 	}

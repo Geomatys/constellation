@@ -55,8 +55,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	private boolean isServiceAllowed(String action, ServiceDef serviceDef){
 		//For now we allow all actions.
 		//  this should be extended to handle user permissions
-		if (    serviceDef == ServiceDef.WMS_1_0_0     || serviceDef == ServiceDef.WMS_1_3_0 
-			 || serviceDef == ServiceDef.WMS_1_0_0_SLD || serviceDef == ServiceDef.WMS_1_3_0_SLD 
+		if (    serviceDef == ServiceDef.WMS_1_1_1     || serviceDef == ServiceDef.WMS_1_3_0
+			 || serviceDef == ServiceDef.WMS_1_1_1_SLD || serviceDef == ServiceDef.WMS_1_3_0_SLD
 			 || serviceDef == ServiceDef.WCS_1_0_0     || serviceDef == ServiceDef.WCS_1_1_1 ){
 				
 				return true;
