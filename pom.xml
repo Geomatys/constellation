@@ -200,9 +200,9 @@
         <version>2.2</version>
       </dependency>
       <dependency>
-      	<groupId>javax.xml.ws</groupId>
-      	<artifactId>jaxws-api</artifactId>
-      	<version>2.1</version>
+        <groupId>javax.xml.ws</groupId>
+        <artifactId>jaxws-api</artifactId>
+        <version>2.1</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.ws</groupId>
@@ -225,7 +225,7 @@
         <version>1.2_08</version>
       </dependency>
       <dependency>
-   	<groupId>javax.servlet</groupId>
+        <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
       </dependency>
@@ -250,9 +250,9 @@
         <version>8.0</version>
       </dependency>
       <dependency>
-      	<groupId>org.apache.lucene</groupId>
-      	<artifactId>lucene-core</artifactId>
-      	<version>2.4.0</version>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>2.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.myfaces.tomahawk</groupId>
@@ -281,9 +281,9 @@
       </dependency>
       <!-- mdweb -->
       <dependency>
-      	<groupId>org.mdweb</groupId>
-     	<artifactId>model</artifactId>
-      	<version>2.0-SNAPSHOT</version>
+        <groupId>org.mdweb</groupId>
+       <artifactId>model</artifactId>
+        <version>2.0-SNAPSHOT</version>
       </dependency>
       <!-- geotools/GeoAPI -->
       <dependency>
@@ -292,9 +292,9 @@
         <version>2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
-      	<groupId>org.opengis</groupId>
-      	<artifactId>onm</artifactId> 
-      	<version>1.0-SNAPSHOT</version>
+        <groupId>org.opengis</groupId>
+        <artifactId>onm</artifactId> 
+        <version>1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
@@ -317,9 +317,9 @@
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
-      	<groupId>org.geotools</groupId>
-      	<artifactId>gt-cql</artifactId>
-       	<version>${geotools.version}</version>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-cql</artifactId>
+         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
@@ -384,8 +384,8 @@
       <!-- database driver -->
       <dependency>
         <groupId>ojdbc</groupId>
-	<artifactId>ojdbc</artifactId>
-	<version>14</version>
+        <artifactId>ojdbc</artifactId>
+        <version>14</version>
       </dependency>
       <dependency>
         <groupId>postgresql</groupId>
@@ -539,7 +539,7 @@
         </executions>
       </plugin>
     </plugins>
-     <extensions>
+    <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
@@ -679,9 +679,9 @@
   -->
   <distributionManagement>
     <repository>
-    	<id>geomatys</id>
-    	<name>Repository maven geomatys</name>
-    	<url>dav:https://maven.geomatys.fr/repository</url>
+      <id>geomatys</id>
+      <name>Repository maven geomatys</name>
+      <url>dav:https://maven.geomatys.fr/repository</url>
     </repository>
   </distributionManagement>
 
