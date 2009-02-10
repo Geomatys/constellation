@@ -142,7 +142,7 @@ public abstract class AbstractCSWConfigurer {
         if (config != null) {
             try {
                 if (currentReader == null) {
-                    currentReader = CSWfactory.getMetadataReader(config, new File(cswConfigDir, "data"), null, cswConfigDir);
+                    currentReader = CSWfactory.getMetadataReader(config, null, cswConfigDir);
                 }
                 AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, cswConfigDir, serviceID);
                 return indexer;
@@ -171,7 +171,7 @@ public abstract class AbstractCSWConfigurer {
         Automatic config = serviceConfiguration.get(serviceID);
         if (config != null) {
             try {
-                MetadataReader currentReader = CSWfactory.getMetadataReader(config, new File(cswConfigDir, "data"), null, cswConfigDir);
+                MetadataReader currentReader = CSWfactory.getMetadataReader(config, null, cswConfigDir);
                 return currentReader;
 
             } catch (CstlServiceException ex) {

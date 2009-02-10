@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -50,10 +51,13 @@ public class FileMetadataWriter extends MetadataWriter {
      * @param marshaller
      * @throws java.sql.SQLException
      */
-    public FileMetadataWriter(AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws CstlServiceException {
+    public FileMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller) throws CstlServiceException {
         super(index);
-        this.marshaller    = marshaller;
-        this.dataDirectory = dataDirectory;
+        this.marshaller = marshaller;
+        dataDirectory   = configuration.getdataDirectory();
+        if (dataDirectory == null || !dataDirectory.exists()) {
+            throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
+        }
         
     }
 

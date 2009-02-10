@@ -55,6 +55,25 @@ public class Automatic {
     
     private Queries queries;
 
+    public Automatic() {
+    }
+
+    public Automatic(String format, String dataDirectory) {
+        this.format        = format;
+        this.dataDirectory = dataDirectory;
+    }
+
+    public Automatic(String format, BDD bdd) {
+        this.format = format;
+        this.bdd    = bdd;
+    }
+
+    public Automatic(String format, BDD bdd, Queries queries) {
+        this.format  = format;
+        this.bdd     = bdd;
+        this.queries = queries;
+    }
+
     public Queries getQueries() {
         return queries;
     }

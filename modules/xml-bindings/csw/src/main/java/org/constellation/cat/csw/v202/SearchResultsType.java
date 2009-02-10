@@ -199,12 +199,13 @@ public class SearchResultsType implements SearchResults {
      * 
      */
     public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched,
-            Integer numberOfRecordsReturned, List<Object> records) {
+            Integer numberOfRecordsReturned, List<Object> records, int nextRecord) {
         this.resultSetId             = resultSetId;
         this.elementSet              = elementSet;
         this.numberOfRecordsMatched  = numberOfResultMatched;
         this.numberOfRecordsReturned = numberOfRecordsReturned;
         this.any                     = records;
+        this.nextRecord              = nextRecord;
         
     }
     

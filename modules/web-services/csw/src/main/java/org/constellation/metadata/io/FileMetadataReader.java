@@ -29,7 +29,25 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.ElementSet;
+import org.constellation.cat.csw.v202.AbstractRecordType;
+import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
+import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.generic.database.Automatic;
+import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
+import org.geotools.metadata.iso.MetaDataImpl;
+import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.distribution.Format;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.GeographicExtent;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.util.InternationalString;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -45,10 +63,13 @@ public class FileMetadataReader extends MetadataReader {
      */
     private final Unmarshaller unmarshaller;
     
-    public FileMetadataReader(File dataDirectory, Unmarshaller unmarshaller) {
+    public FileMetadataReader(Automatic configuration, Unmarshaller unmarshaller) throws CstlServiceException {
         super(true, false);
-        this.dataDirectory = dataDirectory;
         this.unmarshaller  = unmarshaller;
+        dataDirectory = configuration.getdataDirectory();
+        if (dataDirectory == null || !dataDirectory.exists()) {
+            throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
+        } 
     }
     
     /**
@@ -64,7 +85,11 @@ public class FileMetadataReader extends MetadataReader {
      */
     @Override
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
-        return getObjectFromFile(identifier);
+        Object obj = getObjectFromFile(identifier);
+        if (obj instanceof MetaDataImpl && mode == DUBLINCORE) {
+            obj = translateISOtoDC((MetaDataImpl)obj, type);
+        }
+        return obj;
     }
 
     private Object getObjectFromFile(String identifier) throws CstlServiceException {
@@ -84,6 +109,85 @@ public class FileMetadataReader extends MetadataReader {
         } else {
             throw new CstlServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
+    }
+
+    private AbstractRecordType translateISOtoDC(MetaDataImpl metadata, ElementSet type) {
+        AbstractRecordType result = null;
+        if (metadata != null) {
+
+            /*
+             * BRIEF part
+             */
+            SimpleLiteral identifier = new SimpleLiteral(metadata.getFileIdentifier());
+
+            SimpleLiteral title = null;
+            //TODO see for multiple identification
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                if (identification.getCitation() != null && identification.getCitation().getTitle() != null) {
+                    title = new SimpleLiteral(identification.getCitation().getTitle().toString());
+                }
+            }
+
+            SimpleLiteral dataType = null;
+            //TODO see for multiple hierarchyLevel
+            for (ScopeCode code: metadata.getHierarchyLevels()) {
+                dataType = new SimpleLiteral(code.identifier());
+            }
+
+            List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                if (identification instanceof DataIdentification) {
+                    DataIdentification dataIdentification = (DataIdentification) identification;
+                    for (Extent extent : dataIdentification.getExtent()) {
+                        for (GeographicExtent geoExtent :extent.getGeographicElements()) {
+                            if (geoExtent instanceof GeographicBoundingBox) {
+                                GeographicBoundingBox bbox = (GeographicBoundingBox) geoExtent;
+                                // TODO find CRS
+                                bboxes.add(new BoundingBoxType("EPSG:4326",
+                                                                bbox.getWestBoundLongitude(),
+                                                                bbox.getSouthBoundLatitude(),
+                                                                bbox.getEastBoundLongitude(),
+                                                                bbox.getNorthBoundLatitude()));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (type == ElementSetType.BRIEF)
+                return new BriefRecordType(identifier, title, dataType, bboxes);
+
+            /*
+             *  SUMMARY part
+             */
+            List<SimpleLiteral> _abstract = new ArrayList<SimpleLiteral>();
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                if (identification.getAbstract() != null) {
+                    _abstract.add(new SimpleLiteral(identification.getAbstract().toString()));
+                }
+            }
+
+            List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                for (Keywords kw :identification.getDescriptiveKeywords()) {
+                    for (InternationalString str : kw.getKeywords()) {
+                        subjects.add(new SimpleLiteral(str.toString()));
+                    }
+                }
+            }
+            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            Distribution distribution   = metadata.getDistributionInfo();
+            if (distribution != null) {
+                for (Format f: distribution.getDistributionFormats()) {
+                    formats.add(new SimpleLiteral(f.getName().toString()));
+                }
+            }
+
+            if (type == ElementSetType.SUMMARY)
+                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, title, _abstract);
+        }
+        return result;
     }
 
     @Override

@@ -105,8 +105,8 @@ public class FilterMarshallingTest {
         "    </ogc:Overlaps>"                                                                                                                          + '\n' +
         "</ogc:Filter>" + '\n';
     
-        logger.info("result" + result);
-        logger.info("expected" + expResult);
+        logger.finer("result" + result);
+        logger.finer("expected" + expResult);
         assertEquals(expResult, result);
         
         

@@ -28,15 +28,14 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 // constellation dependencies
 import org.constellation.lucene.IndexingException;
+import org.constellation.lucene.SearchingException;
 import org.constellation.lucene.index.AbstractIndexSearcher;
 
 /**
@@ -59,33 +58,33 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
      *
      * @param id
      * @return
-     * @throws org.apache.lucene.index.CorruptIndexException
-     * @throws java.io.IOException
-     * @throws org.apache.lucene.queryParser.ParseException
      */
     @Override
-    public String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException {
-        TermQuery query      = new TermQuery(new Term("id", id));
-        List<String> results = new ArrayList<String>();
-        int maxRecords       = searcher.maxDoc();
-
-        logger.info("TermQuery: " + query.toString());
-        TopDocs hits = searcher.search(query, maxRecords);
-
-        for (ScoreDoc doc :hits.scoreDocs) {
-            results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
+    public String identifierQuery(String id) throws SearchingException {
+        try {
+            TermQuery query = new TermQuery(new Term("id", id));
+            List<String> results = new ArrayList<String>();
+            int maxRecords = searcher.maxDoc();
+            logger.info("TermQuery: " + query.toString());
+            TopDocs hits = searcher.search(query, maxRecords);
+            for (ScoreDoc doc : hits.scoreDocs) {
+                results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
+            }
+            if (results.size() > 1) {
+                logger.warning("multiple record in lucene index for identifier: " + id);
+            }
+            if (results.size() > 0) {
+                return results.get(0);
+            } else {
+                return null;
+            }
+        } catch (IOException ex) {
+            throw new SearchingException("Parse Exception while performing lucene request", ex);
         }
-        if (results.size() > 1)
-            logger.warning("multiple record in lucene index for identifier: " + id);
-
-        if (results.size() > 0)
-            return results.get(0);
-        else
-            return null;
     }
 
     @Override
-    public String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException {
+    public String getMatchingID(Document doc) throws SearchingException {
         return doc.get("id");
     }
 

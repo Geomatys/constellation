@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -153,6 +154,105 @@ public class BriefRecordType extends AbstractRecordType {
             boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         }
         return Collections.unmodifiableList(boundingBox);
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof BriefRecordType) {
+            final BriefRecordType that = (BriefRecordType) object;
+
+            boolean ident = false;
+            if (this.identifier == null && that.identifier == null ) {
+                ident = true;
+            } else if (this.identifier != null && that.identifier != null && (this.identifier.size() == that.identifier.size())) {
+
+                ident = true;
+                for (int i = 0; i < this.identifier.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.identifier.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.identifier.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        ident = false;
+                    }
+                }
+            }
+
+            boolean titl = false;
+            if (this.title == null && that.title == null ) {
+                titl = true;
+            } else if (this.title != null && that.title != null && (this.title.size() == that.title.size())) {
+
+                titl = true;
+                for (int i = 0; i < this.title.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.title.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.title.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        titl = false;
+                    }
+                }
+            }
+
+            boolean bbox = false;
+            if (this.boundingBox == null && that.boundingBox == null ) {
+                bbox = true;
+            } else if (this.boundingBox != null && that.boundingBox != null && (this.boundingBox.size() == that.boundingBox.size())) {
+
+                bbox = true;
+                for (int i = 0; i < this.boundingBox.size(); i++) {
+                    JAXBElement<? extends BoundingBoxType> thisJB = this.boundingBox.get(i);
+                    JAXBElement<? extends BoundingBoxType> thatJB = that.boundingBox.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        bbox = false;
+                    }
+                }
+            }
+            return Utilities.equals(this.type,  that.type)   &&
+                   ident && titl && bbox;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 71 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 71 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 71 * hash + (this.boundingBox != null ? this.boundingBox.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[BriefRecordType]").append('\n');
+
+        if (identifier != null) {
+            s.append("identifier: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : identifier) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (title != null) {
+            s.append("title: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : title) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (type != null) {
+            s.append("type: ").append(type).append('\n');
+        }
+        if (boundingBox != null) {
+            s.append("bounding box: ").append('\n');
+            for (JAXBElement<? extends BoundingBoxType> jb : boundingBox) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        return s.toString();
     }
 
 }

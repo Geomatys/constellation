@@ -60,7 +60,17 @@ public class GetCapabilitiesType extends org.constellation.ows.v100.GetCapabilit
      */
     GetCapabilitiesType() {
     }
-    
+
+    /**
+     * Build a minimal new getCapabilities request with the specified service.
+     *
+     * @param service MUST be CSW.
+     */
+    public GetCapabilitiesType(String service) {
+        super();
+        this.service = service;
+    }
+
     /**
      * Build a new getCapabilities request with the specified service
      * 

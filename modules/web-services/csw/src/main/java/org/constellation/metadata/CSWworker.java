@@ -47,6 +47,7 @@ import org.w3c.dom.Document;
 import org.constellation.cat.csw.AbstractCswRequest;
 import org.constellation.cat.csw.AbstractResultType;
 import org.constellation.cat.csw.ElementSet;
+import org.constellation.cat.csw.ElementSetName;
 import org.constellation.cat.csw.GetDomain;
 import org.constellation.cat.csw.GetRecordById;
 import org.constellation.cat.csw.RequestBase;
@@ -61,7 +62,6 @@ import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DeleteType;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DomainValuesType;
-import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetDomainResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
@@ -84,6 +84,7 @@ import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.lucene.SearchingException;
 import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexSearcher;
 import org.constellation.lucene.index.AbstractIndexer;
@@ -110,12 +111,9 @@ import org.constellation.util.Util;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.generic.database.Automatic.*;
 import static org.constellation.metadata.TypeNames.*;
 
 // Apache Lucene dependencies
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Sort;
 
 //geotools dependencies
@@ -132,6 +130,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // GeoAPI dependencies
+import org.constellation.ows.v100.SectionsType;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -244,23 +243,35 @@ public class CSWworker {
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
 
     /**
-     * Build a new CSW worker
+     * Default constructor for CSW worker.
+     *
+     * @param serviceID The service identifier (used in multiple CSW context). default avlue is "".
+     * @param unmarshaller
+     * @param marshaller
+     */
+    public CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller) {
+        this(serviceID, unmarshaller, marshaller, null);
+    }
+    
+    /**
+     * Build a new CSW worker with the specified configuration directory
      * 
      * @param marshaller A JAXB marshaller to send xml to another CSW service.
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
-     * @throws java.io.IOException
      */
-    public CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller) {
+    protected CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller, File configDir) {
 
         this.unmarshaller = unmarshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
-        File configDir    = getConfigDirectory();
         if (configDir == null) {
-            logger.severe("The CSW service is not working!" + '\n' +
-                          "cause: The configuration directory has not been found");
-             isStarted = false;
-             return;
+            configDir    = getConfigDirectory();
+            if (configDir == null) {
+                logger.severe("The CSW service is not working!" + '\n' +
+                              "cause: The configuration directory has not been found");
+                isStarted = false;
+                return;
+            }
         }
         logger.finer("Path to config directory: " + configDir);
         isStarted = true;
@@ -276,18 +287,6 @@ public class CSWworker {
             } else {
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 
-                // we get the data directory (if needed)
-                File dataDirectory = config.getdataDirectory();
-                if (dataDirectory != null && !dataDirectory.exists()) {
-                    dataDirectory = new File(configDir, "data");
-                    if (!dataDirectory.exists() && config.getType() == FILESYSTEM) {
-                        logger.severe("The CSW service is not working!" + '\n' +
-                            "cause: The unable to find the data directory");
-                        isStarted = false;
-                        return;
-                    }
-                }
-
                 // we load the factory from the available classes
                 AbstractCSWFactory CSWfactory;
                 try {
@@ -302,11 +301,11 @@ public class CSWworker {
 
                 int datasourceType = config.getType();
                 //we initialize all the data retriever (reader/writer) and index worker
-                MDReader      = CSWfactory.getMetadataReader(config, dataDirectory, unmarshaller, configDir);
+                MDReader      = CSWfactory.getMetadataReader(config, unmarshaller, configDir);
                 profile       = CSWfactory.getProfile(datasourceType);
                 AbstractIndexer indexer = CSWfactory.getIndexer(config, MDReader, configDir, serviceID);
                 indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
-                MDWriter      = CSWfactory.getMetadataWriter(config, indexer, marshaller, configDir);
+                MDWriter      = CSWfactory.getMetadataWriter(config, indexer, marshaller);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
@@ -481,6 +480,9 @@ public class CSWworker {
         FilterCapabilities    fc = null;
             
         Sections sections = requestCapabilities.getSections();
+        if (sections == null) {
+            sections = new SectionsType("All");
+        }
         
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
         if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All"))
@@ -699,9 +701,9 @@ public class CSWworker {
         }
         
         // we get the element set type (BRIEF, SUMMARY OR FULL)
-        ElementSetNameType setName = query.getElementSetName();
-        ElementSetType set         = ElementSetType.SUMMARY;
-        List<QName> elementName    = query.getElementName();
+        ElementSetName setName  = query.getElementSetName();
+        ElementSet set          = ElementSetType.SUMMARY;
+        List<QName> elementName = query.getElementName();
         if (setName != null) {
             set = setName.getValue();
         }
@@ -771,7 +773,7 @@ public class CSWworker {
                     distributedStartPosition = 1;
                     distributedMaxRecord     = maxRecord - results.size();
                 }
-            distributedResults = catalogueHarvester.transferGetRecordsRequest(request, cascadedCSWservers, distributedStartPosition, distributedMaxRecord);
+                distributedResults = catalogueHarvester.transferGetRecordsRequest(request, cascadedCSWservers, distributedStartPosition, distributedMaxRecord);
             }
         }
         
@@ -788,111 +790,80 @@ public class CSWworker {
             max = results.size();
         }
         logger.info("local max = " + max + " distributed max = " + maxDistributed);
-        
-        if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
 
-            // we return only the number of result matching
-            if (resultType.equals(ResultType.HITS)) {
-                searchResults = new SearchResultsType(ID, set, results.size(), nextRecord);
-
-            // we return a list of Record
-            } else if (resultType.equals(ResultType.RESULTS)) {
-
-                List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-
-                for (int i = startPos -1; i < max; i++) {
-                    Object obj = MDReader.getMetadata(results.get(i), DUBLINCORE, set, elementName);
-                    if (obj == null && (max + 1) < results.size()) {
-                        max++;
-
-                    } else {
-                        records.add((AbstractRecordType)obj);
-                    }
-                }
-
-                //we add additional distributed result
-                for (int i = 0; i < maxDistributed; i++) {
-
-                    Object additionalResult = distributedResults.additionalResults.get(i);
-                    if (additionalResult instanceof AbstractRecordType) {
-                        records.add((AbstractRecordType) additionalResult);
-                    }
-                }
-
-                searchResults = new SearchResultsType(ID,
-                                                      set,
-                                                      totalMatched,
-                                                      records,
-                                                      records.size(),
-                                                      nextRecord);
-
-            //we return an Acknowledgement if the request is valid.
-            } else if (resultType.equals(ResultType.VALIDATE)) {
-               try {
-                   EchoedRequestType echoRequest = new EchoedRequestType(request);
-                   return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
-
-                } catch(DatatypeConfigurationException ex) {
-                    throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                  NO_APPLICABLE_CODE);
-                }
-            }
-
+        int mode;
+        if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+            mode = ISO_19115;
+        } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0") || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+            mode = EBRIM;
+        } else if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+            mode = DUBLINCORE;
         } else {
+            throw new IllegalArgumentException("undefined outputSchema");
+        }
 
-            int mode;
-            if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
-                mode = ISO_19115;
-            } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")  || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
-                mode = EBRIM;
-            } else {
-                mode = DUBLINCORE;
+        // we return only the number of result matching
+        if (resultType.equals(ResultType.HITS)) {
+            searchResults = new SearchResultsType(ID, (ElementSetType)set, results.size(), nextRecord);
+
+        // we return a list of Record
+        } else if (resultType.equals(ResultType.RESULTS)) {
+
+            List<AbstractRecordType> Arecords = new ArrayList<AbstractRecordType>();
+            List<Object> records              = new ArrayList<Object>();
+
+            for (int i = startPos -1; i < max; i++) {
+                Object obj = MDReader.getMetadata(results.get(i), mode, set, elementName);
+                if (obj == null && (max + 1) < results.size()) {
+                    max++;
+
+                } else {
+                    if (mode == DUBLINCORE)
+                        Arecords.add((AbstractRecordType)obj);
+                    else
+                        records.add(obj);
+                }
             }
 
-            // we return only the number of result matching
-            if (resultType.equals(ResultType.HITS)) {
-                searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size(), nextRecord);
+            //we add additional distributed result
+            for (int i = 0; i < maxDistributed; i++) {
 
-            } else if (resultType.equals(ResultType.RESULTS)) {
-
-                List<Object> records = new ArrayList<Object>();
-
-                for (int i = startPos -1; i < max; i++) {
-
-                    Object obj = MDReader.getMetadata(results.get(i), mode, set, elementName);
-                    if (obj == null && (max + 1) < results.size()) {
-                        max++;
-                    } else {
-                        records.add(obj);
-                    }
-                }
-
-                 //we add additional distributed result
-                for (int i = 0; i < maxDistributed; i++) {
-
-                    Object additionalResult = distributedResults.additionalResults.get(i);
+                Object additionalResult = distributedResults.additionalResults.get(i);
+                if (mode == DUBLINCORE) {
+                    Arecords.add((AbstractRecordType) additionalResult);
+                } else {
                     records.add(additionalResult);
                 }
-
-                searchResults = new SearchResultsType(ID,
-                                                      set,
-                                                      totalMatched,
-                                                      records.size(),
-                                                      records);
-
-            //we return an Acknowledgement if the request is valid.
-            } else if (resultType.equals(ResultType.VALIDATE)) {
-                try {
-                    EchoedRequestType echoRequest = new EchoedRequestType(request);
-                    return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
-
-                } catch(DatatypeConfigurationException ex) {
-                    throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                                  NO_APPLICABLE_CODE);
-                }
             }
 
+            if (mode == DUBLINCORE) {
+                searchResults = new SearchResultsType(ID,
+                                                      (ElementSetType)set,
+                                                      totalMatched,
+                                                      Arecords,
+                                                      Arecords.size(),
+                                                      nextRecord);
+            } else {
+                searchResults = new SearchResultsType(ID,
+                                                      (ElementSetType) set,
+                                                      totalMatched,
+                                                      records.size(),
+                                                      records,
+                                                      nextRecord);
+            }
+
+            //we return an Acknowledgement if the request is valid.
+        } else if (resultType.equals(ResultType.VALIDATE)) {
+            try {
+                EchoedRequestType echoRequest = new EchoedRequestType(request);
+                return new AcknowledgementType(ID, echoRequest, System.currentTimeMillis());
+
+            } catch(DatatypeConfigurationException ex) {
+                throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
+                                               NO_APPLICABLE_CODE);
+            }
         }
+        
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), request.getVersion(), searchResults);
         logger.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
@@ -909,14 +880,8 @@ public class CSWworker {
         try {
             return indexSearcher.doSearch(query);
         
-        } catch (CorruptIndexException ex) {
-            throw new CstlServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
-                                             NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            throw new CstlServiceException("The service has throw an IO exception while making lucene request.",
-                                             NO_APPLICABLE_CODE);
-        } catch (ParseException ex) {
-            throw new CstlServiceException("The service has throw an Parse exception while making lucene request.",
+        } catch (SearchingException ex) {
+            throw new CstlServiceException("The service has throw an exception while making identifier lucene request",
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -932,14 +897,8 @@ public class CSWworker {
         try {
             return indexSearcher.identifierQuery(id);
         
-        } catch (CorruptIndexException ex) {
-            throw new CstlServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
-                                          NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            throw new CstlServiceException("The service has throw an IO exception while making lucene request.",
-                                          NO_APPLICABLE_CODE);
-        } catch (ParseException ex) {
-            throw new CstlServiceException("The service has throw an Parse exception while making lucene request.",
+        } catch (SearchingException ex) {
+            throw new CstlServiceException("The service has throw an exception while making identifier lucene request",
                                           NO_APPLICABLE_CODE);
         }
     }

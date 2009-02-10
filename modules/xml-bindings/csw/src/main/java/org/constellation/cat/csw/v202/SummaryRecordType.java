@@ -30,6 +30,7 @@ import org.constellation.cat.csw.SummaryRecord;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -299,6 +300,185 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
             boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         }
         return Collections.unmodifiableList(boundingBox);
+    }
+
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SummaryRecordType) {
+            final SummaryRecordType that = (SummaryRecordType) object;
+
+            boolean ident = false;
+            if (this.identifier == null && that.identifier == null ) {
+                ident = true;
+            } else if (this.identifier != null && that.identifier != null && (this.identifier.size() == that.identifier.size())) {
+
+                ident = true;
+                for (int i = 0; i < this.identifier.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.identifier.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.identifier.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        ident = false;
+                    }
+                }
+            }
+
+            boolean titl = false;
+            if (this.title == null && that.title == null ) {
+                titl = true;
+            } else if (this.title != null && that.title != null && (this.title.size() == that.title.size())) {
+
+                titl = true;
+                for (int i = 0; i < this.title.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.title.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.title.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        titl = false;
+                    }
+                }
+            }
+
+            boolean bbox = false;
+            if (this.boundingBox == null && that.boundingBox == null ) {
+                bbox = true;
+            } else if (this.boundingBox != null && that.boundingBox != null && (this.boundingBox.size() == that.boundingBox.size())) {
+
+                bbox = true;
+                for (int i = 0; i < this.boundingBox.size(); i++) {
+                    JAXBElement<? extends BoundingBoxType> thisJB = this.boundingBox.get(i);
+                    JAXBElement<? extends BoundingBoxType> thatJB = that.boundingBox.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        bbox = false;
+                    }
+                }
+            }
+
+            boolean fom = false;
+            if (this.format == null && that.format == null ) {
+                fom = true;
+            } else if (this.format != null && that.format != null && (this.format.size() == that.format.size())) {
+
+                fom = true;
+                for (int i = 0; i < this.format.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.format.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.format.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        fom = false;
+                    }
+                }
+            }
+
+            boolean rel = false;
+            if (this.relation == null && that.relation == null ) {
+                rel = true;
+            } else if (this.relation != null && that.relation != null && (this.relation.size() == that.relation.size())) {
+
+                rel = true;
+                for (int i = 0; i < this.relation.size(); i++) {
+                    JAXBElement<SimpleLiteral> thisJB = this.relation.get(i);
+                    JAXBElement<SimpleLiteral> thatJB = that.relation.get(i);
+                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
+                        rel = false;
+                    }
+                }
+            }
+
+            return Utilities.equals(this.type,    that.type)    &&
+                   Utilities.equals(this.subject, that.subject) &&
+                   Utilities.equals(this._abstract, that._abstract) &&
+                   Utilities.equals(this.modified, that.modified) &&
+                   Utilities.equals(this.subject, that.subject) &&
+                   Utilities.equals(this.spatial, that.spatial) &&
+                   ident && titl && bbox && fom && rel;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 11 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 11 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 11 * hash + (this.subject != null ? this.subject.hashCode() : 0);
+        hash = 11 * hash + (this.format != null ? this.format.hashCode() : 0);
+        hash = 11 * hash + (this.relation != null ? this.relation.hashCode() : 0);
+        hash = 11 * hash + (this.modified != null ? this.modified.hashCode() : 0);
+        hash = 11 * hash + (this._abstract != null ? this._abstract.hashCode() : 0);
+        hash = 11 * hash + (this.spatial != null ? this.spatial.hashCode() : 0);
+        hash = 11 * hash + (this.boundingBox != null ? this.boundingBox.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[SummaryRecordType]").append('\n');
+
+        if (identifier != null) {
+            s.append("identifier: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : identifier) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (title != null) {
+            s.append("title: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : title) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (type != null) {
+            s.append("type: ").append(type).append('\n');
+        }
+        if (boundingBox != null) {
+            s.append("bounding box: ").append('\n');
+            for (JAXBElement<? extends BoundingBoxType> jb : boundingBox) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (_abstract != null) {
+            s.append("abstract: ").append('\n');
+            for (SimpleLiteral sl : _abstract) {
+                s.append(sl).append('\n');
+            }
+        }
+        if (subject != null) {
+            s.append("subject: ").append('\n');
+            for (SimpleLiteral sl : subject) {
+                s.append(sl).append('\n');
+            }
+        }
+        if (modified != null) {
+            s.append("modified: ").append('\n');
+            for (SimpleLiteral sl : modified) {
+                s.append(sl).append('\n');
+            }
+        }
+        if (spatial != null) {
+            s.append("spatial: ").append('\n');
+            for (SimpleLiteral sl : spatial) {
+                s.append(sl).append('\n');
+            }
+        }
+        if (format != null) {
+            s.append("format: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : format) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+        if (relation != null) {
+            s.append("relation: ").append('\n');
+            for (JAXBElement<SimpleLiteral> jb : relation) {
+                s.append(jb.getValue()).append('\n');
+            }
+        }
+
+        return s.toString();
     }
 
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<csw:BriefRecord xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+        <dc:identifier>42292_5p_19900609195600</dc:identifier>
+        <dc:title>90008411.ctd</dc:title>
+        <dc:type>dataset</dc:type>
+        <ows:BoundingBox dimensions="2" crs="EPSG:4326">
+            <ows:LowerCorner>1.1667 36.6</ows:LowerCorner>
+            <ows:UpperCorner>1.1667 36.6</ows:UpperCorner>
+        </ows:BoundingBox>
+</csw:BriefRecord>

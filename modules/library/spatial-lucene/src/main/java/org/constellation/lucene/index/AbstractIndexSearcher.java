@@ -26,7 +26,6 @@ import java.util.Map;
 
 // Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -45,6 +44,7 @@ import org.apache.lucene.search.TopDocs;
 
 // constellation dependencies
 import org.constellation.lucene.IndexingException;
+import org.constellation.lucene.SearchingException;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 
@@ -105,6 +105,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             throw new IndexingException("Failure to parse during indexing", ex);
         } catch (IOException ex) {
             throw new IndexingException("IO Exception during indexing", ex);
+        }  catch (SearchingException ex) {
+            throw new IndexingException("Searching Exception during indexing", ex);
         }
         
     }
@@ -127,7 +129,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     /**
      * Fill the list of identifiers ordered by doc ID
      */
-    public final void initIdentifiersList() throws IOException, CorruptIndexException, ParseException {
+    private final void initIdentifiersList() throws IOException, CorruptIndexException, ParseException, SearchingException {
         identifiers = new ArrayList<String>();
         for (int i = 0; i < searcher.maxDoc(); i++) {
             String metadataID = getMatchingID(searcher.doc(i));
@@ -143,7 +145,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      *
      * @return A database id.
      */
-    public abstract String identifierQuery(String id) throws CorruptIndexException, IOException, ParseException;
+    public abstract String identifierQuery(String id) throws SearchingException;
 
     /**
      * This method return the database ID of a matching Document
@@ -152,7 +154,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      *
      * @return A database id.
      */
-    public abstract String getMatchingID(Document doc) throws CorruptIndexException, IOException, ParseException;
+    public abstract String getMatchingID(Document doc) throws SearchingException;
 
     /**
      * This method proceed a lucene search and returns a list of ID.
@@ -161,132 +163,126 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      *
      * @return      A List of id.
      */
-    public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
-        long start = System.currentTimeMillis();
-        List<String> results = new ArrayList<String>();
-        
-        //we look for a cached Query
-        if (isCacheEnabled && cachedQueries.containsKey(spatialQuery)) {
-            results = cachedQueries.get(spatialQuery);
-            logger.info("returning result from cache (" + results.size() +" matching documents)");
+    public List<String> doSearch(SpatialQuery spatialQuery) throws SearchingException {
+        try {
+            long start = System.currentTimeMillis();
+            List<String> results = new ArrayList<String>();
+
+            //we look for a cached Query
+            if (isCacheEnabled && cachedQueries.containsKey(spatialQuery)) {
+                results = cachedQueries.get(spatialQuery);
+                logger.info("returning result from cache (" + results.size() + " matching documents)");
+                return results;
+            }
+
+            int maxRecords = searcher.maxDoc();
+            String field = "Title";
+            QueryParser parser = new QueryParser(field, analyzer);
+            parser.setDefaultOperator(Operator.AND);
+
+            // we enable the leading wildcard mode if the first character of the query is a '*'
+            if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 || spatialQuery.getQuery().indexOf(":(*") != -1 || spatialQuery.getQuery().indexOf(":(+*") != -1 || spatialQuery.getQuery().indexOf(":+*") != -1) {
+                parser.setAllowLeadingWildcard(true);
+                BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+            }
+            Query query = parser.parse(spatialQuery.getQuery());
+            Filter filter = spatialQuery.getSpatialFilter();
+            int operator = spatialQuery.getLogicalOperator();
+            Sort sort = spatialQuery.getSort();
+            String sorted = "no Sorted";
+            if (sort != null) {
+                sorted = "order by: " + sort.toString();
+            }
+            String f = "no Filter";
+            if (filter != null) {
+                f = filter.toString();
+            }
+            logger.info("Searching for: " + query.toString(field) + '\n' + SerialChainFilter.ValueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
+
+            // simple query with an AND
+            if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
+                TopDocs docs;
+                if (sort != null) {
+                    docs = searcher.search(query, filter, maxRecords, sort);
+                } else {
+                    docs = searcher.search(query, filter, maxRecords);
+                }
+                for (ScoreDoc doc : docs.scoreDocs) {
+                    results.add(identifiers.get(doc.doc));
+                }
+
+            // for a OR we need to perform many request
+            } else if (operator == SerialChainFilter.OR) {
+                TopDocs hits1;
+                TopDocs hits2;
+                if (sort != null) {
+                    hits1 = searcher.search(query, null, maxRecords, sort);
+                    hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords, sort);
+                } else {
+                    hits1 = searcher.search(query, maxRecords);
+                    hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords);
+                }
+                for (ScoreDoc doc : hits1.scoreDocs) {
+                    results.add(identifiers.get(doc.doc));
+                }
+                for (ScoreDoc doc : hits2.scoreDocs) {
+                    String id = identifiers.get(doc.doc);
+                    if (!results.contains(id)) {
+                        results.add(id);
+                    }
+                }
+
+            // for a NOT we need to perform many request
+            } else if (operator == SerialChainFilter.NOT) {
+                TopDocs hits1;
+                if (sort != null) {
+                    hits1 = searcher.search(query, filter, maxRecords, sort);
+                } else {
+                    hits1 = searcher.search(query, filter, maxRecords);
+                }
+                List<String> unWanteds = new ArrayList<String>();
+                for (ScoreDoc doc : hits1.scoreDocs) {
+                    unWanteds.add(identifiers.get(doc.doc));
+                }
+
+                TopDocs hits2;
+                if (sort != null) {
+                    hits2 = searcher.search(simpleQuery, null, maxRecords, sort);
+                } else {
+                    hits2 = searcher.search(simpleQuery, maxRecords);
+                }
+                for (ScoreDoc doc : hits2.scoreDocs) {
+                    String id = identifiers.get(doc.doc);
+                    if (!unWanteds.contains(id)) {
+                        results.add(id);
+                    }
+                }
+
+            } else {
+                throw new IllegalArgumentException("unsupported logical Operator");
+            }
+
+            // if we have some subQueries we execute it separely and merge the result
+            if (spatialQuery.getSubQueries().size() > 0) {
+                SpatialQuery sub = spatialQuery.getSubQueries().get(0);
+                List<String> subResults = doSearch(sub);
+                for (String r : results) {
+                    if (!subResults.contains(r)) {
+                        results.remove(r);
+                    }
+                }
+            }
+
+            //we put the query in cache
+            putInCache(spatialQuery, results);
+            
+            logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
             return results;
+        } catch (ParseException ex) {
+            throw new SearchingException("Parse Exception while performing lucene request", ex);
+        } catch (IOException ex) {
+           throw new SearchingException("IO Exception while performing lucene request", ex);
         }
-        
-        int maxRecords = searcher.maxDoc();
-
-        String field        = "Title";
-        QueryParser parser  = new QueryParser(field, analyzer);
-        parser.setDefaultOperator(Operator.AND);
-        logger.info("Analyzer used:" + analyzer.getClass().getSimpleName());
-
-        // we enable the leading wildcard mode if the first character of the query is a '*'
-        if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 ||
-            spatialQuery.getQuery().indexOf(":(*") != -1 || spatialQuery.getQuery().indexOf(":(+*") != -1 ||
-            spatialQuery.getQuery().indexOf(":+*") != -1) {
-            parser.setAllowLeadingWildcard(true);
-            BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
-        }
-
-        Query query   = parser.parse(spatialQuery.getQuery());
-        Filter filter      = spatialQuery.getSpatialFilter();
-        int operator  = spatialQuery.getLogicalOperator();
-        Sort sort     = spatialQuery.getSort();
-        String sorted = "no Sorted";
-        if (sort != null)
-            sorted = "order by: " + sort.toString();
-
-        String f = "no Filter";
-        if (filter != null)
-            f = filter.toString();
-        logger.info("Searching for: "    + query.toString(field) + '\n' +
-                    SerialChainFilter.ValueOf(operator)          + '\n' +
-                    f                                            + '\n' +
-                    sorted                                       + '\n' +
-                    "max records: " + maxRecords);
-
-        // simple query with an AND
-        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
-
-            TopDocs docs;
-            if (sort != null) {
-                docs = searcher.search(query, filter, maxRecords, sort);
-            } else {
-                docs = searcher.search(query, filter, maxRecords);
-            }
-
-            for (ScoreDoc doc :docs.scoreDocs) {
-                results.add(identifiers.get(doc.doc));
-            }
-
-        // for a OR we need to perform many request
-        } else if (operator == SerialChainFilter.OR) {
-            TopDocs hits1;
-            TopDocs hits2;
-            if (sort != null) {
-                hits1 = searcher.search(query, null, maxRecords, sort);
-                hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords, sort);
-            } else {
-                hits1 = searcher.search(query, maxRecords);
-                hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords);
-            }
-
-            for (ScoreDoc doc :hits1.scoreDocs) {
-                results.add(identifiers.get(doc.doc));
-            }
-
-            for (ScoreDoc doc :hits2.scoreDocs) {
-                String id = identifiers.get(doc.doc);
-                if (!results.contains(id)) {
-                    results.add(id);
-                }
-            }
-
-        // for a NOT we need to perform many request
-        } else if (operator == SerialChainFilter.NOT) {
-            TopDocs hits1;
-            if (sort != null)
-                hits1 = searcher.search(query, filter, maxRecords, sort);
-            else
-                hits1 = searcher.search(query, filter, maxRecords);
-
-            List<String> unWanteds = new ArrayList<String>();
-            for (ScoreDoc doc :hits1.scoreDocs) {
-                unWanteds.add(identifiers.get(doc.doc));
-            }
-
-            TopDocs hits2;
-            if (sort != null)
-                hits2 = searcher.search(simpleQuery, null, maxRecords, sort);
-            else
-               hits2 = searcher.search(simpleQuery, maxRecords);
-
-            for (ScoreDoc doc :hits2.scoreDocs) {
-                String id = identifiers.get(doc.doc);
-                if (!unWanteds.contains(id)) {
-                    results.add(id);
-                }
-            }
-
-        } else {
-            throw new IllegalArgumentException("unsupported logical Operator");
-        }
-
-        // if we have some subQueries we execute it separely and merge the result
-        if (spatialQuery.getSubQueries().size() > 0) {
-            SpatialQuery sub = spatialQuery.getSubQueries().get(0);
-            List<String> subResults =  doSearch(sub);
-            for (String r: results) {
-                if (!subResults.contains(r)) {
-                    results.remove(r);
-                }
-            }
-        }
-
-        //we put the query in cache
-        putInCache(spatialQuery, results);
-
-        logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
-        return results;
     }
 
     /**

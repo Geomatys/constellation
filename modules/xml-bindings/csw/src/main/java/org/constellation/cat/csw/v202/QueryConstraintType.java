@@ -162,7 +162,7 @@ public class QueryConstraintType implements QueryConstraint {
     
      @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[GetRecordsType]").append('\n');
+        StringBuilder s = new StringBuilder("[QueryConstraintType]").append('\n');
         
         if (filter != null) {
             s.append("filter: ").append(filter).append('\n');

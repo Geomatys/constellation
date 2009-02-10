@@ -57,7 +57,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MetadataReader getMetadataReader(Automatic configuration, File dataDirectory, Unmarshaller unmarshaller, File configDir) throws CstlServiceException {
+    public MetadataReader getMetadataReader(Automatic configuration, Unmarshaller unmarshaller, File configDir) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -65,7 +65,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataReader(configuration, configDir);
             case FILESYSTEM:
-                return new FileMetadataReader(dataDirectory, unmarshaller);
+                return new FileMetadataReader(configuration, unmarshaller);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + type);
         }
@@ -78,7 +78,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer, Marshaller marshaller, File dataDirectory) throws CstlServiceException {
+    public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer, Marshaller marshaller) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -86,7 +86,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataWriter(configuration, indexer);
             case FILESYSTEM:
-                return new FileMetadataWriter(indexer, marshaller, dataDirectory);
+                return new FileMetadataWriter(configuration, indexer, marshaller);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + type);
         }

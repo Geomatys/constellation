@@ -46,9 +46,9 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
         super(priority);
     }
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration, File dataDir, Unmarshaller unmarshaller, File configDir) throws CstlServiceException;
+    public abstract MetadataReader getMetadataReader(Automatic configuration, Unmarshaller unmarshaller, File configDir) throws CstlServiceException;
 
-    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller, File dataDirectory) throws CstlServiceException;
+    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller) throws CstlServiceException;
     
     public abstract int getProfile(int dbType);
     
