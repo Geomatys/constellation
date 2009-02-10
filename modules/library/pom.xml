@@ -104,6 +104,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
+    <module>postgrid-schema</module>
     <module>spatial-lucene</module>
     <module>xacml</module>
   </modules>
