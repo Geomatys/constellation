@@ -38,7 +38,7 @@ import org.geotools.factory.AbstractFactory;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractCSWFactory extends AbstractFactory {
 

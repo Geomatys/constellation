@@ -360,40 +360,43 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         this.dcElement.add(dublinFactory.createRelation(relation));
     }
     
-    public AbstractSimpleLiteral getRelation() {
+    public List<AbstractSimpleLiteral> getRelation() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("relation")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setSource(SimpleLiteral source) {
         this.dcElement.add(dublinFactory.createSource(source));
     }
     
-    public AbstractSimpleLiteral getSource() {
+    public List<AbstractSimpleLiteral> getSource() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("source")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setCoverage(SimpleLiteral coverage) {
         this.dcElement.add(dublinFactory.createCoverage(coverage));
     }
     
-    public AbstractSimpleLiteral getCoverage() {
+    public List<AbstractSimpleLiteral> getCoverage() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("coverage")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
             
         }
-        return null;
+        return result;
     }
     
     public void setDate(SimpleLiteral date) {
@@ -413,13 +416,14 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         this.dcElement.add(dublinFactory.createRights(rights));
     }
     
-    public AbstractSimpleLiteral getRights() {
+    public List<AbstractSimpleLiteral> getRights() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("rights")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setSpatial(SimpleLiteral spatial) {
@@ -446,26 +450,28 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         this.dcElement.add(dublinFactory.createPublisher(publisher));
     }
     
-    public AbstractSimpleLiteral getPublisher() {
+    public List<AbstractSimpleLiteral> getPublisher() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("publisher")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setContributor(SimpleLiteral contributor) {
         this.dcElement.add(dublinFactory.createContributor(contributor));
     }
     
-    public AbstractSimpleLiteral getContributor() {
+    public List<AbstractSimpleLiteral> getContributor() {
+        List<AbstractSimpleLiteral> result = new ArrayList<AbstractSimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("contributor")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setDescription(SimpleLiteral description) {

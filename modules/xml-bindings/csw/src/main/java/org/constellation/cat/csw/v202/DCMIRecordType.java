@@ -73,6 +73,13 @@ import org.geotools.util.Utilities;
     "_abstract"   ,
     "references"  ,
     "spatial"     ,
+    "relation"    ,
+    "rights"      ,
+    "source"      ,
+    "coverage"    ,
+    "publisher"   ,
+    "contributor" ,
+    "description" ,
     "dcElement"   
 })
 @XmlSeeAlso({
@@ -122,6 +129,27 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     
     @XmlElement(name = "references", namespace = "http://purl.org/dc/terms/")
     private SimpleLiteral references;
+
+    @XmlElement(name = "relation", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> relation;
+
+    @XmlElement(name = "rights", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> rights;
+
+    @XmlElement(name = "source", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> source;
+
+    @XmlElement(name = "coverage", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> coverage;
+
+    @XmlElement(name = "publisher", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> publisher;
+
+    @XmlElement(name = "contributor", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> contributor;
+
+    @XmlElement(name = "description", namespace = "http://purl.org/dc/elements/1.1/")
+    private SimpleLiteral description;
     
     /**
      * An empty constructor used by JAXB
@@ -158,7 +186,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
             List<SimpleLiteral> subjects, List<SimpleLiteral> format, SimpleLiteral modified, SimpleLiteral date, List<SimpleLiteral> _abstract,
             List<SimpleLiteral> creator, SimpleLiteral distributor, SimpleLiteral language, SimpleLiteral spatial, 
-            SimpleLiteral references) {
+            SimpleLiteral references, List<SimpleLiteral> relation) {
         
         this.identifier = identifier;
         this.title      = title;
@@ -176,6 +204,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         this._abstract   = _abstract;
         this.spatial     = spatial;
         this.references  = references;
+        this.relation    = relation;
         
     }
     
@@ -301,39 +330,63 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
     
     public void setRelation(SimpleLiteral relation) {
-        this.dcElement.add(dublinFactory.createRelation(relation));
+        if (this.relation == null)
+            this.relation = new ArrayList<SimpleLiteral>();
+        this.relation.add(relation);
+    }
+
+    public void setRelation(List<SimpleLiteral> relation) {
+        this.relation = relation;
     }
     
-    public SimpleLiteral getRelation() {
-        return getAttributeFromDCelement("relation"); 
+    public List<SimpleLiteral> getRelation() {
+        return relation;
     }
     
     public void setSource(SimpleLiteral source) {
-        this.dcElement.add(dublinFactory.createSource(source));
+        if (this.source == null)
+            this.source = new ArrayList<SimpleLiteral>();
+        this.source.add(source);
+    }
+
+    public void setSource(List<SimpleLiteral> source) {
+        this.source = source;
     }
     
-    public SimpleLiteral getSource() {
-       return getAttributeFromDCelement("source"); 
+    public List<SimpleLiteral> getSource() {
+       return source;
     }
     
     public void setCoverage(SimpleLiteral coverage) {
-        this.dcElement.add(dublinFactory.createCoverage(coverage));
+        if (this.coverage == null)
+            this.coverage = new ArrayList<SimpleLiteral>();
+        this.coverage.add(coverage);
+    }
+
+    public void setCoverage(List<SimpleLiteral> coverage) {
+        this.coverage = coverage;
     }
     
-    public SimpleLiteral getCoverage() {
-        return getAttributeFromDCelement("coverage"); 
+    public List<SimpleLiteral> getCoverage() {
+        return coverage;
     }
     
     public void setRights(SimpleLiteral rights) {
-        this.dcElement.add(dublinFactory.createRights(rights));
+        if (this.rights == null)
+            this.rights = new ArrayList<SimpleLiteral>();
+        this.rights.add(rights);
+    }
+
+    public void setRights(List<SimpleLiteral> rights) {
+        this.rights = rights;
     }
     
-    public SimpleLiteral getRights() {
-        return getAttributeFromDCelement("rights"); 
+    public List<SimpleLiteral> getRights() {
+        return rights;
     }
     
     public void setSpatial(SimpleLiteral spatial) {
-        this.spatial = spatial;//dublinTermFactory.createSpatial(spatial);
+        this.spatial = spatial;
     }
     
     public SimpleLiteral getSpatial() {
@@ -348,28 +401,40 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         return references;
     }
     
+    public void setPublisher(List<SimpleLiteral> publisher) {
+        this.publisher = publisher;
+    }
+
     public void setPublisher(SimpleLiteral publisher) {
-        this.dcElement.add(dublinFactory.createPublisher(publisher));
+        if (this.publisher != null)
+            this.publisher = new ArrayList<SimpleLiteral>();
+        this.publisher.add(publisher);
     }
     
-    public SimpleLiteral getPublisher() {
-        return getAttributeFromDCelement("publisher"); 
+    public List<SimpleLiteral> getPublisher() {
+        return publisher;
     }
     
+    public void setContributor(List<SimpleLiteral> contributor) {
+        this.contributor = contributor;
+    }
+
     public void setContributor(SimpleLiteral contributor) {
-        this.dcElement.add(dublinFactory.createContributor(contributor));
+        if (this.contributor == null)
+            this.contributor = new ArrayList<SimpleLiteral>();
+        this.contributor.add(contributor);
     }
     
-    public SimpleLiteral getContributor() {
-        return getAttributeFromDCelement("contributor"); 
+    public List<SimpleLiteral> getContributor() {
+        return contributor;
     }
     
     public void setDescription(SimpleLiteral description) {
-        this.dcElement.add(dublinFactory.createDescription(description));
+        this.description = description;
     }
     
     public SimpleLiteral getDescription() {
-        return getAttributeFromDCelement("description"); 
+        return description;
     }
     
     /**

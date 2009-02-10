@@ -23,10 +23,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import org.constellation.cat.csw.v202.AcknowledgementType;
+import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.ElementSetNameType;
@@ -34,15 +38,22 @@ import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
+import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.QueryConstraintType;
+import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.generic.database.Automatic;
+import org.constellation.ogc.SortByType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.geotools.metadata.iso.MetaDataImpl;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -338,6 +349,110 @@ public class CSWworkerTest {
         assertEquals(expRecordResult1, recordResult1);
         assertEquals(expRecordResult2, recordResult2);
 
+        /*
+         *  TEST 6 : getRecordById with no identifier (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", null);
+        boolean exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "id");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 7 : getRecordById with an unvalid identifier (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("whatever"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "id");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 8 : getRecordById with an unvalid outputSchema (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.opengis.net/whatever",Arrays.asList("42292_5p_19900609195600"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputSchema");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 9 : getRecordById with an unvalid outputFormat (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "ping/pong", "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("42292_5p_19900609195600"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 11 : getRecordById with the first metadata with no outputSchema.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
+                "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
+        result = worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 1);
+        assertTrue(result.getAny().size() == 0);
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof SummaryRecordType);
+
+        sumResult =  (SummaryRecordType) obj;
+
+        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+
+        assertEquals(expSumResult1, sumResult);
+
+        /*
+         *  TEST 12 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", null,
+                "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
+        result = worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 1);
+        assertTrue(result.getAny().size() == 0);
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof SummaryRecordType);
+
+        sumResult =  (SummaryRecordType) obj;
+
+        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+
+        assertEquals(expSumResult1, sumResult);
+
     }
 
     /**
@@ -347,6 +462,125 @@ public class CSWworkerTest {
      */
     @Test
     public void getRecordsTest() throws Exception {
+        
+        /*
+         *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         */
+        
+        List<QName> typeNames             = Arrays.asList(TypeNames._Record_QNAME);
+        ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        SortByType sortBy                 = null;
+        QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        GetRecordsResponseType result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 0);
+        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        /*
+         *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         */
+
+        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy         = null;
+        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
+        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        Object obj = result.getSearchResults().getAbstractRecord().get(1);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        RecordType recordResult1 = (RecordType) obj;
+
+        obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        RecordType recordResult2 = (RecordType) obj;
+
+        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
+        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2FDC.xml"))).getValue();
+
+        assertEquals(expRecordResult1, recordResult1);
+        assertEquals(expRecordResult2, recordResult2);
+
+        /*
+         *  TEST 3 : getRecords with VALIDATE - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         */
+
+        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy         = null;
+        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.VALIDATE, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        assertTrue(worker.getRecords(request) instanceof AcknowledgementType);
+
+        /*
+         *  TEST 4 : getRecords with RESULTS - DC mode (BRIEF) - CQL text: Title LIKE *0008411.ctd
+         */
+
+        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.BRIEF);
+        sortBy         = null;
+        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
+        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.BRIEF));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        obj = result.getSearchResults().getAbstractRecord().get(1);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof BriefRecordType);
+        BriefRecordType briefResult1 = (BriefRecordType) obj;
+
+        obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof BriefRecordType);
+        BriefRecordType briefResult2 = (BriefRecordType) obj;
+
+        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
+        BriefRecordType expBriefResult2 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2BDC.xml"))).getValue();
+
+        assertEquals(expBriefResult1, briefResult1);
+        assertEquals(expBriefResult2, briefResult2);
 
     }
 

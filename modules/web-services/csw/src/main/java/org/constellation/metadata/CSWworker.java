@@ -136,14 +136,14 @@ import org.opengis.filter.sort.SortOrder;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class CSWworker {
 
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.metadata");
+    private Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A capabilities object containing the static part of the document.
@@ -260,7 +260,7 @@ public class CSWworker {
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      */
-    protected CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller, File configDir) {
+    protected CSWworker(final String serviceID, final Unmarshaller unmarshaller, final Marshaller marshaller, File configDir) {
 
         this.unmarshaller = unmarshaller;
         prefixMapper      = new NamespacePrefixMapperImpl("");
@@ -342,7 +342,7 @@ public class CSWworker {
      * IFREMER hack
      * we search the CATALINA_HOME/webapps/sdn-csw/WEB-INF/csw_configuration
      */
-    public File getConfigDirectory() {
+    private File getConfigDirectory() {
         File configDir = new File(WebService.getSicadeDirectory(), "csw_configuration/");
         if (configDir.exists()) {
             logger.info("taking configuration from sicade directory");
@@ -370,7 +370,7 @@ public class CSWworker {
     /**
      * Initialize the supported type names in function of the redaer capacity.
      */
-    public void initializeSupportedTypeNames() {
+    private void initializeSupportedTypeNames() {
         SUPPORTED_TYPE_NAME = new ArrayList<QName>();
         List<Integer> supportedDataTypes = MDReader.getSupportedDataTypes();
         if (supportedDataTypes.contains(ISO_19115))
@@ -387,7 +387,7 @@ public class CSWworker {
     /**
      * Initialize the supported outputSchema in function of the redaer capacity.
      */
-    public void initializeAcceptedResourceType() {
+    private void initializeAcceptedResourceType() {
         ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
         List<Integer> supportedDataTypes = MDReader.getSupportedDataTypes();
         if (supportedDataTypes.contains(ISO_19115)) {
@@ -406,7 +406,7 @@ public class CSWworker {
     /**
      * Load the federated CSW server from a properties file.
      */
-    public void loadCascadedService(File configDirectory) {
+    private void loadCascadedService(final File configDirectory) {
         cascadedCSWservers = new ArrayList<String>();
         try {
             // we get the cascading configuration file
@@ -437,7 +437,7 @@ public class CSWworker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
+    public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         logger.info("getCapabilities request processing" + '\n');
         long startTime = System.currentTimeMillis();
         
@@ -616,7 +616,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public Object getRecords(GetRecordsRequest request) throws CstlServiceException {
+    public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
         logger.info("GetRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -662,15 +662,21 @@ public class CSWworker {
                 throw new CstlServiceException("The query must specify at least typeName.",
                                               INVALID_PARAMETER_VALUE, "TypeNames");
             } else {
-                for (QName type:typeNames) {
-                    prefixs.put(type.getPrefix(), type.getNamespaceURI());
-                    //for ebrim mode the user can put variable after the Qname
-                    if (type.getLocalPart().indexOf('_') != -1 && !type.getLocalPart().startsWith("MD")) {
-                        StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
-                        type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
-                        while (tokenizer.hasMoreTokens()) {
-                            variables.put(tokenizer.nextToken(), type);
+                for (QName type : typeNames) {
+                    if (type != null) {
+                        prefixs.put(type.getPrefix(), type.getNamespaceURI());
+                        //for ebrim mode the user can put variable after the Qname
+                        if (type.getLocalPart().indexOf('_') != -1 && !type.getLocalPart().startsWith("MD")) {
+                            StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
+                            type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
+                            while (tokenizer.hasMoreTokens()) {
+                                variables.put(tokenizer.nextToken(), type);
+                            }
                         }
+                    } else {
+                        throw new CstlServiceException("The service was unable to read a typeName:" +'\n' +
+                                                       "supported one are:" + '\n' + supportedTypeNames(),
+                                                       INVALID_PARAMETER_VALUE, "TypeNames");
                     }
                     //we verify that the typeName is supported        
                     if (!SUPPORTED_TYPE_NAME.contains(type)) {
@@ -876,7 +882,7 @@ public class CSWworker {
      * @return
      * @throws CstlServiceException
      */
-    private List<String> executeLuceneQuery(SpatialQuery query) throws CstlServiceException {
+    private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
         try {
             return indexSearcher.doSearch(query);
         
@@ -893,7 +899,7 @@ public class CSWworker {
      * @return
      * @throws CstlServiceException
      */
-    private String executeIdentifierQuery(String id) throws CstlServiceException {
+    private String executeIdentifierQuery(final String id) throws CstlServiceException {
         try {
             return indexSearcher.identifierQuery(id);
         
@@ -909,7 +915,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordByIdResponseType getRecordById(GetRecordById request) throws CstlServiceException {
+    public GetRecordByIdResponseType getRecordById(final GetRecordById request) throws CstlServiceException {
         logger.info("GetRecordById request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1095,7 +1101,7 @@ public class CSWworker {
      * @param unexistingID
      * @throws CstlServiceException
      */
-    private void throwUnexistingIdentifierException(List<String> unexistingID) throws CstlServiceException {
+    private void throwUnexistingIdentifierException(final List<String> unexistingID) throws CstlServiceException {
         String identifiers = "";
         for (String s : unexistingID) {
             identifiers = identifiers + s + ',';
@@ -1119,7 +1125,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(DescribeRecord request) throws CstlServiceException{
+    public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
         logger.info("DescribeRecords request processing" + '\n');
         long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
@@ -1205,7 +1211,7 @@ public class CSWworker {
      * @param qnames A list of QNames.
      * @return true if the list contains at least one ebrim V3.0 QName.
      */
-    private boolean containsOneOfEbrim30(List<QName> qnames) {
+    private boolean containsOneOfEbrim30(final List<QName> qnames) {
         
         if (qnames.contains(_AdhocQuery_QNAME)
          || qnames.contains(_Association_QNAME)
@@ -1240,7 +1246,7 @@ public class CSWworker {
      * @param qnames A list of QNames.
      * @return true if the list contains at least one ebrim V2.5 QName.
      */
-    private boolean containsOneOfEbrim25(List<QName> qnames) {
+    private boolean containsOneOfEbrim25(final List<QName> qnames) {
         
         if (qnames.contains(_ExtrinsicObject25_QNAME)
          || qnames.contains(_Federation25_QNAME)
@@ -1274,7 +1280,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetDomainResponseType getDomain(GetDomain request) throws CstlServiceException{
+    public GetDomainResponseType getDomain(final GetDomain request) throws CstlServiceException{
         logger.info("GetDomain request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1353,7 +1359,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(Transaction request) throws CstlServiceException {
+    public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
         logger.info("Transaction request processing" + '\n');
         
         if (profile == DISCOVERY) {
@@ -1422,7 +1428,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(Harvest request) throws CstlServiceException {
+    public HarvestResponseType harvest(final Harvest request) throws CstlServiceException {
         logger.info("Harvest request processing" + '\n');
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
@@ -1553,7 +1559,7 @@ public class CSWworker {
      * 
      * @param format a MIME type represented by a String.
      */
-    private boolean isSupportedFormat(String format) {
+    private boolean isSupportedFormat(final String format) {
         return ACCEPTED_OUTPUT_FORMATS.contains(format);
     }
     
@@ -1562,14 +1568,14 @@ public class CSWworker {
      * 
      * @param staticCapabilities An OWS 1.0.0 capabilities object.
      */
-    public void setStaticCapabilities(Capabilities staticCapabilities) {
+    public void setStaticCapabilities(final Capabilities staticCapabilities) {
         this.staticCapabilities = staticCapabilities;
     }
     
     /**
      * Set the current service URL
      */
-    public void setServiceURL(String serviceURL){
+    public void setServiceURL(final String serviceURL){
         this.serviceURL = serviceURL;
     }
     
@@ -1578,7 +1584,7 @@ public class CSWworker {
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
-    private void verifyBaseRequest(RequestBase request) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBase request) throws CstlServiceException {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!",
                                           NO_APPLICABLE_CODE);
@@ -1627,7 +1633,7 @@ public class CSWworker {
      * @param request
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void initializeOutputFormat(AbstractCswRequest request) throws CstlServiceException {
+    private void initializeOutputFormat(final AbstractCswRequest request) throws CstlServiceException {
         
         // we initialize the output format of the response
         String format = request.getOutputFormat();

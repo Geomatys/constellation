@@ -22,7 +22,8 @@ import org.constellation.dublincore.AbstractSimpleLiteral;
 
 /**
  *
- * @author Mehdi Sidhoum.
+ * @author Mehdi Sidhoum (Geomatys).
+ * @author Guilhem Legal (Geomatys).
  */
 public interface DCMIRecord extends AbstractRecord {
     
@@ -52,23 +53,23 @@ public interface DCMIRecord extends AbstractRecord {
     
     public AbstractSimpleLiteral getLanguage();
     
-    public AbstractSimpleLiteral getRelation();
+    public List<? extends AbstractSimpleLiteral> getRelation();
     
-    public AbstractSimpleLiteral getSource();
+    public List<? extends AbstractSimpleLiteral> getSource();
     
-    public AbstractSimpleLiteral getCoverage();
+    public List<? extends AbstractSimpleLiteral> getCoverage();
     
     public AbstractSimpleLiteral getDate();
     
-    public AbstractSimpleLiteral getRights();
+    public List<? extends AbstractSimpleLiteral> getRights();
     
     public AbstractSimpleLiteral getSpatial();
     
     public AbstractSimpleLiteral getReferences();
     
-    public AbstractSimpleLiteral getPublisher();
+    public List<? extends AbstractSimpleLiteral> getPublisher();
     
-    public AbstractSimpleLiteral getContributor();
+    public List<? extends AbstractSimpleLiteral> getContributor();
     
     public AbstractSimpleLiteral getDescription();
 
