@@ -135,6 +135,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             String metadataID = getMatchingID(searcher.doc(i));
             identifiers.add(i, metadataID);
         }
+        logger.info(identifiers.size() + " records founded.");
     }
 
     /**
@@ -176,6 +177,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             }
 
             int maxRecords = searcher.maxDoc();
+            if (maxRecords == 0) {
+                logger.severe("The index seems to be empty.");
+                maxRecords = 1;
+            }
+
             String field = "Title";
             QueryParser parser = new QueryParser(field, analyzer);
             parser.setDefaultOperator(Operator.AND);

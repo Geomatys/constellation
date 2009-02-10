@@ -81,18 +81,18 @@ import org.geotools.util.Utilities;
 @XmlRootElement(name = "SummaryRecord")
 public class SummaryRecordType extends AbstractRecordType implements SummaryRecord {
 
-    @XmlElementRef(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> identifier;
-    @XmlElementRef(name = "title", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> title;
+    @XmlElement(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> identifier;
+    @XmlElement(name = "title", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> title;
     @XmlElement(namespace = "http://purl.org/dc/elements/1.1/")
     private SimpleLiteral type;
     @XmlElement(namespace = "http://purl.org/dc/elements/1.1/")
     private List<SimpleLiteral> subject;
-    @XmlElementRef(name = "format", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> format;
-    @XmlElementRef(name = "relation", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> relation;
+    @XmlElement(name = "format", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> format;
+    @XmlElement(name = "relation", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> relation;
     @XmlElement(namespace = "http://purl.org/dc/terms/")
     private List<SimpleLiteral> modified;
     @XmlElement(name = "abstract", namespace = "http://purl.org/dc/terms/")
@@ -116,15 +116,15 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
     public SummaryRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes,
             List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract){
         
-        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.identifier = new ArrayList<SimpleLiteral>();
         if (identifier == null)
             identifier = new SimpleLiteral();
-        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        this.identifier.add(identifier);
         
-        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.title = new ArrayList<SimpleLiteral>();
         if (title == null)
             title = new SimpleLiteral();
-        this.title.add(dublinFactory.createTitle(title));
+        this.title.add(title);
         
         this.type = type;
         
@@ -137,9 +137,9 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         }
         this.subject = subject;
         
-        this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.format = new ArrayList<SimpleLiteral>();
         if (format != null)
-            this.format.add(dublinFactory.createFormat(format));
+            this.format.add(format);
         
         this.modified = new ArrayList<SimpleLiteral>();
         if (modified != null)
@@ -148,8 +148,6 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         this._abstract = new ArrayList<SimpleLiteral>();
         if (_abstract != null)
             this._abstract.add(_abstract);
-        
-        
     }
     
     /**
@@ -158,15 +156,15 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
     public SummaryRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes,
             List<SimpleLiteral> subject, List<SimpleLiteral> formats, SimpleLiteral modified, List<SimpleLiteral> _abstract){
         
-        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.identifier = new ArrayList<SimpleLiteral>();
         if (identifier == null)
             identifier = new SimpleLiteral();
-        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        this.identifier.add(identifier);
         
-        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.title = new ArrayList<SimpleLiteral>();
         if (title == null)
             title = new SimpleLiteral();
-        this.title.add(dublinFactory.createTitle(title));
+        this.title.add(title);
         
         this.type = type;
         
@@ -179,20 +177,36 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         }
         this.subject = subject;
         
-        this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
-        if (format != null){
-            for (SimpleLiteral forma: formats)
-                if (forma != null)
-                    this.format.add(dublinFactory.createFormat(forma));
-        }
+        this.format = formats;
         
         this.modified = new ArrayList<SimpleLiteral>();
         if (modified != null)
             this.modified.add(modified);
         
         this._abstract = _abstract;
-        
-        
+    }
+
+    /**
+     * Build a new Summary record TODO add relation and spatial
+     */
+    public SummaryRecordType(List<SimpleLiteral> identifier, List<SimpleLiteral> title, SimpleLiteral type, List<BoundingBoxType> bboxes,
+            List<SimpleLiteral> subject, List<SimpleLiteral> format, List<SimpleLiteral> modified, List<SimpleLiteral> _abstract){
+
+        this.identifier = identifier;
+        this.title = title;
+        this.type = type;
+        this.modified = modified;
+        this._abstract = _abstract;
+        this.subject = subject;
+        this.format = format;
+
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else if (bbox != null)
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
     }
     
     
@@ -200,9 +214,9 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
      * Gets the value of the identifier property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getIdentifier() {
+    public List<SimpleLiteral> getIdentifier() {
         if (identifier == null) {
-            identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+            identifier = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(identifier);
     }
@@ -211,9 +225,9 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
      * Gets the value of the title property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getTitle() {
+    public List<SimpleLiteral> getTitle() {
         if (title == null) {
-            title = new ArrayList<JAXBElement<SimpleLiteral>>();
+            title = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(title);
     }
@@ -240,9 +254,9 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
      * Gets the value of the format property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getFormat() {
+    public List<SimpleLiteral> getFormat() {
         if (format == null) {
-            format = new ArrayList<JAXBElement<SimpleLiteral>>();
+            format = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(format);
     }
@@ -251,9 +265,9 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
      * Gets the value of the relation property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getRelation() {
+    public List<SimpleLiteral> getRelation() {
         if (relation == null) {
-            relation = new ArrayList<JAXBElement<SimpleLiteral>>();
+            relation = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(relation);
     }
@@ -314,36 +328,6 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         if (object instanceof SummaryRecordType) {
             final SummaryRecordType that = (SummaryRecordType) object;
 
-            boolean ident = false;
-            if (this.identifier == null && that.identifier == null ) {
-                ident = true;
-            } else if (this.identifier != null && that.identifier != null && (this.identifier.size() == that.identifier.size())) {
-
-                ident = true;
-                for (int i = 0; i < this.identifier.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.identifier.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.identifier.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        ident = false;
-                    }
-                }
-            }
-
-            boolean titl = false;
-            if (this.title == null && that.title == null ) {
-                titl = true;
-            } else if (this.title != null && that.title != null && (this.title.size() == that.title.size())) {
-
-                titl = true;
-                for (int i = 0; i < this.title.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.title.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.title.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        titl = false;
-                    }
-                }
-            }
-
             boolean bbox = false;
             if (this.boundingBox == null && that.boundingBox == null ) {
                 bbox = true;
@@ -359,43 +343,17 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
                 }
             }
 
-            boolean fom = false;
-            if (this.format == null && that.format == null ) {
-                fom = true;
-            } else if (this.format != null && that.format != null && (this.format.size() == that.format.size())) {
-
-                fom = true;
-                for (int i = 0; i < this.format.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.format.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.format.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        fom = false;
-                    }
-                }
-            }
-
-            boolean rel = false;
-            if (this.relation == null && that.relation == null ) {
-                rel = true;
-            } else if (this.relation != null && that.relation != null && (this.relation.size() == that.relation.size())) {
-
-                rel = true;
-                for (int i = 0; i < this.relation.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.relation.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.relation.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        rel = false;
-                    }
-                }
-            }
-
-            return Utilities.equals(this.type,    that.type)    &&
-                   Utilities.equals(this.subject, that.subject) &&
-                   Utilities.equals(this._abstract, that._abstract) &&
-                   Utilities.equals(this.modified, that.modified) &&
-                   Utilities.equals(this.subject, that.subject) &&
-                   Utilities.equals(this.spatial, that.spatial) &&
-                   ident && titl && bbox && fom && rel;
+            return Utilities.equals(this.type,       that.type)       &&
+                   Utilities.equals(this.subject,    that.subject)    &&
+                   Utilities.equals(this._abstract,  that._abstract)  &&
+                   Utilities.equals(this.modified,   that.modified)   &&
+                   Utilities.equals(this.subject,    that.subject)    &&
+                   Utilities.equals(this.spatial,    that.spatial)    &&
+                   Utilities.equals(this.identifier, that.identifier) &&
+                   Utilities.equals(this.title,      that.title)      &&
+                   Utilities.equals(this.relation,   that.relation)   &&
+                   Utilities.equals(this.format,     that.format)     &&
+                   bbox;
         }
         return false;
     }
@@ -422,14 +380,14 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
 
         if (identifier != null) {
             s.append("identifier: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : identifier) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : identifier) {
+                s.append(jb).append('\n');
             }
         }
         if (title != null) {
             s.append("title: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : title) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : title) {
+                s.append(jb).append('\n');
             }
         }
         if (type != null) {
@@ -467,14 +425,14 @@ public class SummaryRecordType extends AbstractRecordType implements SummaryReco
         }
         if (format != null) {
             s.append("format: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : format) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : format) {
+                s.append(jb).append('\n');
             }
         }
         if (relation != null) {
             s.append("relation: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : relation) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : relation) {
+                s.append(jb).append('\n');
             }
         }
 

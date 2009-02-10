@@ -35,6 +35,7 @@ import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
 import org.constellation.cat.csw.v202.RecordType;
+import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
@@ -267,11 +268,85 @@ public class CSWworkerTest {
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof BriefRecordType);
 
-        BriefRecordType recordResult =  (BriefRecordType) obj;
+        BriefRecordType briefResult =  (BriefRecordType) obj;
 
-        BriefRecordType ExpRecResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
+        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
 
-        assertEquals(ExpRecResult1, recordResult);
+        assertEquals(expBriefResult1, briefResult);
+
+        /*
+         *  TEST 3 : getRecordById with the first metadata in DC mode (SUMMARY).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
+                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
+        result = worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 1);
+        assertTrue(result.getAny().size() == 0);
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof SummaryRecordType);
+
+        SummaryRecordType sumResult =  (SummaryRecordType) obj;
+
+        SummaryRecordType expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+
+        assertEquals(expSumResult1, sumResult);
+
+        /*
+         *  TEST 4 : getRecordById with the first metadata in DC mode (FULL).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
+        result = worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 1);
+        assertTrue(result.getAny().size() == 0);
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof RecordType);
+
+        RecordType recordResult = (RecordType) obj;
+
+        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
+
+        assertEquals(expRecordResult1, recordResult);
+
+        /*
+         *  TEST 5 : getRecordById with two metadata in DC mode (FULL).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
+        result = worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 2);
+        assertTrue(result.getAny().size() == 0);
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof RecordType);
+        RecordType recordResult1 = (RecordType) obj;
+
+        obj = result.getAbstractRecord().get(1);
+        assertTrue(obj instanceof RecordType);
+        RecordType recordResult2 = (RecordType) obj;
+
+        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2FDC.xml"))).getValue();
+
+        assertEquals(expRecordResult1, recordResult1);
+        assertEquals(expRecordResult2, recordResult2);
+
+    }
+
+    /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getRecordsTest() throws Exception {
 
     }
 

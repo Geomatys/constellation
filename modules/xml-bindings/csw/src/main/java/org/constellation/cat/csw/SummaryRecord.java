@@ -31,13 +31,13 @@ public interface SummaryRecord extends AbstractRecord {
      * Gets the value of the identifier property.
      * (unmodifiable)
      */
-    public List<? extends JAXBElement<? extends AbstractSimpleLiteral>> getIdentifier();
+    public List<? extends AbstractSimpleLiteral> getIdentifier();
 
     /**
      * Gets the value of the title property.
      * (unmodifiable)
      */
-    public List<? extends JAXBElement<? extends AbstractSimpleLiteral>> getTitle();
+    public List<? extends AbstractSimpleLiteral> getTitle();
 
     /**
      * Gets the value of the type property.
@@ -54,13 +54,13 @@ public interface SummaryRecord extends AbstractRecord {
      * Gets the value of the format property.
      * (unmodifiable)
      */
-    public List<? extends JAXBElement<? extends AbstractSimpleLiteral>> getFormat();
+    public List<? extends AbstractSimpleLiteral> getFormat();
 
     /**
      * Gets the value of the relation property.
      * (unmodifiable)
      */
-    public List<? extends JAXBElement<? extends AbstractSimpleLiteral>> getRelation();
+    public List<? extends AbstractSimpleLiteral> getRelation();
 
     /**
      * Gets the value of the modified property.

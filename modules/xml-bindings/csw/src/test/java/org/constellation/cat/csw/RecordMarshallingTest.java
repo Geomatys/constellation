@@ -333,9 +333,459 @@ public class RecordMarshallingTest {
         
         logger.finer("result:" + result2.toString());
     }
+
+    /**
+     * Test summary Record Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void summmaryRecordMarshalingTest() throws Exception {
+
+        /*
+         * Test marshalling csw summmary Record v2.0.2
+         */
+
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+
+        List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+        formats.add(new SimpleLiteral("format 11-11"));
+        formats.add(new SimpleLiteral("format 22-22"));
+
+        SimpleLiteral modified         = new SimpleLiteral("2007-11-15 21:26:49");
+        List<SimpleLiteral> Abstract   = new ArrayList<SimpleLiteral>();
+        Abstract.add(new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm."));
+
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+
+        SummaryRecordType record = new SummaryRecordType(id, title, type,  bbox, subject, formats, modified, Abstract);
+
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(record, sw);
+
+        String result = sw.toString();
+        String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:SummaryRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "    <dc:format>format 11-11</dc:format>"                                   + '\n' +
+        "    <dc:format>format 22-22</dc:format>"                                   + '\n' +
+        "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "</csw:SummaryRecord>" + '\n';
+
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+
+        assertEquals(expResult, result);
+
+
+        /*
+         * Test marshalling csw summmary Record v2.0.2
+         */
+
+        List<SimpleLiteral> ids    = new ArrayList<SimpleLiteral>();
+        ids.add(new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}"));
+        ids.add(new SimpleLiteral("urn:ogc-x:df:F7807C8AB645"));
+        List<SimpleLiteral> titles = new ArrayList<SimpleLiteral>();
+        titles.add(new SimpleLiteral("(JASON-1)"));
+        titles.add(new SimpleLiteral("(JASON-2)"));
+
+        type       = new SimpleLiteral("clearinghouse");
+
+        subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+
+        formats = new ArrayList<SimpleLiteral>();
+        formats.add(new SimpleLiteral("format 11-11"));
+        formats.add(new SimpleLiteral("format 22-22"));
+
+        List<SimpleLiteral> modifieds   = new ArrayList<SimpleLiteral>();
+        modifieds.add(new SimpleLiteral("2007-11-15 21:26:49"));
+        modifieds.add(new SimpleLiteral("2007-11-15 21:26:48"));
+        Abstract   = new ArrayList<SimpleLiteral>();
+        Abstract.add(new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm."));
+        Abstract.add(new SimpleLiteral("Jason-2 blablablablabla."));
+
+        bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+        bbox.add(new WGS84BoundingBoxType(100, -6.04, -144, 5.9));
+
+        record = new SummaryRecordType(ids, titles, type,  bbox, subject, formats, modifieds, Abstract);
+
+        sw = new StringWriter();
+        recordMarshaller202.marshal(record, sw);
+
+        result = sw.toString();
+        expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:SummaryRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "    <dc:identifier>urn:ogc-x:df:F7807C8AB645</dc:identifier>" + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "    <dc:title>(JASON-2)</dc:title>"                                        + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "    <dc:format>format 11-11</dc:format>"                                   + '\n' +
+        "    <dc:format>format 22-22</dc:format>"                                   + '\n' +
+        "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "    <dct:modified>2007-11-15 21:26:48</dct:modified>"                      + '\n' +
+        "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "    <dct:abstract>Jason-2 blablablablabla.</dct:abstract>" + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>100.0 -6.04</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-144.0 5.9</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "</csw:SummaryRecord>" + '\n';
+
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test summary Record Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void summmaryRecordUnmarshalingTest() throws Exception {
+
+        /*
+         * Test marshalling csw summmary Record v2.0.2
+         */
+
+        String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:SummaryRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "    <dc:format>format 11-11</dc:format>"                                   + '\n' +
+        "    <dc:format>format 22-22</dc:format>"                                   + '\n' +
+        "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "</csw:SummaryRecord>" + '\n';
+
+        StringReader sr = new StringReader(xml);
+        JAXBElement<SummaryRecordType> jb = (JAXBElement) recordUnmarshaller202.unmarshal(sr);
+        SummaryRecordType result = jb.getValue();
+
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+
+        List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+        formats.add(new SimpleLiteral("format 11-11"));
+        formats.add(new SimpleLiteral("format 22-22"));
+
+        SimpleLiteral modified         = new SimpleLiteral("2007-11-15 21:26:49");
+        List<SimpleLiteral> Abstract   = new ArrayList<SimpleLiteral>();
+        Abstract.add(new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm."));
+
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+
+        SummaryRecordType expResult = new SummaryRecordType(id, title, type,  bbox, subject, formats, modified, Abstract);
+
+        assertEquals(expResult, result);
+
+
+        /*
+         * Test marshalling csw summmary Record v2.0.2
+         */
+
+        xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:SummaryRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>" + '\n' +
+        "    <dc:identifier>urn:ogc-x:df:F7807C8AB645</dc:identifier>" + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                        + '\n' +
+        "    <dc:title>(JASON-2)</dc:title>"                                        + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                      + '\n' +
+        "    <dc:subject>oceans elevation NASA/JPL/JASON-1</dc:subject>"            + '\n' +
+        "    <dc:subject>oceans elevation 2</dc:subject>"                           + '\n' +
+        "    <dc:format>format 11-11</dc:format>"                                   + '\n' +
+        "    <dc:format>format 22-22</dc:format>"                                   + '\n' +
+        "    <dct:modified>2007-11-15 21:26:49</dct:modified>"                      + '\n' +
+        "    <dct:modified>2007-11-15 21:26:48</dct:modified>"                      + '\n' +
+        "    <dct:abstract>Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.</dct:abstract>" + '\n' +
+        "    <dct:abstract>Jason-2 blablablablabla.</dct:abstract>" + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                                + '\n' +
+        "        <ows:LowerCorner>100.0 -6.04</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-144.0 5.9</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                               + '\n' +
+        "</csw:SummaryRecord>" + '\n';
+
+        sr = new StringReader(xml);
+        jb = (JAXBElement) recordUnmarshaller202.unmarshal(sr);
+        result = jb.getValue();
+
+
+        List<SimpleLiteral> ids    = new ArrayList<SimpleLiteral>();
+        ids.add(new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}"));
+        ids.add(new SimpleLiteral("urn:ogc-x:df:F7807C8AB645"));
+        List<SimpleLiteral> titles = new ArrayList<SimpleLiteral>();
+        titles.add(new SimpleLiteral("(JASON-1)"));
+        titles.add(new SimpleLiteral("(JASON-2)"));
+
+        type       = new SimpleLiteral("clearinghouse");
+
+        subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+
+        formats = new ArrayList<SimpleLiteral>();
+        formats.add(new SimpleLiteral("format 11-11"));
+        formats.add(new SimpleLiteral("format 22-22"));
+
+        List<SimpleLiteral> modifieds   = new ArrayList<SimpleLiteral>();
+        modifieds.add(new SimpleLiteral("2007-11-15 21:26:49"));
+        modifieds.add(new SimpleLiteral("2007-11-15 21:26:48"));
+        Abstract   = new ArrayList<SimpleLiteral>();
+        Abstract.add(new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm."));
+        Abstract.add(new SimpleLiteral("Jason-2 blablablablabla."));
+
+        bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+        bbox.add(new WGS84BoundingBoxType(100, -6.04, -144, 5.9));
+
+        expResult = new SummaryRecordType(ids, titles, type,  bbox, subject, formats, modifieds, Abstract);
+
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test brief Record Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void briefRecordMarshalingTest() throws Exception {
+
+        /*
+         * Test marshalling BRIEF csw Record v2.0.2
+         */
+
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+
+        BriefRecordType record = new BriefRecordType(id, title, type, bbox);
+
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(record, sw);
+
+        String result = sw.toString();
+        String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"               + '\n' +
+        "<csw:BriefRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>"   + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                          + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                        + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "</csw:BriefRecord>" + '\n';
+
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+
+        assertEquals(expResult, result);
+
+         /*
+         * Test marshalling csw Record v2.0.2
+         */
+
+        List<SimpleLiteral> identifiers = new ArrayList<SimpleLiteral>();
+        identifiers.add(new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}"));
+        identifiers.add(new SimpleLiteral("urn:ogc:x-def:F7807C8AB645"));
+
+        List<SimpleLiteral> titles = new ArrayList<SimpleLiteral>();
+        titles.add(new SimpleLiteral("(JASON-1)"));
+        titles.add(new SimpleLiteral("(JASON-2)"));
+
+        type       = new SimpleLiteral("clearinghouse");
+
+        bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+        bbox.add(new WGS84BoundingBoxType(176, -16.4, -178, 6.1));
+
+        record = new BriefRecordType(identifiers, titles, type, bbox);
+
+        sw = new StringWriter();
+        recordMarshaller202.marshal(record, sw);
+
+        result = sw.toString();
+        expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"               + '\n' +
+        "<csw:BriefRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>"   + '\n' +
+        "    <dc:identifier>urn:ogc:x-def:F7807C8AB645</dc:identifier>"               + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                          + '\n' +
+        "    <dc:title>(JASON-2)</dc:title>"                                          + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                        + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>176.0 -16.4</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-178.0 6.1</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "</csw:BriefRecord>" + '\n';
+
+        //we remove the 2 first line because the xlmns are not always in the same order.
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+        expResult = expResult.substring(expResult.indexOf('\n') + 1);
+
+        result = result.substring(result.indexOf('\n') + 1);
+        result = result.substring(result.indexOf('\n') + 1);
+
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test brief Record Unmarshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void briefRecordUnmarshalingTest() throws Exception {
+
+        /*
+         * Test marshalling BRIEF csw Record v2.0.2
+         */
+
+        String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"               + '\n' +
+        "<csw:BriefRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>"   + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                          + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                        + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "</csw:BriefRecord>" + '\n';
+
+        StringReader sr = new StringReader(xml);
+        JAXBElement<BriefRecordType> jb = (JAXBElement) recordUnmarshaller202.unmarshal(sr);
+        BriefRecordType result = jb.getValue();
+
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+
+        BriefRecordType expResult = new BriefRecordType(id, title, type, bbox);
+
+        assertEquals(expResult, result);
+
+         /*
+         * Test marshalling csw Record v2.0.2
+         */
+
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"               + '\n' +
+        "<csw:BriefRecord xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:ows=\"http://www.opengis.net/ows\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:dct=\"http://purl.org/dc/terms/\">" + '\n' +
+        "    <dc:identifier>{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}</dc:identifier>"   + '\n' +
+        "    <dc:identifier>urn:ogc:x-def:F7807C8AB645</dc:identifier>"               + '\n' +
+        "    <dc:title>(JASON-1)</dc:title>"                                          + '\n' +
+        "    <dc:title>(JASON-2)</dc:title>"                                          + '\n' +
+        "    <dc:type>clearinghouse</dc:type>"                                        + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>180.0 -66.0000000558794</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-180.0 65.9999999720603</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "    <ows:WGS84BoundingBox dimensions=\"2\">"                                 + '\n' +
+        "        <ows:LowerCorner>176.0 -16.4</ows:LowerCorner>"          + '\n' +
+        "        <ows:UpperCorner>-178.0 6.1</ows:UpperCorner>"          + '\n' +
+        "    </ows:WGS84BoundingBox>"                                                 + '\n' +
+        "</csw:BriefRecord>" + '\n';
+
+        sr = new StringReader(xml);
+        jb = (JAXBElement<BriefRecordType>) recordUnmarshaller202.unmarshal(sr);
+        result = jb.getValue();
+
+        List<SimpleLiteral> identifiers = new ArrayList<SimpleLiteral>();
+        identifiers.add(new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}"));
+        identifiers.add(new SimpleLiteral("urn:ogc:x-def:F7807C8AB645"));
+
+        List<SimpleLiteral> titles = new ArrayList<SimpleLiteral>();
+        titles.add(new SimpleLiteral("(JASON-1)"));
+        titles.add(new SimpleLiteral("(JASON-2)"));
+
+        type       = new SimpleLiteral("clearinghouse");
+
+        bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+        bbox.add(new WGS84BoundingBoxType(176, -16.4, -178, 6.1));
+
+        expResult = new BriefRecordType(identifiers, titles, type, bbox);
+
+        assertEquals(expResult, result);
+
+    }
     
     /**
-     * Test simple Record Marshalling. 
+     * Test getRecordById request Marshalling.
      * 
      * @throws java.lang.Exception
      */

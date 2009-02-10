@@ -5,21 +5,9 @@
         <dc:type>dataset</dc:type>
         <dc:subject>oceans</dc:subject>
         <dc:subject>Transmittance and attenuance of the water column</dc:subject>
-        <dc:subject>Electrical conductivity of the water column</dc:subject>
-        <dc:subject>Dissolved oxygen parameters in the water column</dc:subject>
-        <dc:subject>Light extinction and diffusion coefficients</dc:subject>
-        <dc:subject>Dissolved noble gas concentration parameters in the water column</dc:subject>
-        <dc:subject>Optical backscatter</dc:subject>
-        <dc:subject>Salinity of the water column</dc:subject>
-        <dc:subject>Dissolved concentration parameters for 'other' gases in the water column</dc:subject>
-        <dc:subject>Temperature of the water column</dc:subject>
-        <dc:subject>Visible waveband radiance and irradiance measurements in the atmosphere</dc:subject>
-        <dc:subject>Visible waveband radiance and irradiance measurements in the water column</dc:subject>
-        <dc:subject>CTD profilers</dc:subject>
-        <dc:subject>research vessel</dc:subject>
-        <dc:format>MEDATLAS</dc:format>
-        <dct:modified>2009-02-08T18:06:39</dct:modified>
-        <dct:abstract>Donnees CTD MEDIPROD VI                     120</dct:abstract>
+        <dc:format>MEDATLAS ASCII</dc:format>
+        <dct:modified>2009-01-01T00:00:00</dct:modified>
+        <dct:abstract>Donnees CTD NEDIPROD VI 120</dct:abstract>
         <ows:BoundingBox dimensions="2" crs="EPSG:4326">
             <ows:LowerCorner>1.1667 36.6</ows:LowerCorner>
             <ows:UpperCorner>1.1667 36.6</ows:UpperCorner>

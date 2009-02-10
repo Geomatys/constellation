@@ -70,10 +70,10 @@ import org.geotools.util.Utilities;
 @XmlRootElement(name = "BriefRecord")
 public class BriefRecordType extends AbstractRecordType {
 
-    @XmlElementRef(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> identifier;
-    @XmlElementRef(name = "title", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private List<JAXBElement<SimpleLiteral>> title;
+    @XmlElement(name = "identifier", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> identifier;
+    @XmlElement(name = "title", namespace = "http://purl.org/dc/elements/1.1/")
+    private List<SimpleLiteral> title;
     @XmlElement(namespace = "http://purl.org/dc/elements/1.1/")
     private SimpleLiteral type;
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)
@@ -95,18 +95,41 @@ public class BriefRecordType extends AbstractRecordType {
      */
     public BriefRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes) {
         
-        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.identifier = new ArrayList<SimpleLiteral>();
         if (identifier == null)
             identifier = new SimpleLiteral();
-        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        this.identifier.add(identifier);
         
-        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.title = new ArrayList<SimpleLiteral>();
         if (title == null)
             title = new SimpleLiteral();
-        this.title.add(dublinFactory.createTitle(title));
+        this.title.add(title);
         
         this.type = type;
         
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else if (bbox != null)
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+    }
+
+    /**
+     * Build a new brief record (full possibility).
+     *
+     * @param identifier
+     * @param title
+     * @param type
+     * @param bbox
+     */
+    public BriefRecordType(List<SimpleLiteral> identifier, List<SimpleLiteral> title, SimpleLiteral type, List<BoundingBoxType> bboxes) {
+
+        this.identifier = identifier;
+        this.title      = title;
+        this.type       = type;
+
         this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         for (BoundingBoxType bbox: bboxes) {
             if (bbox instanceof WGS84BoundingBoxType)
@@ -120,9 +143,9 @@ public class BriefRecordType extends AbstractRecordType {
      * Gets the value of the identifier property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getIdentifier() {
+    public List<SimpleLiteral> getIdentifier() {
         if (identifier == null) {
-            identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+            identifier = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(identifier);
     }
@@ -131,9 +154,9 @@ public class BriefRecordType extends AbstractRecordType {
      * Gets the value of the title property.
      * (unmodifiable)
      */
-    public List<JAXBElement<SimpleLiteral>> getTitle() {
+    public List<SimpleLiteral> getTitle() {
         if (title == null) {
-            title = new ArrayList<JAXBElement<SimpleLiteral>>();
+            title = new ArrayList<SimpleLiteral>();
         }
         return Collections.unmodifiableList(title);
     }
@@ -167,36 +190,6 @@ public class BriefRecordType extends AbstractRecordType {
         if (object instanceof BriefRecordType) {
             final BriefRecordType that = (BriefRecordType) object;
 
-            boolean ident = false;
-            if (this.identifier == null && that.identifier == null ) {
-                ident = true;
-            } else if (this.identifier != null && that.identifier != null && (this.identifier.size() == that.identifier.size())) {
-
-                ident = true;
-                for (int i = 0; i < this.identifier.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.identifier.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.identifier.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        ident = false;
-                    }
-                }
-            }
-
-            boolean titl = false;
-            if (this.title == null && that.title == null ) {
-                titl = true;
-            } else if (this.title != null && that.title != null && (this.title.size() == that.title.size())) {
-
-                titl = true;
-                for (int i = 0; i < this.title.size(); i++) {
-                    JAXBElement<SimpleLiteral> thisJB = this.title.get(i);
-                    JAXBElement<SimpleLiteral> thatJB = that.title.get(i);
-                    if (!Utilities.equals(thisJB.getValue(), thatJB.getValue())) {
-                        titl = false;
-                    }
-                }
-            }
-
             boolean bbox = false;
             if (this.boundingBox == null && that.boundingBox == null ) {
                 bbox = true;
@@ -211,8 +204,10 @@ public class BriefRecordType extends AbstractRecordType {
                     }
                 }
             }
-            return Utilities.equals(this.type,  that.type)   &&
-                   ident && titl && bbox;
+            return Utilities.equals(this.type,       that.type)       &&
+                   Utilities.equals(this.identifier, that.identifier) &&
+                   Utilities.equals(this.title,      that.title)      &&
+                   bbox;
         }
         return false;
     }
@@ -233,14 +228,14 @@ public class BriefRecordType extends AbstractRecordType {
 
         if (identifier != null) {
             s.append("identifier: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : identifier) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : identifier) {
+                s.append(jb).append('\n');
             }
         }
         if (title != null) {
             s.append("title: ").append('\n');
-            for (JAXBElement<SimpleLiteral> jb : title) {
-                s.append(jb.getValue()).append('\n');
+            for (SimpleLiteral jb : title) {
+                s.append(jb).append('\n');
             }
         }
         if (type != null) {

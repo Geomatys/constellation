@@ -18,6 +18,8 @@ package org.constellation.metadata.io;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,12 +34,15 @@ import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.ElementSetType;
+import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.extent.Extent;
@@ -46,6 +51,7 @@ import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.InternationalString;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -62,7 +68,9 @@ public class FileMetadataReader extends MetadataReader {
      * A unMarshaller to get object from metadata files.
      */
     private final Unmarshaller unmarshaller;
-    
+
+    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
     public FileMetadataReader(Automatic configuration, Unmarshaller unmarshaller) throws CstlServiceException {
         super(true, false);
         this.unmarshaller  = unmarshaller;
@@ -112,7 +120,6 @@ public class FileMetadataReader extends MetadataReader {
     }
 
     private AbstractRecordType translateISOtoDC(MetaDataImpl metadata, ElementSet type) {
-        AbstractRecordType result = null;
         if (metadata != null) {
 
             /*
@@ -170,6 +177,12 @@ public class FileMetadataReader extends MetadataReader {
 
             List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
+                if (identification instanceof DataIdentification) {
+                    DataIdentification dataIdentification = (DataIdentification) identification;
+                    for (TopicCategory tc : dataIdentification.getTopicCategories()) {
+                        subjects.add(new SimpleLiteral(tc.identifier()));
+                    }
+                }
                 for (Keywords kw :identification.getDescriptiveKeywords()) {
                     for (InternationalString str : kw.getKeywords()) {
                         subjects.add(new SimpleLiteral(str.toString()));
@@ -184,10 +197,42 @@ public class FileMetadataReader extends MetadataReader {
                 }
             }
 
+            SimpleLiteral modified = new SimpleLiteral(formatter.format(metadata.getDateStamp()));
+
             if (type == ElementSetType.SUMMARY)
-                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, title, _abstract);
+                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, _abstract);
+
+            SimpleLiteral date    = modified;
+            List<SimpleLiteral> creator = new ArrayList<SimpleLiteral>();
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                for (ResponsibleParty rp :identification.getPointOfContacts()) {
+                    if (Role.ORIGINATOR.equals(rp.getRole())) {
+                        creator.add(new SimpleLiteral(rp.getOrganisationName().toString()));
+                    }
+
+                }
+            }
+            if (creator.size() == 0) creator = null;
+
+            // TODO multiple
+            SimpleLiteral distributor = null;
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                for (ResponsibleParty rp :identification.getPointOfContacts()) {
+                    if (Role.PUBLISHER.equals(rp.getRole())) {
+                        distributor = new SimpleLiteral(rp.getOrganisationName().toString());
+                    }
+
+                }
+            }
+
+            SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getLanguage());
+
+            // TODO
+            SimpleLiteral spatial = null;
+            SimpleLiteral references = null;
+            return new RecordType(identifier, title, dataType, subjects, formats, modified, date, _abstract, bboxes, creator, distributor, language, spatial, references);
         }
-        return result;
+        return null;
     }
 
     @Override
@@ -246,3 +291,4 @@ public class FileMetadataReader extends MetadataReader {
         return new HashMap<String, List<String>>();
     }
 }
+
