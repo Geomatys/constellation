@@ -75,11 +75,6 @@
       <artifactId>cstl-xml-swe</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-postgrid</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
 </project>
