@@ -159,6 +159,17 @@
       <artifactId>gt-epsg-hsql</artifactId>
       <scope>runtime</scope>
     </dependency>
+    
+    
+    <!-- For TESTING -->
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-postgrid</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
 
 

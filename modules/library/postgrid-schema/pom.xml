@@ -60,6 +60,42 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+    </dependency>
   </dependencies>
 
+
+  <!--
+    Compiles and creates the JAR files.
+  -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <useSystemClassLoader>true</useSystemClassLoader>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+          <skipTests>true</skipTests>
+         </configuration>
+      </plugin>
+    </plugins> 
+    
+  </build>
+  
 </project>

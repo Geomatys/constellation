@@ -27,18 +27,18 @@ import junit.textui.TestRunner;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PostGridSuite extends TestSuite {
+public class PostGridStorageSuite extends TestSuite {
     /**
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
-    public PostGridSuite() {
+    public PostGridStorageSuite() {
         addTestSuite(org.constellation.catalog.DatabaseTest.Open.class); // Must be first
 
         addTestSuite(org.geotools.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
 
-        addTestSuite(org.constellation.catalog.         SpatialFunctionsTest         .class);
-        addTestSuite(org.constellation.catalog.         TimeStampTest                .class);
-        addTestSuite(org.constellation.catalog.         QueryTest                    .class);
+//        addTestSuite(org.constellation.catalog.         SpatialFunctionsTest         .class);
+//        addTestSuite(org.constellation.catalog.         TimeStampTest                .class);
+//        addTestSuite(org.constellation.catalog.         QueryTest                    .class);
         addTestSuite(org.constellation.coverage.catalog.MetadataParserTest           .class);
         addTestSuite(org.constellation.coverage.catalog.CategoryTableTest            .class);
         addTestSuite(org.constellation.coverage.catalog.SampleDimensionTableTest     .class);
@@ -63,7 +63,7 @@ public class PostGridSuite extends TestSuite {
      * Returns the test suite, for JUnit 3 compatibility.
      */
     public static TestSuite suite() {
-        return new PostGridSuite();
+        return new PostGridStorageSuite();
     }
 
     /**
