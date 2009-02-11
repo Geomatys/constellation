@@ -241,6 +241,27 @@ public class CSWworkerTest {
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result != null);
+        
+        /*
+         *  TEST 6 : get capabilities with wrong version (waiting for an exception)
+         */
+        acceptVersions = new AcceptVersionsType("2.0.4");
+        sections       = new SectionsType("All");
+        acceptFormats  = new AcceptFormatsType("text/xml");
+        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+
+        boolean exLaunched = false;
+        try {
+            worker.getCapabilities(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
+            assertEquals(ex.getLocator(), "acceptVersion");
+        }
+
+        assertTrue(exLaunched);
+
+
     }
 
     /**

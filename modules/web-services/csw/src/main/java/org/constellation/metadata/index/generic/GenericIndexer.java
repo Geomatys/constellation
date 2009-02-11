@@ -266,7 +266,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         final Document doc = new Document();
         CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
-        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
 
         final StringBuilder anyText = new StringBuilder();

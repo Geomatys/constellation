@@ -137,7 +137,7 @@ public class KeywordAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -275,7 +275,8 @@ public class KeywordAnalyzerTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("40510_145_19930221211500");
-
+        expectedResult.add("CTDF02");
+        
         assertEquals(expectedResult, result);
     }
 
@@ -309,6 +310,7 @@ public class KeywordAnalyzerTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -327,6 +329,7 @@ public class KeywordAnalyzerTest {
         logger.finer("SortedSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");
@@ -350,6 +353,7 @@ public class KeywordAnalyzerTest {
         logger.finer("SortedSearch 3:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -378,6 +382,7 @@ public class KeywordAnalyzerTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
     }
@@ -414,6 +419,7 @@ public class KeywordAnalyzerTest {
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -441,6 +447,42 @@ public class KeywordAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+    }
+
+    /**
+     *
+     * Test spatial lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void TermQueryTest() throws Exception {
+
+        /**
+         * Test 1
+         */
+
+        String identifier = "39727_22_19750113062500";
+        String result = indexSearcher.identifierQuery(identifier);
+
+        logger.info("identifier query 1:" + '\n' + result);
+
+        String expectedResult = "39727_22_19750113062500";
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 2
+         */
+
+        identifier = "CTDF02";
+        result = indexSearcher.identifierQuery(identifier);
+
+        logger.info("identifier query 2:" + '\n' + result);
+
+        expectedResult = "CTDF02";
 
         assertEquals(expectedResult, result);
     }
@@ -479,6 +521,13 @@ public class KeywordAnalyzerTest {
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
+        if (obj instanceof MetaDataImpl) {
+            result.add((MetaDataImpl) obj);
+        } else {
+            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
+        }
+
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
         if (obj instanceof MetaDataImpl) {
             result.add((MetaDataImpl) obj);
         } else {
