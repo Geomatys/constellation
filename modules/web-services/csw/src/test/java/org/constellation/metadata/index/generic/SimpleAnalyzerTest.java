@@ -57,6 +57,7 @@ public class SimpleAnalyzerTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
+        deleteIndex();
         List<MetaDataImpl> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer());
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new SimpleAnalyzer());
@@ -64,6 +65,10 @@ public class SimpleAnalyzerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        deleteIndex();
+    }
+
+    public static void deleteIndex() {
         if (configDirectory.exists()) {
             File indexDirectory = new File(configDirectory, "index");
             if (indexDirectory.exists()) {

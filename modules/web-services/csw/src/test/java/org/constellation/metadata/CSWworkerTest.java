@@ -70,6 +70,7 @@ public class CSWworkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        deleteTemporaryFile();
 
         JAXBContext context = JAXBContext.newInstance(org.constellation.generic.database.ObjectFactory.class);
         Marshaller marshaller          = context.createMarshaller();
@@ -101,6 +102,10 @@ public class CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        deleteTemporaryFile();
+    }
+
+    public static void deleteTemporaryFile() {
         File configDirectory = new File("CSWWorkerTest");
         if (configDirectory.exists()) {
             File dataDirectory = new File(configDirectory, "data");
@@ -507,19 +512,26 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        Object obj = result.getSearchResults().getAbstractRecord().get(1);
+        Object obj = result.getSearchResults().getAbstractRecord().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof RecordType);
         RecordType recordResult1 = (RecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAbstractRecord().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof RecordType);
         RecordType recordResult2 = (RecordType) obj;
+
+        //because the order of the record can be random we re-order the results
+        if (!recordResult1.getIdentifier().getContent().get(0).equals("42292_5p_19900609195600")) {
+            RecordType temp = recordResult1;
+            recordResult1   = recordResult2;
+            recordResult2   = temp;
+        }
 
         RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
         RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2FDC.xml"))).getValue();
@@ -562,19 +574,26 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(1);
+        obj = result.getSearchResults().getAbstractRecord().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof BriefRecordType);
         BriefRecordType briefResult1 = (BriefRecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAbstractRecord().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof BriefRecordType);
         BriefRecordType briefResult2 = (BriefRecordType) obj;
+
+        //because the order of the record can be random we re-order the results
+        if (!briefResult1.getIdentifier().get(0).getContent().get(0).equals("42292_5p_19900609195600")) {
+            BriefRecordType temp = briefResult1;
+            briefResult1   = briefResult2;
+            briefResult2   = temp;
+        }
 
         BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
         BriefRecordType expBriefResult2 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2BDC.xml"))).getValue();

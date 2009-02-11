@@ -71,14 +71,31 @@ import static org.junit.Assert.*;
  */
 public class LuceneTest {
     
-    private File directory;
-    private IndexSearcher searcher;
-    private Query         simpleQuery;
+    private static File directory;
+    private static IndexSearcher searcher;
+    private static Query         simpleQuery;
     private Logger logger = Logger.getLogger("org.constellation.lucene");
 
    
     @BeforeClass
     public static void setUpClass() throws Exception {
+        directory = new File("luceneTest");
+        if (!directory.exists())
+            directory.mkdir();
+        else {
+            for (File f: directory.listFiles()) {
+                f.delete();
+            }
+        }
+        IndexWriter writer = new IndexWriter(directory, new KeywordAnalyzer(), IndexWriter.MaxFieldLength.UNLIMITED);
+        fillTestData(writer);
+        writer.commit();
+        writer.close();
+
+        IndexReader reader = IndexReader.open(directory);
+        searcher = new IndexSearcher(reader);
+        //create a term query to search against all documents
+        simpleQuery = new TermQuery(new Term("metafile", "doc"));
     }
 
     @AfterClass
@@ -94,23 +111,6 @@ public class LuceneTest {
 
     @Before
     public void setUp() throws Exception {
-        directory = new File("luceneTest");
-        if (!directory.exists())
-            directory.mkdir();
-        else {
-            for (File f: directory.listFiles()) {
-                f.delete();
-            }
-        }
-        IndexWriter writer = new IndexWriter(directory, new KeywordAnalyzer(), IndexWriter.MaxFieldLength.UNLIMITED);
-        fillTestData(writer);
-        writer.commit();
-        writer.close();
-        
-        IndexReader reader = IndexReader.open(directory);
-        searcher = new IndexSearcher(reader);
-        //create a term query to search against all documents
-        simpleQuery = new TermQuery(new Term("metafile", "doc"));
     }
 
     @After
@@ -2808,7 +2808,7 @@ public class LuceneTest {
         assertTrue(results.contains("box 3"));
     }
     
-    private void fillTestData(IndexWriter writer) throws Exception {
+    private static void fillTestData(IndexWriter writer) throws Exception {
         Document doc = new Document();
         doc.add(new Field("name", "point 1", Field.Store.YES, Field.Index.ANALYZED));
         addPoint      (doc,           -10,                10, "EPSG:4326");
@@ -2881,7 +2881,7 @@ public class LuceneTest {
      * @param y       The y coordinate of the point.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addPoint(Document doc, double y, double x, String crsName) {
+    private static void addPoint(Document doc, double y, double x, String crsName) {
 
         // convert the lat / long to lucene fields
         doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -2901,7 +2901,7 @@ public class LuceneTest {
      * @param maxy the maximum Y coordinate of the bounding box.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
+    private static void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
 
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -2921,7 +2921,7 @@ public class LuceneTest {
      * @param y2  the Y coordinate of the first point of the line.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
+    private static void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
 
         
         // convert the corner of the box to lucene fields

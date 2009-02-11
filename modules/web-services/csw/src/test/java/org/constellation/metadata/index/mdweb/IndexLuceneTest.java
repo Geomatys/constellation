@@ -68,15 +68,30 @@ public class IndexLuceneTest {
     
     private Logger logger = Logger.getLogger("org.constellation.metadata");
    
-    private MDWebIndexSearcher indexSearcher;
+    private static MDWebIndexSearcher indexSearcher;
+
+    private static File configDirectory;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
+        configDirectory = new File("config-test");
+        if (!configDirectory.exists())
+            configDirectory.mkdir();
+        else
+            deleteIndex(configDirectory);
+
+        List<Form> forms     = new ArrayList<Form>();
+        List<Path> paths     = new ArrayList<Path>();
+        List<Classe> classes = new ArrayList<Classe>();
+        forms                = fillTestData(paths, classes);
+
+        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
+        indexSearcher        = new MDWebIndexSearcher(configDirectory, "");
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        File configDirectory = new File("config-test");
+        configDirectory = new File("config-test");
         if (configDirectory.exists()) {
             File indexDirectory = new File(configDirectory, "index");
             if (indexDirectory.exists()) {
@@ -91,27 +106,13 @@ public class IndexLuceneTest {
 
     @Before
     public void setUp() throws Exception {
-
-        List<Form> forms     = new ArrayList<Form>();
-        List<Path> paths     = new ArrayList<Path>();
-        List<Classe> classes = new ArrayList<Classe>();
-        forms                = fillTestData(paths, classes); 
-        
-        File configDirectory = new File("config-test");
-        if (!configDirectory.exists())
-            configDirectory.mkdir();
-        else
-            deleteIndex(configDirectory);
-        
-        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
-        indexSearcher        = new MDWebIndexSearcher(configDirectory, "");
     }
 
     @After
     public void tearDown() throws Exception {
     }
 
-    public void deleteIndex(File configDir) {
+    public static void deleteIndex(File configDir) {
         if (configDir.exists()) {
             File indexDirectory = new File(configDir, "index");
             if (indexDirectory.exists()) {
@@ -349,7 +350,7 @@ public class IndexLuceneTest {
     }
 
     
-    public List<Form> fillTestData(List<Path> paths, List<Classe> classes) {
+    public static List<Form> fillTestData(List<Path> paths, List<Classe> classes) {
         List<Form> result       = new ArrayList<Form>();
         
         //we create a new Catalog
