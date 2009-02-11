@@ -102,44 +102,42 @@
         <url-pattern>/faces/myFacesExtensionResource/*</url-pattern>
     </filter-mapping>
 
+    <!--
+        Here we declare a "UserDatabase" realm in order to use the one already present in
+        a Tomcat application server (which already controls the logging to the manager page).
+        For Glassfish, the administrator has to define a new realm named "UserDatabase"
+        and to add a user in the group "administrator" (as defined in the sun-web.xml file).
+    -->
     <!-- Authentication via a pop-up -->
-    <!--login-config>
+    <login-config>
         <auth-method>BASIC</auth-method>
-        <realm-name>file</realm-name>
-    </login-config-->
+        <realm-name>UserDatabase</realm-name>
+    </login-config>
 
-    <!-- Security role, defined in the sun-web.xml -->
-    <!--security-role>
-        <role-name>PUBLIC</role-name>
+    <!--
+        Security role name.
+        - In the case of sun-based application server (like glassfish), this fields is mapped
+          into the sun-web.xml file to the group name defined in the container.
+        - For Tomcat, this role name is directly tested against the realm.
+          The sun-web.xml is not used.
+    -->
+    <security-role>
+        <role-name>admin</role-name>
     </security-role>
 
-    <security-role>
-        <role-name>USER</role-name>
-    </security-role>
-
-    <security-role>
-        <role-name>ADVANCED</role-name>
-    </security-role>
-
-    <security-role>
-        <role-name>ADMIN</role-name>
-    </security-role-->
-
-    <!-- Secured all GET and POST requests done on the wms-sec webservice -->
-    <!--security-constraint>
+    <!-- Secured all GET and POST requests done on the configuration webservice -->
+    <security-constraint>
         <web-resource-collection>
             <web-resource-name>Constellation secured service</web-resource-name>
-            <url-pattern>/WS/wms-sec</url-pattern>
+            <url-pattern>/WS/configuration</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>
         <auth-constraint>
-            <description>Should be an internal user to request this data</description>
-            <role-name>USER</role-name>
-            <role-name>ADVANCED</role-name>
-            <role-name>ADMIN</role-name>
+            <description>User must be logged in as an administrator to use this service.</description>
+            <role-name>admin</role-name>
         </auth-constraint>
-    </security-constraint-->
+    </security-constraint>
 
     <!-- Faces Servlet -->
     <servlet>
