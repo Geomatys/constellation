@@ -75,6 +75,11 @@
       <artifactId>cstl-xml-swe</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

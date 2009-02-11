@@ -79,11 +79,16 @@
       <artifactId>cstl-xml-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--  dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-postgrid</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency -->
   </dependencies>
 
 </project>
