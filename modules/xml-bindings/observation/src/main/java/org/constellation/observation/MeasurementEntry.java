@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.coverage.model.Distribution;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.metadata.MetaDataEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
@@ -57,7 +56,6 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param station           La station d'observation (par exemple une position de pêche).
      * @param observedProperty  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
      * @param process           La procedure effectuée sur cette operation.
-     * @param distribution
      * @param quality
      * @param result            Le resultat de l'observation, ici une measure.
      * @param samplingTime
@@ -71,14 +69,13 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final SamplingFeatureEntry   station,
             final PhenomenonEntry        observedProperty,
             final ProcessEntry           procedure,
-            final Distribution           distribution,
             final ElementEntry           quality,
             final MeasureEntry           result,
             final AbstractTimeGeometricPrimitiveType    samplingTime,
             final MetaDataEntry          observationMetadata,
             final AbstractTimeGeometricPrimitiveType    procedureTime,
             final Object                 procedureParameter) {
-        super(name, definition, station, observedProperty, procedure, distribution, quality, result,
+        super(name, definition, station, observedProperty, procedure, quality, result,
                 samplingTime, observationMetadata, procedureTime, procedureParameter);
     }
     
@@ -96,11 +93,10 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final SamplingFeatureEntry station,
             final PhenomenonEntry      observedProperty,
             final ProcessEntry         procedure,
-            final Distribution         distribution,
             //final ElementEntry         quality,
             final MeasureEntry         result,
             final AbstractTimeGeometricPrimitiveType  samplingTime) {
-        super(name, definition, station, observedProperty, procedure, distribution, result,
+        super(name, definition, station, observedProperty, procedure, result,
                 samplingTime);
         
     }

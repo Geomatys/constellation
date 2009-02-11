@@ -25,7 +25,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ServerException;
-import org.constellation.coverage.catalog.*;
 import org.constellation.observation.MeasurementTable;
 
 
@@ -37,6 +36,7 @@ import org.constellation.observation.MeasurementTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 final class MeasurementInserts extends Thread {
     /**
      * La table des mesures à modifier.
@@ -45,14 +45,16 @@ final class MeasurementInserts extends Thread {
 
     /**
      * Liste des stations à insérer.
-     */
+     
     private final BlockingQueue<SamplingFeatureDescriptorPair> values = new LinkedBlockingQueue<SamplingFeatureDescriptorPair>();
-    
+    */
+
     /**
      * Valeur sentinelle indiquant que les insertions sont terminées.
-     */
+     
     private final SamplingFeatureDescriptorPair finish = new SamplingFeatureDescriptorPair(null, null);
-
+    */
+    
     /**
      * Si non-null, alors l'erreur qui vient de se produire.
      */
@@ -67,7 +69,7 @@ final class MeasurementInserts extends Thread {
 
     /**
      * Ajoute la valeur spécifiée à la liste des valeurs à insérer.
-     */
+     
     public void add(final SamplingFeatureDescriptorPair value) throws CatalogException {
         assert isAlive();
         final CatalogException e = exception;
@@ -75,12 +77,12 @@ final class MeasurementInserts extends Thread {
             throw e;
         }
         values.add(value);
-    }
+    }*/
 
     /**
      * Indique qu'il n'y a plus d'autres valeurs à insérer. Cette méthode bloquera
      * jusqu'à ce que toutes les valeurs restantes aient été insérées.
-     */
+     
     public void finished() throws CatalogException {
         assert isAlive();
         values.add(finish);
@@ -93,7 +95,7 @@ final class MeasurementInserts extends Thread {
         if (e != null) {
             throw e;
         }
-    }
+    }*/
 
     /**
      * Insére toutes les valeurs dans la queue. Si une exception se produit lors de l'insertion
@@ -101,7 +103,7 @@ final class MeasurementInserts extends Thread {
      */
     @Override
     public void run() {
-        do {
+        /*do {
             final SamplingFeatureDescriptorPair pair;
             try {
                 pair = values.take();
@@ -114,7 +116,7 @@ final class MeasurementInserts extends Thread {
             }
             //measures.setObservable(pair.descriptor);  // TODO
             //measures.setStation   (pair.samplingFeature);
-            /*try {
+            try {
                 measures.setValue(pair.value, Float.NaN); //TODO
             } catch (CatalogException cause) {
                 exception = cause;
@@ -122,7 +124,7 @@ final class MeasurementInserts extends Thread {
             } catch (SQLException cause) {
                 exception = new ServerException(cause);
                 break;
-            }*/
-        } while (exception == null);
+            }
+        } while (exception == null);*/
     }
 }

@@ -30,7 +30,6 @@ import javax.xml.bind.annotation.XmlType;
 // Constellation dependencies 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Entry;
-import org.constellation.coverage.model.Distribution;
 
 // openGis dependencies
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
@@ -125,9 +124,9 @@ public class ObservationEntry extends Entry implements Observation {
     
      /**
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
-     */
+     
     @XmlTransient
-    private Distribution distribution;
+    private Distribution distribution;*/
     
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
@@ -183,7 +182,6 @@ public class ObservationEntry extends Entry implements Observation {
                             final SamplingFeatureEntry featureOfInterest, 
                             final PhenomenonEntry      observedProperty,
                             final ProcessEntry         procedure,
-                            final Distribution         distribution,
                             final ElementEntry         quality,
                             final Object               result,
                             final AbstractTimeGeometricPrimitiveType  samplingTime,
@@ -197,10 +195,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
-        if (distribution == null)
-            this.distribution    = Distribution.NORMAL;
-        else
-            this.distribution    = distribution;
         this.resultQuality       = quality;
         this.result              = result;
         this.observationMetadata = observationMetadata;
@@ -223,7 +217,6 @@ public class ObservationEntry extends Entry implements Observation {
                             final SamplingFeatureEntry  featureOfInterest, 
                             final PhenomenonEntry       observedProperty,
                             final ProcessEntry          procedure,
-                            final Distribution          distribution,
                          // final ElementEntry          resultQuality,
                             final Object                result,
                             final AbstractTimeGeometricPrimitiveType   samplingTime)
@@ -234,10 +227,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
-        if (distribution == null)
-            this.distribution    = Distribution.NORMAL;
-        else
-            this.distribution    = distribution;
         this.resultQuality       = null;       //= resultQuality;
         this.result              = result;
         this.observationMetadata = null;
@@ -274,7 +263,6 @@ public class ObservationEntry extends Entry implements Observation {
                                     foi, 
                                     pheno,
                                     this.procedure,
-                                    this.distribution,
                                     this.result,
                                     time);
         
@@ -334,20 +322,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.procedure = process;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Distribution getDistribution() {
-        return distribution;
-    }
-    
-    /**
-     * fixe la distribution de cette observation.
-     */
-    public void setDistribution(Distribution distrib) {
-        this.distribution = distrib;
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -495,7 +469,6 @@ public class ObservationEntry extends Entry implements Observation {
                    Utilities.equals(this.observedProperty,    that.observedProperty)    &&
                    Utilities.equals(this.procedure,           that.procedure)           &&
                    Utilities.equals(this.resultQuality,       that.resultQuality)       && 
-                   Utilities.equals(this.distribution,        that.distribution)        &&
                    Utilities.equals(this.result,              that.result)              &&
                    Utilities.equals(this.samplingTime,        that.samplingTime)        &&
                    Utilities.equals(this.observationMetadata, that.observationMetadata) &&
@@ -526,8 +499,6 @@ public class ObservationEntry extends Entry implements Observation {
         s.append(lineSeparator);
         if (samplingTime != null)
             s.append("samplingTime = ").append(samplingTime.toString()).append(lineSeparator);
-        if (distribution != null)
-            s.append(" distribution = ").append(distribution.toString()).append(lineSeparator);
        if (procedure != null)
             s.append("procedure = ").append(procedure.toString()).append(lineSeparator);
         else

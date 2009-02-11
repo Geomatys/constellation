@@ -25,8 +25,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.coverage.model.Distribution;
-import org.constellation.coverage.model.DistributionTable;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
@@ -95,12 +93,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
     protected ProcessTable procedures;
     
     /**
-     * Connexion vers la table des {@linkplain Distribution distributions}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    protected DistributionTable distributions;
-    
-    /**
      * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
      * sera construite la première fois où elle sera nécessaire.
      */
@@ -136,10 +128,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
     @Override
     public MeasurementEntry createEntry(final ResultSet result) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
-        if (distributions == null) {
-            distributions = getDatabase().getTable(DistributionTable.class);
-        }
-        Distribution distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
         
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
@@ -204,7 +192,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                                     station,
                                     pheno,
                                     procedure,
-                                    distrib,
                                     //manque quality
                                     resultat,
                                     samplingTime);
@@ -239,14 +226,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name),         id);
             statement.setString(indexOf(query.description),  meas.getDefinition());
-            // on insere la distribution
-            if (meas.getDistribution() == null) {
-                meas.setDistribution(Distribution.NORMAL);
-            }
-            if (distributions == null) {
-                distributions = getDatabase().getTable(DistributionTable.class);
-            }
-            statement.setString(indexOf(query.distribution), distributions.getIdentifier(meas.getDistribution()));
+            statement.setString(indexOf(query.distribution), "normale");
         
             // on insere la station qui a effectué cette measervation
             if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){

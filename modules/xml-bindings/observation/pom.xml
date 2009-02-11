@@ -76,8 +76,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-postgrid</artifactId>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -29,8 +29,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.coverage.model.Distribution;
-import org.constellation.coverage.model.DistributionTable;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
@@ -118,12 +116,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected ProcessTable procedures;
-    
-    /**
-     * Connexion vers la table des {@linkplain Distribution distributions}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    protected DistributionTable distributions;
     
     /**
      * Connexion vers la table des {@linkplain AnyResult result}.
@@ -269,11 +261,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
     public Observation createEntry(final ResultSet result) throws CatalogException, SQLException {
         final ObservationQuery query = (ObservationQuery) super.query;
         
-        if (distributions == null) {
-            distributions = getDatabase().getTable(DistributionTable.class);
-        }
-        Distribution distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
-        
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
@@ -346,7 +333,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                                     station,
                                     pheno,
                                     procedure,
-                                    distrib,
                                     //manque quality
                                     resultat,
                                     samplingTime);
@@ -384,17 +370,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             statement.setString(indexOf(query.name),         id);
             statement.setString(indexOf(query.description),  obs.getDefinition());
         
-            // on insere la distribution
-            if (obs.getDistribution() == null) {
-                obs.setDistribution(Distribution.NORMAL);
-            } else if (obs.getDistribution().getName() == null) {
-                obs.setDistribution(Distribution.NORMAL);
-            }
-            if (distributions == null) {
-                distributions = getDatabase().getTable(DistributionTable.class);
-            }
             // regler le probleme avec la distribution
-            statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
+            statement.setString(indexOf(query.distribution), "normale");
         
         
             // on insere la station qui a effectué cette observation

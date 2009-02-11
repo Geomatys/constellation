@@ -23,7 +23,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.model.Descriptor;
 import org.opengis.observation.sampling.SamplingFeature;
 
 
@@ -40,12 +39,13 @@ final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureD
     /**
      * La station.
      */
-    final SamplingFeature samplingFeature;
+    SamplingFeature samplingFeature;
 
     /**
      * Le descripteur du paysage océanique.
-     */
+     
     final Descriptor descriptor;
+     */
 
     /**
      * La valeur. Sera calculée par {@link MeasurementTableFiller}.
@@ -54,32 +54,33 @@ final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureD
 
     /**
      * Construit une nouvelle paire pour la station et le descripteur spécifié.
-     */
+     
     public SamplingFeatureDescriptorPair(final SamplingFeature samplingFeature, final Descriptor descriptor) {
         this.samplingFeature    = samplingFeature;
         this.descriptor = descriptor;
-    }
+    }*/
 
     /**
      * Retourne la date à laquelle le descripteur sera évalué.
-     */
+     
     private long getTime() throws CatalogException {
         final Date time = null; //samplingFeature.getTime();
         if (time == null) {
             /*
              * Place les stations dont la date est indéterminée à la fin. C'est cohérent
              * avec le classement des valeurs NaN de type 'float' par exemple.
-             */
+             *
             return Long.MAX_VALUE;
         }
         return time.getTime() + Math.round((24*60*60*1000) * descriptor.getRegionOfInterest().getDayOffset());
     }
+    */
 
     /**
      * Compare cette paire avec la paire spécifiée.
      */
     public int compareTo(final SamplingFeatureDescriptorPair that) {
-        final long t1, t2;
+        /*final long t1, t2;
         try {
             t1 = this.getTime();
             t2 = that.getTime();
@@ -88,7 +89,7 @@ final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureD
             throw new UndeclaredThrowableException(exception);
         }
         if (t1 < t2) return -1;
-        if (t1 > t2) return +1;
+        if (t1 > t2) return +1;*/
         return 0;
     }
 

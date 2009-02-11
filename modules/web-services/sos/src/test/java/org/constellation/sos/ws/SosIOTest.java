@@ -22,9 +22,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+// constellation dependencies
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
@@ -42,12 +46,14 @@ import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
+import static org.constellation.sos.ws.SOSworker.*;
+
+// Junit dependencies
 import org.junit.Test;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import static org.constellation.sos.ws.SOSworker.*;
 import static org.junit.Assert.*;
 
 /**
@@ -187,7 +193,6 @@ public class SosIOTest {
             ObservationEntry expObs = expResult.getMember().iterator().next();
             ObservationEntry obs    = result.getMember().iterator().next();
             assertEquals(expObs.getDefinition(), obs.getDefinition());
-            assertEquals(expObs.getDistribution(), obs.getDistribution());
             assertEquals(expObs.getFeatureOfInterest(), obs.getFeatureOfInterest());
             assertEquals(expObs.getName(), obs.getName());
             assertEquals(expObs.getObservedProperty(), obs.getObservedProperty());

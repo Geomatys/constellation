@@ -33,17 +33,17 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.LoggingLevel;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.Table;
 
 // Geotools dependencies
 import org.geotools.util.Utilities;
 
 // Constellation dependencies
-import org.constellation.coverage.model.Descriptor;
-import org.constellation.coverage.model.RegionOfInterest;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.LoggingLevel;
+import org.constellation.catalog.Query;
+import org.constellation.catalog.Table;
+//import org.constellation.coverage.model.Descriptor;
+//import org.constellation.coverage.model.RegionOfInterest;
 
 // GeoAPI dependencies
 import org.opengis.observation.Phenomenon;
@@ -144,7 +144,7 @@ public class MergedMeasurementTable extends Table {
      *         cette procédure seront pris en compte.
      * @param  offset Si non-nul, alors seul les observations à cette position relative seront
      *         pris en compte.
-     */
+    
     public synchronized int count(final Phenomenon phenomenon,
                                   final Process   procedure,
                                   final RegionOfInterest offset)
@@ -169,6 +169,7 @@ public class MergedMeasurementTable extends Table {
         }
         return count;
     }
+     *  */
 
     /**
      * Retourne un itérateur qui parcourera l'ensemble des données sélectionnées. La première
