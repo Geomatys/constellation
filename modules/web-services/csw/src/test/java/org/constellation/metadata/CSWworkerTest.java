@@ -22,13 +22,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+// constyellation dependencies
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.BriefRecordType;
@@ -54,7 +59,10 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.geotools.metadata.iso.MetaDataImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
+import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
 
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -621,6 +629,59 @@ public class CSWworkerTest {
 
         assertEquals(expBriefResult1, briefResult1);
         assertEquals(expBriefResult2, briefResult2);
+
+
+        /*
+         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE *0008411.ctd
+         */
+
+        typeNames        = Arrays.asList(TypeNames._Record_QNAME);
+        List<QName> cust = new ArrayList<QName>();
+        cust.add(_Identifier_QNAME);
+        cust.add(_Subject_QNAME);
+        cust.add(_Date_QNAME);
+        cust.add(_Format_QNAME);
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        query            = new QueryType(typeNames, cust, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
+        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        RecordType customResult1 = (RecordType) obj;
+
+        obj = result.getSearchResults().getAbstractRecord().get(1);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        RecordType customResult2 = (RecordType) obj;
+
+        //because the order of the record can be random we re-order the results
+        if (!customResult1.getIdentifier().getContent().get(0).equals("42292_5p_19900609195600")) {
+            RecordType temp = customResult1;
+            customResult1   = customResult2;
+            customResult2   = temp;
+        }
+
+        RecordType expCustomResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1CustomDC.xml"))).getValue();
+        RecordType expCustomResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2CustomDC.xml"))).getValue();
+
+        assertEquals(expCustomResult1, customResult1);
+        assertEquals(expCustomResult2, customResult2);
 
     }
 

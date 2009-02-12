@@ -25,10 +25,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+// constellation dependencies
 import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.v202.AbstractRecordType;
@@ -40,7 +44,12 @@ import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
-import org.geotools.metadata.iso.MetaDataImpl;
+import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
+import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
+import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
+
+// geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.distribution.Distribution;
@@ -54,7 +63,10 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.InternationalString;
-import static org.constellation.ows.OWSExceptionCode.*;
+
+// Geotools dependencies
+import org.geotools.metadata.iso.MetaDataImpl;
+
 
 /**
  *
@@ -95,7 +107,7 @@ public class FileMetadataReader extends MetadataReader {
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         Object obj = getObjectFromFile(identifier);
         if (obj instanceof MetaDataImpl && mode == DUBLINCORE) {
-            obj = translateISOtoDC((MetaDataImpl)obj, type);
+            obj = translateISOtoDC((MetaDataImpl)obj, type, elementName);
         }
         return obj;
     }
@@ -119,13 +131,18 @@ public class FileMetadataReader extends MetadataReader {
         }
     }
 
-    private AbstractRecordType translateISOtoDC(MetaDataImpl metadata, ElementSet type) {
+    private AbstractRecordType translateISOtoDC(MetaDataImpl metadata, ElementSet type, List<QName> elementName) {
         if (metadata != null) {
+
+            RecordType customRecord = new RecordType();
 
             /*
              * BRIEF part
              */
             SimpleLiteral identifier = new SimpleLiteral(metadata.getFileIdentifier());
+            if (elementName != null && elementName.contains(_Identifier_QNAME)) {
+                customRecord.setIdentifier(identifier);
+            }
 
             SimpleLiteral title = null;
             //TODO see for multiple identification
@@ -134,11 +151,17 @@ public class FileMetadataReader extends MetadataReader {
                     title = new SimpleLiteral(identification.getCitation().getTitle().toString());
                 }
             }
+            if (elementName != null && elementName.contains(_Title_QNAME)) {
+                customRecord.setTitle(title);
+            }
 
             SimpleLiteral dataType = null;
             //TODO see for multiple hierarchyLevel
             for (ScopeCode code: metadata.getHierarchyLevels()) {
                 dataType = new SimpleLiteral(code.identifier());
+            }
+            if (elementName != null && elementName.contains(_Type_QNAME)) {
+                customRecord.setType(dataType);
             }
 
             List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
@@ -161,8 +184,11 @@ public class FileMetadataReader extends MetadataReader {
                     }
                 }
             }
+            if (elementName != null && elementName.contains(_BoundingBox_QNAME)) {
+                customRecord.setBoundingBox(bboxes);
+            }
 
-            if (type == ElementSetType.BRIEF)
+            if (type != null && type.equals(ElementSetType.BRIEF))
                 return new BriefRecordType(identifier, title, dataType, bboxes);
 
             /*
@@ -173,6 +199,9 @@ public class FileMetadataReader extends MetadataReader {
                 if (identification.getAbstract() != null) {
                     _abstract.add(new SimpleLiteral(identification.getAbstract().toString()));
                 }
+            }
+            if (elementName != null && elementName.contains(_Abstract_QNAME)) {
+                customRecord.setAbstract(_abstract);
             }
 
             List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
@@ -189,6 +218,11 @@ public class FileMetadataReader extends MetadataReader {
                     }
                 }
             }
+            if (elementName != null && elementName.contains(_Subject_QNAME)) {
+                customRecord.setSubject(subjects);
+            }
+
+
             List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
             Distribution distribution   = metadata.getDistributionInfo();
             if (distribution != null) {
@@ -196,13 +230,26 @@ public class FileMetadataReader extends MetadataReader {
                     formats.add(new SimpleLiteral(f.getName().toString()));
                 }
             }
+            if (elementName != null && elementName.contains(_Format_QNAME)) {
+                customRecord.setFormat(formats);
+            }
+
 
             SimpleLiteral modified = new SimpleLiteral(formatter.format(metadata.getDateStamp()));
+            if (elementName != null && elementName.contains(_Modified_QNAME)) {
+                customRecord.setModified(modified);
+            }
 
-            if (type == ElementSetType.SUMMARY)
+
+            if (type != null && type.equals(ElementSetType.SUMMARY))
                 return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, _abstract);
 
             SimpleLiteral date    = modified;
+            if (elementName != null && elementName.contains(_Date_QNAME)) {
+                customRecord.setDate(date);
+            }
+
+
             List<SimpleLiteral> creator = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (ResponsibleParty rp :identification.getPointOfContacts()) {
@@ -213,6 +260,10 @@ public class FileMetadataReader extends MetadataReader {
                 }
             }
             if (creator.size() == 0) creator = null;
+            if (elementName != null && elementName.contains(_Creator_QNAME)) {
+                customRecord.setCreator(creator);
+            }
+
 
             // TODO multiple
             SimpleLiteral distributor = null;
@@ -224,13 +275,23 @@ public class FileMetadataReader extends MetadataReader {
 
                 }
             }
+            if (elementName != null && elementName.contains(_Publisher_QNAME)) {
+                customRecord.setPublisher(distributor);
+            }
+
 
             SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getLanguage());
+            if (elementName != null && elementName.contains(_Language_QNAME)) {
+                customRecord.setLanguage(language);
+            }
 
             // TODO
             SimpleLiteral spatial = null;
             SimpleLiteral references = null;
-            return new RecordType(identifier, title, dataType, subjects, formats, modified, date, _abstract, bboxes, creator, distributor, language, spatial, references);
+            if (type != null && type.equals(ElementSetType.FULL))
+                return new RecordType(identifier, title, dataType, subjects, formats, modified, date, _abstract, bboxes, creator, distributor, language, spatial, references);
+
+            return customRecord;
         }
         return null;
     }

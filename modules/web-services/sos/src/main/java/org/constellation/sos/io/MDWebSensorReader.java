@@ -27,6 +27,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -83,9 +85,17 @@ public class MDWebSensorReader extends SensorReader {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public MDWebSensorReader(Connection connection, String sensorIdBase, Properties map) throws CstlServiceException  {
+    public MDWebSensorReader(Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException  {
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
         try {
-            sensorMLConnection = connection;
+            sensorMLConnection = db.getConnection();
             sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
             SMLCatalog         = sensorMLReader.getCatalog("SMLC");
             XMLWriter          = new Writer(sensorMLReader);
@@ -97,9 +107,9 @@ public class MDWebSensorReader extends SensorReader {
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new CstlServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQLException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 

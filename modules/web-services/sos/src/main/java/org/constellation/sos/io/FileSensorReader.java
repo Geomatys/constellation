@@ -27,6 +27,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
+import org.constellation.generic.database.Automatic;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -44,13 +45,13 @@ public class FileSensorReader extends SensorReader {
 
     private File dataDirectory;
     
-    public FileSensorReader(File dataDirectory) throws CstlServiceException  {
+    public FileSensorReader(Automatic configuration) throws CstlServiceException  {
         try {
             //we initialize the unmarshaller
             JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
             unmarshaller        = context.createUnmarshaller();
 
-            this.dataDirectory  = dataDirectory;
+            this.dataDirectory  = configuration.getdataDirectory();
         } catch (JAXBException ex) {
             ex.printStackTrace();
             throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ows="http://www.opengis.net/ows" xmlns:dct="http://purl.org/dc/terms/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
         <dc:identifier>42292_9s_19900610041000</dc:identifier>
-        <dc:title>90008411.ctd</dc:title>
-        <dc:type>dataset</dc:type>
         <dc:subject>oceans</dc:subject>
         <dc:subject>Transmittance and attenuance of the water column</dc:subject>
         <dc:subject>Electrical conductivity of the water column</dc:subject>
@@ -18,14 +16,5 @@
         <dc:subject>CTD profilers</dc:subject>
         <dc:subject>research vessel</dc:subject>
         <dc:format>MEDATLAS ASCII</dc:format>
-        <dc:language>en</dc:language>
-        <!--dc:publisher>IFREMER / IDM/SISMER</dc:publisher-->
-        <!--dc:creator>UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. &amp; BIOGEOCHIMIE - LUMINY</dc:creator-->
-        <dct:modified>2009-01-26T12:00:00</dct:modified>
         <dc:date>2009-01-26T12:00:00</dc:date>
-        <dct:abstract>Donnees CTD MEDIPROD VI 120</dct:abstract>
-        <ows:BoundingBox dimensions="2" crs="EPSG:4326">
-            <ows:LowerCorner>1.3667 36.6</ows:LowerCorner>
-            <ows:UpperCorner>1.3667 36.6</ows:UpperCorner>
-        </ows:BoundingBox>
 </csw:Record>

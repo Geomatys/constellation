@@ -41,31 +41,31 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _GetCapabilities_QNAME = new QName("http://www.opengis.net/ows", "GetCapabilities");
-    private final static QName _Language_QNAME = new QName("http://www.opengis.net/ows", "Language");
-    private final static QName _PositionName_QNAME = new QName("http://www.opengis.net/ows", "PositionName");
-    private final static QName _Keywords_QNAME = new QName("http://www.opengis.net/ows", "Keywords");
-    private final static QName _ContactInfo_QNAME = new QName("http://www.opengis.net/ows", "ContactInfo");
-    private final static QName _AbstractMetaData_QNAME = new QName("http://www.opengis.net/ows", "AbstractMetaData");
-    private final static QName _WGS84BoundingBox_QNAME = new QName("http://www.opengis.net/ows", "WGS84BoundingBox");
-    private final static QName _ExtendedCapabilities_QNAME = new QName("http://www.opengis.net/ows", "ExtendedCapabilities");
-    private final static QName _Abstract_QNAME = new QName("http://www.opengis.net/ows", "Abstract");
-    private final static QName _PointOfContact_QNAME = new QName("http://www.opengis.net/ows", "PointOfContact");
-    private final static QName _Title_QNAME = new QName("http://www.opengis.net/ows", "Title");
-    private final static QName _OrganisationName_QNAME = new QName("http://www.opengis.net/ows", "OrganisationName");
-    private final static QName _Role_QNAME = new QName("http://www.opengis.net/ows", "Role");
-    private final static QName _Fees_QNAME = new QName("http://www.opengis.net/ows", "Fees");
-    private final static QName _IndividualName_QNAME = new QName("http://www.opengis.net/ows", "IndividualName");
-    private final static QName _Exception_QNAME = new QName("http://www.opengis.net/ows", "Exception");
-    private final static QName _SupportedCRS_QNAME = new QName("http://www.opengis.net/ows", "SupportedCRS");
-    private final static QName _OutputFormat_QNAME = new QName("http://www.opengis.net/ows", "OutputFormat");
-    private final static QName _AvailableCRS_QNAME = new QName("http://www.opengis.net/ows", "AvailableCRS");
-    private final static QName _AccessConstraints_QNAME = new QName("http://www.opengis.net/ows", "AccessConstraints");
-    private final static QName _Metadata_QNAME = new QName("http://www.opengis.net/ows", "Metadata");
-    private final static QName _Identifier_QNAME = new QName("http://www.opengis.net/ows", "Identifier");
-    private final static QName _BoundingBox_QNAME = new QName("http://www.opengis.net/ows", "BoundingBox");
-    private final static QName _HTTPGet_QNAME = new QName("http://www.opengis.net/ows", "Get");
-    private final static QName _HTTPPost_QNAME = new QName("http://www.opengis.net/ows", "Post");
+    public final static QName _GetCapabilities_QNAME = new QName("http://www.opengis.net/ows", "GetCapabilities");
+    public final static QName _Language_QNAME = new QName("http://www.opengis.net/ows", "Language");
+    public final static QName _PositionName_QNAME = new QName("http://www.opengis.net/ows", "PositionName");
+    public final static QName _Keywords_QNAME = new QName("http://www.opengis.net/ows", "Keywords");
+    public final static QName _ContactInfo_QNAME = new QName("http://www.opengis.net/ows", "ContactInfo");
+    public final static QName _AbstractMetaData_QNAME = new QName("http://www.opengis.net/ows", "AbstractMetaData");
+    public final static QName _WGS84BoundingBox_QNAME = new QName("http://www.opengis.net/ows", "WGS84BoundingBox");
+    public final static QName _ExtendedCapabilities_QNAME = new QName("http://www.opengis.net/ows", "ExtendedCapabilities");
+    public final static QName _Abstract_QNAME = new QName("http://www.opengis.net/ows", "Abstract");
+    public final static QName _PointOfContact_QNAME = new QName("http://www.opengis.net/ows", "PointOfContact");
+    public final static QName _Title_QNAME = new QName("http://www.opengis.net/ows", "Title");
+    public final static QName _OrganisationName_QNAME = new QName("http://www.opengis.net/ows", "OrganisationName");
+    public final static QName _Role_QNAME = new QName("http://www.opengis.net/ows", "Role");
+    public final static QName _Fees_QNAME = new QName("http://www.opengis.net/ows", "Fees");
+    public final static QName _IndividualName_QNAME = new QName("http://www.opengis.net/ows", "IndividualName");
+    public final static QName _Exception_QNAME = new QName("http://www.opengis.net/ows", "Exception");
+    public final static QName _SupportedCRS_QNAME = new QName("http://www.opengis.net/ows", "SupportedCRS");
+    public final static QName _OutputFormat_QNAME = new QName("http://www.opengis.net/ows", "OutputFormat");
+    public final static QName _AvailableCRS_QNAME = new QName("http://www.opengis.net/ows", "AvailableCRS");
+    public final static QName _AccessConstraints_QNAME = new QName("http://www.opengis.net/ows", "AccessConstraints");
+    public final static QName _Metadata_QNAME = new QName("http://www.opengis.net/ows", "Metadata");
+    public final static QName _Identifier_QNAME = new QName("http://www.opengis.net/ows", "Identifier");
+    public final static QName _BoundingBox_QNAME = new QName("http://www.opengis.net/ows", "BoundingBox");
+    public final static QName _HTTPGet_QNAME = new QName("http://www.opengis.net/ows", "Get");
+    public final static QName _HTTPPost_QNAME = new QName("http://www.opengis.net/ows", "Post");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.ows

@@ -34,22 +34,22 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _DCElement_QNAME   = new QName("http://purl.org/dc/elements/1.1/", "DC-element");
-    private final static QName _Contributor_QNAME = new QName("http://purl.org/dc/elements/1.1/", "contributor");
-    private final static QName _Rights_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "rights");
-    private final static QName _Coverage_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "coverage");
-    private final static QName _Relation_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "relation");
-    private final static QName _Format_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "format");
-    private final static QName _Title_QNAME       = new QName("http://purl.org/dc/elements/1.1/", "title");
-    private final static QName _Subject_QNAME     = new QName("http://purl.org/dc/elements/1.1/", "subject");
-    private final static QName _Publisher_QNAME   = new QName("http://purl.org/dc/elements/1.1/", "publisher");
-    private final static QName _Creator_QNAME     = new QName("http://purl.org/dc/elements/1.1/", "creator");
-    private final static QName _Type_QNAME        = new QName("http://purl.org/dc/elements/1.1/", "type");
-    private final static QName _Date_QNAME        = new QName("http://purl.org/dc/elements/1.1/", "date");
-    private final static QName _Source_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "source");
-    private final static QName _Language_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "language");
-    private final static QName _Identifier_QNAME  = new QName("http://purl.org/dc/elements/1.1/", "identifier");
-    private final static QName _Description_QNAME = new QName("http://purl.org/dc/elements/1.1/", "description");
+    public final static QName _DCElement_QNAME   = new QName("http://purl.org/dc/elements/1.1/", "DC-element");
+    public final static QName _Contributor_QNAME = new QName("http://purl.org/dc/elements/1.1/", "contributor");
+    public final static QName _Rights_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "rights");
+    public final static QName _Coverage_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "coverage");
+    public final static QName _Relation_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "relation");
+    public final static QName _Format_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "format");
+    public final static QName _Title_QNAME       = new QName("http://purl.org/dc/elements/1.1/", "title");
+    public final static QName _Subject_QNAME     = new QName("http://purl.org/dc/elements/1.1/", "subject");
+    public final static QName _Publisher_QNAME   = new QName("http://purl.org/dc/elements/1.1/", "publisher");
+    public final static QName _Creator_QNAME     = new QName("http://purl.org/dc/elements/1.1/", "creator");
+    public final static QName _Type_QNAME        = new QName("http://purl.org/dc/elements/1.1/", "type");
+    public final static QName _Date_QNAME        = new QName("http://purl.org/dc/elements/1.1/", "date");
+    public final static QName _Source_QNAME      = new QName("http://purl.org/dc/elements/1.1/", "source");
+    public final static QName _Language_QNAME    = new QName("http://purl.org/dc/elements/1.1/", "language");
+    public final static QName _Identifier_QNAME  = new QName("http://purl.org/dc/elements/1.1/", "identifier");
+    public final static QName _Description_QNAME = new QName("http://purl.org/dc/elements/1.1/", "description");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.constellation.dublincore.v2.elements

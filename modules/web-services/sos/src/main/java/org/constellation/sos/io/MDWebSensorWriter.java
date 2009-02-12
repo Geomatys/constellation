@@ -31,6 +31,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.xml.sax.SAXException;
 
 // Constellation dependencies
@@ -91,9 +93,17 @@ public class MDWebSensorWriter extends SensorWriter {
      */
     private Marshaller marshaller;
 
-    public MDWebSensorWriter(Connection connection, String sensorIdBase) throws CstlServiceException {
+    public MDWebSensorWriter(Automatic configuration, String sensorIdBase) throws CstlServiceException {
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
         try {
-            smlConnection  = connection;
+            smlConnection  = db.getConnection();
             sensorMLWriter = new Writer20(smlConnection);
             sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
             SMLCatalog     = sensorMLReader.getCatalog("SMLC");

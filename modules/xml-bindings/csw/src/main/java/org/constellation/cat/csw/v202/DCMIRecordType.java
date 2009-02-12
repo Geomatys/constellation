@@ -80,6 +80,7 @@ import org.geotools.util.Utilities;
     "publisher"   ,
     "contributor" ,
     "description" ,
+    "temporal"    ,
     "dcElement"   
 })
 @XmlSeeAlso({
@@ -150,6 +151,9 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
 
     @XmlElement(name = "description", namespace = "http://purl.org/dc/elements/1.1/")
     private SimpleLiteral description;
+
+    @XmlElement(name = "temporal", namespace = "http://purl.org/dc/terms/")
+    private SimpleLiteral temporal;
     
     /**
      * An empty constructor used by JAXB
@@ -436,6 +440,14 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     public SimpleLiteral getDescription() {
         return description;
     }
+
+    public void setTemporal(SimpleLiteral temporal) {
+        this.temporal = temporal;
+    }
+
+    public SimpleLiteral getTemporal() {
+        return temporal;
+    }
     
     /**
      * if the attribute have not been fill by JAXB we search in DCelement
@@ -470,16 +482,23 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
                 s.append(sl).append('\n');
             }
         }
-        if (dcElement != null) {
-            for (JAXBElement<SimpleLiteral> jb: dcElement) {
-                s.append("name=").append(jb.getName()).append(" value=").append(jb.getValue().toString()).append('\n');
-            }
-        }
         if (distributor != null) {
             s.append("distributor: ").append(distributor).append('\n');
         }
+        if (date != null) {
+            s.append("date: ").append(date).append('\n');
+        }
+        if (contributor != null) {
+            s.append("contributor: ").append(contributor).append('\n');
+        }
+        if (coverage != null) {
+            s.append("coverage: ").append(coverage).append('\n');
+        }
         if (creator != null) {
             s.append("creator: ").append(creator).append('\n');
+        }
+        if (description != null) {
+            s.append("description: ").append(description).append('\n');
         }
         if (language != null) {
             s.append("language: ").append(language).append('\n');
@@ -490,11 +509,28 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
         if (_abstract != null) {
             s.append("abstract: ").append(_abstract).append('\n');
         }
+        if (source != null) {
+            s.append("source: ").append(source).append('\n');
+        }
         if (spatial != null) {
             s.append("spatial: ").append(spatial).append('\n');
         }
         if (references != null) {
             s.append("references: ").append(references).append('\n');
+        }
+        if (relation != null) {
+            s.append("relation: ").append(relation).append('\n');
+        }
+        if (rights != null) {
+            s.append("rights: ").append(rights).append('\n');
+        }
+        if (temporal != null) {
+            s.append("temporal: ").append(temporal).append('\n');
+        }
+        if (dcElement != null) {
+            for (JAXBElement<SimpleLiteral> jb: dcElement) {
+                s.append("name=").append(jb.getName()).append(" value=").append(jb.getValue().toString()).append('\n');
+            }
         }
         return s.toString();
     }
@@ -525,16 +561,25 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
             }
             return Utilities.equals(this._abstract,   that._abstract)   &&
                    Utilities.equals(this.creator  ,   that.creator)     &&
+                   Utilities.equals(this.contributor, that.contributor) &&
+                   Utilities.equals(this.coverage,    that.coverage)    &&
+                   Utilities.equals(this.date,        that.date)        &&
+                   Utilities.equals(this.description, that.description) &&
                    Utilities.equals(this.distributor, that.distributor) &&
                    Utilities.equals(this.format,      that.format)      &&
                    Utilities.equals(this.identifier,  that.identifier)  &&
                    Utilities.equals(this.language,    that.language)    &&
                    Utilities.equals(this.modified,    that.modified)    &&
+                   Utilities.equals(this.publisher,   that.publisher)   &&
                    Utilities.equals(this.references,  that.references)  &&
+                   Utilities.equals(this.relation,    that.relation)    &&
+                   Utilities.equals(this.rights,      that.rights)      &&
+                   Utilities.equals(this.source,      that.source)      &&
                    Utilities.equals(this.spatial,     that.spatial)     &&
                    Utilities.equals(this.subject,     that.subject)     &&
                    Utilities.equals(this.title,       that.title)       &&
                    Utilities.equals(this.type,        that.type)        &&
+                   Utilities.equals(this.temporal,    that.temporal)    &&
                    dcelement;
         }
         return false;

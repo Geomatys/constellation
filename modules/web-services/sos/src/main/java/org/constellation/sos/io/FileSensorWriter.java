@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.constellation.generic.database.Automatic;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -43,10 +44,13 @@ public class FileSensorWriter extends SensorWriter {
 
     private String sensorIdBase;
 
-    public FileSensorWriter(File dataDirectory, String sensorIdBase) throws CstlServiceException {
+    public FileSensorWriter(Automatic configuration, String sensorIdBase) throws CstlServiceException {
+        if (configuration == null) {
+            throw new CstlServiceException("The sensor configuration object is null", NO_APPLICABLE_CODE);
+        }
         this.sensorIdBase = sensorIdBase;
         uncommittedFiles = new ArrayList<File>();
-        this.dataDirectory = dataDirectory;
+        this.dataDirectory = configuration.getdataDirectory();
     }
 
     @Override

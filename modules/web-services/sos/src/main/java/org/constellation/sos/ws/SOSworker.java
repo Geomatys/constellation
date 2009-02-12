@@ -344,31 +344,30 @@ public class SOSworker {
         if (SMLType == null)
             SMLType = DataSourceType.MDWEB;
 
+        // TODO we temporary build a configuration file
+        Automatic SMLConfiguration = new Automatic();
+        SMLConfiguration.setFormat(SMLType.name());
+
         // Database configuration
-        Connection SMLconnection        = null;
         PGSimpleDataSource dataSourceOM = null;
         Connection OMConnection         = null;
-        File dataDirectory              = null;
         Automatic configuration         = null;
         try {
             if (SMLType == DataSourceType.MDWEB) {
                 //we create a connection to the sensorML database
-                PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
-                dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
-                dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
-                dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
-                dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
-                dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-                SMLconnection = dataSourceSML.getConnection();
-
+                BDD bdd = new BDD();
+                bdd.setConnectURL("jdbc:postgresql://" + prop.getProperty("SMLDBServerName") + ':' +
+                        Integer.parseInt(prop.getProperty("SMLDBServerPort")) + '/' + prop.getProperty("SMLDBName"));
+                bdd.setUser(prop.getProperty("SMLDBUser"));
+                bdd.setPassword(prop.getProperty("SMLDBUserPassword"));
+                SMLConfiguration.setBdd(bdd);
             } else if (SMLType == DataSourceType.FILE_SYSTEM) {
                 String path = prop.getProperty("SMLDataDirectory");
+
                 if (path != null) {
-                    dataDirectory = new File(path);
+                   SMLConfiguration.setDataDirectory(path);
                 } else {
-                    dataDirectory = new File(sosConfigDir, "sensors");
-                    if (!dataDirectory.exists())
-                        dataDirectory.mkdir();
+                    SMLConfiguration.setDataDirectory(sosConfigDir.getPath() + "sensors");
                 }
             }
 
@@ -442,8 +441,8 @@ public class SOSworker {
             int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
             templateValidTime         = (h * 3600000) + (m * 60000);
 
-            SMLReader = SOSfactory.getSensorReader(SMLType, dataDirectory, sensorIdBase, SMLconnection, map);
-            SMLWriter = SOSfactory.getSensorWriter(SMLType, dataDirectory, SMLconnection, sensorIdBase);
+            SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
+            SMLWriter = SOSfactory.getSensorWriter(SMLType, SMLConfiguration, sensorIdBase);
             OMReader  = SOSfactory.getObservationReader(OMReaderType, dataSourceOM, observationIdBase, configuration);
             OMWriter  = SOSfactory.getObservationWriter(dataSourceOM);
             OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConnection, sosConfigDir);

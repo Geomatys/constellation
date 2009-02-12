@@ -68,6 +68,34 @@ public class BDD {
     public String getPassword() {
         return password;
     }
+
+    /**
+     * @param className the className to set
+     */
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    /**
+     * @param connectURL the connectURL to set
+     */
+    public void setConnectURL(String connectURL) {
+        this.connectURL = connectURL;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
     
     /**
      * Return a new connection to the database.
@@ -76,6 +104,10 @@ public class BDD {
      * @throws java.sql.SQLException
      */
     public Connection getConnection() throws SQLException {
+        // by Default  we use the postgres driver.
+        if (className == null) {
+            className = "org.postgresql.Driver";
+        }
         JDBC.loadDriver(className);
         return DriverManager.getConnection(connectURL, user, password);
     }

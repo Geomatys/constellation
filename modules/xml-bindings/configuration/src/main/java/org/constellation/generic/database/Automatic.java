@@ -52,7 +52,7 @@ public class Automatic {
     private String format;
     
     private String dataDirectory;
-    
+
     private Queries queries;
 
     public Automatic() {
@@ -82,16 +82,29 @@ public class Automatic {
         return bdd;
     }
 
+    public void setBdd(BDD bdd) {
+        this.bdd = bdd;
+    }
+
     public String getFormat() {
         return format;
     }
-    
-    public File getdataDirectory() {
-        if (dataDirectory != null)
-            return new File(dataDirectory);
-        else return null;
+
+    public void setFormat(String format) {
+        this.format = format;
     }
     
+    public File getdataDirectory() {
+        if (dataDirectory != null) {
+            return new File(dataDirectory);
+        }
+        return null;
+    }
+
+    public void setDataDirectory(String s) {
+        this.dataDirectory = s;
+    }
+
     public int getType() {
         if (format.equals("cdi"))
             return CDI;

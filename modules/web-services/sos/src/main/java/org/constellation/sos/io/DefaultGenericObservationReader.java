@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.xml.namespace.QName;
+
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.PointType;

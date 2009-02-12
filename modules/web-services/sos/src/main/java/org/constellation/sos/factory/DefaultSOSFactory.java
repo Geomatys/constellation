@@ -80,22 +80,22 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws CstlServiceException {
+    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException {
         switch (type) {
-            case FILE_SYSTEM: return new FileSensorReader(dataDirectory);
+            case FILE_SYSTEM: return new FileSensorReader(configuration);
 
-            case MDWEB: return new MDWebSensorReader(connection, sensorIdBase, map);
+            case MDWEB: return new MDWebSensorReader(configuration, sensorIdBase, map);
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
     }
 
     @Override
-    public SensorWriter getSensorWriter(DataSourceType type,  File dataDirectory, Connection connection, String sensorIdBase) throws CstlServiceException {
+    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase) throws CstlServiceException {
         switch (type) {
-            case FILE_SYSTEM: return new FileSensorWriter(dataDirectory, sensorIdBase);
+            case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
 
-            case MDWEB: return new MDWebSensorWriter(connection, sensorIdBase);
+            case MDWEB: return new MDWebSensorWriter(configuration, sensorIdBase);
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }

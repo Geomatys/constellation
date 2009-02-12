@@ -392,7 +392,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSet type) throws CstlServiceException {
+    private void loadData(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         logger.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
@@ -408,7 +408,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         } else {
             List<String> variables;
             if (mode == DUBLINCORE) {
-                variables = getVariablesForDublinCore(type);
+                variables = getVariablesForDublinCore(type, elementName);
             } else if (mode == CONTACT) {
                 variables = getVariablesForContact();
             } else {
@@ -633,7 +633,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Object result = null;
         
         //TODO we verify that the identifier exists
-        loadData(identifier, mode, type);
+        loadData(identifier, mode, type, elementName);
         
         if (mode == ISO_19115) {
             result = getISO(identifier);
@@ -669,7 +669,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Return a list of variables name used for the dublicore representation.
      * @return
      */
-    protected abstract List<String> getVariablesForDublinCore(ElementSet type);
+    protected abstract List<String> getVariablesForDublinCore(ElementSet type, List<QName> elementName);
        
     /**
      * Return a list of contact id used in this database.
@@ -940,7 +940,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         List<String> results = new ArrayList<String>();
         List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
-            loadData(id, CONTACT, null);
+            loadData(id, CONTACT, null, null);
             for(String var: getVariablesForContact()) {
                 String contactID = getVariable(var);
                 if (contactID == null) {

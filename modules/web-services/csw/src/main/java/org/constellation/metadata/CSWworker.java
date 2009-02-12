@@ -706,14 +706,16 @@ public class CSWworker {
                                           INVALID_PARAMETER_VALUE, "Query");
         }
         
-        // we get the element set type (BRIEF, SUMMARY OR FULL)
+        // we get the element set type (BRIEF, SUMMARY OR FULL) or the custom elementName
         ElementSetName setName  = query.getElementSetName();
         ElementSet set          = ElementSetType.SUMMARY;
         List<QName> elementName = query.getElementName();
         if (setName != null) {
             set = setName.getValue();
+        } else if (elementName != null && elementName.size() != 0){
+            set = null;
         }
-        
+
         SearchResultsType searchResults = null;
         
         //we get the maxRecords wanted and start position

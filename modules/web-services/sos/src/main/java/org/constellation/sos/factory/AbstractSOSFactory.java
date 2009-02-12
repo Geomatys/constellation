@@ -49,8 +49,8 @@ public abstract class AbstractSOSFactory extends AbstractFactory {
 
     public abstract ObservationWriter getObservationWriter(DataSource dataSourceOM) throws CstlServiceException;
 
-    public abstract SensorReader getSensorReader(DataSourceType type, File dataDirectory, String sensorIdBase, Connection connection, Properties map) throws CstlServiceException;
+    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 
-    public abstract SensorWriter getSensorWriter(DataSourceType type, File dataDirectory, Connection connection, String sensorIdBase) throws CstlServiceException;
+    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase) throws CstlServiceException;
 
 }
