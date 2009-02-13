@@ -49,6 +49,8 @@ import org.constellation.provider.LayerDataProvider;
 import org.constellation.provider.configuration.LayerLinkReader;
 
 import org.constellation.ws.rs.WebService;
+import org.geotools.map.ElevationModel;
+import org.geotools.map.MapBuilder;
 import org.geotools.util.SoftValueHashMap;
 import org.xml.sax.SAXException;
 
@@ -67,6 +69,8 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
     private final Map<String,Layer> index = new HashMap<String,Layer>();
     private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
     private final Map<String,PostGridReader> cache = new SoftValueHashMap<String, PostGridReader>(6);
+
+    private String elevationModelName = null;
 
     protected static final Database database;
 
@@ -323,6 +327,7 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
         if(file.exists()){
             Map<String,List<String>> links = null;
             try {
+                elevationModelName = LayerLinkReader.getElevationModel(file);
                 links = LayerLinkReader.read(file);
             } catch (ParserConfigurationException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
@@ -351,6 +356,20 @@ public class PostGridNamedLayerDP implements LayerDataProvider{
             instance = new PostGridNamedLayerDP();
         }
         return instance;
+    }
+
+    @Override
+    public ElevationModel getElevationModel(String name) {
+        if(elevationModelName != null){
+            System.out.println("there is an elevation model");
+            PostGridLayerDetails pgld = (PostGridLayerDetails) get(elevationModelName);
+            if(pgld != null){
+                System.out.println("layer exists");
+                MapBuilder builder = MapBuilder.getInstance();
+                return builder.createElevationModel(pgld.getReader(), null);
+            }
+        }
+        return null;
     }
 
 }

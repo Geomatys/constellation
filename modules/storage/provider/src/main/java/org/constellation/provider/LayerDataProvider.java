@@ -16,6 +16,8 @@
  */
 package org.constellation.provider;
 
+import org.geotools.map.ElevationModel;
+
 
 /**
  *
@@ -23,5 +25,7 @@ package org.constellation.provider;
  * @author Johann Sorel (Geomatys)
  */
 public interface LayerDataProvider extends DataProvider<String,LayerDetails>{
- 
+
+    public ElevationModel getElevationModel(String name);
+
 }

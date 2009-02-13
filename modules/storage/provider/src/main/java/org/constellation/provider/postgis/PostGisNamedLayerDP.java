@@ -44,6 +44,7 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 
+import org.geotools.map.ElevationModel;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -273,6 +274,11 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         }
 
         return ProviderConfig.read(new File(configFile.trim()));
+    }
+
+    @Override
+    public ElevationModel getElevationModel(String name) {
+        return null;
     }
 
 }

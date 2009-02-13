@@ -40,6 +40,7 @@ import org.constellation.ws.rs.WebService;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.map.ElevationModel;
 import org.geotools.util.SoftValueHashMap;
 
 import org.xml.sax.SAXException;
@@ -291,5 +292,9 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
         return ProviderConfig.read(new File(configFile.trim()));
     }
 
+    @Override
+    public ElevationModel getElevationModel(String name) {
+        return null;
+    }
 
 }

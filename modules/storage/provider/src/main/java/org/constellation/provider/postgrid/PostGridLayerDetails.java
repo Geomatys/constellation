@@ -40,13 +40,17 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 import org.constellation.map.PostGridMapLayer;
+import org.constellation.map.PostGridMapLayer2;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.NamedLayerDP;
 import org.constellation.provider.NamedStyleDP;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.io.CoverageReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.ElevationModel;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -69,8 +73,10 @@ import org.opengis.style.ChannelSelection;
 import org.opengis.style.ColorMap;
 import org.opengis.style.ContrastEnhancement;
 import org.opengis.style.Description;
+import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.OverlapBehavior;
 import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.Rule;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 
@@ -259,7 +265,7 @@ class PostGridLayerDetails implements LayerDetails {
     }
 
     private MapLayer createMapLayer(Object style, final Map<String, Object> params) {
-        final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
+        final PostGridMapLayer2 mapLayer = new PostGridMapLayer2(reader);
 
         mapLayer.setName(getName());
         
@@ -307,10 +313,34 @@ class PostGridLayerDetails implements LayerDetails {
             }
         }
 
+        //search if we need an elevationmodel for style
+        search_loop:
+        for(FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
+            for(Rule rule : fts.rules()){
+                for(Symbolizer symbol : rule.symbolizers()){
+                    if(symbol instanceof RasterSymbolizer){
+                        RasterSymbolizer rs = (RasterSymbolizer) symbol;
+                        ShadedRelief sr = rs.getShadedRelief();
+                        if(sr.getReliefFactor().evaluate(null, Float.class) != 0){
+                            ElevationModel model = NamedLayerDP.getInstance().getElevationModel(null);
+                            if(model != null){
+                                mapLayer.setElevationModel(model);
+                            }
+                            break search_loop;
+                        }
+                    }
+                }
+            }
+        }
+
 
         return mapLayer;
     }
-    
+
+    protected CoverageReader getReader(){
+        return reader;
+    }
+
     private MutableStyle toStyle(final MeasurementRange dimRange) {
         final List<InterpolationPoint> values = new ArrayList<InterpolationPoint>();
         values.add(STYLE_FACTORY.createInterpolationPoint(

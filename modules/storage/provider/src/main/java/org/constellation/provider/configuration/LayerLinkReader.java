@@ -86,6 +86,27 @@ public class LayerLinkReader {
         }
         return styles;
     }
-    
+
+    public static final String getElevationModel(File f)
+            throws ParserConfigurationException, SAXException, IOException{
+
+        final DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder constructeur = fabrique.newDocumentBuilder();
+
+        final Document document = constructeur.parse(f);
+
+        final Element racine = document.getDocumentElement();
+
+        final String tag = "ElevationModel";
+        final NodeList liste = racine.getElementsByTagName(tag);
+        for(int i=0, n=liste.getLength(); i<n; i++){
+            final Element link = (Element)liste.item(i);
+            if(link.hasAttribute("LayerName")){
+                return link.getAttribute("LayerName");
+            }
+        }
+
+        return null;
+    }
     
 }

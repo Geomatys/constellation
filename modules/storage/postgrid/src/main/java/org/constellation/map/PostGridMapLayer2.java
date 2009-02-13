@@ -174,8 +174,5 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
         return reader;
     }
 
-    public GridCoverage2D getGridCoverage2D() {
-        return null;
-    }
 
 }

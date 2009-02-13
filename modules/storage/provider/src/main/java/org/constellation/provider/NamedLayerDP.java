@@ -25,6 +25,7 @@ import java.util.Set;
 import org.constellation.provider.postgis.PostGisNamedLayerDP;
 import org.constellation.provider.postgrid.PostGridNamedLayerDP;
 import org.constellation.provider.shapefile.ShapeFileNamedLayerDP;
+import org.geotools.map.ElevationModel;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
@@ -100,7 +101,16 @@ public class NamedLayerDP implements LayerDataProvider{
         }
         return styles;
     }
-    
+
+    @Override
+    public ElevationModel getElevationModel(String name) {
+        for(LayerDataProvider dp : dps){
+            ElevationModel model = dp.getElevationModel(name);
+            if(model != null) return model;
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -140,4 +150,5 @@ public class NamedLayerDP implements LayerDataProvider{
         
         return instance;
     }
+
 }
