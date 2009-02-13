@@ -571,7 +571,7 @@ public final class WCSWorker {
                     servletContext.getRealPath("WEB-INF"))).getValue();
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    INVALID_PARAMETER_VALUE, actingVersion);
+                    NO_APPLICABLE_CODE, actingVersion);
         }
         if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") ||
                                         requestedSection.equals("/"))
@@ -697,7 +697,7 @@ public final class WCSWorker {
                     servletContext.getRealPath("WEB-INF"));
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    INVALID_PARAMETER_VALUE, actingVersion);
+                    NO_APPLICABLE_CODE, actingVersion);
 
         }
 
@@ -914,6 +914,7 @@ public final class WCSWorker {
      * Returns the file where to read the capabilities document for each serviceType.
      * If no such file is found, then this method returns {@code null}.
      *
+     * @param home The home directory, where to search for configuration files.
      * @return The capabilities Object, or {@code null} if none.
      */
     private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {

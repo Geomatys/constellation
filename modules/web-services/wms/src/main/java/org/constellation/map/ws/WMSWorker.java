@@ -93,7 +93,6 @@ import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
-import org.geotools.util.Version;
 
 //Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -203,14 +202,14 @@ public class WMSWorker extends AbstractWMSWorker {
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
-            inCapabilities = (AbstractWMSCapabilities) getCapabilitiesObject(getCapab.getVersion(),
+            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(
                     servletContext.getRealPath("WEB-INF"));
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    e.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
+                    e.getMessage(), NO_APPLICABLE_CODE, getCapab.getVersion());
         } catch (JAXBException ex) {
             throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    ex.getMessage(), INVALID_PARAMETER_VALUE, getCapab.getVersion());
+                    ex.getMessage(), NO_APPLICABLE_CODE, getCapab.getVersion());
         }
         final String url = uriContext.getBaseUri().toString();
         inCapabilities.getService().getOnlineResource().setHref(url + "wms");
@@ -454,15 +453,14 @@ public class WMSWorker extends AbstractWMSWorker {
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
      *
-     * @param version The version of the capabilities request.
      * @param home    The home directory, where to search for configuration files.
      * @return The capabilities Object, or {@code null} if none.
      *
      * @throws JAXBException
      * @throws IOException
      */
-    private Object getCapabilitiesObject(final Version version, final String home) throws JAXBException, IOException {
-        final String fileName = "WMSCapabilities" + version.toString() + ".xml";
+    private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
+        final String fileName = "WMSCapabilities" + actingVersion.toString() + ".xml";
         final File changeFile = getFile("change.properties", home);
         Properties p = new Properties();
 
