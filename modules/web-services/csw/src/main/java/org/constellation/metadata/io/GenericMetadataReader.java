@@ -79,9 +79,8 @@ import org.opengis.metadata.extent.GeographicExtent;
 /**
  * A database Reader using a generic configuration to request an unknown database.
  * 
- * TODO regarder les cardinalite est mettre des null la ou 0-...
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class GenericMetadataReader extends MetadataReader {
     
@@ -158,9 +157,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
 
     /**
      * Build a new Generic metadata reader and initialize the statement.
-     * @param genericConfiguration
+     * @param configuration
      */
-    public GenericMetadataReader(Automatic configuration, File configDir) throws CstlServiceException {
+    public GenericMetadataReader(Automatic configuration) throws CstlServiceException {
         super(false, true);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -170,6 +169,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
+        if (configuration.getConfigurationDirectory() == null || !configuration.getConfigurationDirectory().exists()) {
+            throw new CstlServiceException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
+        }
         this.configuration = configuration;
         try {
             this.connection        = db.getConnection();
@@ -178,7 +180,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             multipleValue          = new HashMap<String, List<String>>();
             JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
             unmarshaller           = context.createUnmarshaller();
-            contacts               = loadContacts(new File(configDir, "contacts"));
+            contacts               = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -190,9 +192,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
     
     /**
      * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
-     * @param genericConfiguration
+     * @param configuration
      */
-    public GenericMetadataReader(Automatic configuration, File configDir, boolean fillAnchor) throws CstlServiceException {
+    public GenericMetadataReader(Automatic configuration, boolean fillAnchor) throws CstlServiceException {
         super(false, true);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -201,6 +203,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        if (configuration.getConfigurationDirectory() == null || !configuration.getConfigurationDirectory().exists()) {
+            throw new CstlServiceException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
         }
         this.configuration = configuration;
         try {
@@ -211,10 +216,39 @@ public abstract class GenericMetadataReader extends MetadataReader {
             contacts               = new HashMap<String, ResponsibleParty>();
             JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
             unmarshaller           = context.createUnmarshaller();
-            contacts               = loadContacts(new File(configDir, "contacts"));
+            contacts               = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * Build a new Generic metadata reader for test purpose.
+     *
+     * it replace the SQL statement by specified datas.
+     *
+     * @param genericConfiguration
+     */
+    protected GenericMetadataReader(Automatic configuration, Map<String, ResponsibleParty> contacts) throws CstlServiceException {
+        super(false, true);
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        this.configuration = configuration;
+        try {
+            this.connection        = null;
+            singleStatements   = new HashMap<PreparedStatement, List<String>>();
+            multipleStatements = new HashMap<PreparedStatement, List<String>>();
+            singleValue            = new HashMap<String, String>();
+            multipleValue          = new HashMap<String, List<String>>();
+            this.contacts          = contacts;
+            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
+            unmarshaller           = context.createUnmarshaller();
+
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -281,7 +315,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             logger.severe("The configuration file is probably malformed, there is no queries part.");
         }
     }
-    
+
     /**
      * Load a Map of contact from the specified directory
      */
@@ -318,12 +352,15 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role) {
-        ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
-        if (result != null) {
-            result = new ResponsiblePartyImpl(result);
-            result.setRole(role);
+        if (contacts != null) {
+            ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
+            if (result != null) {
+                result = new ResponsiblePartyImpl(result);
+                result.setRole(role);
+            }
+            return result;
         }
-        return result;
+        return null;
     }
     
     /**

@@ -410,7 +410,7 @@ public class DCMIRecordType extends AbstractRecordType implements DCMIRecord {
     }
 
     public void setPublisher(SimpleLiteral publisher) {
-        if (this.publisher != null)
+        if (this.publisher == null)
             this.publisher = new ArrayList<SimpleLiteral>();
         this.publisher.add(publisher);
     }
