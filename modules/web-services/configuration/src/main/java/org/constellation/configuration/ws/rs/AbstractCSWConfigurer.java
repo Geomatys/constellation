@@ -113,6 +113,7 @@ public abstract class AbstractCSWConfigurer {
                 String id = getConfigID(configFile);
                 // we get the CSW configuration file
                 Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
             
@@ -135,16 +136,16 @@ public abstract class AbstractCSWConfigurer {
      * @return A lucene Indexer
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected AbstractIndexer initIndexer(String serviceID, File cswConfigDir, MetadataReader currentReader) throws CstlServiceException {
+    protected AbstractIndexer initIndexer(String serviceID, MetadataReader currentReader) throws CstlServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
         if (config != null) {
             try {
                 if (currentReader == null) {
-                    currentReader = CSWfactory.getMetadataReader(config, null, cswConfigDir);
+                    currentReader = CSWfactory.getMetadataReader(config);
                 }
-                AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, cswConfigDir, serviceID);
+                AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, serviceID);
                 return indexer;
 
             } catch (IndexingException ex) {
@@ -160,18 +161,17 @@ public abstract class AbstractCSWConfigurer {
      * Build a new Metadata reader for the specified service ID.
      *
      * @param serviceID the service identifier (form multiple CSW) default: ""
-     * @param cswConfigDir the CSW configuration directory.
      *
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected MetadataReader initReader(String serviceID, File cswConfigDir) throws CstlServiceException {
+    protected MetadataReader initReader(String serviceID) throws CstlServiceException {
 
         // we get the CSW configuration file
         Automatic config = serviceConfiguration.get(serviceID);
         if (config != null) {
             try {
-                MetadataReader currentReader = CSWfactory.getMetadataReader(config, null, cswConfigDir);
+                MetadataReader currentReader = CSWfactory.getMetadataReader(config);
                 return currentReader;
 
             } catch (CstlServiceException ex) {
@@ -317,7 +317,7 @@ public abstract class AbstractCSWConfigurer {
             File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
             AbstractIndexer indexer = null;
             try {
-                indexer = initIndexer(currentId, configurationDirectory, null);
+                indexer = initIndexer(currentId, null);
                 if (indexer != null) {
                     nexIndexDir.mkdir();
                     indexer.setFileDirectory(nexIndexDir);
@@ -367,7 +367,7 @@ public abstract class AbstractCSWConfigurer {
             AbstractIndexer indexer = null;
             MetadataReader reader   = null;
             try {
-                reader  = initReader(currentId, cswConfigDir);
+                reader  = initReader(currentId);
                 List<Object> objectToIndex = new ArrayList<Object>();
                 if (reader != null) {
                     for (String identifier : identifiers) {
@@ -377,7 +377,7 @@ public abstract class AbstractCSWConfigurer {
                     throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
                 }
 
-                indexer = initIndexer(currentId, cswConfigDir, reader);
+                indexer = initIndexer(currentId, reader);
                 if (indexer != null) {
                     for (Object obj : objectToIndex) {
                         indexer.indexDocument(obj);

@@ -178,7 +178,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             multipleValue          = new HashMap<String, List<String>>();
             JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
             unmarshaller           = context.createUnmarshaller();
-            contacts = loadContacts(new File(configDir, "contacts"));
+            contacts               = loadContacts(new File(configDir, "contacts"));
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);

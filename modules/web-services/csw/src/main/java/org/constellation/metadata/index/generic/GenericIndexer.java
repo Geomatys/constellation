@@ -47,6 +47,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
+import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.IndexingException;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
@@ -90,8 +91,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndexer(MetadataReader reader, File configDirectory, String serviceID) throws IndexingException {
-        super(serviceID, configDirectory);
+    public GenericIndexer(MetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
+        super(serviceID, configuration.getConfigurationDirectory());
         this.reader = reader;
         if (reader != null)
             additionalQueryable = reader.getAdditionalQueryablePathMap();

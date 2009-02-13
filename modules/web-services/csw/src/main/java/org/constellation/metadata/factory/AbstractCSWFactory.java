@@ -20,10 +20,6 @@ package org.constellation.metadata.factory;
 
 import java.io.File;
 
-// JAXB dependencies
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.IndexingException;
@@ -46,13 +42,13 @@ public abstract class AbstractCSWFactory extends AbstractFactory {
         super(priority);
     }
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration, Unmarshaller unmarshaller, File configDir) throws CstlServiceException;
+    public abstract MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException;
 
-    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller) throws CstlServiceException;
+    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException;
     
     public abstract int getProfile(int dbType);
     
-    public abstract AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, File configDir, String serviceID) throws IndexingException;
+    public abstract AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException;
     
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
 }

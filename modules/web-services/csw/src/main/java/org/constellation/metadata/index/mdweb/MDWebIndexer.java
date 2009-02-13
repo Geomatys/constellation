@@ -79,13 +79,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     private Map<String, Classe> classeMap;
     
      /**
-     * Creates a new Lucene Index into the specified directory with the specified MDweb reader.
-     * 
-     * @param reader An mdweb reader for read the metadata database.
-     * @param configDirectory A directory where the index can write indexation file. 
+     * Creates a new CSW indexer for a MDWeb database.
+     *
+     * @param configuration A configuration object containing the database informations.
+     * @param serviceID
      */
-    public MDWebIndexer(Automatic configuration, File configDirectory, String serviceID) throws IndexingException {
-        super(serviceID, configDirectory);
+    public MDWebIndexer(Automatic configuration, String serviceID) throws IndexingException {
+        super(serviceID, configuration.getConfigurationDirectory());
         if (configuration == null) {
             throw new IndexingException("The configuration object is null");
         }

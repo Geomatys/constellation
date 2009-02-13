@@ -245,11 +245,11 @@ public class CSWworker {
     /**
      * Default constructor for CSW worker.
      *
-     * @param serviceID The service identifier (used in multiple CSW context). default avlue is "".
+     * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      * @param unmarshaller
      * @param marshaller
      */
-    public CSWworker(String serviceID, Unmarshaller unmarshaller, Marshaller marshaller) {
+    public CSWworker(final String serviceID, final Unmarshaller unmarshaller, final Marshaller marshaller) {
         this(serviceID, unmarshaller, marshaller, null);
     }
     
@@ -277,7 +277,7 @@ public class CSWworker {
         isStarted = true;
         try {
             // we initialize the filterParsers
-            JAXBContext jb     = JAXBContext.newInstance("org.constellation.generic.database");
+            JAXBContext jb = JAXBContext.newInstance("org.constellation.generic.database");
             Unmarshaller configUnmarshaller = jb.createUnmarshaller();
             File configFile = new File(configDir, serviceID + "config.xml");
             if (!configFile.exists()) {
@@ -285,40 +285,38 @@ public class CSWworker {
                         "cause: The configuration file has not been found");
                  isStarted = false;
             } else {
-                Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                
-                // we load the factory from the available classes
-                AbstractCSWFactory CSWfactory;
-                try {
-                    CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
-                    logger.finer("CSW factory loaded:" + CSWfactory.getClass().getName());
-                } catch (FactoryNotFoundException ex) {
-                    logger.severe("The CSW service is not working!" + '\n' +
-                            "cause: Unable to find a CSW Factory");
-                    isStarted = false;
-                    return;
-                }
+                Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
 
-                int datasourceType = config.getType();
+                // we assign the configuration directory
+                configuration.setConfigurationDirectory(configDir);
+
+                // we load the factory from the available classes
+                AbstractCSWFactory CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
+                logger.finer("CSW factory loaded:" + CSWfactory.getClass().getName());
+
+                int datasourceType = configuration.getType();
                 //we initialize all the data retriever (reader/writer) and index worker
-                MDReader      = CSWfactory.getMetadataReader(config, unmarshaller, configDir);
+                MDReader      = CSWfactory.getMetadataReader(configuration);
                 profile       = CSWfactory.getProfile(datasourceType);
-                AbstractIndexer indexer = CSWfactory.getIndexer(config, MDReader, configDir, serviceID);
+                AbstractIndexer indexer = CSWfactory.getIndexer(configuration, MDReader, serviceID);
                 indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
-                MDWriter      = CSWfactory.getMetadataWriter(config, indexer, marshaller);
+                MDWriter      = CSWfactory.getMetadataWriter(configuration, indexer);
                 catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
                 
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
                 loadCascadedService(configDir);
-                logger.info("CSW service (" + config.getFormat() + ") running");
+                logger.info("CSW service (" + configuration.getFormat() + ") running");
             }
+        } catch (FactoryNotFoundException ex) {
+            logger.severe("The CSW service is not working!" + '\n' +
+                    "cause: Unable to find a CSW Factory");
+            isStarted = false;
         } catch (JAXBException ex) {
             ex.printStackTrace();
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause: JAXBException while getting configuration");
             isStarted = false;
-
         } catch (CstlServiceException e) {
             logger.severe("The CSW service is not working!" + '\n' +
                     "cause:" + e.getMessage());

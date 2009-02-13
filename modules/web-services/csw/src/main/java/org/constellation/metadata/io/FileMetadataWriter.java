@@ -22,21 +22,23 @@ package org.constellation.metadata.io;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.index.AbstractIndexer;
+import org.constellation.metadata.CSWClassesContext;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class FileMetadataWriter extends MetadataWriter {
     
     /**
-     * A unMarshaller to get object from harvested resource.
+     * A marshaller to store object from harvested resource.
      */
     private final Marshaller marshaller;
     
@@ -51,12 +53,16 @@ public class FileMetadataWriter extends MetadataWriter {
      * @param marshaller
      * @throws java.sql.SQLException
      */
-    public FileMetadataWriter(Automatic configuration, AbstractIndexer index, Marshaller marshaller) throws CstlServiceException {
+    public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
         super(index);
-        this.marshaller = marshaller;
         dataDirectory   = configuration.getdataDirectory();
         if (dataDirectory == null || !dataDirectory.exists()) {
-            throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unable to find the data directory", NO_APPLICABLE_CODE);
+        }
+        try {
+           marshaller = JAXBContext.newInstance(CSWClassesContext.getAllClasses()).createMarshaller();
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
         }
         
     }

@@ -47,6 +47,9 @@ public class Automatic {
     public static final int FILESYSTEM  = 5;
             
     private BDD bdd;
+
+    @XmlTransient
+    private File configurationDirectory;
     
     @XmlAttribute
     private String format;
@@ -84,6 +87,20 @@ public class Automatic {
 
     public void setBdd(BDD bdd) {
         this.bdd = bdd;
+    }
+
+    /**
+     * @return the configurationDirectory
+     */
+    public File getConfigurationDirectory() {
+        return configurationDirectory;
+    }
+
+    /**
+     * @param configurationDirectory the configurationDirectory to set
+     */
+    public void setConfigurationDirectory(File configurationDirectory) {
+        this.configurationDirectory = configurationDirectory;
     }
 
     public String getFormat() {

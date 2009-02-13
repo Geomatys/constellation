@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -42,6 +43,7 @@ import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.CSWClassesContext;
 import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -69,27 +71,51 @@ import org.geotools.metadata.iso.MetaDataImpl;
 
 
 /**
+ * A csw Metadata Reader. This reader does not require a database.
+ * The csw records are stored XML file in a directory .
  *
- * @author Guilhem Legal 
+ * This reader can be used for test purpose or in case of small amount of record.
+ *
+ * @author Guilhem Legal (Geomatys)
  */
 public class FileMetadataReader extends MetadataReader {
 
+    /**
+     * The directory containing the data XML files.
+     */
     private File dataDirectory;
     
     /**
-     * A unMarshaller to get object from metadata files.
+     * A unmarshaller to get java object from metadata files.
      */
     private final Unmarshaller unmarshaller;
 
+    /**
+     * A date formatter used to display the Date object for dublin core translation.
+     */
     private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    public FileMetadataReader(Automatic configuration, Unmarshaller unmarshaller) throws CstlServiceException {
+    /**
+     * Build a new CSW File Reader.
+     *
+     * @param configuration A generic configuration object containing a directory path
+     * in the configuration.dataDirectory field.
+     *
+     * @throws org.constellation.ws.CstlServiceException If the configuration object does
+     * not contains an existing directory path in the configuration.dataDirectory field.
+     * If the creation of a JAXBContext throw a JAXBException.
+     */
+    public FileMetadataReader(Automatic configuration) throws CstlServiceException {
         super(true, false);
-        this.unmarshaller  = unmarshaller;
         dataDirectory = configuration.getdataDirectory();
-        if (dataDirectory == null || !dataDirectory.exists()) {
+        if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
             throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
-        } 
+        }
+        try {
+            unmarshaller = JAXBContext.newInstance(CSWClassesContext.getAllClasses()).createUnmarshaller();
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("cause: JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
+        }
     }
     
     /**

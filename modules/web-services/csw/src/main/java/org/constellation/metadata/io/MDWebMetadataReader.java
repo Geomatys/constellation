@@ -181,7 +181,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Automatic configuration, File configDir) throws CstlServiceException {
+    public MDWebMetadataReader(Automatic configuration) throws CstlServiceException {
         super(true, false);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -210,7 +210,7 @@ public class MDWebMetadataReader extends MetadataReader {
         this.ebrimV3Package     = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
         this.ebrimV25Package    = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
         
-        this.classBinding       = initClassBinding(configDir);
+        this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
         this.classeNotFound     = new ArrayList<String>();
     }

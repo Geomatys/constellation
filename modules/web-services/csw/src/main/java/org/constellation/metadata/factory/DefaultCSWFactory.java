@@ -20,10 +20,6 @@ package org.constellation.metadata.factory;
 
 import java.io.File;
 
-// JAXB dependencies
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.IndexingException;
@@ -44,8 +40,10 @@ import static org.constellation.generic.database.Automatic.*;
 import org.constellation.ws.CstlServiceException;
 
 /**
+ * A default implementation of the CSW factory.
+ * it provide various reader / writer and  lucene indexer / searcher.
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class DefaultCSWFactory extends AbstractCSWFactory {
 
@@ -57,15 +55,15 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MetadataReader getMetadataReader(Automatic configuration, Unmarshaller unmarshaller, File configDir) throws CstlServiceException {
+    public MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
         switch (type) {
             case MDWEB:
-                return new MDWebMetadataReader(configuration, configDir);
+                return new MDWebMetadataReader(configuration);
             case FILESYSTEM:
-                return new FileMetadataReader(configuration, unmarshaller);
+                return new FileMetadataReader(configuration);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + type);
         }
@@ -78,7 +76,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer, Marshaller marshaller) throws CstlServiceException {
+    public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -86,7 +84,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebMetadataWriter(configuration, indexer);
             case FILESYSTEM:
-                return new FileMetadataWriter(configuration, indexer, marshaller);
+                return new FileMetadataWriter(configuration, indexer);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + type);
         }
@@ -119,27 +117,27 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, File configDir, String serviceID) throws IndexingException {
+    public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
         switch (type) {
             case MDWEB:
-                return new MDWebIndexer(configuration, configDir, serviceID);
+                return new MDWebIndexer(configuration, serviceID);
             case FILESYSTEM:
-                return new GenericIndexer(reader, configDir, serviceID);
+                return new GenericIndexer(reader, configuration, serviceID);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + type);
         }
     }
     
-     @Override
-    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException {
+    @Override
+    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebIndexSearcher(configDir, serviceID);
+                return new MDWebIndexSearcher(configDirectory, serviceID);
             case FILESYSTEM:
-                return new GenericIndexSearcher(configDir, serviceID);
+                return new GenericIndexSearcher(configDirectory, serviceID);
             default:
                 throw new IllegalArgumentException("Unknow database type: " + dbType);
         }

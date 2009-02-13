@@ -20,7 +20,6 @@ package org.constellation.metadata.ws.rs;
 // java se dependencies
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ import org.constellation.cat.csw.v202.HarvestType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
-import org.constellation.cat.wrs.v100.ExtrinsicObjectType;
+import org.constellation.metadata.CSWClassesContext;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ogc.FilterType;
@@ -71,16 +70,11 @@ import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.ws.ServiceType;
-import org.constellation.ebrim.v250.RegistryObjectType;
-import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.metadata.CSWworker;
 import org.constellation.util.Util;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.ows.OWSExceptionCode.*;
-
-// geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
 
 /**
  * RestFul CSW service.
@@ -102,7 +96,7 @@ public class CSWService extends OGCWebService {
         super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
         serviceID = "";
         try {
-            setXMLContext("", getAllClasses());
+            setXMLContext("", CSWClassesContext.getAllClasses());
             worker = new CSWworker(serviceID, unmarshaller, marshaller);
             
         } catch (JAXBException ex){
@@ -121,7 +115,7 @@ public class CSWService extends OGCWebService {
         super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
         this.serviceID = serviceID;
         try {
-            setXMLContext("", getAllClasses());
+            setXMLContext("", CSWClassesContext.getAllClasses());
             worker = new CSWworker(serviceID, unmarshaller, marshaller);
 
         } catch (JAXBException ex){
@@ -132,47 +126,6 @@ public class CSWService extends OGCWebService {
         }
     }
 
-    /**
-     * Return the list of all the marshallable classes
-     * 
-     * @return
-     */
-    private Class[] getAllClasses() {
-        List<Class> classeList = new ArrayList<Class>();
-        //ISO 19115 class
-        classeList.add(MetaDataImpl.class);
-
-        //ISO 19115 French profile class
-        classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
-
-        //CSW 2.0.2 classes
-        classeList.addAll(Arrays.asList(org.constellation.cat.csw.v202.ObjectFactory.class,
-                                        ExceptionReport.class,
-                                        org.constellation.ows.v110.ExceptionReport.class,  // TODO remove
-                                        org.constellation.dublincore.v2.terms.ObjectFactory.class));
-            
-           //CSW 2.0.0 classes
-           classeList.addAll(Arrays.asList(org.constellation.cat.csw.v200.ObjectFactory.class,
-                                           org.constellation.dublincore.v1.terms.ObjectFactory.class));
-           
-           //Ebrim classes
-           classeList.add(IdentifiableType.class);
-           classeList.add(ExtrinsicObjectType.class);
-           classeList.add(org.constellation.ebrim.v300.ObjectFactory.class);
-           classeList.add(org.constellation.cat.wrs.v100.ObjectFactory.class);
-           
-           classeList.add(RegistryObjectType.class);
-           classeList.add(org.constellation.ebrim.v250.ObjectFactory.class);
-           classeList.add(org.constellation.cat.wrs.v090.ObjectFactory.class);
-           
-           // we add the extensions classes
-           classeList.addAll(loadExtensionsClasses());
-            
-            
-            
-           return Util.toArray(classeList);
-    }
-    
      /**
      * Treat the incomming request and call the right function.
      * 
@@ -784,110 +737,6 @@ public class CSWService extends OGCWebService {
                                resourceFormat, 
                                handler, 
                                harvestInterval);
-    }
-    
-    /**
-     * Load some extensions classes (ISO 19119 and ISO 19110) if thay are present in the classPath.
-     * Return a list of classes to add in the context of JAXB.
-     */
-    private List<Class> loadExtensionsClasses() {
-        List<Class> ExtClasses = new ArrayList<Class>();
-        
-        // if they are present in the classPath we add the ISO 19119 classes
-        Class c = null;
-        try {
-            c = Class.forName("org.geotools.service.ServiceIdentificationImpl");
-        } catch (ClassNotFoundException e) {
-            LOGGER.info("ISO 19119 classes not found (optional)") ;
-        }
-        if (c != null) {
-            ExtClasses.add(c);
-            LOGGER.info("extension ISO 19119 loaded");
-        } 
-
-        // if they are present in the classPath we add the ISO 19110 classes
-        
-        try {
-            c = Class.forName("org.geotools.feature.catalog.AssociationRoleImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.BindingImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.BoundFeatureAttributeImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.ConstraintImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.DefinitionReferenceImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.DefinitionSourceImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.FeatureAssociationImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.FeatureAttributeImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.FeatureCatalogueImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.FeatureOperationImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.FeatureTypeImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.InheritanceRelationImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.ListedValueImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-
-            c = Class.forName("org.geotools.feature.catalog.PropertyTypeImpl");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-            
-            c = Class.forName("org.geotools.util.Multiplicity");
-            if (c != null) {
-                ExtClasses.add(c);
-            }
-            
-            LOGGER.info("extension ISO 19110 loaded");
-        } catch (ClassNotFoundException e) {
-            LOGGER.info("ISO 19110 classes not found (optional).");
-        }
-        return ExtClasses;
     }
     
     /**
