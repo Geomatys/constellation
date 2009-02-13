@@ -25,6 +25,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
@@ -52,9 +54,22 @@ public class DefaultObservationFilter extends ObservationFilter {
     /**
      *
      */
-    public DefaultObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection) {
+    public DefaultObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         super(observationIdBase, observationTemplateIdBase, map);
-        this.connection = connection;
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
+        try {
+            this.connection = db.getConnection();
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        }
     }
 
 

@@ -26,6 +26,8 @@ import javax.sql.DataSource;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.ReferenceTable;
 import org.constellation.observation.MeasurementEntry;
@@ -38,6 +40,7 @@ import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
+import org.postgresql.ds.PGSimpleDataSource;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -75,10 +78,25 @@ public class DefaultObservationWriter extends ObservationWriter {
      * @throws org.constellation.catalog.NoSuchTableException
      * @throws java.sql.SQLException
      */
-    public DefaultObservationWriter(DataSource dataSourceOM) throws CstlServiceException {
+    public DefaultObservationWriter(Automatic configuration) throws CstlServiceException {
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
         try {
-            OMDatabase   = new Database(dataSourceOM);
+            PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
+            dataSourceOM.setServerName(db.getHostName());
+            dataSourceOM.setPortNumber(db.getPortNumber());
+            dataSourceOM.setDatabaseName(db.getDatabaseName());
+            dataSourceOM.setUser(db.getUser());
+            dataSourceOM.setPassword(db.getPassword());
 
+            OMDatabase   = new Database(dataSourceOM);
+            
             //we build the database table frequently used.
             obsTable = OMDatabase.getTable(ObservationTable.class);
             offTable = OMDatabase.getTable(ObservationOfferingTable.class);

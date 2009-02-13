@@ -16,14 +16,14 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.configuration;
 
 /**
  *
  * @author Guilhem Legal
  */
-public enum ObservationFilterType {
-
+public enum ObservationReaderType {
+    
     GENERIC,
 
     DEFAULT

@@ -16,20 +16,15 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.configuration;
 
 /**
  *
  * @author Guilhem Legal
  */
-public enum DataSourceType {
+public enum ObservationFilterType {
 
-    FILE_SYSTEM,
+    GENERIC,
 
-    MDWEB,
-
-    POSTGRID_O_M,
-
-    GENERIC_O_M
-
+    DEFAULT
 }

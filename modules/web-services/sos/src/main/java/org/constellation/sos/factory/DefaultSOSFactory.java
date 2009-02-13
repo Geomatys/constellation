@@ -17,12 +17,11 @@
 
 package org.constellation.sos.factory;
 
-import java.io.File;
-import java.sql.Connection;
 import java.util.Properties;
-import javax.sql.DataSource;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.ObservationFilterType;
+import org.constellation.configuration.ObservationReaderType;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.DefaultGenericObservationReader;
 import org.constellation.sos.io.DefaultObservationFilter;
 import org.constellation.sos.io.DefaultObservationReader;
@@ -33,9 +32,7 @@ import org.constellation.sos.io.GenericObservationFilter;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -52,11 +49,11 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDir) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
       switch (type) {
-            case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, connection);
+            case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
 
-            case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, connection, configDir);
+            case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
 
             default: throw new IllegalArgumentException("Unknow observationFilter type: " + type);
         }
@@ -64,9 +61,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws CstlServiceException {
+    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
         switch (type) {
-            case DEFAULT : return new DefaultObservationReader(dataSourceOM, observationIdBase);
+            case DEFAULT : return new DefaultObservationReader(configuration, observationIdBase);
 
             case GENERIC : return new DefaultGenericObservationReader(observationIdBase, configuration);
 
@@ -75,8 +72,8 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationWriter getObservationWriter(DataSource dataSourceOM) throws CstlServiceException {
-        return new DefaultObservationWriter(dataSourceOM);
+    public ObservationWriter getObservationWriter(Automatic configuration) throws CstlServiceException {
+        return new DefaultObservationWriter(configuration);
     }
 
     @Override

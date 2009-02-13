@@ -28,6 +28,8 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.generic.filter.From;
 import org.constellation.generic.filter.Query;
 import org.constellation.generic.filter.Select;
@@ -56,13 +58,20 @@ public class GenericObservationFilter extends ObservationFilter {
      */
     private final Connection connection;
 
-    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection,
-            File configDir) throws CstlServiceException {
+    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         super(observationIdBase, observationTemplateIdBase, map);
+        if (configuration == null) {
+            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+        }
+        // we get the database informations
+        BDD db = configuration.getBdd();
+        if (db == null) {
+            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+        }
         try {
             JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            File affinage = new File(configDir, "affinage.xml");
+            File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
                 Object object = unmarshaller.unmarshal(affinage);
                 if (object instanceof Query)
@@ -72,9 +81,12 @@ public class GenericObservationFilter extends ObservationFilter {
             } else {
                 throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
-            this.connection = connection;
+            this.connection = db.getConnection();
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
+        } catch (SQLException ex) {
+            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
     

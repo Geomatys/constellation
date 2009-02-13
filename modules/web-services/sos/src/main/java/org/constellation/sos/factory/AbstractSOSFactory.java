@@ -17,16 +17,13 @@
 
 package org.constellation.sos.factory;
 
-import java.io.File;
-import java.sql.Connection;
 import java.util.Properties;
-import javax.sql.DataSource;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.ObservationFilterType;
+import org.constellation.configuration.ObservationReaderType;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -43,11 +40,11 @@ public abstract class AbstractSOSFactory extends AbstractFactory {
         super(priority);
     }
 
-    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Connection connection, File configDirectory) throws CstlServiceException;
+    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;
 
-    public abstract ObservationReader getObservationReader(ObservationReaderType type, DataSource dataSourceOM, String observationIdBase, Automatic configuration) throws CstlServiceException;
+    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
 
-    public abstract ObservationWriter getObservationWriter(DataSource dataSourceOM) throws CstlServiceException;
+    public abstract ObservationWriter getObservationWriter(Automatic configuration) throws CstlServiceException;
 
     public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 

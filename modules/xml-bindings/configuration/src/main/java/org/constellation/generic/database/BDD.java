@@ -21,6 +21,7 @@ package org.constellation.generic.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotools.resources.JDBC;
@@ -67,6 +68,45 @@ public class BDD {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getHostName() {
+        if (connectURL != null && connectURL.indexOf("://") != -1) {
+            String hostName = connectURL.substring(connectURL.indexOf("://") + 3);
+            if (hostName.indexOf(':') != -1) {
+                hostName        = hostName.substring(0, hostName.indexOf(':'));
+                return hostName;
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public String getDatabaseName() {
+        if (connectURL != null && connectURL.lastIndexOf("/") != -1) {
+            String databaseName = connectURL.substring(connectURL.lastIndexOf("/") + 1);
+            return databaseName;
+        }
+        return null;
+    }
+
+    public int getPortNumber() {
+        if (connectURL != null && connectURL.lastIndexOf(":") != -1) {
+            String portName = connectURL.substring(connectURL.lastIndexOf(":") + 1);
+            if (portName.indexOf('/') != -1) {
+                portName        = portName.substring(0, portName.indexOf('/'));
+                try {
+                    return Integer.parseInt(portName);
+                } catch (NumberFormatException ex) {
+                    Logger.getAnonymousLogger().severe("unable to parse the port number: " + portName);
+                    return -1;
+                }
+            } else {
+                return -1;
+            }
+        }
+        return -1;
     }
 
     /**

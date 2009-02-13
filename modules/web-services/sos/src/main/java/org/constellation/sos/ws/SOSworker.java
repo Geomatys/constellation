@@ -23,8 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -49,8 +47,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.ObservationFilterType;
+import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
@@ -99,11 +100,8 @@ import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.sos.factory.AbstractSOSFactory;
-import org.constellation.sos.io.DataSourceType;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationFilterType;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationReaderType;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -131,9 +129,6 @@ import org.opengis.observation.Observation;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistry;
 
-// postgres driver
-import org.postgresql.ds.PGSimpleDataSource;
-
 /**
  *
  * @author Guilhem Legal (Geomatys).
@@ -156,17 +151,17 @@ public class SOSworker {
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */ 
-    private final Properties map;
+    private final Properties map = new Properties();;
     
     /**
      * The base for sensor id.
      */ 
-    private final String sensorIdBase;
+    private String sensorIdBase;
     
     /**
      * The base for observation id.
      */ 
-    private final String observationTemplateIdBase;
+    private String observationTemplateIdBase;
     
     /**
      * The base for offering id.
@@ -181,12 +176,12 @@ public class SOSworker {
     /**
      * The valid time for a getObservation template (in ms).
      */
-    private final long templateValidTime;
+    private long templateValidTime;
     
     /**
      * The maximum of observation return in a getObservation request.
      */
-    private final int maxObservationByRequest;
+    private int maxObservationByRequest;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -229,27 +224,27 @@ public class SOSworker {
     /**
      * The Observation database reader
      */
-    private final ObservationReader OMReader;
+    private ObservationReader OMReader;
     
     /**
      * The Observation database writer
      */
-    private final ObservationWriter OMWriter;
+    private ObservationWriter OMWriter;
 
     /**
      * The observation filter
      */
-    private final ObservationFilter OMFilter;
+    private ObservationFilter OMFilter;
     
     /**
      * The sensorML database reader
      */
-    private final SensorReader SMLReader;
+    private SensorReader SMLReader;
     
     /**
      * The sensorML database writer
      */
-    private final SensorWriter SMLWriter;
+    private SensorWriter SMLWriter;
 
     public static final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
@@ -258,211 +253,122 @@ public class SOSworker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(int profile, File configurationDirectory) throws CstlServiceException {
+    public SOSworker(int profile, File configurationDirectory) {
         this.profile = profile;
         if (profile != TRANSACTIONAL && profile != DISCOVERY) {
             throw new IllegalArgumentException("the flag profile must be equals to TRANSACTIONAL or DISCOVERY!");
         }
         
-        //we load the properties files
-        Properties prop = new Properties();
-        map   = new Properties();
-        File f = null;
         if (configurationDirectory == null) {
             configurationDirectory = getSicadeDirectory();
-        } 
+        }
+
         logger.info("path to config file=" + configurationDirectory);
+
         File sosConfigDir = new File(configurationDirectory, "sos_configuration");
         boolean start = true;
-        try {
-            // we get the configuration file
-            f = new File(sosConfigDir, "config.properties");
-            FileInputStream in = new FileInputStream(f);
-            prop.load(in);
-            in.close();
-            
-            // the file who record the map between phisycal ID and DB ID.
-            f = new File(sosConfigDir, "mapping.properties");
-            in = new FileInputStream(f);
-            map.load(in);
-            in.close();
-            
-        } catch (FileNotFoundException e) {
-            if (f != null) {
-                logger.severe(f.getPath());
-            }
-            logger.severe("The SOS service is not working!"                       + '\n' + 
-                          "cause: The service can not load the properties files!" + '\n' + 
-                          "cause: " + e.getMessage());
-            start = false;
-        }  catch (IOException e) {
-            if (f != null) {
-                logger.severe(f.getPath());
-            }
-            logger.severe("The SOS service is not working(IOException)!"          + '\n' +
-                          "cause: The service can not load the properties files!" + '\n' +
-                          "cause: " + e.getMessage());
-            start = false;
-        }
-
-        //we get the O&M filter Type
-        String omfType = prop.getProperty("OMFilterType");
-        ObservationFilterType OMFilterType = null;
-        if (omfType != null) {
-            try {
-                OMFilterType = ObservationFilterType.valueOf(omfType);
-            } catch (IllegalArgumentException ex) {
-                logger.severe("unknow OM Filter type:" + omfType);
-            }
-        }
-        if (OMFilterType == null)
-            OMFilterType = ObservationFilterType.DEFAULT;
-
-        //we get the O&M reader Type
-        String omrType = prop.getProperty("OMReaderType");
-        ObservationReaderType OMReaderType = null;
-        if (omrType != null) {
-            try {
-                OMReaderType = ObservationReaderType.valueOf(omrType);
-            } catch (IllegalArgumentException ex) {
-                logger.severe("unknow OM Reader type:" + omrType);
-            }
-        }
-        if (OMReaderType == null)
-            OMReaderType = ObservationReaderType.DEFAULT;
-
-        //we get the Sensor reader type
-        String smlt = prop.getProperty("SMLDataSourceType");
-        DataSourceType SMLType = null;
-        if (smlt != null)  {
-            try {
-                SMLType = DataSourceType.valueOf(smlt);
-            } catch (IllegalArgumentException ex) {
-                logger.severe("unknow SML type:" + smlt);
-            }
-        }
-        if (SMLType == null)
-            SMLType = DataSourceType.MDWEB;
-
-        // TODO we temporary build a configuration file
-        Automatic SMLConfiguration = new Automatic();
-        SMLConfiguration.setFormat(SMLType.name());
+        SOSConfiguration configuration = null;
 
         // Database configuration
-        PGSimpleDataSource dataSourceOM = null;
-        Connection OMConnection         = null;
-        Automatic configuration         = null;
         try {
-            if (SMLType == DataSourceType.MDWEB) {
-                //we create a connection to the sensorML database
-                BDD bdd = new BDD();
-                bdd.setConnectURL("jdbc:postgresql://" + prop.getProperty("SMLDBServerName") + ':' +
-                        Integer.parseInt(prop.getProperty("SMLDBServerPort")) + '/' + prop.getProperty("SMLDBName"));
-                bdd.setUser(prop.getProperty("SMLDBUser"));
-                bdd.setPassword(prop.getProperty("SMLDBUserPassword"));
-                SMLConfiguration.setBdd(bdd);
-            } else if (SMLType == DataSourceType.FILE_SYSTEM) {
-                String path = prop.getProperty("SMLDataDirectory");
 
-                if (path != null) {
-                   SMLConfiguration.setDataDirectory(path);
-                } else {
-                    SMLConfiguration.setDataDirectory(sosConfigDir.getPath() + "sensors");
-                }
-            }
-
-            if (OMReaderType == ObservationReaderType.DEFAULT) {
-                //we create a connection to the O&M database
-                dataSourceOM = new PGSimpleDataSource();
-                dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
-                dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
-                dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
-                dataSourceOM.setUser(prop.getProperty("OMDBUser"));
-                dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
-                OMConnection = dataSourceOM.getConnection();
-                
-            } else if (OMReaderType == ObservationReaderType.GENERIC) {
-                JAXBContext context = JAXBContext.newInstance("org.constellation.generic.database");
-                Unmarshaller genericUnmarshaller = context.createUnmarshaller();
-                f = new File(sosConfigDir, "generic-config.xml");
-                if (f.exists()) {
-                    Object object = genericUnmarshaller.unmarshal(f);
-                    if (object instanceof Automatic) {
-                        configuration = (Automatic) object;
-                        BDD bdd = configuration.getBdd();
-                        if (bdd != null) {
-                            OMConnection = bdd.getConnection();
-                        } else {
-                            logger.severe("The SOS service is not running!" + '\n' +
-                                      "cause: The generic configuration file is malformed: no database information");
-                            start = false;
-                        }
-                    } else {
-                        logger.severe("The SOS service is not running!" + '\n' +
-                                      "cause: The generic configuration file is malformed");
-                        start = false;
-                    }
+            Unmarshaller configUM = JAXBContext.newInstance("org.constellation.generic.database:org.constellation.configuration").createUnmarshaller();
+            File configFile = new File(sosConfigDir, "config.xml");
+            if (configFile.exists()) {
+                Object object = configUM.unmarshal(configFile);
+                if (object instanceof SOSConfiguration) {
+                    configuration = (SOSConfiguration) object;
                 } else {
                     logger.severe("The SOS service is not running!" + '\n' +
-                                  "cause: The generic configuration file can't be found");
-                     start = false;
+                            "cause: The generic configuration file is malformed");
+                    start = false;
+                    return;
                 }
+            } else {
+                logger.severe("The SOS service is not running!" + '\n' +
+                        "cause: The configuration file can't be found");
+                start = false;
+                return;
             }
 
-        } catch (SQLException ex) {
-            logger.severe("The SOS service is not running!" + '\n' +
-                          "cause: SQLException:" + ex.getMessage());
-            start = false;
-        } catch (JAXBException ex) {
-            ex.printStackTrace();
-            logger.severe("The SOS service is not running!" + '\n' +
-                          "cause: JAXBException:" + ex.getMessage());
-            start = false;
-        }
+            // the file who record the map between phisycal ID and DB ID.
+            loadMapping(sosConfigDir);
 
-        // we load the factory from the available classes
-        AbstractSOSFactory SOSfactory = null;
-        try {
-            SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
-        } catch (FactoryNotFoundException ex) {
-            logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
-            start = false;
-        }
+            //we get the O&M filter Type
+            ObservationFilterType OMFilterType = configuration.getObservationFilterType();
 
-        if (start) {
+            //we get the O&M reader Type
+            ObservationReaderType OMReaderType = configuration.getObservationReaderType();
 
+            //we get the Sensor reader type
+            DataSourceType SMLType = configuration.getSMLType();
+
+            Automatic SMLConfiguration = configuration.getSMLConfiguration();
+            SMLConfiguration.setConfigurationDirectory(sosConfigDir);
+            Automatic OMConfiguration = configuration.getOMConfiguration();
+            OMConfiguration.setConfigurationDirectory(sosConfigDir);
+
+            // we load the factory from the available classes
+            AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
+        
             //we initailize the properties attribute 
-            String observationIdBase  = prop.getProperty("observationIdBase");
-            sensorIdBase              = prop.getProperty("sensorIdBase");
-            observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-            maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
-            String validTime          = prop.getProperty("templateValidTime");
+            String observationIdBase  = configuration.getObservationIdBase();
+            sensorIdBase              = configuration.getSensorIdBase();
+            observationTemplateIdBase = configuration.getObservationTemplateIdBase();
+            maxObservationByRequest   = configuration.getMaxObservationByRequest();
+            String validTime          = configuration.getTemplateValidTime();
             int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
             int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
             templateValidTime         = (h * 3600000) + (m * 60000);
 
             SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
             SMLWriter = SOSfactory.getSensorWriter(SMLType, SMLConfiguration, sensorIdBase);
-            OMReader  = SOSfactory.getObservationReader(OMReaderType, dataSourceOM, observationIdBase, configuration);
-            OMWriter  = SOSfactory.getObservationWriter(dataSourceOM);
-            OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConnection, sosConfigDir);
+            OMReader  = SOSfactory.getObservationReader(OMReaderType, OMConfiguration, observationIdBase);
+            OMWriter  = SOSfactory.getObservationWriter(OMConfiguration);
+            OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConfiguration);
 
             logger.info("SOS service running");
             
-        } else {
-            sensorIdBase              = null;
-            observationTemplateIdBase = null;
-            OMReader                  = null;
-            OMWriter                  = null;
-            OMFilter                  = null;
-            SMLReader                 = null;
-            SMLWriter                 = null;
-            maxObservationByRequest   = -1;
-            templateValidTime         = -1;
-            
+
+        } catch (JAXBException ex) {
+            ex.printStackTrace();
+            logger.severe("The SOS service is not running!" + '\n' +
+                          "cause: JAXBException:" + ex.getMessage());
+            start = false;
+        } catch (FactoryNotFoundException ex) {
+            logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
+            start = false;
+        } catch (CstlServiceException ex) {
+            logger.severe("The SOS service is not working!" + '\n' + "cause:" + ex.getMessage());
+            start = false;
         }
     }
-    
+
+    /**
+     *
+     * @param configDir
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    private void loadMapping(File configDir) {
+        // the file who record the map between phisycal ID and DB ID.
+        try {
+            File f = new File(configDir, "mapping.properties");
+            if (f.exists()) {
+                FileInputStream in = new FileInputStream(f);
+                map.load(in);
+                in.close();
+            } else {
+                logger.info("No mapping file found creating one.");
+                f.createNewFile();
+            }
+        } catch (FileNotFoundException e) {
+            // this tecnically can't happen
+            logger.warning("File Not Found Exception while loading the mapping file");
+        }  catch (IOException e) {
+            logger.severe("IO Exception while loading the mapping file:" + e.getMessage());
+        }
+    }
     /**
      * Web service operation describing the service and its capabilities.
      * 
