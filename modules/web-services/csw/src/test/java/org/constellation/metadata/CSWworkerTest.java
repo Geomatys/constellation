@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -70,7 +70,8 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
- *
+ * Test the differents methods of CSWWorker with a FileSystem reader/writer.
+ * 
  * @author Guilhem Legal (geomatys)
  */
 public class CSWworkerTest {
@@ -142,12 +143,7 @@ public class CSWworkerTest {
     @Before
     public void setUp() throws Exception {
 
-
-        JAXBContext context = JAXBContext.newInstance(MetaDataImpl.class,
-                                                      org.constellation.cat.csw.v202.ObjectFactory.class,
-                                                      //org.constellation.ebrim.v300.ObjectFactory.class,
-                                                      //org.constellation.ebrim.v250.ObjectFactory.class,
-                                                      org.constellation.generic.database.ObjectFactory.class);
+        JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
         unmarshaller      = context.createUnmarshaller();
         Marshaller marshaller          = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

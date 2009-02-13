@@ -436,6 +436,7 @@ public class CSWworker {
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
+        isWorking();
         logger.info("getCapabilities request processing" + '\n');
         long startTime = System.currentTimeMillis();
         
@@ -1585,10 +1586,7 @@ public class CSWworker {
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
     private void verifyBaseRequest(final RequestBase request) throws CstlServiceException {
-        if (!isStarted) {
-            throw new CstlServiceException("The service is not running!",
-                                          NO_APPLICABLE_CODE);
-        }
+        isWorking();
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("CSW"))  {
@@ -1649,7 +1647,12 @@ public class CSWworker {
                                              INVALID_PARAMETER_VALUE, "outputFormat");
         }
     }
-    
+
+    private void isWorking() throws CstlServiceException {
+        if (!isStarted) {
+            throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
+        }
+    }
     /**
      * Destroy all the resource and close the connection when the web application is undeployed.
      */

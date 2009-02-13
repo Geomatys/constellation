@@ -409,7 +409,7 @@ public class StandardAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("spatialSearch 1:" + '\n' + resultReport);
+        logger.finer("spatialSearch 1:" + '\n' + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -435,7 +435,7 @@ public class StandardAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.info("spatialSearch 2:" + '\n' + resultReport);
+        logger.finer("spatialSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -461,7 +461,7 @@ public class StandardAnalyzerTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.info("identifier query 1:" + '\n' + result);
+        logger.finer("identifier query 1:" + '\n' + result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -474,7 +474,7 @@ public class StandardAnalyzerTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.info("identifier query 2:" + '\n' + result);
+        logger.finer("identifier query 2:" + '\n' + result);
 
         expectedResult = "CTDF02";
 

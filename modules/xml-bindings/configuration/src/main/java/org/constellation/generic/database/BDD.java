@@ -54,6 +54,17 @@ public class BDD {
      */
     private String password;
 
+    public BDD() {
+
+    }
+
+    public BDD(String className, String connectURL, String user, String password) {
+        this.className  = className;
+        this.connectURL = connectURL;
+        this.password   = password;
+        this.user       = user;
+    }
+
     public String getClassName() {
         return className;
     }

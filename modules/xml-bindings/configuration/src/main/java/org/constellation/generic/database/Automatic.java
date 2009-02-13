@@ -123,15 +123,15 @@ public class Automatic {
     }
 
     public int getType() {
-        if (format.equals("cdi"))
+        if ("cdi".equals(format))
             return CDI;
-        else if (format.equals("csr"))
+        else if ("csr".equals(format))
             return CSR;
-        else if (format.equals("edmed"))
+        else if ("edmed".equals(format))
             return EDMED;
-        else if (format.equals("mdweb"))
+        else if ("mdweb".equals(format))
             return MDWEB;
-        else if (format.equals("filesystem"))
+        else if ("filesystem".equals(format))
             return FILESYSTEM;
         else
             return DEFAULT;
