@@ -49,8 +49,6 @@ public class CSWorkerInitialisationTest {
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
-    private Marshaller   configMarshaller;
-
     private static File configurationDirectory = new File("CSWorkerInitialisationTest");
 
     private Capabilities staticCapabilities;
@@ -109,9 +107,6 @@ public class CSWorkerInitialisationTest {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
         staticCapabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
 
-        configMarshaller = JAXBContext.newInstance("org.constellation.generic.database").createMarshaller();
-        
-
     }
 
     @After
@@ -119,7 +114,7 @@ public class CSWorkerInitialisationTest {
     }
 
     /**
-     * Tests the initialisation of the CSW worker with deifferent configuration mistake
+     * Tests the initialisation of the CSW worker with different configuration mistake
      *
      * @throws java.lang.Exception
      */

@@ -18,12 +18,17 @@
 
 package org.constellation.configuration;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.generic.database.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "SOSConfiguration")
 public class SOSConfiguration {
 
     private Automatic SMLConfiguration;
@@ -48,6 +53,11 @@ public class SOSConfiguration {
 
     public SOSConfiguration() {
         
+    }
+
+    public SOSConfiguration(Automatic SMLConfiguration, Automatic OMConfiguration) {
+        this.OMConfiguration  = OMConfiguration;
+        this.SMLConfiguration = SMLConfiguration;
     }
 
     /**

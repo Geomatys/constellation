@@ -1648,11 +1648,17 @@ public class CSWworker {
         }
     }
 
+    /**
+     * Throw and exception if the service is not working
+     * 
+     * @throws org.constellation.ws.CstlServiceException
+     */
     private void isWorking() throws CstlServiceException {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
         }
     }
+    
     /**
      * Destroy all the resource and close the connection when the web application is undeployed.
      */

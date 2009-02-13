@@ -56,11 +56,11 @@ public class GetCapabilities extends GetCapabilitiesType {
     private String service;
 
     /**
-     * Construct a new request often directly from a XML file received by the SOS server.
-     * this constructor is only used by JaxB.
+     * minimal getCapabilities request.
      */
-    GetCapabilities() {
-    
+    public  GetCapabilities() {
+        super();
+        this.service = "SOS";
     }
     
     /**
@@ -79,6 +79,8 @@ public class GetCapabilities extends GetCapabilitiesType {
         super(acceptVersions, acceptFormats);
         this.service = "SOS";
     }
+
+
     
     /**
      * Return the value of the service property (often "SOS").

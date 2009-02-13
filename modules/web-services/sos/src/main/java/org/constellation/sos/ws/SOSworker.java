@@ -249,6 +249,11 @@ public class SOSworker {
     public static final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
+
+    /**
+     * A flag indicating if the worker is correctly started.
+     */
+    private boolean isStarted;
     
     /**
      * Initialize the database connection.
@@ -260,20 +265,20 @@ public class SOSworker {
         }
         
         if (configurationDirectory == null) {
-            configurationDirectory = getSicadeDirectory();
+            configurationDirectory = new File(getSicadeDirectory(), "sos_configuration");
         }
 
         logger.info("path to config file=" + configurationDirectory);
 
-        File sosConfigDir = new File(configurationDirectory, "sos_configuration");
-        boolean start = true;
+        
+        isStarted = true;
         SOSConfiguration configuration = null;
 
         // Database configuration
         try {
 
-            Unmarshaller configUM = JAXBContext.newInstance("org.constellation.generic.database:org.constellation.configuration").createUnmarshaller();
-            File configFile = new File(sosConfigDir, "config.xml");
+            Unmarshaller configUM = JAXBContext.newInstance(SOSConfiguration.class).createUnmarshaller();
+            File configFile = new File(configurationDirectory, "config.xml");
             if (configFile.exists()) {
                 Object object = configUM.unmarshal(configFile);
                 if (object instanceof SOSConfiguration) {
@@ -281,18 +286,18 @@ public class SOSworker {
                 } else {
                     logger.severe("The SOS service is not running!" + '\n' +
                             "cause: The generic configuration file is malformed");
-                    start = false;
+                    isStarted = false;
                     return;
                 }
             } else {
                 logger.severe("The SOS service is not running!" + '\n' +
                         "cause: The configuration file can't be found");
-                start = false;
+                isStarted = false;
                 return;
             }
 
             // the file who record the map between phisycal ID and DB ID.
-            loadMapping(sosConfigDir);
+            loadMapping(configurationDirectory);
 
             //we get the O&M filter Type
             ObservationFilterType OMFilterType = configuration.getObservationFilterType();
@@ -304,9 +309,22 @@ public class SOSworker {
             DataSourceType SMLType = configuration.getSMLType();
 
             Automatic SMLConfiguration = configuration.getSMLConfiguration();
-            SMLConfiguration.setConfigurationDirectory(sosConfigDir);
+            if (SMLConfiguration == null) {
+                logger.severe("The SOS service is not running!" + '\n' +
+                        "cause: The configuration file does not contains a SML configuration");
+                isStarted = false;
+                return;
+            }
+            SMLConfiguration.setConfigurationDirectory(configurationDirectory);
+
             Automatic OMConfiguration = configuration.getOMConfiguration();
-            OMConfiguration.setConfigurationDirectory(sosConfigDir);
+            if (OMConfiguration == null) {
+                logger.severe("The SOS service is not running!" + '\n' +
+                        "cause: The configuration file does not contains a O&M configuration");
+                isStarted = false;
+                return;
+            }
+            OMConfiguration.setConfigurationDirectory(configurationDirectory);
 
             // we load the factory from the available classes
             AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
@@ -316,11 +334,24 @@ public class SOSworker {
             sensorIdBase              = configuration.getSensorIdBase();
             observationTemplateIdBase = configuration.getObservationTemplateIdBase();
             maxObservationByRequest   = configuration.getMaxObservationByRequest();
-            String validTime          = configuration.getTemplateValidTime();
-            int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
-            int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
+
+            int h, m;
+            try {
+                String validTime = configuration.getTemplateValidTime();
+                if (validTime == null || validTime.equals("") || validTime.indexOf(':') == -1) {
+                    validTime = "1:00";
+                    logger.info("using default template valid time: one hour.");
+                }
+                h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
+                m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
+            } catch (NumberFormatException ex) {
+                logger.info("using default template valid time: one hour.");
+                h = 1;
+                m = 0;
+            }
             templateValidTime         = (h * 3600000) + (m * 60000);
 
+            // we initialize the reader/writer/filter
             SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
             SMLWriter = SOSfactory.getSensorWriter(SMLType, SMLConfiguration, sensorIdBase);
             OMReader  = SOSfactory.getObservationReader(OMReaderType, OMConfiguration, observationIdBase);
@@ -334,13 +365,13 @@ public class SOSworker {
             ex.printStackTrace();
             logger.severe("The SOS service is not running!" + '\n' +
                           "cause: JAXBException:" + ex.getMessage());
-            start = false;
+            isStarted = false;
         } catch (FactoryNotFoundException ex) {
             logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
-            start = false;
+            isStarted = false;
         } catch (CstlServiceException ex) {
             logger.severe("The SOS service is not working!" + '\n' + "cause:" + ex.getMessage());
-            start = false;
+            isStarted = false;
         }
     }
 
@@ -376,6 +407,7 @@ public class SOSworker {
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
+        isWorking();
         logger.info("getCapabilities request processing" + '\n');
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
@@ -1338,6 +1370,7 @@ public class SOSworker {
      *  Verify that the bases request attributes are correct.
      */ 
     private void verifyBaseRequest(RequestBaseType request) throws CstlServiceException {
+        isWorking();
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("SOS"))  {
@@ -1721,6 +1754,17 @@ public class SOSworker {
             ex.printStackTrace();
             throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * Throw and exception if the service is not working
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    private void isWorking() throws CstlServiceException {
+        if (!isStarted) {
+            throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
         }
     }
 

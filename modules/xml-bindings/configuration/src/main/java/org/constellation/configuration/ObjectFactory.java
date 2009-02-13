@@ -71,5 +71,13 @@ public class ObjectFactory {
         return new UpdatePropertiesFileType();
     }
 
+    /**
+     * Create an instance of {@link WRSExtrinsicObjectType }
+     *
+     */
+    public SOSConfiguration createSOSConfiguration() {
+        return new SOSConfiguration();
+    }
+
 
 }
