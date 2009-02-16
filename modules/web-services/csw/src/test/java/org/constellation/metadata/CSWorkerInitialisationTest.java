@@ -292,7 +292,7 @@ public class CSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 8:  A configuration file with mdweb mdweb database and wrong database config.
+         * Test 8:  A configuration file with mdweb mode and wrong database config.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -317,7 +317,7 @@ public class CSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
          /**
-         * Test 9:  A configuration file with mdweb mdweb database and wrong database config.
+         * Test 9:  A configuration file with mdweb mode and wrong database config.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -342,7 +342,7 @@ public class CSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 10:  A configuration file with mdweb mdweb database and wrong database config.
+         * Test 10:  A configuration file with mdweb mode and wrong database config.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -367,7 +367,7 @@ public class CSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 11:  A configuration file with mdweb mdweb database and wrong database config.
+         * Test 11:  A configuration file with mdweb mode and wrong database config.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();

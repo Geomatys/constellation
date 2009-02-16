@@ -33,7 +33,7 @@ import org.constellation.ws.CstlServiceException;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class ObservationReader {
     

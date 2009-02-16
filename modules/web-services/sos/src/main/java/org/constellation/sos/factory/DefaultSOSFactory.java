@@ -21,14 +21,18 @@ import java.util.Properties;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.DefaultGenericObservationReader;
 import org.constellation.sos.io.DefaultObservationFilter;
 import org.constellation.sos.io.DefaultObservationReader;
 import org.constellation.sos.io.DefaultObservationWriter;
+import org.constellation.sos.io.FileObservationReader;
+import org.constellation.sos.io.FileObservationWriter;
 import org.constellation.sos.io.FileSensorReader;
 import org.constellation.sos.io.FileSensorWriter;
 import org.constellation.sos.io.GenericObservationFilter;
+import org.constellation.sos.io.LuceneObservationFilter;
 import org.constellation.sos.io.MDWebSensorReader;
 import org.constellation.sos.io.MDWebSensorWriter;
 import org.constellation.sos.io.ObservationFilter;
@@ -55,6 +59,8 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
             case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
 
+            case LUCENE : return new LuceneObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
+
             default: throw new IllegalArgumentException("Unknow observationFilter type: " + type);
         }
 
@@ -63,17 +69,25 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     @Override
     public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
         switch (type) {
-            case DEFAULT : return new DefaultObservationReader(configuration, observationIdBase);
+            case DEFAULT   : return new DefaultObservationReader(configuration, observationIdBase);
 
-            case GENERIC : return new DefaultGenericObservationReader(observationIdBase, configuration);
+            case GENERIC   : return new DefaultGenericObservationReader(observationIdBase, configuration);
+
+            case FILESYSTEM: return new FileObservationReader(observationIdBase, configuration);
 
             default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
         }
     }
 
     @Override
-    public ObservationWriter getObservationWriter(Automatic configuration) throws CstlServiceException {
-        return new DefaultObservationWriter(configuration);
+    public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException {
+        switch (type) {
+            case DEFAULT   : return new DefaultObservationWriter(configuration);
+            
+            case FILESYSTEM: return new FileObservationWriter(configuration);
+            
+            default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
+        }
     }
 
     @Override

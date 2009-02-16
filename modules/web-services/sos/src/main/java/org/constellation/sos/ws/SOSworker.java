@@ -50,6 +50,7 @@ import javax.xml.namespace.QName;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
@@ -305,6 +306,9 @@ public class SOSworker {
             //we get the O&M reader Type
             ObservationReaderType OMReaderType = configuration.getObservationReaderType();
 
+            //we get the O&M writer Type
+            ObservationWriterType OMWriterType = configuration.getObservationWriterType();
+
             //we get the Sensor reader type
             DataSourceType SMLType = configuration.getSMLType();
 
@@ -355,7 +359,7 @@ public class SOSworker {
             SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
             SMLWriter = SOSfactory.getSensorWriter(SMLType, SMLConfiguration, sensorIdBase);
             OMReader  = SOSfactory.getObservationReader(OMReaderType, OMConfiguration, observationIdBase);
-            OMWriter  = SOSfactory.getObservationWriter(OMConfiguration);
+            OMWriter  = SOSfactory.getObservationWriter(OMWriterType, OMConfiguration);
             OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConfiguration);
 
             logger.info("SOS service running");

@@ -21,6 +21,7 @@ import java.util.Properties;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
@@ -44,7 +45,7 @@ public abstract class AbstractSOSFactory extends AbstractFactory {
 
     public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
 
-    public abstract ObservationWriter getObservationWriter(Automatic configuration) throws CstlServiceException;
+    public abstract ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException;
 
     public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 

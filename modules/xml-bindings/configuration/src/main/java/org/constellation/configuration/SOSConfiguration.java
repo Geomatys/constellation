@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,6 +36,8 @@ public class SOSConfiguration {
     private ObservationFilterType observationFilterType;
 
     private ObservationReaderType observationReaderType;
+
+    private ObservationWriterType observationWriterType;
 
     private DataSourceType SMLType;
 
@@ -204,6 +206,20 @@ public class SOSConfiguration {
      */
     public void setTemplateValidTime(String templateValidTime) {
         this.templateValidTime = templateValidTime;
+    }
+
+    /**
+     * @return the observationWriterType
+     */
+    public ObservationWriterType getObservationWriterType() {
+        return observationWriterType;
+    }
+
+    /**
+     * @param observationWriterType the observationWriterType to set
+     */
+    public void setObservationWriterType(ObservationWriterType observationWriterType) {
+        this.observationWriterType = observationWriterType;
     }
 
 }

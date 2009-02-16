@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,13 +20,10 @@ package org.constellation.configuration;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public enum ObservationFilterType {
-
-    GENERIC,
-
+public enum ObservationWriterType {
     DEFAULT,
 
-    LUCENE
+    FILESYSTEM
 }
