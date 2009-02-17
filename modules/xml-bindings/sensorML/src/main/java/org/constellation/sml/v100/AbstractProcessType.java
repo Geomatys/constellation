@@ -196,6 +196,25 @@ public abstract class AbstractProcessType extends AbstractSMLType implements Abs
     }
 
     /**
+     * Gets the value of the legalConstraint property.
+     *
+     */
+    public void setLegalConstraint(LegalConstraint legalConstraint) {
+        if (this.legalConstraint == null) {
+            this.legalConstraint = new ArrayList<LegalConstraint>();
+        }
+        this.legalConstraint.add(legalConstraint);
+    }
+
+    /**
+     * Gets the value of the legalConstraint property.
+     *
+     */
+    public void setLegalConstraint(List<LegalConstraint> legalConstraint) {
+        this.legalConstraint = legalConstraint;
+    }
+
+    /**
      * Gets the value of the characteristics property.
      * 
      */
@@ -204,6 +223,24 @@ public abstract class AbstractProcessType extends AbstractSMLType implements Abs
             characteristics = new ArrayList<Characteristics>();
         }
         return this.characteristics;
+    }
+
+    /**
+     * Sets the value of the characteristics property.
+     *
+     */
+    public void setCharacteristics(List<Characteristics> characteristics) {
+        this.characteristics = characteristics;
+    }
+
+    /**
+     * Sets the value of the characteristics property.
+     *
+     */
+    public void setCharacteristics(Characteristics characteristics) {
+        if (this.characteristics == null)
+            this.characteristics = new ArrayList<Characteristics>();
+        this.characteristics.add(characteristics);
     }
 
     /**
@@ -251,7 +288,7 @@ public abstract class AbstractProcessType extends AbstractSMLType implements Abs
      * Sets the value of the contact property.
      *
      */
-    public void SetContact(Contact contact) {
+    public void setContact(Contact contact) {
         if (this.contact == null) {
             this.contact = new ArrayList<Contact>();
         }

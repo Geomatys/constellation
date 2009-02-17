@@ -54,7 +54,10 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     @Override
     public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-      switch (type) {
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
             case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
 
             case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
@@ -68,6 +71,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     @Override
     public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
+        if (type == null) {
+            return null;
+        }
         switch (type) {
             case DEFAULT   : return new DefaultObservationReader(configuration, observationIdBase);
 
@@ -81,6 +87,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     @Override
     public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException {
+        if (type == null) {
+            return null;
+        }
         switch (type) {
             case DEFAULT   : return new DefaultObservationWriter(configuration);
             
@@ -92,6 +101,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     @Override
     public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException {
+        if (type == null) {
+            return null;
+        }
         switch (type) {
             case FILE_SYSTEM: return new FileSensorReader(configuration);
 
@@ -103,6 +115,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     @Override
     public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase) throws CstlServiceException {
+        if (type == null) {
+            return null;
+        }
         switch (type) {
             case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
 

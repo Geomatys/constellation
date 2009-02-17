@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -70,6 +71,16 @@ public class Rights {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;
+
+    public Rights() {
+
+    }
+
+    public Rights(Boolean copyRights, Boolean privacyAct, Documentation docu) {
+        this.copyRights = copyRights;
+        this.privacyAct = privacyAct;
+        this.documentation = docu;
+    }
 
     /**
      * Gets the value of the documentation property.
@@ -139,6 +150,58 @@ public class Rights {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Rights]").append("\n");
+        if (id != null) {
+            sb.append("id: ").append(id).append('\n');
+        }
+        if (copyRights != null) {
+            sb.append("copyRights: ").append(copyRights).append('\n');
+        }
+        if (intellectualPropertyRights != null) {
+            sb.append("intellectualPropertyRights: ").append(intellectualPropertyRights).append('\n');
+        }
+        if (privacyAct != null) {
+            sb.append("privacyAct: ").append(privacyAct).append('\n');
+        }
+        if (documentation != null) {
+            sb.append("documentation: ").append(documentation).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof Rights) {
+            final Rights that = (Rights) object;
+            return Utilities.equals(this.copyRights,    that.copyRights)       &&
+                   Utilities.equals(this.documentation, that.documentation)       &&
+                   Utilities.equals(this.id,            that.id)          &&
+                   Utilities.equals(this.intellectualPropertyRights, that.intellectualPropertyRights)  &&
+                   Utilities.equals(this.privacyAct,    that.privacyAct);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 13 * hash + (this.documentation != null ? this.documentation.hashCode() : 0);
+        hash = 13 * hash + (this.copyRights != null ? this.copyRights.hashCode() : 0);
+        hash = 13 * hash + (this.intellectualPropertyRights != null ? this.intellectualPropertyRights.hashCode() : 0);
+        hash = 13 * hash + (this.privacyAct != null ? this.privacyAct.hashCode() : 0);
+        hash = 13 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 
 }

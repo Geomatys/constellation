@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -66,13 +67,16 @@ public class BooleanType extends AbstractDataComponentType {
     @XmlSchemaType(name = "token")
     private String axisID;
 
+    public BooleanType() {
+
+    }
+
+    public BooleanType(String definition) {
+        super(definition);
+    }
+
     /**
      * Gets the value of the quality property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public QualityPropertyType getQuality() {
         return quality;
@@ -80,11 +84,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the quality property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public void setQuality(QualityPropertyType value) {
         this.quality = value;
@@ -92,11 +91,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
      */
     public java.lang.Boolean isValue() {
         return value;
@@ -104,11 +98,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
      */
     public void setValue(java.lang.Boolean value) {
         this.value = value;
@@ -116,11 +105,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
@@ -128,11 +112,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the referenceFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceFrame(String value) {
         this.referenceFrame = value;
@@ -140,11 +119,6 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the axisID property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAxisID() {
         return axisID;
@@ -152,14 +126,39 @@ public class BooleanType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the axisID property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setAxisID(String value) {
         this.axisID = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof BooleanType) {
+            final BooleanType that = (BooleanType) object;
+
+            return Utilities.equals(this.axisID, that.axisID)   &&
+                   Utilities.equals(this.quality, that.quality) &&
+                   Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+                   Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + (this.quality != null ? this.quality.hashCode() : 0);
+        hash = 71 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 71 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 71 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        return hash;
     }
 
 }

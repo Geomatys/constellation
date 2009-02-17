@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:ObservationOffering gml:id="offering-allSensor">
+    <gml:name>offering-allSensor</gml:name>
+    <gml:srsName>EPSG:4326</gml:srsName>
+    <gml:boundedBy>
+        <gml:Null>not_bounded</gml:Null>
+
+    </gml:boundedBy>
+    <sos:time>
+        <gml:TimePeriod>
+            <gml:beginPosition>2008-05-14T10:40:25.236</gml:beginPosition>
+            <gml:endPosition indeterminatePosition="now"></gml:endPosition>
+        </gml:TimePeriod>
+    </sos:time>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:1"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:2"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:3"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:4"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:5"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:6"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:7"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:8"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:9"/>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:BRGM:10"/>
+
+    <sos:observedProperty>
+        <swe:CompositePhenomenon dimension="2" gml:id="depth-temperature">
+            <gml:name>urn:ogc:def:phenomenon:BRGM:resultComponents</gml:name>
+            <swe:component>
+                <swe:Phenomenon gml:id="temperature">
+                    <gml:description>temperature</gml:description>
+                    <gml:name>urn:ogc:def:phenomenon:BRGM:temperature</gml:name>
+
+                </swe:Phenomenon>
+            </swe:component>
+            <swe:component>
+                <swe:Phenomenon gml:id="depth">
+                    <gml:description>profondeur</gml:description>
+                    <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
+                </swe:Phenomenon>
+            </swe:component>
+
+        </swe:CompositePhenomenon>
+    </sos:observedProperty>
+    <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:BRGM:depth"/>
+    <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:BRGM:temperature"/>
+    <sos:featureOfInterest xlink:href="station"/>
+    <sos:featureOfInterest xlink:href="station-001"/>
+    <sos:responseFormat>application/xml</sos:responseFormat>
+    <sos:resultModel>om:Observation</sos:resultModel>
+
+    <sos:responseMode>inline</sos:responseMode>
+    <sos:responseMode>resultTemplate</sos:responseMode>
+</sos:ObservationOffering>

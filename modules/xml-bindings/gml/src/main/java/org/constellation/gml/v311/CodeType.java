@@ -92,6 +92,17 @@ public class CodeType {
         return codeSpace;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[CodeType]").append("\n");
+        if (codeSpace != null) {
+            sb.append("codespace: ").append(codeSpace).append('\n');
+        }
+        if (value != null) {
+            sb.append("value: ").append(value).append('\n');
+        }
+        return sb.toString();
+    }
     /**
      * Verify if this entry is identical to the specified object.
      */

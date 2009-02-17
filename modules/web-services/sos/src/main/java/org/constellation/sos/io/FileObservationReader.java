@@ -57,7 +57,7 @@ public class FileObservationReader extends ObservationReader {
     public FileObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         super(observationIdBase);
         File dataDirectory = configuration.getdataDirectory();
-        if (dataDirectory.exists()) {
+        if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
             phenomenonDirectory  = new File(dataDirectory, "phenomenons");
             observationDirectory = new File(dataDirectory, "observations");
@@ -105,7 +105,7 @@ public class FileObservationReader extends ObservationReader {
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
-        for (File offeringFile: observationDirectory.listFiles()) {
+        for (File offeringFile: offeringDirectory.listFiles()) {
             try {
                 Object obj = unmarshaller.unmarshal(offeringFile);
                 if (obj instanceof ObservationOfferingEntry) {

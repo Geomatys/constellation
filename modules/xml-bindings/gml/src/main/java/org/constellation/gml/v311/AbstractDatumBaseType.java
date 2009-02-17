@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -77,6 +78,39 @@ public abstract class AbstractDatumBaseType extends DefinitionType {
      */
     public void setDatumName(String datumName) {
         this.datumName = datumName;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append("\n");
+        if (datumName != null) {
+            sb.append("datumName: ").append(datumName).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractDatumType && super.equals(object)) {
+            final AbstractDatumType that = (AbstractDatumType) object;
+
+            return Utilities.equals(this.datumName,     that.getDatumName());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + (this.datumName != null ? this.datumName.hashCode() : 0);
+        return hash;
     }
 
 }

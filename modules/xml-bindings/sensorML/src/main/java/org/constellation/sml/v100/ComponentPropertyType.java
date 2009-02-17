@@ -88,6 +88,12 @@ public class ComponentPropertyType {
         this.process = process;
     }
 
+    public ComponentPropertyType(String name, String role, String href) {
+        this.name    = name;
+        this.href    = href;
+        this.role    = role;
+    }
+
     /**
      * Gets the value of the process property.
      */

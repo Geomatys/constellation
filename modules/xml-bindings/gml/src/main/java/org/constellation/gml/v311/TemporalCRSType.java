@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -56,6 +57,17 @@ public class TemporalCRSType extends AbstractReferenceSystemType {
     @XmlElement(required = true)
     private TemporalDatumRefType usesTemporalDatum;
 
+    public TemporalCRSType() {
+
+    }
+
+    public TemporalCRSType(final String id, final String name, final String description, String srsName,
+            TemporalCSRefType usesTemporalCS, TemporalDatumRefType usesTemporalDatum) {
+        super(id, name, description, srsName);
+        this.usesTemporalCS    = usesTemporalCS;
+        this.usesTemporalDatum = usesTemporalDatum;
+    }
+
     /**
      * Gets the value of the usesTemporalCS property.
      */
@@ -83,6 +95,44 @@ public class TemporalCRSType extends AbstractReferenceSystemType {
      */
     public void setUsesTemporalDatum(TemporalDatumRefType value) {
         this.usesTemporalDatum = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append("\n");
+        if (usesTemporalCS != null) {
+            sb.append("usesTemporalCS: ").append(usesTemporalCS).append('\n');
+        }
+        if (usesTemporalDatum != null) {
+            sb.append("usesTemporalDatum: ").append(usesTemporalDatum).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof TemporalCRSType && super.equals(object)) {
+            final TemporalCRSType that = (TemporalCRSType) object;
+
+            return Utilities.equals(this.usesTemporalCS,    that.usesTemporalCS) &&
+                   Utilities.equals(this.usesTemporalDatum, that.usesTemporalDatum);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.usesTemporalCS != null ? this.usesTemporalCS.hashCode() : 0);
+        hash = 29 * hash + (this.usesTemporalDatum != null ? this.usesTemporalDatum.hashCode() : 0);
+        return hash;
     }
 
 }

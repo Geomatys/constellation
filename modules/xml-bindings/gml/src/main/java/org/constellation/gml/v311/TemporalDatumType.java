@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -70,6 +71,39 @@ public class TemporalDatumType extends TemporalDatumBaseType {
      */
     public void setOrigin(XMLGregorianCalendar value) {
         this.origin = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append("\n");
+        if (origin != null) {
+            sb.append("origin: ").append(origin).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof TemporalDatumType && super.equals(object)) {
+            final TemporalDatumType that = (TemporalDatumType) object;
+
+            return Utilities.equals(this.origin,     that.origin);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.origin != null ? this.origin.hashCode() : 0);
+        return hash;
     }
 
 }

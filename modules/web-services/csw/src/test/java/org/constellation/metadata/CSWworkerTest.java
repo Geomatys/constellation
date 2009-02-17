@@ -59,11 +59,13 @@ import org.constellation.ows.v100.SectionsType;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.geotools.metadata.iso.MetaDataImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
 import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
 import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
+
+// geotools dependencies
+import org.geotools.metadata.iso.MetaDataImpl;
 
 // JUnit dependencies
 import org.junit.*;

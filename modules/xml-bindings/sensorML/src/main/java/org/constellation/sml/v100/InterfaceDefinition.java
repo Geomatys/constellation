@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -83,6 +84,15 @@ public class InterfaceDefinition {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     private String id;
+
+    public InterfaceDefinition() {
+
+    }
+
+    public InterfaceDefinition(String id, LayerPropertyType applicationLayer, LayerPropertyType dataLinkLayer) {
+        this.applicationLayer = applicationLayer;
+        this.dataLinkLayer    = dataLinkLayer;
+    }
 
     /**
      * Gets the value of the serviceLayer property.
@@ -223,5 +233,46 @@ public class InterfaceDefinition {
     public void setId(String value) {
         this.id = value;
     }
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof InterfaceDefinition) {
+            final InterfaceDefinition that = (InterfaceDefinition) object;
+
+            return Utilities.equals(this.applicationLayer,  that.applicationLayer) &&
+                   Utilities.equals(this.dataLinkLayer,     that.dataLinkLayer)    &&
+                   Utilities.equals(this.id,                that.id)               &&
+                   Utilities.equals(this.mechanicalLayer,   that.mechanicalLayer)  &&
+                   Utilities.equals(this.networkLayer,      that.networkLayer)     &&
+                   Utilities.equals(this.physicalLayer,     that.physicalLayer)    &&
+                   Utilities.equals(this.presentationLayer, that.presentationLayer)&&
+                   Utilities.equals(this.serviceLayer,      that.serviceLayer)     &&
+                   Utilities.equals(this.sessionLayer,      that.sessionLayer)     &&
+                   Utilities.equals(this.transportLayer,    that.transportLayer);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + (this.serviceLayer != null ? this.serviceLayer.hashCode() : 0);
+        hash = 67 * hash + (this.applicationLayer != null ? this.applicationLayer.hashCode() : 0);
+        hash = 67 * hash + (this.presentationLayer != null ? this.presentationLayer.hashCode() : 0);
+        hash = 67 * hash + (this.sessionLayer != null ? this.sessionLayer.hashCode() : 0);
+        hash = 67 * hash + (this.transportLayer != null ? this.transportLayer.hashCode() : 0);
+        hash = 67 * hash + (this.networkLayer != null ? this.networkLayer.hashCode() : 0);
+        hash = 67 * hash + (this.dataLinkLayer != null ? this.dataLinkLayer.hashCode() : 0);
+        hash = 67 * hash + (this.physicalLayer != null ? this.physicalLayer.hashCode() : 0);
+        hash = 67 * hash + (this.mechanicalLayer != null ? this.mechanicalLayer.hashCode() : 0);
+        hash = 67 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
 
 }

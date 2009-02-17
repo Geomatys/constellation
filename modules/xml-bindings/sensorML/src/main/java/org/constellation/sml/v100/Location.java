@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractCurveType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.sml.AbstractLocation;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -83,6 +84,14 @@ public class Location implements AbstractLocation {
     private String title;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
+
+    public Location() {
+
+    }
+
+    public Location(PointType point) {
+        this.point = point;
+    }
 
     /**
      * Gets the value of the point property.
@@ -237,6 +246,89 @@ public class Location implements AbstractLocation {
      */
     public void setType(String value) {
         this.type = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Characteristics]").append("\n");
+        if (abstractCurve != null) {
+            sb.append("abstract curve: ").append(abstractCurve.getValue()).append('\n');
+        }
+        if (remoteSchema != null) {
+            sb.append("remoteSchema: ").append(remoteSchema).append('\n');
+        }
+        if (actuate != null) {
+            sb.append("actuate: ").append(actuate).append('\n');
+        }
+        if (arcrole != null) {
+            sb.append("actuate: ").append(arcrole).append('\n');
+        }
+        if (href != null) {
+            sb.append("href: ").append(href).append('\n');
+        }
+        if (role != null) {
+            sb.append("role: ").append(role).append('\n');
+        }
+        if (show != null) {
+            sb.append("show: ").append(show).append('\n');
+        }
+        if (title != null) {
+            sb.append("title: ").append(title).append('\n');
+        }
+        if (type != null) {
+            sb.append("type: ").append(type).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        boolean record = false;
+        if (object instanceof Location) {
+            final Location that = (Location) object;
+            if (this.abstractCurve != null && that.abstractCurve != null) {
+                record = Utilities.equals(this.abstractCurve.getValue(), that.abstractCurve.getValue());
+            } else if (this.abstractCurve == null && that.abstractCurve == null) {
+                record = true;
+            }
+
+            return Utilities.equals(this.actuate,      that.actuate)       &&
+                   Utilities.equals(this.arcrole,      that.arcrole)       &&
+                   Utilities.equals(this.point,        that.point)         &&
+                   Utilities.equals(this.href,         that.href)          &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
+                   Utilities.equals(this.role,         that.role)          &&
+                   Utilities.equals(this.show,         that.show)          &&
+                   Utilities.equals(this.title,        that.title)         &&
+                   record                                                  &&
+                   Utilities.equals(this.type,         that.type)          &&
+                   Utilities.equals(this.nilReason,         that.nilReason);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.point != null ? this.point.hashCode() : 0);
+        hash = 53 * hash + (this.abstractCurve != null ? this.abstractCurve.hashCode() : 0);
+        hash = 53 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 53 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 53 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 53 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 53 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 53 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 53 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 53 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 53 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 
 }

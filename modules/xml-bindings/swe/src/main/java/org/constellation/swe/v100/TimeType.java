@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -75,13 +76,17 @@ public class TimeType extends AbstractDataComponentType {
     @XmlSchemaType(name = "anyURI")
     private String localFrame;
 
+    public TimeType() {
+
+    }
+
+    public TimeType(String definition, UomPropertyType uom) {
+        super(definition);
+        this.uom = uom;
+    }
+
     /**
      * Gets the value of the uom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UomPropertyType }
-     *     
      */
     public UomPropertyType getUom() {
         return uom;
@@ -89,12 +94,7 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the uom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UomPropertyType }
-     *     
-     */
+      */
     public void setUom(UomPropertyType value) {
         this.uom = value;
     }
@@ -102,10 +102,6 @@ public class TimeType extends AbstractDataComponentType {
     /**
      * Gets the value of the constraint property.
      * 
-     * @return
-     *     possible object is
-     *     {@link AllowedTimesPropertyType }
-     *     
      */
     public AllowedTimesPropertyType getConstraint() {
         return constraint;
@@ -113,10 +109,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the constraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AllowedTimesPropertyType }
      *     
      */
     public void setConstraint(AllowedTimesPropertyType value) {
@@ -125,11 +117,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the quality property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public QualityPropertyType getQuality() {
         return quality;
@@ -137,11 +124,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the quality property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QualityPropertyType }
-     *     
      */
     public void setQuality(QualityPropertyType value) {
         this.quality = value;
@@ -149,25 +131,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the value property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getValue().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getValue() {
         if (value == null) {
@@ -178,11 +141,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceTime property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceTime() {
         return referenceTime;
@@ -190,11 +148,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the referenceTime property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceTime(String value) {
         this.referenceTime = value;
@@ -202,11 +155,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
@@ -214,11 +162,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the referenceFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setReferenceFrame(String value) {
         this.referenceFrame = value;
@@ -226,11 +169,6 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Gets the value of the localFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getLocalFrame() {
         return localFrame;
@@ -238,14 +176,45 @@ public class TimeType extends AbstractDataComponentType {
 
     /**
      * Sets the value of the localFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setLocalFrame(String value) {
         this.localFrame = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof TimeType) {
+            final TimeType that = (TimeType) object;
+
+            return Utilities.equals(this.referenceTime, that.referenceTime)   &&
+                   Utilities.equals(this.quality, that.quality) &&
+                   Utilities.equals(this.localFrame, that.localFrame) &&
+                   Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+                   Utilities.equals(this.uom, that.uom) &&
+                   Utilities.equals(this.value, that.value) &&
+                   Utilities.equals(this.constraint,  that.constraint);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.uom != null ? this.uom.hashCode() : 0);
+        hash = 53 * hash + (this.constraint != null ? this.constraint.hashCode() : 0);
+        hash = 53 * hash + (this.quality != null ? this.quality.hashCode() : 0);
+        hash = 53 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 53 * hash + (this.referenceTime != null ? this.referenceTime.hashCode() : 0);
+        hash = 53 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 53 * hash + (this.localFrame != null ? this.localFrame.hashCode() : 0);
+        return hash;
     }
 
 }

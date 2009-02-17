@@ -120,7 +120,7 @@
 				</swe:DataRecord>
 			</characteristics>
 			<!-- description des capacites generales du piezometre, notamment les eventuelles limites et perecisions -->
-			<capabilities>
+            <capabilities>
 				<swe:DataRecord definition="urn:x-ogc:def:property:measurementProperties">
 					<gml:description>Toutes les informations sur les  contraintes sur les donnees</gml:description>
 				
@@ -156,11 +156,15 @@
 					<individualName>ASSENS Martine (CG66)</individualName>
 					<organizationName>CONSEIL GENERAL DES PYRENEES ORIENTALES</organizationName>
 					<contactInfo>
-                        <address>
-                            <deliveryPoint>Hotel du Departement, B.P. 906, 66 906 Perpignan Cedex</deliveryPoint>
-                            <city>PERPIGNAN</city>
-                        </address>
-                    </contactInfo>
+           					<Contact>
+							<address>
+								<Address>
+									<deliveryPoint>Hotel du Departement, B.P. 906, 66 906 Perpignan Cedex</deliveryPoint>
+									<city>PERPIGNAN</city>
+								</Address>
+							</address>
+						</Contact>
+					</contactInfo>
 				</ResponsibleParty>
 			</contact>
 			<documentation xlink:role="urn:ogc:role:description">
@@ -181,7 +185,9 @@
 					<gml:usesEngineeringDatum>
 						<gml:EngineeringDatum gml:id="datum">
 							<gml:datumName>Sensor Datum</gml:datumName>
-							<gml:anchorPoint>X, Y et Z sont orthogonal au regard d'un point de reference.</gml:anchorPoint>
+							<gml:anchorPoint>
+							    X, Y et Z sont orthogonal au regard d'un point de reference. Toutes les mesures s'effectuent depuis ce point.
+							</gml:anchorPoint>
 						</gml:EngineeringDatum>
 					</gml:usesEngineeringDatum>
 				</gml:EngineeringCRS>
@@ -316,7 +322,7 @@
 									<swe:coordinate name="z">
 										<swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="Z">
 											<swe:uom code="m"/>
-											<swe:value>0.0</swe:value>
+											<swe:value>0</swe:value>
 										</swe:Quantity>
 									</swe:coordinate>
 								</swe:Vector>

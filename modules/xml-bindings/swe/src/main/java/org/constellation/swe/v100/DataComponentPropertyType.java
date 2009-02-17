@@ -130,12 +130,30 @@ public class DataComponentPropertyType implements DataComponentProperty {
         this.timeRange = timeRange;
     }
 
+    public DataComponentPropertyType(String name, String role, TimeType time) {
+        this.name      = name;
+        this.role      = role;
+        this.time      = time;
+    }
+
     public DataComponentPropertyType(String name, String role, QuantityType quantity) {
         this.name      = name;
         this.role      = role;
         this.quantity  = quantity;
     }
 
+    public DataComponentPropertyType(String name, String role, BooleanType bool) {
+        this.name      = name;
+        this.role      = role;
+        this._boolean  = bool;
+    }
+
+    public DataComponentPropertyType(String name, String role, JAXBElement<? extends AbstractDataRecordType> dataRecord) {
+        this.name      = name;
+        this.role      = role;
+        this.abstractDataRecord = dataRecord;
+    }
+    
     public DataComponentPropertyType(String name, String role, QuantityRange quantityRange) {
         this.name      = name;
         this.role      = role;

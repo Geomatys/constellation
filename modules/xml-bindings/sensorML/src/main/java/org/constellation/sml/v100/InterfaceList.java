@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -60,6 +61,15 @@ public class InterfaceList {
     @XmlID
     private String id;
 
+    public InterfaceList() {
+
+    }
+
+    public InterfaceList(String id, List<Interface> _interface) {
+        this._interface = _interface;
+        this.id = id;
+    }
+
     /**
      * Gets the value of the interface property.
      */
@@ -83,4 +93,41 @@ public class InterfaceList {
     public void setId(String value) {
         this.id = value;
     }
+
+     @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof InterfaceList) {
+            final InterfaceList that = (InterfaceList) object;
+            return Utilities.equals(this._interface, that._interface) &&
+                   Utilities.equals(this.id, that.id);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this._interface != null ? this._interface.hashCode() : 0);
+        hash = 89 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[InterfaceList]").append("\n");
+        if (_interface != null) {
+            sb.append("interfaces:").append('\n');
+            for (Interface k : _interface) {
+                sb.append("interface: ").append(k).append('\n');
+            }
+        }
+        return sb.toString();
+     }
+
 }

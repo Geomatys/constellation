@@ -54,7 +54,7 @@ public class FileSensorReader extends SensorReader {
             this.dataDirectory  = configuration.getdataDirectory();
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);
         } 
     }
 

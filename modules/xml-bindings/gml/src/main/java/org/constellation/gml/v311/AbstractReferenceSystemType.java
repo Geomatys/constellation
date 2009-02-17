@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -107,5 +108,51 @@ public abstract class AbstractReferenceSystemType extends AbstractReferenceSyste
      */
     public String getScope() {
         return scope;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append("\n");
+        if (srsID != null) {
+            sb.append("srsID: ").append('\n');
+            for (IdentifierType s: srsID) {
+                sb.append(s).append('\n');
+            }
+        }
+        if (scope != null) {
+            sb.append("scope: ").append(scope).append('\n');
+        }
+        if (validArea != null) {
+            sb.append("valid area: ").append(validArea).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractReferenceSystemType && super.equals(object)) {
+            final AbstractReferenceSystemType that = (AbstractReferenceSystemType) object;
+
+            return Utilities.equals(this.scope,     that.scope) &&
+                   Utilities.equals(this.srsID,     that.srsID) &&
+                   Utilities.equals(this.validArea, that.validArea);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 11 * hash + (this.srsID != null ? this.srsID.hashCode() : 0);
+        hash = 11 * hash + (this.validArea != null ? this.validArea.hashCode() : 0);
+        hash = 11 * hash + (this.scope != null ? this.scope.hashCode() : 0);
+        return hash;
     }
 }

@@ -91,7 +91,6 @@ public abstract class AbstractReferenceSystemBaseType extends DefinitionType {
         if (object == this) {
             return true;
         }
-
         if (object instanceof AbstractReferenceSystemBaseType && super.equals(object)) {
             final AbstractReferenceSystemBaseType that = (AbstractReferenceSystemBaseType) object;
             return Utilities.equals(this.srsName, that.srsName);
@@ -104,5 +103,14 @@ public abstract class AbstractReferenceSystemBaseType extends DefinitionType {
         int hash = 7;
         hash = 47 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
         return hash;
+    }
+
+     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString()).append("\n");
+        if (srsName != null) {
+            sb.append("srsName: ").append(srsName).append('\n');
+        }
+        return sb.toString();
     }
 }

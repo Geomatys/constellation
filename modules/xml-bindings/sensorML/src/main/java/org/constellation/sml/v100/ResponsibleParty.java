@@ -78,6 +78,13 @@ public class ResponsibleParty {
         this.organizationName = organizationName;
     }
 
+    public ResponsibleParty(String individualName, String organizationName, String positionName, ContactInfo contactInfo) {
+        this.organizationName = organizationName;
+        this.contactInfo      = contactInfo;
+        this.individualName   = individualName;
+        this.positionName     = positionName;
+    }
+
     /**
      * Gets the value of the individualName property.
      */

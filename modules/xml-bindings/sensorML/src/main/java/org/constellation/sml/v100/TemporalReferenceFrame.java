@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TemporalCRSType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -54,6 +55,14 @@ public class TemporalReferenceFrame {
     @XmlElement(name = "TemporalCRS", namespace = "http://www.opengis.net/gml", required = true)
     private TemporalCRSType temporalCRS;
 
+    public TemporalReferenceFrame() {
+
+    }
+
+    public TemporalReferenceFrame(TemporalCRSType temporalCRS) {
+        this.temporalCRS = temporalCRS;
+    }
+
     /**
      * Gets the value of the temporalCRS property.
      */
@@ -66,6 +75,39 @@ public class TemporalReferenceFrame {
      */
     public void setTemporalCRS(TemporalCRSType value) {
         this.temporalCRS = value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[TemporalReferenceFrame]").append("\n");
+        if (temporalCRS != null) {
+            sb.append("temporalCRS: ").append(temporalCRS).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof TemporalReferenceFrame) {
+            final TemporalReferenceFrame that = (TemporalReferenceFrame) object;
+
+            return Utilities.equals(this.temporalCRS,  that.temporalCRS);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + (this.temporalCRS != null ? this.temporalCRS.hashCode() : 0);
+        return hash;
     }
 
 }
