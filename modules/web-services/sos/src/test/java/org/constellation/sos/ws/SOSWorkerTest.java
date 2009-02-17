@@ -322,9 +322,9 @@ public class SOSWorkerTest {
     @Test
     public void DescribeSensorTest() throws Exception {
         DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
-        SensorML result = (AbstractSensorML) worker.describeSensor(request);
+        AbstractSensorML result = (AbstractSensorML) worker.describeSensor(request);
 
-        SensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
 
         assertEquals(expResult, result);
     }
