@@ -42,7 +42,7 @@ public class SOSWorkerInitialisationTest {
 
     private static File configurationDirectory = new File("SOSWorkerInitialisationTest");
 
-    private static Capabilities staticCapabilities;
+    private static Capabilities skeletonCapabilities;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -53,7 +53,7 @@ public class SOSWorkerInitialisationTest {
 
         JAXBContext context = JAXBContext.newInstance("org.constellation.sos.v100");
         Unmarshaller unmarshaller      = context.createUnmarshaller();
-        staticCapabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
+        skeletonCapabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
     }
 
     @AfterClass
@@ -116,7 +116,7 @@ public class SOSWorkerInitialisationTest {
          * Test 1: No configuration file.
          */
         SOSworker worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         boolean exceptionLaunched = false;
         GetCapabilities request = new GetCapabilities();
@@ -139,7 +139,7 @@ public class SOSWorkerInitialisationTest {
         configFile.createNewFile();
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -164,7 +164,7 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(request, configFile);
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -189,7 +189,7 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(configuration, configFile);
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -214,7 +214,7 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(configuration, configFile);
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -240,7 +240,7 @@ public class SOSWorkerInitialisationTest {
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
 
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -267,7 +267,7 @@ public class SOSWorkerInitialisationTest {
 
         worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
 
-        worker.setStaticCapabilities(staticCapabilities);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {

@@ -144,7 +144,7 @@ public class CSWService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
             logger.info("received SOAP getCapabilities request");
-            worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+            worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
              
             return worker.getCapabilities(requestCapabilities);
             

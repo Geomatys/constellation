@@ -34,12 +34,9 @@ import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.SectionsType;
 import org.constellation.sml.AbstractSensorML;
-import org.constellation.sml.v100.SensorML;
-import org.constellation.sml.v100.SystemType;
 import org.constellation.sos.v100.Capabilities;
 import org.constellation.sos.v100.DescribeSensor;
 import org.constellation.sos.v100.GetCapabilities;
-import org.constellation.swe.v100.DataRecordType;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
@@ -172,7 +169,7 @@ public class SOSWorkerTest {
         File configDir = new File("SOSWorkerTest");
         worker = new SOSworker(SOSworker.DISCOVERY, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        worker.setStaticCapabilities(stcapa);
+        worker.setSkeletonCapabilities(stcapa);
     }
 
     @After
@@ -325,6 +322,13 @@ public class SOSWorkerTest {
         AbstractSensorML result = (AbstractSensorML) worker.describeSensor(request);
 
         AbstractSensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+
+        assertEquals(expResult, result);
+
+        request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
+        result = (AbstractSensorML) worker.describeSensor(request);
+
+        expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
 
         assertEquals(expResult, result);
     }

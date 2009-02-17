@@ -121,7 +121,7 @@ public class SOService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
         try {
             logger.info("received SOAP getCapabilities request");
-            worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+            worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
              
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {

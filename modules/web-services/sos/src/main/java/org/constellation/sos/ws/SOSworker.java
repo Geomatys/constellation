@@ -187,7 +187,7 @@ public class SOSworker {
     /**
      * A capabilities object containing the static part of the document.
      */
-    private Capabilities staticCapabilities;
+    private Capabilities skeletonCapabilities;
     
     /**
      * The service url.
@@ -461,26 +461,26 @@ public class SOSworker {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
 
-        if (staticCapabilities == null) {
+        if (skeletonCapabilities == null) {
             throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
         }
 
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
 
-            si = staticCapabilities.getServiceIdentification();
+            si = skeletonCapabilities.getServiceIdentification();
         }
 
         //we enter the information for service provider.
         if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
 
-            sp = staticCapabilities.getServiceProvider();
+            sp = skeletonCapabilities.getServiceProvider();
         }
 
         //we enter the operation Metadata
         if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
 
-           om = staticCapabilities.getOperationsMetadata();
+           om = skeletonCapabilities.getOperationsMetadata();
 
            //we remove the operation not supported in this profile (transactional/discovery)
            if (profile == DISCOVERY) {
@@ -521,7 +521,7 @@ public class SOSworker {
         //we enter the information filter capablities.
         if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
 
-            fc = staticCapabilities.getFilterCapabilities();
+            fc = skeletonCapabilities.getFilterCapabilities();
         }
 
 
@@ -1708,8 +1708,8 @@ public class SOSworker {
     /**
      * Set the capabilities document.
      */
-    public void setStaticCapabilities(Capabilities staticCapabilities) {
-        this.staticCapabilities = staticCapabilities;
+    public void setSkeletonCapabilities(Capabilities skeletonCapabilities) {
+        this.skeletonCapabilities = skeletonCapabilities;
     }
     
     /**
@@ -1776,10 +1776,14 @@ public class SOSworker {
      * Destroy and free the resource used by the worker.
      */
     public void destroy() {
-        SMLReader.destroy();
-        SMLWriter.destroy();
-        OMReader.destroy();
-        OMWriter.destroy();
+        if (SMLReader != null)
+            SMLReader.destroy();
+        if (SMLWriter != null)
+            SMLWriter.destroy();
+        if (OMReader != null)
+            OMReader.destroy();
+        if (OMWriter != null)
+            OMWriter.destroy();
         for (Timer t : schreduledTask) {
             t.cancel();
         }

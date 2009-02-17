@@ -64,31 +64,31 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
 
     @Override
     public List<String> getOfferingNames() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var01"), null);
+        Values values = loadData(Arrays.asList("var01"));
         return getVariables("var01", values);
     }
 
     @Override
     public List<String> getProcedureNames() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var02"), null);
+        Values values = loadData(Arrays.asList("var02"));
         return getVariables("var02", values);
     }
 
     @Override
     public List<String> getPhenomenonNames() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var03"), null);
+        Values values = loadData(Arrays.asList("var03"));
         return getVariables("var03", values);
     }
 
     @Override
     public List<String> getFeatureOfInterestNames() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var04"), null);
+        Values values = loadData(Arrays.asList("var04"));
         return getVariables("var04", values);
     }
 
     @Override
     public String getNewObservationId() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var05"), null);
+        Values values = loadData(Arrays.asList("var05"));
         int id = Integer.parseInt(getVariable("var05", values));
 
         values = loadData(Arrays.asList("var44"), observationIdBase + id);
@@ -103,7 +103,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
 
     @Override
     public String getMinimalEventTime() throws CstlServiceException {
-         Values values = loadData(Arrays.asList("var06"), null);
+         Values values = loadData(Arrays.asList("var06"));
         return getVariable("var06", values);
     }
 
@@ -185,7 +185,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
 
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
-        Values values = loadData(Arrays.asList("var01"), null);
+        Values values = loadData(Arrays.asList("var01"));
         List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
         List<String> offeringNames = getVariables("var01", values);
         for (String offeringName : offeringNames) {

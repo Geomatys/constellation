@@ -153,10 +153,18 @@ public class Query {
         }
         mainQuery = mainQuery.deleteCharAt(mainQuery.length() - 1);
 
-        mainQuery.append(" FROM ").append(from.get(0).getvalue());
+        if (from != null && from.size() > 0) {
+            mainQuery.append(" FROM ").append(from.get(0).getvalue());
+        } else {
+            throw new IllegalArgumentException("The query :" + name + " is malformed, FROM part missing");
+        }
 
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
+            while (sql.indexOf(":${") != -1 && sql.indexOf("}") != -1) {
+                String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
+                sql = sql.replace(s, "?");
+            }
             sql = sql.replace("':$'", "?");
             sql = sql.replace(":$", "?");
             mainQuery.append(" WHERE ").append(sql);

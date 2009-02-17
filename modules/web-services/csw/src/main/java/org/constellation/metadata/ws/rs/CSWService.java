@@ -165,7 +165,7 @@ public class CSWService extends OGCWebService {
                           */
                         gc = createNewGetCapabilitiesRequest();
                     }
-                    worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                 
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getCapabilities(gc), sw);
@@ -234,7 +234,7 @@ public class CSWService extends OGCWebService {
                         */
                         gd = createNewGetDomainRequest();
                     }
-                    worker.setStaticCapabilities((Capabilities)getStaticCapabilitiesObject());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                     
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getDomain(gd), sw);

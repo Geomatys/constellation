@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
@@ -129,6 +130,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
+// geotools dependencies
+import org.geotools.util.logging.MonolineFormatter;
+
 // GeoAPI dependencies
 import org.constellation.ows.v100.SectionsType;
 import org.opengis.filter.sort.SortOrder;
@@ -148,7 +152,7 @@ public class CSWworker {
     /**
      * A capabilities object containing the static part of the document.
      */
-    private Capabilities staticCapabilities;
+    private Capabilities skeletonCapabilities;
     
     /**
      * The service url.
@@ -467,7 +471,7 @@ public class CSWworker {
         }
 
         // if the static capabilities are null we send an exception
-        if (staticCapabilities == null)
+        if (skeletonCapabilities == null)
             throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
 
         //we prepare the response document
@@ -490,19 +494,19 @@ public class CSWworker {
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
                 
-            si = staticCapabilities.getServiceIdentification();
+            si = skeletonCapabilities.getServiceIdentification();
         }
             
         //we enter the information for service provider.
         if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
            
-            sp = staticCapabilities.getServiceProvider();
+            sp = skeletonCapabilities.getServiceProvider();
         }
             
         //we enter the operation Metadata
         if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
                 
-            om = staticCapabilities.getOperationsMetadata();
+            om = skeletonCapabilities.getOperationsMetadata();
             
              //we remove the operation not supported in this profile (transactional/discovery)
             if (profile == DISCOVERY) {
@@ -599,7 +603,7 @@ public class CSWworker {
         //we enter the information filter capablities.
         if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
             
-            fc = staticCapabilities.getFilterCapabilities();
+            fc = skeletonCapabilities.getFilterCapabilities();
         }
             
             
@@ -1307,12 +1311,12 @@ public class CSWworker {
                 int pointLocation = token.indexOf('.');
                 if (pointLocation != -1) {
 
-                    if (staticCapabilities == null)
+                    if (skeletonCapabilities == null)
                         throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
 
                     String operationName = token.substring(0, pointLocation);
                     String parameter     = token.substring(pointLocation + 1);
-                    Operation o  = staticCapabilities.getOperationsMetadata().getOperation(operationName);
+                    Operation o  = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
                     if (o != null) {
                         DomainType param        = o.getParameter(parameter);
                         QName type;
@@ -1567,10 +1571,10 @@ public class CSWworker {
     /**
      * Set the capabilities document.
      * 
-     * @param staticCapabilities An OWS 1.0.0 capabilities object.
+     * @param skeletonCapabilities An OWS 1.0.0 capabilities object.
      */
-    public void setStaticCapabilities(final Capabilities staticCapabilities) {
-        this.staticCapabilities = staticCapabilities;
+    public void setSkeletonCapabilities(final Capabilities skeletonCapabilities) {
+        this.skeletonCapabilities = skeletonCapabilities;
     }
     
     /**
@@ -1645,6 +1649,21 @@ public class CSWworker {
             throw new CstlServiceException("The server does not support this output format: " + format + '\n' +
                                              " supported ones are: " + '\n' + supportedFormat,
                                              INVALID_PARAMETER_VALUE, "outputFormat");
+        }
+    }
+
+    private void initLogger(String ID) {
+        try {
+            if (ID != null && !ID.equals("")) {
+                ID = ID + '-';
+            }
+            FileHandler handler  = new FileHandler(ID + "cstl-csw.log");
+            handler.setFormatter(new MonolineFormatter());
+            logger.addHandler(handler);
+        } catch (IOException ex) {
+            logger.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
+        } catch (SecurityException ex) {
+            logger.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
         }
     }
 

@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +90,8 @@ public abstract class GenericObservationReader extends ObservationReader {
             }
         } catch (SQLException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (IllegalArgumentException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         isThreadEnabled = false;
     }
@@ -99,16 +102,7 @@ public abstract class GenericObservationReader extends ObservationReader {
      * @throws java.sql.SQLException
      */
     private final void initStatement(Connection connection, Automatic configuration) throws SQLException {
-        // we initialize the main query
-        if (configuration.getQueries() != null           &&
-            configuration.getQueries().getMain() != null &&
-            configuration.getQueries().getMain().getQuery() != null) {
-            Query mainQuery = configuration.getQueries().getMain().getQuery();
-            mainStatement      = connection.prepareStatement(mainQuery.buildSQLQuery());
-        } else {
-            logger.severe("The configuration file is malformed, unable to reach the main query");
-        }
-
+        // no main query in sos
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
         Queries queries = configuration.getQueries();
@@ -125,7 +119,7 @@ public abstract class GenericObservationReader extends ObservationReader {
                         }
                     }
                     String textQuery = query.buildSQLQuery();
-                    logger.finer("new Single query: " + textQuery);
+                    logger.info("new Single query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
@@ -143,7 +137,9 @@ public abstract class GenericObservationReader extends ObservationReader {
                             varNames.add(col.getVar());
                         }
                     }
-                    PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
+                    String textQuery = query.buildSQLQuery();
+                    logger.info("new Multiple query: " + textQuery);
+                    PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     multipleStatements.put(stmt, varNames);
                 }
             } else {
@@ -158,7 +154,32 @@ public abstract class GenericObservationReader extends ObservationReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
+    protected Values loadData(String variable, String value) {
+        return loadData(Arrays.asList(variable), Arrays.asList(value));
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
     protected Values loadData(List<String> variables, String value) {
+        return loadData(variables, Arrays.asList(value));
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
+    protected Values loadData(List<String> variables) {
+        List<String> s = null;
+        return loadData(variables, s);
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
+    protected Values loadData(List<String> variables, List<String> value) {
 
         Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
         Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
@@ -196,27 +217,31 @@ public abstract class GenericObservationReader extends ObservationReader {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private Values sequentialLoading(List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
         Values values = new Values();
         
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
             try {
-                fillStatement(stmt, identifier);
+                fillStatement(stmt, parameters);
                 fillSingleValues(stmt, values);
             } catch (SQLException ex) {
-                logSqlError(singleStatements.get(stmt), ex, stmt);
+                logError(singleStatements.get(stmt), ex, stmt);
+            } catch (IllegalArgumentException ex) {
+                logError(singleStatements.get(stmt), ex, stmt);
             }
         }
 
         //we extract the multiple values
         for (PreparedStatement stmt : subMultiStmts) {
             try {
-                fillStatement(stmt, identifier);
+                fillStatement(stmt, parameters);
                 fillMultipleValues(stmt, values);
                 
             } catch (SQLException ex) {
-               logSqlError(multipleStatements.get(stmt), ex, stmt);
+                logError(multipleStatements.get(stmt), ex, stmt);
+            } catch (IllegalArgumentException ex) {
+                logError(singleStatements.get(stmt), ex, stmt);
             }
         }
         return values;
@@ -228,7 +253,7 @@ public abstract class GenericObservationReader extends ObservationReader {
      *
      * @param identifier
      */
-    private Values paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private Values paraleleLoading(final List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
         final Values values = new Values();
 
         //we extract the single values
@@ -238,11 +263,13 @@ public abstract class GenericObservationReader extends ObservationReader {
 
                 public Object call() {
                     try {
-                        fillStatement(stmt, identifier);
+                        fillStatement(stmt, parameters);
                         fillSingleValues(stmt, values);
 
                     } catch (SQLException ex) {
-                        logSqlError(singleStatements.get(stmt), ex, stmt);
+                        logError(singleStatements.get(stmt), ex, stmt);
+                    } catch (IllegalArgumentException ex) {
+                        logError(singleStatements.get(stmt), ex, stmt);
                     }
                     return null;
                 }
@@ -256,7 +283,7 @@ public abstract class GenericObservationReader extends ObservationReader {
                logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
                logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
-            }
+            } 
         }
         //we extract the multiple values
         cs = new BoundedCompletionService(this.pool, 5);
@@ -265,11 +292,13 @@ public abstract class GenericObservationReader extends ObservationReader {
 
                 public Object call() {
                     try {
-                        fillStatement(stmt, identifier);
+                        fillStatement(stmt, parameters);
                         fillMultipleValues(stmt, values);
                         
                     } catch (SQLException ex) {
-                        logSqlError(multipleStatements.get(stmt), ex, stmt);
+                        logError(multipleStatements.get(stmt), ex, stmt);
+                    } catch (IllegalArgumentException ex) {
+                        logError(singleStatements.get(stmt), ex, stmt);
                     }
                     return null;
                 }
@@ -289,25 +318,32 @@ public abstract class GenericObservationReader extends ObservationReader {
     }
 
     /**
-     * Fill the dynamic parameters of a prepared statement with the specified identifier.
+     * Fill the dynamic parameters of a prepared statement with the specified parameters.
+     * 
      * @param stmt
-     * @param identifier
+     * @param parameters
      */
-    private void fillStatement(PreparedStatement stmt, String identifier) throws SQLException {
+    private void fillStatement(PreparedStatement stmt, List<String> parameters) throws SQLException {
+        if (parameters == null)
+            parameters = new ArrayList<String>();
         ParameterMetaData meta = stmt.getParameterMetaData();
         int nbParam = meta.getParameterCount();
+        if (nbParam != parameters.size())
+            throw new IllegalArgumentException("There is not the good number of parameters specified for this statement: stmt:" + nbParam + " parameters:" + parameters.size());
+        
         int i = 1;
         while (i < nbParam + 1) {
+            String parameter = parameters.get(i - 1);
             int type = meta.getParameterType(i);
             if (type == java.sql.Types.INTEGER) {
                 try {
-                    int id = Integer.parseInt(identifier);
+                    int id = Integer.parseInt(parameter);
                     stmt.setInt(i, id);
                 } catch(NumberFormatException ex) {
-                    logger.severe("unable to parse the int parameter:" + identifier);
+                    logger.severe("unable to parse the int parameter:" + parameter);
                 }
             } else  {
-                stmt.setString(i, identifier);
+                stmt.setString(i, parameter);
             }
             i++;
         }
@@ -374,18 +410,22 @@ public abstract class GenericObservationReader extends ObservationReader {
      * @param varList a list of variable.
      * @param ex
      */
-    public void logSqlError(List<String> varList, SQLException ex, PreparedStatement stmt) {
+    public void logError(List<String> varList, Exception ex, PreparedStatement stmt) {
         String varlist = "";
         if (varList != null) {
             for (String s : varList) {
                 varlist += s + ',';
             }
+            if (varlist.length() > 1);
+                varlist = varlist.substring(0, varlist.length() - 1);
         } else {
             varlist = "no variables";
         }
-        logger.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
-                      "query: " + stmt.toString()                              + '\n' +
-                      "for variable: " + varlist);
+        logger.severe( ex.getClass().getSimpleName() +
+                      " occurs while executing query: " + '\n' +
+                      "query: " + stmt.toString()                + '\n' +
+                      "cause: " + ex.getMessage()                + '\n' +
+                      "for variable: " + varlist                 + '\n');
     }
 
     /**

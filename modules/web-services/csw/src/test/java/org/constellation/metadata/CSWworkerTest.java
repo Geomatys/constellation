@@ -155,7 +155,7 @@ public class CSWworkerTest {
         File configDir = new File("CSWWorkerTest");
         worker = new CSWworker("", unmarshaller, marshaller, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
-        worker.setStaticCapabilities(stcapa);
+        worker.setSkeletonCapabilities(stcapa);
     }
 
     @After
