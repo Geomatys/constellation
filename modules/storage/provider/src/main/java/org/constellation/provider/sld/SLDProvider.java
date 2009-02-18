@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.styling;
+package org.constellation.provider.sld;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.provider.DataProvider;
+import org.constellation.provider.Provider;
 
+import org.constellation.provider.StyleProvider;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.sld.MutableLayer;
 import org.geotools.sld.MutableLayerStyle;
@@ -47,8 +48,8 @@ import org.geotools.util.SoftValueHashMap;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.styling");
+public class SLDProvider implements StyleProvider{
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.sld");
     private static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
     private static final Collection<String> masks = new ArrayList<String>();
     static{
@@ -62,7 +63,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
     private final Map<String,MutableStyle> cache = new SoftValueHashMap<String, MutableStyle>(20);
     
     
-    public SLDNamedStyleDP(File folder){
+    protected SLDProvider(File folder){
         if(folder == null || !folder.exists() || !folder.isDirectory()){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
@@ -81,8 +82,8 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
+    public Class<Object> getValueClass() {
+        return Object.class;
     }
 
     /**
@@ -117,7 +118,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 final MutableStyle style = getFirstStyle(sld);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is an SLD 1.1.0");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an SLD 1.1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /* dont log*/ }
@@ -128,7 +129,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 final MutableStyle style = getFirstStyle(sld);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is an SLD 1.0.0");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an SLD 1.0.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -138,7 +139,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is a UserStyle SLD 1.1.0");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is a UserStyle SLD 1.1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -148,7 +149,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.SLD_1_0_0);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is a UserStyle SLD 1.0.0");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is a UserStyle SLD 1.0.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -160,7 +161,7 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is FeatureTypeStyle SE 1.1");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is FeatureTypeStyle SE 1.1");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -172,12 +173,12 @@ public class SLDNamedStyleDP implements DataProvider<String,MutableStyle>{
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.INFO, "Style " + key + "is an FeatureTypeStyle SLD 1.0");
+                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an FeatureTypeStyle SLD 1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
             
-            LOGGER.log(Level.WARNING, "Style " + key + " could not be parsed");
+            LOGGER.log(Level.WARNING, "[PROVIDER]> SLD Style " + key + " could not be parsed");
         }
         
         return null;

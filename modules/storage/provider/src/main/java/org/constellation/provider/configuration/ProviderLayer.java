@@ -31,10 +31,13 @@ public class ProviderLayer {
     public final String dateEndField;
     public final String elevationStartField;
     public final String elevationEndField;
+    public final String elevationModel;
+    public final boolean isElevationModel;
     
     ProviderLayer(final String name,final List<String> styles,
             final String startDate, final String endDate,
-            final String startElevation, final String endElevation){
+            final String startElevation, final String endElevation,
+            final boolean isElevationModel, final String elevationModel){
         if(name == null || styles == null){
             throw new NullPointerException("Name and style list must not be null");
         }
@@ -44,6 +47,8 @@ public class ProviderLayer {
         this.dateEndField = endDate;
         this.elevationStartField = startElevation;
         this.elevationEndField = endElevation;
+        this.isElevationModel = isElevationModel;
+        this.elevationModel = elevationModel;
     }
     
     

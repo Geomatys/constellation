@@ -31,7 +31,7 @@ import java.util.Set;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.LayerDataProvider;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
@@ -55,13 +55,13 @@ import org.xml.sax.SAXException;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class ShapeFileNamedLayerDP implements LayerDataProvider {
+public class ShapeFileProvider implements LayerProvider {
     /**
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.shapefile");
-    private static final String KEY_SHAPEFILE_CONFIG = "shapefile_config";
-    private static final String KEY_FOLDER_PATH = "path";
+    public static final String KEY_SHAPEFILE_CONFIG = "shapefile_config";
+    public static final String KEY_FOLDER_PATH = "path";
 
     /**
      * Mask to select only shape files.
@@ -81,7 +81,7 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
     private final Map<String,DataStore> cache = new SoftValueHashMap<String, DataStore>(10);
 
 
-    private ShapeFileNamedLayerDP(final ProviderSource source) throws IllegalArgumentException {
+    protected ShapeFileProvider(final ProviderSource source) throws IllegalArgumentException {
         this.source = source;
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
@@ -96,6 +96,10 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
         }
 
         visit(folder);
+    }
+
+    protected ProviderSource getSource(){
+        return source;
     }
 
     /**
@@ -235,62 +239,6 @@ public class ShapeFileNamedLayerDP implements LayerDataProvider {
         }
     }
 
-    public static final Collection<ShapeFileNamedLayerDP> loadProviders() {
-        final ProviderConfig config;
-        try {
-            config = getConfig();
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return Collections.emptyList();
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return Collections.emptyList();
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return Collections.emptyList();
-        } catch (NamingException ex) {
-            return Collections.emptyList();
-        }
-        final Collection<ShapeFileNamedLayerDP> dps = new ArrayList<ShapeFileNamedLayerDP>();
-        if (config == null) {
-            return dps;
-        }
-        for (final ProviderSource ps : config.sources) {
-            try {
-                dps.add(new ShapeFileNamedLayerDP(ps));
-            } catch(IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "Invalide shapefile provider config", ex);
-            }
-        }
-
-        final StringBuilder builder = new StringBuilder("DATA PROVIDER : ShapeFile ");
-        for (final ShapeFileNamedLayerDP dp : dps) {
-            builder.append("\n[" + dp.source.parameters.get(KEY_FOLDER_PATH) + "=");
-            for (final String layer : dp.getKeys()) {
-                builder.append(layer + ",");
-            }
-            builder.append("]");
-        }
-        LOGGER.log(Level.INFO, builder.toString());
-        return dps;
-    }
-
-    /**
-     *
-     * @return List of folders holding shapefiles
-     */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException,
-            SAXException, IOException, NamingException
-    {
-
-        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_SHAPEFILE_CONFIG);
-
-        if (configFile == null || configFile.trim().isEmpty()) {
-            return null;
-        }
-
-        return ProviderConfig.read(new File(configFile.trim()));
-    }
 
     @Override
     public ElevationModel getElevationModel(String name) {

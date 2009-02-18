@@ -24,7 +24,7 @@ import org.geotools.map.ElevationModel;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerDataProvider extends DataProvider<String,LayerDetails>{
+public interface LayerProvider extends Provider<String,LayerDetails>{
 
     public ElevationModel getElevationModel(String name);
 

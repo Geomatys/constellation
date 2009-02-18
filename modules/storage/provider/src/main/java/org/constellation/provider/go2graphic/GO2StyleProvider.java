@@ -14,14 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.styling;
+package org.constellation.provider.go2graphic;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.provider.DataProvider;
-
+import org.constellation.provider.StyleProvider;
 import org.geotools.display.container.GridMarkGraphicBuilder;
 import org.geotools.map.GraphicBuilder;
 
@@ -29,14 +28,12 @@ import org.geotools.map.GraphicBuilder;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class GO2NamedStyleDP implements DataProvider<String,GraphicBuilder>{
-
-    private static GO2NamedStyleDP instance = null;
+public class GO2StyleProvider implements StyleProvider{
     
     private final Map<String,GraphicBuilder> index = new HashMap<String,GraphicBuilder>();
     
     
-    private GO2NamedStyleDP(){
+    protected GO2StyleProvider(){
         visit();
     }
     
@@ -44,8 +41,8 @@ public class GO2NamedStyleDP implements DataProvider<String,GraphicBuilder>{
         return String.class;
     }
 
-    public Class<GraphicBuilder> getValueClass() {
-        return GraphicBuilder.class;
+    public Class<Object> getValueClass() {
+        return Object.class;
     }
 
     public Set<String> getKeys() {
@@ -74,11 +71,4 @@ public class GO2NamedStyleDP implements DataProvider<String,GraphicBuilder>{
         index.put("GO2:VectorField", new GridMarkGraphicBuilder());
     }
     
-    public static GO2NamedStyleDP getDefault(){
-        if(instance == null){
-            instance = new GO2NamedStyleDP();
-        }
-        return instance;
-    }
-
 }

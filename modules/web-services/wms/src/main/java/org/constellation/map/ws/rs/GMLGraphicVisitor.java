@@ -35,7 +35,7 @@ import javax.measure.unit.Unit;
 import org.constellation.catalog.CatalogException;
 import org.constellation.portrayal.AbstractGraphicVisitor;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -62,7 +62,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class GMLGraphicVisitor extends AbstractGraphicVisitor{
 
-    private final NamedLayerDP dp = NamedLayerDP.getInstance();
+    private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
     private final Map<String,List<String>> values = new HashMap<String,List<String>>();
     private final GetFeatureInfo gfi;
 

@@ -46,6 +46,8 @@ public class ProviderConfig {
     private static final String PARAM_PERIODE_END = "periode_end";
     private static final String PARAM_ELEVATION_START = "elevation_start";
     private static final String PARAM_ELEVATION_END = "elevation_end";
+    private static final String PARAM_ELEVATION_MODEL = "elevation_model";
+    private static final String PARAM_IS_ELEVATION_MODEL = "is_elevation_model";
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
@@ -100,6 +102,8 @@ public class ProviderConfig {
         String endDate = null;
         String startElevation = null;
         String endElevation = null;
+        String elevationModel = null;
+        boolean isElevationModel = false;
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
         for(int i=0, n=paramNodes.getLength(); i<n; i++){
@@ -118,10 +122,15 @@ public class ProviderConfig {
                 startElevation = text;
             }else if(PARAM_ELEVATION_END.equalsIgnoreCase(name)){
                 endElevation = text;
+            }else if(PARAM_IS_ELEVATION_MODEL.equalsIgnoreCase(name)){
+                isElevationModel = Boolean.valueOf(text);
+            }else if(PARAM_ELEVATION_MODEL.equalsIgnoreCase(name)){
+                elevationModel = text;
             }
             
         }
-        return new ProviderLayer(layerName, layerStyles, startDate, endDate, startElevation, endElevation);
+        return new ProviderLayer(layerName, layerStyles, startDate, endDate, 
+                startElevation, endElevation,isElevationModel,elevationModel);
     }
     
     

@@ -43,8 +43,8 @@ import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridMapLayer2;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
-import org.constellation.provider.NamedStyleDP;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReader;
@@ -95,6 +95,8 @@ class PostGridLayerDetails implements LayerDetails {
      */
     private final List<String> favorites;
 
+    private final String elevationModel;
+
     /**
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
      * {@linkplain Database database}.
@@ -102,7 +104,7 @@ class PostGridLayerDetails implements LayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    PostGridLayerDetails(final PostGridReader reader, final List<String> favorites) {
+    PostGridLayerDetails(final PostGridReader reader, final List<String> favorites, final String elevationModel) {
         this.reader = reader;
 
         if (favorites == null) {
@@ -110,6 +112,7 @@ class PostGridLayerDetails implements LayerDetails {
         } else {
             this.favorites = favorites;
         }
+        this.elevationModel = elevationModel;
     }
 
     /**
@@ -282,7 +285,7 @@ class PostGridLayerDetails implements LayerDetails {
 
         if (style instanceof String) {
             //the given style is a named style
-            style = NamedStyleDP.getInstance().get((String)style);
+            style = StyleProviderProxy.getInstance().get((String)style);
             if (style == null) {
                 //something is wrong, the named style doesnt exist, create a default one
                 style = RANDOM_FACTORY.createRasterStyle();
@@ -322,7 +325,7 @@ class PostGridLayerDetails implements LayerDetails {
                         RasterSymbolizer rs = (RasterSymbolizer) symbol;
                         ShadedRelief sr = rs.getShadedRelief();
                         if(sr.getReliefFactor().evaluate(null, Float.class) != 0){
-                            ElevationModel model = NamedLayerDP.getInstance().getElevationModel(null);
+                            ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
                             if(model != null){
                                 mapLayer.setElevationModel(model);
                             }

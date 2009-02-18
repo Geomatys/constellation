@@ -23,7 +23,7 @@ import java.util.Set;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public interface DataProvider<K,V> {
+public interface Provider<K,V> {
 
     public final String JNDI_GROUP = "Data Provider Properties";
     

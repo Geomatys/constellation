@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.constellation.provider.AbstractFeatureLayerDetails;
-import org.constellation.provider.NamedStyleDP;
+import org.constellation.provider.StyleProviderProxy;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
@@ -69,7 +69,7 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
 
         if(style instanceof String){
             //the given style is a named style
-            style = NamedStyleDP.getInstance().get((String)style);
+            style = StyleProviderProxy.getInstance().get((String)style);
             if(style == null){
                 //somehting is wrong, the named style doesnt exist, create a default one
                 style = RANDOM_FACTORY.createDefaultVectorStyle(fs);

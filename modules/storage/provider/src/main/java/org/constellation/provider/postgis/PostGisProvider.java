@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.LayerDataProvider;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
@@ -57,23 +57,23 @@ import org.xml.sax.SAXException;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGisNamedLayerDP implements LayerDataProvider{
+public class PostGisProvider implements LayerProvider{
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
-    private static final String KEY_DBTYPE          = PostgisDataStoreFactory.DBTYPE.key;
-    private static final String KEY_HOST            = PostgisDataStoreFactory.HOST.key;
-    private static final String KEY_PORT            = PostgisDataStoreFactory.PORT.key;
-    private static final String KEY_SCHEMA          = PostgisDataStoreFactory.SCHEMA.key;
-    private static final String KEY_DATABASE        = PostgisDataStoreFactory.DATABASE.key;
-    private static final String KEY_USER            = PostgisDataStoreFactory.USER.key;
-    private static final String KEY_PASSWD          = PostgisDataStoreFactory.PASSWD.key;
-    private static final String KEY_MAXCONN         = PostgisDataStoreFactory.MAXCONN.key;
-    private static final String KEY_MINCONN         = PostgisDataStoreFactory.MINCONN.key;
-    private static final String KEY_NAMESPACE       = PostgisDataStoreFactory.NAMESPACE.key;
-    private static final String KEY_VALIDATECONN    = PostgisDataStoreFactory.VALIDATECONN.key;
-    private static final String KEY_ESTIMATEDEXTENT = PostgisDataStoreFactory.ESTIMATEDEXTENT.key;
-    private static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
-    private static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
+    public static final String KEY_DBTYPE          = PostgisDataStoreFactory.DBTYPE.key;
+    public static final String KEY_HOST            = PostgisDataStoreFactory.HOST.key;
+    public static final String KEY_PORT            = PostgisDataStoreFactory.PORT.key;
+    public static final String KEY_SCHEMA          = PostgisDataStoreFactory.SCHEMA.key;
+    public static final String KEY_DATABASE        = PostgisDataStoreFactory.DATABASE.key;
+    public static final String KEY_USER            = PostgisDataStoreFactory.USER.key;
+    public static final String KEY_PASSWD          = PostgisDataStoreFactory.PASSWD.key;
+    public static final String KEY_MAXCONN         = PostgisDataStoreFactory.MAXCONN.key;
+    public static final String KEY_MINCONN         = PostgisDataStoreFactory.MINCONN.key;
+    public static final String KEY_NAMESPACE       = PostgisDataStoreFactory.NAMESPACE.key;
+    public static final String KEY_VALIDATECONN    = PostgisDataStoreFactory.VALIDATECONN.key;
+    public static final String KEY_ESTIMATEDEXTENT = PostgisDataStoreFactory.ESTIMATEDEXTENT.key;
+    public static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
+    public static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
 
     private final Map<String,Object> params = new HashMap<String,Object>();
     private final List<String> index = new ArrayList<String>();
@@ -81,7 +81,7 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
     private final ProviderSource source;
 
 
-    private PostGisNamedLayerDP(ProviderSource source) throws IOException {
+    protected PostGisProvider(ProviderSource source) throws IOException {
         this.source = source;
         params.put(KEY_DBTYPE, "postgis");
 
@@ -126,6 +126,10 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
 
         store = DataStoreFinder.getDataStore(params);
         visit();
+    }
+
+    protected ProviderSource getSource(){
+        return source;
     }
 
     /**
@@ -217,8 +221,8 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         }
     }
 
-    public static final Collection<PostGisNamedLayerDP> loadProviders(){
-        final Collection<PostGisNamedLayerDP> dps = new ArrayList<PostGisNamedLayerDP>();
+    public static final Collection<PostGisProvider> loadProviders(){
+        final Collection<PostGisProvider> dps = new ArrayList<PostGisProvider>();
         final ProviderConfig config;
         try {
             config = getConfig();
@@ -240,14 +244,14 @@ public class PostGisNamedLayerDP implements LayerDataProvider{
         }
         for(final ProviderSource ps : config.sources) {
             try {
-                dps.add(new PostGisNamedLayerDP(ps));
+                dps.add(new PostGisProvider(ps));
             } catch(IOException ex){
                 LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
             }
         }
 
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : PostGIS ");
-        for(final PostGisNamedLayerDP dp : dps){
+        for(final PostGisProvider dp : dps){
             builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
             for(final String layer : dp.getKeys()){
                 builder.append(layer + ",");

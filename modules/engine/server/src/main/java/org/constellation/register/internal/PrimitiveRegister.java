@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerDP;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
 
@@ -105,9 +105,9 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	private List<LayerDetails> getAllLayerRefs() throws RegisterException {
 		
 		List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-		Set<String> layerNames = NamedLayerDP.getInstance().getKeys();
+		Set<String> layerNames = LayerProviderProxy.getInstance().getKeys();
 		for (String layerName : layerNames){
-			LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+			LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
 			
 			if ( null == layerRef) {
 	                throw new RegisterException("Unknown layer " + layerName);
@@ -124,7 +124,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
 		List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
 		for (String layerName : layerNames){
-			LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+			LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
 			
 			if ( null == layerRef) {
 	                throw new RegisterException("Unknown layer " + layerName);
@@ -138,7 +138,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 	
 	private LayerDetails getLayerRef( String layerName ) throws RegisterException {
 		
-		LayerDetails layerRef = NamedLayerDP.getInstance().get(layerName);
+		LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
 		
 		if ( null == layerRef) {
             throw new RegisterException("Unknown layer " + layerName);

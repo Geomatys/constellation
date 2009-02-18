@@ -1,0 +1,3 @@
+org.constellation.provider.shapefile.ShapeFileProviderService
+org.constellation.provider.postgis.PostGisProviderService
+org.constellation.provider.postgrid.PostGridProviderService
