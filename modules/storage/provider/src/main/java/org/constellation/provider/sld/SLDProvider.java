@@ -26,9 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.provider.Provider;
-
 import org.constellation.provider.StyleProvider;
+import org.constellation.provider.configuration.ProviderSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.sld.MutableLayer;
 import org.geotools.sld.MutableLayerStyle;
@@ -49,9 +48,13 @@ import org.geotools.util.SoftValueHashMap;
  * @author Johann Sorel (Geomatys)
  */
 public class SLDProvider implements StyleProvider{
+
+    public static final String KEY_FOLDER_PATH = "path";
+
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.sld");
     private static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
     private static final Collection<String> masks = new ArrayList<String>();
+
     static{
         masks.add(".xml");
         masks.add(".sld");
@@ -61,17 +64,25 @@ public class SLDProvider implements StyleProvider{
     private final File folder;
     private final Map<String,File> index = new HashMap<String,File>();
     private final Map<String,MutableStyle> cache = new SoftValueHashMap<String, MutableStyle>(20);
+    private final ProviderSource source;
     
     
-    protected SLDProvider(File folder){
+    protected SLDProvider(ProviderSource source){
+        this.source = source;
+        String path = source.parameters.get(KEY_FOLDER_PATH);
+        folder = new File(path);
+
         if(folder == null || !folder.exists() || !folder.isDirectory()){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
         
-        this.folder = folder;
         visit(folder);
     }
-    
+
+    protected ProviderSource getSource(){
+        return source;
+    }
+
     /**
      * {@inheritDoc }
      */

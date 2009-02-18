@@ -6,17 +6,20 @@
 package org.constellation.provider.sld;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.provider.StyleProviderService;
+import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderSource;
+import org.xml.sax.SAXException;
+
+import static org.constellation.provider.sld.SLDProvider.*;
+
 
 /**
  *
@@ -57,28 +60,26 @@ public class SLDProviderService implements StyleProviderService{
 
         SLDProviderService.CONFIG_FILE = file;
 
-        Properties props = new Properties();
+        ProviderConfig config = null;
         try {
-            props.load(new FileInputStream(file));
+            config = ProviderConfig.read(file);
+        } catch (ParserConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "[PROVIDER]> SLD config file is unvalid : "+ file.getPath());
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
-        String strFolders = props.getProperty("paths");
+        if(config == null) return;
 
-        if (strFolders == null) {
-            strFolders = "";
-        }
-
-        final StringTokenizer token = new StringTokenizer(strFolders,";");
-        while(token.hasMoreElements()){
-            final String path = token.nextToken();
-            final File f = new File(path);
-            if(f.exists() && f.isDirectory()){
-                PROVIDERS.add(new SLDProvider(f));
-                LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + path);
-            }else{
-                LOGGER.log(Level.WARNING, "[PROVIDER]> SLD folder provided does not exist : "+ path);
+        for (final ProviderSource ps : config.sources) {
+            try {
+                SLDProvider provider = new SLDProvider(ps);
+                PROVIDERS.add(provider);
+                LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.WARNING, "Invalide SLD provider config", ex);
             }
         }
 
