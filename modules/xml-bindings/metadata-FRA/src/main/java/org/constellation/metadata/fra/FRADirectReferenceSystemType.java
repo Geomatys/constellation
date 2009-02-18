@@ -42,12 +42,22 @@ import org.geotools.referencing.DefaultReferenceSystem;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "FRA_DirectReferenceSystem")
 @XmlRootElement(name= "FRA_DirectReferenceSystem")
 public class FRADirectReferenceSystemType extends DefaultReferenceSystem {
 
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return (object instanceof FRADirectReferenceSystemType) && super.equals(object);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

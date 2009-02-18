@@ -1652,12 +1652,12 @@ public class CSWworker {
         }
     }
 
-    private void initLogger(String ID) {
+    private void initLogger(String ID, String filePath) {
         try {
             if (ID != null && !ID.equals("")) {
                 ID = ID + '-';
             }
-            FileHandler handler  = new FileHandler(ID + "cstl-csw.log");
+            FileHandler handler  = new FileHandler(filePath + '/'+ ID + "cstl-csw.log");
             handler.setFormatter(new MonolineFormatter());
             logger.addHandler(handler);
         } catch (IOException ex) {

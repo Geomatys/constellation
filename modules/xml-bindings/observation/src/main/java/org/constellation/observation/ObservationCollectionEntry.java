@@ -60,10 +60,6 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
         System.out.println("-----------------------------AQUI-----------------------------------");
     }
     
-    
-    
-    
-    
     /**
      * Add a new Observation to the collection. 
      */

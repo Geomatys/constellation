@@ -347,7 +347,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
      *
      * @param l'observation a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final ObservationEntry obs) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final Observation obs) throws SQLException, CatalogException {
         final ObservationQuery query = (ObservationQuery) super.query;
         String id;
         boolean success = false;

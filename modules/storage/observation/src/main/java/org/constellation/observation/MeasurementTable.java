@@ -204,7 +204,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
      *
      * @param l'measervation a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final MeasurementEntry meas) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final Measurement meas) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         String id;
         boolean success = false;

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class Values {
     /**
@@ -39,6 +39,11 @@ public class Values {
     public Values() {
         singleValue = new HashMap<String, String>();
         multipleValue = new HashMap<String, List<String>>();
+    }
+
+    public Values(Map<String, String> singleValue, Map<String, List<String>> multipleValue) {
+        this.singleValue   = singleValue;
+        this.multipleValue = multipleValue;
     }
 
     public void addSingleValue(String varName, String value) {

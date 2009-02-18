@@ -21,13 +21,15 @@ import java.util.logging.Logger;
 
 // constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.observation.MeasurementEntry;
-import org.constellation.observation.ObservationEntry;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
+
+// GeoAPI dependencies
+import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -43,9 +45,9 @@ public abstract class ObservationWriter {
     public ObservationWriter() throws CstlServiceException {
     }
    
-    public abstract String writeObservation(ObservationEntry observation) throws CstlServiceException;
+    public abstract String writeObservation(Observation observation) throws CstlServiceException;
     
-    public abstract String writeMeasurement(MeasurementEntry measurement) throws CstlServiceException;
+    public abstract String writeMeasurement(Measurement measurement) throws CstlServiceException;
     
     public abstract String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
     

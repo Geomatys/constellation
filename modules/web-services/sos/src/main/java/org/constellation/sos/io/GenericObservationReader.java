@@ -49,7 +49,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class GenericObservationReader extends ObservationReader {
 
@@ -72,7 +72,24 @@ public abstract class GenericObservationReader extends ObservationReader {
      * A flag indicating if the multi thread mecanism is enabled or not.
      */
     private final boolean isThreadEnabled;
+
+    /**
+     * A flag indicating if the jdbc driver support several specific operation
+     * (the oracle driver does not support a lot of method for example).
+     *
+     */
+    private boolean advancedJdbcDriver;
     
+    /**
+     * A flag indicating that the debug mode is ON.
+     */
+    private boolean debugMode = false;
+
+    /**
+     * A list of predefined Values used in debug mode
+     */
+    private List<Values> debugValues;
+
     /**
      * Shared Thread Pool for parralele execution
      */
@@ -80,6 +97,7 @@ public abstract class GenericObservationReader extends ObservationReader {
 
     public GenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         super(observationIdBase);
+        advancedJdbcDriver = true;
         try {
             BDD bdd = configuration.getBdd();
             if (bdd != null) {
@@ -94,6 +112,16 @@ public abstract class GenericObservationReader extends ObservationReader {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         isThreadEnabled = false;
+    }
+
+    protected GenericObservationReader(String observationIdBase, List<Values> debugValues) throws CstlServiceException {
+        super(observationIdBase);
+        advancedJdbcDriver = true;
+        debugMode          = true;
+        isThreadEnabled    = false;
+        this.debugValues   = debugValues;
+        singleStatements   = new HashMap<PreparedStatement, List<String>>();
+        multipleStatements = new HashMap<PreparedStatement, List<String>>();
     }
 
     /**
@@ -154,16 +182,16 @@ public abstract class GenericObservationReader extends ObservationReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, String value) {
-        return loadData(Arrays.asList(variable), Arrays.asList(value));
+    protected Values loadData(String variable, String parameter) {
+        return loadData(Arrays.asList(variable), Arrays.asList(parameter));
     }
 
     /**
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, String value) {
-        return loadData(variables, Arrays.asList(value));
+    protected Values loadData(List<String> variables, String parameter) {
+        return loadData(variables, Arrays.asList(parameter));
     }
 
     /**
@@ -179,7 +207,7 @@ public abstract class GenericObservationReader extends ObservationReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, List<String> value) {
+    protected Values loadData(List<String> variables, List<String> parameters) {
 
         Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
         Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
@@ -202,12 +230,25 @@ public abstract class GenericObservationReader extends ObservationReader {
         }
 
         Values values;
-        if (isThreadEnabled) {
-            values = paraleleLoading(value, subSingleStmts, subMultiStmts);
+        if (debugMode) {
+            values = debugLoading(variables, parameters);
+        }else if (isThreadEnabled) {
+            values = paraleleLoading(parameters, subSingleStmts, subMultiStmts);
         } else {
-            values = sequentialLoading(value, subSingleStmts, subMultiStmts);
+            values = sequentialLoading(parameters, subSingleStmts, subMultiStmts);
         }
         return values;
+    }
+
+
+    /**
+     * Load the data in debug mode without queying the database .
+     *
+     */
+    private Values debugLoading(List<String> variables, List<String> parameters) {
+        if (debugValues != null)
+            return debugValues.get(0);
+        return null;
     }
 
     /**
@@ -241,7 +282,7 @@ public abstract class GenericObservationReader extends ObservationReader {
             } catch (SQLException ex) {
                 logError(multipleStatements.get(stmt), ex, stmt);
             } catch (IllegalArgumentException ex) {
-                logError(singleStatements.get(stmt), ex, stmt);
+                logError(multipleStatements.get(stmt), ex, stmt);
             }
         }
         return values;
@@ -298,7 +339,7 @@ public abstract class GenericObservationReader extends ObservationReader {
                     } catch (SQLException ex) {
                         logError(multipleStatements.get(stmt), ex, stmt);
                     } catch (IllegalArgumentException ex) {
-                        logError(singleStatements.get(stmt), ex, stmt);
+                        logError(multipleStatements.get(stmt), ex, stmt);
                     }
                     return null;
                 }
@@ -334,7 +375,17 @@ public abstract class GenericObservationReader extends ObservationReader {
         int i = 1;
         while (i < nbParam + 1) {
             String parameter = parameters.get(i - 1);
-            int type = meta.getParameterType(i);
+
+            // in some jdbc driver (oracle for example) the following instruction is not supported.
+            int type = -1;
+            if (advancedJdbcDriver)  {
+                try {
+                    type = meta.getParameterType(i);
+                } catch (Exception ex) {
+                    logger.warning("unsupported jdbc operation in fillstatement");
+                    advancedJdbcDriver = false;
+                }
+            }
             if (type == java.sql.Types.INTEGER) {
                 try {
                     int id = Integer.parseInt(parameter);
@@ -410,7 +461,7 @@ public abstract class GenericObservationReader extends ObservationReader {
      * @param varList a list of variable.
      * @param ex
      */
-    public void logError(List<String> varList, Exception ex, PreparedStatement stmt) {
+    private void logError(List<String> varList, Exception ex, PreparedStatement stmt) {
         String varlist = "";
         if (varList != null) {
             for (String s : varList) {

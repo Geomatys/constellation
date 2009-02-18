@@ -24,12 +24,14 @@ import java.util.logging.Logger;
 
 // Constellation dependencies
 import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.swe.AnyResult;
-import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.ws.CstlServiceException;
+
+// GeoAPI
+import org.opengis.observation.Observation;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  *
@@ -99,7 +101,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException;
+    public abstract Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
 
     /**
      * Return a list of sampling feature identifiers.
@@ -116,7 +118,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+    public abstract SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.
@@ -125,7 +127,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract ObservationEntry getObservation(String identifier) throws CstlServiceException;
+    public abstract Observation getObservation(String identifier) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.

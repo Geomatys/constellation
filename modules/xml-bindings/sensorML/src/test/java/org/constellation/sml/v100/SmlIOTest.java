@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-//Junit dependencies
+// Constellation dependencies
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.CoordinateSystemRefType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -61,12 +61,14 @@ import org.constellation.swe.v100.PositionType;
 import org.constellation.swe.v100.TimeType;
 import org.constellation.swe.v100.VectorPropertyType;
 import org.constellation.swe.v100.VectorType;
+
+//Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class SmlIOTest {
 

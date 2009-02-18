@@ -125,6 +125,9 @@ import static org.constellation.sos.ws.SensorMLUtils.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
+import org.opengis.observation.CompositePhenomenon;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
 
 //geotools dependencies
 import org.geotools.factory.FactoryNotFoundException;
@@ -679,16 +682,16 @@ public class SOSworker {
                 if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                     phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                 }
-                PhenomenonEntry phen = OMReader.getPhenomenon(phenomenonName);
+                Phenomenon phen = OMReader.getPhenomenon(phenomenonName);
                 if (phen == null) {
                     throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
                             INVALID_PARAMETER_VALUE, "observedProperty");
                 }
-                if (phen instanceof CompositePhenomenonEntry) {
-                    singlePhenomenons.add(phenomenonName);
-
-                } else if (phen instanceof PhenomenonEntry) {
+                if (phen instanceof CompositePhenomenon) {
                     compositePhenomenons.add(phenomenonName);
+
+                } else {
+                    singlePhenomenons.add(phenomenonName);
                 }
             }
             OMFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
@@ -708,7 +711,7 @@ public class SOSworker {
                 
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
                     //verify that the station is registred in the DB.
-                    SamplingFeatureEntry foi = OMReader.getFeatureOfInterest(samplingFeatureName);
+                    SamplingFeature foi = OMReader.getFeatureOfInterest(samplingFeatureName);
                     if (foi == null)
                         throw new CstlServiceException("the feature of interest is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
@@ -825,11 +828,11 @@ public class SOSworker {
 
         List<String> observationIDs = OMFilter.filterObservation();
         for (String observationID : observationIDs) {
-            ObservationEntry o = OMReader.getObservation(observationID);
+            Observation o = OMReader.getObservation(observationID);
             if (template) {
 
                 String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                ObservationEntry temporaryTemplate = o.getTemporaryTemplate(temporaryTemplateId, templateTime);
+                ObservationEntry temporaryTemplate = ((ObservationEntry)o).getTemporaryTemplate(temporaryTemplateId, templateTime);
                 templates.put(temporaryTemplateId, temporaryTemplate);
 
                 // we launch a timer which will destroy the template in one hours
@@ -842,7 +845,7 @@ public class SOSworker {
 
                 response.add(temporaryTemplate);
             } else {
-                response.add(o);
+                response.add((ObservationEntry)o);
 
                 //we stop the request if its too big
                 if (response.getMember().size() > maxObservationByRequest) {
@@ -1215,7 +1218,7 @@ public class SOSworker {
         } else if (obs instanceof ObservationEntry) {
 
             //in first we verify that the observation is conform to the template
-            ObservationEntry template = OMReader.getObservation(observationTemplateIdBase + num);
+            ObservationEntry template = (ObservationEntry) OMReader.getObservation(observationTemplateIdBase + num);
             //if the observation to insert match the template we can insert it in the OM db
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {

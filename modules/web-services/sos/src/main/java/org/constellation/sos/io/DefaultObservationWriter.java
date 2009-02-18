@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.sql.DataSource;
 
 // constellation dependencies
 import org.constellation.catalog.CatalogException;
@@ -30,9 +29,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.ReferenceTable;
-import org.constellation.observation.MeasurementEntry;
 import org.constellation.observation.MeasurementTable;
-import org.constellation.observation.ObservationEntry;
 import org.constellation.observation.ObservationTable;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
@@ -40,8 +37,15 @@ import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
-import org.postgresql.ds.PGSimpleDataSource;
 import static org.constellation.ows.OWSExceptionCode.*;
+
+// GeoAPI dependencies
+import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
+
+// Postgres dependencies
+import org.postgresql.ds.PGSimpleDataSource;
+
 
 /**
  * Default Observation reader for Postgrid O&M database.
@@ -110,7 +114,7 @@ public class DefaultObservationWriter extends ObservationWriter {
 
     }
 
-    public String writeObservation(ObservationEntry observation) throws CstlServiceException {
+    public String writeObservation(Observation observation) throws CstlServiceException {
         try {
             if (obsTable != null) {
                 return obsTable.getIdentifier(observation);
@@ -126,7 +130,7 @@ public class DefaultObservationWriter extends ObservationWriter {
         }
     }
 
-    public String writeMeasurement(MeasurementEntry measurement) throws CstlServiceException {
+    public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
             MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
             return measTable.getIdentifier(measurement);

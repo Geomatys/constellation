@@ -19,19 +19,26 @@ package org.constellation.sos.io;
 
 import java.io.File;
 import java.io.IOException;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.observation.MeasurementEntry;
-import org.constellation.observation.ObservationEntry;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
+
+// GeoAPI dependencies
+import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
+
 
 /**
  *
@@ -75,7 +82,7 @@ public class FileObservationWriter extends ObservationWriter {
 
 
     @Override
-    public String writeObservation(ObservationEntry observation) throws CstlServiceException {
+    public String writeObservation(Observation observation) throws CstlServiceException {
         try {
             File observationFile = new File(observationDirectory, observation.getName() + ".xml");
             observationFile.createNewFile();
@@ -89,7 +96,7 @@ public class FileObservationWriter extends ObservationWriter {
     }
 
     @Override
-    public String writeMeasurement(MeasurementEntry measurement) throws CstlServiceException {
+    public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
             File observationFile = new File(observationDirectory, measurement.getName() + ".xml");
             observationFile.createNewFile();
