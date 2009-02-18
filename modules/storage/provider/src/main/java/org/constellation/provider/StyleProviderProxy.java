@@ -155,14 +155,6 @@ public class StyleProviderProxy implements Provider<String,Object>{
             final String name = service.getName();
             final String path = CONFIG_PATH + name + ".xml";
             final File configFile = new File(path);
-            if(!configFile.exists()){
-                try {
-                    configFile.createNewFile();
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                    continue;
-                }
-            }
             service.init(configFile);
 
             SERVICES.add(service);
@@ -172,7 +164,7 @@ public class StyleProviderProxy implements Provider<String,Object>{
 
     public synchronized static StyleProviderProxy getInstance(){
         if(INSTANCE == null){
-            init(WebService.getSicadeDirectory().getPath() + File.separator);
+            init(WebService.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new StyleProviderProxy();
         }
         return INSTANCE;

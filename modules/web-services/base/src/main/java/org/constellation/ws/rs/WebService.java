@@ -18,12 +18,14 @@
 package org.constellation.ws.rs;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 
@@ -498,6 +500,31 @@ public abstract class WebService {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
 
+    public static File getConfigDirectory() {
+        try {
+            String path = getPropertyValue("Constellation", "config_dir");
+            if(path != null){
+                File folder = new File(path);
+                if(folder.exists() && folder.canRead() && folder.canWrite()){
+                    return folder;
+                }else{
+                    try {
+                        folder.createNewFile();
+                        return folder;
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.SEVERE,"", ex);
+                    }
+                }
+            }else{
+                LOGGER.log(Level.WARNING,"config_dir is not defined in the Constelaltion JNDI resource.");
+            }
+
+        } catch (NamingException ex) {
+            LOGGER.log(Level.SEVERE,"", ex);
+        }
+
+        return getSicadeDirectory();
+    }
 
     /**
      * Return the ".sicade" directory.

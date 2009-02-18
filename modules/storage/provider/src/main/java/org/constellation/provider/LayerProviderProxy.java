@@ -202,7 +202,7 @@ public class LayerProviderProxy implements LayerProvider{
 
     public synchronized static LayerProviderProxy getInstance(){
         if(INSTANCE == null){
-            init(WebService.getSicadeDirectory().getPath() + File.separator);
+            init(WebService.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new LayerProviderProxy();
         }
         

@@ -55,6 +55,11 @@ public class ProviderConfig {
     
     public static final synchronized ProviderConfig read(final File configFile) 
             throws ParserConfigurationException, SAXException, IOException{
+
+        if(!configFile.exists()){
+            return new ProviderConfig();
+        }
+
         final DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
         final DocumentBuilder constructeur = fabrique.newDocumentBuilder();
         final Document document = constructeur.parse(configFile);
