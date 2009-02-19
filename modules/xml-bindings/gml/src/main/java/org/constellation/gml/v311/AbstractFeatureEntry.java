@@ -45,7 +45,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     @XmlElement(nillable = true)
     private BoundingShapeEntry boundedBy;
     @XmlElement
-    LocationPropertyType location;
+    private LocationPropertyType location;
 
     /**
      *  Empty constructor used by JAXB.
@@ -109,15 +109,10 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         if (super.equals(object) && object instanceof AbstractFeatureEntry) {
             final AbstractFeatureEntry that = (AbstractFeatureEntry) object;
             
-            boolean locationEquals = false;
-            if (this.location != null && that.location != null) {
-                locationEquals = Utilities.equals(this.location, that.location);
-            } else {
-                locationEquals = (this.location == null && that.location == null);
-            }
-            return Utilities.equals(this.boundedBy,           that.boundedBy) &&
-                   locationEquals;
-        } else System.out.println("abstractGML.equals=false");
+            return Utilities.equals(this.boundedBy, that.boundedBy) &&
+                   Utilities.equals(this.location,  that.location)  &&
+                   Utilities.equals(this.srsName,   that.srsName);
+        }
         return false;
     }
 

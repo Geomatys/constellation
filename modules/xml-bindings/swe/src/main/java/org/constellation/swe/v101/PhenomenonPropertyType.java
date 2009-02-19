@@ -95,6 +95,13 @@ public class PhenomenonPropertyType {
     PhenomenonPropertyType() {
         
     }
+
+    /**
+     * An empty constructor used by JAXB.
+     */
+    public PhenomenonPropertyType(String href) {
+        this.href = href;
+    }
     
     /**
      * Build a new Phenomenon Property.

@@ -44,6 +44,7 @@ import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.PhenomenonEntry;
+import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.QuantityType;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
 import org.constellation.swe.v101.TextBlockEntry;
@@ -65,37 +66,37 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     @Override
     public List<String> getOfferingNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var01"));
-        return getVariables("var01", values);
+        return values.getVariables("var01");
     }
 
     @Override
     public List<String> getProcedureNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var02"));
-        return getVariables("var02", values);
+        return values.getVariables("var02");
     }
 
     @Override
     public List<String> getPhenomenonNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var03"));
-        return getVariables("var03", values);
+        return values.getVariables("var03");
     }
 
     @Override
     public List<String> getFeatureOfInterestNames() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var04"));
-        return getVariables("var04", values);
+        return values.getVariables("var04");
     }
 
     @Override
     public String getNewObservationId() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var05"));
-        int id = Integer.parseInt(getVariable("var05", values));
+        int id = Integer.parseInt(values.getVariable("var05"));
 
         values = loadData(Arrays.asList("var44"), observationIdBase + id);
         String _continue = null;
         do {
             id++;
-            _continue = getVariable("var44", values);
+            _continue = values.getVariable("var44");
 
         } while (_continue != null);
         return observationIdBase + id;
@@ -104,20 +105,20 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     @Override
     public String getMinimalEventTime() throws CstlServiceException {
          Values values = loadData(Arrays.asList("var06"));
-        return getVariable("var06", values);
+        return values.getVariable("var06");
     }
 
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18"), offeringName);
-        List<String> srsName = getVariables("var07", values);
+        List<String> srsName = values.getVariables("var07");
 
         // event time
         TimePeriodType time;
-        String offeringBegin = getVariable("var08", values);
+        String offeringBegin = values.getVariable("var08");
         if (offeringBegin != null)
-            offeringBegin        = offeringBegin.replace(' ', 'T');
-        String offeringEnd   = getVariable("var09", values);
+            offeringBegin    = offeringBegin.replace(' ', 'T');
+        String offeringEnd   = values.getVariable("var09");
         if (offeringEnd != null) {
             offeringEnd          = offeringEnd.replace(' ', 'T');
             time  = new TimePeriodType(offeringBegin, offeringEnd);
@@ -128,38 +129,38 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
 
         // procedure
         List<ReferenceEntry> procedures = new ArrayList<ReferenceEntry>();
-        for (String procedureName : getVariables("var10", values)) {
+        for (String procedureName : values.getVariables("var10")) {
             procedures.add(new ReferenceEntry(null, procedureName));
         }
 
         // phenomenon
-        List<PhenomenonEntry> observedProperties = new ArrayList<PhenomenonEntry>();
-        for (String phenomenonId : getVariables("var12", values)) {
+        List<PhenomenonPropertyType> observedProperties = new ArrayList<PhenomenonPropertyType>();
+        for (String phenomenonId : values.getVariables("var12")) {
             if (phenomenonId!= null && !phenomenonId.equals("")) {
                 Values compositeValues = loadData(Arrays.asList("var17"), phenomenonId);
                 List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
-                for (String componentID : getVariables("var17", compositeValues)) {
+                for (String componentID : compositeValues.getVariables("var17")) {
                     components.add(getPhenomenon(componentID));
                 }
                 compositeValues = loadData(Arrays.asList("var15", "var16"), phenomenonId);
                 CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
-                                                                                   getVariable("var15", compositeValues),
-                                                                                   getVariable("var16", compositeValues),
+                                                                                   compositeValues.getVariable("var15"),
+                                                                                   compositeValues.getVariable("var16"),
                                                                                    null,
                                                                                    components);
-                observedProperties.add(phenomenon);
+                observedProperties.add(new PhenomenonPropertyType(phenomenon));
             }
         }
-        for (String phenomenonId : getVariables("var11", values)) {
+        for (String phenomenonId : values.getVariables("var11")) {
             if (phenomenonId != null && !phenomenonId.equals("")) {
                 PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
-                observedProperties.add(phenomenon);
+                observedProperties.add(new PhenomenonPropertyType(phenomenon));
             }
         }
 
         // feature of interest
         List<ReferenceEntry> fois = new ArrayList<ReferenceEntry>();
-        for (String foiID : getVariables("var18", values)) {
+        for (String foiID : values.getVariables("var18")) {
             fois.add(new ReferenceEntry(null, foiID));
         }
 
@@ -187,7 +188,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var01"));
         List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
-        List<String> offeringNames = getVariables("var01", values);
+        List<String> offeringNames = values.getVariables("var01");
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName));
         }
@@ -200,21 +201,21 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var13", "var14"), phenomenonName);
-        PhenomenonEntry phenomenon = new PhenomenonEntry(phenomenonName, getVariable("var13", values), getVariable("var14", values));
+        PhenomenonEntry phenomenon = new PhenomenonEntry(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
         return phenomenon;
     }
 
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24"), samplingFeatureId);
-        String name            = getVariable("var19", values);
-        String description     = getVariable("var20", values);
-        String sampledFeature  = getVariable("var21", values);
+        String name            = values.getVariable("var19");
+        String description     = values.getVariable("var20");
+        String sampledFeature  = values.getVariable("var21");
 
-        String pointID         = getVariable("var22", values);
-        String SRSname         = getVariable("var23", values);
+        String pointID         = values.getVariable("var22");
+        String SRSname         = values.getVariable("var23");
 
-        String dimension       = getVariable("var24", values);
+        String dimension       = values.getVariable("var24");
         int srsDimension       = 0;
         try {
             srsDimension       = Integer.parseInt(dimension);
@@ -232,7 +233,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var25"), samplingFeatureId);
         List<Double> result = new ArrayList<Double>();
-        List<String> coordinates = getVariables("var25", values);
+        List<String> coordinates = values.getVariables("var25");
         for (String coordinate : coordinates) {
             try {
                 result.add(Double.parseDouble(coordinate));
@@ -246,12 +247,12 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     @Override
     public ObservationEntry getObservation(String identifier) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
-        SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(getVariable("var26", values));
-        PhenomenonEntry observedProperty = getPhenomenon(getVariable("var27", values));
-        ProcessEntry procedure = new ProcessEntry(getVariable("var28", values));
+        SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(values.getVariable("var26"));
+        PhenomenonEntry observedProperty = getPhenomenon(values.getVariable("var27"));
+        ProcessEntry procedure = new ProcessEntry(values.getVariable("var28"));
 
-        TimePeriodType samplingTime = new TimePeriodType(getVariable("var29", values), getVariable("var30", values));
-        AnyResultEntry anyResult = getResult(getVariable("var31", values));
+        TimePeriodType samplingTime = new TimePeriodType(values.getVariable("var29"), values.getVariable("var30"));
+        AnyResultEntry anyResult = getResult(values.getVariable("var31"));
         DataArrayEntry dataArray = anyResult.getArray();
         DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
         ObservationEntry observation = new ObservationEntry(identifier,
@@ -268,23 +269,23 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     public AnyResultEntry getResult(String identifier) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                 "var40", "var41", "var42", "var43"), identifier);
-        int count = Integer.parseInt(getVariable("var32", values));
+        int count = Integer.parseInt(values.getVariable("var32"));
 
         // encoding
-        String encodingID       = getVariable("var34", values);
-        String tokenSeparator   = getVariable("var35", values);
-        String decimalSeparator = getVariable("var36", values);
-        String blockSeparator   = getVariable("var37", values);
+        String encodingID       = values.getVariable("var34");
+        String tokenSeparator   = values.getVariable("var35");
+        String decimalSeparator = values.getVariable("var36");
+        String blockSeparator   = values.getVariable("var37");
         TextBlockEntry encoding = new TextBlockEntry(encodingID, tokenSeparator, blockSeparator, decimalSeparator);
 
         //data block description
-        String blockId          = getVariable("var38", values);
-        String dataRecordId     = getVariable("var39", values);
+        String blockId          = values.getVariable("var38");
+        String dataRecordId     = values.getVariable("var39");
         Set<AnyScalarPropertyType> fields = new HashSet<AnyScalarPropertyType>();
-        List<String> fieldNames = getVariables("var40", values);
-        List<String> fieldDef   = getVariables("var41", values);
-        List<String> type       = getVariables("var42", values);
-        List<String> uomCodes   = getVariables("var43", values);
+        List<String> fieldNames = values.getVariables("var40");
+        List<String> fieldDef   = values.getVariables("var41");
+        List<String> type       = values.getVariables("var42");
+        List<String> uomCodes   = values.getVariables("var43");
         for(int i = 0; i < fieldNames.size(); i++) {
             AbstractDataComponentEntry component = null;
             String typeName   = type.get(i);
@@ -307,7 +308,7 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
 
         SimpleDataRecordEntry elementType = new SimpleDataRecordEntry(blockId, dataRecordId, null, false, fields);
 
-        String dataValues = getVariable("var33", values);
+        String dataValues = values.getVariable("var33");
         DataArrayEntry result = new DataArrayEntry(blockId, count, elementType, encoding, dataValues);
         return new AnyResultEntry(identifier, result);
     }

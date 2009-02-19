@@ -23,37 +23,94 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A container for values retrieved from a database by a generic reader.
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class Values {
     /**
-     * A Map of varName - value refreshed at every request.
+     * A Map of (varName) - (value) refreshed at every request.
      */
     protected Map<String, String> singleValue;
     /**
-     * * A Map of varName - list of value refreshed at every request.
+     * * A Map of (varName) - (list of values) refreshed at every request.
      */
     protected Map<String, List<String>> multipleValue;
 
+    /**
+     * Build a new values container.
+     */
     public Values() {
         singleValue = new HashMap<String, String>();
         multipleValue = new HashMap<String, List<String>>();
     }
 
+    /**
+     * Build a new values container with the specified values.
+     * This constructor is used for test when there is no database to fil the container.
+     *
+     * @param singleValue   A map of (variable name) - (value)
+     * @param multipleValue A map of (variable name) - (list of values)
+     */
     public Values(Map<String, String> singleValue, Map<String, List<String>> multipleValue) {
         this.singleValue   = singleValue;
         this.multipleValue = multipleValue;
     }
 
+    /**
+     * return the value for the specified variable name.
+     *
+     * @param variable
+     * @return
+     */
+    public String getVariable(String variable) {
+        if (singleValue != null) {
+            return singleValue.get(variable);
+        }
+        return null;
+    }
+
+    /**
+     * return a list of value for the specified variable name.
+     *
+     * @param variables
+     * @return
+     */
+    public List<String> getVariables(String variable) {
+        if (multipleValue != null) {
+            List<String> values = multipleValue.get(variable);
+            if (values == null)
+                values = new ArrayList<String>();
+            return values;
+        }
+        return null;
+    }
+
+    /**
+     * Add a single value for the specified varibale name to the container.
+     *
+     * @param varName The name of the variable.
+     * @param value The value of the variable.
+     */
     public void addSingleValue(String varName, String value) {
         singleValue.put(varName, value);
     }
 
+    /**
+     * Add a new multiple field for the specified variable.
+     *
+     * @param varName The name of the variable.
+     */
     public void createNewMultipleValue(String varName) {
         multipleValue.put(varName, new ArrayList<String>());
     }
 
+    /**
+     * Add a new value to the specified multiple variable.
+     *
+     * @param varName The name of the variable.
+     * @param value   The value to add.
+     */
     public void addToMultipleValue(String varName, String value) {
         if (multipleValue.get(varName) != null) {
             multipleValue.get(varName).add(value);

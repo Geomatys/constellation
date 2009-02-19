@@ -40,7 +40,7 @@ public abstract class MetadataReader {
     /**
      * A debugging logger
      */
-    protected Logger logger = Logger.getLogger("org.constellation.metadata.io");
+    protected Logger logger = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A flag indicating if the cache mecanism is enabled or not.

@@ -79,7 +79,7 @@ public class CSWService {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("fr.geomatys.sos");
+    Logger logger = Logger.getLogger("org.costellation.metadata");
     
     /**
      * A map containing the Capabilities Object already load from file.

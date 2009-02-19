@@ -15,15 +15,56 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ows;
 
-import java.util.List;
+package org.constellation.sos.io;
 
 /**
+ *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AcceptVersions {
+public class Parameter {
 
-    public List<String> getVersion();
+    private String name;
+
+    private String value;
+
+    public Parameter() {
+
+    }
+
+    public Parameter(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+
 
 }

@@ -201,22 +201,31 @@ public class LocationPropertyType {
         if (object == this) {
             return true;
         }
-        final LocationPropertyType that = (LocationPropertyType) object;
+        if (object instanceof LocationPropertyType) {
+            final LocationPropertyType that = (LocationPropertyType) object;
 
-        return Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this._null,              that._null)            &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.locationKeyWord,    that.locationKeyWord)  &&
-               Utilities.equals(this.locationString,     that.locationString)   &&
-               Utilities.equals(this.nilReason,          that.nilReason)        &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title)            &&
-               Utilities.equals(this.abstractGeometry.getValue(),   that.abstractGeometry.getValue());
-        
+            boolean geom = false;
+            if (this.abstractGeometry != null && that.abstractGeometry != null) {
+                geom = Utilities.equals(this.abstractGeometry.getValue(),   that.abstractGeometry.getValue());
+            } else if (this.abstractGeometry != null && that.abstractGeometry != null) {
+                geom = true;
+            }
+
+            return Utilities.equals(this.actuate,            that.actuate)          &&
+                   Utilities.equals(this._null,              that._null)            &&
+                   Utilities.equals(this.arcrole,            that.arcrole)          &&
+                   Utilities.equals(this.type,               that.type)             &&
+                   Utilities.equals(this.href,               that.href)             &&
+                   Utilities.equals(this.locationKeyWord,    that.locationKeyWord)  &&
+                   Utilities.equals(this.locationString,     that.locationString)   &&
+                   Utilities.equals(this.nilReason,          that.nilReason)        &&
+                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+                   Utilities.equals(this.show,               that.show)             &&
+                   Utilities.equals(this.role,               that.role)             &&
+                   Utilities.equals(this.title,              that.title)            &&
+                   geom;
+        }
+        return false;
     }
 
     @Override

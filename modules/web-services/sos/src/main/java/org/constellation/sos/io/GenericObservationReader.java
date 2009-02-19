@@ -88,7 +88,7 @@ public abstract class GenericObservationReader extends ObservationReader {
     /**
      * A list of predefined Values used in debug mode
      */
-    private List<Values> debugValues;
+    private Map<List<String>, Values> debugValues;
 
     /**
      * Shared Thread Pool for parralele execution
@@ -114,7 +114,7 @@ public abstract class GenericObservationReader extends ObservationReader {
         isThreadEnabled = false;
     }
 
-    protected GenericObservationReader(String observationIdBase, List<Values> debugValues) throws CstlServiceException {
+    protected GenericObservationReader(String observationIdBase, Map<List<String>, Values> debugValues) throws CstlServiceException {
         super(observationIdBase);
         advancedJdbcDriver = true;
         debugMode          = true;
@@ -147,7 +147,7 @@ public abstract class GenericObservationReader extends ObservationReader {
                         }
                     }
                     String textQuery = query.buildSQLQuery();
-                    logger.info("new Single query: " + textQuery);
+                    logger.finer("new Single query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
@@ -166,7 +166,7 @@ public abstract class GenericObservationReader extends ObservationReader {
                         }
                     }
                     String textQuery = query.buildSQLQuery();
-                    logger.info("new Multiple query: " + textQuery);
+                    logger.finer("new Multiple query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     multipleStatements.put(stmt, varNames);
                 }
@@ -224,7 +224,8 @@ public abstract class GenericObservationReader extends ObservationReader {
                         subMultiStmts.add(stmt);
                     }
                 } else {
-                    logger.severe("no statement found for variable: " + var);
+                    if (!debugMode)
+                        logger.severe("no statement found for variable: " + var);
                 }
             }
         }
@@ -232,7 +233,7 @@ public abstract class GenericObservationReader extends ObservationReader {
         Values values;
         if (debugMode) {
             values = debugLoading(variables, parameters);
-        }else if (isThreadEnabled) {
+        } else if (isThreadEnabled) {
             values = paraleleLoading(parameters, subSingleStmts, subMultiStmts);
         } else {
             values = sequentialLoading(parameters, subSingleStmts, subMultiStmts);
@@ -246,8 +247,9 @@ public abstract class GenericObservationReader extends ObservationReader {
      *
      */
     private Values debugLoading(List<String> variables, List<String> parameters) {
-        if (debugValues != null)
-            return debugValues.get(0);
+        if (debugValues != null) {
+            return debugValues.get(parameters);
+        }
         return null;
     }
 
@@ -477,29 +479,6 @@ public abstract class GenericObservationReader extends ObservationReader {
                       "query: " + stmt.toString()                + '\n' +
                       "cause: " + ex.getMessage()                + '\n' +
                       "for variable: " + varlist                 + '\n');
-    }
-
-    /**
-     * return a list of value for the specified variable name.
-     *
-     * @param variables
-     * @return
-     */
-    protected List<String> getVariables(String variable, Values val) {
-        List<String> values = val.multipleValue.get(variable);
-        if (values == null)
-            values = new ArrayList<String>();
-        return values;
-    }
-
-    /**
-     * return the value for the specified variable name.
-     *
-     * @param variable
-     * @return
-     */
-    protected String getVariable(String variable, Values values) {
-        return values.singleValue.get(variable);
     }
 
     @Override

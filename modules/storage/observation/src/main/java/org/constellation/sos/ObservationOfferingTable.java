@@ -46,6 +46,7 @@ import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingResponseModeEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.sos.v100.ResponseModeType;
+import org.constellation.swe.v101.PhenomenonPropertyType;
 
 /**
  *
@@ -167,12 +168,12 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          //System.out.println("ID OFERRRRRRRRRRRRRING" + idOffering);
          Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
         
-         List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
+         List<PhenomenonPropertyType> phenos = new ArrayList<PhenomenonPropertyType>();
         
          Iterator i = entries1.iterator();
          while(i.hasNext()) {
             OfferingPhenomenonEntry c =(OfferingPhenomenonEntry) i.next();
-            phenos.add(c.getComponent());
+            phenos.add(new PhenomenonPropertyType(c.getComponent()));
          }
          
          getProcedures().setIdOffering(idOffering);

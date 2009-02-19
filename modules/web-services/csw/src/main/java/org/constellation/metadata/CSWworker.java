@@ -1359,7 +1359,7 @@ public class CSWworker {
     }
     
     /**
-     * TODO
+     * A web service method alowing to Insert / update / delete record from the CSW.
      * 
      * @param request
      * @return

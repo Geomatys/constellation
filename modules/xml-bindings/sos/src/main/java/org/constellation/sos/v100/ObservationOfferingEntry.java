@@ -80,15 +80,12 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      */ 
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
             BoundingShapeEntry boundedBy, List<String> srsName, AbstractTimeGeometricPrimitiveType time, List<ReferenceEntry> procedure,
-            List<PhenomenonEntry> observedProperty, List<ReferenceEntry> featureOfInterest,
+            List<PhenomenonPropertyType> observedProperty, List<ReferenceEntry> featureOfInterest,
             List<String> responseFormat, List<QName> resultModel, List<ResponseModeType> responseMode) {
         
         super(id, name, description, descriptionReference, boundedBy, srsName);
         this.procedure         = procedure;
-        this.observedProperty  = new ArrayList<PhenomenonPropertyType>();
-        for (PhenomenonEntry p: observedProperty){
-            this.observedProperty.add(new PhenomenonPropertyType(p));
-        }
+        this.observedProperty = observedProperty;
         this.featureOfInterest = featureOfInterest;
         this.responseFormat    = responseFormat;
         this.resultModel       = resultModel;
@@ -307,7 +304,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         if (observedProperty != null){
            s.append('\n').append("observedProperty:").append('\n');
            for (PhenomenonPropertyType phen:observedProperty){
-                s.append(phen.getPhenomenon().toString());
+                s.append(phen);
             } 
         }
         return s.toString();

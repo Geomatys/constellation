@@ -67,7 +67,7 @@ public abstract class FilterParser {
      /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.filter");
+    protected Logger logger = Logger.getLogger("org.constellation.metadata");
     
    /**
      * Build a Filter with the specified CQL query

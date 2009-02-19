@@ -48,7 +48,7 @@ public abstract class MetadataWriter {
     /**
      * A debugging logger.
      */
-    protected static Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
+    protected static Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
     /**
      * Record the date format in the metadata.

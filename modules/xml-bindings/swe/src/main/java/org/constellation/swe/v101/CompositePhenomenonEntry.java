@@ -38,7 +38,7 @@ import org.geotools.util.Utilities;
   */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CompositePhenomenon", propOrder = {"base", "component"})
-public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements CompositePhenomenon{
+public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements CompositePhenomenon {
     
     /**
      * The base phenomenon.
