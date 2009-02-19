@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.generic;
 
 import java.util.ArrayList;
 import java.util.HashMap;

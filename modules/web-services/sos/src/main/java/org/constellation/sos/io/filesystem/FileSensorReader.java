@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.filesystem;
 
 // J2SE dependencies
 import java.io.File;
@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 

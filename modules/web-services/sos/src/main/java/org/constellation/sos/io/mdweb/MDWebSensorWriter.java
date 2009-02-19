@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.mdweb;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,12 +31,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.xml.sax.SAXException;
 
 // Constellation dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
@@ -53,7 +54,7 @@ import org.mdweb.xml.Reader;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (geomatys)
  */
 public class MDWebSensorWriter extends SensorWriter {
 

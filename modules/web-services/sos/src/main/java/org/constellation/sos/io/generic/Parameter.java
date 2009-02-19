@@ -16,7 +16,7 @@
  */
 
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.generic;
 
 /**
  *

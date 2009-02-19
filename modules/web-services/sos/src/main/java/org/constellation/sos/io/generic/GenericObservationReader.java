@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.generic;
 
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
@@ -44,6 +44,7 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
+import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 

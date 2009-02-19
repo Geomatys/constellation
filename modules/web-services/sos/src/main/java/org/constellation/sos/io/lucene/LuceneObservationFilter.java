@@ -15,11 +15,12 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.lucene;
 
 import java.util.List;
 import java.util.Properties;
 import org.constellation.generic.database.Automatic;
+import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;

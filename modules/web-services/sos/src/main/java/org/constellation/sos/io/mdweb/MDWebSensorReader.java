@@ -15,12 +15,14 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.mdweb;
 
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -30,6 +32,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 

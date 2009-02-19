@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.generic;
 
 import java.io.File;
 import java.sql.Connection;
@@ -37,6 +37,7 @@ import org.constellation.generic.filter.Where;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;

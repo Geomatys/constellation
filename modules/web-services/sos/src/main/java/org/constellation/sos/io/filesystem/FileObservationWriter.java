@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.filesystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import javax.xml.bind.Marshaller;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;

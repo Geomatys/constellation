@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.observation.ObservationEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.swe.AnyResult;
 import org.constellation.swe.v101.PhenomenonEntry;

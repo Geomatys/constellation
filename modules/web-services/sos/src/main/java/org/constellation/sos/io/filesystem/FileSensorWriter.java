@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
