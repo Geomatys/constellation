@@ -103,9 +103,9 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
     }
 
     @Override
-    public String getMinimalEventTime() throws CstlServiceException {
+    public List<String> getEventTime() throws CstlServiceException {
          Values values = loadData(Arrays.asList("var06"));
-        return values.getVariable("var06");
+         return Arrays.asList(values.getVariable("var06"));
     }
 
     @Override

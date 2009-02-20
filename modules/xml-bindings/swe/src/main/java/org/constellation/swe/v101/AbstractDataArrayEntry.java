@@ -84,11 +84,26 @@ public abstract class AbstractDataArrayEntry extends AbstractDataComponentEntry 
         super(id, null, false);
         this.elementCount = new ElementCount(count);
     }
+
     /**
      * Gets the value of the elementCount property.
      */
     public AbstractDataArrayEntry.ElementCount getElementCount() {
         return elementCount;
+    }
+
+    /**
+     * Sets the value of the elementCount property.
+     */
+    public void setElementCount(AbstractDataArrayEntry.ElementCount elementCount) {
+        this.elementCount = elementCount;
+    }
+
+    /**
+     * Sets the value of the elementCount property.
+     */
+    public void setElementCount(int count) {
+        this.elementCount = new ElementCount(count);
     }
 
     /**

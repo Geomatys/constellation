@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
@@ -29,10 +30,10 @@ import org.constellation.ws.CstlServiceException;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LuceneObservationFilter extends ObservationFilter {
+public class LuceneObservationFilter implements ObservationFilter {
 
     public LuceneObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase, observationTemplateIdBase, map);
+        
     }
     @Override
     public void initFilterObservation(ResponseModeType requestMode) {

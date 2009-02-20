@@ -152,9 +152,9 @@ public abstract class ObservationReader {
     public abstract String getNewObservationId() throws CstlServiceException;
     
     /**
-     * Return the minimal value for the offering event Time
+     * Return the minimal/maximal value for the offering event Time
      */
-    public abstract String getMinimalEventTime() throws CstlServiceException;
+    public abstract List<String> getEventTime() throws CstlServiceException;
 
     /**
      * free the resources and close the database connection if there is one.

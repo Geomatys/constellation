@@ -74,6 +74,13 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public void setField(Collection<AnyScalarPropertyType> field) {
+        this.field = field;
+    }
+
+    /**
      * Return the block identifier containing this data record.
      */
     public String getBlockId() {

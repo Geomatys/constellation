@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+// Constellation dependencies
+import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.ReferenceEntry;
@@ -35,12 +38,13 @@ import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.v100.ResponseModeType.*;
 import static org.constellation.ows.OWSExceptionCode.*;
+import static org.constellation.sos.ws.Utils.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public class DefaultObservationFilter extends ObservationFilter {
+public class DefaultObservationFilter implements ObservationFilter {
 
 
     private StringBuilder SQLRequest;
@@ -50,12 +54,34 @@ public class DefaultObservationFilter extends ObservationFilter {
      */
     private final Connection connection;
 
+    /**
+     * The properties file allowing to store the id mapping between physical and database ID.
+     */
+    protected Properties map;
+
+     /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
+
+    /**
+     * The base for observation id.
+     */
+    protected String observationIdBase;
+
+    /**
+     * The base for observation id.
+     */
+    protected String observationTemplateIdBase;
 
     /**
      *
      */
     public DefaultObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase, observationTemplateIdBase, map);
+        this.observationIdBase         = observationIdBase;
+        this.observationTemplateIdBase = observationTemplateIdBase;
+        this.map                       = map;
+        
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -288,16 +314,16 @@ public class DefaultObservationFilter extends ObservationFilter {
     }
 
     @Override
-    public List<ObservationFilter.ObservationResult> filterResult() throws CstlServiceException {
+    public List<ObservationResult> filterResult() throws CstlServiceException {
         logger.info("request:" + SQLRequest.toString());
         try {
-            List<ObservationFilter.ObservationResult> results = new ArrayList<ObservationFilter.ObservationResult>();
+            List<ObservationResult> results = new ArrayList<ObservationResult>();
             Statement currentStatement = connection.createStatement();
             ResultSet result = currentStatement.executeQuery(SQLRequest.toString());
             while (result.next()) {
-                results.add(new ObservationFilter.ObservationResult(result.getString(1),
-                                                                    result.getTimestamp(2),
-                                                                    result.getTimestamp(3)));
+                results.add(new ObservationResult(result.getString(1),
+                                                  result.getTimestamp(2),
+                                                  result.getTimestamp(3)));
             }
             result.close();
             currentStatement.close();

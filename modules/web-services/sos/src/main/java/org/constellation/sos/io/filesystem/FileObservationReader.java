@@ -19,6 +19,7 @@ package org.constellation.sos.io.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
@@ -232,8 +233,8 @@ public class FileObservationReader extends ObservationReader {
     }
 
     @Override
-    public String getMinimalEventTime() throws CstlServiceException {
-        return "undefined";
+    public List<String> getEventTime() throws CstlServiceException {
+        return Arrays.asList("undefined", "now");
     }
 
     @Override

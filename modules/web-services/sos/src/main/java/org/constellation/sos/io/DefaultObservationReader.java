@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -396,7 +397,7 @@ public class DefaultObservationReader extends ObservationReader {
     /**
      * Return the minimal value for the offering event Time
      */
-    public String getMinimalEventTime() throws CstlServiceException {
+    public List<String> getEventTime() throws CstlServiceException {
         String ret = null;
         try {
             ResultSet res = getMinEventTimeOffering.executeQuery();
@@ -415,7 +416,9 @@ public class DefaultObservationReader extends ObservationReader {
            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        return ret;
+        if  (ret != null)
+            return Arrays.asList(ret);
+        return null;
     }
 
 }

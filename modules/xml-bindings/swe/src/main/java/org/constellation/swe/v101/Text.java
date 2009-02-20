@@ -53,6 +53,15 @@ public class Text extends AbstractDataComponentEntry {
 
     private String value;
 
+    public Text() {
+
+    }
+
+    public Text(String definition, String value) {
+        super(definition);
+        this.value = value;
+    }
+
     /**
      * Gets the value of the value property.
      */

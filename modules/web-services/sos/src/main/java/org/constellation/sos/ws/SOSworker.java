@@ -102,7 +102,9 @@ import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationFilterReader;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -121,13 +123,13 @@ import org.constellation.ws.rs.OGCWebService;
 
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.sos.v100.ResponseModeType.*;
-import static org.constellation.sos.ws.SensorMLUtils.*;
+import static org.constellation.sos.ws.Utils.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingPoint;
 
 //geotools dependencies
 import org.geotools.factory.FactoryNotFoundException;
@@ -503,8 +505,14 @@ public class SOSworker {
            go.updateParameter("offering", OMReader.getOfferingNames());
 
            // the event time range
-           RangeType range = new RangeType(OMReader.getMinimalEventTime(), "now");
-           go.updateParameter("eventTime", range);
+           List<String> eventTime = OMReader.getEventTime();
+           if (eventTime != null && eventTime.size() == 1) {
+               RangeType range = new RangeType(eventTime.get(0), "now");
+               go.updateParameter("eventTime", range);
+           } else if (eventTime != null && eventTime.size() == 2) {
+               RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
+               go.updateParameter("eventTime", range);
+           }
 
            //the process list
            Collection<String> procNames  = OMReader.getProcedureNames();
@@ -708,12 +716,12 @@ public class SOSworker {
 
             // if the request is a list of station
             if (!foiRequest.getObjectID().isEmpty()) {
-                
+
+                //verify that the station is registred in the DB.
+                Collection<String> fois = OMReader.getFeatureOfInterestNames();
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
-                    //verify that the station is registred in the DB.
-                    SamplingFeature foi = OMReader.getFeatureOfInterest(samplingFeatureName);
-                    if (foi == null)
-                        throw new CstlServiceException("the feature of interest is not registered",
+                    if (!fois.contains(samplingFeatureName))
+                        throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
                 }
                 OMFilter.setFeatureOfInterest(foiRequest.getObjectID());
@@ -731,7 +739,7 @@ public class SOSworker {
                         boolean add     = false;
                         List<String> matchingFeatureOfInterest = new ArrayList<String>();
                         for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
-                            SamplingPointEntry station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
+                            SamplingPoint station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
                             if (station == null)
                                 throw new CstlServiceException("the feature of interest is not registered",
                                         INVALID_PARAMETER_VALUE);
@@ -826,13 +834,41 @@ public class SOSworker {
             }
         }
 
-        List<String> observationIDs = OMFilter.filterObservation();
-        for (String observationID : observationIDs) {
-            Observation o = OMReader.getObservation(observationID);
+        /*
+         * here we can have 2 different behaviour :
+         *
+         * (1) - We have separate observation filter and reader :
+         *        - The filter execute a request and return a list of identifiers.
+         *        - The reader retrieve each observation from the list of identifiers
+         *
+         * (2) - We have mixed observation filter and reader :
+         *        - The filterReader execute a request and return directly the observations
+         *
+         */
+        List<Observation> matchingResult = new ArrayList<Observation>();
+
+        // case (1)
+        if (!(OMReader instanceof ObservationFilterReader)) {
+            List<String> observationIDs = OMFilter.filterObservation();
+            for (String observationID : observationIDs) {
+                matchingResult.add(OMReader.getObservation(observationID));
+            }
+
+        // case (2)
+        } else {
+            ObservationFilterReader OMFR = (ObservationFilterReader) OMReader;
+            if (template) {
+                matchingResult = OMFR.getObservationTemplates();
+            } else {
+                matchingResult = OMFR.getObservations();
+            }
+        }
+
+        for (Observation o : matchingResult) {
             if (template) {
 
                 String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                ObservationEntry temporaryTemplate = ((ObservationEntry)o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
                 templates.put(temporaryTemplateId, temporaryTemplate);
 
                 // we launch a timer which will destroy the template in one hours
@@ -845,12 +881,12 @@ public class SOSworker {
 
                 response.add(temporaryTemplate);
             } else {
-                response.add((ObservationEntry)o);
+                response.add((ObservationEntry) o);
 
                 //we stop the request if its too big
                 if (response.getMember().size() > maxObservationByRequest) {
                     throw new CstlServiceException("Your request is to voluminous please add filter and try again",
-                                                  NO_APPLICABLE_CODE);
+                            NO_APPLICABLE_CODE);
                 }
             }
         }
@@ -924,9 +960,9 @@ public class SOSworker {
         treatEventTimeRequest(times, false);
         
         //we prepare the response document
-        List<ObservationFilter.ObservationResult> results = OMFilter.filterResult();
+        List<ObservationResult> results = OMFilter.filterResult();
         StringBuilder datablock = new StringBuilder();
-        for (ObservationFilter.ObservationResult result: results) {
+        for (ObservationResult result: results) {
             Timestamp tBegin = result.beginTime;
             Timestamp tEnd   = result.endTime;
             AnyResult a = OMReader.getResult(result.resultID);

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,10 +17,12 @@
 
 package org.constellation.sos.ws;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.gml.v311.DirectPositionType;
+import org.constellation.gml.v311.TimePositionType;
 import org.constellation.sml.AbstractClassification;
 import org.constellation.sml.AbstractClassifier;
 import org.constellation.sml.AbstractDerivableComponent;
@@ -28,12 +30,14 @@ import org.constellation.sml.AbstractIdentification;
 import org.constellation.sml.AbstractIdentifier;
 import org.constellation.sml.AbstractProcess;
 import org.constellation.sml.AbstractSensorML;
+import org.constellation.ws.CstlServiceException;
+import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public class SensorMLUtils {
+public class Utils {
 
     /**
      * use for debugging purpose
@@ -108,5 +112,40 @@ public class SensorMLUtils {
         }
         logger.severe("there is no piezo location");
         return null;
+    }
+
+    /**
+     * return a SQL formatted timestamp
+     *
+     * @param time a GML time position object.
+     */
+    public static String getTimeValue(TimePositionType time) throws CstlServiceException {
+        if (time != null && time.getValue() != null) {
+            String value = time.getValue();
+            value = value.replace("T", " ");
+
+            //we delete the data after the second
+            if (value.indexOf('.') != -1) {
+                value = value.substring(0, value.indexOf('.'));
+            }
+             try {
+                 //here t is not used but it allow to verify the syntax of the timestamp
+                 Timestamp t = Timestamp.valueOf(value);
+                 return t.toString();
+
+             } catch(IllegalArgumentException e) {
+                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
+                                               "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
+                                               INVALID_PARAMETER_VALUE, "eventTime");
+             }
+          } else {
+            String locator;
+            if (time == null)
+                locator = "Timeposition";
+            else
+                locator = "TimePosition value";
+            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
+                                              MISSING_PARAMETER_VALUE, "eventTime");
+          }
     }
 }
