@@ -338,11 +338,13 @@ public class SOSworker {
             // we load the factory from the available classes
             AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
         
-            //we initailize the properties attribute 
+            //we initialize the properties attribute
             String observationIdBase  = configuration.getObservationIdBase();
             sensorIdBase              = configuration.getSensorIdBase();
             observationTemplateIdBase = configuration.getObservationTemplateIdBase();
             maxObservationByRequest   = configuration.getMaxObservationByRequest();
+            if (maxObservationByRequest == 0)
+                maxObservationByRequest = 500;
 
             int h, m;
             try {
@@ -848,7 +850,7 @@ public class SOSworker {
         List<Observation> matchingResult = new ArrayList<Observation>();
 
         // case (1)
-        if (!(OMReader instanceof ObservationFilterReader)) {
+        if (!(OMFilter instanceof ObservationFilterReader)) {
             List<String> observationIDs = OMFilter.filterObservation();
             for (String observationID : observationIDs) {
                 matchingResult.add(OMReader.getObservation(observationID));
@@ -856,7 +858,7 @@ public class SOSworker {
 
         // case (2)
         } else {
-            ObservationFilterReader OMFR = (ObservationFilterReader) OMReader;
+            ObservationFilterReader OMFR = (ObservationFilterReader) OMFilter;
             if (template) {
                 matchingResult = OMFR.getObservationTemplates();
             } else {

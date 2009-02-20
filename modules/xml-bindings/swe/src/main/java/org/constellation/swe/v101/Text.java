@@ -45,7 +45,7 @@ import org.geotools.util.Utilities;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "Text", propOrder = {
     "value"
 })
 @XmlRootElement(name = "Text")
