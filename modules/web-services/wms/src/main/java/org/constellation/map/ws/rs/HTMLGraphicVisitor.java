@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Map;
 import javax.measure.unit.Unit;
 
-import org.constellation.portrayal.AbstractGraphicVisitor;
 
 import org.constellation.query.wms.GetFeatureInfo;
 import org.geotools.display.primitive.GraphicFeatureJ2D;
 import org.geotools.display.primitive.GraphicJ2D;
+import org.geotools.display.service.AbstractGraphicVisitor;
 import org.geotools.map.CoverageMapLayer;
 import org.geotools.map.FeatureMapLayer;
 

@@ -176,7 +176,75 @@ class PostGridLayerDetails implements LayerDetails {
      */
     @Override
     public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
-        return createMapLayer(style, params);
+        final PostGridMapLayer2 mapLayer = new PostGridMapLayer2(reader);
+
+        mapLayer.setName(getName());
+
+        if (style == null) {
+            //no style provided, try to get the favorite one
+            if (favorites.size() > 0) {
+                //there are some favorites styles
+                style = favorites.get(0);
+            } else {
+                //no favorites defined, create a default one
+                style = RANDOM_FACTORY.createRasterStyle();
+            }
+        }
+
+        if (style instanceof String) {
+            //the given style is a named style
+            style = StyleProviderProxy.getInstance().get((String)style);
+            if (style == null) {
+                //something is wrong, the named style doesnt exist, create a default one
+                style = RANDOM_FACTORY.createRasterStyle();
+            }
+        }
+
+        if (style instanceof MutableStyle) {
+            //style is a commun SLD style
+            mapLayer.setStyle((MutableStyle) style);
+        } else if (style instanceof GraphicBuilder) {
+            //special graphic builder
+            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
+            mapLayer.graphicBuilders().add((GraphicBuilder) style);
+        } else {
+            //style is unknowed type, use a random style
+            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
+        }
+
+        if (params != null) {
+            mapLayer.setDimRange((MeasurementRange) params.get(KEY_DIM_RANGE));
+            final Double elevation = (Double) params.get(KEY_ELEVATION);
+            if (elevation != null) {
+                mapLayer.setElevation(elevation);
+            }
+            final Date time = (Date) params.get(KEY_TIME);
+            if (time != null) {
+                mapLayer.times().add(time);
+            }
+        }
+
+        //search if we need an elevationmodel for style
+        search_loop:
+        for(FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
+            for(Rule rule : fts.rules()){
+                for(Symbolizer symbol : rule.symbolizers()){
+                    if(symbol instanceof RasterSymbolizer){
+                        RasterSymbolizer rs = (RasterSymbolizer) symbol;
+                        ShadedRelief sr = rs.getShadedRelief();
+                        if(sr.getReliefFactor().evaluate(null, Float.class) != 0){
+                            ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
+                            if(model != null){
+                                mapLayer.setElevationModel(model);
+                            }
+                            break search_loop;
+                        }
+                    }
+                }
+            }
+        }
+
+        return mapLayer;
     }
 
     /**
@@ -265,79 +333,6 @@ class PostGridLayerDetails implements LayerDetails {
     @Override
     public String getThematic() {
         return reader.getTable().getLayer().getThematic();
-    }
-
-    private MapLayer createMapLayer(Object style, final Map<String, Object> params) {
-        final PostGridMapLayer2 mapLayer = new PostGridMapLayer2(reader);
-
-        mapLayer.setName(getName());
-        
-        if (style == null) {
-            //no style provided, try to get the favorite one
-            if (favorites.size() > 0) {
-                //there are some favorites styles
-                style = favorites.get(0);
-            } else {
-                //no favorites defined, create a default one
-                style = RANDOM_FACTORY.createRasterStyle();
-            }
-        }
-
-        if (style instanceof String) {
-            //the given style is a named style
-            style = StyleProviderProxy.getInstance().get((String)style);
-            if (style == null) {
-                //something is wrong, the named style doesnt exist, create a default one
-                style = RANDOM_FACTORY.createRasterStyle();
-            }
-        }
-
-        if (style instanceof MutableStyle) {
-            //style is a commun SLD style
-            mapLayer.setStyle((MutableStyle) style);
-        } else if (style instanceof GraphicBuilder) {
-            //special graphic builder
-            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
-            mapLayer.graphicBuilders().add((GraphicBuilder) style);
-        } else {
-            //style is unknowed type, use a random style
-            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
-        }
-
-        if (params != null) {
-            mapLayer.setDimRange((MeasurementRange) params.get(KEY_DIM_RANGE));
-            final Double elevation = (Double) params.get(KEY_ELEVATION);
-            if (elevation != null) {
-                mapLayer.setElevation(elevation);
-            }
-            final Date time = (Date) params.get(KEY_TIME);
-            if (time != null) {
-                mapLayer.times().add(time);
-            }
-        }
-
-        //search if we need an elevationmodel for style
-        search_loop:
-        for(FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
-            for(Rule rule : fts.rules()){
-                for(Symbolizer symbol : rule.symbolizers()){
-                    if(symbol instanceof RasterSymbolizer){
-                        RasterSymbolizer rs = (RasterSymbolizer) symbol;
-                        ShadedRelief sr = rs.getShadedRelief();
-                        if(sr.getReliefFactor().evaluate(null, Float.class) != 0){
-                            ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
-                            if(model != null){
-                                mapLayer.setElevationModel(model);
-                            }
-                            break search_loop;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        return mapLayer;
     }
 
     protected CoverageReader getReader(){

@@ -109,6 +109,75 @@ public class WMSService extends OGCWebService {
         LOGGER.info("WMS service running");
     }
 
+    private String preprocess1(Object objectRequest) throws CstlServiceException, NumberFormatException, Exception{
+
+        final String request = (String) getParameter(KEY_REQUEST, true);
+        LOGGER.info("New request: " + request);
+        logParameters();
+
+        String requestedVersion = (String) getParameter(KEY_VERSION, false);
+        if (requestedVersion != null) {
+            setActingVersion(requestedVersion);
+        }
+
+        return request;
+    }
+
+    private Response makeResponse(BufferedImage map, String format){
+        return Response.ok(map, format).build();
+    }
+
+    private Response processMap() throws CstlServiceException, NumberFormatException, Exception {
+        final GetMap requestMap = adaptGetMap(true);
+        final BufferedImage map = worker.getMap(requestMap);
+        final Response resp = makeResponse(map, requestMap.getFormat());
+        return resp;
+    }
+
+    private Response processFeatureInfo() throws CstlServiceException, NumberFormatException, Exception {
+
+        final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
+        final String result = worker.getFeatureInfo(requestFeatureInfo);
+        //Need to reset the GML mime format to XML for browsers
+        String infoFormat = requestFeatureInfo.getInfoFormat();
+        if (infoFormat.equals(GML)) {
+            infoFormat = APP_XML;
+        }
+        return Response.ok(result, infoFormat).build();
+    }
+
+    private Response processCapabilities() throws CstlServiceException, NumberFormatException, Exception {
+
+        final GetCapabilities requestCapab = adaptGetCapabilities();
+        worker.initServletContext(servletContext);
+        worker.initUriContext(uriContext);
+        final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
+        //workaround because 1.1.1 is defined with a DTD rather than an XSD
+        //we marshall the response and return the XML String
+        final StringWriter sw = new StringWriter();
+        marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ? "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
+        marshaller.marshal(capabilities, sw);
+        return Response.ok(sw.toString(), requestCapab.getFormat()).build();
+
+    }
+
+    private Response processLegend() throws CstlServiceException, NumberFormatException, Exception {
+        final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
+        final BufferedImage legend = worker.getLegendGraphic(requestLegend);
+        return Response.ok(legend, requestLegend.getFormat()).build();
+    }
+
+    private Response processDescribe() throws CstlServiceException, NumberFormatException, Exception {
+
+        final DescribeLayer describeLayer = adaptDescribeLayer();
+        worker.initUriContext(uriContext);
+        final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
+        //We need to marshall the string to XML
+        final StringWriter sw = new StringWriter();
+        marshaller.marshal(response, sw);
+        return Response.ok(sw.toString(), TEXT_XML).build();
+    }
+
     /**
      * Treat the incoming request and call the right function in the worker.
      * <p>
@@ -129,61 +198,24 @@ public class WMSService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
-            final String request = (String) getParameter(KEY_REQUEST, true);
-            LOGGER.info("New request: " + request);
-            logParameters();
-
-            String requestedVersion = (String) getParameter(KEY_VERSION, false);
-            if (requestedVersion != null) {
-                setActingVersion(requestedVersion);
-            }
+            final String request = preprocess1(objectRequest);
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
-                final GetMap requestMap = adaptGetMap(true);
-                final BufferedImage map = worker.getMap(requestMap);
-                return Response.ok(map, requestMap.getFormat()).build();
+                return processMap();
+            } else if (GETFEATUREINFO.equalsIgnoreCase(request)) {
+                return processFeatureInfo();
+            } else if (GETCAPABILITIES.equalsIgnoreCase(request)) {
+                return processCapabilities();
+            } else if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
+                return processLegend();
+            } else if (DESCRIBELAYER.equalsIgnoreCase(request)) {
+                return processDescribe();
             }
-            if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
-                final String result = worker.getFeatureInfo(requestFeatureInfo);
-                //Need to reset the GML mime format to XML for browsers
-                String infoFormat = requestFeatureInfo.getInfoFormat();
-                if (infoFormat.equals(GML)) {
-                    infoFormat = APP_XML;
-                }
-                return Response.ok(result, infoFormat).build();
-            }
-            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                final GetCapabilities requestCapab = adaptGetCapabilities();
-                worker.initServletContext(servletContext);
-                worker.initUriContext(uriContext);
-                final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
-                //workaround because 1.1.1 is defined with a DTD rather than an XSD
-                //we marshall the response and return the XML String
-                final StringWriter sw = new StringWriter();
-                marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ?
-                    "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
-                marshaller.marshal(capabilities, sw);
-                return Response.ok(sw.toString(), requestCapab.getFormat()).build();
-            }
-            if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
-                final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
-                final BufferedImage legend = worker.getLegendGraphic(requestLegend);
-                return Response.ok(legend, requestLegend.getFormat()).build();
-            }
-            if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-                final DescribeLayer describeLayer = adaptDescribeLayer();
-                worker.initUriContext(uriContext);
-                final DescribeLayerResponseType response =  worker.describeLayer(describeLayer);
-                //We need to marshall the string to XML
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(response, sw);
-                return Response.ok(sw.toString(), TEXT_XML).build();
-            }
+
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
-
+            
         } catch (CstlServiceException ex) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
