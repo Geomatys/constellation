@@ -257,11 +257,31 @@ public class Query {
         }
         if (where != null) {
             sb.append(" WHERE ");
-            for (Where s : where) {
-                sb.append('(').append(s.getvalue()).append(") AND ");
+            boolean ORblock = false;
+            for (int i = 0; i < where.size(); i++) {
+                Where w = where.get(i);
+                String block = '(' + w.getvalue() + ')';
+                if (i + 1 < where.size()) {
+                    if (where.get(i + 1).getGroup().equals(w.getGroup())) {
+                        if (ORblock) {
+                            sb.append(block).append(" OR ");
+                        } else {
+                            sb.append('(').append(block).append(" OR ");
+                            ORblock = true;
+                        }
+                    } else {
+                        if (ORblock) {
+                            sb.append(block).append(") AND ");
+                            ORblock = false;
+                        } else {
+                            sb.append(block).append(" AND ");
+                        }
+                    }
+                } else {
+                    sb.append(block);
+                }
             }
-            if (where.size() > 0)
-               sb = sb.delete(sb.length() - 5, sb.length());
+            
         }
         /*if (union != null) {
             sb.append("UNION ");

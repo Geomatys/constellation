@@ -97,9 +97,11 @@ public class ProcessEntry extends Entry implements Process {
         if (object == this) {
             return true;
         }
-        final ProcessEntry that = (ProcessEntry) object;
-
-        return Utilities.equals(this.href, that.href);
+        if (object instanceof ProcessEntry) {
+            final ProcessEntry that = (ProcessEntry) object;
+            return Utilities.equals(this.href, that.href);
+        }
+        return false;
     }
 
     @Override

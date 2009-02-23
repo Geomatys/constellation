@@ -47,6 +47,16 @@ public class Where {
     @XmlValue
     private String value;
 
+    public Where() {
+
+    }
+
+    public Where(Where original) {
+        this.group    = original.group;
+        this.operator = original.operator;
+        this.value    = original.value;
+    }
+
     /**
      * Gets the value of the operator property.
      */

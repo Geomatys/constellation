@@ -339,12 +339,10 @@ public class SOSworker {
             AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
         
             //we initialize the properties attribute
-            String observationIdBase  = configuration.getObservationIdBase();
-            sensorIdBase              = configuration.getSensorIdBase();
-            observationTemplateIdBase = configuration.getObservationTemplateIdBase();
-            maxObservationByRequest   = configuration.getMaxObservationByRequest();
-            if (maxObservationByRequest == 0)
-                maxObservationByRequest = 500;
+            String observationIdBase  = configuration.getObservationIdBase() != null ? configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
+            sensorIdBase              = configuration.getSensorIdBase() != null ? configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
+            observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ? configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
+            maxObservationByRequest   = configuration.getMaxObservationByRequest() != 0 ? configuration.getMaxObservationByRequest() : 500;
 
             int h, m;
             try {

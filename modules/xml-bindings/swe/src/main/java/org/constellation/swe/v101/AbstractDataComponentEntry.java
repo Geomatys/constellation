@@ -17,6 +17,8 @@
  */
 package org.constellation.swe.v101;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -31,6 +33,7 @@ import org.constellation.swe.AbstractDataComponent;
  */
 @XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class})
 @XmlType(name="AbstractDataComponent")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent {
     
     /**
@@ -72,6 +75,13 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Set the identifier of this data record.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
     
     /**

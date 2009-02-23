@@ -123,6 +123,13 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
     }
 
     /**
+     * Sets the value of the beginPosition property.
+     */
+    public void setBeginPosition(TimePositionType beginPosition) {
+        this.beginPosition = beginPosition;
+    }
+
+    /**
      * Gets the value of the begin property.
      */
     public TimeInstantPropertyType getBegin() {
@@ -134,6 +141,13 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
      */
     public TimePositionType getEndPosition() {
         return endPosition;
+    }
+
+    /**
+     * Sets the value of the endPosition property.
+     */
+    public void setEndPosition(TimePositionType endPosition) {
+        this.endPosition = endPosition;
     }
 
     /**
