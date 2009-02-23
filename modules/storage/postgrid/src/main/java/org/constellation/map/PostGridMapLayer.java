@@ -85,6 +85,8 @@ import org.opengis.style.RasterSymbolizer;
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ *
+ * @deprecated
  */
 public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLayer {
     /**
@@ -569,39 +571,39 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     }
     
     private void normalProtray(RenderingContext2D renderingContext, GridCoverage2D coverage) throws PortrayalException{
-        final Name coverageName = new NameImpl(getName());
-        final List<CachedRule> rules = J2DGraphicUtilities.getValidRules(getStyle(), renderingContext.getScale(), coverageName);
-
-        //we perform a first check on the style to see if there is at least
-        //one valid rule at this scale, if not we just continue.
-        if (rules.isEmpty()) {
-            return;   //----------------------------------------------------->CONTINUE
-        }
-        
-        if(coverage != null){
-            final CoordinateReferenceSystem dataCRS = coverage.getCoordinateReferenceSystem();
-            final CoordinateReferenceSystem displayCRS = renderingContext.getDisplayCRS();
-            final CoordinateReferenceSystem objectiveCRS = renderingContext.getObjectiveCRS();
-            final J2DGraphicUtilities J2Dtool = J2DGraphicUtilities.getInstance();
-        
-            J2Dtool.prepare(1,dataCRS,displayCRS,objectiveCRS,renderingContext.getCanvas().getObjectiveToDisplayTransform());
-                        
-            for(final CachedRule rule : rules){
-//                final Filter filter = rule.getFilter();
-                //test if the rule is valid for this feature
-//                if(filter == null  || filter.evaluate(feature)){
-                    final List<CachedSymbolizer> symbols = rule.symbolizers();
-                                     
-                    for(final CachedSymbolizer symbol : symbols){
-                        if(symbol instanceof CachedRasterSymbolizer){
-                            J2Dtool.portray(coverage,null, (CachedRasterSymbolizer)symbol, renderingContext);
-                        }
-                    }
-                    
-//                }
-            }
-            
-        }
+//        final Name coverageName = new NameImpl(getName());
+//        final List<CachedRule> rules = J2DGraphicUtilities.getValidRules(getStyle(), renderingContext.getScale(), coverageName);
+//
+//        //we perform a first check on the style to see if there is at least
+//        //one valid rule at this scale, if not we just continue.
+//        if (rules.isEmpty()) {
+//            return;   //----------------------------------------------------->CONTINUE
+//        }
+//
+//        if(coverage != null){
+//            final CoordinateReferenceSystem dataCRS = coverage.getCoordinateReferenceSystem();
+//            final CoordinateReferenceSystem displayCRS = renderingContext.getDisplayCRS();
+//            final CoordinateReferenceSystem objectiveCRS = renderingContext.getObjectiveCRS();
+//            final J2DGraphicUtilities J2Dtool = J2DGraphicUtilities.getInstance();
+//
+//            J2Dtool.prepare(1,dataCRS,displayCRS,objectiveCRS,renderingContext.getCanvas().getObjectiveToDisplayTransform());
+//
+//            for(final CachedRule rule : rules){
+////                final Filter filter = rule.getFilter();
+//                //test if the rule is valid for this feature
+////                if(filter == null  || filter.evaluate(feature)){
+//                    final List<CachedSymbolizer> symbols = rule.symbolizers();
+//
+//                    for(final CachedSymbolizer symbol : symbols){
+//                        if(symbol instanceof CachedRasterSymbolizer){
+//                            J2Dtool.portray(coverage,null, (CachedRasterSymbolizer)symbol, renderingContext);
+//                        }
+//                    }
+//
+////                }
+//            }
+//
+//        }
             
     }
     

@@ -109,29 +109,15 @@ public class WMSService extends OGCWebService {
         LOGGER.info("WMS service running");
     }
 
-    private String preprocess1(Object objectRequest) throws CstlServiceException, NumberFormatException, Exception{
-
-        final String request = (String) getParameter(KEY_REQUEST, true);
-        LOGGER.info("New request: " + request);
-        logParameters();
-
-        String requestedVersion = (String) getParameter(KEY_VERSION, false);
-        if (requestedVersion != null) {
-            setActingVersion(requestedVersion);
-        }
-
-        return request;
-    }
-
-    private Response makeResponse(BufferedImage map, String format){
-        return Response.ok(map, format).build();
+    private Response createResponse(BufferedImage map, String mime){
+        return Response.ok(map, mime).build();
     }
 
     private Response processMap() throws CstlServiceException, NumberFormatException, Exception {
         final GetMap requestMap = adaptGetMap(true);
         final BufferedImage map = worker.getMap(requestMap);
-        final Response resp = makeResponse(map, requestMap.getFormat());
-        return resp;
+        final Response resp = createResponse(map, requestMap.getFormat());
+        return  resp;
     }
 
     private Response processFeatureInfo() throws CstlServiceException, NumberFormatException, Exception {
@@ -198,7 +184,15 @@ public class WMSService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
-            final String request = preprocess1(objectRequest);
+
+            final String request = (String) getParameter(KEY_REQUEST, true);
+            LOGGER.info("New request: " + request);
+            logParameters();
+
+            String requestedVersion = (String) getParameter(KEY_VERSION, false);
+            if (requestedVersion != null) {
+                setActingVersion(requestedVersion);
+            }
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
