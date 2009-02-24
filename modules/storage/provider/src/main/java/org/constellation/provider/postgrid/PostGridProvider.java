@@ -216,8 +216,7 @@ public class PostGridProvider implements LayerProvider{
         if(layer != null && layer.isElevationModel){
             PostGridLayerDetails pgld = get(name);
             if(pgld != null){
-                MapBuilder builder = MapBuilder.getInstance();
-                return builder.createElevationModel(pgld.getReader(), null);
+                return MapBuilder.createElevationModel(pgld.getReader(), null);
             }
         }
         

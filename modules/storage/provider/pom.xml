@@ -65,6 +65,10 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt-go2-style-extension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt-shapefile</artifactId>
     </dependency>
     <dependency>

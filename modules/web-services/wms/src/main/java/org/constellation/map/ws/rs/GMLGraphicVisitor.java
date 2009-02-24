@@ -38,12 +38,10 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.display.primitive.GraphicCoverageJ2D;
 import org.geotools.display.primitive.GraphicFeatureJ2D;
-import org.geotools.display.primitive.GraphicJ2D;
-import org.geotools.display.service.AbstractGraphicVisitor;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.CoverageMapLayer;
 import org.geotools.map.FeatureMapLayer;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
@@ -60,16 +58,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class GMLGraphicVisitor extends AbstractGraphicVisitor{
+public class GMLGraphicVisitor extends TextGraphicVisitor{
 
     private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
     private final Map<String,List<String>> values = new HashMap<String,List<String>>();
-    private final GetFeatureInfo gfi;
 
     private int index = 0;
 
     public GMLGraphicVisitor(GetFeatureInfo gfi){
-        this.gfi = gfi;
+        super(gfi);
     }
 
     /**
@@ -77,9 +74,14 @@ public class GMLGraphicVisitor extends AbstractGraphicVisitor{
      */
     @Override
     public boolean isStopRequested() {
-        return (index == gfi.getFeatureCount());
+        Integer count = gfi.getFeatureCount();
+        if(count != null){
+            return (index == count);
+        }else{
+            return false;
+        }
     }
-
+    
     /**
      * {@inheritDoc }
      */
@@ -122,9 +124,9 @@ public class GMLGraphicVisitor extends AbstractGraphicVisitor{
      * {@inheritDoc }
      */
     @Override
-    public void visit(GraphicJ2D graphic, CoverageMapLayer coverage, Shape queryArea) {
+    public void visit(GraphicCoverageJ2D coverage, Shape queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(graphic, coverage, queryArea);
+        final Object[][] results = getCoverageValues(coverage, queryArea);
 
         if(results == null) return;
 

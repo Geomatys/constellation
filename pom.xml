@@ -333,6 +333,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
+        <artifactId>gt-go2-style-extension</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
         <artifactId>gt-main</artifactId>
         <version>${geotools.version}</version>
       </dependency>

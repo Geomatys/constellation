@@ -50,7 +50,6 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  */
 public class CstlPortrayalService implements PortrayalServiceIF {
 
-    private static final MapBuilder MAP_BUILDER = MapBuilder.getInstance();
     private static final Logger LOGGER = Logger.getLogger("org.constellation.portrayal");
     
     /**
@@ -176,7 +175,7 @@ public class CstlPortrayalService implements PortrayalServiceIF {
     private MapContext createContext( final Portrayal.SceneDef sdef ) throws PortrayalException {
 
     	assert ( sdef.layerRefs.size() == sdef.styleRefs.size() );
-        final MapContext context = MAP_BUILDER.createContext(DefaultGeographicCRS.WGS84);
+        final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
         context.layers().clear();
 
         for (int i = 0; i < sdef.layerRefs.size(); i++){

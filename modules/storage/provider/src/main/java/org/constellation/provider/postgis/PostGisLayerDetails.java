@@ -28,6 +28,7 @@ import org.constellation.provider.StyleProviderProxy;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.map.GraphicBuilder;
+import org.geotools.map.MapBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
 
@@ -78,16 +79,16 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
         if(style instanceof MutableStyle){
             //style is a commun SLD style
-            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
+            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
         }else if( style instanceof GraphicBuilder){
             //special graphic builder
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
+            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
             layer.graphicBuilders().add((GraphicBuilder) style);
         }else{
             //style is unknowed type, use a random style
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = MAP_BUILDER.createFeatureLayer(fs, (MutableStyle)style);
+            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
         }
 
         if (params != null) {

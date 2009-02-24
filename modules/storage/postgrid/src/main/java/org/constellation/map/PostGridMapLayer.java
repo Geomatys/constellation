@@ -46,12 +46,7 @@ import org.geotools.display.exception.PortrayalException;
 import org.geotools.display.primitive.GraphicJ2D;
 import org.geotools.display.renderer.RenderingContext;
 import org.geotools.display.renderer.RenderingContext2D;
-import org.geotools.display.style.CachedRasterSymbolizer;
-import org.geotools.display.style.CachedRule;
-import org.geotools.display.style.CachedSymbolizer;
-import org.geotools.display.style.J2DGraphicUtilities;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.NameImpl;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.AbstractMapLayer;
@@ -67,7 +62,6 @@ import org.geotools.util.MeasurementRange;
 
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -295,8 +289,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapBuilder mapBuilder = MapBuilder.getInstance();
-            final MapLayer coverageLayer = mapBuilder.createCoverageLayer(coverage, getStyle(), "name");
+            final MapLayer coverageLayer = MapBuilder.createCoverageLayer(coverage, getStyle(), "name");
             RenderingContext2D context2D = (RenderingContext2D) context;
             //special graphic builder
             final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
@@ -463,8 +456,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
 
         if(builder != null ){
             //TODO Find a better way to solve this issue
-            final MapBuilder mapBuilder = MapBuilder.getInstance();
-            final MapLayer coverageLayer = mapBuilder.createCoverageLayer(coverage, getStyle(), "name");
+            final MapLayer coverageLayer = MapBuilder.createCoverageLayer(coverage, getStyle(), "name");
             //special graphic builder
             final Collection<? extends GraphicJ2D> graphics = builder.createGraphics(coverageLayer, context2D.getCanvas());
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

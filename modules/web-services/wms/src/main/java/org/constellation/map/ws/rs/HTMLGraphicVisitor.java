@@ -25,12 +25,9 @@ import java.util.List;
 import java.util.Map;
 import javax.measure.unit.Unit;
 
-
 import org.constellation.query.wms.GetFeatureInfo;
+import org.geotools.display.primitive.GraphicCoverageJ2D;
 import org.geotools.display.primitive.GraphicFeatureJ2D;
-import org.geotools.display.primitive.GraphicJ2D;
-import org.geotools.display.service.AbstractGraphicVisitor;
-import org.geotools.map.CoverageMapLayer;
 import org.geotools.map.FeatureMapLayer;
 
 import org.opengis.feature.Feature;
@@ -41,14 +38,13 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class HTMLGraphicVisitor extends AbstractGraphicVisitor{
+public class HTMLGraphicVisitor extends TextGraphicVisitor{
 
     private final Map<String,List<String>> values = new HashMap<String,List<String>>();
-    private final GetFeatureInfo gfi;
     private int index = 0;
 
     public HTMLGraphicVisitor(final GetFeatureInfo gfi) {
-        this.gfi = gfi;
+        super(gfi);
     }
 
     /**
@@ -56,7 +52,12 @@ public class HTMLGraphicVisitor extends AbstractGraphicVisitor{
      */
     @Override
     public boolean isStopRequested() {
-        return (index == gfi.getFeatureCount());
+        Integer count = gfi.getFeatureCount();
+        if(count != null){
+            return (index == count);
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -99,9 +100,9 @@ public class HTMLGraphicVisitor extends AbstractGraphicVisitor{
      * {@inheritDoc }
      */
     @Override
-    public void visit(GraphicJ2D graphic, CoverageMapLayer coverage, Shape queryArea) {
+    public void visit(GraphicCoverageJ2D coverage, Shape queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(graphic, coverage, queryArea);
+        final Object[][] results = getCoverageValues(coverage, queryArea);
 
         if(results == null) return;
 

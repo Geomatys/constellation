@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.StyleProvider;
-import org.geotools.display.container.GridMarkGraphicBuilder;
+import org.geotools.display.ext.vectorfield.GridMarkGraphicBuilder;
 import org.geotools.map.GraphicBuilder;
 
 /**

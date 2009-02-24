@@ -51,6 +51,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.map.ws.rs.CSVGraphicVisitor;
 import org.constellation.map.ws.rs.GMLGraphicVisitor;
 import org.constellation.map.ws.rs.HTMLGraphicVisitor;
+import org.constellation.map.ws.rs.TextGraphicVisitor;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.query.wms.DescribeLayer;
@@ -80,7 +81,7 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.service.AbstractGraphicVisitor;
+import org.geotools.display.canvas.AbstractGraphicVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
@@ -652,7 +653,7 @@ public class WMSWorker extends AbstractWMSWorker {
             //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
             infoFormat = TEXT_PLAIN;
         }
-        final AbstractGraphicVisitor visitor;
+        final TextGraphicVisitor visitor;
         if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
             // TEXT / PLAIN
             visitor = new CSVGraphicVisitor(getFI);
