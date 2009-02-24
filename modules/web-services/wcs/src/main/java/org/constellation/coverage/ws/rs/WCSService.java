@@ -87,8 +87,9 @@ import org.constellation.ows.v110.SectionsType;
 import org.constellation.query.Query;
 import org.constellation.query.QueryAdapter;
 import org.constellation.util.Util;
-import org.constellation.wcs.AbstractDescribeCoverage;
-import org.constellation.wcs.AbstractGetCoverage;
+import org.constellation.wcs.DescribeCoverage;
+import org.constellation.wcs.GetCapabilities;
+import org.constellation.wcs.GetCoverage;
 import org.constellation.wcs.v111.GridCrsType;
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
 import org.constellation.ws.CstlServiceException;
@@ -177,9 +178,9 @@ public final class WCSService extends OGCWebService {
             LOGGER.info("New request: " + request);
             logParameters();
             
-            if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCapabilities) )
+            if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilities) )
             {
-                AbstractGetCapabilities getcaps = (AbstractGetCapabilities)objectRequest;
+                GetCapabilities getcaps = (GetCapabilities)objectRequest;
                 if (getcaps == null) {
                     getcaps = adaptKvpGetCapabilitiesRequest();
                 }
@@ -191,9 +192,9 @@ public final class WCSService extends OGCWebService {
                 return worker.getCapabilities(getcaps);
             }
             
-            if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractDescribeCoverage) )
+            if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
             {
-                AbstractDescribeCoverage desccov = (AbstractDescribeCoverage)objectRequest;
+                DescribeCoverage desccov = (DescribeCoverage)objectRequest;
                 
                 //TODO: move me into the worker.
                 verifyBaseParameter(0);
@@ -212,9 +213,9 @@ public final class WCSService extends OGCWebService {
                 return worker.describeCoverage(desccov);
             }
             
-            if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof AbstractGetCoverage) )
+            if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
             {
-                AbstractGetCoverage getcov = (AbstractGetCoverage)objectRequest;
+                GetCoverage getcov = (GetCoverage)objectRequest;
                 //TODO: move me into the worker.
                 verifyBaseParameter(0);
                 
@@ -300,7 +301,7 @@ public final class WCSService extends OGCWebService {
      * @return a marshallable GetCapabilities request.
      * @throws CstlServiceException
      */
-    private AbstractGetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
@@ -322,7 +323,7 @@ public final class WCSService extends OGCWebService {
 
         final String version = getActingVersion().toString();
         if (version.equals("1.0.0")) {
-            return new org.constellation.wcs.v100.GetCapabilities(
+            return new org.constellation.wcs.v100.GetCapabilitiesType(
                     getParameter(KEY_SECTION, false), null);
         } else if (version.equals("1.1.1")) {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
@@ -348,7 +349,7 @@ public final class WCSService extends OGCWebService {
             }
             SectionsType sections = new SectionsType(requestedSections);
             AcceptVersionsType versions = new AcceptVersionsType("1.1.1");
-            return new org.constellation.wcs.v111.GetCapabilities(versions, sections, formats, null);
+            return (GetCapabilities) new org.constellation.wcs.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
@@ -362,12 +363,12 @@ public final class WCSService extends OGCWebService {
      * @return a marshallable DescribeCoverage request.
      * @throws CstlServiceException
      */
-    private AbstractDescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
+    private DescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
         final String version = getActingVersion().toString();
         if (version.equals("1.0.0")) {
-            return new org.constellation.wcs.v100.DescribeCoverage(getParameter(KEY_COVERAGE, true));
+            return new org.constellation.wcs.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
         } else if (version.equals("1.1.1")) {
-            return new org.constellation.wcs.v111.DescribeCoverage(getParameter(KEY_IDENTIFIER, true));
+            return new org.constellation.wcs.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
@@ -382,7 +383,7 @@ public final class WCSService extends OGCWebService {
      * @return a marshallable GetCoverage request.
      * @throws CstlServiceException
      */
-    private AbstractGetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
+    private GetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
         final String version = getActingVersion().toString();
         if (version.equals("1.0.0")) {
             return adaptKvpGetCoverageRequest100();
@@ -402,7 +403,7 @@ public final class WCSService extends OGCWebService {
      * @return The GetCoverage request in version 1.0.0
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v100.GetCoverage adaptKvpGetCoverageRequest100()
+    private org.constellation.wcs.v100.GetCoverageType adaptKvpGetCoverageRequest100()
                                                     throws CstlServiceException
     {
         String width = getParameter(KEY_WIDTH, false);
@@ -483,7 +484,7 @@ public final class WCSService extends OGCWebService {
                 new org.constellation.wcs.v100.OutputType(getParameter(KEY_FORMAT, true),
                                                           getParameter(KEY_RESPONSE_CRS, false));
 
-        return new org.constellation.wcs.v100.GetCoverage(
+        return new org.constellation.wcs.v100.GetCoverageType(
                 getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
     }
     
@@ -495,7 +496,7 @@ public final class WCSService extends OGCWebService {
      * @return The GetCoverage request in version 1.1.1
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v111.GetCoverage adaptKvpGetCoverageRequest111()
+    private org.constellation.wcs.v111.GetCoverageType adaptKvpGetCoverageRequest111()
                                                     throws CstlServiceException
     {
         // temporal subset
@@ -611,7 +612,7 @@ public final class WCSService extends OGCWebService {
         final org.constellation.wcs.v111.OutputType output =
                 new org.constellation.wcs.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
 
-        return new org.constellation.wcs.v111.GetCoverage(
+        return new org.constellation.wcs.v111.GetCoverageType(
                 new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
                 domain, range, output);
     }

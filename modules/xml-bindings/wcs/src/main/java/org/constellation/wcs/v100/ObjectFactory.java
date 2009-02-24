@@ -376,24 +376,24 @@ public class ObjectFactory {
      * Create an instance of {@link net.opengis.wcs.GetCapabilities }
      * 
      */
-    public GetCapabilities createGetCapabilities() {
-        return new GetCapabilities();
+    public GetCapabilitiesType createGetCapabilities() {
+        return new GetCapabilitiesType();
     }
 
      /**
      * Create an instance of {@link net.opengis.wcs.GetCoverage }
      * 
      */
-    public GetCoverage createGetCoverage() {
-        return new GetCoverage();
+    public GetCoverageType createGetCoverage() {
+        return new GetCoverageType();
     }
 
     /**
      * Create an instance of {@link net.opengis.wcs.DescribeCoverage }
      * 
      */
-    public DescribeCoverage createDescribeCoverage() {
-        return new DescribeCoverage();
+    public DescribeCoverageType createDescribeCoverage() {
+        return new DescribeCoverageType();
     }
     
     /**

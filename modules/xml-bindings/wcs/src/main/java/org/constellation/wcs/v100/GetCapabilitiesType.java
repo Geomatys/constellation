@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.ows.AbstractGetCapabilities;
+import org.constellation.wcs.GetCapabilities;
 import org.constellation.ows.AcceptFormats;
 import org.constellation.ows.AcceptVersions;
 import org.constellation.ows.Sections;
@@ -59,7 +59,7 @@ import org.constellation.ows.Sections;
     "section"
 })
 @XmlRootElement(name = "GetCapabilities")
-public class GetCapabilities implements AbstractGetCapabilities {
+public class GetCapabilitiesType implements GetCapabilities {
 
     @XmlElement(defaultValue = "/")
     private String section;
@@ -73,13 +73,13 @@ public class GetCapabilities implements AbstractGetCapabilities {
     /**
      * An empty constructor used by JAXB
      */
-    GetCapabilities(){
+    GetCapabilitiesType(){
     }
     
     /**
      * Build a new getCapabilities request version 1.0.0.
      */
-    public GetCapabilities(String section, String updateSequence){
+    public GetCapabilitiesType(String section, String updateSequence){
         this.version = "1.0.0";
         this.updateSequence = updateSequence;
         if (section == null) {

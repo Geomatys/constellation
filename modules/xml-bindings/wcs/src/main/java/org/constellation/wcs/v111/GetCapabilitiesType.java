@@ -23,8 +23,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.GetCapabilitiesType;
 import org.constellation.ows.v110.SectionsType;
+import org.constellation.wcs.GetCapabilities;
 
 
 /**
@@ -49,7 +49,7 @@ import org.constellation.ows.v110.SectionsType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "GetCapabilities")
-public class GetCapabilities extends GetCapabilitiesType {
+public class GetCapabilitiesType extends org.constellation.ows.v110.GetCapabilitiesType implements GetCapabilities {
 
     @XmlAttribute(required = true)
     private String service;
@@ -57,14 +57,14 @@ public class GetCapabilities extends GetCapabilitiesType {
     /**
      * An empty constructor used by JAXB
      */
-    GetCapabilities(){
+    GetCapabilitiesType(){
     }
     
     
      /**
      * Build a new getCapabilities request version 1.1.1.
      */
-    public GetCapabilities(AcceptVersionsType acceptVersions, SectionsType sections,
+    public GetCapabilitiesType(AcceptVersionsType acceptVersions, SectionsType sections,
             AcceptFormatsType acceptFormats, String updateSequence){
         super (acceptVersions, sections, acceptFormats, updateSequence);
         this.service        = "WCS";

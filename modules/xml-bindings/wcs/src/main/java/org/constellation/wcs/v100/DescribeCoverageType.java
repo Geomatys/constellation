@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wcs.v111;
+package org.constellation.wcs.v100;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,46 +26,51 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.wcs.AbstractDescribeCoverage;
+import org.constellation.wcs.DescribeCoverage;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>An xml binding classe for a DescribeCoverage request.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/wcs/1.1.1}RequestBaseType">
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Identifier" maxOccurs="unbounded"/>
+ *         &lt;element name="Coverage" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *     &lt;/extension>
+ *       &lt;attribute name="service" use="required" type="{http://www.w3.org/2001/XMLSchema}string" fixed="WCS" />
+ *       &lt;attribute name="version" use="required" type="{http://www.w3.org/2001/XMLSchema}string" fixed="1.0.0" />
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
+ * @author Cédric Briançon
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "identifier"
-})
+@XmlType(name = "", propOrder = {"coverage"})
 @XmlRootElement(name = "DescribeCoverage")
-public class DescribeCoverage implements AbstractDescribeCoverage {
+public class DescribeCoverageType implements DescribeCoverage {
 
     @XmlAttribute(required = true)
     private String service;
     @XmlAttribute(required = true)
     private String version;
-    @XmlElement(name = "Identifier", required = true)
-    private List<String> identifier;
-
+    
+    /*
+     * WCS 1.0.0
+     */
+    @XmlElement(name = "Coverage")
+    private List<String> coverage;
+    
     /**
      * Empty constructor used by JAXB
      */
-    DescribeCoverage(){
+    DescribeCoverageType(){
     }
     
     /**
@@ -74,14 +79,14 @@ public class DescribeCoverage implements AbstractDescribeCoverage {
      * @param version The version of the service.
      * @param listOfCoverage a string containing many coverage name separated by a colon.
      */
-    public DescribeCoverage(String listOfCoverage){
+    public DescribeCoverageType(String listOfCoverage){
         this.service = "WCS";
-        this.version = "1.1.1";
-        identifier = new ArrayList<String>();
+        this.version = "1.0.0";
+        coverage = new ArrayList<String>();
         final StringTokenizer tokens = new StringTokenizer(listOfCoverage, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
-            identifier.add(token);
+            coverage.add(token);
         }
     }
     
@@ -91,34 +96,34 @@ public class DescribeCoverage implements AbstractDescribeCoverage {
      * @param version The version of the service.
      * @param coverages A list  of coverage name.
      */
-    public DescribeCoverage(List<String> identifier){
+    public DescribeCoverageType(List<String> coverages){
         this.service = "WCS";
-        this.version = "1.1.1";
-        this.identifier = identifier;
+        this.version = "1.0.0";
+        this.coverage = coverages;
     }
     
     /**
-     * Unordered list of identifiers of desired coverages. A client can obtain identifiers by a prior GetCapabilities request, or from a third-party source. Gets the value of the identifier property.
+     * Return the list of requested coverage name.
+     * (unmodifiable)
      */
-    public List<String> getIdentifier() {
-        if (identifier == null) {
-            identifier = new ArrayList<String>();
+    public List<String> getCoverage() {
+        if (coverage == null) {
+            coverage = new ArrayList<String>();
         }
-        return Collections.unmodifiableList(identifier);
+        return Collections.unmodifiableList(coverage);
     }
     
-     /**
-     * Gets the value of the service property.
+    /**
+     * return the service type here always WCS.
      */
     public String getService() {
         return "WCS";
     }
 
     /**
-     * Gets the value of the version property.
+     * Return the version of the service.
      */
     public String getVersion() {
         return version;
     }
-
 }

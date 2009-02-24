@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,15 @@
  */
 package org.constellation.wcs;
 
-import org.constellation.ws.AbstractRequest;
+import org.constellation.ows.AbstractGetCapabilities;
 
 /**
- *  Super abstract type for all the different versions of DescribeCoverage request.
  *
- * @author Guilhem Legal
+ * @author Cédric Briançon (Geomatys)
  */
-public interface AbstractDescribeCoverage extends AbstractRequest {
+public interface GetCapabilities extends AbstractGetCapabilities {
+
+    public String getService();
 
 }
+

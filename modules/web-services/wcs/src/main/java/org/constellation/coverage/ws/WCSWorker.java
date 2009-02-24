@@ -57,7 +57,6 @@ import org.constellation.gml.v311.CodeListType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.ows.AbstractDCP;
-import org.constellation.ows.AbstractGetCapabilities;
 import org.constellation.ows.AbstractOnlineResourceType;
 import org.constellation.ows.AbstractOperation;
 import org.constellation.ows.v110.AcceptFormatsType;
@@ -74,8 +73,9 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.query.QueryAdapter;
 import org.constellation.register.RegisterException;
 import org.constellation.util.Util;
-import org.constellation.wcs.AbstractDescribeCoverage;
-import org.constellation.wcs.AbstractGetCoverage;
+import org.constellation.wcs.DescribeCoverage;
+import org.constellation.wcs.GetCoverage;
+import org.constellation.wcs.GetCapabilities;
 import org.constellation.wcs.v100.ContentMetadata;
 import org.constellation.wcs.v100.CoverageDescription;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
@@ -211,7 +211,7 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response describeCoverage(final AbstractDescribeCoverage abstractRequest)
+    public Response describeCoverage(final DescribeCoverage abstractRequest)
                                           throws JAXBException, CstlServiceException
     {
         LOGGER.info("describeCoverage request processing");
@@ -226,9 +226,9 @@ public final class WCSWorker {
         //we prepare the response object to return
         final Object response;
         if (version.equals("1.0.0")) {
-            response = describeCoverage100((org.constellation.wcs.v100.DescribeCoverage) abstractRequest);
+            response = describeCoverage100((org.constellation.wcs.v100.DescribeCoverageType) abstractRequest);
         } else if (version.equals("1.1.1")) {
-            response = describeCoverage111((org.constellation.wcs.v111.DescribeCoverage) abstractRequest);
+            response = describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, actingVersion, "version");
@@ -251,7 +251,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      */
     private CoverageDescription describeCoverage100(
-            final org.constellation.wcs.v100.DescribeCoverage request)
+            final org.constellation.wcs.v100.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
         if (request.getCoverage().size() == 0) {
@@ -375,7 +375,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      */
     private CoverageDescriptions describeCoverage111(
-            final org.constellation.wcs.v111.DescribeCoverage request)
+            final org.constellation.wcs.v111.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
         if (request.getIdentifier().size() == 0) {
@@ -490,7 +490,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public Response getCapabilities(AbstractGetCapabilities abstractRequest)
+    public Response getCapabilities(GetCapabilities abstractRequest)
                                   throws JAXBException, CstlServiceException
     {
         //we begin by extract the base attribute
@@ -505,13 +505,13 @@ public final class WCSWorker {
 
         if (version.equals("1.0.0")) {
             final WCSCapabilitiesType capabilities100 = getCapabilities100(
-                    (org.constellation.wcs.v100.GetCapabilities) abstractRequest);
+                    (org.constellation.wcs.v100.GetCapabilitiesType) abstractRequest);
             marshaller.marshal(capabilities100, sw);
             format = TEXT_XML;
         } else if (version.equals("1.1.1")) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
-                    ((org.constellation.wcs.v111.GetCapabilities)abstractRequest).getAcceptFormats();
+                    ((org.constellation.wcs.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
                 format = TEXT_XML;
             } else {
@@ -523,7 +523,7 @@ public final class WCSWorker {
             }
 
             final Capabilities capabilities111 = getCapabilities111(
-                    (org.constellation.wcs.v111.GetCapabilities) abstractRequest);
+                    (org.constellation.wcs.v111.GetCapabilitiesType) abstractRequest);
             marshaller.marshal(capabilities111, sw);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -544,7 +544,7 @@ public final class WCSWorker {
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private WCSCapabilitiesType getCapabilities100(
-            final org.constellation.wcs.v100.GetCapabilities request)
+            final org.constellation.wcs.v100.GetCapabilitiesType request)
                            throws CstlServiceException, JAXBException
     {
         /*
@@ -674,7 +674,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Capabilities getCapabilities111(final org.constellation.wcs.v111.GetCapabilities request)
+    private Capabilities getCapabilities111(final org.constellation.wcs.v111.GetCapabilitiesType request)
                                                            throws CstlServiceException, JAXBException
     {
         // First we try to extract only the requested section.
@@ -787,7 +787,7 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response getCoverage(final AbstractGetCoverage abstractRequest) throws JAXBException,
+    public Response getCoverage(final GetCoverage abstractRequest) throws JAXBException,
                                                                             CstlServiceException
     {
         final String inputVersion = abstractRequest.getVersion();

@@ -59,8 +59,8 @@ public class ObjectFactory {
      * Create an instance of {@link DescribeCoverage }
      * 
      */
-    public DescribeCoverage createDescribeCoverage() {
-        return new DescribeCoverage();
+    public DescribeCoverageType createDescribeCoverage() {
+        return new DescribeCoverageType();
     }
     
     /**
@@ -203,8 +203,8 @@ public class ObjectFactory {
      * Create an instance of {@link GetCapabilities }
      * 
      */
-    public GetCapabilities createGetCapabilities() {
-        return new GetCapabilities();
+    public GetCapabilitiesType createGetCapabilities() {
+        return new GetCapabilitiesType();
     }
     
     /**
@@ -315,8 +315,8 @@ public class ObjectFactory {
      * Create an instance of {@link GetCoverage }
      * 
      */
-    public GetCoverage createGetCoverage() {
-        return new GetCoverage();
+    public GetCoverageType createGetCoverage() {
+        return new GetCoverageType();
     }
 
     

@@ -29,7 +29,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Guilhem Legal
  * @author Cédric Briançon (Geomatys)
  */
-public interface AbstractGetCoverage extends AbstractRequest {
+public interface GetCoverage extends AbstractRequest {
 
     /**
      * Returns the {@link CoordinateReferenceSystem} of the request, or {@code null}

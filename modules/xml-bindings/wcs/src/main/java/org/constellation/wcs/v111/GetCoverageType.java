@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.CodeType;
-import org.constellation.wcs.AbstractGetCoverage;
+import org.constellation.wcs.GetCoverage;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
@@ -71,7 +71,7 @@ import org.opengis.referencing.crs.VerticalCRS;
     "output"
 })
 @XmlRootElement(name = "GetCoverage")
-public class GetCoverage implements AbstractGetCoverage {
+public class GetCoverageType implements GetCoverage {
 
     @XmlAttribute(required = true)
     private String service;
@@ -89,13 +89,13 @@ public class GetCoverage implements AbstractGetCoverage {
      /**
      * Empty constructor used by JAXB.
      */
-    GetCoverage() {
+    GetCoverageType() {
     }
     
     /**
      * Build a new GetCoverage request (1.1.1)
      */
-    public GetCoverage(CodeType identifier, DomainSubsetType domainSubset, 
+    public GetCoverageType(CodeType identifier, DomainSubsetType domainSubset,
             RangeSubsetType rangeSubset, OutputType output) {
         
         this.domainSubset        = domainSubset;
