@@ -93,8 +93,8 @@ public class SLDProvider implements StyleProvider{
     /**
      * {@inheritDoc }
      */
-    public Class<Object> getValueClass() {
-        return Object.class;
+    public Class<MutableStyle> getValueClass() {
+        return MutableStyle.class;
     }
 
     /**

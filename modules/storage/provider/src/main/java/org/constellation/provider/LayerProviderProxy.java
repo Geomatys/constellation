@@ -185,14 +185,7 @@ public class LayerProviderProxy implements LayerProvider{
             final String name = service.getName();
             final String path = CONFIG_PATH + name + ".xml";
             final File configFile = new File(path);
-            if(!configFile.exists()){
-                try {
-                    configFile.createNewFile();
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                    continue;
-                }
-            }
+            
             service.init(configFile);
 
             SERVICES.add(service);

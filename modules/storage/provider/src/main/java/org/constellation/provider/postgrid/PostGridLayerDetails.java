@@ -39,7 +39,6 @@ import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
-import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridMapLayer2;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
@@ -51,7 +50,6 @@ import org.geotools.coverage.io.CoverageReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.ElevationModel;
-import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
@@ -175,42 +173,24 @@ class PostGridLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public MapLayer getMapLayer(Object style, final Map<String, Object> params) {
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
         final PostGridMapLayer2 mapLayer = new PostGridMapLayer2(reader);
 
         mapLayer.setName(getName());
 
-        if (style == null) {
+        if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
-            if (favorites.size() > 0) {
-                //there are some favorites styles
-                style = favorites.get(0);
-            } else {
-                //no favorites defined, create a default one
-                style = RANDOM_FACTORY.createRasterStyle();
-            }
+            //there are some favorites styles
+            String namedStyle = favorites.get(0);
+            style = StyleProviderProxy.getInstance().get(namedStyle);
         }
 
-        if (style instanceof String) {
-            //the given style is a named style
-            style = StyleProviderProxy.getInstance().get((String)style);
-            if (style == null) {
-                //something is wrong, the named style doesnt exist, create a default one
-                style = RANDOM_FACTORY.createRasterStyle();
-            }
+        if(style == null){
+            //no favorites defined, create a default one
+            style = RANDOM_FACTORY.createRasterStyle();
         }
 
-        if (style instanceof MutableStyle) {
-            //style is a commun SLD style
-            mapLayer.setStyle((MutableStyle) style);
-        } else if (style instanceof GraphicBuilder) {
-            //special graphic builder
-            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
-            mapLayer.graphicBuilders().add((GraphicBuilder) style);
-        } else {
-            //style is unknowed type, use a random style
-            mapLayer.setStyle(RANDOM_FACTORY.createRasterStyle());
-        }
+        mapLayer.setStyle(style);
 
         if (params != null) {
             mapLayer.setDimRange((MeasurementRange) params.get(KEY_DIM_RANGE));

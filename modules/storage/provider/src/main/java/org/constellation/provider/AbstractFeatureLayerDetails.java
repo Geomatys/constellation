@@ -51,6 +51,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
@@ -131,7 +132,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public MapLayer getMapLayer(Object style, final Map<String, Object> params) throws PortrayalException{
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException{
         try {
             return createMapLayer(style, params);
         } catch (IOException ex) {
@@ -371,6 +372,6 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return query;
     }
     
-    protected abstract MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException;
+    protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException;
     
 }

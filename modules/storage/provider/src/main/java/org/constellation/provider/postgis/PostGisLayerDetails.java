@@ -27,7 +27,6 @@ import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
@@ -54,43 +53,23 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
     }
 
     @Override
-    protected MapLayer createMapLayer(Object style, final Map<String, Object> params) throws IOException{
+    protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException{
         MapLayer layer = null;
 
-        if(style == null){
+        if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
-            if(favorites.size() > 0){
-                //there are some favorites styles
-                style = favorites.get(0);
-            }else{
-                //no favorites defined, create a default one
-                style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            }
+            //there are some favorites styles
+            String namedStyle = favorites.get(0);
+            style = StyleProviderProxy.getInstance().get(namedStyle);
         }
 
-        if(style instanceof String){
-            //the given style is a named style
-            style = StyleProviderProxy.getInstance().get((String)style);
-            if(style == null){
-                //somehting is wrong, the named style doesnt exist, create a default one
-                style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            }
-        }
-
-        if(style instanceof MutableStyle){
-            //style is a commun SLD style
-            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
-        }else if( style instanceof GraphicBuilder){
-            //special graphic builder
+        if(style == null){
+            //no favorites defined, create a default one
             style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
-            layer.graphicBuilders().add((GraphicBuilder) style);
-        }else{
-            //style is unknowed type, use a random style
-            style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
-            layer = MapBuilder.createFeatureLayer(fs, (MutableStyle)style);
         }
 
+        layer = MapBuilder.createFeatureLayer(fs, style);
+        
         if (params != null) {
             final Date date = (Date) params.get(KEY_TIME);
             final Number elevation = (Number) params.get(KEY_ELEVATION);
@@ -101,4 +80,5 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
         
         return layer;
     }
+
 }

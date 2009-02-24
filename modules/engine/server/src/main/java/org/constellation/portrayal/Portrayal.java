@@ -20,11 +20,13 @@ package org.constellation.portrayal;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.style.MutableStyle;
 
 
 /**
@@ -98,36 +100,33 @@ public final class Portrayal {
 	
 	public final static class SceneDef{
 		
-		public final List<LayerDetails> layerRefs;
-		public final List<Object> styleRefs;
-		public final Map<String, Object> renderingParameters;//TODO: what is this really?
+		public final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+		public final List<MutableStyle> styleRefs = new ArrayList<MutableStyle>();
+        //Hold some extra parameters, like dimensions and DIM_RANGE styles.
+		public final Map<String, Object> renderingParameters = new HashMap<String, Object>();
 		
 		public SceneDef( List<LayerDetails> layerRefs, 
-				         List<Object> styleRefs, 
+				         List<MutableStyle> styleRefs,
 				         Map<String, Object> renderingParameters){
-			
-			assert( null != layerRefs );
-			assert( 0 < layerRefs.size() );
-			assert( null != styleRefs );
-			//assert( 0 < styleRefs.size() ); //No! since we could merely want the default styles
-			
-			this.layerRefs = layerRefs;
-			this.styleRefs = styleRefs;
-			this.renderingParameters = renderingParameters;
+			if(layerRefs.size() == 0){
+                throw new IllegalArgumentException("A scene definition must have at least one layer.");
+            }
+
+            this.layerRefs.addAll(layerRefs);
+            this.styleRefs.addAll(styleRefs);
+            this.renderingParameters.putAll(renderingParameters);
 		}
 
 		public SceneDef( LayerDetails layerRef, 
-				         Object styleRef, 
+				         MutableStyle styleRef,
 				         Map<String, Object> renderingParameters){
+			if(layerRef == null){
+                throw new NullPointerException("The scene's layer is not defined.");
+            }
 			
-			assert( null != layerRef );
-			assert( null != styleRef );
-			
-			this.layerRefs = new ArrayList<LayerDetails>();
 			this.layerRefs.add(layerRef);
-			this.styleRefs = new ArrayList<Object>();
 			this.styleRefs.add(styleRef);
-			this.renderingParameters = renderingParameters;
+            this.renderingParameters.putAll(renderingParameters);
 		}
 
 	}

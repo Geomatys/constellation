@@ -33,6 +33,7 @@ import org.geotools.map.MapBuilder;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.style.MutableStyle;
 
 
 /**
@@ -181,7 +182,7 @@ public class CstlPortrayalService implements PortrayalServiceIF {
         for (int i = 0; i < sdef.layerRefs.size(); i++){
 
         	final LayerDetails layerRef = sdef.layerRefs.get(i);
-        	final Object style = sdef.styleRefs.get(i);
+        	final MutableStyle style = sdef.styleRefs.get(i);
 
         	assert ( null != layerRef );
         	//style can be null

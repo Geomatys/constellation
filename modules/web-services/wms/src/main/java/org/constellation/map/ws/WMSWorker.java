@@ -54,6 +54,7 @@ import org.constellation.map.ws.rs.HTMLGraphicVisitor;
 import org.constellation.map.ws.rs.TextGraphicVisitor;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -594,17 +595,18 @@ public class WMSWorker extends AbstractWMSWorker {
         final List<String> styleNames          = getFI.getStyles();
         final MutableStyledLayerDescriptor sld = getFI.getSld();
         
-        final List<Object> styles = new ArrayList<Object>();
+        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
-            final Object style;
+            final MutableStyle style;
             if (sld != null) {
                 //try to use the provided SLD
                 style = extractStyle(layerRefs.get(i).getName(),sld);
             } else if (styleNames != null && styles.size() > i) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                style = styleNames.get(i);
+                String namedStyle = styleNames.get(i);
+                style = StyleProviderProxy.getInstance().get(namedStyle);
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
                 style = null;
@@ -746,17 +748,18 @@ public class WMSWorker extends AbstractWMSWorker {
         final List<String> styleNames          = getMap.getStyles();
         final MutableStyledLayerDescriptor sld = getMap.getSld();
         
-        final List<Object> styles = new ArrayList<Object>();
+        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
-            final Object style;
+            final MutableStyle style;
             if (sld != null) {
                 //try to use the provided SLD
                 style = extractStyle(layerRefs.get(i).getName(),sld);
             } else if (styleNames != null && styles.size() > i) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                style = styleNames.get(i);
+                String namedStyle = styleNames.get(i);
+                style = StyleProviderProxy.getInstance().get(namedStyle);
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
                 style = null;
@@ -873,7 +876,7 @@ public class WMSWorker extends AbstractWMSWorker {
     
 
 
-    private Object extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
+    private MutableStyle extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");
         }
@@ -887,9 +890,10 @@ public class WMSWorker extends AbstractWMSWorker {
                 for(final MutableLayerStyle mls : mnl.styles()){
                     if(mls instanceof MutableNamedStyle){
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
-                        return mns.getName();
+                        String namedStyle = mns.getName();
+                        return StyleProviderProxy.getInstance().get(namedStyle);
                     }else if(mls instanceof MutableStyle){
-                        return mls;
+                        return (MutableStyle)mls;
                     }
 
                 }

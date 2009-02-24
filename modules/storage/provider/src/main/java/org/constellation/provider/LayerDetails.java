@@ -34,6 +34,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
+import org.geotools.style.MutableStyle;
 import org.geotools.style.RandomStyleFactory;
 import org.geotools.style.StyleFactory;
 import org.geotools.util.MeasurementRange;
@@ -108,7 +109,7 @@ public interface LayerDetails {
      * @param style : can be null. reconized types are String/GraphicBuilder/MutableStyle.
      * @param params : can be null.
      */
-    public MapLayer getMapLayer(Object style, final Map<String, Object> params) throws PortrayalException;
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException;
 
     /**
      * @see Layer#getName

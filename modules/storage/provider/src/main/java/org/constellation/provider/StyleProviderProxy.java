@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.ws.rs.WebService;
+import org.geotools.style.MutableStyle;
 
 
 /**
@@ -36,7 +37,7 @@ import org.constellation.ws.rs.WebService;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public class StyleProviderProxy implements Provider<String,Object>{
+public class StyleProviderProxy implements Provider<String,MutableStyle>{
 
     /**
      * Default logger.
@@ -62,8 +63,8 @@ public class StyleProviderProxy implements Provider<String,Object>{
     /**
      * {@inheritDoc }
      */
-    public Class<Object> getValueClass() {
-        return Object.class;
+    public Class<MutableStyle> getValueClass() {
+        return MutableStyle.class;
     }
 
     /**
@@ -99,11 +100,11 @@ public class StyleProviderProxy implements Provider<String,Object>{
     /**
      * {@inheritDoc }
      */
-    public Object get(String key) {
+    public MutableStyle get(String key) {
 
         for(StyleProviderService service : SERVICES){
             for(StyleProvider provider : service.getProviders()){
-                Object style = provider.get(key);
+                MutableStyle style = provider.get(key);
                 if(style != null) return style;
             }
         }

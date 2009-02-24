@@ -21,8 +21,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.StyleProvider;
-import org.geotools.display.ext.vectorfield.GridMarkGraphicBuilder;
-import org.geotools.map.GraphicBuilder;
+import org.geotools.display.ext.vectorfield.VectorFieldSymbolizer;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.style.MutableStyle;
+import org.geotools.style.StyleFactory;
+import org.opengis.style.Symbolizer;
 
 /**
  *
@@ -30,7 +33,7 @@ import org.geotools.map.GraphicBuilder;
  */
 public class GO2StyleProvider implements StyleProvider{
     
-    private final Map<String,GraphicBuilder> index = new HashMap<String,GraphicBuilder>();
+    private final Map<String,MutableStyle> index = new HashMap<String,MutableStyle>();
     
     
     protected GO2StyleProvider(){
@@ -41,8 +44,8 @@ public class GO2StyleProvider implements StyleProvider{
         return String.class;
     }
 
-    public Class<Object> getValueClass() {
-        return Object.class;
+    public Class<MutableStyle> getValueClass() {
+        return MutableStyle.class;
     }
 
     public Set<String> getKeys() {
@@ -53,7 +56,7 @@ public class GO2StyleProvider implements StyleProvider{
         return index.containsKey(key);
     }
 
-    public GraphicBuilder get(String key) {
+    public MutableStyle get(String key) {
         return index.get(key);
     }
 
@@ -67,8 +70,11 @@ public class GO2StyleProvider implements StyleProvider{
     }
     
     private void visit() {
+        StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
         //TODO : find another way to load special styles.
-        index.put("GO2:VectorField", new GridMarkGraphicBuilder());
+        Symbolizer symbol = new VectorFieldSymbolizer();
+
+        index.put("GO2:VectorField", SF.createStyle(symbol));
     }
     
 }
