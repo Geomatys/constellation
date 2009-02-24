@@ -25,6 +25,7 @@ import org.constellation.ows.v110.CapabilitiesBaseType;
 import org.constellation.ows.v110.OperationsMetadata;
 import org.constellation.ows.v110.ServiceIdentification;
 import org.constellation.ows.v110.ServiceProvider;
+import org.constellation.wcs.GetCapabilitiesResponse;
 
 
 /**
@@ -51,7 +52,7 @@ import org.constellation.ows.v110.ServiceProvider;
     "contents"
 })
 @XmlRootElement(name = "Capabilities")
-public class Capabilities extends CapabilitiesBaseType {
+public class Capabilities extends CapabilitiesBaseType implements GetCapabilitiesResponse {
 
     @XmlElement(name = "Contents")
     private Contents contents;

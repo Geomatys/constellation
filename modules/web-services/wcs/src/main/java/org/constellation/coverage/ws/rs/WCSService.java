@@ -21,6 +21,7 @@ import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.Query.APP_XML;
+import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
 import static org.constellation.query.wcs.WCSQuery.GETCOVERAGE;
@@ -48,6 +49,7 @@ import static org.constellation.query.wcs.WCSQuery.KEY_STORE;
 import static org.constellation.query.wcs.WCSQuery.KEY_TIME;
 import static org.constellation.query.wcs.WCSQuery.KEY_TIMESEQUENCE;
 import static org.constellation.query.wcs.WCSQuery.KEY_WIDTH;
+import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
@@ -58,6 +60,7 @@ import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
 import com.sun.jersey.spi.resource.Singleton;
 
 // J2SE dependencies
+import java.awt.image.RenderedImage;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -78,7 +81,6 @@ import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.GridLimitsType;
 import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.ows.AbstractGetCapabilities;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
@@ -88,7 +90,9 @@ import org.constellation.query.Query;
 import org.constellation.query.QueryAdapter;
 import org.constellation.util.Util;
 import org.constellation.wcs.DescribeCoverage;
+import org.constellation.wcs.DescribeCoverageResponse;
 import org.constellation.wcs.GetCapabilities;
+import org.constellation.wcs.GetCapabilitiesResponse;
 import org.constellation.wcs.GetCoverage;
 import org.constellation.wcs.v111.GridCrsType;
 import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
@@ -189,7 +193,10 @@ public final class WCSService extends OGCWebService {
                 worker.internal_initServletContext(servletContext);
                 worker.internal_initUriContext(uriContext);
                 
-                return worker.getCapabilities(getcaps);
+                final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(capsResponse, sw);
+                return Response.ok(sw.toString(), TEXT_XML).build();
             }
             
             if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
@@ -210,7 +217,11 @@ public final class WCSService extends OGCWebService {
                     desccov = adaptKvpDescribeCoverageRequest();
                 }
                 
-                return worker.describeCoverage(desccov);
+                final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
+                //we marshall the response and return the XML String
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(describeResponse, sw);
+                return Response.ok(sw.toString(), TEXT_XML).build();
             }
             
             if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
@@ -222,7 +233,12 @@ public final class WCSService extends OGCWebService {
                 if (getcov == null) {
                     getcov = adaptKvpGetCoverageRequest();
                 }
-                return worker.getCoverage(getcov);
+                final RenderedImage rendered = worker.getCoverage(getcov);
+                String format = getcov.getFormat();
+                if (format.equalsIgnoreCase(MATRIX)) {
+                    format = "application/matrix";
+                }
+                return Response.ok(rendered, format).build();
             }
             
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",

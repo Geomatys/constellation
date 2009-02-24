@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.wcs.DescribeCoverageResponse;
 
 
 /**
@@ -50,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
     "coverageDescription"
 })
 @XmlRootElement(name = "CoverageDescriptions")
-public class CoverageDescriptions {
+public class CoverageDescriptions implements DescribeCoverageResponse {
 
     @XmlElement(name = "CoverageDescription", required = true)
     private List<CoverageDescriptionType> coverageDescription = new ArrayList<CoverageDescriptionType>();

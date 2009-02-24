@@ -16,7 +16,6 @@
  */
 package org.constellation.wcs.v100;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.wcs.DescribeCoverageResponse;
 
 
 /**
@@ -55,7 +55,7 @@ import javax.xml.bind.annotation.XmlType;
     "coverageOffering"
 })
 @XmlRootElement(name = "CoverageDescription")
-public class CoverageDescription {
+public class CoverageDescription implements DescribeCoverageResponse {
 
     @XmlElement(name = "CoverageOffering", required = true)
     private List<CoverageOfferingType> coverageOffering;

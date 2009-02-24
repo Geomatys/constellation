@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.constellation.wcs.GetCapabilitiesResponse;
 
 
 /**
@@ -60,7 +61,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     "contentMetadata"
 })
 @XmlRootElement(name="WCS_Capabilities")        
-public class WCSCapabilitiesType {
+public class WCSCapabilitiesType implements GetCapabilitiesResponse {
 
     @XmlElement(name = "Service", required = true)
     private ServiceType service;

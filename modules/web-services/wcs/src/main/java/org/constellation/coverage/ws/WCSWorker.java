@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,7 +40,6 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -74,8 +72,10 @@ import org.constellation.query.QueryAdapter;
 import org.constellation.register.RegisterException;
 import org.constellation.util.Util;
 import org.constellation.wcs.DescribeCoverage;
+import org.constellation.wcs.DescribeCoverageResponse;
 import org.constellation.wcs.GetCoverage;
 import org.constellation.wcs.GetCapabilities;
+import org.constellation.wcs.GetCapabilitiesResponse;
 import org.constellation.wcs.v100.ContentMetadata;
 import org.constellation.wcs.v100.CoverageDescription;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
@@ -211,8 +211,8 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response describeCoverage(final DescribeCoverage abstractRequest)
-                                          throws JAXBException, CstlServiceException
+    public DescribeCoverageResponse describeCoverage(final DescribeCoverage abstractRequest)
+                                                  throws JAXBException, CstlServiceException
     {
         LOGGER.info("describeCoverage request processing");
         this.actingVersion = new ServiceVersion(ServiceType.WCS, abstractRequest.getVersion());
@@ -223,21 +223,14 @@ public final class WCSWorker {
                            MISSING_PARAMETER_VALUE, actingVersion, "version");
         }
 
-        //we prepare the response object to return
-        final Object response;
         if (version.equals("1.0.0")) {
-            response = describeCoverage100((org.constellation.wcs.v100.DescribeCoverageType) abstractRequest);
+            return describeCoverage100((org.constellation.wcs.v100.DescribeCoverageType) abstractRequest);
         } else if (version.equals("1.1.1")) {
-            response = describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
+            return describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, actingVersion, "version");
         }
-
-        //we marshall the response and return the XML String
-        final StringWriter sw = new StringWriter();
-        marshaller.marshal(response, sw);
-        return Response.ok(sw.toString(), TEXT_XML).build();
     }
 
     /**
@@ -250,7 +243,7 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    private CoverageDescription describeCoverage100(
+    private DescribeCoverageResponse describeCoverage100(
             final org.constellation.wcs.v100.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
@@ -374,7 +367,7 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    private CoverageDescriptions describeCoverage111(
+    private DescribeCoverageResponse describeCoverage111(
             final org.constellation.wcs.v111.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
@@ -490,7 +483,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public Response getCapabilities(GetCapabilities abstractRequest)
+    public GetCapabilitiesResponse getCapabilities(GetCapabilities abstractRequest)
                                   throws JAXBException, CstlServiceException
     {
         //we begin by extract the base attribute
@@ -501,13 +494,9 @@ public final class WCSWorker {
 
         this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
         final String format;
-        StringWriter sw = new StringWriter();
 
         if (version.equals("1.0.0")) {
-            final WCSCapabilitiesType capabilities100 = getCapabilities100(
-                    (org.constellation.wcs.v100.GetCapabilitiesType) abstractRequest);
-            marshaller.marshal(capabilities100, sw);
-            format = TEXT_XML;
+            return getCapabilities100((org.constellation.wcs.v100.GetCapabilitiesType) abstractRequest);
         } else if (version.equals("1.1.1")) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
@@ -522,15 +511,11 @@ public final class WCSWorker {
                 }
             }
 
-            final Capabilities capabilities111 = getCapabilities111(
-                    (org.constellation.wcs.v111.GetCapabilitiesType) abstractRequest);
-            marshaller.marshal(capabilities111, sw);
+            return getCapabilities111((org.constellation.wcs.v111.GetCapabilitiesType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, actingVersion, "version");
         }
-
-        return Response.ok(sw.toString(), format).build();
     }
 
     /**
@@ -543,7 +528,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private WCSCapabilitiesType getCapabilities100(
+    private GetCapabilitiesResponse getCapabilities100(
             final org.constellation.wcs.v100.GetCapabilitiesType request)
                            throws CstlServiceException, JAXBException
     {
@@ -787,8 +772,8 @@ public final class WCSWorker {
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public Response getCoverage(final GetCoverage abstractRequest) throws JAXBException,
-                                                                            CstlServiceException
+    public RenderedImage getCoverage(final GetCoverage abstractRequest) throws JAXBException,
+                                                                         CstlServiceException
     {
         final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
@@ -834,8 +819,7 @@ public final class WCSWorker {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
             }
 
-            final String mime = "application/matrix";
-            return Response.ok(image, mime).build();
+            return image;
 
         } else if( abstractRequest.getFormat().equalsIgnoreCase(NETCDF) ){
 
@@ -906,7 +890,7 @@ public final class WCSWorker {
                 //}
             }
 
-            return Response.ok(img, abstractRequest.getFormat()).build();
+            return img;
         }
     }
 
