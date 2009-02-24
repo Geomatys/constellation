@@ -31,4 +31,6 @@ public interface ObservationFilterReader extends ObservationFilter {
 
     public List<Observation> getObservations() throws CstlServiceException;
 
+    public String getResults() throws CstlServiceException;
+
 }

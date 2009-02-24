@@ -31,7 +31,7 @@ import org.constellation.swe.AbstractDataComponent;
  * @version $Id:
  * @author Guilhem Legal
  */
-@XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class})
+@XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class, Text.class})
 @XmlType(name="AbstractDataComponent")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent {

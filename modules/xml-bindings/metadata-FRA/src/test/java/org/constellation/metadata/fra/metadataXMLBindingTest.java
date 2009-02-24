@@ -17,8 +17,6 @@
 
 package org.constellation.metadata.fra;
 
-
-//Junit dependencies
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.security.AccessController;
@@ -34,6 +32,7 @@ import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
 import org.geotools.referencing.NamedIdentifier;
 import org.opengis.referencing.ReferenceIdentifier;
 
+//Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 

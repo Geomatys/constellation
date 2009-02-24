@@ -55,6 +55,7 @@ import org.geotools.util.Utilities;
     "time",
     "_boolean",
     "quantity",
+    "text",
     "name"
 })
 public class AnyScalarPropertyType extends Entry implements AnyScalar {
@@ -73,6 +74,8 @@ public class AnyScalarPropertyType extends Entry implements AnyScalar {
     protected BooleanType _boolean;
     @XmlElement(name = "Quantity")
     protected QuantityType quantity;
+    @XmlElement(name = "Text")
+    protected Text text;
     
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
@@ -116,6 +119,8 @@ public class AnyScalarPropertyType extends Entry implements AnyScalar {
             this.quantity = (QuantityType)component;
         } else if (component instanceof BooleanType) {
             this._boolean = (BooleanType)component;
+        } else if (component instanceof Text) {
+            this.text = (Text)component;
         } else {
             abstractDataComponent = component;
         }

@@ -339,10 +339,17 @@ public class SOSworker {
             AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
         
             //we initialize the properties attribute
-            String observationIdBase  = configuration.getObservationIdBase() != null ? configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
-            sensorIdBase              = configuration.getSensorIdBase() != null ? configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
-            observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ? configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
-            maxObservationByRequest   = configuration.getMaxObservationByRequest() != 0 ? configuration.getMaxObservationByRequest() : 500;
+            String observationIdBase  = configuration.getObservationIdBase() != null ?
+            configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
+
+            sensorIdBase              = configuration.getSensorIdBase() != null ?
+            configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
+
+            observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
+            configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
+
+            maxObservationByRequest   = configuration.getMaxObservationByRequest() != 0 ?
+            configuration.getMaxObservationByRequest() : 500;
 
             int h, m;
             try {
@@ -358,7 +365,7 @@ public class SOSworker {
                 h = 1;
                 m = 0;
             }
-            templateValidTime         = (h * 3600000) + (m * 60000);
+            templateValidTime = (h * 3600000) + (m * 60000);
 
             // we initialize the reader/writer/filter
             SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
@@ -595,7 +602,7 @@ public class SOSworker {
                         INVALID_PARAMETER_VALUE, "responseFormat");
             }
         } else {
-            throw new CstlServiceException("Response format text/xml;subtype=\"om/1.0.0\" must be specify",
+            throw new CstlServiceException("Response format text/xml; subtype=\"om/1.0.0\" must be specify",
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
         
@@ -960,23 +967,31 @@ public class SOSworker {
         treatEventTimeRequest(times, false);
         
         //we prepare the response document
-        List<ObservationResult> results = OMFilter.filterResult();
-        StringBuilder datablock = new StringBuilder();
-        for (ObservationResult result: results) {
-            Timestamp tBegin = result.beginTime;
-            Timestamp tEnd   = result.endTime;
-            AnyResult a = OMReader.getResult(result.resultID);
-            if (a != null) {
-                DataArray array = a.getArray();
-                if (array != null) {
-                    String values = getResultValues(tBegin, tEnd, array, times);
-                    datablock.append(values).append('\n');
-                } else {
-                    throw new IllegalArgumentException("Array is null");
+        
+        String values;
+        if (OMFilter instanceof ObservationFilterReader) {
+            values = ((ObservationFilterReader)OMFilter).getResults();
+            
+        } else {
+            List<ObservationResult> results = OMFilter.filterResult();
+            StringBuilder datablock = new StringBuilder();
+            for (ObservationResult result: results) {
+                Timestamp tBegin = result.beginTime;
+                Timestamp tEnd   = result.endTime;
+                AnyResult a = OMReader.getResult(result.resultID);
+                if (a != null) {
+                    DataArray array = a.getArray();
+                    if (array != null) {
+                        String resultValues = getResultValues(tBegin, tEnd, array, times);
+                        datablock.append(resultValues).append('\n');
+                    } else {
+                        throw new IllegalArgumentException("Array is null");
+                    }
                 }
             }
+            values = datablock.toString();
         }
-        GetResultResponse.Result r = new GetResultResponse.Result(datablock.toString(), serviceURL + '/' + requestResult.getObservationTemplateId());
+        GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
         GetResultResponse response = new GetResultResponse(r);
         logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
         return response;

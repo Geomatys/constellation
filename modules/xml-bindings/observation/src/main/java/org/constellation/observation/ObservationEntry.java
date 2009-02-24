@@ -241,7 +241,7 @@ public class ObservationEntry extends Entry implements Observation {
      */
     public ObservationEntry getTemporaryTemplate(String temporaryName, AbstractTimeGeometricPrimitiveType time) {
         if (time == null) { 
-            TimePositionType begin = new  TimePositionType("1900-01-01 00:00:00");
+            TimePositionType begin = new  TimePositionType("1900-01-01T00:00:00");
             time = new TimePeriodType(begin);
         }
         PhenomenonEntry pheno = null;
