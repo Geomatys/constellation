@@ -24,6 +24,11 @@ package org.constellation.xacml;
  * @author Cédric Briançon
  */
 public class XACMLException extends Exception {
+    /*
+     * Serial version identifier.
+     */
+    private static final long serialVersionUID = -3358310787515594934L;
+
     /**
      * Creates an exception with no cause and no details message.
      */

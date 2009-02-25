@@ -26,6 +26,11 @@ import org.constellation.xacml.XACMLException;
  * @author Cédric Briançon
  */
 public class FactoryException extends XACMLException {
+    /*
+     * Serial version identifier.
+     */
+    private static final long serialVersionUID = 7421600909866689212L;
+
     /**
      * Creates an exception with no cause and no details message.
      */

@@ -62,6 +62,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
         }
     }
 
+    @Override
     public void init(final PolicyFinder finder) {
         policyFinder = finder;
     }

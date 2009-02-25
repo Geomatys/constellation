@@ -92,6 +92,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
      * @see XACMLPolicy#getType()
      * @see XACMLConstants
      */
+    @Override
     public int getType() {
         return policyType;
     }
@@ -99,6 +100,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
     /**
      * @see XACMLPolicy#setEnclosingPolicies
      */
+    @Override
     public void setEnclosingPolicies(List<XACMLPolicy> policies) {
         enclosingPolicies.addAll(policies);
     }
@@ -106,6 +108,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
     /**
      * @see XACMLPolicy#getEnclosingPolicies()
      */
+    @Override
     public List<XACMLPolicy> getEnclosingPolicies() {
         return enclosingPolicies;
     }
@@ -113,6 +116,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
     /**
      * @see ContextMapOp#get
      */
+    @Override
     public Object get(final XACMLConstants key) {
         return map.get(key);
     }
@@ -120,6 +124,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
     /**
      * @see ContextMapOp#set
      */
+    @Override
     public void set(final XACMLConstants key, final Object obj) {
         map.put(key, obj);
     }

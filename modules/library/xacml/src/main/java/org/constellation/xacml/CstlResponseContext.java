@@ -43,7 +43,6 @@ import org.constellation.xacml.policy.ObligationsType;
 import org.constellation.xacml.api.ResponseContext;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -63,6 +62,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ContextMapOp#get
      */
+    @Override
     public Object get(final XACMLConstants key) {
         return map.get(key);
     }
@@ -70,6 +70,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ContextMapOp#set
      */
+    @Override
     public void set(final XACMLConstants key, final Object obj) {
         map.put(key, obj);
     }
@@ -77,6 +78,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#getDecision()
      */
+    @Override
     public int getDecision() {
         final int decision = XACMLConstants.DECISION_DENY;
         final ResponseCtx response = (ResponseCtx) map.get(XACMLConstants.RESPONSE_CTX);
@@ -97,6 +99,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#getResult()
      */
+    @Override
     public ResultType getResult() {
         final ObjectFactory objectFactory = new ObjectFactory();
         final ResultType resultType = objectFactory.createResultType();
@@ -144,6 +147,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#getDocumentElement()
      */
+    @Override
     public Node getDocumentElement() {
         return documentElement;
     }
@@ -151,6 +155,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#marshall(OutputStream)
      */
+    @Override
     public void marshall(final OutputStream os) throws IOException {
         final ResponseCtx storedResponse = (ResponseCtx) get(XACMLConstants.RESPONSE_CTX);
         if (storedResponse != null) {
@@ -161,6 +166,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#readResponse(InputStream)
      */
+    @Override
     public void readResponse(final InputStream is) throws IOException {
         readResponse(getResponse(is));
     }
@@ -168,6 +174,7 @@ public class CstlResponseContext implements ResponseContext {
     /**
      * @see ResponseContext#readResponse(Node)
      */
+    @Override
     public void readResponse(final Node node) throws IOException {
         if (node == null) {
             throw new IllegalArgumentException("node is null");

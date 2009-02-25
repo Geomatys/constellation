@@ -92,10 +92,12 @@ public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
         this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, policyFinderModule);
     }
     
+    @Override
     public Object get(XACMLConstants key) {
         return map.get(key.key);
     }
 
+    @Override
     public void set(XACMLConstants key, Object obj) {
         map.put(key.key, obj);
     }

@@ -91,6 +91,7 @@ public class CstlPDP implements PolicyDecisionPoint {
     /**
      * @see PolicyDecisionPoint#evaluate(RequestContext)
      */
+    @Override
     public ResponseContext evaluate(final RequestContext request) {
         final HashSet<PolicyFinderModule> policyModules = new HashSet<PolicyFinderModule>();
         
@@ -124,6 +125,7 @@ public class CstlPDP implements PolicyDecisionPoint {
     /**
      * @see PolicyDecisionPoint#setLocators(Set)
      */
+    @Override
     public void setLocators(final Set<PolicyLocator> locators) {
         this.locators = locators;
     }
@@ -131,6 +133,7 @@ public class CstlPDP implements PolicyDecisionPoint {
     /**
      * @see PolicyDecisionPoint#setPolicies(Set)
      */
+    @Override
     public void setPolicies(final Set<XACMLPolicy> policies) {
         this.policies = policies;
         locators.add(new JBossPolicyLocator(policies));

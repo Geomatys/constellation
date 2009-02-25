@@ -24,6 +24,11 @@ package org.constellation.xacml;
  * @author Cédric Briançon
  */
 public class PDPException extends XACMLException {
+    /*
+     * Serial version identifier.
+     */
+    private static final long serialVersionUID = -7958843323996227939L;
+
     /**
      * Creates an exception with no cause and no details message.
      */

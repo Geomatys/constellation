@@ -56,6 +56,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see ContextMapOp#get
      */
+    @Override
     public Object get(final XACMLConstants key) {
         return map.get(key);
     }
@@ -63,6 +64,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see ContextMapOp#set
      */
+    @Override
     public void set(final XACMLConstants key, final Object obj) {
         map.put(key, obj);
     }
@@ -70,6 +72,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see RequestContext#getDocumentElement()
      */
+    @Override
     public Node getDocumentElement() {
         return documentElement;
     }
@@ -77,6 +80,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see RequestContext#setRequest(RequestType)
      */
+    @Override
     public void setRequest(final RequestType requestType) throws IOException {
         final JAXBElement<RequestType> requestJAXB = new ObjectFactory().createRequest(requestType);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -88,6 +92,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see RequestContext#readRequest(InputStream)
      */
+    @Override
     public void readRequest(final InputStream is) throws IOException {
         final Node root = getRequest(is);
         documentElement = root;
@@ -106,6 +111,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see RequestContext#readRequest(Node)
      */
+    @Override
     public void readRequest(final Node node) throws IOException {
         documentElement = node;
         if (node == null) {
@@ -123,6 +129,7 @@ public class CstlRequestContext implements RequestContext {
     /**
      * @see RequestContext#marshall(OutputStream)
      */
+    @Override
     public void marshall(final OutputStream os) throws IOException {
         final RequestCtx storedRequest = (RequestCtx) get(XACMLConstants.REQUEST_CTX);
         if (storedRequest != null) {

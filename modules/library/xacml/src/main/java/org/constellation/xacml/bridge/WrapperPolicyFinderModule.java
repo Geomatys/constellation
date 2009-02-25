@@ -46,6 +46,7 @@ public class WrapperPolicyFinderModule extends PolicyFinderModule {
     /**
      * @see PolicyFinderModule#init(com.sun.xacml.finder.PolicyFinder)
      */
+    @Override
     public void init(final PolicyFinder policyFinder) {
         this.policyFinder = policyFinder;
     }
