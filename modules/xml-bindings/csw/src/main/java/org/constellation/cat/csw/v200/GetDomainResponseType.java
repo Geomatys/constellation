@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.GetDomainResponse;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -83,6 +84,41 @@ public class GetDomainResponseType implements GetDomainResponse {
             domainValues = new ArrayList<DomainValuesType>();
         }
         return this.domainValues;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[GetDomainResponseType]").append('\n');
+        if (domainValues != null) {
+            sb.append("domainValues:").append('\n');
+            for (DomainValuesType d : domainValues) {
+                sb.append(d).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof GetDomainResponseType) {
+            final GetDomainResponseType that = (GetDomainResponseType) object;
+
+            return  Utilities.equals(this.domainValues, that.domainValues);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + (this.domainValues != null ? this.domainValues.hashCode() : 0);
+        return hash;
     }
 
 }

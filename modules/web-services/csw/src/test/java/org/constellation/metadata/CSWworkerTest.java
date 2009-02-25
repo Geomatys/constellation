@@ -34,16 +34,22 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constyellation dependencies
+import org.constellation.cat.csw.DomainValues;
+import org.constellation.cat.csw.GetDomainResponse;
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetCapabilitiesType;
+import org.constellation.cat.csw.v202.GetDomainResponseType;
+import org.constellation.cat.csw.v202.GetDomainType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
 import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.RecordType;
@@ -62,6 +68,7 @@ import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
 import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
+import static org.constellation.metadata.TypeNames.*;
 import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
 
 // geotools dependencies
@@ -491,7 +498,7 @@ public class CSWworkerTest {
     }
 
     /**
-     * Tests the getcapabilities method
+     * Tests the getRecords method
      *
      * @throws java.lang.Exception
      */
@@ -742,6 +749,58 @@ public class CSWworkerTest {
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
+
+    }
+
+    /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getDomainTest() throws Exception {
+
+        /*
+         *  TEST 1 : getDomain 2.0.2 parameterName = GetCapabilities.sections
+         */
+        GetDomainType request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.sections");
+
+        GetDomainResponse result = worker.getDomain(request);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        List<DomainValuesType> domainValues = new ArrayList<DomainValuesType>();
+        ListOfValuesType values = new  ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities"));
+        DomainValuesType value  = new DomainValuesType("GetCapabilities.sections", null, values, _Capabilities_QNAME);
+        domainValues.add(value);
+        GetDomainResponse expResult = new GetDomainResponseType(domainValues);
+
+        assertEquals(expResult, result);
+        
+        
+        /*
+         *  TEST 1 : getDomain 2.0.0 parameterName = GetCapabilities.sections
+         */
+        org.constellation.cat.csw.v200.GetDomainType request200 = new org.constellation.cat.csw.v200.GetDomainType("CSW", "2.0.0", null, "GetCapabilities.sections");
+
+        GetDomainResponse result200 = worker.getDomain(request200);
+
+        assertTrue(result200 instanceof org.constellation.cat.csw.v200.GetDomainResponseType);
+
+        List<org.constellation.cat.csw.v200.DomainValuesType> domainValues200 = new ArrayList<org.constellation.cat.csw.v200.DomainValuesType>();
+        List<Object> list = new ArrayList<Object>();
+        list.add("All");
+        list.add("ServiceIdentification");
+        list.add("ServiceProvider");
+        list.add("OperationsMetadata");
+        list.add("Filter_Capabilities");
+        org.constellation.cat.csw.v200.ListOfValuesType values200 = new org.constellation.cat.csw.v200.ListOfValuesType(list);
+        org.constellation.cat.csw.v200.DomainValuesType value200  = new org.constellation.cat.csw.v200.DomainValuesType("GetCapabilities.sections", null, values200, _Capabilities_QNAME);
+        domainValues200.add(value200);
+        GetDomainResponse expResult200 = new org.constellation.cat.csw.v200.GetDomainResponseType(domainValues200);
+
+        assertEquals(expResult200, result200);
+
 
     }
 

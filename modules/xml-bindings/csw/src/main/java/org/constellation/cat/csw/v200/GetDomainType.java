@@ -60,7 +60,31 @@ public class GetDomainType extends RequestBaseType implements GetDomain {
     @XmlElement(name = "PropertyName")
     private QName propertyName;
     @XmlElement(name = "ParameterName")
-    private QName parameterName;
+    private String parameterName;
+
+    /**
+     * An empty constructor used by JAXB
+     */
+    public GetDomainType() {
+
+    }
+
+    /**
+     * Build a new GetDomain request.
+     * One of propertyName or parameterName must be null
+     *
+     * @param service
+     * @param version
+     * @param propertyName
+     */
+    public GetDomainType(String service, String version, QName propertyName, String parameterName) {
+        super(service, version);
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
+    }
 
     /**
      * Gets the value of the propertyName property.
@@ -85,16 +109,14 @@ public class GetDomainType extends RequestBaseType implements GetDomain {
      * 
      */
     public String getParameterName() {
-        if (parameterName != null)
-            return parameterName.getPrefix() + ":" + parameterName.getLocalPart();
-        return null;
+        return parameterName;
     }
 
     /**
      * Sets the value of the parameterName property.
      * 
      */
-    public void setParameterName(QName value) {
+    public void setParameterName(String value) {
         this.parameterName = value;
     }
 

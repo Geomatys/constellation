@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
  *
  * @author guilhem
  */
-public class SmlIOTest {
+public class SmlXMLBindingTest {
 
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller unmarshaller;

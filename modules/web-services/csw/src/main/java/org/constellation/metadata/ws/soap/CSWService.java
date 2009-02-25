@@ -39,6 +39,7 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
+import org.constellation.cat.csw.GetDomainResponse;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
@@ -162,7 +163,7 @@ public class CSWService {
      * Web service operation 
      */
     @WebMethod(action="getDomain")
-    public GetDomainResponseType getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
+    public GetDomainResponse getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
         try {
             logger.info("received SOAP GetDomain request");
             return worker.getDomain(requestGetDomain);

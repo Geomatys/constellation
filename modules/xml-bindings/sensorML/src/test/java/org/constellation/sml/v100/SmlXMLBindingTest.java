@@ -70,7 +70,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SmlIOTest {
+public class SmlXMLBindingTest {
 
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller unmarshaller;

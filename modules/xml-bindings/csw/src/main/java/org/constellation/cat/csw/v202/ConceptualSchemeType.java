@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -81,4 +82,48 @@ public class ConceptualSchemeType {
     public String getAuthority() {
         return authority;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ConceptualSchemeType]").append('\n');
+        if (authority != null) {
+            sb.append("authority:").append(authority).append('\n');
+        }
+        if (name != null) {
+            sb.append("name:").append(name).append('\n');
+        }
+        if (document != null) {
+            sb.append("document:").append(document).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ConceptualSchemeType) {
+            final ConceptualSchemeType that = (ConceptualSchemeType) object;
+
+            return  Utilities.equals(this.authority, that.authority) &&
+                    Utilities.equals(this.name,      that.name)      &&
+                    Utilities.equals(this.document,  that.document);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 17 * hash + (this.document != null ? this.document.hashCode() : 0);
+        hash = 17 * hash + (this.authority != null ? this.authority.hashCode() : 0);
+        return hash;
+    }
+
+
 }

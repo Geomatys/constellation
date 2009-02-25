@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * 
  * @author Guilhem Legal
  */
-public class FilterMarshallingTest {
+public class FilterXMLBindingTest {
     
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller unmarshaller;

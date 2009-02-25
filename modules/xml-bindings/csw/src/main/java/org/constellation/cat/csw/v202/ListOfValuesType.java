@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -56,7 +57,7 @@ public class ListOfValuesType {
     /**
      * An empty constructor used by JAXB 
      */
-     ListOfValuesType(){
+     public ListOfValuesType(){
          
      }
      
@@ -76,6 +77,41 @@ public class ListOfValuesType {
             value = new ArrayList<String>();
         }
         return Collections.unmodifiableList(value);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ListOfValuesType]").append('\n');
+        if (value != null) {
+            sb.append("values:").append('\n');
+            for (String v : value) {
+                sb.append(v).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof ListOfValuesType) {
+            final ListOfValuesType that = (ListOfValuesType) object;
+
+            return  Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
     }
 
 }

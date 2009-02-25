@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -67,4 +68,42 @@ public class RangeOfValuesType {
     public Object getMaxValue() {
         return maxValue;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[RangeOfValuesType]").append('\n');
+        if (minValue != null) {
+            sb.append("minValue:").append(minValue).append('\n');
+        }
+        if (maxValue != null) {
+            sb.append("maxValue:").append(maxValue).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof RangeOfValuesType) {
+            final RangeOfValuesType that = (RangeOfValuesType) object;
+
+            return  Utilities.equals(this.minValue, that.minValue) &&
+                    Utilities.equals(this.maxValue, that.maxValue);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.minValue != null ? this.minValue.hashCode() : 0);
+        hash = 53 * hash + (this.maxValue != null ? this.maxValue.hashCode() : 0);
+        return hash;
+    }
+    
 }

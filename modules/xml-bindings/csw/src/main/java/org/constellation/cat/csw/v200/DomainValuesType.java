@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.DomainValues;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -68,7 +69,7 @@ public class DomainValuesType implements DomainValues {
     @XmlElement(name = "PropertyName")
     private QName propertyName;
     @XmlElement(name = "ParameterName")
-    private QName parameterName;
+    private String parameterName;
     @XmlElement(name = "ListOfValues")
     private ListOfValuesType listOfValues;
     @XmlElement(name = "ConceptualScheme")
@@ -81,6 +82,31 @@ public class DomainValuesType implements DomainValues {
     @XmlSchemaType(name = "anyURI")
     private String uom;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    public DomainValuesType() {
+
+    }
+
+    /**
+     * Build a new Domain values type with the specified list Of Values.
+     * One of parameterName or propertyName must be null.
+     *
+     */
+    public DomainValuesType(String parameterName, QName propertyName, ListOfValuesType listOfValues, QName type) {
+
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        } else if (propertyName == null && parameterName == null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be filled");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
+        this.listOfValues  = listOfValues;
+        this.type          = type;
+    }
+    
     /**
      * Gets the value of the propertyName property.
      * 
@@ -100,7 +126,7 @@ public class DomainValuesType implements DomainValues {
     /**
      * Gets the value of the parameterName property.
      */
-    public QName getParameterName() {
+    public String getParameterName() {
         return parameterName;
     }
 
@@ -108,7 +134,7 @@ public class DomainValuesType implements DomainValues {
      * Sets the value of the parameterName property.
      * 
      */
-    public void setParameterName(QName value) {
+    public void setParameterName(String value) {
         this.parameterName = value;
     }
 
@@ -192,4 +218,65 @@ public class DomainValuesType implements DomainValues {
         this.uom = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[DomainValuesType]").append('\n');
+        if (conceptualScheme != null) {
+            sb.append("conceptualScheme:").append(conceptualScheme).append('\n');
+        }
+        if (listOfValues != null) {
+            sb.append("listOfValues:").append(listOfValues).append('\n');
+        }
+        if (parameterName != null) {
+            sb.append("parameterName:").append(parameterName).append('\n');
+        }
+        if (propertyName != null) {
+            sb.append("propertyName:").append(propertyName).append('\n');
+        }
+        if (rangeOfValues != null) {
+            sb.append("rangeOfValues:").append(rangeOfValues).append('\n');
+        }
+        if (type != null) {
+            sb.append("type:").append(type).append('\n');
+        }
+        if (uom != null) {
+            sb.append("uom:").append(uom).append('\n');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DomainValuesType) {
+            final DomainValuesType that = (DomainValuesType) object;
+
+            return  Utilities.equals(this.conceptualScheme, that.conceptualScheme) &&
+                    Utilities.equals(this.listOfValues,     that.listOfValues) &&
+                    Utilities.equals(this.parameterName,    that.parameterName) &&
+                    Utilities.equals(this.propertyName,     that.propertyName) &&
+                    Utilities.equals(this.rangeOfValues,    that.rangeOfValues) &&
+                    Utilities.equals(this.type,             that.type) &&
+                    Utilities.equals(this.uom,              that.uom);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.propertyName != null ? this.propertyName.hashCode() : 0);
+        hash = 97 * hash + (this.parameterName != null ? this.parameterName.hashCode() : 0);
+        hash = 97 * hash + (this.listOfValues != null ? this.listOfValues.hashCode() : 0);
+        hash = 97 * hash + (this.conceptualScheme != null ? this.conceptualScheme.hashCode() : 0);
+        hash = 97 * hash + (this.rangeOfValues != null ? this.rangeOfValues.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 97 * hash + (this.uom != null ? this.uom.hashCode() : 0);
+        return hash;
+    }
 }

@@ -62,7 +62,7 @@ import static org.junit.Assert.*;
  * 
  * @author Guilhem Legal
  */
-public class RecordMarshallingTest {
+public class CswXMLBindingTest {
     
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller recordUnmarshaller202;

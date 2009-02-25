@@ -345,7 +345,7 @@ public class CSWService extends OGCWebService {
                     requestedSections.add(token);
                 } else {
                     throw new CstlServiceException("The section " + token + " does not exist",
-                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "Sections");
+                                                  INVALID_PARAMETER_VALUE, "Sections");
                 }   
             }
         } else {
@@ -378,7 +378,7 @@ public class CSWService extends OGCWebService {
                 resultType = ResultType.fromValue(resultTypeName);
             } catch (IllegalArgumentException e){
                throw new CstlServiceException("The resultType " + resultTypeName + " does not exist",
-                                             INVALID_PARAMETER_VALUE, getActingVersion(), "ResultType");
+                                             INVALID_PARAMETER_VALUE, "ResultType");
             }
         }
         
@@ -402,7 +402,7 @@ public class CSWService extends OGCWebService {
                 startPosition = new Integer(startPos);
             } catch (NumberFormatException e){
                throw new CstlServiceException("The positif integer " + startPos + " is malformed",
-                                             INVALID_PARAMETER_VALUE, getActingVersion(), "startPosition");
+                                             INVALID_PARAMETER_VALUE, "startPosition");
             }
         } 
         
@@ -414,7 +414,7 @@ public class CSWService extends OGCWebService {
                 maxRecords = new Integer(maxRec);
             } catch (NumberFormatException e){
                throw new CstlServiceException("The positif integer " + maxRec + " is malformed",
-                                             INVALID_PARAMETER_VALUE, getActingVersion(), "maxRecords");
+                                             INVALID_PARAMETER_VALUE, "maxRecords");
             }
         } 
         
@@ -437,7 +437,7 @@ public class CSWService extends OGCWebService {
                     namespaces.put(prefix, url);
                 } else {
                      throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, "namespace");
                 }
             }
         }
@@ -460,7 +460,7 @@ public class CSWService extends OGCWebService {
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
                 throw new CstlServiceException("The QName " + token + " is malformed",
-                        INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
+                        INVALID_PARAMETER_VALUE, "namespace");
             }
         }
         
@@ -472,7 +472,7 @@ public class CSWService extends OGCWebService {
             
             } catch (IllegalArgumentException e){
                throw new CstlServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, getActingVersion(), "ElementSetName");
+                                                INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
         
@@ -493,12 +493,12 @@ public class CSWService extends OGCWebService {
                         orderType = SortOrderType.fromValue(order);
                     } catch (IllegalArgumentException e){
                         throw new CstlServiceException("The SortOrder Name " + order + " does not exist",
-                                                      INVALID_PARAMETER_VALUE, getActingVersion(), "SortBy");
+                                                      INVALID_PARAMETER_VALUE, "SortBy");
                     }
                     sorts.add(new SortPropertyType(propName, orderType));
                 } else {
                      throw new CstlServiceException("The expression " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, getActingVersion(), "SortBy");
+                                                      INVALID_PARAMETER_VALUE, "SortBy");
                 }
             }
             sortBy = new SortByType(sorts);
@@ -523,7 +523,7 @@ public class CSWService extends OGCWebService {
                 
             } else {
                 throw new CstlServiceException("The constraint language " + constLanguage + " is not supported",
-                                                 INVALID_PARAMETER_VALUE, getActingVersion(), "ConstraintLanguage");
+                                                 INVALID_PARAMETER_VALUE, "ConstraintLanguage");
             }
         }
         
@@ -545,7 +545,7 @@ public class CSWService extends OGCWebService {
                     hopCount = Integer.parseInt(count);
                 } catch (NumberFormatException e){
                     throw new CstlServiceException("The positif integer " + count + " is malformed",
-                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "HopCount");
+                                                  INVALID_PARAMETER_VALUE, "HopCount");
                 }
             }
             distribSearch = new DistributedSearchType(hopCount);
@@ -584,7 +584,7 @@ public class CSWService extends OGCWebService {
             
             } catch (IllegalArgumentException e){
                throw new CstlServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                             INVALID_PARAMETER_VALUE, getActingVersion(), "ElementSetName");
+                                             INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
         
@@ -647,7 +647,7 @@ public class CSWService extends OGCWebService {
                     namespaces.put(prefix, url);
                 } else {
                      throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, "namespace");
                 }
             }
         }
@@ -670,7 +670,7 @@ public class CSWService extends OGCWebService {
                     typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
                 } else {
                      throw new CstlServiceException("The QName " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, getActingVersion(), "namespace");
+                                                   INVALID_PARAMETER_VALUE, "namespace");
                 }
         }
         
@@ -698,7 +698,7 @@ public class CSWService extends OGCWebService {
         String propertyName = getParameter("PROPERTYNAME", false);
         if (propertyName != null && parameterName != null) {
             throw new CstlServiceException("One of propertyName or parameterName must be null",
-                                          INVALID_PARAMETER_VALUE, getActingVersion(), "parameterName");
+                                          INVALID_PARAMETER_VALUE, "parameterName");
         }
        
         return new GetDomainType(service, version, propertyName, parameterName);
@@ -726,7 +726,7 @@ public class CSWService extends OGCWebService {
                 harvestInterval          = factory.newDuration(interval) ;
             } catch (DatatypeConfigurationException ex) {
                 throw new CstlServiceException("The Duration " + interval + " is malformed",
-                                              INVALID_PARAMETER_VALUE, getActingVersion(), "HarvestInsterval");
+                                              INVALID_PARAMETER_VALUE, "HarvestInsterval");
             }
         }
         

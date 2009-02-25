@@ -68,7 +68,7 @@ public class GetDomainType extends RequestBaseType implements GetDomain {
     /**
      * An empty constructor used by JAXB
      */
-    GetDomainType() {
+    public GetDomainType() {
         
     }
     

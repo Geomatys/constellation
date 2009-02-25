@@ -57,6 +57,8 @@ import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.cat.csw.Harvest;
 import org.constellation.cat.csw.Transaction;
 import org.constellation.cat.csw.DescribeRecord;
+import org.constellation.cat.csw.DomainValues;
+import org.constellation.cat.csw.GetDomainResponse;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.Capabilities;
@@ -101,13 +103,16 @@ import org.constellation.ows.Sections;
 import org.constellation.ows.v100.DomainType;
 import org.constellation.ows.v100.Operation;
 import org.constellation.ows.v100.OperationsMetadata;
+import org.constellation.ows.v100.SectionsType;
 import org.constellation.ows.v100.ServiceIdentification;
 import org.constellation.ows.v100.ServiceProvider;
+import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.ws.rs.WebService;
-import org.constellation.util.Util;
+import org.constellation.ws.ServiceType;
+import org.constellation.ws.ServiceVersion;
 
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.io.MetadataReader.*;
@@ -134,12 +139,12 @@ import javax.xml.namespace.QName;
 import org.geotools.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
-import org.constellation.ows.v100.SectionsType;
 import org.opengis.filter.sort.SortOrder;
 
 
 /**
- *
+ * The CSW (Catalog Service Web) engine.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public class CSWworker {
@@ -243,8 +248,17 @@ public class CSWworker {
      * A flag indicating if the service have to support Transactional operations.
      */
     private int profile;
-    
+
+    /**
+     * A factory registry allowing to load various CSW Factory in function of the implementation build.
+     */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
+
+
+    /**
+     * The current version of the service.
+     */
+    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.2");
 
     /**
      * Default constructor for CSW worker.
@@ -259,7 +273,8 @@ public class CSWworker {
     
     /**
      * Build a new CSW worker with the specified configuration directory
-     * 
+     *
+     * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      * @param marshaller A JAXB marshaller to send xml to another CSW service.
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
@@ -370,7 +385,7 @@ public class CSWworker {
     }
 
     /**
-     * Initialize the supported type names in function of the redaer capacity.
+     * Initialize the supported type names in function of the reader capacity.
      */
     private void initializeSupportedTypeNames() {
         SUPPORTED_TYPE_NAME = new ArrayList<QName>();
@@ -387,7 +402,7 @@ public class CSWworker {
     }
 
     /**
-     * Initialize the supported outputSchema in function of the redaer capacity.
+     * Initialize the supported outputSchema in function of the reader capacity.
      */
     private void initializeAcceptedResourceType() {
         ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
@@ -1211,86 +1226,17 @@ public class CSWworker {
     }
     
     /**
-     * Return true if the specified list of QNames contains an ebrim V3.0 QName.
-     *
-     * @param qnames A list of QNames.
-     * @return true if the list contains at least one ebrim V3.0 QName.
-     */
-    private boolean containsOneOfEbrim30(final List<QName> qnames) {
-        
-        if (qnames.contains(_AdhocQuery_QNAME)
-         || qnames.contains(_Association_QNAME)
-         || qnames.contains(_AuditableEvent_QNAME)
-         || qnames.contains(_ClassificationNode_QNAME)
-         || qnames.contains(_ClassificationScheme_QNAME)
-         || qnames.contains(_Classification_QNAME)
-         || qnames.contains(_ExternalIdentifier_QNAME)
-         || qnames.contains(_ExternalLink_QNAME)
-         || qnames.contains(_ExtrinsicObject_QNAME)
-         || qnames.contains(_Federation_QNAME)
-         || qnames.contains(_Notification_QNAME)
-         || qnames.contains(_ObjectRefList_QNAME)
-         || qnames.contains(_Person_QNAME)
-         || qnames.contains(_Organization_QNAME)
-         || qnames.contains(_RegistryObject_QNAME)
-         || qnames.contains(_RegistryPackage_QNAME)
-         || qnames.contains(_Registry_QNAME)
-         || qnames.contains(_ServiceBinding_QNAME)
-         || qnames.contains(_Service_QNAME)
-         || qnames.contains(_SpecificationLink_QNAME)
-         || qnames.contains(_Subscription_QNAME)
-         || qnames.contains(_User_QNAME)
-         || qnames.contains(_WRSExtrinsicObject_QNAME))
-            return true;
-        return false;
-    }
-    
-    /**
-     * Return true if the specified list of QNames contains an ebrim V2.5 QName.
-     *
-     * @param qnames A list of QNames.
-     * @return true if the list contains at least one ebrim V2.5 QName.
-     */
-    private boolean containsOneOfEbrim25(final List<QName> qnames) {
-        
-        if (qnames.contains(_ExtrinsicObject25_QNAME)
-         || qnames.contains(_Federation25_QNAME)
-         || qnames.contains(_ExternalLink25_QNAME)
-         || qnames.contains(_ClassificationNode25_QNAME)
-         || qnames.contains(_User25_QNAME)
-         || qnames.contains(_Classification25_QNAME)
-         || qnames.contains(_RegistryPackage25_QNAME)
-         || qnames.contains(_RegistryObject25_QNAME)
-         || qnames.contains(_Association25_QNAME)
-         || qnames.contains(_RegistryEntry25_QNAME)
-         || qnames.contains(_ClassificationScheme25_QNAME)
-         || qnames.contains(_Organization25_QNAME)
-         || qnames.contains(_ExternalIdentifier25_QNAME)
-         || qnames.contains(_SpecificationLink25_QNAME)
-         || qnames.contains(_Registry25_QNAME)
-         || qnames.contains(_ServiceBinding25_QNAME)
-         || qnames.contains(_Service25_QNAME)
-         || qnames.contains(_AuditableEvent25_QNAME)
-         || qnames.contains(_Subscription25_QNAME)
-         || qnames.contains(_Geometry09_QNAME)
-         || qnames.contains(_ApplicationModule09_QNAME)
-         || qnames.contains(_WRSExtrinsicObject09_QNAME))
-            return true;
-        return false;
-    }
-    
-    /**
      * TODO
      * 
      * @param request
      * @return
      */
-    public GetDomainResponseType getDomain(final GetDomain request) throws CstlServiceException{
+    public GetDomainResponse getDomain(final GetDomain request) throws CstlServiceException{
         logger.info("GetDomain request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the response
-        List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
+        List<? extends DomainValues> responseList;
         
         String parameterName = request.getParameterName();
         String propertyName  = request.getPropertyName();
@@ -1305,6 +1251,7 @@ public class CSWworker {
          * "parameterName" return metadata about the service itself.
          */ 
         if (parameterName != null) {
+            List<DomainValues> tmp = new ArrayList<DomainValues>();
             final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -1326,9 +1273,15 @@ public class CSWworker {
                             type = _Record_QNAME;
                         }
                         if (param != null) {
-                            ListOfValuesType values = new  ListOfValuesType(param.getValue());
-                            DomainValuesType value  = new DomainValuesType(token, null, values, type); 
-                            responseList.add(value);
+                            DomainValues value;
+                            if (actingVersion.toString().equals("2.0.0")) {
+                                org.constellation.cat.csw.v200.ListOfValuesType values = new org.constellation.cat.csw.v200.ListOfValuesType(param.getValue());
+                                value  = new org.constellation.cat.csw.v200.DomainValuesType(token, null, values, type);
+                            } else {
+                                ListOfValuesType values = new ListOfValuesType(param.getValue());
+                                value  = new DomainValuesType(token, null, values, type);
+                            }
+                            tmp.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
                                                           INVALID_PARAMETER_VALUE, "parameterName");
@@ -1342,20 +1295,26 @@ public class CSWworker {
                                                      INVALID_PARAMETER_VALUE, "parameterName");
                 }
             }
+            responseList = tmp;
         
         /*
          * "PropertyName" return a list of metadata for a specific field.
          */  
         } else if (propertyName != null) {
-            responseList = (List<DomainValuesType>) MDReader.getFieldDomainofValues(propertyName);
+            responseList = MDReader.getFieldDomainofValues(propertyName);
             
         // if no parameter have been filled we launch an exception    
         } else {
             throw new CstlServiceException("One of propertyName or parameterName must be filled",
                                           MISSING_PARAMETER_VALUE, "parameterName, propertyName");
         }
-        logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");   
-        return new GetDomainResponseType(responseList);
+        logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+
+        if (actingVersion.toString().equals("2.0.0")) {
+            return new org.constellation.cat.csw.v200.GetDomainResponseType((List<org.constellation.cat.csw.v200.DomainValuesType>)responseList);
+        } else {
+            return new GetDomainResponseType((List<DomainValuesType>)responseList);
+        }
     }
     
     /**
@@ -1602,9 +1561,18 @@ public class CSWworker {
                                               MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().equals("2.0.2")) {
-                    throw new CstlServiceException("version must be \"2.0.2\"!",
-                                                  VERSION_NEGOTIATION_FAILED, "version");
+                /*
+                 * Ugly patch to begin to support CSW 2.0.0 request
+                 *
+                 * TODO remove this
+                 */
+                if (request.getVersion().equals("2.0.2")) {
+                    this.actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.2");
+                } else if (request.getVersion().equals("2.0.0") && (request instanceof GetDomain)) {
+                    this.actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.0");
+
+                } else {
+                    throw new CstlServiceException("version must be \"2.0.2\"!", VERSION_NEGOTIATION_FAILED, "version");
                 }
             } else {
                 throw new CstlServiceException("version must be specified!",
