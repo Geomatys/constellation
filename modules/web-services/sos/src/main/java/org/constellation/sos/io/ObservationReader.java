@@ -37,33 +37,23 @@ import org.opengis.observation.sampling.SamplingFeature;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class ObservationReader {
-    
-    /**
-     * use for debugging purpose
-     */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.io");
-    
-    /**
-     * The base for observation id.
-     */ 
-    protected final String observationIdBase;
+public interface ObservationReader {
     
     /**
      * Build a new Observation Reader
      *
      * @param observationIdBase An urn prefixing the observations id.
-     */
+     *
     public ObservationReader(String observationIdBase) throws CstlServiceException {
         this.observationIdBase = observationIdBase;
-    }
+    }*/
 
     /**
      * Return the list of offering names.
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Collection<String> getOfferingNames() throws CstlServiceException;
+    public Collection<String> getOfferingNames() throws CstlServiceException;
 
     /**
      * Return The offering with the specified name.
@@ -72,28 +62,28 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
+    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
+    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
 
     /**
      * Return a list of the sensor identifiers.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Collection<String> getProcedureNames() throws CstlServiceException;
+    public Collection<String> getProcedureNames() throws CstlServiceException;
 
     /**
      * Return a list of the phenomenon identifiers.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Collection<String> getPhenomenonNames() throws CstlServiceException;
+    public Collection<String> getPhenomenonNames() throws CstlServiceException;
 
     /**
      * Return a phenomenon with the specified identifier
@@ -101,7 +91,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
+    public Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
 
     /**
      * Return a list of sampling feature identifiers.
@@ -109,7 +99,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
+    public Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
 
     /**
      * Return a sampling feature for the specified sampling feature.
@@ -118,7 +108,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+    public SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.
@@ -127,7 +117,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract Observation getObservation(String identifier) throws CstlServiceException;
+    public Observation getObservation(String identifier) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.
@@ -136,7 +126,7 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract AnyResult getResult(String identifier) throws CstlServiceException;
+    public AnyResult getResult(String identifier) throws CstlServiceException;
 
     /**
      * Return a reference from the specified identifier
@@ -144,20 +134,25 @@ public abstract class ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract ReferenceEntry getReference(String href) throws CstlServiceException;
+    public ReferenceEntry getReference(String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation.
      */
-    public abstract String getNewObservationId() throws CstlServiceException;
+    public String getNewObservationId() throws CstlServiceException;
     
     /**
      * Return the minimal/maximal value for the offering event Time
      */
-    public abstract List<String> getEventTime() throws CstlServiceException;
+    public List<String> getEventTime() throws CstlServiceException;
 
+    /**
+     * Return informations about the implementation class.
+     */
+    public String getInfos();
+    
     /**
      * free the resources and close the database connection if there is one.
      */
-    public abstract void destroy();
+    public void destroy();
 }

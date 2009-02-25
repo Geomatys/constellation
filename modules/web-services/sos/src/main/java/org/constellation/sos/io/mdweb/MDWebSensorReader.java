@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -45,9 +46,14 @@ import org.mdweb.xml.Writer;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public class MDWebSensorReader extends SensorReader {
+public class MDWebSensorReader implements SensorReader {
+
+    /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
 
      /**
      * A simple Connection to the SensorML database.
@@ -154,7 +160,11 @@ public class MDWebSensorReader extends SensorReader {
             throw new CstlServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
         }
     }
-    
+
+    public String getInfos() {
+        return "Constellation MDweb Sensor Reader 0.3";
+    }
+
     @Override
     public void destroy() {
         try {

@@ -1652,6 +1652,14 @@ public class CSWworker {
         }
     }
 
+    /**
+     * Redirect the logs into the specified folder.
+     * if the parameter ID is null or empty it create a file named "cstl-csw.log"
+     * else the file is named "ID-cstl-csw.log"
+     *
+     * @param ID The ID of the service in a case of multiple sos server.
+     * @param filePath The path to the log folder.
+     */
     private void initLogger(String ID, String filePath) {
         try {
             if (ID != null && !ID.equals("")) {

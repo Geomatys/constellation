@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.sos.io;
+package org.constellation.sos.io.postgrid;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 // constellation dependencies
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
@@ -33,6 +34,7 @@ import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
+import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
@@ -52,7 +54,12 @@ import org.postgresql.ds.PGSimpleDataSource;
  * 
  * @author Guilhem Legal
  */
-public class DefaultObservationWriter extends ObservationWriter {
+public class DefaultObservationWriter implements ObservationWriter {
+
+    /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
 
     /**
      * A Database object for the O&M dataBase.
@@ -225,6 +232,10 @@ public class DefaultObservationWriter extends ObservationWriter {
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
+    }
+
+    public String getInfos() {
+        return "Constellation Postgrid O&M Writer 0.3";
     }
 
     public void destroy() {

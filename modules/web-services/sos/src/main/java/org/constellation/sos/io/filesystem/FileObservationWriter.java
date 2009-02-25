@@ -45,7 +45,7 @@ import org.opengis.observation.Observation;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileObservationWriter extends ObservationWriter {
+public class FileObservationWriter implements ObservationWriter {
 
      private File offeringDirectory;
 
@@ -137,6 +137,10 @@ public class FileObservationWriter extends ObservationWriter {
     @Override
     public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
         // TODO
+    }
+
+    public String getInfos() {
+        return "Constellation Filesystem O&M Writer 0.3";
     }
 
     @Override

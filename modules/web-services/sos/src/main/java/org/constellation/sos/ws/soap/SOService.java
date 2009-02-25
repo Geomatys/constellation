@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import org.constellation.sos.ws.SOSworker;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @WebService(name = "SOService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
@@ -67,7 +67,7 @@ public class SOService {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("fr.geomatys.sos");
+    Logger logger = Logger.getLogger("org.constellation.sos");
     
     /**
      * A map containing the Capabilities Object already load from file.
@@ -103,7 +103,7 @@ public class SOService {
      * Initialize the database connection.
      */
     public SOService() throws JAXBException, CstlServiceException {
-       worker = new SOSworker(SOSworker.TRANSACTIONAL, null);
+       worker = new SOSworker(null);
        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.observation");
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url

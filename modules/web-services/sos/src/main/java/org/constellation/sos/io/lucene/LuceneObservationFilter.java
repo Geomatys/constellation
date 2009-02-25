@@ -90,4 +90,8 @@ public class LuceneObservationFilter implements ObservationFilter {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    public String getInfos() {
+        return "Constellation Lucene O&M Filter 0.3";
+    }
+
 }

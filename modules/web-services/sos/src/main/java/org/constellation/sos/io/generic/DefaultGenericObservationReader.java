@@ -319,5 +319,8 @@ public class DefaultGenericObservationReader extends GenericObservationReader {
         return new ReferenceEntry(null, href);
     }
 
+    public String getInfos() {
+        return "Constellation Postgrid Generic O&M Reader 0.3";
+    }
 
 }

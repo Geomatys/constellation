@@ -16,10 +16,13 @@
  */
 package org.constellation.filter;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+
+// J2SE dependencies
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -27,6 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+// constellation dependencies
 import org.constellation.ogc.ExpressionType;
 import org.constellation.gml.v311.AbstractGeometryType;
 import org.constellation.gml.v311.CoordinatesType;
@@ -74,6 +79,8 @@ import org.constellation.ogc.SpatialOperatorsType;
 import org.constellation.ogc.TouchesType;
 import org.constellation.ogc.UpperBoundaryType;
 import org.constellation.ogc.WithinType;
+
+// GeoAPI dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;

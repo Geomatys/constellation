@@ -17,8 +17,6 @@
 
 package org.constellation.sos.io;
 
-import java.util.logging.Logger;
-
 // constellation dependencies
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.sos.v100.ObservationOfferingEntry;
@@ -33,30 +31,27 @@ import org.opengis.observation.Observation;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public abstract class ObservationWriter {
+public interface ObservationWriter {
     
-    /**
-     * use for debugging purpose
-     */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.io");
+    public String writeObservation(Observation observation) throws CstlServiceException;
     
-    public ObservationWriter() throws CstlServiceException {
-    }
-   
-    public abstract String writeObservation(Observation observation) throws CstlServiceException;
+    public String writeMeasurement(Measurement measurement) throws CstlServiceException;
     
-    public abstract String writeMeasurement(Measurement measurement) throws CstlServiceException;
+    public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
     
-    public abstract String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
-    
-    public abstract void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
+    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
             OfferingSamplingFeatureEntry offSF) throws CstlServiceException;
     
-    public abstract void updateOfferings();
+    public void updateOfferings();
     
-    public abstract void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
+    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
+
+    /**
+     * Return informations about the implementation class.
+     */
+    public String getInfos();
     
-    public abstract void destroy();
+    public void destroy();
 }

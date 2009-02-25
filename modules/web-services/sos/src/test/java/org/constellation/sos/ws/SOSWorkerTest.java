@@ -167,7 +167,7 @@ public class SOSWorkerTest {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
 
         File configDir = new File("SOSWorkerTest");
-        worker = new SOSworker(SOSworker.DISCOVERY, configDir);
+        worker = new SOSworker(configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         worker.setSkeletonCapabilities(stcapa);
     }

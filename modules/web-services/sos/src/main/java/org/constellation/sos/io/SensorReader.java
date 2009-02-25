@@ -17,21 +17,15 @@
 
 package org.constellation.sos.io;
 
-import java.util.logging.Logger;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public abstract class SensorReader {
+public interface SensorReader {
     
-    /**
-     * use for debugging purpose
-     */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
-
     /**
      * Return the specified sensor description from the specified ID.
      *
@@ -39,8 +33,13 @@ public abstract class SensorReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public abstract AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
-    
+    public AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
+
+    /**
+     * Return informations about the implementation class.
+     */
+    public String getInfos();
+
     /**
      * Destroy and free the resource used by the reader.
      */

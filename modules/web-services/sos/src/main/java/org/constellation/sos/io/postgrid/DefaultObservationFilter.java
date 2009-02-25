@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.postgrid;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,6 +33,8 @@ import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
@@ -356,5 +358,10 @@ public class DefaultObservationFilter implements ObservationFilter {
                                           NO_APPLICABLE_CODE);
         }
 
+    }
+    
+    @Override
+    public String getInfos() {
+        return "Constellation Postgrid O&M Filter 0.3";
     }
 }

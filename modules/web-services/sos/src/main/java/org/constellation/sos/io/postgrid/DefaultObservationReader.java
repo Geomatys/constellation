@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io;
+package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -28,9 +28,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.sql.DataSource;
 
 // Constellation dependencies
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchRecordException;
@@ -47,6 +47,7 @@ import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
+import org.constellation.sos.io.ObservationReader;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
@@ -62,7 +63,17 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public class DefaultObservationReader extends ObservationReader {
+public class DefaultObservationReader implements ObservationReader {
+
+    /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
+
+    /**
+     * The base for observation id.
+     */
+    protected final String observationIdBase;
 
     /**
      * A Database object for the O&M dataBase.
@@ -105,7 +116,7 @@ public class DefaultObservationReader extends ObservationReader {
      * @param observationIdBase
      */
     public DefaultObservationReader(Automatic configuration, String observationIdBase) throws CstlServiceException {
-        super(observationIdBase);
+        this.observationIdBase = observationIdBase;
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -421,4 +432,7 @@ public class DefaultObservationReader extends ObservationReader {
         return null;
     }
 
+    public String getInfos() {
+        return "Constellation Postgrid O&M Reader 0.3";
+    }
 }

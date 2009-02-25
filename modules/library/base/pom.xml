@@ -82,12 +82,6 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-    <!-- 
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi</artifactId>
-    </dependency>
-    -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-metadata</artifactId>

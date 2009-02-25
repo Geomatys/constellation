@@ -53,6 +53,10 @@ public class SOSConfiguration {
 
     private String templateValidTime;
 
+    private String profile;
+
+    private String logFolder;
+
     public SOSConfiguration() {
         
     }
@@ -220,6 +224,26 @@ public class SOSConfiguration {
      */
     public void setObservationWriterType(ObservationWriterType observationWriterType) {
         this.observationWriterType = observationWriterType;
+    }
+
+    public int getProfile() {
+        if ("transactional".equalsIgnoreCase(profile))
+            return 1;
+        return 0;
+    }
+
+    /**
+     * @return the logFolder
+     */
+    public String getLogFolder() {
+        return logFolder;
+    }
+
+    /**
+     * @param logFolder the logFolder to set
+     */
+    public void setLogFolder(String logFolder) {
+        this.logFolder = logFolder;
     }
 
 }

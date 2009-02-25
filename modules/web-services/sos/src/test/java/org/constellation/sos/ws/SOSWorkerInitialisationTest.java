@@ -115,7 +115,7 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        SOSworker worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        SOSworker worker = new SOSworker(configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         boolean exceptionLaunched = false;
@@ -138,7 +138,7 @@ public class SOSWorkerInitialisationTest {
         File configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -163,7 +163,7 @@ public class SOSWorkerInitialisationTest {
         Marshaller marshaller = JAXBContext.newInstance("org.constellation.sos.v100").createMarshaller();
         marshaller.marshal(request, configFile);
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -188,7 +188,7 @@ public class SOSWorkerInitialisationTest {
         SOSConfiguration configuration = new SOSConfiguration();
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -213,7 +213,7 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), null);
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -238,7 +238,7 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
 
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
@@ -265,7 +265,7 @@ public class SOSWorkerInitialisationTest {
         configuration.setTemplateValidTime("ff:oo");
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(SOSworker.TRANSACTIONAL, configurationDirectory);
+        worker = new SOSworker(configurationDirectory);
 
         worker.setSkeletonCapabilities(skeletonCapabilities);
 

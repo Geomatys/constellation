@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // constellation dependecies
+import java.util.logging.Logger;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -52,7 +53,17 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class GenericObservationReader extends ObservationReader {
+public abstract class GenericObservationReader implements ObservationReader {
+
+    /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
+
+    /**
+     * The base for observation id.
+     */
+    protected final String observationIdBase;
 
     /**
      * A list of precompiled SQL request returning single value.
@@ -97,7 +108,7 @@ public abstract class GenericObservationReader extends ObservationReader {
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
     public GenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase);
+        this.observationIdBase = observationIdBase;
         advancedJdbcDriver = true;
         try {
             BDD bdd = configuration.getBdd();
@@ -116,7 +127,7 @@ public abstract class GenericObservationReader extends ObservationReader {
     }
 
     protected GenericObservationReader(String observationIdBase, Map<List<String>, Values> debugValues) throws CstlServiceException {
-        super(observationIdBase);
+        this.observationIdBase = observationIdBase;
         advancedJdbcDriver = true;
         debugMode          = true;
         isThreadEnabled    = false;

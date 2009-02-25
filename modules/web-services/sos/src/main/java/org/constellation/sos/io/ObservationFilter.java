@@ -111,4 +111,8 @@ public interface ObservationFilter {
      */
     public List<String> filterObservation() throws CstlServiceException;
 
+    /**
+     * Return informations about the implementation class.
+     */
+    public String getInfos();
 }

@@ -369,6 +369,9 @@ public class GenericObservationFilter implements ObservationFilter {
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
+    }
 
+    public String getInfos() {
+        return "Constellation Generic O&M Filter 0.3";
     }
 }

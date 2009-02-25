@@ -17,33 +17,61 @@
 
 package org.constellation.sos.io;
 
-import java.util.logging.Logger;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 
 /**
+ * An interface used by the SOS worker to store sensorML document into various datasource.
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
-public abstract class SensorWriter {
+public interface SensorWriter {
 
     /**
-     * use for debugging purpose
+     * Store a new SensorML document into the data source.
+     *
+     * @param id The identifier of the sensor
+     * @param sensor The sensor description.
+     *
+     * @throws org.constellation.ws.CstlServiceException
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    public void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
 
-    public abstract void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
-    
-    public abstract void startTransaction() throws CstlServiceException;
-    
-    public abstract void abortTransaction() throws CstlServiceException;
-    
-    public abstract void endTransaction() throws CstlServiceException;
+    /**
+     * Start a transaction on the datasource.
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void startTransaction() throws CstlServiceException;
+
+    /**
+     * Abort if there is a transaction running.
+     * Restore the data like they were before the begin of the transaction.
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void abortTransaction() throws CstlServiceException;
+
+    /**
+     * End a transaction (if there is one running)
+     * and store the changement made during this transaction on the datasource.
+     * 
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void endTransaction() throws CstlServiceException;
 
     /**
      * Create a new identifier for a sensor.
      */
-    public abstract int getNewSensorId() throws CstlServiceException;
+    public int getNewSensorId() throws CstlServiceException;
 
-    public abstract void destroy();
+    /**
+     * Return informations about the implementation class.
+     */
+    public String getInfos();
+
+    /**
+     * Free the resources and close the connections to datasource.
+     */
+    public void destroy();
 }

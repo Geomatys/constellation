@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -40,7 +41,17 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileObservationReader extends ObservationReader {
+public class FileObservationReader implements ObservationReader {
+
+     /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
+
+    /**
+     * The base for observation id.
+     */
+    protected final String observationIdBase;
 
     private File offeringDirectory;
 
@@ -57,7 +68,7 @@ public class FileObservationReader extends ObservationReader {
     private Unmarshaller unmarshaller;
 
     public FileObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase);
+        this.observationIdBase = observationIdBase;
         File dataDirectory = configuration.getdataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
@@ -240,6 +251,10 @@ public class FileObservationReader extends ObservationReader {
     @Override
     public void destroy() {
         
+    }
+
+    public String getInfos() {
+        return "Constellation Filesystem O&M Reader 0.3";
     }
 
 }

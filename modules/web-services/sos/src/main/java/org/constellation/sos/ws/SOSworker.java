@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -134,6 +135,7 @@ import org.opengis.observation.sampling.SamplingPoint;
 //geotools dependencies
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistry;
+import org.geotools.util.logging.MonolineFormatter;
 
 /**
  *
@@ -147,7 +149,7 @@ public class SOSworker {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
     
     /**
      * A list of temporary ObservationTemplate
@@ -177,7 +179,7 @@ public class SOSworker {
     /**
      * The base for phenomenon id.
      */ 
-    private final String phenomenonIdBase = "urn:ogc:def:phenomenon:BRGM:";
+    private final String phenomenonIdBase = "urn:ogc:def:phenomenon:OGC:1.0.30:";
     
     /**
      * The valid time for a getObservation template (in ms).
@@ -220,7 +222,7 @@ public class SOSworker {
     /**
      * The profile of the SOS service (transational/discovery). 
      */
-    private final int profile;
+    private int profile;
     
     /**
      * A date formater used to parse datablock.
@@ -264,11 +266,7 @@ public class SOSworker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(int profile, File configurationDirectory) {
-        this.profile = profile;
-        if (profile != TRANSACTIONAL && profile != DISCOVERY) {
-            throw new IllegalArgumentException("the flag profile must be equals to TRANSACTIONAL or DISCOVERY!");
-        }
+    public SOSworker(File configurationDirectory) {
         
         if (configurationDirectory == null) {
             configurationDirectory = new File(getSicadeDirectory(), "sos_configuration");
@@ -290,16 +288,27 @@ public class SOSworker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    logger.severe("The SOS service is not running!" + '\n' +
-                            "cause: The generic configuration file is malformed");
+                    logger.severe("The SOS service is not running!"              + '\n' +
+                            "cause: The generic configuration file is malformed" + '\n');
                     isStarted = false;
                     return;
                 }
             } else {
                 logger.severe("The SOS service is not running!" + '\n' +
-                        "cause: The configuration file can't be found");
+                        "cause: The configuration file can't be found" + '\n');
                 isStarted = false;
                 return;
+            }
+
+            if (configuration.getLogFolder() != null) {
+                initLogger("", configuration.getLogFolder());
+                logger.info("Redirecting the log to: " + configuration.getLogFolder());
+            }
+            this.profile = configuration.getProfile();
+            if (this.profile == DISCOVERY) {
+                logger.info("Discovery profile loaded." + '\n');
+            } else {
+                logger.info("Transactional profile loaded." + '\n');
             }
 
             // the file who record the map between phisycal ID and DB ID.
@@ -374,13 +383,15 @@ public class SOSworker {
             OMWriter  = SOSfactory.getObservationWriter(OMWriterType, OMConfiguration);
             OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConfiguration);
 
-            logger.info("SOS service running");
+            // we log some implementation informations
+            logInfos();
+
+            logger.info("SOS service running" + '\n');
             
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
-            logger.severe("The SOS service is not running!" + '\n' +
-                          "cause: JAXBException:" + ex.getMessage());
+            logger.severe("The SOS service is not running!" + '\n' + "cause: JAXBException:" + ex.getMessage());
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
             logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
@@ -388,6 +399,41 @@ public class SOSworker {
         } catch (CstlServiceException ex) {
             logger.severe("The SOS service is not working!" + '\n' + "cause:" + ex.getMessage());
             isStarted = false;
+        }
+    }
+
+    /**
+     * Log some informations about the implementations classes for reader / writer / filter object.
+     */
+    public void logInfos() {
+        if (SMLReader != null) {
+            logger.info(SMLReader.getInfos() + " loaded. " + '\n');
+        } else {
+            logger.warning("No SensorML reader loaded.");
+        }
+        if ( profile == TRANSACTIONAL) {
+            if (SMLWriter != null) {
+                logger.info(SMLWriter.getInfos() + " loaded. " + '\n');
+            } else {
+                logger.warning("No SensorML writer loaded.");
+            }
+        }
+        if (OMReader != null) {
+            logger.info(OMReader.getInfos() + " loaded. " + '\n');
+        } else {
+            logger.warning("No O&M reader loaded.");
+        }
+        if (OMFilter != null) {
+            logger.info(OMFilter.getInfos() + " loaded. " + '\n');
+        } else {
+            logger.warning("No O&M filter loaded.");
+        }
+        if ( profile == TRANSACTIONAL) {
+            if (OMWriter != null) {
+                logger.info(OMWriter.getInfos() + " loaded. " + '\n');
+            } else {
+                logger.warning("No O&M writer loaded.");
+            }
         }
     }
 
@@ -1823,6 +1869,29 @@ public class SOSworker {
     private void isWorking() throws CstlServiceException {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * Redirect the logs into the specified folder.
+     * if the parameter ID is null or empty it create a file named "cstl-sos.log"
+     * else the file is named "ID-cstl-sos.log"
+     *
+     * @param ID The ID of the service in a case of multiple sos server.
+     * @param filePath The path to the log folder.
+     */
+    private void initLogger(String ID, String filePath) {
+        try {
+            if (ID != null && !ID.equals("")) {
+                ID = ID + '-';
+            }
+            FileHandler handler  = new FileHandler(filePath + '/'+ ID + "cstl-sos.log");
+            handler.setFormatter(new MonolineFormatter());
+            logger.addHandler(handler);
+        } catch (IOException ex) {
+            logger.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
+        } catch (SecurityException ex) {
+            logger.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
         }
     }
 

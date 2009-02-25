@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -56,7 +57,12 @@ import org.mdweb.xml.Reader;
  *
  * @author Guilhem Legal (geomatys)
  */
-public class MDWebSensorWriter extends SensorWriter {
+public class MDWebSensorWriter implements SensorWriter {
+
+    /**
+     * use for debugging purpose
+     */
+    protected Logger logger = Logger.getLogger("org.constellation.sos");
 
     /**
      * A Writer to the SensorML database.
@@ -239,6 +245,10 @@ public class MDWebSensorWriter extends SensorWriter {
         } catch (SQLException ex) {
             logger.severe("SQLException while closing SOSWorker");
         }
+    }
+
+    public String getInfos() {
+        return "Constellation MDweb Sensor Writer 0.3";
     }
 
 }

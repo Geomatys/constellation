@@ -42,7 +42,7 @@ public class Utils {
     /**
      * use for debugging purpose
      */
-    private static Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    private static Logger logger = Logger.getLogger("org.constellation.sos");
 
     /**
      * Return the physical ID of a sensor.
