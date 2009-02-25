@@ -20,10 +20,10 @@
   <groupId>org.constellation.library</groupId>
   <artifactId>cstl-lib-xacml</artifactId>
   <packaging>jar</packaging>
-  <name>XACML security library</name>
+  <name>Library providing XACML</name>
   <description>
-    The sunxacml.sf.net library as improved by JBoss reviewed and redesigned for 
-    Constellation.
+    The sunxacml.sf.net library as improved by JBoss, reviewed and redesigned 
+    for Constellation.
   </description>
 
 

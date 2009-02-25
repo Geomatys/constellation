@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-sos</artifactId>
   <packaging>jar</packaging>
-  <name>Sensor Observation Service binding</name>
+  <name>Bindings for the Sensor Observation Service schema</name>
   <description>
     XML bindings for the OGC Sensor Observation Service schema.
   </description>

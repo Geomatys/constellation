@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-wcs</artifactId>
   <packaging>jar</packaging>
-  <name>Web Coverage Service</name>
+  <name>Web service for an OGC WCS</name>
   <description>
     HTTP facade to an OGC Web Coverage Service (WCS).
   </description>

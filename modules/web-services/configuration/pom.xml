@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-configuration</artifactId>
   <packaging>jar</packaging>
-  <name>Configuration web service</name>
+  <name>Web service for Constellation configuration</name>
   <description>
     Web Service enabling the remote configuration or control of a Constellation
     instance.

@@ -21,7 +21,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-wps</artifactId>
   <packaging>jar</packaging>
-  <name>Web Processing Service binding</name>
+  <name>Bindings for the Web Processing Service schema</name>
   <description>
     XML bindings for the OGC Web Processing Service schema.
   </description>

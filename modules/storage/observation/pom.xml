@@ -21,7 +21,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-observation</artifactId>
   <packaging>jar</packaging>
-  <name>Observation and Measurement storage</name>
+  <name>Storage using the Observation and Measurement schema</name>
   <description>
     An Observations and measurement implementation extended to contain both 
     Sampling Feature(OnM part-2) and Sensor Web Enablement implementation.

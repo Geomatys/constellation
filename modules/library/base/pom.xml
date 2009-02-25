@@ -20,7 +20,7 @@
   <groupId>org.constellation.library</groupId>
   <artifactId>cstl-lib-base</artifactId>
   <packaging>jar</packaging>
-  <name>Base library</name>
+  <name>Library providing base utilities</name>
   <description>
     The base library for Constellation.
   </description>

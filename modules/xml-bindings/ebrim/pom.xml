@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-ebrim</artifactId>
   <packaging>jar</packaging>
-  <name>OASIS ebrim registry binding</name>
+  <name>Bindings for the OASIS ebrim registry schema</name>
   <description>
     XML bindings for the objects used in the ebRIM registry storage model.
   </description>

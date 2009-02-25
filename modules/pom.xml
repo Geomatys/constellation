@@ -76,11 +76,11 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>web-services</module>
-    <module>engine</module>
-    <module>storage</module>
-    <module>xml-bindings</module>
     <module>library</module>
+    <module>xml-bindings</module>
+    <module>storage</module>
+    <module>engine</module>
+    <module>web-services</module>
   </modules>
 
 </project>

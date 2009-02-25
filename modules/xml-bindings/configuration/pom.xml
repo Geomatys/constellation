@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-configuration</artifactId>
   <packaging>jar</packaging>
-  <name>Configuration bindings</name>
+  <name>Bindings for the configuration system schema</name>
   <description>
     XML binding for the messages exchanged by POST used for constellation 
     administration and configuration.

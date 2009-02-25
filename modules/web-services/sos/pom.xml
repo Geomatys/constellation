@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-sos</artifactId>
   <packaging>jar</packaging>
-  <name>Sensor Observation web Services</name>
+  <name>Web service for an OGC SOS</name>
   <description>
     Web service facades to standardized service Sensor Observation Service.
   </description>

@@ -20,7 +20,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-provider</artifactId>
   <packaging>jar</packaging>
-  <name>Providers</name>
+  <name>Storage using the provider system</name>
   <description>
     These packages provide access to data of various formats.
   </description>

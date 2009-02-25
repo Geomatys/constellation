@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-om</artifactId>
   <packaging>jar</packaging>
-  <name>Observation and Measurement binding</name>
+  <name>Bindings for the Observation and Measurement schema</name>
   <description>
     XML bindings for the OGC Observation and Measurement schema.
   </description>

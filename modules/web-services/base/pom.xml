@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-base</artifactId>
   <packaging>jar</packaging>
-  <name>Common implementations of web services</name>
+  <name>Web service common base</name>
   <description>
     Common classes used by different web services.
   </description>

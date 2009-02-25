@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-gml</artifactId>
   <packaging>jar</packaging>
-  <name>Geometry Markup Language bindings</name>
+  <name>Bindings for the Geometry Markup Language schema</name>
   <description>
     XML bindings for the various versions of the OGC standard Geographic Markup 
     Language (GML) schemas.

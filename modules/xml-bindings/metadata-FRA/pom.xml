@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-metadata-FRA</artifactId>
   <packaging>jar</packaging>
-  <name>ISO 19115 French profile binding</name>
+  <name>Bindings for the ISO 19115 French profile schema</name>
   <description>
     XML bindings for objects in the schema defining the French profile of ISO 19115.
   </description>

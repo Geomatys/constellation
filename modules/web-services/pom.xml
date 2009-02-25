@@ -79,10 +79,10 @@
       </activation>
       <modules>
         <module>csw</module>
-        <module>configuration</module>
         <module>sos</module>
         <module>wms</module>
         <module>wcs</module>
+        <module>configuration</module>
       </modules>
     </profile>
     <profile>

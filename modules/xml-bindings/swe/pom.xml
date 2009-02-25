@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-swe</artifactId>
   <packaging>jar</packaging>
-  <name>Sensor Web Enablement binding</name>
+  <name>Bindings for the Sensor Web Enablement schema</name>
   <description>
     XML bindings for the OGC Sensor Web Enablement schema.
   </description>

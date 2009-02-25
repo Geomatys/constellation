@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-xacml</artifactId>
   <packaging>jar</packaging>
-  <name>XACML/GeoXACML binding</name>
+  <name>Bindings for the XACML and GeoXACML schema</name>
   <description>
     XML binding for the OASIS XACML schema and the OGC GeoXACML schema.
   </description>

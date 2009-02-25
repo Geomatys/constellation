@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-skos</artifactId>
   <packaging>jar</packaging>
-  <name>Simple Knowledge Organization System bindings</name>
+  <name>Bindings for the Simple Knowledge Organization System</name>
   <description>
     XML bindings for various versions of the Simple Knowledge Organization 
     System (SKOS) schemas.

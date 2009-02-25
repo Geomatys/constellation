@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-csw</artifactId>
   <packaging>jar</packaging>
-  <name>Catalogue web Services</name>
+  <name>Web service for an OGC CSW</name>
   <description>
     Web service facades to standardized service Catalogue service Web.
   </description>

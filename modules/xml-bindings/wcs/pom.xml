@@ -20,7 +20,7 @@
   <groupId>org.constellation.xml-bindings</groupId>
   <artifactId>cstl-xml-wcs</artifactId>
   <packaging>jar</packaging>
-  <name>Web Coverage Service bindings</name>
+  <name>Bindings for the Web Coverage Service schema</name>
   <description>
     XML bindings for various versions of the OGC Web Coverage Service schemas.
   </description>

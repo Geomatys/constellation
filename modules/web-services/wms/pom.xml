@@ -20,7 +20,7 @@
   <groupId>org.constellation.web-services</groupId>
   <artifactId>cstl-web-wms</artifactId>
   <packaging>jar</packaging>
-  <name>Web Map Service</name>
+  <name>Web service for an OGC WMS</name>
   <description>
     HTTP service facade for an OGC Web Map Service (WMS).
   </description>

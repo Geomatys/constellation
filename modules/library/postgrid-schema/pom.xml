@@ -20,7 +20,7 @@
   <groupId>org.constellation.library</groupId>
   <artifactId>cstl-lib-postgrid</artifactId>
   <packaging>jar</packaging>
-  <name>PostGRID schema library</name>
+  <name>Library providing PostGRID</name>
   <description>
     The library providing the PostGRID database schema.
   </description>
