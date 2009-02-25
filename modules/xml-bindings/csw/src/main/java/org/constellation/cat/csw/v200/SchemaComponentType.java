@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.SchemaComponent;
 
 
 /**
@@ -58,7 +59,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "SchemaComponentType", propOrder = {
     "content"
 })
-public class SchemaComponentType {
+public class SchemaComponentType implements SchemaComponent {
 
     @XmlMixed
     @XmlAnyElement(lax = true)

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,20 +21,9 @@ import java.util.List;
 
 /**
  *
- * @author Mehdi Sidhoum
+ * @author Guilhem Legal (Geomatys)
  */
-public interface GetRecordByIdResponse {
-    
-    /**
-     * Gets the value of the abstractRecord property. The returned type can be List<JAXBElement<? extends AbstractRecordType>> or JAXBElement<? extends AbstractRecordType>.
-     * (unmodifiable) 
-     */
-    public Object getAbstractRecord();
+public interface DescribeRecordResponse {
 
-    /**
-     * Gets the value of the any property.
-     * (unmodifiable)
-     */
-    public List<Object> getAny();
-
+    public List<? extends SchemaComponent> getSchemaComponent();
 }

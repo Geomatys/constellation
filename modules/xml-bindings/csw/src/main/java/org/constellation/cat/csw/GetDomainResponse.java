@@ -21,20 +21,10 @@ import java.util.List;
 
 /**
  *
- * @author Mehdi Sidhoum
+ * @author Guilhem Legal (Geomatys)
  */
-public interface GetRecordByIdResponse {
-    
-    /**
-     * Gets the value of the abstractRecord property. The returned type can be List<JAXBElement<? extends AbstractRecordType>> or JAXBElement<? extends AbstractRecordType>.
-     * (unmodifiable) 
-     */
-    public Object getAbstractRecord();
+public interface GetDomainResponse {
 
-    /**
-     * Gets the value of the any property.
-     * (unmodifiable)
-     */
-    public List<Object> getAny();
+    public List<? extends DomainValues> getDomainValues();
 
 }

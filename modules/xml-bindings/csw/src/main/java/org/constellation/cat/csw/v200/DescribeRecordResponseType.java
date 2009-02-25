@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.DescribeRecordResponse;
 
 
 /**
@@ -51,11 +52,35 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "DescribeRecordResponseType", propOrder = {
     "schemaComponent"
 })
-public class DescribeRecordResponseType {
+public class DescribeRecordResponseType implements DescribeRecordResponse {
 
     @XmlElement(name = "SchemaComponent")
     private List<SchemaComponentType> schemaComponent;
 
+    /**
+     * An empty constructor used by JAXB.
+     */
+    public DescribeRecordResponseType() {
+
+    }
+
+    /**
+     * Build a new response to a describeRecord request.
+     */
+    public DescribeRecordResponseType(SchemaComponentType... schemaCompo) {
+        schemaComponent = new ArrayList<SchemaComponentType>();
+        for (SchemaComponentType sc: schemaCompo) {
+            schemaComponent.add(sc);
+        }
+    }
+
+    /**
+     * Build a new response to a describeRecord request.
+     */
+    public DescribeRecordResponseType(List<SchemaComponentType> schemaComponent) {
+        this.schemaComponent = schemaComponent;
+    }
+    
     /**
      * Gets the value of the schemaComponent property.
      * 

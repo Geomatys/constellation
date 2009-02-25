@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.GetDomainResponse;
 
 
 /**
@@ -54,11 +55,25 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "GetDomainResponseType", propOrder = {
     "domainValues"
 })
-public class GetDomainResponseType {
+public class GetDomainResponseType implements GetDomainResponse {
 
     @XmlElement(name = "DomainValues", required = true)
     private List<DomainValuesType> domainValues;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    public GetDomainResponseType() {
+
+    }
+
+    /**
+     * build a new response to a getDomain request
+     */
+    public GetDomainResponseType(List<DomainValuesType> domainValues) {
+        this.domainValues = domainValues;
+    }
+    
     /**
      * Gets the value of the domainValues property.
      * 

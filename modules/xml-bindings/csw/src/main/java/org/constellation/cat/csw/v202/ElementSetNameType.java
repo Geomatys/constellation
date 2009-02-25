@@ -143,4 +143,19 @@ public class ElementSetNameType implements ElementSetName {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[ElementSetNameType]");
+        if (typeNames != null) {
+            sb.append("typeNames").append('\n');
+            for (QName q: typeNames) {
+                sb.append(q).append('\n');
+            }
+        }
+        if (value != null) {
+            sb.append("value").append(value).append('\n');
+        }
+        return sb.toString();
+    }
+
 }

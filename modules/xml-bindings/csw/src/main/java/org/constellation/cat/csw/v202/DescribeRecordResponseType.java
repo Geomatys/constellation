@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.DescribeRecordResponse;
 
 
 /**
@@ -53,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
     "schemaComponent"
 })
 @XmlRootElement(name = "DescribeRecordResponse")
-public class DescribeRecordResponseType {
+public class DescribeRecordResponseType implements DescribeRecordResponse {
 
     @XmlElement(name = "SchemaComponent")
     private List<SchemaComponentType> schemaComponent;

@@ -1222,10 +1222,9 @@ public final class Util {
         if (prop == null || f == null) {
             throw new IllegalArgumentException(" the properties or file can't be null");
         } else {
-          
-                FileOutputStream out = new FileOutputStream(f);
-                prop.store(out, "");
-                out.close();
+            FileOutputStream out = new FileOutputStream(f);
+            prop.store(out, "");
+            out.close();
         }
     }
     
@@ -1303,16 +1302,13 @@ public final class Util {
      */
     public static String transformCodeName(String code) {
         String result = "";
-        char prefix;
         while (code.indexOf('_') != -1) {
             final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
-            prefix = code.charAt(0);
-            result += tmp.replace(tmp.charAt(0), prefix);
+            result += firstToUpper(tmp);
             code = code.substring(code.indexOf('_') + 1, code.length());
         }
-        prefix = code.charAt(0);
         code = code.toLowerCase();
-        result += code.replace(code.charAt(0), prefix);
+        result += firstToUpper(code);
         return result;
     }
 }

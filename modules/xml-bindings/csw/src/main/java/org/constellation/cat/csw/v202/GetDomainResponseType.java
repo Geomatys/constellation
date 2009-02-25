@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.GetDomainResponse;
 
 
 /**
@@ -53,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
     "domainValues"
 })
 @XmlRootElement(name="GetDomainResponse")
-public class GetDomainResponseType {
+public class GetDomainResponseType implements GetDomainResponse {
 
     @XmlElement(name = "DomainValues", required = true)
     private List<DomainValuesType> domainValues;
@@ -61,12 +62,12 @@ public class GetDomainResponseType {
     /**
      * An empty constructor used by JAXB
      */
-    GetDomainResponseType() {
+    public GetDomainResponseType() {
         
     }
     
     /**
-     * build a new respon to a getDomain request
+     * build a new response to a getDomain request
      */
     public GetDomainResponseType(List<DomainValuesType> domainValues) {
         this.domainValues = domainValues;
