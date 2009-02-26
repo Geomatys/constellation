@@ -17,20 +17,13 @@
 
 package org.constellation.cat.csw;
 
-import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface DomainValues {
+public interface ListOfValues {
 
-    public String getPropertyName();
-
-    public String getParameterName();
-
-    public ListOfValues getListOfValues();
-
-    public QName getType();
-
+    public List<String> getValue();
 }

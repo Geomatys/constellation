@@ -16,6 +16,7 @@
  */
 package org.constellation.cat.csw.v202;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -107,6 +108,24 @@ public class DomainValuesType implements DomainValues {
         this.parameterName = parameterName;
         this.listOfValues  = listOfValues; 
         this.type          = type; 
+    }
+
+    /**
+     * Build a new Domain values type with the specified list Of Values.
+     * One of parameterName or propertyName must be null.
+     *
+     */
+    public DomainValuesType(String parameterName, String propertyName, List<String> listOfValues, QName type) {
+
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        } else if (propertyName == null && parameterName == null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be filled");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
+        this.listOfValues  = new ListOfValuesType(listOfValues);
+        this.type          = type;
     }
     
     /**

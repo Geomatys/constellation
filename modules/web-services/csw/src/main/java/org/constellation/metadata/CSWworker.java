@@ -64,14 +64,11 @@ import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DeleteType;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
-import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetDomainResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.HarvestResponseType;
 import org.constellation.cat.csw.v202.InsertType;
-import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SearchResultsType;
@@ -136,6 +133,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // geotools dependencies
+import org.constellation.cat.csw.CswXmlFactory;
+import org.constellation.cat.csw.GetRecordByIdResponse;
 import org.geotools.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
@@ -935,7 +934,7 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordByIdResponseType getRecordById(final GetRecordById request) throws CstlServiceException {
+    public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
         logger.info("GetRecordById request processing" + '\n');
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1236,7 +1235,7 @@ public class CSWworker {
         long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the response
-        List<? extends DomainValues> responseList;
+        List<DomainValues> responseList = new ArrayList<DomainValues>();
         
         String parameterName = request.getParameterName();
         String propertyName  = request.getPropertyName();
@@ -1251,7 +1250,6 @@ public class CSWworker {
          * "parameterName" return metadata about the service itself.
          */ 
         if (parameterName != null) {
-            List<DomainValues> tmp = new ArrayList<DomainValues>();
             final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -1273,15 +1271,8 @@ public class CSWworker {
                             type = _Record_QNAME;
                         }
                         if (param != null) {
-                            DomainValues value;
-                            if (actingVersion.toString().equals("2.0.0")) {
-                                org.constellation.cat.csw.v200.ListOfValuesType values = new org.constellation.cat.csw.v200.ListOfValuesType(param.getValue());
-                                value  = new org.constellation.cat.csw.v200.DomainValuesType(token, null, values, type);
-                            } else {
-                                ListOfValuesType values = new ListOfValuesType(param.getValue());
-                                value  = new DomainValuesType(token, null, values, type);
-                            }
-                            tmp.add(value);
+                            DomainValues value = CswXmlFactory.getDomainValues(actingVersion.toString(), token, null, param.getValue(), type);
+                            responseList.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
                                                           INVALID_PARAMETER_VALUE, "parameterName");
@@ -1295,7 +1286,6 @@ public class CSWworker {
                                                      INVALID_PARAMETER_VALUE, "parameterName");
                 }
             }
-            responseList = tmp;
         
         /*
          * "PropertyName" return a list of metadata for a specific field.
@@ -1310,11 +1300,7 @@ public class CSWworker {
         }
         logger.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
 
-        if (actingVersion.toString().equals("2.0.0")) {
-            return new org.constellation.cat.csw.v200.GetDomainResponseType((List<org.constellation.cat.csw.v200.DomainValuesType>)responseList);
-        } else {
-            return new GetDomainResponseType((List<DomainValuesType>)responseList);
-        }
+        return CswXmlFactory.getDomainResponse(actingVersion.toString(), responseList);
     }
     
     /**

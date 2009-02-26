@@ -45,6 +45,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
+import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.DomainValuesType;
@@ -997,7 +998,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return results;
     }
     
-    public List<DomainValuesType> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
          throw new UnsupportedOperationException("Not supported yet.");
     }
     

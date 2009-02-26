@@ -78,7 +78,7 @@ public abstract class MetadataReader {
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public abstract List<? extends DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
+    public abstract List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
     
     /**
      * Execute a SQL query and return the result as a List of identifier;

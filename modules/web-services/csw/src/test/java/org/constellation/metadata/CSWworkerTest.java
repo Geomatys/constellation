@@ -769,7 +769,7 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        List<DomainValuesType> domainValues = new ArrayList<DomainValuesType>();
+        List<DomainValues> domainValues = new ArrayList<DomainValues>();
         ListOfValuesType values = new  ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities"));
         DomainValuesType value  = new DomainValuesType("GetCapabilities.sections", null, values, _Capabilities_QNAME);
         domainValues.add(value);
@@ -787,8 +787,8 @@ public class CSWworkerTest {
 
         assertTrue(result200 instanceof org.constellation.cat.csw.v200.GetDomainResponseType);
 
-        List<org.constellation.cat.csw.v200.DomainValuesType> domainValues200 = new ArrayList<org.constellation.cat.csw.v200.DomainValuesType>();
-        List<Object> list = new ArrayList<Object>();
+        List<DomainValues> domainValues200 = new ArrayList<DomainValues>();
+        List<String> list = new ArrayList<String>();
         list.add("All");
         list.add("ServiceIdentification");
         list.add("ServiceProvider");

@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.GetDomainResponse;
 import org.geotools.util.Utilities;
 
@@ -71,8 +72,18 @@ public class GetDomainResponseType implements GetDomainResponse {
     /**
      * build a new response to a getDomain request
      */
-    public GetDomainResponseType(List<DomainValuesType> domainValues) {
-        this.domainValues = domainValues;
+    public GetDomainResponseType(List<DomainValues> domainValues) {
+        if (domainValues != null) {
+            this.domainValues = new ArrayList<DomainValuesType>(domainValues.size());
+            for (DomainValues dv : domainValues) {
+                List<String> listOfValues = null;
+                if (dv.getListOfValues() != null) {
+                    listOfValues = dv.getListOfValues().getValue();
+                }
+                DomainValuesType dvt = new DomainValuesType(dv.getParameterName(), dv.getPropertyName(), listOfValues, dv.getType());
+                this.domainValues.add(dvt);
+            }
+        }
     }
     
     /**

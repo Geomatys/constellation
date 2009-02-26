@@ -19,8 +19,6 @@ package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies 
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,6 +38,7 @@ import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
 import org.constellation.cat.csw.GetDomainResponse;
+import org.constellation.cat.csw.GetRecordByIdResponse;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
@@ -71,7 +70,7 @@ import org.geotools.metadata.iso.MetaDataImpl;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
@@ -115,24 +114,31 @@ public class CSWService {
     /**
      * Initialize the database connection.
      */
-    public CSWService() throws JAXBException, IOException, IOException, SQLException  {
-       
-       JAXBContext jbcontext = JAXBContext.newInstance(MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
-                        ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
-                        ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
-                        ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
-                        ,QueryType.class, ResultType.class, TransactionType.class
-                        ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
-                        ,DescribeRecordResponseType.class, GetDomainResponseType.class
-                        ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
-                        ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
-       
-       unmarshaller = jbcontext.createUnmarshaller();
-       worker = new CSWworker("", unmarshaller, jbcontext.createMarshaller());
-       //TODO find real url
-       worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-       this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");
+    public CSWService() {
+
+       try {
+           JAXBContext jbcontext = JAXBContext.newInstance(MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
+                            ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
+                            ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
+                            ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
+                            ,QueryType.class, ResultType.class, TransactionType.class
+                            ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
+                            ,DescribeRecordResponseType.class, GetDomainResponseType.class
+                            ,TransactionResponseType.class, HarvestResponseType.class
+                            ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
+                            ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
+
+           unmarshaller = jbcontext.createUnmarshaller();
+           worker = new CSWworker("", unmarshaller, jbcontext.createMarshaller());
+           //TODO find real url
+           worker.setServiceURL("http://localhost:8080/SOServer/SOService");
+           this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");
+       } catch (JAXBException ex){
+           logger.severe("The CSW service is not running."       + '\n' +
+                         " cause  : Error creating XML context." + '\n' +
+                         " error  : " + ex.getMessage()          + '\n' +
+                         " details: " + ex.toString());
+        }
     }
     
     /**
@@ -180,7 +186,7 @@ public class CSWService {
      * Web service operation 
      */
     @WebMethod(action="getRecordById")
-    public GetRecordByIdResponseType getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
+    public GetRecordByIdResponse getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
         try {
             logger.info("received SOAP getRecordById request");
             return worker.getRecordById(requestRecordById);

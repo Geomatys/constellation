@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.ListOfValues;
 import org.geotools.util.Utilities;
 
 
@@ -49,7 +50,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "ListOfValuesType", propOrder = {
     "value"
 })
-public class ListOfValuesType {
+public class ListOfValuesType implements ListOfValues {
 
     @XmlElement(name = "Value", required = true)
     private List<String> value;

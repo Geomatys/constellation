@@ -16,6 +16,7 @@
  */
 package org.constellation.cat.csw.v200;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -67,7 +68,7 @@ import org.geotools.util.Utilities;
 public class DomainValuesType implements DomainValues {
 
     @XmlElement(name = "PropertyName")
-    private QName propertyName;
+    private String propertyName;
     @XmlElement(name = "ParameterName")
     private String parameterName;
     @XmlElement(name = "ListOfValues")
@@ -94,7 +95,7 @@ public class DomainValuesType implements DomainValues {
      * One of parameterName or propertyName must be null.
      *
      */
-    public DomainValuesType(String parameterName, QName propertyName, ListOfValuesType listOfValues, QName type) {
+    public DomainValuesType(String parameterName, String propertyName, ListOfValuesType listOfValues, QName type) {
 
         if (propertyName != null && parameterName != null) {
             throw new IllegalArgumentException("One of propertyName or parameterName must be null");
@@ -106,12 +107,30 @@ public class DomainValuesType implements DomainValues {
         this.listOfValues  = listOfValues;
         this.type          = type;
     }
+
+    /**
+     * Build a new Domain values type with the specified list Of Values.
+     * One of parameterName or propertyName must be null.
+     *
+     */
+    public DomainValuesType(String parameterName, String propertyName, List<String> listOfValues, QName type) {
+
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        } else if (propertyName == null && parameterName == null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be filled");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
+        this.listOfValues  = new ListOfValuesType(listOfValues);
+        this.type          = type;
+    }
     
     /**
      * Gets the value of the propertyName property.
      * 
      */
-    public QName getPropertyName() {
+    public String getPropertyName() {
         return propertyName;
     }
 
@@ -119,7 +138,7 @@ public class DomainValuesType implements DomainValues {
      * Sets the value of the propertyName property.
      * 
      */
-    public void setPropertyName(QName value) {
+    public void setPropertyName(String value) {
         this.propertyName = value;
     }
 

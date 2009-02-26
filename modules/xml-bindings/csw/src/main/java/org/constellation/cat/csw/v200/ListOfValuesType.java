@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.cat.csw.ListOfValues;
 import org.geotools.util.Utilities;
 
 
@@ -48,10 +49,10 @@ import org.geotools.util.Utilities;
 @XmlType(name = "ListOfValuesType", propOrder = {
     "value"
 })
-public class ListOfValuesType {
+public class ListOfValuesType implements ListOfValues {
 
     @XmlElement(name = "Value", required = true)
-    private List<Object> value;
+    private List<String> value;
 
     /**
      * An empty constructor used by JAXB
@@ -63,7 +64,7 @@ public class ListOfValuesType {
      /**
       * Build a new List of values
       */
-     public ListOfValuesType(List values){
+     public ListOfValuesType(List<String> values){
          value = values;
      }
 
@@ -71,9 +72,9 @@ public class ListOfValuesType {
      * Gets the value of the value property.
      * 
      */
-    public List<Object> getValue() {
+    public List<String> getValue() {
         if (value == null) {
-            value = new ArrayList<Object>();
+            value = new ArrayList<String>();
         }
         return this.value;
     }
