@@ -82,6 +82,20 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     }
 
     /**
+     * Gets the value of the boundedBy property.
+     */
+    public void setBoundedBy(BoundingShapeEntry boundingShape) {
+        this.boundedBy = boundingShape;
+    }
+
+    /**
+     * Gets the value of the boundedBy property.
+     */
+    public void setBoundedBy(EnvelopeEntry envelope) {
+        this.boundedBy = new BoundingShapeEntry(envelope);
+    }
+
+    /**
      * Gets the value of the location property.
      */
     public LocationPropertyType getLocation() {

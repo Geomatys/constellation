@@ -17,7 +17,6 @@
 package org.constellation.gml.v311;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -140,7 +139,7 @@ public class DirectPositionType {
         if (value == null) {
             value = new ArrayList<Double>();
         }
-        return Collections.unmodifiableList(value);
+        return value;
     }
 
     /**
@@ -165,7 +164,7 @@ public class DirectPositionType {
         if (axisLabels == null) {
             axisLabels = new ArrayList<String>();
         }
-        return Collections.unmodifiableList(axisLabels);
+        return axisLabels;
     }
 
     /**
@@ -176,7 +175,7 @@ public class DirectPositionType {
         if (uomLabels == null) {
             uomLabels = new ArrayList<String>();
         }
-        return Collections.unmodifiableList(uomLabels);
+        return uomLabels;
     }
 
     /**

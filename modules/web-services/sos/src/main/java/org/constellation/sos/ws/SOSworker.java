@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -57,7 +58,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.FeaturePropertyType;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeIndeterminateValueType;
 import org.constellation.gml.v311.TimePositionType;
@@ -110,21 +110,18 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.swe.AbstractEncoding;
-import org.constellation.swe.AbstractEncodingProperty;
 import org.constellation.swe.DataArray;
-import org.constellation.swe.DataArrayProperty;
-import org.constellation.swe.DataComponentProperty;
 import org.constellation.swe.TextBlock;
 import org.constellation.swe.AnyResult;
 import org.constellation.swe.v101.PhenomenonEntry;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
-import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
+import org.constellation.ws.rs.WebService;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.sos.v100.ResponseModeType.*;
 import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.Normalizer.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -275,7 +272,7 @@ public class SOSworker {
     public SOSworker(File configurationDirectory) {
         
         if (configurationDirectory == null) {
-            configurationDirectory = new File(getSicadeDirectory(), "sos_configuration");
+            configurationDirectory = new File(WebService.getSicadeDirectory(), "sos_configuration");
         }
 
         logger.info("path to config file=" + configurationDirectory);
@@ -477,6 +474,8 @@ public class SOSworker {
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
         logger.info("getCapabilities request processing" + '\n');
+        long start = System.currentTimeMillis();
+        
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("SOS")) {
@@ -602,7 +601,11 @@ public class SOSworker {
         }
         c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
 
-        return normalizeDocument(c);
+        // we normalize the document
+        c = normalizeDocument(c);
+
+        logger.info("getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        return c;
     }
     
     /**
@@ -612,7 +615,8 @@ public class SOSworker {
      */
     public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws CstlServiceException  {
         logger.info("DescribeSensor request processing"  + '\n');
-        
+        long start = System.currentTimeMillis();
+
         // we get the form
         verifyBaseRequest(requestDescSensor);
 
@@ -632,7 +636,8 @@ public class SOSworker {
                                          MISSING_PARAMETER_VALUE, "procedure");
         }
         String sensorId = requestDescSensor.getProcedure();
-        logger.info("sensorId received: " + sensorId);
+
+        logger.info("describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return SMLReader.getSensor(sensorId);
     }
     
@@ -644,6 +649,8 @@ public class SOSworker {
      */
     public ObservationCollectionEntry getObservation(GetObservation requestObservation) throws CstlServiceException {
         logger.info("getObservation request processing"  + '\n');
+        long start = System.currentTimeMillis();
+        
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
 
@@ -949,8 +956,13 @@ public class SOSworker {
                 }
             }
         }
-        return normalizeDocument(response);
+
+        response.setBoundedBy(getCollectionBound(response));
+        response = normalizeDocument(response);
+        logger.info("getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        return response;
     }
+
     
     /**
      * Web service operation
@@ -1045,7 +1057,7 @@ public class SOSworker {
         }
         GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
         GetResultResponse response = new GetResultResponse(r);
-        logger.info("GetResult request executed in " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
     }
     
@@ -1204,6 +1216,8 @@ public class SOSworker {
      */
     public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws CstlServiceException {
         logger.info("registerSensor request processing"  + '\n');
+        long start = System.currentTimeMillis();
+        
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
         
@@ -1277,6 +1291,7 @@ public class SOSworker {
             }
         }
         
+        logger.info("registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
         return new RegisterSensorResponse(id);
     }
     
@@ -1288,8 +1303,10 @@ public class SOSworker {
      */
     public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws CstlServiceException {
         logger.info("InsertObservation request processing"  + '\n');
+        long start = System.currentTimeMillis();
+
         //we verify the base request attribute
-       verifyBaseRequest(requestInsObs);
+        verifyBaseRequest(requestInsObs);
         
         String id = "";
         //we get the id of the sensor and we create a sensor object
@@ -1335,7 +1352,9 @@ public class SOSworker {
                 throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
                                               INVALID_PARAMETER_VALUE, "samplingTime");
             }
-        } 
+        }
+
+        logger.info("insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
         return new InsertObservationResponse(id);
     }
     
@@ -1442,41 +1461,6 @@ public class SOSworker {
     }
     
     /**
-     * return a SQL formatted timestamp
-     * 
-     * @param time a GML time position object.
-     */
-    private String getTimeValue(TimePositionType time) throws CstlServiceException {
-        if (time != null && time.getValue() != null) {
-            String value = time.getValue();
-            value = value.replace("T", " ");
-            
-            //we delete the data after the second
-            if (value.indexOf('.') != -1) {
-                value = value.substring(0, value.indexOf('.'));
-            }
-             try {
-                 //here t is not used but it allow to verify the syntax of the timestamp
-                 Timestamp t = Timestamp.valueOf(value);
-                 return t.toString();
-                 
-             } catch(IllegalArgumentException e) {
-                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
-                                                 "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
-                                                 INVALID_PARAMETER_VALUE, "eventTime");
-             }
-          } else {
-            String locator;
-            if (time == null)
-                locator = "Timeposition";
-            else
-                locator = "TimePosition value";
-            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
-                                              MISSING_PARAMETER_VALUE, "eventTime");
-          }
-    }
-    
-    /**
      *  Verify that the bases request attributes are correct.
      */ 
     private void verifyBaseRequest(RequestBaseType request) throws CstlServiceException {
@@ -1484,27 +1468,21 @@ public class SOSworker {
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("SOS"))  {
-                    throw new CstlServiceException("service must be \"SOS\"!",
-                                                  INVALID_PARAMETER_VALUE, "service");
+                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, "service");
                 }
             } else {
-                throw new CstlServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, "service");
+                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().equals("1.0.0")) {
-                    throw new CstlServiceException("version must be \"1.0.0\"!",
-                                                  VERSION_NEGOTIATION_FAILED);
+                    throw new CstlServiceException("version must be \"1.0.0\"!", VERSION_NEGOTIATION_FAILED);
                 }
             } else {
-                throw new CstlServiceException("version must be specified!",
-                                              MISSING_PARAMETER_VALUE, "version");
+                throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
             }
          } else { 
-            throw new CstlServiceException("The request is null!",
-                                          NO_APPLICABLE_CODE);
+            throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
          }  
-        
     }
     
     /**
@@ -1693,113 +1671,6 @@ public class SOSworker {
     }
 
     /**
-     * Normalize the capabilities document by replacing the double by reference
-     * 
-     * @param capa the unnormalized document.
-     * 
-     * @return a normalized document
-     */
-    private Capabilities normalizeDocument(Capabilities capa){
-        List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
-        if (capa.getContents() != null) {
-            for (ObservationOfferingEntry off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
-                for (PhenomenonPropertyType pheno: off.getRealObservedProperty()) {
-                    if (alreadySee.contains(pheno)) {
-                        pheno.setToHref();
-                    } else {
-                        if (pheno.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                            CompositePhenomenonEntry compo = (CompositePhenomenonEntry) pheno.getPhenomenon();
-                            for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
-                                if (alreadySee.contains(pheno2)) {
-                                    pheno2.setToHref();
-                                } else {
-                                    alreadySee.add(pheno2);
-                                }
-                            }
-                        }
-                        alreadySee.add(pheno);
-                    }
-                }
-            }
-        }
-        return capa;
-    }
-    
-    /**
-     * Normalize the Observation collection document by replacing the double by reference
-     * 
-     * @param capa the unnormalized document.
-     * 
-     * @return a normalized document
-     */
-    private ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
-        //first if the collection is empty
-        if (collection.getMember().size() == 0) {
-            return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
-        }
-        
-        List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
-        List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
-        List<AbstractEncodingProperty>     encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
-        List<DataComponentProperty>        dataAlreadySee  = new ArrayList<DataComponentProperty>();
-        int index = 0;
-        for (ObservationEntry observation: collection.getMember()) {
-            //we do this for the feature of interest
-            FeaturePropertyType foi = observation.getPropertyFeatureOfInterest();
-            if (foiAlreadySee.contains(foi)){
-                foi.setToHref();
-            } else {
-                foiAlreadySee.add(foi);
-            }
-            //for the phenomenon
-            PhenomenonPropertyType phenomenon = observation.getPropertyObservedProperty();
-            if (phenoAlreadySee.contains(phenomenon)){
-                phenomenon.setToHref();
-            } else {
-                if (phenomenon.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                    CompositePhenomenonEntry compo = (CompositePhenomenonEntry) phenomenon.getPhenomenon();
-                    for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
-                        if (phenoAlreadySee.contains(pheno2)) {
-                                    pheno2.setToHref();
-                        } else {
-                            phenoAlreadySee.add(pheno2);
-                        }
-                    }
-                }
-                phenoAlreadySee.add(phenomenon);
-            }
-            //for the result : textBlock encoding and element type
-            if (observation.getResult() instanceof DataArrayProperty) {
-                DataArray array = ((DataArrayProperty)observation.getResult()).getDataArray();
-                
-                //element type
-                DataComponentProperty elementType = array.getPropertyElementType();
-                if (dataAlreadySee.contains(elementType)){
-                    elementType.setToHref();
-                } else {
-                    dataAlreadySee.add(elementType);
-                }
-                
-                //encoding
-                AbstractEncodingProperty encoding = array.getPropertyEncoding();
-                if (encAlreadySee.contains(encoding)){
-                    encoding.setToHref();
-                                        
-                } else {
-                    encAlreadySee.add(encoding);
-                }
-            } else {
-                if (observation.getResult() != null)
-                    logger.severe("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
-                else
-                    logger.severe("NormalizeDocument: The result is null");
-            }
-            index++;
-        }
-        return collection;
-    }
-    
-    /**
      * Return the current output format MIME type (default: application/xml).
      * 
      * @return The current output format MIME type (default: application/xml).
@@ -1825,23 +1696,6 @@ public class SOSworker {
         this.serviceURL = serviceURL;
     }
     
-     /**
-     * Return the ".sicade" directory.
-     *
-     * @return The ".sicade" directory containing .
-     */
-    public File getSicadeDirectory() {
-        File sicadeDirectory;
-        String home = System.getProperty("user.home");
-
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-             sicadeDirectory = new File(home, "Application Data\\Sicade");
-        } else {
-             sicadeDirectory = new File(home, ".sicade");
-        }
-        return sicadeDirectory;
-    }
-
     /**
      * Record the mapping between physical ID and database ID.
      *
@@ -1851,7 +1705,7 @@ public class SOSworker {
     private void recordMapping(String dbId, String physicalID) throws CstlServiceException {
         try {
             map.setProperty(physicalID, dbId);
-            File mappingFile = new File(getSicadeDirectory(), "/sos_configuration/mapping.properties");
+            File mappingFile = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
             FileOutputStream out = new FileOutputStream(mappingFile);
             map.store(out, "");
             out.close();
