@@ -254,8 +254,14 @@ public class SOSworker {
      */
     private SensorWriter SMLWriter;
 
+    /**
+     * The base Qname for complex observation.
+     */
     public static final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
+    /**
+     * A registry factory allowing to load carious SOS factory in function of the build implementation.
+     */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
 
     /**
@@ -365,12 +371,12 @@ public class SOSworker {
                 String validTime = configuration.getTemplateValidTime();
                 if (validTime == null || validTime.equals("") || validTime.indexOf(':') == -1) {
                     validTime = "1:00";
-                    logger.info("using default template valid time: one hour.");
+                    logger.info("using default template valid time: one hour.\n");
                 }
                 h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
                 m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
             } catch (NumberFormatException ex) {
-                logger.info("using default template valid time: one hour.");
+                logger.info("using default template valid time: one hour.\n");
                 h = 1;
                 m = 0;
             }
@@ -407,32 +413,32 @@ public class SOSworker {
      */
     public void logInfos() {
         if (SMLReader != null) {
-            logger.info(SMLReader.getInfos() + " loaded. " + '\n');
+            logger.info(SMLReader.getInfos() + " loaded.\n");
         } else {
-            logger.warning("No SensorML reader loaded.");
+            logger.warning("No SensorML reader loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (SMLWriter != null) {
-                logger.info(SMLWriter.getInfos() + " loaded. " + '\n');
+                logger.info(SMLWriter.getInfos() + " loaded.\n");
             } else {
-                logger.warning("No SensorML writer loaded.");
+                logger.warning("No SensorML writer loaded.\n");
             }
         }
         if (OMReader != null) {
-            logger.info(OMReader.getInfos() + " loaded. " + '\n');
+            logger.info(OMReader.getInfos() + " loaded.\n");
         } else {
-            logger.warning("No O&M reader loaded.");
+            logger.warning("No O&M reader loaded.\n");
         }
         if (OMFilter != null) {
-            logger.info(OMFilter.getInfos() + " loaded. " + '\n');
+            logger.info(OMFilter.getInfos() + " loaded.\n");
         } else {
-            logger.warning("No O&M filter loaded.");
+            logger.warning("No O&M filter loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (OMWriter != null) {
-                logger.info(OMWriter.getInfos() + " loaded. " + '\n');
+                logger.info(OMWriter.getInfos() + " loaded.\n");
             } else {
-                logger.warning("No O&M writer loaded.");
+                logger.warning("No O&M writer loaded.\n");
             }
         }
     }

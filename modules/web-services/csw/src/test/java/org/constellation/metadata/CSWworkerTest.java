@@ -293,7 +293,7 @@ public class CSWworkerTest {
          */
         GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
-        GetRecordByIdResponseType result = worker.getRecordById(request);
+        GetRecordByIdResponseType result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 0);
@@ -312,7 +312,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.BRIEF),
                 "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
@@ -332,7 +332,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
@@ -352,7 +352,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
@@ -372,7 +372,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 2);
@@ -460,7 +460,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
@@ -480,7 +480,7 @@ public class CSWworkerTest {
          */
         request = new GetRecordByIdType("CSW", "2.0.2", null,
                 "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
-        result = worker.getRecordById(request);
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
