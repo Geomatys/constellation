@@ -71,6 +71,7 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
@@ -174,12 +175,19 @@ public final class WCSService extends OGCWebService {
         	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
         		return Response.ok(getIndexPage(), Query.TEXT_HTML).build();
         	}
-        	
-            final String request = (String) getParameter(KEY_REQUEST, true);
-            
+
+            String request = "";
+            if (objectRequest instanceof JAXBElement) {
+                objectRequest = ((JAXBElement) objectRequest).getValue();
+            }
+
+            // if the request is not an xml request we fill the request parameter.
+            if (objectRequest == null) {
+                request = (String) getParameter(KEY_REQUEST, true);
+            }
+
             //TODO: fix logging of request, which may be in the objectRequest 
             //      and not in the parameter.
-            LOGGER.info("New request: " + request);
             logParameters();
             
             if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilities) )
