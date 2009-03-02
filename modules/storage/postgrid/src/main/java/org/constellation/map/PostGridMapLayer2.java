@@ -139,8 +139,8 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
 
     private static final MutableStyle createDefaultRasterStyle() {
         final StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
-        final RasterSymbolizer symbol =sf.createRasterSymbolizer();
-        return sf.createStyle(symbol);
+        final RasterSymbolizer symbol =sf.rasterSymbolizer();
+        return sf.style(symbol);
     }
 
     /**

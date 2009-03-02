@@ -74,7 +74,7 @@ public class GO2StyleProvider implements StyleProvider{
         //TODO : find another way to load special styles.
         Symbolizer symbol = new VectorFieldSymbolizer();
 
-        index.put("GO2:VectorField", SF.createStyle(symbol));
+        index.put("GO2:VectorField", SF.style(symbol));
     }
     
 }

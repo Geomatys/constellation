@@ -321,21 +321,21 @@ class PostGridLayerDetails implements LayerDetails {
 
     private MutableStyle toStyle(final MeasurementRange dimRange) {
         final List<InterpolationPoint> values = new ArrayList<InterpolationPoint>();
-        values.add(STYLE_FACTORY.createInterpolationPoint(
+        values.add(STYLE_FACTORY.interpolationPoint(
                         STYLE_FACTORY.colorExpression(Color.WHITE), dimRange.getMinimum()));
-        values.add(STYLE_FACTORY.createInterpolationPoint(
+        values.add(STYLE_FACTORY.interpolationPoint(
                         STYLE_FACTORY.colorExpression(Color.BLUE), dimRange.getMaximum()));
         final Literal lookup = StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
         final Literal fallback = StyleConstants.DEFAULT_FALLBACK;
-        final Function interpolateFunction = STYLE_FACTORY.createInterpolateFunction(
+        final Function interpolateFunction = STYLE_FACTORY.interpolateFunction(
                 lookup, values, Method.COLOR, Mode.LINEAR, fallback);
 
-        final ChannelSelection selection = STYLE_FACTORY.createChannelSelection(
-                STYLE_FACTORY.createSelectedChannelType("0", STYLE_FACTORY.literalExpression(1)));
+        final ChannelSelection selection = STYLE_FACTORY.channelSelection(
+                STYLE_FACTORY.selectedChannelType("0", STYLE_FACTORY.literalExpression(1)));
 
         final Expression opacity = STYLE_FACTORY.literalExpression(1f);
         final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
-        final ColorMap colorMap = STYLE_FACTORY.createColorMap(interpolateFunction);
+        final ColorMap colorMap = STYLE_FACTORY.colorMap(interpolateFunction);
         final ContrastEnhancement enhanced = StyleConstants.DEFAULT_CONTRAST_ENHANCEMENT;
         final ShadedRelief relief = StyleConstants.DEFAULT_SHADED_RELIEF;
         final Symbolizer outline = null; //createRealWorldLineSymbolizer();
@@ -344,9 +344,12 @@ class PostGridLayerDetails implements LayerDetails {
         final String name = "raster symbol name";
         final Description desc = StyleConstants.DEFAULT_DESCRIPTION;
 
-        final RasterSymbolizer symbol = STYLE_FACTORY.createRasterSymbolizer(opacity, selection,
-                overlap, colorMap, enhanced, relief, outline, uom, geom, name, desc);
-        
-        return STYLE_FACTORY.createStyle(symbol);
+//        final RasterSymbolizer symbol = STYLE_FACTORY.rasterSymbolizer(
+//                name,geom,desc,uom,opacity, selection,
+//                overlap, colorMap, enhanced, relief, outline);
+
+        final RasterSymbolizer symbol = STYLE_FACTORY.rasterSymbolizer();
+
+        return STYLE_FACTORY.style(symbol);
     }
 }

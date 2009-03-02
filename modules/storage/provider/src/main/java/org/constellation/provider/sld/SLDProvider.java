@@ -168,7 +168,7 @@ public class SLDProvider implements StyleProvider{
             //try FeatureTypeStyle SE 1.1
             try {
                 final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(f, SymbologyEncoding.V_1_1_0);
-                final MutableStyle style = SF.createStyle();
+                final MutableStyle style = SF.style();
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
@@ -180,7 +180,7 @@ public class SLDProvider implements StyleProvider{
             //try FeatureTypeStyle SLD 1.0
             try {
                 final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(f, SymbologyEncoding.SLD_1_0_0);
-                final MutableStyle style = SF.createStyle();
+                final MutableStyle style = SF.style();
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
