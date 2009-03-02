@@ -139,7 +139,7 @@ public class PEP {
         //Create a subject type
         SubjectType subject = new SubjectType();
         subject.getAttribute().add(
-                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_ID.key, 
+                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_SUBJECTID.key, 
                                                                   issuer, 
                                                                   user.getName()));
         
@@ -147,7 +147,7 @@ public class PEP {
         while (roles.hasMoreElements()) {
             Principal rolePrincipal = roles.nextElement();
             AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
-                    XACMLConstants.ATTRIBUTEID_ROLE.key, issuer, rolePrincipal.getName());
+                    XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key, issuer, rolePrincipal.getName());
             subject.getAttribute().add(attSubjectID);
         }
         return subject;
@@ -165,7 +165,7 @@ public class PEP {
         //Create a resource type
         ResourceType resourceType = new ResourceType();
         resourceType.getAttribute().add(
-                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key, null, new URI(URI)));
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, new URI(URI)));
         return resourceType;
     }
     
@@ -181,7 +181,7 @@ public class PEP {
         //Create a resource type
         ResourceType resourceType = new ResourceType();
         resourceType.getAttribute().add(
-                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key, null, URI));
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, URI));
         return resourceType;
     }
     
@@ -197,7 +197,7 @@ public class PEP {
         //Create an action type
         ActionType actionType = new ActionType();
         actionType.getAttribute().add(
-                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key, issuer, action));
+                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key, issuer, action));
         
         return actionType;
     
@@ -211,7 +211,7 @@ public class PEP {
         //Create an Environment Type
         EnvironmentType environmentType = new EnvironmentType();
         environmentType.getAttribute().add(
-                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_CURRENT_TIME.key, issuer));
+                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_ENVIRONMENT_CURRENTTIME.key, issuer));
         return environmentType;
         
     }

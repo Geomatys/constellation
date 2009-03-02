@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2007, JBoss Inc.
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,10 +18,12 @@
 package org.constellation.xacml;
 
 /**
- *  Constants
- *  @author Anil.Saldhana@redhat.com
- *  @since  Jul 6, 2007 
- *  @version $Revision$
+ *  URN Constants used in XACML Policy and Request documents.
+ *  
+ *  @author Anil Saldhana (Redhat)
+ *  @author Adrian Custer (Geomatys)
+ *  @version 0.3
+ *  @since  Jul 6, 2007 (JBoss)
  */
 public enum XACMLConstants {
 
@@ -34,38 +36,45 @@ public enum XACMLConstants {
     RESPONSE_CTX("response_ctx"),
     CONTEXT_SCHEMA("urn:oasis:names:tc:xacml:2.0:context:schema:os"),
     POLICY_SCHEMA("urn:oasis:names:tc:xacml:2.0:policy:schema:os"),
-    //Action Attribute IDs
-    ATTRIBUTEID_ACTION_ID("urn:oasis:names:tc:xacml:1.0:action:action-id"),
-    ATTRIBUTEID_IMPLIED_ACTION("urn:oasis:names:tc:xacml:1.0:action:implied-action"),
-    ATTRIBUTEID_ACTION_NAMESPACE("urn:oasis:names:tc:xacml:1.0:action:action-namespace"),
-    //Environment Attribute IDs
-    ATTRIBUTEID_CURRENT_TIME("urn:oasis:names:tc:xacml:1.0:environment:current-time"),
-    ATTRIBUTEID_CURRENT_DATE("urn:oasis:names:tc:xacml:1.0:environment:current-date"),
-    ATTRIBUTEID_CURRENT_DATE_TIME("urn:oasis:names:tc:xacml:1.0:environment:current-dateTime"),
-    //Resource Attribute IDs
-    ATTRIBUTEID_RESOURCE_ID("urn:oasis:names:tc:xacml:1.0:resource:resource-id"),
-    ATTRIBUTEID_TARGET_NAMESPACE("urn:oasis:names:tc:xacml:2.0:resource:target-namespace"),
-    ATTRIBUTEID_RESOURCE_LOCATION("urn:oasis:names:tc:xacml:1.0:resource:resource-location"),
-    ATTRIBUTEID_XPATH("urn:oasis:names:tc:xacml:1.0:resource:xpath"),
-    ATTRIBUTEID_SIMPLE_FILE_NAME("urn:oasis:names:tc:xacml:1.0:resource:simple-file-name"),
-    //Subject Attribute IDs
-    ATTRIBUTEID_SUBJECT_ID("urn:oasis:names:tc:xacml:1.0:subject:subject-id"),
-    ATTRIBUTEID_ROLE("urn:oasis:names:tc:xacml:2.0:subject:role"),
-    ATTRIBUTEID_DNS_NAME("urn:oasis:names:tc:xacml:1.0:subject:authn-locality:dns-name"),
-    ATTRIBUTEID_IP_ADDRESS("urn:oasis:names:tc:xacml:1.0:subject:authn-locality:ip-address"),
-    ATTRIBUTEID_AUTHENTICATION_METHOD("urn:oasis:names:tc:xacml:1.0:subject:authentication-method"),
-    ATTRIBUTEID_AUTHENTICATION_TIME("urn:oasis:names:tc:xacml:1.0:subject:authentication-time"),
-    ATTRIBUTEID_KEY_INFO("urn:oasis:names:tc:xacml:1.0:subject:key-info"),
-    ATTRIBUTEID_REQUEST_TIME("urn:oasis:names:tc:xacml:1.0:subject:request-time"),
-    ATTRIBUTEID_NAME_FORMAT("urn:oasis:names:tc:xacml:1.0:subject:name-format"),
-    ATTRIBUTEID_SESSION_START_TIME("urn:oasis:names:tc:xacml:1.0:subject:session-start-time"),
-    ATTRIBUTEID_SUBJECT_ID_QUALIFIER("urn:oasis:names:tc:xacml:1.0:subject:subject-id-qualifier"),
-    ATTRIBUTEID_ACCESS_SUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"),
-    ATTRIBUTEID_CODEBASE("urn:oasis:names:tc:xacml:1.0:subject-category:codebase"),
-    ATTRIBUTEID_INTERMEDIARY_SUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"),
-    ATTRIBUTEID_RECIPIENT_SUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"),
-    ATTRIBUTEID_REQUESTING_MACHINE("urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine"),
-    //Begin Functions
+    //
+    // ATTRIBUTE IDENTIFIERS
+    //
+    // subject
+    ATTRIBUTEID_SUBJECT_SUBJECTID("urn:oasis:names:tc:xacml:1.0:subject:subject-id"),
+    ATTRIBUTEID_SUBJECT_ROLE("urn:oasis:names:tc:xacml:2.0:subject:role"),
+    ATTRIBUTEID_SUBJECT_AUTHLOC_DNSNAME("urn:oasis:names:tc:xacml:1.0:subject:authn-locality:dns-name"),
+    ATTRIBUTEID_SUBJECT_AUTHLOC_IPADDRESS("urn:oasis:names:tc:xacml:1.0:subject:authn-locality:ip-address"),
+    ATTRIBUTEID_SUBJECT_AUTHMETHOD("urn:oasis:names:tc:xacml:1.0:subject:authentication-method"),
+    ATTRIBUTEID_SUBJECT_AUTHTIME("urn:oasis:names:tc:xacml:1.0:subject:authentication-time"),
+    ATTRIBUTEID_SUBJECT_KEYINFO("urn:oasis:names:tc:xacml:1.0:subject:key-info"),
+    ATTRIBUTEID_SUBJECT_REQUESTTIME("urn:oasis:names:tc:xacml:1.0:subject:request-time"),
+    ATTRIBUTEID_SUBJECT_NAMEFORMAT("urn:oasis:names:tc:xacml:1.0:subject:name-format"),
+    ATTRIBUTEID_SUBJECT_SESSIONSTARTTIME("urn:oasis:names:tc:xacml:1.0:subject:session-start-time"),
+    ATTRIBUTEID_SUBJECT_SUBJECTIDQUALIFIER("urn:oasis:names:tc:xacml:1.0:subject:subject-id-qualifier"),
+    // subject-category
+    ATTRIBUTEID_SUBJECTCAT_ACCESSSUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"),
+    ATTRIBUTEID_SUBJECTCAT_CODEBASE("urn:oasis:names:tc:xacml:1.0:subject-category:codebase"),
+    ATTRIBUTEID_SUBJECTCAT_INTERMEDIARYSUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject"),
+    ATTRIBUTEID_SUBJECTCAT_RECIPIENTSUBJECT("urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject"),
+    ATTRIBUTEID_SUBJECTCAT_REQUESTINGMACHINE("urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine"),
+    // resource
+    ATTRIBUTEID_RESOURCE_RESOURCEID("urn:oasis:names:tc:xacml:1.0:resource:resource-id"),
+    ATTRIBUTEID_RESOURCE_RESOURCETYPE("urn:oasis:names:tc:xacml:1.0:resource:resource-type"),
+    ATTRIBUTEID_RESOURCE_TARGETNAMESPACE("urn:oasis:names:tc:xacml:2.0:resource:target-namespace"),
+    ATTRIBUTEID_RESOURCE_RESOURCELOC("urn:oasis:names:tc:xacml:1.0:resource:resource-location"),
+    ATTRIBUTEID_RESOURCE_XPATH("urn:oasis:names:tc:xacml:1.0:resource:xpath"),
+    ATTRIBUTEID_RESOURCE_SIMPLEFILENAME("urn:oasis:names:tc:xacml:1.0:resource:simple-file-name"),
+    // action
+    ATTRIBUTEID_ACTION_ACTIONID("urn:oasis:names:tc:xacml:1.0:action:action-id"),
+    ATTRIBUTEID_ACTION_IMPLIEDACTION("urn:oasis:names:tc:xacml:1.0:action:implied-action"),
+    ATTRIBUTEID_ACTION_ACTIONNAMESPACE("urn:oasis:names:tc:xacml:1.0:action:action-namespace"),
+    // environment
+    ATTRIBUTEID_ENVIRONMENT_CURRENTTIME("urn:oasis:names:tc:xacml:1.0:environment:current-time"),
+    ATTRIBUTEID_ENVIRONMENT_CURRENTDATE("urn:oasis:names:tc:xacml:1.0:environment:current-date"),
+    ATTRIBUTEID_ENVIRONMENT_CURRENTDATETIME("urn:oasis:names:tc:xacml:1.0:environment:current-dateTime"),
+    //
+    // FUNCTIONS
+    //
     //Equal
     FUNCTION_ANYURI_EQUAL("urn:oasis:names:tc:xacml:1.0:function:anyURI-equal"),
     FUNCTION_BASEBINARY_EQUAL("urn:oasis:names:tc:xacml:1.0:function:base64Binary-equal"),
@@ -300,8 +309,9 @@ public enum XACMLConstants {
     FUNCTION_XPATH_NODE_COUNT("urn:oasis:names:tc:xacml:1.0:function:xpath-node-count"),
     FUNCTION_XPATH_NODE_EQUAL("urn:oasis:names:tc:xacml:1.0:function:xpath-node-equal"),
     FUNCTION_XPATH_NODE_MATCH("urn:oasis:names:tc:xacml:1.0:function:xpath-node-match"),
-    //End Functions
+    //
     //Rule Combining Algorithms
+    //
     RULE_COMBINING_FIRST_APPLICABLE("urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable"),
     RULE_COMBINING_DENY_OVERRIDES("urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides"),
     RULE_COMBINING_ORDERED_DENY_OVERRIDES("urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:ordered-deny-overrides"),

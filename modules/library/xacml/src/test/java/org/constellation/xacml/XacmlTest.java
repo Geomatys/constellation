@@ -825,7 +825,7 @@ public class XacmlTest {
         
         // description of the attribute here the resource ID of type anyURI
         rmt.setResourceAttributeDesignator(PolicyAttributeFactory.createAttributeDesignatorType(
-                XACMLConstants.ATTRIBUTEID_RESOURCE_ID.key,
+                XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key,
                 XMLSchemaConstants.DATATYPE_ANYURI.key,
                 null,
                 true));
@@ -854,7 +854,7 @@ public class XacmlTest {
         amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
         amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("read"));
         amct.setActionAttributeDesignator(
-                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key,
                                                                      XMLSchemaConstants.DATATYPE_STRING.key,
                                                                      null, true));
         
@@ -874,7 +874,7 @@ public class XacmlTest {
         
         // the condition is: "developer" is in role id 
         permitRuleApplyType.setFunctionId(XACMLConstants.FUNCTION_STRING_IS_IN.key);
-        SubjectAttributeDesignatorType sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ROLE.key,
+        SubjectAttributeDesignatorType sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key,
                                                                                                           XMLSchemaConstants.DATATYPE_STRING.key,
                                                                                                           null, true, null);
         
@@ -905,7 +905,7 @@ public class XacmlTest {
         amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
         amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("read"));
         amct.setActionAttributeDesignator(
-                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key,
                                                                      XMLSchemaConstants.DATATYPE_STRING.key,
                                                                      null, true));
         
@@ -918,7 +918,7 @@ public class XacmlTest {
         amct.setMatchId("urn:oasis:names:tc:xacml:1.0:function:string-equal");
         amct.setAttributeValue(PolicyAttributeFactory.createStringAttributeType("write"));
         amct.setActionAttributeDesignator(
-                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ID.key,
+                PolicyAttributeFactory.createAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key,
                                                                      XMLSchemaConstants.DATATYPE_STRING.key,
                                                                      null, true));
         
@@ -940,7 +940,7 @@ public class XacmlTest {
         
         // the condition is: "admin" is in role id 
         permitRuleApplyType.setFunctionId(XACMLConstants.FUNCTION_STRING_IS_IN.key);
-        sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_ROLE.key,
+        sadt = PolicyAttributeFactory.createSubjectAttributeDesignatorType(XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key,
                                                                            XMLSchemaConstants.DATATYPE_STRING.key,
                                                                            null, true, null);
         
