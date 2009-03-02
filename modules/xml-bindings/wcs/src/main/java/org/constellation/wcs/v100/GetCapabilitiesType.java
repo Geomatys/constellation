@@ -100,6 +100,7 @@ public class GetCapabilitiesType implements GetCapabilities {
     /**
      * Gets the value of the service property.
      */
+    @Override
     public String getService() {
         if (service == null) {
             return "WCS";
@@ -111,6 +112,7 @@ public class GetCapabilitiesType implements GetCapabilities {
     /**
      * Gets the value of the version property.
      */
+    @Override
     public String getVersion() {
         if (version == null) {
             return "1.0.0";
@@ -133,18 +135,22 @@ public class GetCapabilitiesType implements GetCapabilities {
      */
 
 
+    @Override
     public AcceptVersions getAcceptVersions() {
         return new AcceptVersions() {
 
+            @Override
             public List<String> getVersion() {
                 return Arrays.asList(version);
             }
         };
     }
 
+    @Override
     public Sections getSections() {
         return new Sections() {
 
+            @Override
             public List<String> getSection() {
                 final StringTokenizer tokens = new StringTokenizer(section, ",");
                 List<String> sections = new ArrayList<String>();
@@ -155,6 +161,7 @@ public class GetCapabilitiesType implements GetCapabilities {
                 return sections;
             }
 
+            @Override
             public void add(String sec) {
                 if (sec != null)
                     section = section + ',' + sec;
@@ -162,13 +169,19 @@ public class GetCapabilitiesType implements GetCapabilities {
         };
     }
 
+    @Override
     public AcceptFormats getAcceptFormats() {
         return new AcceptFormats() {
 
+            @Override
             public List<String> getOutputFormat() {
                 return Arrays.asList("application/xml");
             }
         };
     }
 
+    @Override
+    public String toKvp() {
+        return "request=GetCapabilities&service="+ getService() + "&version="+ getVersion();
+    }
 }

@@ -73,11 +73,17 @@ public class GetCapabilitiesType extends org.constellation.ows.v110.GetCapabilit
     /**
      * Gets the value of the service property.
      */
+    @Override
     public String getService() {
         if (service == null) {
             return "WCS";
         } else {
             return service;
         }
+    }
+
+    @Override
+    public String toKvp() {
+        return "request=GetCapabilities&service="+ getService() + "&version="+ getVersion();
     }
 }

@@ -73,4 +73,6 @@ public interface GetCoverage extends AbstractRequest {
      * Returns the time of the request, or {@code null} if none.
      */
     public String getTime();
+
+    public String toKvp();
 }

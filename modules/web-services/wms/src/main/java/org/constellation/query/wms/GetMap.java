@@ -21,8 +21,8 @@ import java.awt.Dimension;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import org.constellation.query.QueryAdapter;
 import org.constellation.query.QueryRequest;
+import org.constellation.util.StringUtilities;
 import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
@@ -367,16 +367,16 @@ public class GetMap extends WMSQuery {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters
         kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
-           .append('&').append(KEY_BBOX    ).append('=').append(QueryAdapter.toBboxValue(envelope))
+           .append('&').append(KEY_BBOX    ).append('=').append(StringUtilities.toBboxValue(envelope))
            .append('&').append((version.toString().equals("1.1.1")) ?
                                KEY_CRS_v111 :
-                               KEY_CRS_v130).append('=').append(QueryAdapter.toCrsCode(envelope))
+                               KEY_CRS_v130).append('=').append(StringUtilities.toCrsCode(envelope))
            .append('&').append(KEY_VERSION ).append('=').append(version)
            .append('&').append(KEY_FORMAT  ).append('=').append(format)
-           .append('&').append(KEY_LAYERS  ).append('=').append(QueryAdapter.toCommaSeparatedValues(layers))
+           .append('&').append(KEY_LAYERS  ).append('=').append(StringUtilities.toCommaSeparatedValues(layers))
            .append('&').append(KEY_WIDTH   ).append('=').append(size.width)
            .append('&').append(KEY_HEIGHT  ).append('=').append(size.height)
-           .append('&').append(KEY_STYLES  ).append('=').append(QueryAdapter.toCommaSeparatedValues(styles));
+           .append('&').append(KEY_STYLES  ).append('=').append(StringUtilities.toCommaSeparatedValues(styles));
 
         //Optional Parameters
         if (sld != null) {

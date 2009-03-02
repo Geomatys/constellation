@@ -18,6 +18,8 @@ package org.constellation.wcs.v100;
 
 import java.awt.Dimension;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,6 +31,7 @@ import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.GridEnvelopeType;
 import org.constellation.gml.v311.TimePositionType;
+import org.constellation.util.StringUtilities;
 import org.constellation.wcs.GetCoverage;
 
 import org.geotools.geometry.GeneralEnvelope;
@@ -91,6 +94,8 @@ public class GetCoverageType implements GetCoverage {
     private String service;
     @XmlAttribute(required = true)
     private String version;
+
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.wcs.v100");
 
     /**
      * Empty constructor used by JAXB.
@@ -301,5 +306,24 @@ public class GetCoverageType implements GetCoverage {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toKvp() {
+        String kvp;
+        try {
+            kvp = "request=GetCapabilities&service="+ getService() +"&version="+ getVersion() +"&coverage="+
+                     getCoverage() +"&bbox="+ StringUtilities.toBboxValue(getEnvelope()) +"&crs="+
+                     StringUtilities.toCrsCode(getEnvelope()) +"&format="+ StringUtilities.toFormat(getFormat()) +
+                     "&width="+ getSize().getWidth() +"&height="+ getSize().getHeight();
+            final String time = getTime();
+            if (time != null) {
+                kvp += "&time="+ time;
+            }
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.INFO, null, ex);
+            return null;
+        }
+        return kvp;
     }
 }

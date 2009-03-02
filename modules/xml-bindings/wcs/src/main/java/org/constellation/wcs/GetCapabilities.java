@@ -26,5 +26,7 @@ public interface GetCapabilities extends AbstractGetCapabilities {
 
     public String getService();
 
+    public String toKvp();
+
 }
 

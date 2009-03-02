@@ -117,8 +117,13 @@ public class DescribeCoverageType implements DescribeCoverage {
     /**
      * Gets the value of the version property.
      */
+    @Override
     public String getVersion() {
         return version;
     }
 
+    @Override
+    public String toKvp() {
+        return "request=DescribeCoverage&service="+ getService() +"&version="+ getVersion() +"&identifier="+ getIdentifier().get(0);
+    }
 }

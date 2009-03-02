@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
-import org.constellation.query.QueryAdapter;
+import org.constellation.util.StringUtilities;
 import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
@@ -129,7 +129,7 @@ public class GetFeatureInfo extends GetMap {
         final String getMapKvp = super.toKvp();
         final StringBuilder kvp = new StringBuilder(getMapKvp);
         //Obligatory Parameters
-        kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(QueryAdapter.toCommaSeparatedValues(queryLayers))
+        kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(StringUtilities.toCommaSeparatedValues(queryLayers))
            .append('&').append(KEY_INFO_FORMAT ).append('=').append(infoFormat)
            .append('&').append((version.toString().equals("1.1.1")) ?
                                KEY_I_v111 :

@@ -48,6 +48,7 @@ import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
+import org.constellation.util.StringUtilities;
 import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
@@ -265,7 +266,7 @@ public class WMSService extends OGCWebService {
     private DescribeLayer adaptDescribeLayer() throws CstlServiceException {
         final String strLayer  = getParameter(KEY_LAYERS,  true );
         final String strVersion = getParameter(KEY_VERSION, false);
-        final List<String> layers = QueryAdapter.toStringList(strLayer);
+        final List<String> layers = StringUtilities.toStringList(strLayer);
         setActingVersion(strVersion);
         isVersionSupported(strVersion);
         return new DescribeLayer(layers, getActingVersion());
@@ -316,15 +317,15 @@ public class WMSService extends OGCWebService {
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
-        final List<String> queryLayers = QueryAdapter.toStringList(strQueryLayers);
+        final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, getActingVersion());
-        final int x = QueryAdapter.toInt(strX);
-        final int y = QueryAdapter.toInt(strY);
+        final int x = StringUtilities.toInt(strX);
+        final int y = StringUtilities.toInt(strY);
         final Integer featureCount;
         if (strFeatureCount == null || strFeatureCount.equals("")) {
             featureCount = null;
         } else {
-            featureCount = QueryAdapter.toInt(strFeatureCount);
+            featureCount = StringUtilities.toInt(strFeatureCount);
         }
         return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
     }
@@ -343,7 +344,7 @@ public class WMSService extends OGCWebService {
         final String strHeight = getParameter(KEY_HEIGHT, false);
         final String format;
         try {
-            format = QueryAdapter.toFormat(strFormat);
+            format = StringUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT,
                     new ServiceVersion(ServiceType.WMS, "1.1.0"));
@@ -354,8 +355,8 @@ public class WMSService extends OGCWebService {
             final int width;
             final int height;
             try {
-                width  = QueryAdapter.toInt(strWidth);
-                height = QueryAdapter.toInt(strHeight);
+                width  = StringUtilities.toInt(strWidth);
+                height = StringUtilities.toInt(strHeight);
             } catch (NumberFormatException n) {
                 throw new CstlServiceException(n, INVALID_PARAMETER_VALUE,
                         new ServiceVersion(ServiceType.WMS, "1.1.0"));
@@ -399,13 +400,13 @@ public class WMSService extends OGCWebService {
 
         final CoordinateReferenceSystem crs;
         try {
-            crs = QueryAdapter.toCRS(strCRS);
+            crs = StringUtilities.toCRS(strCRS);
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS, getActingVersion());
         }
         final ImmutableEnvelope env;
         try {
-            env = (ImmutableEnvelope) QueryAdapter.toEnvelope(strBBox, crs);
+            env = (ImmutableEnvelope) StringUtilities.toEnvelope(strBBox, crs);
             //TODO change to this method when renderer will support 4D BBox
 //            env = QueryAdapter.toEnvelope(strBBox, crs, strElevation, strTime,wmsVersion);
         } catch (IllegalArgumentException i) {
@@ -413,37 +414,37 @@ public class WMSService extends OGCWebService {
         }
         final String format;
         try {
-            format = QueryAdapter.toFormat(strFormat);
+            format = StringUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT, getActingVersion());
         }
-        final List<String> layers  = QueryAdapter.toStringList(strLayers);
-        final List<String> styles = QueryAdapter.toStringList(strStyles);
+        final List<String> layers  = StringUtilities.toStringList(strLayers);
+        final List<String> styles = StringUtilities.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
         final Double elevation;
         try {
-            elevation = (strElevation != null) ? QueryAdapter.toDouble(strElevation) : null;
+            elevation = (strElevation != null) ? StringUtilities.toDouble(strElevation) : null;
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
-            date = QueryAdapter.toDate(strTime);
+            date = StringUtilities.toDate(strTime);
         } catch (ParseException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final int width;
         final int height;
         try {
-            width  = QueryAdapter.toInt(strWidth);
-            height = QueryAdapter.toInt(strHeight);
+            width  = StringUtilities.toInt(strWidth);
+            height = StringUtilities.toInt(strHeight);
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, getActingVersion());
         }
         final Dimension size = new Dimension(width, height);
-        final Color background = QueryAdapter.toColor(strBGColor);
-        final boolean transparent = QueryAdapter.toBoolean(strTransparent);
+        final Color background = StringUtilities.toColor(strBGColor);
+        final boolean transparent = StringUtilities.toBoolean(strTransparent);
 
         if (strRemoteOwsUrl != null) {
             InputStream in = null;
@@ -477,7 +478,7 @@ public class WMSService extends OGCWebService {
 
         final double azimuth;
         try {
-            azimuth = (strAzimuth == null) ? 0.0 : QueryAdapter.toDouble(strAzimuth);
+            azimuth = (strAzimuth == null) ? 0.0 : StringUtilities.toDouble(strAzimuth);
         } catch(NumberFormatException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, getActingVersion());
         }

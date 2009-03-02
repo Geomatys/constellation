@@ -88,7 +88,7 @@ import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.SectionsType;
 import org.constellation.query.Query;
-import org.constellation.query.QueryAdapter;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.wcs.DescribeCoverage;
 import org.constellation.wcs.DescribeCoverageResponse;
@@ -454,14 +454,14 @@ public final class WCSService extends OGCWebService {
         final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
         final String bbox = getParameter(KEY_BBOX, true);
         if (bbox != null) {
-            final List<String> bboxValues = QueryAdapter.toStringList(bbox);
-            pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(0)),
-                    QueryAdapter.toDouble(bboxValues.get(2))));
-            pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(1)),
-                    QueryAdapter.toDouble(bboxValues.get(3))));
+            final List<String> bboxValues = StringUtilities.toStringList(bbox);
+            pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(0)),
+                    StringUtilities.toDouble(bboxValues.get(2))));
+            pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(1)),
+                    StringUtilities.toDouble(bboxValues.get(3))));
             if (bboxValues.size() > 4) {
-                pos.add(new DirectPositionType(QueryAdapter.toDouble(bboxValues.get(4)),
-                        QueryAdapter.toDouble(bboxValues.get(5))));
+                pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(4)),
+                        StringUtilities.toDouble(bboxValues.get(5))));
             }
         }
         final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
@@ -556,7 +556,7 @@ public final class WCSService extends OGCWebService {
             final Double[] coordinates = new Double[tokens.countTokens()];
             int i = 0;
             while (tokens.hasMoreTokens()) {
-                coordinates[i] = QueryAdapter.toDouble(tokens.nextToken());
+                coordinates[i] = StringUtilities.toDouble(tokens.nextToken());
                 i++;
             }
             if (i < 4) {
@@ -611,7 +611,7 @@ public final class WCSService extends OGCWebService {
         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
         final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
-            Double value = QueryAdapter.toDouble(tokens.nextToken());
+            Double value = StringUtilities.toDouble(tokens.nextToken());
             origin.add(value);
         }
 
@@ -620,7 +620,7 @@ public final class WCSService extends OGCWebService {
         if (gridOffsets != null) {
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
-                Double value = QueryAdapter.toDouble(tokens.nextToken());
+                Double value = StringUtilities.toDouble(tokens.nextToken());
                 offset.add(value);
             }
         }

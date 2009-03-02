@@ -123,7 +123,13 @@ public class DescribeCoverageType implements DescribeCoverage {
     /**
      * Return the version of the service.
      */
+    @Override
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public String toKvp() {
+        return "request=DescribeCoverage&service="+ getService() + "&version=" + getVersion() + "&coverage="+ getCoverage().get(0);
     }
 }

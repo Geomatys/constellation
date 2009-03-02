@@ -82,7 +82,6 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.canvas.AbstractGraphicVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;

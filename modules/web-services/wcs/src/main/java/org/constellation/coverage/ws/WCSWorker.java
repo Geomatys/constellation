@@ -68,8 +68,8 @@ import org.constellation.ows.v110.ServiceProvider;
 import org.constellation.ows.v110.WGS84BoundingBoxType;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
-import org.constellation.query.QueryAdapter;
 import org.constellation.register.RegisterException;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.wcs.DescribeCoverage;
 import org.constellation.wcs.DescribeCoverageResponse;
@@ -784,7 +784,7 @@ public final class WCSWorker {
 
         Date date = null;
         try {
-            date = QueryAdapter.toDate(abstractRequest.getTime());
+            date = StringUtilities.toDate(abstractRequest.getTime());
         } catch (ParseException ex) {
             LOGGER.log(Level.INFO, "Parsing of the date failed. Please verify that the specified" +
                     " date is compliant with the ISO-8601 standard.", ex);

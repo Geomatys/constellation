@@ -18,6 +18,8 @@ package org.constellation.wcs.v111;
 
 import java.awt.Dimension;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -28,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.CodeType;
+import org.constellation.util.StringUtilities;
 import org.constellation.wcs.GetCoverage;
 
 import org.geotools.geometry.GeneralEnvelope;
@@ -85,6 +88,8 @@ public class GetCoverageType implements GetCoverage {
     private RangeSubsetType rangeSubset;
     @XmlElement(name = "Output", required = true)
     private OutputType output;
+
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.wcs.v111");
 
      /**
      * Empty constructor used by JAXB.
@@ -239,6 +244,17 @@ public class GetCoverageType implements GetCoverage {
     }
 
     /**
+     * Gets the value of the service property.
+     */
+    public String getService() {
+        if (service == null) {
+            return "WCS";
+        } else {
+            return service;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -264,5 +280,24 @@ public class GetCoverageType implements GetCoverage {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toKvp() {
+        String kvp;
+        try {
+            kvp = "request=GetCapabilities&service="+ getService() +"&version="+ getVersion() +"&identifier="+
+                     getCoverage() +"&bbox="+ StringUtilities.toBboxValue(getEnvelope()) +"&crs="+
+                     StringUtilities.toCrsCode(getEnvelope()) +"&format="+ StringUtilities.toFormat(getFormat()) +
+                     "&width="+ getSize().getWidth() +"&height="+ getSize().getHeight();
+            final String time = getTime();
+            if (time != null) {
+                kvp += "&time="+ time;
+            }
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.INFO, null, ex);
+            return null;
+        }
+        return kvp;
     }
 }

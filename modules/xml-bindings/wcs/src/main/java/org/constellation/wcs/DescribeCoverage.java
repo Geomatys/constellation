@@ -24,5 +24,5 @@ import org.constellation.ws.AbstractRequest;
  * @author Guilhem Legal
  */
 public interface DescribeCoverage extends AbstractRequest {
-
+    public String toKvp();
 }
