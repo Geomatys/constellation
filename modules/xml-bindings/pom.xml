@@ -120,6 +120,7 @@
     <module>wcs</module>
     <module>wfs</module>
     <module>wms</module>
+    <module>wmts</module>
     <module>wps</module>
     <module>xacml</module>
     <module>sos</module>
