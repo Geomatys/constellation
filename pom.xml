@@ -470,6 +470,11 @@
       <url>http://maven.geotools.fr/repository</url>
     </repository>
     <repository>
+      <id>geotidy</id>
+      <name>Geotidy et ses dépendances spécifiques</name>
+      <url>http://geotidy.geomatys.fr/repository</url>
+    </repository>
+    <repository>
       <id>apache</id>
       <name>Other projects</name>
       <url>http://people.apache.org/maven-snapshot-repository</url>
