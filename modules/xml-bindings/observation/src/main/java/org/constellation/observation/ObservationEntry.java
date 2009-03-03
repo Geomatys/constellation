@@ -39,6 +39,7 @@ import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.metadata.MetaDataEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
+import org.constellation.sampling.SamplingPointEntry;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
@@ -54,10 +55,6 @@ import org.opengis.metadata.MetaData;
 
 // geotools dependencies
 import org.geotools.util.Utilities;
-
-
-
-
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Observation observation}.
@@ -86,7 +83,9 @@ public class ObservationEntry extends Entry implements Observation {
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
-    
+
+    @XmlTransient
+    org.constellation.sampling.ObjectFactory factory = new org.constellation.sampling.ObjectFactory();
     /**
      * A logger (debugging purpose)
      */
@@ -192,7 +191,9 @@ public class ObservationEntry extends Entry implements Observation {
         super(name);
         this.name                = name;
         this.definition          = definition;
-        this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
+        if (featureOfInterest instanceof SamplingPointEntry) {
+            this.featureOfInterest   = new FeaturePropertyType(factory.createSamplingPoint((SamplingPointEntry)featureOfInterest));
+        }
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         this.resultQuality       = quality;
@@ -224,7 +225,9 @@ public class ObservationEntry extends Entry implements Observation {
         super(name);
         this.name                = name;
         this.definition          = definition;
-        this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
+        if (featureOfInterest instanceof SamplingPointEntry) {
+            this.featureOfInterest   = new FeaturePropertyType(factory.createSamplingPoint((SamplingPointEntry)featureOfInterest));
+        }
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         this.resultQuality       = null;       //= resultQuality;

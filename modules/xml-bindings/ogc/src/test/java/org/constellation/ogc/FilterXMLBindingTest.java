@@ -92,9 +92,14 @@ public class FilterXMLBindingTest {
         marshaller.marshal(filter, sw);
         
         String result = sw.toString();
+        //we remove the xmlmns
+        result = result.replace(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"", "");
+        result = result.replace(" xmlns:gml=\"http://www.opengis.net/gml\"", "");
+        result = result.replace(" xmlns:ogc=\"http://www.opengis.net/ogc\"", "");
+
         String expResult = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
-        "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<ogc:Filter>" + '\n' +
         "    <ogc:Overlaps>"                                                                                                                           + '\n' +
         "        <ogc:PropertyName>boundingBox</ogc:PropertyName>"                                                                                     + '\n' +
         "        <gml:Envelope srsName=\"EPSG:4326\">"                                                                                                 + '\n' +
@@ -182,7 +187,10 @@ public class FilterXMLBindingTest {
                 prefix = "ogc";
             } else if ("http://www.w3.org/1999/xlink".equals(namespaceUri)) {
                 prefix = "xlink";
+            } else if ("http://www.opengis.net/sa/1.0".equals(namespaceUri)) {
+                prefix = "sa";
             }
+
             return prefix;
         }
 

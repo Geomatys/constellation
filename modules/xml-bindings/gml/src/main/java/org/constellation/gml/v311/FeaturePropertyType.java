@@ -17,16 +17,16 @@
  */
 package org.constellation.gml.v311;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.sampling.SamplingFeatureEntry;
-import org.constellation.sampling.SamplingPointEntry;
 import org.geotools.util.Utilities;
 
 
@@ -54,16 +54,12 @@ import org.geotools.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FeaturePropertyType", propOrder = {
-    "abstractFeature",
-    "samplingPoint"
+    "abstractFeature"
 })
-@XmlSeeAlso({SamplingFeatureEntry.class,SamplingPointEntry.class})
 public class FeaturePropertyType {
 
-    @XmlElement(name = "AbstractFeature")
-    private AbstractFeatureEntry abstractFeature;
-    @XmlElement(name = "SamplingPoint", namespace = "http://www.opengis.net/sa/1.0")
-    private SamplingPointEntry samplingPoint;
+    @XmlElementRef(name= "AbstractFeature", namespace="http://www.opengis.net/gml", type=JAXBElement.class)
+    private JAXBElement<? extends AbstractFeatureEntry> abstractFeature;
     
     /**
      * Allow to record the feature when its in href mode
@@ -102,28 +98,18 @@ public class FeaturePropertyType {
     /**
      * Build a new feature.
      */
-    public FeaturePropertyType(AbstractFeatureEntry feature) {
-        if (feature instanceof SamplingPointEntry) {
-            this.samplingPoint = (SamplingPointEntry)feature;
-        } else {
-            this.abstractFeature = feature;
-        }
-        
+    public FeaturePropertyType(JAXBElement<? extends AbstractFeatureEntry> feature) {
+        this.abstractFeature = feature;
     }
     
     /**
      * Set the feature into href mode.
      */
     public void setToHref() {
-        if (abstractFeature != null) {
-            this.href       = abstractFeature.getName();
-            hiddenFeature   = abstractFeature;
+        if (abstractFeature != null && abstractFeature.getValue() != null) {
+            this.href       = abstractFeature.getValue().getName();
+            hiddenFeature   = abstractFeature.getValue();
             abstractFeature = null;
-            
-        } else if (samplingPoint != null) {
-            this.href      = samplingPoint.getName();
-            hiddenFeature  = samplingPoint;
-            samplingPoint  = null;
         }
     }
     
@@ -132,10 +118,8 @@ public class FeaturePropertyType {
      */
     public AbstractFeatureEntry getFeature() {
         if (abstractFeature != null) {
-            return abstractFeature;
-        } else if (samplingPoint != null) {
-            return samplingPoint;     
-        } else if (hiddenFeature != null) {
+            return abstractFeature.getValue();
+        }  else if (hiddenFeature != null) {
             return hiddenFeature;     
         }
         return null;
@@ -209,11 +193,16 @@ public class FeaturePropertyType {
         if (object == this) {
             return true;
         }
-
         if (object instanceof FeaturePropertyType) {
             final FeaturePropertyType that = (FeaturePropertyType) object;
-            return Utilities.equals(this.abstractFeature,    that.abstractFeature)  &&
-                   Utilities.equals(this.samplingPoint,      that.samplingPoint)    &&
+
+            boolean feat = false;
+            if (this.abstractFeature == null && that.abstractFeature == null) {
+                feat = true;
+            } else if (this.abstractFeature != null && that.abstractFeature != null) {
+                feat = Utilities.equals(this.abstractFeature.getValue(),    that.abstractFeature.getValue());
+            }
+            return feat                                                             &&
                    Utilities.equals(this.hiddenFeature,      that.hiddenFeature)    &&
                    Utilities.equals(this.actuate,            that.actuate)          &&
                    Utilities.equals(this.arcrole,            that.arcrole)          &&
@@ -232,7 +221,6 @@ public class FeaturePropertyType {
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + (this.abstractFeature != null ? this.abstractFeature.hashCode() : 0);
-        hash = 47 * hash + (this.samplingPoint != null ? this.samplingPoint.hashCode() : 0);
         hash = 47 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
         hash = 47 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         hash = 47 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
@@ -251,10 +239,8 @@ public class FeaturePropertyType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[featurePropertyType]");
-        if (abstractFeature != null)
-            s.append(abstractFeature.toString()).append('\n');
-        if (samplingPoint != null)
-            s.append(samplingPoint.toString()).append('\n');
+        if (abstractFeature != null && abstractFeature.getValue() != null)
+            s.append(abstractFeature.getValue().toString()).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

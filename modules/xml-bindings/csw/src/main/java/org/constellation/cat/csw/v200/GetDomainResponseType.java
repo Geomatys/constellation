@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.GetDomainResponse;
@@ -57,6 +58,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "GetDomainResponseType", propOrder = {
     "domainValues"
 })
+@XmlRootElement(name="GetDomainResponse")
 public class GetDomainResponseType implements GetDomainResponse {
 
     @XmlElement(name = "DomainValues", required = true)

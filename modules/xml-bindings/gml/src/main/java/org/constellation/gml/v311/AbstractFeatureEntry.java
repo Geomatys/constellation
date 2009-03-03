@@ -56,7 +56,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
      * Build a new light "Feature"
      */
     public AbstractFeatureEntry(String id, String name, String description) {
-        super(null, name, description, null);
+        super(id, name, description, null);
         this.boundedBy = new BoundingShapeEntry("not_bounded");
     }
     

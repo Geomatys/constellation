@@ -17,7 +17,6 @@
 
 package org.constellation.swe;
 
-//Junit dependencies
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -29,6 +28,8 @@ import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
 import org.constellation.swe.v101.Text;
 import org.constellation.swe.v101.TextBlockEntry;
+
+//Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -84,6 +85,7 @@ public class SweXMLBindingTest {
         result = result.replace(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"", "");
         result = result.replace(" xmlns:gml=\"http://www.opengis.net/gml\"", "");
         result = result.replace(" xmlns:swe=\"http://www.opengis.net/swe/1.0.1\"", "");
+        result = result.replace(" xmlns:sa=\"http://www.opengis.net/sa/1.0\"", "");
        
 
         String expResult = "<swe:Text definition=\"definition\">" + '\n' +
@@ -108,7 +110,7 @@ public class SweXMLBindingTest {
         result = result.replace(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"", "");
         result = result.replace(" xmlns:gml=\"http://www.opengis.net/gml\"", "");
         result = result.replace(" xmlns:swe=\"http://www.opengis.net/swe/1.0.1\"", "");
-
+        result = result.replace(" xmlns:sa=\"http://www.opengis.net/sa/1.0\"", "");
         
 
         expResult = "<swe:DataArray gml:id=\"array-id-1\">" + '\n' +

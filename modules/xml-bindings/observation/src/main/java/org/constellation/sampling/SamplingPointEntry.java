@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.PointType;
@@ -34,9 +35,13 @@ import org.opengis.observation.sampling.SamplingPoint;
  *
  * @author Guilhem Legal
  */
+@XmlRootElement( name="SamplingPoint" )
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SamplingPoint", namespace="http://www.opengis.net/sa/1.0",
-propOrder = {"position"})
+@XmlType(name = "", namespace="http://www.opengis.net/sa/1.0",
+    propOrder = {
+    "position"
+    }
+)
 @XmlSeeAlso({PointType.class})
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
     
@@ -49,7 +54,7 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     /**
      * Constructor used by JAXB.
      */
-    SamplingPointEntry(){
+    public SamplingPointEntry(){
     }
             
     /** 

@@ -118,6 +118,7 @@
     <module>ogc</module>
     <module>ows</module>
     <module>wcs</module>
+    <module>wfs</module>
     <module>wms</module>
     <module>wps</module>
     <module>xacml</module>

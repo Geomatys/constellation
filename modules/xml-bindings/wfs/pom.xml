@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "cstl-xml-gml" module from Constellation project.
-  Version: $Id$
+  Configuration of "cstl-xml-wps" module from Constellation project.
+  Version: $Id: pom.xml 1413 2009-02-25 22:39:08Z acuster $
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
@@ -18,12 +19,11 @@
     Module description.
   -->
   <groupId>org.constellation.xml-bindings</groupId>
-  <artifactId>cstl-xml-gml</artifactId>
+  <artifactId>cstl-xml-wfs</artifactId>
   <packaging>jar</packaging>
-  <name>Bindings for the Geometry Markup Language schema</name>
+  <name>Bindings for the Web Feature Service schema</name>
   <description>
-    XML bindings for the various versions of the OGC standard Geographic Markup 
-    Language (GML) schemas.
+    XML bindings for the OGC Web Feature Service schema.
   </description>
 
 
@@ -36,17 +36,6 @@
       <id>glegal</id>
       <name>Guilhem Legal</name>
       <email>guilhem.legal@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
@@ -72,17 +61,13 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>onm</artifactId> 
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-postgrid</artifactId>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

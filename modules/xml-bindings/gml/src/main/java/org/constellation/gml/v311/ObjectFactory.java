@@ -203,7 +203,25 @@ public class ObjectFactory {
     private final static QName _PointProperty_QNAME             = new QName("http://www.opengis.net/gml", "pointProperty");
     private final static QName _CenterOf_QNAME                  = new QName("http://www.opengis.net/gml", "centerOf");
     private final static QName _Coord_QNAME                     = new QName("http://www.opengis.net/gml", "coord");
-        
+    private final static QName _AbstractFeatureCollection_QNAME = new QName("http://www.opengis.net/gml", "AbstractFeatureCollection");
+    private final static QName _FeatureCollection_QNAME         = new QName("http://www.opengis.net/gml", "FeatureCollection");
+    private final static QName _FeatureMembers_QNAME            = new QName("http://www.opengis.net/gml", "featureMembers");
+    private final static QName _History_QNAME                   = new QName("http://www.opengis.net/gml", "history");
+    private final static QName _TimeSlice_QNAME                 = new QName("http://www.opengis.net/gml", "AbstractTimeSlice");
+    private final static QName _MovingObjectStatus_QNAME        = new QName("http://www.opengis.net/gml", "MovingObjectStatus");
+    private final static QName _Track_QNAME                     = new QName("http://www.opengis.net/gml", "track");
+    private final static QName _Measure_QNAME                   = new QName("http://www.opengis.net/gml", "measure");
+    private final static QName _Direction_QNAME                 = new QName("http://www.opengis.net/gml", "direction");
+    private final static QName _Quantity_QNAME                  = new QName("http://www.opengis.net/gml", "Quantity");
+    private final static QName _CompassPoint_QNAME              = new QName("http://www.opengis.net/gml", "CompassPoint");
+    private final static QName _Angle_QNAME                     = new QName("http://www.opengis.net/gml", "angle");
+    private final static QName _SemiMajorAxis_QNAME             = new QName("http://www.opengis.net/gml", "semiMajorAxis");
+    private final static QName _Result_QNAME                    = new QName("http://www.opengis.net/gml", "result");
+    private final static QName _Value_QNAME                     = new QName("http://www.opengis.net/gml", "value");
+    private final static QName _SemiMinorAxis_QNAME             = new QName("http://www.opengis.net/gml", "semiMinorAxis");
+    private final static QName _DirectionVector_QNAME           = new QName("http://www.opengis.net/gml", "DirectionVector");
+    private final static QName _InverseFlattening_QNAME         = new QName("http://www.opengis.net/gml", "inverseFlattening");
+
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
      * 
@@ -211,6 +229,150 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    /**
+     * Create an instance of {@link DynamicFeatureType }
+     *
+     */
+    public DynamicFeatureType createDynamicFeatureType() {
+        return new DynamicFeatureType();
+    }
+
+    /**
+     * Create an instance of {@link AreaType }
+     *
+     */
+    public AreaType createAreaType() {
+        return new AreaType();
+    }
+
+    /**
+     * Create an instance of {@link GridLengthType }
+     *
+     */
+    public GridLengthType createGridLengthType() {
+        return new GridLengthType();
+    }
+
+    /**
+     * Create an instance of {@link DirectionPropertyType }
+     *
+     */
+    public DirectionPropertyType createDirectionPropertyType() {
+        return new DirectionPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link VolumeType }
+     *
+     */
+    public VolumeType createVolumeType() {
+        return new VolumeType();
+    }
+
+    /**
+     * Create an instance of {@link ScaleType }
+     *
+     */
+    public ScaleType createScaleType() {
+        return new ScaleType();
+    }
+
+    /**
+     * Create an instance of {@link MeasureType }
+     *
+     */
+    public MeasureType createMeasureType() {
+        return new MeasureType();
+    }
+
+    /**
+     * Create an instance of {@link DirectionVectorType }
+     *
+     */
+    public DirectionVectorType createDirectionVectorType() {
+        return new DirectionVectorType();
+    }
+
+    /**
+     * Create an instance of {@link SpeedType }
+     *
+     */
+    public SpeedType createSpeedType() {
+        return new SpeedType();
+    }
+
+    /**
+     * Create an instance of {@link AngleType }
+     *
+     */
+    public AngleType createAngleType() {
+        return new AngleType();
+    }
+
+    /**
+     * Create an instance of {@link TimeType }
+     *
+     */
+    public TimeType createTimeType() {
+        return new TimeType();
+    }
+
+    /**
+     * Create an instance of {@link LengthType }
+     *
+     */
+    public LengthType createLengthType() {
+        return new LengthType();
+    }
+
+    /**
+     * Create an instance of {@link HistoryPropertyType }
+     *
+     */
+    public HistoryPropertyType createHistoryPropertyType() {
+        return new HistoryPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TrackType }
+     *
+     */
+    public TrackType createTrackType() {
+        return new TrackType();
+    }
+
+    /**
+     * Create an instance of {@link MovingObjectStatusType }
+     *
+     */
+    public MovingObjectStatusType createMovingObjectStatusType() {
+        return new MovingObjectStatusType();
+    }
+
+    /**
+     * Create an instance of {@link DynamicFeatureCollectionType }
+     *
+     */
+    public DynamicFeatureCollectionType createDynamicFeatureCollectionType() {
+        return new DynamicFeatureCollectionType();
+    }
+    
+    /**
+     * Create an instance of {@link FeatureCollectionType }
+     *
+     */
+    public FeatureCollectionType createFeatureCollectionType() {
+        return new FeatureCollectionType();
+    }
+
+    /**
+     * Create an instance of {@link FeatureArrayPropertyType }
+     *
+     */
+    public FeatureArrayPropertyType createFeatureArrayPropertyType() {
+        return new FeatureArrayPropertyType();
+    }
+    
     /**
      * Create an instance of {@link MetaDataPropertyType }
      * 
@@ -2109,5 +2271,167 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "TimeInstant", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractTimeGeometricPrimitive")
     public JAXBElement<TimeInstantType> createTimeInstant(TimeInstantType value) {
         return new JAXBElement<TimeInstantType>(_TimeInstant_QNAME, TimeInstantType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link HistoryPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "history")
+    public JAXBElement<HistoryPropertyType> createHistory(HistoryPropertyType value) {
+        return new JAXBElement<HistoryPropertyType>(_History_QNAME, HistoryPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FeatureCollectionType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "FeatureCollection", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractFeature")
+    public JAXBElement<FeatureCollectionType> createFeatureCollection(FeatureCollectionType value) {
+        return new JAXBElement<FeatureCollectionType>(_FeatureCollection_QNAME, FeatureCollectionType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractFeatureCollectionType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractFeatureCollection", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractFeature")
+    public JAXBElement<AbstractFeatureCollectionType> createAbstractFeatureCollection(AbstractFeatureCollectionType value) {
+        return new JAXBElement<AbstractFeatureCollectionType>(_AbstractFeatureCollection_QNAME, AbstractFeatureCollectionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FeatureArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "featureMembers")
+    public JAXBElement<FeatureArrayPropertyType> createFeatureMembers(FeatureArrayPropertyType value) {
+        return new JAXBElement<FeatureArrayPropertyType>(_FeatureMembers_QNAME, FeatureArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MovingObjectStatusType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "MovingObjectStatus", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractTimeSlice")
+    public JAXBElement<MovingObjectStatusType> createMovingObjectStatus(MovingObjectStatusType value) {
+        return new JAXBElement<MovingObjectStatusType>(_MovingObjectStatus_QNAME, MovingObjectStatusType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimeSliceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractTimeSlice", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGML")
+    public JAXBElement<AbstractTimeSliceType> createTimeSlice(AbstractTimeSliceType value) {
+        return new JAXBElement<AbstractTimeSliceType>(_TimeSlice_QNAME, AbstractTimeSliceType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TrackType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "track", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "history")
+    public JAXBElement<TrackType> createTrack(TrackType value) {
+        return new JAXBElement<TrackType>(_Track_QNAME, TrackType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "inverseFlattening")
+    public JAXBElement<MeasureType> createInverseFlattening(MeasureType value) {
+        return new JAXBElement<MeasureType>(_InverseFlattening_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DirectionVectorType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "DirectionVector")
+    public JAXBElement<DirectionVectorType> createDirectionVector(DirectionVectorType value) {
+        return new JAXBElement<DirectionVectorType>(_DirectionVector_QNAME, DirectionVectorType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "value")
+    public JAXBElement<MeasureType> createValue(MeasureType value) {
+        return new JAXBElement<MeasureType>(_Value_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "semiMinorAxis")
+    public JAXBElement<MeasureType> createSemiMinorAxis(MeasureType value) {
+        return new JAXBElement<MeasureType>(_SemiMinorAxis_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "measure")
+    public JAXBElement<MeasureType> createMeasure(MeasureType value) {
+        return new JAXBElement<MeasureType>(_Measure_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DirectionPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "direction")
+    public JAXBElement<DirectionPropertyType> createDirection(DirectionPropertyType value) {
+        return new JAXBElement<DirectionPropertyType>(_Direction_QNAME, DirectionPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Quantity")
+    public JAXBElement<MeasureType> createQuantity(MeasureType value) {
+        return new JAXBElement<MeasureType>(_Quantity_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompassPointEnumeration }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "CompassPoint")
+    public JAXBElement<CompassPointEnumeration> createCompassPoint(CompassPointEnumeration value) {
+        return new JAXBElement<CompassPointEnumeration>(_CompassPoint_QNAME, CompassPointEnumeration.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "angle")
+    public JAXBElement<MeasureType> createAngle(MeasureType value) {
+        return new JAXBElement<MeasureType>(_Angle_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "semiMajorAxis")
+    public JAXBElement<MeasureType> createSemiMajorAxis(MeasureType value) {
+        return new JAXBElement<MeasureType>(_SemiMajorAxis_QNAME, MeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "result")
+    public JAXBElement<MeasureType> createResult(MeasureType value) {
+        return new JAXBElement<MeasureType>(_Result_QNAME, MeasureType.class, null, value);
     }
 }
