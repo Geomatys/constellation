@@ -174,6 +174,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link DatasetDescriptionSummaryBaseType }
+     *
+     */
+    public DatasetDescriptionSummaryBaseType createDatasetDescriptionSummaryBaseType() {
+        return new DatasetDescriptionSummaryBaseType();
+    }
+
+    /**
      * Create an instance of {@link DescriptionType }
      * 
      */
@@ -363,6 +371,14 @@ public class ObjectFactory {
      */
     public ContactType createContactType() {
         return new ContactType();
+    }
+
+    /**
+     * Create an instance of {@link ContentsBaseType }
+     *
+     */
+    public ContentsBaseType createContentsBaseType() {
+        return new ContentsBaseType();
     }
 
     /**
@@ -713,6 +729,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "Metadata")
     public JAXBElement<MetadataType> createMetadata(MetadataType value) {
         return new JAXBElement<MetadataType>(_Metadata_QNAME, MetadataType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DatasetDescriptionSummaryBaseType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "DatasetDescriptionSummary")
+    public JAXBElement<DatasetDescriptionSummaryBaseType> createDatasetDescriptionSummary(DatasetDescriptionSummaryBaseType value) {
+        return new JAXBElement<DatasetDescriptionSummaryBaseType>(_DatasetDescriptionSummary_QNAME, DatasetDescriptionSummaryBaseType.class, null, value);
     }
 
     /**
