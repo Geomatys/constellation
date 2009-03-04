@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -64,9 +65,8 @@ import javax.xml.bind.annotation.XmlType;
     "lockId",
     "insertOrUpdateOrDelete"
 })
-public class TransactionType
-    extends BaseRequestType
-{
+@XmlRootElement(name = "Transaction")
+public class TransactionType extends BaseRequestType {
 
     @XmlElement(name = "LockId")
     private String lockId;

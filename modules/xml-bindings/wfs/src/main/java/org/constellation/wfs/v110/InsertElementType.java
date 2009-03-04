@@ -64,7 +64,7 @@ import org.constellation.gml.v311.AbstractFeatureEntry;
 })
 public class InsertElementType {
 
-    @XmlElementRef(name = "_Feature", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractFeature", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractFeatureEntry>> feature;
     @XmlAttribute
     private IdentifierGenerationOptionType idgen;

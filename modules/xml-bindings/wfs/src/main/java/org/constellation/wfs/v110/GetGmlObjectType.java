@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ogc.GmlObjectIdType;
@@ -58,6 +59,7 @@ import org.constellation.ogc.GmlObjectIdType;
 @XmlType(name = "GetGmlObjectType", propOrder = {
     "gmlObjectId"
 })
+@XmlRootElement(name = "GetGmlObject")
 public class GetGmlObjectType extends BaseRequestType {
 
     @XmlElement(name = "GmlObjectId", namespace = "http://www.opengis.net/ogc", required = true)

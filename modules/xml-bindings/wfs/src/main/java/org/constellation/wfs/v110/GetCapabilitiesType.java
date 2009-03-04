@@ -21,6 +21,7 @@ package org.constellation.wfs.v110;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -51,6 +52,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "GetCapabilitiesType")
+@XmlRootElement(name = "GetCapabilities")
 public class GetCapabilitiesType extends org.constellation.ows.v100.GetCapabilitiesType {
 
     @XmlAttribute

@@ -21,6 +21,7 @@ package org.constellation.wfs.v110;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ogc.FilterCapabilities;
 import org.constellation.ows.v100.CapabilitiesBaseType;
@@ -67,6 +68,7 @@ import org.constellation.ows.v100.CapabilitiesBaseType;
     "supportsGMLObjectTypeList",
     "filterCapabilities"
 })
+@XmlRootElement(name = "WFSCapabilities")
 public class WFSCapabilitiesType extends CapabilitiesBaseType {
 
     @XmlElement(name = "FeatureTypeList")
