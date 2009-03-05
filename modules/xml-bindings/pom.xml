@@ -114,6 +114,7 @@
     <module>configuration</module>    
     <module>csw</module>
     <module>gml</module>
+    <module>citygml</module>
     <module>kml</module>
     <module>ogc</module>
     <module>ows</module>

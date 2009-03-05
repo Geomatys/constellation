@@ -221,7 +221,20 @@ public class ObjectFactory {
     private final static QName _SemiMinorAxis_QNAME             = new QName("http://www.opengis.net/gml", "semiMinorAxis");
     private final static QName _DirectionVector_QNAME           = new QName("http://www.opengis.net/gml", "DirectionVector");
     private final static QName _InverseFlattening_QNAME         = new QName("http://www.opengis.net/gml", "inverseFlattening");
-
+    private final static QName _GeometricAggregate_QNAME        = new QName("http://www.opengis.net/gml", "_GeometricAggregate");
+    private final static QName _Association_QNAME               = new QName("http://www.opengis.net/gml", "_association");
+    private final static QName _ResultOf_QNAME                  = new QName("http://www.opengis.net/gml", "resultOf");
+    private final static QName _Member_QNAME                    = new QName("http://www.opengis.net/gml", "member");
+    private final static QName _StrictAssociation_QNAME         = new QName("http://www.opengis.net/gml", "_strictAssociation");
+    private final static QName _GeometryMember_QNAME            = new QName("http://www.opengis.net/gml", "geometryMember");
+    private final static QName _MultiPosition_QNAME             = new QName("http://www.opengis.net/gml", "multiPosition");
+    private final static QName _MultiPoint_QNAME                = new QName("http://www.opengis.net/gml", "MultiPoint");
+    private final static QName _MultiPointProperty_QNAME        = new QName("http://www.opengis.net/gml", "multiPointProperty");
+    private final static QName _MultiCenterOf_QNAME             = new QName("http://www.opengis.net/gml", "multiCenterOf");
+    private final static QName _MultiLocation_QNAME             = new QName("http://www.opengis.net/gml", "multiLocation");
+    private final static QName _PointMembers_QNAME              = new QName("http://www.opengis.net/gml", "pointMembers");
+    private final static QName _PointArrayProperty_QNAME        = new QName("http://www.opengis.net/gml", "pointArrayProperty");
+    
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
      * 
@@ -229,6 +242,46 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    /**
+     * Create an instance of {@link PointArrayPropertyType }
+     *
+     */
+    public PointArrayPropertyType createPointArrayPropertyType() {
+        return new PointArrayPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link MultiPointType }
+     *
+     */
+    public MultiPointType createMultiPointType() {
+        return new MultiPointType();
+    }
+    
+    /**
+     * Create an instance of {@link MultiPointPropertyType }
+     *
+     */
+    public MultiPointPropertyType createMultiPointPropertyType() {
+        return new MultiPointPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link GeometryPropertyType }
+     *
+     */
+    public GeometryPropertyType createGeometryPropertyType() {
+        return new GeometryPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link AssociationType }
+     *
+     */
+    public AssociationType createAssociationType() {
+        return new AssociationType();
+    }
+    
     /**
      * Create an instance of {@link DynamicFeatureType }
      *
@@ -2434,4 +2487,122 @@ public class ObjectFactory {
     public JAXBElement<MeasureType> createResult(MeasureType value) {
         return new JAXBElement<MeasureType>(_Result_QNAME, MeasureType.class, null, value);
     }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractGeometricAggregateType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_GeometricAggregate", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGeometry")
+    public JAXBElement<AbstractGeometricAggregateType> createGeometricAggregate(AbstractGeometricAggregateType value) {
+        return new JAXBElement<AbstractGeometricAggregateType>(_GeometricAggregate_QNAME, AbstractGeometricAggregateType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssociationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_association")
+    public JAXBElement<AssociationType> createAssociation(AssociationType value) {
+        return new JAXBElement<AssociationType>(_Association_QNAME, AssociationType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssociationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "resultOf")
+    public JAXBElement<AssociationType> createResultOf(AssociationType value) {
+        return new JAXBElement<AssociationType>(_ResultOf_QNAME, AssociationType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssociationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "member")
+    public JAXBElement<AssociationType> createMember(AssociationType value) {
+        return new JAXBElement<AssociationType>(_Member_QNAME, AssociationType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssociationType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_strictAssociation")
+    public JAXBElement<AssociationType> createStrictAssociation(AssociationType value) {
+        return new JAXBElement<AssociationType>(_StrictAssociation_QNAME, AssociationType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GeometryPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "geometryMember")
+    public JAXBElement<GeometryPropertyType> createGeometryMember(GeometryPropertyType value) {
+        return new JAXBElement<GeometryPropertyType>(_GeometryMember_QNAME, GeometryPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiPointPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiPosition")
+    public JAXBElement<MultiPointPropertyType> createMultiPosition(MultiPointPropertyType value) {
+        return new JAXBElement<MultiPointPropertyType>(_MultiPosition_QNAME, MultiPointPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiPointPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiPointProperty")
+    public JAXBElement<MultiPointPropertyType> createMultiPointProperty(MultiPointPropertyType value) {
+        return new JAXBElement<MultiPointPropertyType>(_MultiPointProperty_QNAME, MultiPointPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiPointPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiCenterOf")
+    public JAXBElement<MultiPointPropertyType> createMultiCenterOf(MultiPointPropertyType value) {
+        return new JAXBElement<MultiPointPropertyType>(_MultiCenterOf_QNAME, MultiPointPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiPointPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiLocation")
+    public JAXBElement<MultiPointPropertyType> createMultiLocation(MultiPointPropertyType value) {
+        return new JAXBElement<MultiPointPropertyType>(_MultiLocation_QNAME, MultiPointPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiPointType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "MultiPoint", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GeometricAggregate")
+    public JAXBElement<MultiPointType> createMultiPoint(MultiPointType value) {
+        return new JAXBElement<MultiPointType>(_MultiPoint_QNAME, MultiPointType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointMembers")
+    public JAXBElement<PointArrayPropertyType> createPointMembers(PointArrayPropertyType value) {
+        return new JAXBElement<PointArrayPropertyType>(_PointMembers_QNAME, PointArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointArrayProperty")
+    public JAXBElement<PointArrayPropertyType> createPointArrayProperty(PointArrayPropertyType value) {
+        return new JAXBElement<PointArrayPropertyType>(_PointArrayProperty_QNAME, PointArrayPropertyType.class, null, value);
+    }
+
 }
