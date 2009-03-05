@@ -57,13 +57,13 @@ import org.opengis.filter.expression.Expression;
 })
 public class BinaryComparisonOpType extends ComparisonOpsType {
 
-    @XmlElement(name = "Literal", type = LiteralType.class, nillable = true)        
+    @XmlElement(name = "Literal", type = LiteralType.class)        
     private LiteralType literal;
     
-    @XmlElement(name = "expression", type = ExpressionType.class, nillable = true)
+    @XmlElement(name = "expression", type = ExpressionType.class)
     private ExpressionType expression;
     
-    @XmlElement(name = "PropertyName", type = String.class, nillable = true)
+    @XmlElement(name = "PropertyName", type = String.class)
     private String propertyName;
             
     @XmlAttribute
