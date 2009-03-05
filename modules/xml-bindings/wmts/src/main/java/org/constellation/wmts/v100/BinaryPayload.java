@@ -116,12 +116,35 @@ public class BinaryPayload {
      * @return
      * @throws IOException
      */
-    public BufferedImage getBufferedImage(final String format) throws IOException {
+    public BufferedImage getBufferedImageByFormatName(final String format) throws IOException {
 
         ByteArrayInputStream in = new ByteArrayInputStream(payloadContent);
         ImageInputStream st = ImageIO.createImageInputStream(in);
 
         Iterator<ImageReader> rs = ImageIO.getImageReadersByFormatName(format);
+        ImageReader r = rs.next();
+        r.setInput(st, true, true);
+
+        BufferedImage bi = r.read(0);
+
+        in.close();//un-necessary but good practice.
+
+        return bi;
+    }
+
+    /**
+     * Convert the Tile image to a BufferedImage.
+     *
+     * @param format a String containing the mime type of a format (e.g., "image/png" or "image/tiff").
+     * @return
+     * @throws IOException
+     */
+    public BufferedImage getBufferedImageByMimeType(final String mimeType) throws IOException {
+
+        ByteArrayInputStream in = new ByteArrayInputStream(payloadContent);
+        ImageInputStream st = ImageIO.createImageInputStream(in);
+
+        Iterator<ImageReader> rs = ImageIO.getImageReadersByMIMEType(mimeType);
         ImageReader r = rs.next();
         r.setInput(st, true, true);
 
