@@ -91,6 +91,16 @@ public class QueryType {
     @XmlSchemaType(name = "anyURI")
     private String srsName;
 
+    public QueryType() {
+
+    }
+
+    public QueryType(FilterType filter, List<QName> typeName, String featureVersion) {
+        this.featureVersion = featureVersion;
+        this.filter         = filter;
+        this.typeName       = typeName;
+    }
+    
     /**
      * Gets the value of the propertyNameOrXlinkPropertyNameOrFunction property.
      */

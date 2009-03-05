@@ -66,6 +66,16 @@ public abstract class BaseRequestType {
     @XmlAttribute
     private String handle;
 
+    public BaseRequestType() {
+
+    }
+
+    public BaseRequestType(String service, String version, String handle) {
+        this.service = service;
+        this.version = version;
+        this.handle  = handle;
+    }
+
     /**
      * Gets the value of the service property.
      * 

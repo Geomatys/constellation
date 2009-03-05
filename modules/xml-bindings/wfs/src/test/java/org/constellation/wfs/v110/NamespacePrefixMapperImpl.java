@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.rs;
+package org.constellation.wfs.v110;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 

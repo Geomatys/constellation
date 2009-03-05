@@ -61,6 +61,16 @@ public class DeleteElementType {
     @XmlAttribute(required = true)
     private QName typeName;
 
+    public DeleteElementType() {
+
+    }
+
+    public DeleteElementType(FilterType filter, String handle, QName typeName) {
+        this.filter   = filter;
+        this.handle   = handle;
+        this.typeName = typeName;
+    }
+
     /**
      * The Filter element is used to constrain the scope of the delete operation to those features identified
      * by the filter.

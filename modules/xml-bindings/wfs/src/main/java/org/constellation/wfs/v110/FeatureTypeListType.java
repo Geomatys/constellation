@@ -62,6 +62,15 @@ public class FeatureTypeListType {
     @XmlElement(name = "FeatureType", required = true)
     private List<FeatureTypeType> featureType;
 
+    public FeatureTypeListType() {
+
+    }
+
+    public FeatureTypeListType(OperationsType operations, List<FeatureTypeType> featureType) {
+        this.featureType = featureType;
+        this.operations  = operations;
+    }
+
     /**
      * Gets the value of the operations property.
      * 
@@ -88,31 +97,16 @@ public class FeatureTypeListType {
 
     /**
      * Gets the value of the featureType property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the featureType property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getFeatureType().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link FeatureTypeType }
-     * 
-     * 
      */
     public List<FeatureTypeType> getFeatureType() {
         if (featureType == null) {
             featureType = new ArrayList<FeatureTypeType>();
         }
         return this.featureType;
+    }
+
+    public void setFeatureType(List<FeatureTypeType> featureType) {
+        this.featureType = featureType;
     }
 
 }

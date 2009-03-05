@@ -17,7 +17,6 @@
 
 package org.constellation.wfs.v110;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -75,12 +74,36 @@ public class GetFeatureType extends BaseRequestType {
     private String outputFormat;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger maxFeatures;
+    private Integer maxFeatures;
     @XmlAttribute
     private String traverseXlinkDepth;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger traverseXlinkExpiry;
+    private Integer traverseXlinkExpiry;
+
+    public GetFeatureType() {
+
+    }
+
+    public GetFeatureType(String service, String version, String handle, Integer maxFeatures,
+            List<QueryType> query, ResultTypeType resultType, String outputformat) {
+        super(service, version, handle);
+        this.maxFeatures  = maxFeatures;
+        this.query        = query;
+        this.resultType   = resultType;
+        this.outputFormat = outputformat;
+    }
+
+    public GetFeatureType(String service, String version, String handle, Integer maxFeatures,
+            List<QueryType> query, ResultTypeType resultType, String outputformat, String trXlinkDepth, Integer trXlinkExpiry) {
+        super(service, version, handle);
+        this.maxFeatures  = maxFeatures;
+        this.query        = query;
+        this.resultType   = resultType;
+        this.outputFormat = outputformat;
+        this.traverseXlinkDepth  = trXlinkDepth;
+        this.traverseXlinkExpiry = trXlinkExpiry;
+    }
 
     /**
      * Gets the value of the query property.
@@ -153,10 +176,10 @@ public class GetFeatureType extends BaseRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getMaxFeatures() {
+    public Integer getMaxFeatures() {
         return maxFeatures;
     }
 
@@ -165,10 +188,10 @@ public class GetFeatureType extends BaseRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setMaxFeatures(BigInteger value) {
+    public void setMaxFeatures(Integer value) {
         this.maxFeatures = value;
     }
 
@@ -201,10 +224,10 @@ public class GetFeatureType extends BaseRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getTraverseXlinkExpiry() {
+    public Integer getTraverseXlinkExpiry() {
         return traverseXlinkExpiry;
     }
 
@@ -213,10 +236,10 @@ public class GetFeatureType extends BaseRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setTraverseXlinkExpiry(BigInteger value) {
+    public void setTraverseXlinkExpiry(Integer value) {
         this.traverseXlinkExpiry = value;
     }
 

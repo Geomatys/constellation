@@ -80,6 +80,19 @@ public class TransactionType extends BaseRequestType {
     @XmlAttribute
     private AllSomeType releaseAction;
 
+     public TransactionType() {
+
+    }
+
+    public TransactionType(String service, String version, String handle, AllSomeType releaseAction, DeleteElementType delete) {
+        super(service, version, handle);
+        this.releaseAction = releaseAction;
+        this.insertOrUpdateOrDelete = new ArrayList<Object>();
+        if (delete != null) {
+            this.insertOrUpdateOrDelete.add(delete);
+        }
+    }
+    
     /**
      * 
      * In order for a client application to operate upon locked feature instances,

@@ -117,6 +117,18 @@ public class FeatureTypeType {
     @XmlElement(name = "MetadataURL")
     private List<MetadataURLType> metadataURL;
 
+    public FeatureTypeType() {
+
+    }
+
+    public FeatureTypeType(QName name, String title, String defaultSRS, List<String> otherCRS, List<WGS84BoundingBoxType> wgs84BoundingBox) {
+        this.name       = name;
+        this.title      = title;
+        this.defaultSRS = defaultSRS;
+        this.otherSRS   = otherCRS;
+        this.wgs84BoundingBox = wgs84BoundingBox;
+    }
+
     /**
      * Gets the value of the name property.
      * 
@@ -191,25 +203,6 @@ public class FeatureTypeType {
 
     /**
      * Gets the value of the keywords property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the keywords property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getKeywords().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link KeywordsType }
-     * 
-     * 
      */
     public List<KeywordsType> getKeywords() {
         if (keywords == null) {
@@ -244,25 +237,6 @@ public class FeatureTypeType {
 
     /**
      * Gets the value of the otherSRS property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the otherSRS property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getOtherSRS().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getOtherSRS() {
         if (otherSRS == null) {
@@ -345,25 +319,6 @@ public class FeatureTypeType {
 
     /**
      * Gets the value of the wgs84BoundingBox property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the wgs84BoundingBox property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getWGS84BoundingBox().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link WGS84BoundingBoxType }
-     * 
-     * 
      */
     public List<WGS84BoundingBoxType> getWGS84BoundingBox() {
         if (wgs84BoundingBox == null) {
@@ -374,25 +329,6 @@ public class FeatureTypeType {
 
     /**
      * Gets the value of the metadataURL property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the metadataURL property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMetadataURL().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link MetadataURLType }
-     * 
-     * 
      */
     public List<MetadataURLType> getMetadataURL() {
         if (metadataURL == null) {

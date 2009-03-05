@@ -17,7 +17,6 @@
 
 package org.constellation.wfs.v110;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -70,8 +69,27 @@ public class GetGmlObjectType extends BaseRequestType {
     private String traverseXlinkDepth;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger traverseXlinkExpiry;
+    private Integer traverseXlinkExpiry;
 
+    public GetGmlObjectType() {
+
+    }
+
+    public GetGmlObjectType(String service, String version, String handle, GmlObjectIdType gmlObjectId, String outputFormat) {
+        super(service, version, handle);
+        this.gmlObjectId  = gmlObjectId;
+        this.outputFormat = outputFormat;
+    }
+
+    public GetGmlObjectType(String service, String version, String handle, GmlObjectIdType gmlObjectId, String outputFormat,
+            String traverseXlinkDepth, Integer traverseXlinkExpiry) {
+        super(service, version, handle);
+        this.gmlObjectId  = gmlObjectId;
+        this.outputFormat = outputFormat;
+        this.traverseXlinkDepth  = traverseXlinkDepth;
+        this.traverseXlinkExpiry = traverseXlinkExpiry;
+    }
+    
     /**
      * Gets the value of the gmlObjectId property.
      * 
@@ -153,10 +171,10 @@ public class GetGmlObjectType extends BaseRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getTraverseXlinkExpiry() {
+    public Integer getTraverseXlinkExpiry() {
         return traverseXlinkExpiry;
     }
 
@@ -165,10 +183,10 @@ public class GetGmlObjectType extends BaseRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setTraverseXlinkExpiry(BigInteger value) {
+    public void setTraverseXlinkExpiry(Integer value) {
         this.traverseXlinkExpiry = value;
     }
 

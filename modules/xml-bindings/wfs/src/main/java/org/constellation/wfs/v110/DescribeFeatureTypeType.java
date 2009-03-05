@@ -72,6 +72,16 @@ public class DescribeFeatureTypeType extends BaseRequestType {
     @XmlAttribute
     private String outputFormat;
 
+    public DescribeFeatureTypeType() {
+
+    }
+
+    public DescribeFeatureTypeType(String service, String version, String handle, List<QName> typeName, String outputFormat) {
+        super(service, version, handle);
+        this.outputFormat = outputFormat;
+        this.typeName     = typeName;
+    }
+    
     /**
      * Gets the value of the typeName property.
      */

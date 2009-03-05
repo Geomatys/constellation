@@ -18,7 +18,6 @@
 
 package org.constellation.wfs.v110;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -69,10 +68,21 @@ public class LockFeatureType extends BaseRequestType {
     private List<LockType> lock;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger expiry;
+    private Integer expiry;
     @XmlAttribute
     private AllSomeType lockAction;
 
+    public LockFeatureType() {
+
+    }
+
+    public LockFeatureType(String service, String version, String handle, List<LockType> lock, Integer expiry, AllSomeType lockAction) {
+        super(service, version, handle);
+        this.expiry     = expiry;
+        this.lock       = lock;
+        this.lockAction = lockAction;
+    }
+    
     /**
      * Gets the value of the lock property.
      */
@@ -88,12 +98,12 @@ public class LockFeatureType extends BaseRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getExpiry() {
+    public Integer getExpiry() {
         if (expiry == null) {
-            return new BigInteger("5");
+            return new Integer("5");
         } else {
             return expiry;
         }
@@ -104,10 +114,10 @@ public class LockFeatureType extends BaseRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setExpiry(BigInteger value) {
+    public void setExpiry(Integer value) {
         this.expiry = value;
     }
 

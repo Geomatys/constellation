@@ -23,6 +23,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.ows.v100.AcceptFormatsType;
+import org.constellation.ows.v100.AcceptVersionsType;
+import org.constellation.ows.v100.SectionsType;
 
 
 /**
@@ -57,6 +60,38 @@ public class GetCapabilitiesType extends org.constellation.ows.v100.GetCapabilit
 
     @XmlAttribute
     private String service;
+
+    /**
+     * An empty constructor used by JAXB
+     */
+    public GetCapabilitiesType() {
+    }
+
+    /**
+     * Build a minimal new getCapabilities request with the specified service.
+     *
+     * @param service MUST be CSW.
+     */
+    public GetCapabilitiesType(String service) {
+        super();
+        this.service = service;
+    }
+
+    /**
+     * Build a new getCapabilities request with the specified service
+     *
+     * @param acceptVersions The different versions accepted by the client.
+     * @param sections The different sections of the capabilities document requested.
+     *                 one or more of "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All".
+     * @param acceptFormats The different fomat (MIME type) accepted by the client.
+     * @param updateSequence not used yet.
+     * @param service MUST be CSW.
+     */
+    public GetCapabilitiesType(AcceptVersionsType acceptVersions, SectionsType sections,
+            AcceptFormatsType acceptFormats, String updateSequence, String service) {
+        super(acceptVersions, sections, acceptFormats, updateSequence);
+        this.service = service;
+    }
 
     /**
      * Gets the value of the service property.

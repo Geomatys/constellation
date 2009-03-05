@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
  */
 public class SweXMLBindingTest {
 
-    private Logger       logger = Logger.getLogger("org.constellation.metadata.fra");
+    private Logger       logger = Logger.getLogger("org.constellation.swe");
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
