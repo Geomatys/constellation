@@ -234,6 +234,7 @@ public class ObjectFactory {
     private final static QName _MultiLocation_QNAME             = new QName("http://www.opengis.net/gml", "multiLocation");
     private final static QName _PointMembers_QNAME              = new QName("http://www.opengis.net/gml", "pointMembers");
     private final static QName _PointArrayProperty_QNAME        = new QName("http://www.opengis.net/gml", "pointArrayProperty");
+    private final static QName _FeatureMember_QNAME             = new QName("http://www.opengis.net/gml", "featureMember");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -2603,6 +2604,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointArrayProperty")
     public JAXBElement<PointArrayPropertyType> createPointArrayProperty(PointArrayPropertyType value) {
         return new JAXBElement<PointArrayPropertyType>(_PointArrayProperty_QNAME, PointArrayPropertyType.class, null, value);
+    }
+
+        /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FeaturePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "featureMember")
+    public JAXBElement<FeaturePropertyType> createFeatureMember(FeaturePropertyType value) {
+        return new JAXBElement<FeaturePropertyType>(_FeatureMember_QNAME, FeaturePropertyType.class, null, value);
     }
 
 }

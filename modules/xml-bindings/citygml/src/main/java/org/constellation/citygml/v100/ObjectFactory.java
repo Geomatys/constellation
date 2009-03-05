@@ -180,7 +180,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ImplicitGeometryType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "ImplicitGeometry", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GML")
+    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "ImplicitGeometry", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGML")
     public JAXBElement<ImplicitGeometryType> createImplicitGeometry(ImplicitGeometryType value) {
         return new JAXBElement<ImplicitGeometryType>(_ImplicitGeometry_QNAME, ImplicitGeometryType.class, null, value);
     }
@@ -189,7 +189,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractCityObjectType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "_CityObject", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_Feature")
+    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "_CityObject", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractFeature")
     public JAXBElement<AbstractCityObjectType> createCityObject(AbstractCityObjectType value) {
         return new JAXBElement<AbstractCityObjectType>(_CityObject_QNAME, AbstractCityObjectType.class, null, value);
     }
@@ -207,7 +207,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AddressType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "Address", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_Feature")
+    @XmlElementDecl(namespace = "http://www.opengis.net/citygml/1.0", name = "Address", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractFeature")
     public JAXBElement<AddressType> createAddress(AddressType value) {
         return new JAXBElement<AddressType>(_Address_QNAME, AddressType.class, null, value);
     }
