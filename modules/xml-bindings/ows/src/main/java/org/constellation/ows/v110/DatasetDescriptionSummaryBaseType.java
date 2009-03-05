@@ -67,8 +67,8 @@ public class DatasetDescriptionSummaryBaseType
     protected List<WGS84BoundingBoxType> wgs84BoundingBox;
     @XmlElement(name = "Identifier", required = true)
     protected CodeType identifier;
-    @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class)
-    protected List<JAXBElement<? extends BoundingBoxType>> boundingBox;
+    @XmlElement(name = "BoundingBox")
+    protected List<BoundingBoxType> boundingBox;
     @XmlElement(name = "Metadata")
     protected List<MetadataType> metadata;
     @XmlElementRef(name = "DatasetDescriptionSummary", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class)
@@ -150,9 +150,9 @@ public class DatasetDescriptionSummaryBaseType
      * 
      * 
      */
-    public List<JAXBElement<? extends BoundingBoxType>> getBoundingBox() {
+    public List<BoundingBoxType> getBoundingBox() {
         if (boundingBox == null) {
-            boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+            boundingBox = new ArrayList<BoundingBoxType>();
         }
         return this.boundingBox;
     }

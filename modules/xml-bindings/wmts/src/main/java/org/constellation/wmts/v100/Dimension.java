@@ -53,7 +53,7 @@ import org.constellation.ows.v110.DomainMetadataType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "DimensionType", propOrder = {
     "identifier",
     "uom",
     "unitSymbol",

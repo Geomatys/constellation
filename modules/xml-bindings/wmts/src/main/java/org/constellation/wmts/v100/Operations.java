@@ -49,7 +49,7 @@ import org.constellation.ows.v110.Operation;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "OperationsType", propOrder = {
     "operation",
     "parameter",
     "constraint"

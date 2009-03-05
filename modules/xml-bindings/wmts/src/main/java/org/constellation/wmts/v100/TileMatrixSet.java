@@ -29,7 +29,6 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.CodeType;
 import org.constellation.ows.v110.DescriptionType;
-import org.constellation.ows.v110.WGS84BoundingBoxType;
 
 
 /**
@@ -56,7 +55,7 @@ import org.constellation.ows.v110.WGS84BoundingBoxType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "TileMatrixSetType", propOrder = {
     "identifier",
     "boundingBox",
     "supportedCRS",

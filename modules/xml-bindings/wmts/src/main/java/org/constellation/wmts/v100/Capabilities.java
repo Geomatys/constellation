@@ -45,7 +45,7 @@ import org.constellation.ows.v110.CapabilitiesBaseType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "CapabilitiesType", propOrder = {
     "contents",
     "themes"
 })

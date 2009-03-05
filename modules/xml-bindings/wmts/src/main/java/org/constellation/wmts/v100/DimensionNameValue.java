@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "DimensionNameValueType", propOrder = {
     "value"
 })
 @XmlRootElement(name = "DimensionNameValue")

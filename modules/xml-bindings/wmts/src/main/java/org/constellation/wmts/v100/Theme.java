@@ -50,7 +50,7 @@ import org.constellation.ows.v110.DescriptionType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "ThemeType", propOrder = {
     "identifier",
     "theme",
     "layerRef"

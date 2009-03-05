@@ -52,7 +52,7 @@ import org.constellation.ows.v110.OnlineResourceType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "LegendURLType", propOrder = {
     "format",
     "onlineResource"
 })
