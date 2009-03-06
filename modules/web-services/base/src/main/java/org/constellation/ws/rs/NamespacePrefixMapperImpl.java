@@ -17,10 +17,14 @@
 package org.constellation.ws.rs;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
-    
+
+    private Map<String, String> namespaceExtensions = new HashMap<String, String>();
+
     /**
      * if set this namespace will be the root of the document with no prefix.
      */
@@ -180,11 +184,28 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.opengis.net/wfs".equals(namespaceUri) )
             prefix = "wfs";
         
-        //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
+        else prefix = namespaceExtensions.get(namespaceUri);
+
         return prefix;
     }
     
-    
+
+    /**
+     * Add a new mapping between a namespace and a prefix.
+     *
+     * @param prefix
+     * @param namespace
+     */
+    public void addMappedNamespace(String prefix, String namespace) {
+        namespaceExtensions.put(namespace, prefix);
+    }
+
+    /**
+     * clear the extension mapping added.
+     */
+    public void clearExtensionMapping() {
+        namespaceExtensions = new HashMap<String, String>();
+    }
     
     /**
      * Returns a list of namespace URIs that should be declared

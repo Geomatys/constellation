@@ -235,6 +235,52 @@ public class ObjectFactory {
     private final static QName _PointMembers_QNAME              = new QName("http://www.opengis.net/gml", "pointMembers");
     private final static QName _PointArrayProperty_QNAME        = new QName("http://www.opengis.net/gml", "pointArrayProperty");
     private final static QName _FeatureMember_QNAME             = new QName("http://www.opengis.net/gml", "featureMember");
+    private final static QName _AbstractSolid_QNAME             = new QName("http://www.opengis.net/gml", "AbstractSolid");
+    private final static QName _AbstractSurfacePatch_QNAME      = new QName("http://www.opengis.net/gml", "AbstractSurfacePatch");
+    private final static QName _CompositeSolid_QNAME            = new QName("http://www.opengis.net/gml", "CompositeSolid");
+    private final static QName _Cone_QNAME                      = new QName("http://www.opengis.net/gml", "Cone");
+    private final static QName _CurveArrayProperty_QNAME        = new QName("http://www.opengis.net/gml", "curveArrayProperty");
+    private final static QName _CurveMember_QNAME               = new QName("http://www.opengis.net/gml", "curveMember");
+    private final static QName _Solid_QNAME                     = new QName("http://www.opengis.net/gml", "Solid");
+    private final static QName _MultiCurveProperty_QNAME        = new QName("http://www.opengis.net/gml", "multiCurveProperty");
+    private final static QName _PolygonPatches_QNAME            = new QName("http://www.opengis.net/gml", "polygonPatches");
+    private final static QName _MultiEdgeOf_QNAME               = new QName("http://www.opengis.net/gml", "multiEdgeOf");
+    private final static QName _CurveMembers_QNAME              = new QName("http://www.opengis.net/gml", "curveMembers");
+    private final static QName _CenterLineOf_QNAME              = new QName("http://www.opengis.net/gml", "centerLineOf");
+    private final static QName _MultiCenterLineOf_QNAME         = new QName("http://www.opengis.net/gml", "multiCenterLineOf");
+    private final static QName _BaseCurve_QNAME                 = new QName("http://www.opengis.net/gml", "baseCurve");
+    private final static QName _CurveProperty_QNAME             = new QName("http://www.opengis.net/gml", "curveProperty");
+    private final static QName _PolygonPatch_QNAME              = new QName("http://www.opengis.net/gml", "PolygonPatch");
+    private final static QName _GriddedSurface_QNAME            = new QName("http://www.opengis.net/gml", "_GriddedSurface");
+    private final static QName _Rectangle_QNAME                 = new QName("http://www.opengis.net/gml", "Rectangle");
+    private final static QName _EdgeOf_QNAME                    = new QName("http://www.opengis.net/gml", "edgeOf");
+    private final static QName _Triangle_QNAME                  = new QName("http://www.opengis.net/gml", "Triangle");
+    private final static QName _ParametricCurveSurface_QNAME    = new QName("http://www.opengis.net/gml", "_ParametricCurveSurface");
+    private final static QName _Cylinder_QNAME                  = new QName("http://www.opengis.net/gml", "Cylinder");
+    private final static QName _MultiCurve_QNAME                = new QName("http://www.opengis.net/gml", "MultiCurve");
+    private final static QName _MultiSurface_QNAME              = new QName("http://www.opengis.net/gml", "MultiSurface");
+    private final static QName _MultiSurfaceProperty_QNAME      = new QName("http://www.opengis.net/gml", "multiSurfaceProperty");
+    private final static QName _MultiExtentOf_QNAME             = new QName("http://www.opengis.net/gml", "multiExtentOf");
+    private final static QName _QuantityList_QNAME              = new QName("http://www.opengis.net/gml", "QuantityList");
+    private final static QName _Segments_QNAME                  = new QName("http://www.opengis.net/gml", "segments");
+    private final static QName _Curve_QNAME                     = new QName("http://www.opengis.net/gml", "Curve");
+    private final static QName _MultiCoverage_QNAME             = new QName("http://www.opengis.net/gml", "multiCoverage");
+    private final static QName _PolyhedralSurface_QNAME         = new QName("http://www.opengis.net/gml", "PolyhedralSurface");
+    private final static QName _QuantityExtent_QNAME            = new QName("http://www.opengis.net/gml", "QuantityExtent");
+    private final static QName _SolidProperty_QNAME             = new QName("http://www.opengis.net/gml", "solidProperty");
+    private final static QName _Sphere_QNAME                    = new QName("http://www.opengis.net/gml", "Sphere");
+    private final static QName _SolidMember_QNAME               = new QName("http://www.opengis.net/gml", "solidMember");
+    private final static QName _SurfaceArrayProperty_QNAME      = new QName("http://www.opengis.net/gml", "surfaceArrayProperty");
+    private final static QName _SurfaceMembers_QNAME            = new QName("http://www.opengis.net/gml", "surfaceMembers");
+    private final static QName _Patches_QNAME                   = new QName("http://www.opengis.net/gml", "patches");
+    private final static QName _BaseSurface_QNAME               = new QName("http://www.opengis.net/gml", "baseSurface");
+    private final static QName _SurfaceProperty_QNAME           = new QName("http://www.opengis.net/gml", "surfaceProperty");
+    private final static QName _ExtentOf_QNAME                  = new QName("http://www.opengis.net/gml", "extentOf");
+    private final static QName _SurfaceMember_QNAME             = new QName("http://www.opengis.net/gml", "surfaceMember");
+    private final static QName _TrianglePatches_QNAME           = new QName("http://www.opengis.net/gml", "trianglePatches");
+    private final static QName _TriangulatedSurface_QNAME       = new QName("http://www.opengis.net/gml", "TriangulatedSurface");
+    private final static QName _Tin_QNAME                       = new QName("http://www.opengis.net/gml", "Tin");
+    private final static QName _Surface_QNAME                   = new QName("http://www.opengis.net/gml", "Surface");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -243,6 +289,215 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    /**
+     * Create an instance of {@link TriangleType }
+     *
+     */
+    public TriangleType createTriangleType() {
+        return new TriangleType();
+    }
+    
+    /**
+     * Create an instance of {@link SurfaceType }
+     *
+     */
+    public SurfaceType createSurfaceType() {
+        return new SurfaceType();
+    }
+    
+    /**
+     * Create an instance of {@link SphereType }
+     *
+     */
+    public SphereType createSphereType() {
+        return new SphereType();
+    }
+
+    /**
+     * Create an instance of {@link SurfaceArrayPropertyType }
+     *
+     */
+    public SurfaceArrayPropertyType createSurfaceArrayPropertyType() {
+        return new SurfaceArrayPropertyType();
+    }
+    
+     /**
+     * Create an instance of {@link RectangleType }
+     *
+     */
+    public RectangleType createRectangleType() {
+        return new RectangleType();
+    }
+
+    /**
+     * Create an instance of {@link SolidPropertyType }
+     *
+     */
+    public SolidPropertyType createSolidPropertyType() {
+        return new SolidPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link QuantityExtentType }
+     *
+     */
+    public QuantityExtentType createQuantityExtentType() {
+        return new QuantityExtentType();
+    }
+    
+    /**
+     * Create an instance of {@link PolygonPatchArrayPropertyType }
+     *
+     */
+    public PolygonPatchArrayPropertyType createPolygonPatchArrayPropertyType() {
+        return new PolygonPatchArrayPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link PolyhedralSurfaceType }
+     *
+     */
+    public PolyhedralSurfaceType createPolyhedralSurfaceType() {
+        return new PolyhedralSurfaceType();
+    }
+    
+    /**
+     * Create an instance of {@link PolygonPatchType }
+     *
+     */
+    public PolygonPatchType createPolygonPatchType() {
+        return new PolygonPatchType();
+    }
+
+    /**
+     * Create an instance of {@link MultiSurfacePropertyType }
+     *
+     */
+    public MultiSurfacePropertyType createMultiSurfacePropertyType() {
+        return new MultiSurfacePropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link MeasureOrNullListType }
+     *
+     */
+    public MeasureOrNullListType createMeasureOrNullListType() {
+        return new MeasureOrNullListType();
+    }
+    
+    /**
+     * Create an instance of {@link MultiCurveType }
+     *
+     */
+    public MultiCurveType createMultiCurveType() {
+        return new MultiCurveType();
+    }
+
+    /**
+     * Create an instance of {@link LineStringSegmentArrayPropertyType }
+     *
+     */
+    public LineStringSegmentArrayPropertyType createLineStringSegmentArrayPropertyType() {
+        return new LineStringSegmentArrayPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link CurveSegmentArrayPropertyType }
+     *
+     */
+    public CurveSegmentArrayPropertyType createCurveSegmentArrayPropertyType() {
+        return new CurveSegmentArrayPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link CylinderType }
+     *
+     */
+    public CylinderType createCylinderType() {
+        return new CylinderType();
+    }
+
+    /**
+     * Create an instance of {@link SurfacePatchArrayPropertyType }
+     *
+     */
+    public SurfacePatchArrayPropertyType createSurfacePatchArrayPropertyType() {
+        return new SurfacePatchArrayPropertyType();
+    }
+
+
+    /**
+     * Create an instance of {@link SolidType }
+     *
+     */
+    public SolidType createSolidType() {
+        return new SolidType();
+    }
+
+    /**
+     * Create an instance of {@link CurvePropertyType }
+     *
+     */
+    public CurvePropertyType createCurvePropertyType() {
+        return new CurvePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link CurveType }
+     *
+     */
+    public CurveType createCurveType() {
+        return new CurveType();
+    }
+
+    /**
+     * Create an instance of {@link MultiCurvePropertyType }
+     *
+     */
+    public MultiCurvePropertyType createMultiCurvePropertyType() {
+        return new MultiCurvePropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link MultiSurfaceType }
+     *
+     */
+    public MultiSurfaceType createMultiSurfaceType() {
+        return new MultiSurfaceType();
+    }
+
+    /**
+     * Create an instance of {@link CurveArrayPropertyType }
+     *
+     */
+    public CurveArrayPropertyType createCurveArrayPropertyType() {
+        return new CurveArrayPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TrianglePatchArrayPropertyType }
+     *
+     */
+    public TrianglePatchArrayPropertyType createTrianglePatchArrayPropertyType() {
+        return new TrianglePatchArrayPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link ConeType }
+     *
+     */
+    public ConeType createConeType() {
+        return new ConeType();
+    }
+    
+    /**
+     * Create an instance of {@link CompositeSolidType }
+     *
+     */
+    public CompositeSolidType createCompositeSolidType() {
+        return new CompositeSolidType();
+    }
+    
     /**
      * Create an instance of {@link PointArrayPropertyType }
      *
@@ -892,6 +1147,478 @@ public class ObjectFactory {
      */
     public CoordType createCoordType() {
         return new CoordType();
+    }
+
+    /**
+     * Create an instance of {@link TinType.ControlPoint }
+     *
+     */
+    public TinType.ControlPoint createTinTypeControlPoint() {
+        return new TinType.ControlPoint();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Surface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurface")
+    public JAXBElement<SurfaceType> createSurface(SurfaceType value) {
+        return new JAXBElement<SurfaceType>(_Surface_QNAME, SurfaceType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TrianglePatchArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "trianglePatches", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "patches")
+    public JAXBElement<TrianglePatchArrayPropertyType> createTrianglePatches(TrianglePatchArrayPropertyType value) {
+        return new JAXBElement<TrianglePatchArrayPropertyType>(_TrianglePatches_QNAME, TrianglePatchArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TinType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Tin", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "TriangulatedSurface")
+    public JAXBElement<TinType> createTin(TinType value) {
+        return new JAXBElement<TinType>(_Tin_QNAME, TinType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link TriangulatedSurfaceType }
+     *
+     */
+    public TriangulatedSurfaceType createTriangulatedSurfaceType() {
+        return new TriangulatedSurfaceType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TriangulatedSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "TriangulatedSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Surface")
+    public JAXBElement<TriangulatedSurfaceType> createTriangulatedSurface(TriangulatedSurfaceType value) {
+        return new JAXBElement<TriangulatedSurfaceType>(_TriangulatedSurface_QNAME, TriangulatedSurfaceType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "baseSurface")
+    public JAXBElement<SurfacePropertyType> createBaseSurface(SurfacePropertyType value) {
+        return new JAXBElement<SurfacePropertyType>(_BaseSurface_QNAME, SurfacePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "surfaceProperty")
+    public JAXBElement<SurfacePropertyType> createSurfaceProperty(SurfacePropertyType value) {
+        return new JAXBElement<SurfacePropertyType>(_SurfaceProperty_QNAME, SurfacePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "extentOf")
+    public JAXBElement<SurfacePropertyType> createExtentOf(SurfacePropertyType value) {
+        return new JAXBElement<SurfacePropertyType>(_ExtentOf_QNAME, SurfacePropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "surfaceMember")
+    public JAXBElement<SurfacePropertyType> createSurfaceMember(SurfacePropertyType value) {
+        return new JAXBElement<SurfacePropertyType>(_SurfaceMember_QNAME, SurfacePropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfacePatchArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "patches")
+    public JAXBElement<SurfacePatchArrayPropertyType> createPatches(SurfacePatchArrayPropertyType value) {
+        return new JAXBElement<SurfacePatchArrayPropertyType>(_Patches_QNAME, SurfacePatchArrayPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfaceArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "surfaceArrayProperty")
+    public JAXBElement<SurfaceArrayPropertyType> createSurfaceArrayProperty(SurfaceArrayPropertyType value) {
+        return new JAXBElement<SurfaceArrayPropertyType>(_SurfaceArrayProperty_QNAME, SurfaceArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SurfaceArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "surfaceMembers")
+    public JAXBElement<SurfaceArrayPropertyType> createSurfaceMembers(SurfaceArrayPropertyType value) {
+        return new JAXBElement<SurfaceArrayPropertyType>(_SurfaceMembers_QNAME, SurfaceArrayPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SolidPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "solidProperty")
+    public JAXBElement<SolidPropertyType> createSolidProperty(SolidPropertyType value) {
+        return new JAXBElement<SolidPropertyType>(_SolidProperty_QNAME, SolidPropertyType.class, null, value);
+    }
+
+     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SphereType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Sphere", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GriddedSurface")
+    public JAXBElement<SphereType> createSphere(SphereType value) {
+        return new JAXBElement<SphereType>(_Sphere_QNAME, SphereType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SolidPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "solidMember")
+    public JAXBElement<SolidPropertyType> createSolidMember(SolidPropertyType value) {
+        return new JAXBElement<SolidPropertyType>(_SolidMember_QNAME, SolidPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link QuantityExtentType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "QuantityExtent")
+    public JAXBElement<QuantityExtentType> createQuantityExtent(QuantityExtentType value) {
+        return new JAXBElement<QuantityExtentType>(_QuantityExtent_QNAME, QuantityExtentType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PolyhedralSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "PolyhedralSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Surface")
+    public JAXBElement<PolyhedralSurfaceType> createPolyhedralSurface(PolyhedralSurfaceType value) {
+        return new JAXBElement<PolyhedralSurfaceType>(_PolyhedralSurface_QNAME, PolyhedralSurfaceType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiSurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiCoverage")
+    public JAXBElement<MultiSurfacePropertyType> createMultiCoverage(MultiSurfacePropertyType value) {
+        return new JAXBElement<MultiSurfacePropertyType>(_MultiCoverage_QNAME, MultiSurfacePropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiSurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiSurfaceProperty")
+    public JAXBElement<MultiSurfacePropertyType> createMultiSurfaceProperty(MultiSurfacePropertyType value) {
+        return new JAXBElement<MultiSurfacePropertyType>(_MultiSurfaceProperty_QNAME, MultiSurfacePropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiSurfacePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiExtentOf")
+    public JAXBElement<MultiSurfacePropertyType> createMultiExtentOf(MultiSurfacePropertyType value) {
+        return new JAXBElement<MultiSurfacePropertyType>(_MultiExtentOf_QNAME, MultiSurfacePropertyType.class, null, value);
+    }
+
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "MultiSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GeometricAggregate")
+    public JAXBElement<MultiSurfaceType> createMultiSurface(MultiSurfaceType value) {
+        return new JAXBElement<MultiSurfaceType>(_MultiSurface_QNAME, MultiSurfaceType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link AbstractGriddedSurfaceType }
+     *
+     */
+    public AbstractGriddedSurfaceType createAbstractGriddedSurfaceType() {
+        return new AbstractGriddedSurfaceType();
+    }
+
+    /**
+     * Create an instance of {@link SurfacePropertyType }
+     *
+     */
+    public SurfacePropertyType createSurfacePropertyType() {
+        return new SurfacePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TinType }
+     *
+     */
+    public TinType createTinType() {
+        return new TinType();
+    }
+
+    /**
+     * Create an instance of {@link AbstractSolidType }
+     *
+     */
+    public AbstractSolidType createAbstractSolidType() {
+        return new AbstractSolidType();
+    }
+
+    /**
+     * Create an instance of {@link AbstractParametricCurveSurfaceType }
+     *
+     */
+    public AbstractParametricCurveSurfaceType createAbstractParametricCurveSurfaceType() {
+        return new AbstractParametricCurveSurfaceType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurveSegmentArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "segments")
+    public JAXBElement<CurveSegmentArrayPropertyType> createSegments(CurveSegmentArrayPropertyType value) {
+        return new JAXBElement<CurveSegmentArrayPropertyType>(_Segments_QNAME, CurveSegmentArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeasureOrNullListType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "QuantityList")
+    public JAXBElement<MeasureOrNullListType> createQuantityList(MeasureOrNullListType value) {
+        return new JAXBElement<MeasureOrNullListType>(_QuantityList_QNAME, MeasureOrNullListType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurveType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Curve", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCurve")
+    public JAXBElement<CurveType> createCurve(CurveType value) {
+        return new JAXBElement<CurveType>(_Curve_QNAME, CurveType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiCurveType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "MultiCurve", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GeometricAggregate")
+    public JAXBElement<MultiCurveType> createMultiCurve(MultiCurveType value) {
+        return new JAXBElement<MultiCurveType>(_MultiCurve_QNAME, MultiCurveType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CylinderType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Cylinder", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GriddedSurface")
+    public JAXBElement<CylinderType> createCylinder(CylinderType value) {
+        return new JAXBElement<CylinderType>(_Cylinder_QNAME, CylinderType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiCurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiCurveProperty")
+    public JAXBElement<MultiCurvePropertyType> createMultiCurveProperty(MultiCurvePropertyType value) {
+        return new JAXBElement<MultiCurvePropertyType>(_MultiCurveProperty_QNAME, MultiCurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiCurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiEdgeOf")
+    public JAXBElement<MultiCurvePropertyType> createMultiEdgeOf(MultiCurvePropertyType value) {
+        return new JAXBElement<MultiCurvePropertyType>(_MultiEdgeOf_QNAME, MultiCurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "curveMember")
+    public JAXBElement<CurvePropertyType> createCurveMember(CurvePropertyType value) {
+        return new JAXBElement<CurvePropertyType>(_CurveMember_QNAME, CurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "curveProperty")
+    public JAXBElement<CurvePropertyType> createCurveProperty(CurvePropertyType value) {
+        return new JAXBElement<CurvePropertyType>(_CurveProperty_QNAME, CurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "edgeOf")
+    public JAXBElement<CurvePropertyType> createEdgeOf(CurvePropertyType value) {
+        return new JAXBElement<CurvePropertyType>(_EdgeOf_QNAME, CurvePropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "centerLineOf")
+    public JAXBElement<CurvePropertyType> createCenterLineOf(CurvePropertyType value) {
+        return new JAXBElement<CurvePropertyType>(_CenterLineOf_QNAME, CurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "baseCurve")
+    public JAXBElement<CurvePropertyType> createBaseCurve(CurvePropertyType value) {
+        return new JAXBElement<CurvePropertyType>(_BaseCurve_QNAME, CurvePropertyType.class, null, value);
+    }
+
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MultiCurvePropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "multiCenterLineOf")
+    public JAXBElement<MultiCurvePropertyType> createMultiCenterLineOf(MultiCurvePropertyType value) {
+        return new JAXBElement<MultiCurvePropertyType>(_MultiCenterLineOf_QNAME, MultiCurvePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PolygonPatchArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "polygonPatches", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "patches")
+    public JAXBElement<PolygonPatchArrayPropertyType> createPolygonPatches(PolygonPatchArrayPropertyType value) {
+        return new JAXBElement<PolygonPatchArrayPropertyType>(_PolygonPatches_QNAME, PolygonPatchArrayPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurveArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "curveMembers")
+    public JAXBElement<CurveArrayPropertyType> createCurveMembers(CurveArrayPropertyType value) {
+        return new JAXBElement<CurveArrayPropertyType>(_CurveMembers_QNAME, CurveArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CurveArrayPropertyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "curveArrayProperty")
+    public JAXBElement<CurveArrayPropertyType> createCurveArrayProperty(CurveArrayPropertyType value) {
+        return new JAXBElement<CurveArrayPropertyType>(_CurveArrayProperty_QNAME, CurveArrayPropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ConeType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Cone", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_GriddedSurface")
+    public JAXBElement<ConeType> createCone(ConeType value) {
+        return new JAXBElement<ConeType>(_Cone_QNAME, ConeType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TriangleType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Triangle", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurfacePatch")
+    public JAXBElement<TriangleType> createTriangle(TriangleType value) {
+        return new JAXBElement<TriangleType>(_Triangle_QNAME, TriangleType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractSurfacePatchType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractSurfacePatch")
+    public JAXBElement<AbstractSurfacePatchType> createAbstractSurfacePatch(AbstractSurfacePatchType value) {
+        return new JAXBElement<AbstractSurfacePatchType>(_AbstractSurfacePatch_QNAME, AbstractSurfacePatchType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RectangleType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Rectangle", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurfacePatch")
+    public JAXBElement<RectangleType> createRectangle(RectangleType value) {
+        return new JAXBElement<RectangleType>(_Rectangle_QNAME, RectangleType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PolygonPatchType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "PolygonPatch", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurfacePatch")
+    public JAXBElement<PolygonPatchType> createPolygonPatch(PolygonPatchType value) {
+        return new JAXBElement<PolygonPatchType>(_PolygonPatch_QNAME, PolygonPatchType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SolidType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Solid", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSolid")
+    public JAXBElement<SolidType> createSolid(SolidType value) {
+        return new JAXBElement<SolidType>(_Solid_QNAME, SolidType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompositeSolidType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "CompositeSolid", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSolid")
+    public JAXBElement<CompositeSolidType> createCompositeSolid(CompositeSolidType value) {
+        return new JAXBElement<CompositeSolidType>(_CompositeSolid_QNAME, CompositeSolidType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractSolidType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractSolid", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGeometricPrimitive")
+    public JAXBElement<AbstractSolidType> createAbstractSolid(AbstractSolidType value) {
+        return new JAXBElement<AbstractSolidType>(_AbstractSolid_QNAME, AbstractSolidType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractGriddedSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_GriddedSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_ParametricCurveSurface")
+    public JAXBElement<AbstractGriddedSurfaceType> createGriddedSurface(AbstractGriddedSurfaceType value) {
+        return new JAXBElement<AbstractGriddedSurfaceType>(_GriddedSurface_QNAME, AbstractGriddedSurfaceType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractParametricCurveSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_ParametricCurveSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurfacePatch")
+    public JAXBElement<AbstractParametricCurveSurfaceType> createParametricCurveSurface(AbstractParametricCurveSurfaceType value) {
+        return new JAXBElement<AbstractParametricCurveSurfaceType>(_ParametricCurveSurface_QNAME, AbstractParametricCurveSurfaceType.class, null, value);
     }
     
     /**
