@@ -218,4 +218,30 @@ public class LayerType
         return this.tileMatrixSet;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("class=LayerType").append('\n');
+        s.append("style:").append('\n');
+        for (Style st:getStyle()) {
+             s.append(st).append('\n');
+        }
+        s.append("format:").append('\n');
+        for (FormatType f:getFormat()) {
+             s.append(f).append('\n');
+        }
+        s.append("infoFormat:").append('\n');
+        for (FormatType infoForm:getInfoFormat()) {
+             s.append(infoForm).append('\n');
+        }
+        s.append("dimension:").append('\n');
+        for (Dimension dim:getDimension()) {
+             s.append(dim).append('\n');
+        }
+        s.append("tileMatrixSet:").append('\n');
+        for (String tms:getTileMatrixSet()) {
+             s.append(tms).append('\n');
+        }
+        return s.toString();
+    }
 }

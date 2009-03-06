@@ -216,4 +216,27 @@ public class DatasetDescriptionSummaryBaseType
         return this.datasetDescriptionSummary;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("class=DatasetDescriptionSummaryBaseType").append('\n');
+        s.append("wgs84BoundingBox:").append('\n');
+        for (WGS84BoundingBoxType wgs84bbox:getWGS84BoundingBox()) {
+             s.append(wgs84bbox).append('\n');
+        }
+        s.append("identifier:").append(getIdentifier().getValue()).append('\n');
+        s.append("boundingBox:").append('\n');
+        for (BoundingBoxType bbox:getBoundingBox()) {
+             s.append(bbox).append('\n');
+        }
+        s.append("metadata:").append('\n');
+        for (MetadataType m:getMetadata()) {
+             s.append(m).append('\n');
+        }
+        s.append("datasetDescriptionSummary:").append('\n');
+        for (JAXBElement<? extends DatasetDescriptionSummaryBaseType> elem:getDatasetDescriptionSummary()) {
+             s.append(elem.getValue()).append('\n');
+        }
+        return s.toString();
+    }
 }

@@ -143,4 +143,16 @@ public class Style
         this.isDefault = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("class=Style").append('\n');
+        s.append("identifier:").append(getIdentifier().getValue()).append('\n');
+        s.append("legendURL:").append('\n');
+        for (LegendURL l:getLegendURL()) {
+             s.append(l).append('\n');
+        }
+        s.append("isDefault:").append(isIsDefault()).append('\n');
+        return s.toString();
+    }
 }

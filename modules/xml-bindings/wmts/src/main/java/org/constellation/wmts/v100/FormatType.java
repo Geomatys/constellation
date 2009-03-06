@@ -102,4 +102,12 @@ public class FormatType {
         this.fileExtension = value;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("class=FormatType").append('\n');
+        s.append("mime:").append(getMIME()).append('\n');
+        s.append("fileExtension:").append(getFileExtension()).append('\n');
+        return s.toString();
+    }
 }
