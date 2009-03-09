@@ -59,13 +59,13 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 //Geotools dependencies
-import org.geotools.geometry.ImmutableEnvelope;
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.sld.XMLUtilities;
 import org.geotools.util.MeasurementRange;
 
 //Geoapi dependencies
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -404,9 +404,9 @@ public class WMSService extends OGCWebService {
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS, getActingVersion());
         }
-        final ImmutableEnvelope env;
+        final Envelope env;
         try {
-            env = (ImmutableEnvelope) StringUtilities.toEnvelope(strBBox, crs);
+            env = StringUtilities.toEnvelope(strBBox, crs);
             //TODO change to this method when renderer will support 4D BBox
 //            env = QueryAdapter.toEnvelope(strBBox, crs, strElevation, strTime,wmsVersion);
         } catch (IllegalArgumentException i) {

@@ -55,7 +55,7 @@ public class GetLegendGraphic extends WMSQuery {
     public GetLegendGraphic(final String layer, final String format,
                             final Integer width, final Integer height)
     {
-        super(new ServiceVersion(ServiceType.WMS, "1.1.0"));
+        super(new ServiceVersion(ServiceType.WMS, "1.1.1"));
         this.layer  = layer;
         this.format = format;
         this.width  = width;
