@@ -27,7 +27,7 @@ import javax.measure.unit.Unit;
 
 import org.constellation.query.wms.GetFeatureInfo;
 import org.geotools.display.primitive.GraphicCoverageJ2D;
-import org.geotools.display.primitive.GraphicFeatureJ2D;
+import org.geotools.display.primitive.ProjectedFeature;
 import org.geotools.map.FeatureMapLayer;
 
 import org.opengis.feature.Feature;
@@ -64,11 +64,11 @@ public class HTMLGraphicVisitor extends TextGraphicVisitor{
      * {@inheritDoc }
      */
     @Override
-    public void visit(GraphicFeatureJ2D graphic, Shape queryArea) {
+    public void visit(ProjectedFeature graphic, Shape queryArea) {
         index++;
         final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getSource();
-        final Feature feature       = graphic.getUserObject();
+        final Feature feature       = graphic.getFeature();
 
         for(final Property prop : feature.getProperties()){
             if(prop == null) continue;
