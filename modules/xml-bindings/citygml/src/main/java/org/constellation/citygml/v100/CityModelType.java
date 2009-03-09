@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractFeatureCollectionType;
 
@@ -53,6 +54,7 @@ import org.constellation.gml.v311.AbstractFeatureCollectionType;
 @XmlType(name = "CityModelType", propOrder = {
     "genericApplicationPropertyOfCityModel"
 })
+@XmlRootElement(name = "CityModel")
 public class CityModelType extends AbstractFeatureCollectionType {
 
     @XmlElement(name = "_GenericApplicationPropertyOfCityModel")
