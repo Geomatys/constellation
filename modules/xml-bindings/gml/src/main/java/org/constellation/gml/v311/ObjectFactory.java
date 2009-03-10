@@ -284,12 +284,38 @@ public class ObjectFactory {
     private final static QName _CompositeCurve_QNAME            = new QName("http://www.opengis.net/gml", "CompositeCurve");
     private final static QName _CompositeSurface_QNAME          = new QName("http://www.opengis.net/gml", "CompositeSurface");
     private final static QName _GeometricComplex_QNAME          = new QName("http://www.opengis.net/gml", "GeometricComplex");
+    private final static QName _Ring_QNAME                      = new QName("http://www.opengis.net/gml", "Ring");
+    private final static QName _LinearRing_QNAME                = new QName("http://www.opengis.net/gml", "LinearRing");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link LinearRingPropertyType }
+     *
+     */
+    public LinearRingPropertyType createLinearRingPropertyType() {
+        return new LinearRingPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link LinearRingType }
+     *
+     */
+    public LinearRingType createLinearRingType() {
+        return new LinearRingType();
+    }
+
+    /**
+     * Create an instance of {@link RingType }
+     *
+     */
+    public RingType createRingType() {
+        return new RingType();
     }
 
     /**
@@ -1438,6 +1464,24 @@ public class ObjectFactory {
         return new JAXBElement<CurveSegmentArrayPropertyType>(_Segments_QNAME, CurveSegmentArrayPropertyType.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LinearRingType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "LinearRing", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractRing")
+    public JAXBElement<LinearRingType> createLinearRing(LinearRingType value) {
+        return new JAXBElement<LinearRingType>(_LinearRing_QNAME, LinearRingType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RingType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Ring", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractRing")
+    public JAXBElement<RingType> createRing(RingType value) {
+        return new JAXBElement<RingType>(_Ring_QNAME, RingType.class, null, value);
+    }
+    
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link MeasureOrNullListType }{@code >}}
      *

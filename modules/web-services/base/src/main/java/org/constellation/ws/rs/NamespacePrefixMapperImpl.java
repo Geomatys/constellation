@@ -183,6 +183,22 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
         else if( "http://www.opengis.net/wfs".equals(namespaceUri) )
             prefix = "wfs";
+
+        else if( "http://www.opengis.net/ows-6/utds/0.3".equals(namespaceUri) )
+            prefix = "utds";
+
+        else if( "http://www.opengis.net/citygml/1.0".equals(namespaceUri) )
+            prefix = "citygml";
+
+        else if( "http://www.opengis.net/citygml/building/1.0".equals(namespaceUri) )
+            prefix = "building";
+
+        else if( "http://www.opengis.net/citygml/cityfurniture/1.0".equals(namespaceUri) )
+            prefix = "furniture";
+
+        else if( "http://www.opengis.net/citygml/transportation/1.0".equals(namespaceUri) )
+            prefix = "trans";
+
         
         else prefix = namespaceExtensions.get(namespaceUri);
 
