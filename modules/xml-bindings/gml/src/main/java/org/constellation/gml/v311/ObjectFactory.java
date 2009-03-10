@@ -281,6 +281,9 @@ public class ObjectFactory {
     private final static QName _TriangulatedSurface_QNAME       = new QName("http://www.opengis.net/gml", "TriangulatedSurface");
     private final static QName _Tin_QNAME                       = new QName("http://www.opengis.net/gml", "Tin");
     private final static QName _Surface_QNAME                   = new QName("http://www.opengis.net/gml", "Surface");
+    private final static QName _CompositeCurve_QNAME            = new QName("http://www.opengis.net/gml", "CompositeCurve");
+    private final static QName _CompositeSurface_QNAME          = new QName("http://www.opengis.net/gml", "CompositeSurface");
+    private final static QName _GeometricComplex_QNAME          = new QName("http://www.opengis.net/gml", "GeometricComplex");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -289,6 +292,46 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    /**
+     * Create an instance of {@link GeometricComplexPropertyType }
+     *
+     */
+    public GeometricComplexPropertyType createGeometricComplexPropertyType() {
+        return new GeometricComplexPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link GeometricPrimitivePropertyType }
+     *
+     */
+    public GeometricPrimitivePropertyType createGeometricPrimitivePropertyType() {
+        return new GeometricPrimitivePropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link CompositeCurveType }
+     *
+     */
+    public CompositeCurveType createCompositeCurveType() {
+        return new CompositeCurveType();
+    }
+
+    /**
+     * Create an instance of {@link CompositeSurfaceType }
+     *
+     */
+    public CompositeSurfaceType createCompositeSurfaceType() {
+        return new CompositeSurfaceType();
+    }
+
+    /**
+     * Create an instance of {@link GeometricComplexType }
+     *
+     */
+    public GeometricComplexType createGeometricComplexType() {
+        return new GeometricComplexType();
+    }
+    
     /**
      * Create an instance of {@link TriangleType }
      *
@@ -1854,7 +1897,34 @@ public class ObjectFactory {
     public JAXBElement<AbstractCurveType> createAbstractCurve(AbstractCurveType value) {
         return new JAXBElement<AbstractCurveType>(_AbstractCurve_QNAME, AbstractCurveType.class, null, value);
     }
-    
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompositeCurveType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "CompositeCurve", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCurve")
+    public JAXBElement<CompositeCurveType> createCompositeCurve(CompositeCurveType value) {
+        return new JAXBElement<CompositeCurveType>(_CompositeCurve_QNAME, CompositeCurveType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompositeSurfaceType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "CompositeSurface", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractSurface")
+    public JAXBElement<CompositeSurfaceType> createCompositeSurface(CompositeSurfaceType value) {
+        return new JAXBElement<CompositeSurfaceType>(_CompositeSurface_QNAME, CompositeSurfaceType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GeometricComplexType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "GeometricComplex", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGeometry")
+    public JAXBElement<GeometricComplexType> createGeometricComplex(GeometricComplexType value) {
+        return new JAXBElement<GeometricComplexType>(_GeometricComplex_QNAME, GeometricComplexType.class, null, value);
+    }
+
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimeComplexType }{@code >}}
      * 
