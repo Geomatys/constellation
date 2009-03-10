@@ -56,8 +56,11 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.xml.bind.JAXBElement;
@@ -1159,6 +1162,7 @@ public final class Util {
      */
     public static ClassLoader getContextClassLoader() {
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
             public ClassLoader run() {
                 return Thread.currentThread().getContextClassLoader();
             }
@@ -1262,7 +1266,85 @@ public final class Util {
         }
         throw new IOException("Unknowed image type");
     }
-    
+
+    /**
+     * Returns the mime type matching the extension of an image file.
+     * For example, for a file "my_image.png" it will return "image/png", in most cases.
+     *
+     * @param extension The extension of an image file.
+     * @return The mime type for the extension specified.
+     *
+     * @throws IIOException if no image reader are able to handle the extension given.
+     */
+    public static String fileExtensionToMimeType(final String extension) throws IIOException {
+        final Iterator<ImageReaderSpi> readers = IIORegistry.lookupProviders(ImageReaderSpi.class);
+        while (readers.hasNext()) {
+            final ImageReaderSpi reader = readers.next();
+            final String[] suffixes = reader.getFileSuffixes();
+            for (String suffixe : suffixes) {
+                if (extension.equalsIgnoreCase(suffixe)) {
+                    final String[] mimeTypes = reader.getMIMETypes();
+                    if (mimeTypes != null && mimeTypes.length > 0) {
+                        return mimeTypes[0];
+                    }
+                }
+            }
+        }
+        throw new IIOException("No available image reader able to handle the extension specified: "+ extension);
+    }
+
+    /**
+     * Returns the mime type matching the format name of an image file.
+     * For example, for a format name "png" it will return "image/png", in most cases.
+     *
+     * @param format name The format name of an image file.
+     * @return The mime type for the format name specified.
+     *
+     * @throws IIOException if no image reader are able to handle the format name given.
+     */
+    public static String formatNameToMimeType(final String formatName) throws IIOException {
+        final Iterator<ImageReaderSpi> readers = IIORegistry.lookupProviders(ImageReaderSpi.class);
+        while (readers.hasNext()) {
+            final ImageReaderSpi reader = readers.next();
+            final String[] formats = reader.getFormatNames();
+            for (String format : formats) {
+                if (formatName.equalsIgnoreCase(format)) {
+                    final String[] mimeTypes = reader.getMIMETypes();
+                    if (mimeTypes != null && mimeTypes.length > 0) {
+                        return mimeTypes[0];
+                    }
+                }
+            }
+        }
+        throw new IIOException("No available image reader able to handle the format name specified: "+ formatName);
+    }
+
+    /**
+     * Returns the format name matching the mime type of an image file.
+     * For example, for a mime type "image/png" it will return "png", in most cases.
+     *
+     * @param mimeType The mime type of an image file.
+     * @return The format name for the mime type specified.
+     *
+     * @throws IIOException if no image reader are able to handle the mime type given.
+     */
+    public static String mimeTypeToFormatName(final String mimeType) throws IIOException {
+        final Iterator<ImageReaderSpi> readers = IIORegistry.lookupProviders(ImageReaderSpi.class);
+        while (readers.hasNext()) {
+            final ImageReaderSpi reader = readers.next();
+            final String[] mimes = reader.getMIMETypes();
+            for (String mime : mimes) {
+                if (mimeType.equalsIgnoreCase(mime)) {
+                    final String[] formats = reader.getFormatNames();
+                    if (formats != null && formats.length > 0) {
+                        return formats[0];
+                    }
+                }
+            }
+        }
+        throw new IIOException("No available image reader able to handle the mime type specified: "+ mimeType);
+    }
+
     /**
      * Check if the provided object is an instance of one of the given classes.
      */
