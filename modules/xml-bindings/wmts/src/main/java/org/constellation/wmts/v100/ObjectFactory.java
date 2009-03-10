@@ -39,8 +39,8 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Layer_QNAME = new QName("http://www.opengis.net/wmts/1.0", "Layer");
-    private final static QName _FeatureInfoResponse_QNAME = new QName("http://www.opengis.net/wmts/1.0", "FeatureInfoResponse");
+    private final static QName _Layer_QNAME = new QName("http://www.opengis.net/wmts/1.0.0", "Layer");
+    private final static QName _FeatureInfoResponse_QNAME = new QName("http://www.opengis.net/wmts/1.0.0", "FeatureInfoResponse");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.constellation.wmts.v100
@@ -189,7 +189,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link LayerType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/wmts/1.0", name = "Layer", substitutionHeadNamespace = "http://www.opengis.net/ows/1.1", substitutionHeadName = "DatasetDescriptionSummary")
+    @XmlElementDecl(namespace = "http://www.opengis.net/wmts/1.0.0", name = "Layer", substitutionHeadNamespace = "http://www.opengis.net/ows/1.1", substitutionHeadName = "DatasetDescriptionSummary")
     public JAXBElement<LayerType> createLayer(LayerType value) {
         return new JAXBElement<LayerType>(_Layer_QNAME, LayerType.class, null, value);
     }
@@ -198,7 +198,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/wmts/1.0", name = "FeatureInfoResponse")
+    @XmlElementDecl(namespace = "http://www.opengis.net/wmts/1.0.0", name = "FeatureInfoResponse")
     public JAXBElement<Object> createFeatureInfoResponse(Object value) {
         return new JAXBElement<Object>(_FeatureInfoResponse_QNAME, Object.class, null, value);
     }
