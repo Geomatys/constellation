@@ -319,6 +319,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RingPropertyType }
+     *
+     */
+    public RingPropertyType createRingPropertyType() {
+        return new RingPropertyType();
+    }
+
+    /**
      * Create an instance of {@link GeometricComplexPropertyType }
      *
      */

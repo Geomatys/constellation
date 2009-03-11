@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.util.Utilities;
 import org.opengis.filter.expression.Expression;
@@ -51,6 +52,13 @@ import org.opengis.filter.expression.Expression;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractGeometryType")
+@XmlSeeAlso({
+    GeometricComplexType.class,
+    GridType.class,
+    AbstractRingType.class,
+    AbstractGeometricPrimitiveType.class,
+    AbstractGeometricAggregateType.class
+})
 public abstract class AbstractGeometryType extends AbstractGMLEntry implements Expression {
 
     @XmlAttribute

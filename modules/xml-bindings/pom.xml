@@ -113,20 +113,21 @@
   <modules>
     <module>configuration</module>    
     <module>csw</module>
-    <module>gml</module>
     <module>citygml</module>
+    <module>gml</module>
     <module>kml</module>
+    <module>observation</module>
     <module>ogc</module>
     <module>ows</module>
+    <module>sos</module>
+    <module>swe</module>
     <module>wcs</module>
     <module>wfs</module>
     <module>wms</module>
     <module>wmts</module>
     <module>wps</module>
     <module>xacml</module>
-    <module>sos</module>
-    <module>swe</module>
-    <module>observation</module>
+    <module>xsd</module>
   </modules>
 
 </project>

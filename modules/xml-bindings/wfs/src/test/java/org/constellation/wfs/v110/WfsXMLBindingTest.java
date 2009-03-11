@@ -27,11 +27,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-//Junit dependencies
 import javax.xml.namespace.QName;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
 import org.constellation.util.Util;
+
+//Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,27 +14,33 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.gml.v311;
+
+package org.constellation.xsd.v2001;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
- * An abstraction of a surface to support the different levels of complexity. A surface is always a continuous region of a plane.
- * 
- * <p>Java class for AbstractSurfaceType complex type.
+ * <p>Java class for realGroup complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="AbstractSurfaceType">
+ * &lt;complexType name="realGroup">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml}AbstractGeometricPrimitiveType">
- *     &lt;/extension>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}group">
+ *       &lt;sequence>
+ *         &lt;element ref="{http://www.w3.org/2001/XMLSchema}annotation" minOccurs="0"/>
+ *         &lt;choice minOccurs="0">
+ *           &lt;element ref="{http://www.w3.org/2001/XMLSchema}all"/>
+ *           &lt;element ref="{http://www.w3.org/2001/XMLSchema}choice"/>
+ *           &lt;element ref="{http://www.w3.org/2001/XMLSchema}sequence"/>
+ *         &lt;/choice>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -42,25 +48,12 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AbstractSurfaceType")
+@XmlType(name = "realGroup")
 @XmlSeeAlso({
-    //OrientableSurfaceType.class,
-    PolygonType.class,
-    CompositeSurfaceType.class,
-    SurfaceType.class
+    NamedGroup.class,
+    GroupRef.class
 })
-public class AbstractSurfaceType extends AbstractGeometricPrimitiveType {
+public class RealGroup extends Group {
 
-    public Object evaluate(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
-    public <T> T evaluate(Object object, Class<T> context) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object accept(ExpressionVisitor visitor, Object extraData) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
-    

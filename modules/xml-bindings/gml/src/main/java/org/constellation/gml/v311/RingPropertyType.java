@@ -14,27 +14,30 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.gml.v311;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
- * An abstraction of a surface to support the different levels of complexity. A surface is always a continuous region of a plane.
+ * Encapsulates a ring to represent properties in features or geometry collections.
  * 
- * <p>Java class for AbstractSurfaceType complex type.
+ * <p>Java class for RingPropertyType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="AbstractSurfaceType">
+ * &lt;complexType name="RingPropertyType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml}AbstractGeometricPrimitiveType">
- *     &lt;/extension>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element ref="{http://www.opengis.net/gml}Ring"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -42,25 +45,36 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AbstractSurfaceType")
-@XmlSeeAlso({
-    //OrientableSurfaceType.class,
-    PolygonType.class,
-    CompositeSurfaceType.class,
-    SurfaceType.class
+@XmlType(name = "RingPropertyType", propOrder = {
+    "ring"
 })
-public class AbstractSurfaceType extends AbstractGeometricPrimitiveType {
+public class RingPropertyType {
 
-    public Object evaluate(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @XmlElement(name = "Ring", required = true)
+    private RingType ring;
+
+    /**
+     * Gets the value of the ring property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link RingType }
+     *     
+     */
+    public RingType getRing() {
+        return ring;
     }
 
-    public <T> T evaluate(Object object, Class<T> context) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * Sets the value of the ring property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link RingType }
+     *     
+     */
+    public void setRing(RingType value) {
+        this.ring = value;
     }
 
-    public Object accept(ExpressionVisitor visitor, Object extraData) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
-    
