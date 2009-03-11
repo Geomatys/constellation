@@ -39,7 +39,6 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -272,7 +271,7 @@ public class SOSworker {
     public SOSworker(File configurationDirectory) {
         
         if (configurationDirectory == null) {
-            configurationDirectory = new File(WebService.getSicadeDirectory(), "sos_configuration");
+            configurationDirectory = getConfigDirectory();
         }
 
         logger.info("path to config file=" + configurationDirectory);
@@ -1729,6 +1728,37 @@ public class SOSworker {
     private void isWorking() throws CstlServiceException {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * In some implementations there is no sicade directory.
+     * So if we don't find The .sicade/sos_configuration directory
+     * IFREMER hack
+     * we search the CATALINA_HOME/webapps/ifremer-sos/WEB-INF/sos_configuration
+     */
+    private File getConfigDirectory() {
+        File configDir = new File(WebService.getSicadeDirectory(), "sos_configuration/");
+        if (configDir.exists()) {
+            logger.info("taking configuration from sicade directory");
+            return configDir;
+        } else {
+
+            /* Ifremer's server does not contain any .sicade directory, so the
+             * configuration file is put under the WEB-INF directory of constellation.
+             */
+            final String catalinaPath = System.getenv().get("CATALINA_HOME");
+            if (catalinaPath != null) {
+                File dirCatalina = new File(catalinaPath);
+                if (dirCatalina != null && dirCatalina.exists()) {
+                    configDir = new File(dirCatalina, "webapps/ifremer-sos/WEB-INF/sos_configuration");
+                    if (configDir.exists()) {
+                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
+                        return configDir;
+                    }
+                }
+            }
+            return null;
         }
     }
 

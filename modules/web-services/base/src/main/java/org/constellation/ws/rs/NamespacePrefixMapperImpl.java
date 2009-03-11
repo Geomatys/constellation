@@ -199,6 +199,15 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.opengis.net/citygml/transportation/1.0".equals(namespaceUri) )
             prefix = "trans";
 
+        else if("urn:oasis:names:tc:ciq:xsdschema:xAL:2.0".equals(namespaceUri) )
+            prefix = "xal";
+
+        else if("http://www.w3.org/2001/XMLSchema".equals(namespaceUri) )
+            prefix = "xsd";
+
+        else if("urn:us:gov:ic:ism:v2".equals(namespaceUri) )
+            prefix = "ism";
+
         
         else prefix = namespaceExtensions.get(namespaceUri);
 
