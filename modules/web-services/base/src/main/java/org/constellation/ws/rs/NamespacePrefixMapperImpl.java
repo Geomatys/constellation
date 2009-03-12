@@ -72,7 +72,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
      */
     public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
         String prefix = null;
-        
+
+        prefix = namespaceExtensions.get(namespaceUri);
+        if (prefix != null) {
+            return prefix;
+        }
+
         if (rootNamespace!=null && rootNamespace.equals(namespaceUri))
             prefix = "";
         
@@ -188,16 +193,16 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
             prefix = "utds";
 
         else if( "http://www.opengis.net/citygml/1.0".equals(namespaceUri) )
-            prefix = "citygml";
+            prefix = "core";
 
         else if( "http://www.opengis.net/citygml/building/1.0".equals(namespaceUri) )
-            prefix = "building";
+            prefix = "build";
 
         else if( "http://www.opengis.net/citygml/cityfurniture/1.0".equals(namespaceUri) )
             prefix = "furniture";
 
         else if( "http://www.opengis.net/citygml/transportation/1.0".equals(namespaceUri) )
-            prefix = "trans";
+            prefix = "tr";
 
         else if("urn:oasis:names:tc:ciq:xsdschema:xAL:2.0".equals(namespaceUri) )
             prefix = "xal";
@@ -206,11 +211,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
             prefix = "xsd";
 
         else if("urn:us:gov:ic:ism:v2".equals(namespaceUri) )
-            prefix = "ism";
+            prefix = "icism";
+
+        else if("http://www.opengis.net/wmts/1.0.0".equals(namespaceUri) )
+            prefix = "wmts";
 
         
-        else prefix = namespaceExtensions.get(namespaceUri);
-
         return prefix;
     }
     
