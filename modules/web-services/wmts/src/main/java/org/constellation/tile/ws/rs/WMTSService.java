@@ -64,11 +64,14 @@ import static org.constellation.query.Query.TEXT_XML;
 @Path("wmts")
 @Singleton
 public class WMTSService extends OGCWebService {
-
+    /**
+     * A worker to use in order to do WMTS operations.
+     */
     protected AbstractWMTSWorker worker;
 
     /**
-     * Build a new Restfull CSW service.
+     * Builds a new WMTS service REST (both REST Kvp and RESTFUL). This service only
+     * provides the version 1.0.0 of OGC WMTS standard, for the moment.
      */
     public WMTSService() {
         super("WMTS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
@@ -87,7 +90,7 @@ public class WMTSService extends OGCWebService {
     }
 
     /**
-     * Treat the incomming request and call the right function.
+     * Treat the incoming request and call the right function.
      *
      * @param objectRequest if the server receive a POST request in XML,
      *        this object contain the request. Else for a GET or a POST kvp
@@ -168,7 +171,10 @@ public class WMTSService extends OGCWebService {
     }
 
     /**
-     * Build a new GetCapabilities request object with the url parameters
+     * Builds a new {@link GetCapabilities} request from a REST Kvp request.
+     *
+     * @return The {@link GetCapabilities} request.
+     * @throws CstlServiceException if a required parameter is not present in the request.
      */
     private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
 
@@ -214,10 +220,13 @@ public class WMTSService extends OGCWebService {
     }
 
     /**
-     * Build a new GetCapabilities request object with the url parameters
+     * Builds a new {@link GetCapabilities} request from a RESTFUL request.
+     *
+     * @return The {@link GetCapabilities} request.
+     * @throws CstlServiceException if a required parameter is not present in the request.
      */
     private GetCapabilities createNewGetCapabilitiesRequestRestful(final String version)
-                                                                   throws CstlServiceException
+                                                             throws CstlServiceException
     {
         AcceptVersionsType versions;
         if (version != null) {
@@ -228,6 +237,12 @@ public class WMTSService extends OGCWebService {
         return new GetCapabilities(versions, null, null, null, "WMTS");
     }
 
+    /**
+     * Builds a new {@link GetFeatureInfo} request from a REST Kvp request.
+     *
+     * @return The {@link GetFeatureInfo} request.
+     * @throws CstlServiceException if a required parameter is not present in the request.
+     */
     private GetFeatureInfo createNewGetFeatureInfoRequest() throws CstlServiceException {
         final GetFeatureInfo gfi = new GetFeatureInfo();
         gfi.setGetTile(createNewGetTileRequest());
@@ -239,6 +254,12 @@ public class WMTSService extends OGCWebService {
         return gfi;
     }
 
+    /**
+     * Builds a new {@link GetTile} request from a REST Kvp request.
+     *
+     * @return The {@link GetTile} request.
+     * @throws CstlServiceException if a required parameter is not present in the request.
+     */
     private GetTile createNewGetTileRequest() throws CstlServiceException {
         final GetTile getTile = new GetTile();
         // Mandatory parameters
@@ -255,6 +276,12 @@ public class WMTSService extends OGCWebService {
         return getTile;
     }
 
+    /**
+     * Builds a new {@link GetTile} request from a RESTFUL request.
+     *
+     * @return The {@link GetTile} request.
+     * @throws CstlServiceException if a required parameter is not present in the request.
+     */
     private GetTile createNewGetTileRequestRestful(String layer, String tileMatrixSet,
                                                    String tileMatrix, String tileRow,
                                                    String tileCol, String format, String style)
@@ -329,7 +356,7 @@ public class WMTSService extends OGCWebService {
     }
 
     /**
-     * Handle {@code GetCapabilities request} in RESTFUL mode.
+     * Handle {@code GetTile request} in RESTFUL mode.
      *
      * @param layer The layer to request.
      * @param tileMatrixSet The matrix set of the tile.
@@ -338,12 +365,11 @@ public class WMTSService extends OGCWebService {
      * @param tileCol The column of the tile in the matrix.
      * @param format The format extension, like png.
      *
-     * @return The XML formatted response, for an OWS GetCapabilities of the WMTS standard.
+     * @return The response containing the tile.
      * @throws JAXBException
      */
     @GET
     @Path("{layer}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}")
-    //MexicoGulf/.../MexicoGulf_CRS_84/33d/5/116.png
     public Response processGetTileRestful(@PathParam("layer") String layer,
                                           @PathParam("tileMatrixSet") String tileMatrixSet,
                                           @PathParam("tileMatrix") String tileMatrix,
@@ -415,6 +441,9 @@ public class WMTSService extends OGCWebService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         LOGGER.info("Shutting down the REST WMTS service facade.");

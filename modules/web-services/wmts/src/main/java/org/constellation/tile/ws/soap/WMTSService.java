@@ -38,24 +38,31 @@ import org.constellation.ws.ExceptionCode;
 
 /**
  * The SOAP facade to an OGC Web Map Tile Service, implementing the 1.0.0 version.
+ * <p>
+ * This SOAP service is not runned in that implementation because the working part is
+ * not written.
+ * </p>
  *
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
  */
-@WebService(name = "WMTSpepRegion", serviceName = "WMTSpepRegion")
+//@WebService(name = "WMTSpepRegion", serviceName = "WMTSpepRegion")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 public class WMTSService {
     /**
      * The default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.wmts.pep");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.tile.ws.soap");
 
     /**
      * The worker for the SOAP service.
      */
     protected AbstractWMTSWorker worker;
 
+    /**
+     * Creates a WMTS SOAP service.
+     */
     public WMTSService() {
         worker = new WMTSWorker();
     }
@@ -65,6 +72,8 @@ public class WMTSService {
      *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
+     *
+     * @throws SOAPServiceException
      */
     @WebMethod(action="getCapabilities")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities)
@@ -81,6 +90,13 @@ public class WMTSService {
         }
     }
 
+    /**
+     * Web service operation giving the value of a precise point in an image.
+     *
+     * @param requestFeatureInfo The request to execute.
+     *
+     * @throws SOAPServiceException
+     */
     @WebMethod(action="getFeatureInfo")
     public String getFeatureInfo(@WebParam(name = "GetFeatureInfo") GetFeatureInfo requestFeatureInfo)
                                                                            throws SOAPServiceException
@@ -96,6 +112,13 @@ public class WMTSService {
         }
     }
 
+    /**
+     * Web service operation returning the image chosen.
+     *
+     * @param requestTile The request to execute.
+     *
+     * @throws SOAPServiceException
+     */
     @WebMethod(action="getTile")
     public BinaryPayload getTile(@WebParam(name = "GetTile") GetTile requestTile)
                                                       throws SOAPServiceException
