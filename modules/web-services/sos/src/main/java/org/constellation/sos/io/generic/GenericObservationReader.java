@@ -45,7 +45,6 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -53,17 +52,12 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class GenericObservationReader implements ObservationReader {
+public abstract class GenericObservationReader  {
 
     /**
      * use for debugging purpose
      */
     protected Logger logger = Logger.getLogger("org.constellation.sos");
-
-    /**
-     * The base for observation id.
-     */
-    protected final String observationIdBase;
 
     /**
      * A list of precompiled SQL request returning single value.
@@ -107,8 +101,7 @@ public abstract class GenericObservationReader implements ObservationReader {
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
-    public GenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
-        this.observationIdBase = observationIdBase;
+    public GenericObservationReader(Automatic configuration) throws CstlServiceException {
         advancedJdbcDriver = true;
         try {
             BDD bdd = configuration.getBdd();
@@ -126,8 +119,7 @@ public abstract class GenericObservationReader implements ObservationReader {
         isThreadEnabled = false;
     }
 
-    protected GenericObservationReader(String observationIdBase, Map<List<String>, Values> debugValues) throws CstlServiceException {
-        this.observationIdBase = observationIdBase;
+    protected GenericObservationReader(Map<List<String>, Values> debugValues) throws CstlServiceException {
         advancedJdbcDriver = true;
         debugMode          = true;
         isThreadEnabled    = false;
@@ -493,7 +485,6 @@ public abstract class GenericObservationReader implements ObservationReader {
                       "for variable: " + varlist                 + '\n');
     }
 
-    @Override
     public void destroy() {
         logger.info("destroying generic reader");
         try {

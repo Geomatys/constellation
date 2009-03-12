@@ -34,6 +34,7 @@ import org.constellation.observation.ObservationEntry;
 import org.constellation.observation.ProcessEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingPointEntry;
+import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.v101.AbstractDataComponentEntry;
@@ -57,10 +58,16 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public class DefaultGenericObservationReader extends GenericObservationReader {
+public class DefaultGenericObservationReader extends GenericObservationReader implements ObservationReader {
 
+    /**
+     * The base for observation id.
+     */
+    protected final String observationIdBase;
+    
     public DefaultGenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase, configuration);
+        super(configuration);
+        this.observationIdBase = observationIdBase;
     }
 
     @Override
