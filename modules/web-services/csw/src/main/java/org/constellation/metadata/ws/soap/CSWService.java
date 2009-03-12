@@ -37,8 +37,6 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
-import org.constellation.cat.csw.GetDomainResponse;
-import org.constellation.cat.csw.GetRecordByIdResponse;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
@@ -169,10 +167,10 @@ public class CSWService {
      * Web service operation 
      */
     @WebMethod(action="getDomain")
-    public GetDomainResponse getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
+    public GetDomainResponseType getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
         try {
             logger.info("received SOAP GetDomain request");
-            return worker.getDomain(requestGetDomain);
+            return (GetDomainResponseType) worker.getDomain(requestGetDomain);
         } catch (CstlServiceException ex) {
            ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)
@@ -186,10 +184,10 @@ public class CSWService {
      * Web service operation 
      */
     @WebMethod(action="getRecordById")
-    public GetRecordByIdResponse getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
+    public GetRecordByIdResponseType getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
         try {
             logger.info("received SOAP getRecordById request");
-            return worker.getRecordById(requestRecordById);
+            return (GetRecordByIdResponseType) worker.getRecordById(requestRecordById);
         } catch (CstlServiceException ex) {
             ServiceVersion exVersion = ex.getVersion();
             if (exVersion == null)

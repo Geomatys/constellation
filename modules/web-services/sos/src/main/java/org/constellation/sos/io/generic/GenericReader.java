@@ -52,7 +52,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class GenericObservationReader  {
+public abstract class GenericReader  {
 
     /**
      * use for debugging purpose
@@ -101,7 +101,7 @@ public abstract class GenericObservationReader  {
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
-    public GenericObservationReader(Automatic configuration) throws CstlServiceException {
+    public GenericReader(Automatic configuration) throws CstlServiceException {
         advancedJdbcDriver = true;
         try {
             BDD bdd = configuration.getBdd();
@@ -119,7 +119,7 @@ public abstract class GenericObservationReader  {
         isThreadEnabled = false;
     }
 
-    protected GenericObservationReader(Map<List<String>, Values> debugValues) throws CstlServiceException {
+    protected GenericReader(Map<List<String>, Values> debugValues) throws CstlServiceException {
         advancedJdbcDriver = true;
         debugMode          = true;
         isThreadEnabled    = false;

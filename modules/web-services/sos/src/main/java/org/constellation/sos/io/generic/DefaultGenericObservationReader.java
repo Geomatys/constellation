@@ -58,7 +58,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public class DefaultGenericObservationReader extends GenericObservationReader implements ObservationReader {
+public class DefaultGenericObservationReader extends GenericReader implements ObservationReader {
 
     /**
      * The base for observation id.
