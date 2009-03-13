@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
@@ -134,18 +135,18 @@ public class WMSWorker extends AbstractWMSWorker {
      * The web service marshaller, which will use the web service name space.
      */
     @SuppressWarnings("unused")
-    private final Marshaller marshaller;
+    private final LinkedBlockingQueue<Marshaller> marshallers;
     
     private ServiceVersion actingVersion;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
      */
-    private final Unmarshaller unmarshaller;
+    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
-    public WMSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller, ServiceVersion actingVersion) {
-        this.marshaller   = marshaller;
-        this.unmarshaller = unmarshaller;
+    public WMSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers, ServiceVersion actingVersion) {
+        this.marshallers   = marshallers;
+        this.unmarshallers = unmarshallers;
         this.actingVersion = actingVersion;
     }
 
@@ -484,8 +485,21 @@ public class WMSWorker extends AbstractWMSWorker {
             }
 
             File f = getFile(fileName, home);
-            response = unmarshaller.unmarshal(f);
-            capabilities.put(fileName, response);
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = unmarshallers.take();
+                response = unmarshaller.unmarshal(f);
+                capabilities.put(fileName, response);
+                
+            } catch (InterruptedException ex) {
+                LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());
+
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallers.add(unmarshaller);
+                }
+            }
+
             //this.setLastUpdateSequence(System.currentTimeMillis());
             p.put("update", "false");
 

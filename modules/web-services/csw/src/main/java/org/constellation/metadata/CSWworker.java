@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
@@ -181,7 +182,7 @@ public class CSWworker {
     /**
      * A unMarshaller to get object from harvested resource.
      */
-    private final Unmarshaller unmarshaller;
+    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
     
     /**
      * A lucene index searcher to make quick search on the metadatas.
@@ -266,8 +267,8 @@ public class CSWworker {
      * @param unmarshaller
      * @param marshaller
      */
-    public CSWworker(final String serviceID, final Unmarshaller unmarshaller, final Marshaller marshaller) {
-        this(serviceID, unmarshaller, marshaller, null);
+    public CSWworker(final String serviceID, final LinkedBlockingQueue<Unmarshaller> unmarshallers, final LinkedBlockingQueue<Marshaller> marshallers) {
+        this(serviceID, unmarshallers, marshallers, null);
     }
     
     /**
@@ -278,9 +279,9 @@ public class CSWworker {
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      */
-    protected CSWworker(final String serviceID, final Unmarshaller unmarshaller, final Marshaller marshaller, File configDir) {
+    protected CSWworker(final String serviceID, final LinkedBlockingQueue<Unmarshaller> unmarshallers, final LinkedBlockingQueue<Marshaller> marshallers, File configDir) {
 
-        this.unmarshaller = unmarshaller;
+        this.unmarshallers = unmarshallers;
         prefixMapper      = new NamespacePrefixMapperImpl("");
         if (configDir == null) {
             configDir    = getConfigDirectory();
@@ -319,7 +320,7 @@ public class CSWworker {
                 AbstractIndexer indexer = CSWfactory.getIndexer(configuration, MDReader, serviceID);
                 indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
                 MDWriter      = CSWfactory.getMetadataWriter(configuration, indexer);
-                catalogueHarvester = new CatalogueHarvester(marshaller, unmarshaller, MDWriter);
+                catalogueHarvester = new CatalogueHarvester(marshallers, unmarshallers, MDWriter);
                 
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
@@ -1404,9 +1405,10 @@ public class CSWworker {
         }
         String sourceURL = request.getSource();
         if (sourceURL != null) {
-            
+            Unmarshaller unmarshaller = null;
             try {
-                
+
+                unmarshaller = unmarshallers.take();
                 // if the resource is a simple record
                 if (sourceURL.endsWith("xml")) {
                     
@@ -1466,7 +1468,14 @@ public class CSWworker {
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, "Source");
-            } 
+            } catch (InterruptedException ex) {
+                throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
+                                              NO_APPLICABLE_CODE);
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallers.add(unmarshaller);
+                }
+            }
             
         }
         

@@ -32,6 +32,7 @@ import javax.servlet.ServletContext;
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
 import java.io.StringWriter;
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -46,7 +47,6 @@ import javax.ws.rs.POST;
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -138,14 +138,14 @@ public abstract class WebService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
-     * A JAXB unmarshaller used to create Java objects from XML files.
+     * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
-    protected Unmarshaller unmarshaller;
+    protected LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
     /**
-     * A JAXB marshaller used to transform Java objects into XML String.
+     * A pool of JAXB marshaller used to transform Java objects into XML String.
      */
-    protected Marshaller marshaller;
+    protected LinkedBlockingQueue<Marshaller> marshallers;
 
     /**
      * Provides access to the URI used in the method call, for instance, to
@@ -178,14 +178,17 @@ public abstract class WebService {
     private String serviceURL;
 
 
+    protected boolean workingContext = true;
+    
     /**
      * Initialize the basic attribute of a web service.
      *
      * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
      */
     public WebService() {
-        unmarshaller = null;
-        serviceURL   = null;
+        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(4);
+        marshallers   = new LinkedBlockingQueue<Marshaller>(4);
+        serviceURL    = null;
     }
 
 
@@ -258,10 +261,16 @@ public abstract class WebService {
     private void initXMLContext(final JAXBContext jbcontext, final String rootNamespace)
             throws JAXBException
     {
-        unmarshaller = jbcontext.createUnmarshaller();
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper(rootNamespace);
+        for (int i = 0; i < 4; i++) {
+            Unmarshaller unmarshaller = jbcontext.createUnmarshaller();
+            Marshaller marshaller = jbcontext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
+            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+            
+            marshallers.add(marshaller);
+            unmarshallers.add(unmarshaller);
+        }
     }
 
 
@@ -309,16 +318,25 @@ public abstract class WebService {
     @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
         LOGGER.info("request POST xml: ");
-        if (unmarshaller != null) {
+        if (unmarshallers != null) {
             Object request = null;
+            Unmarshaller unmarshaller = null;
             try {
+                unmarshaller = unmarshallers.take();
                 request = unmarshaller.unmarshal(is);
+            } catch (InterruptedException ex) {
+                String msg = "Interupted exeception while trying to unmarshall a incomming request";
+                LOGGER.severe(msg);
+                return Response.ok(msg, "text/xml").build();
+
             } catch (UnmarshalException e) {
                 LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-                final StringWriter sw = new StringWriter();
-                final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
-                marshaller.marshal(obj, sw);
-                return Response.ok(sw.toString(), "text/xml").build();
+
+                return Response.ok(returnInvalidXMLException(), "text/xml").build();
+            } finally {
+                if (unmarshaller != null)  {
+                    unmarshallers.add(unmarshaller);
+                }
             }
 
             if (request != null && request instanceof AbstractRequest) {
@@ -328,6 +346,25 @@ public abstract class WebService {
             return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", "text/plain").build();
+        }
+    }
+
+    private String returnInvalidXMLException() throws JAXBException {
+
+        final StringWriter sw = new StringWriter();
+        final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallers.take();
+            marshaller.marshal(obj, sw);
+            return sw.toString();
+        } catch (InterruptedException ex) {
+            LOGGER.severe("Interupted exception while trying to unmarshall a incomming request");
+            return "An exception occurs: The XML request is not valid ";
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
     }
 
@@ -433,7 +470,9 @@ public abstract class WebService {
      */
     protected Object getComplexParameter(String parameterName, boolean mandatory) throws CstlServiceException {
 
+        Unmarshaller unmarshaller = null;
         try {
+            unmarshaller = unmarshallers.take();
             MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
             LinkedList<String> list = (LinkedList<String>) parameters.get(parameterName);
             if (list == null) {
@@ -454,6 +493,13 @@ public abstract class WebService {
         } catch (JAXBException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
+        } catch (InterruptedException ex) {
+             throw new CstlServiceException("InteruptedException while unmarshalling a complex parameter" + '\n' +
+                            ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (unmarshaller != null) {
+                unmarshallers.add(unmarshaller);
+            }
         }
     }
 
@@ -487,17 +533,6 @@ public abstract class WebService {
             serviceURL = uriContext.getBaseUri().toString();
         }
         return serviceURL;
-    }
-
-    /**
-     * Set the prefixMapper for the marshaller.
-     * The root namespace specified will have no prefix.
-     *
-     * @param rootNamespace The main namespace of all the produced XML document (xmlns = rootNamespace)
-     */
-    protected void setPrefixMapper(String rootNamespace) throws PropertyException {
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
     }
 
     public static File getConfigDirectory() {

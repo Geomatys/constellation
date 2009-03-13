@@ -41,6 +41,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import javax.xml.bind.JAXBException;
 
 // constellation dependencies
+import javax.xml.bind.Marshaller;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
@@ -110,6 +111,7 @@ public class ConfigurationService extends WebService  {
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             CSWFunctionEnabled = true;
         } catch (JAXBException ex) {
+            workingContext = false;
             LOGGER.severe("JAXBException while setting the JAXB context for configuration service:" + ex.getMessage());
             ex.printStackTrace();
             CSWFunctionEnabled = false;
@@ -128,7 +130,9 @@ public class ConfigurationService extends WebService  {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallers.take();
             String request  = "";
             StringWriter sw = new StringWriter();
 
@@ -238,6 +242,14 @@ public class ConfigurationService extends WebService  {
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
         
     }

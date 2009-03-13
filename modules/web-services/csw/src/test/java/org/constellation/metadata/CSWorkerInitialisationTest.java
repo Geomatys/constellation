@@ -19,6 +19,7 @@ package org.constellation.metadata;
 
 // JAXB dependencies
 import java.io.File;
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -46,8 +47,8 @@ import static org.junit.Assert.*;
  */
 public class CSWorkerInitialisationTest {
 
-    private Unmarshaller unmarshaller;
-    private Marshaller   marshaller;
+    private LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private LinkedBlockingQueue<Marshaller>  marshallers;
 
     private static File configurationDirectory = new File("CSWorkerInitialisationTest");
 
@@ -100,12 +101,20 @@ public class CSWorkerInitialisationTest {
     public void setUp() throws Exception {
         emptyConfigurationDirectory();
         JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
-        unmarshaller      = context.createUnmarshaller();
-        marshaller          = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(1);
+        marshallers   = new LinkedBlockingQueue<Marshaller>(1);
+
+        Unmarshaller u = context.createUnmarshaller();
+        unmarshallers.add(u);
+
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-        skeletonCapabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
+        m.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+        marshallers.add(m);
+        
+        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
 
     }
 
@@ -124,7 +133,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        CSWworker worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        CSWworker worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         boolean exceptionLaunched = false;
@@ -147,7 +156,7 @@ public class CSWorkerInitialisationTest {
         File configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
         
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -169,9 +178,18 @@ public class CSWorkerInitialisationTest {
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        marshaller.marshal(request, configFile);
+        Marshaller m = null;
+        try {
+             m = marshallers.take();
+             m.marshal(request, configFile);
+        } catch (InterruptedException ex) {
+            System.out.println("InterruptedException in initialisation Test");
+        } finally {
+            marshallers.add(m);
+        }
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -197,7 +215,7 @@ public class CSWorkerInitialisationTest {
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -223,7 +241,7 @@ public class CSWorkerInitialisationTest {
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -249,7 +267,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -275,7 +293,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -300,7 +318,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -325,7 +343,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -350,7 +368,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -375,7 +393,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshaller, marshaller, configurationDirectory);
+        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;

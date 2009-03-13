@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
@@ -161,12 +162,12 @@ public final class WCSWorker {
     /**
      * The web service marshaller, which will use the web service name space.
      */
-    private final Marshaller marshaller;
+    private final LinkedBlockingQueue<Marshaller> marshallers;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
      */
-    private final Unmarshaller unmarshaller;
+    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
     /**
      * The current version of the service, as asked into the request.
@@ -188,11 +189,11 @@ public final class WCSWorker {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public WCSWorker(final Marshaller marshaller, final Unmarshaller unmarshaller,
+    public WCSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers,
                                                final ServiceVersion actingVersion)
     {
-        this.marshaller = marshaller;
-        this.unmarshaller = unmarshaller;
+        this.marshallers   = marshallers;
+        this.unmarshallers = unmarshallers;
         this.actingVersion = actingVersion;
     }
 
@@ -926,9 +927,19 @@ public final class WCSWorker {
             }
 
             final File f = getFile(fileName, home);
-            response = unmarshaller.unmarshal(f);
-            capabilities.put(fileName, response);
-            p.put("update", "false");
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = unmarshallers.take();
+                response = unmarshaller.unmarshal(f);
+                capabilities.put(fileName, response);
+            } catch (InterruptedException ex) {
+                LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallers.add(unmarshaller);
+                }
+            }
+                p.put("update", "false");
 
             // if the flag file is present we store the properties
             if (changeFile != null && changeFile.exists()) {

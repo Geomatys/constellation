@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 //JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -97,9 +98,10 @@ public class CSWService extends OGCWebService {
         serviceID = "";
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
-            worker = new CSWworker(serviceID, unmarshaller, marshaller);
+            worker = new CSWworker(serviceID, unmarshallers, marshallers);
             
         } catch (JAXBException ex){
+            workingContext = false;
             LOGGER.severe("The CSW service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' + 
@@ -116,7 +118,7 @@ public class CSWService extends OGCWebService {
         this.serviceID = serviceID;
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
-            worker = new CSWworker(serviceID, unmarshaller, marshaller);
+            worker = new CSWworker(serviceID, unmarshallers, marshallers);
 
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
@@ -137,8 +139,10 @@ public class CSWService extends OGCWebService {
      * @throw JAXBException
      */
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        Marshaller marshaller = null;
         try {
-            
+            marshaller = marshallers.take();
+
             if (worker != null) {
             
                 worker.setServiceURL(getServiceURL());
@@ -287,33 +291,46 @@ public class CSWService extends OGCWebService {
             }
         
         } catch (CstlServiceException ex) {
-            /* We don't print the stack trace:
-             * - if the user have forget a mandatory parameter.
-             * - if the version number is wrong.
-             * - if the user have send a wrong request parameter
-             */
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                ex.printStackTrace();
-            } else {
-                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
-            }
+            return processExceptionResponse(ex, marshaller);
+
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+            
+        } finally {
             if (marshaller != null) {
-                ServiceVersion version = ex.getVersion();
-                if (version == null)
-                    version = getActingVersion();
-                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
-                StringWriter sw = new StringWriter();    
-                marshaller.marshal(report, sw);
-                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
-            } else {
-                return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
+                marshallers.add(marshaller);
             }
         }
     }
     
+    @Override
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+        /* We don't print the stack trace:
+         * - if the user have forget a mandatory parameter.
+         * - if the version number is wrong.
+         * - if the user have send a wrong request parameter
+         */
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            ex.printStackTrace();
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
+        }
+        if (workingContext) {
+            ServiceVersion version = ex.getVersion();
+            if (version == null) {
+                version = getActingVersion();
+            }
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+        } else {
+            return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build();
+        }
+    }
     
     /**
      * Build a new GetCapabilities request object with the url parameters 

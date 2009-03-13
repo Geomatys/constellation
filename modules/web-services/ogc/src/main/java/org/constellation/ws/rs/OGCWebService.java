@@ -27,9 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
@@ -124,7 +127,6 @@ public abstract class OGCWebService extends WebService {
         // We set that the current version is probably the highest one, the best one, which should
         // be the first in the list of supported version.
         this.actingVersion = this.supportedVersions.get(0);
-        unmarshaller = null;//TODO: explain this. We are freeing the un-needed resource?
     }
 
     /**
@@ -207,6 +209,23 @@ public abstract class OGCWebService extends WebService {
     }
 
     /**
+     * Handle all exceptions returned by a web service operation in two ways:
+     * <ul>
+     *   <li>if the exception code indicates a mistake done by the user, just display a single
+     *       line message in logs.</li>
+     *   <li>otherwise logs the full stack trace in logs, because it is something interesting for
+     *       a developper</li>
+     * </ul>
+     * In both ways, the exception is then marshalled and returned to the client.
+     *
+     * @param ex The exception that has been generated during the webservice operation requested.
+     * @return An XML representing the exception.
+     *
+     * @throws JAXBException if an error occurs during the marshalling of the exception.
+     */
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException;
+
+    /**
      * The shared method to build a service ExceptionReport.
      *
      * @param message
@@ -270,27 +289,40 @@ public abstract class OGCWebService extends WebService {
            boolean update  = p.getProperty("update").equals("true");
 
            if (response == null || update) {
-               if (update)
-                    LOGGER.info("updating metadata");
+               if (update) {
+                   LOGGER.info("updating metadata");
+               }
 
                File f = getFile(fileName);
-               response = unmarshaller.unmarshal(f);
-               capabilities.put(fileName, response);
-               this.setLastUpdateTIme(System.currentTimeMillis());
-               p.put("update", "false");
+               Unmarshaller unmarshaller = null;
+               try {
+                   unmarshaller = unmarshallers.take();
+                   response = unmarshaller.unmarshal(f);
+               } catch (InterruptedException ex) {
+                   LOGGER.severe("Interrupted Exception in getCapabilities Object");
+
+               } finally {
+                   if (unmarshaller != null) {
+                       unmarshallers.add(unmarshaller);
+                   }
+               }
+               if (response != null) {
+                   capabilities.put(fileName, response);
+                   this.setLastUpdateTIme(System.currentTimeMillis());
+                   p.put("update", "false");
+               }
 
                // if the flag file is present we store the properties
                if (changeFile != null && changeFile.exists()) {
                    try {
-                   FileOutputStream out = new FileOutputStream(changeFile);
-                   p.store(out, "updated from WebService");
-                   out.close();
+                       FileOutputStream out = new FileOutputStream(changeFile);
+                       p.store(out, "updated from WebService");
+                       out.close();
                    } catch (IOException ex) {
-                        LOGGER.warning("Unable to write the change.properties file");
+                       LOGGER.warning("Unable to write the change.properties file");
                    }
                }
            }
-
            return response;
         }
     }

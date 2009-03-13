@@ -28,6 +28,7 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -125,12 +126,12 @@ public class CatalogueHarvester {
     /**
      * A Marshaller to send request to another CSW services.
      */
-    private final Marshaller marshaller;
+    private final LinkedBlockingQueue<Marshaller> marshallers;
     
     /**
      * A unMarshaller to get object from harvested resource.
      */
-    protected final Unmarshaller unmarshaller;
+    protected final LinkedBlockingQueue<Unmarshaller> unmarshallers;
     
     /**
      * A flag indicating that we are harvesting a CSW special case 1
@@ -150,9 +151,9 @@ public class CatalogueHarvester {
     /**
      * Build a new catalogue harvester with the write part.
      */
-    public CatalogueHarvester(Marshaller marshaller, Unmarshaller unmarshaller, MetadataWriter metadataWriter) {
-        this.marshaller     = marshaller;
-        this.unmarshaller   = unmarshaller;
+    public CatalogueHarvester(LinkedBlockingQueue<Marshaller> marshallers, LinkedBlockingQueue<Unmarshaller> unmarshallers, MetadataWriter metadataWriter) {
+        this.marshallers    = marshallers;
+        this.unmarshallers  = unmarshallers;
         this.metadataWriter = metadataWriter;
         initializeRequest();
     }
@@ -670,12 +671,20 @@ public class CatalogueHarvester {
                 conec.setRequestProperty("Content-Type","text/xml");
                 OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
                 StringWriter sw = new StringWriter();
+                Marshaller marshaller = null;
                 try {
-                    
+                    marshaller = marshallers.take();
                     marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE);
+                } catch (InterruptedException ex) {
+                    throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
+                                                 NO_APPLICABLE_CODE);
+                } finally {
+                    if (marshaller != null) {
+                        marshallers.add(marshaller);
+                    }
                 }
                 String XMLRequest = sw.toString();
             
@@ -727,8 +736,10 @@ public class CatalogueHarvester {
             if (decodedString.contains("xmlns:csw=\"http://www.opengis.net/csw\"")) {
                 decodedString = decodedString.replace("xmlns:csw=\"http://www.opengis.net/csw\"", "xmlns:csw=\"http://www.opengis.net/cat/csw\"");
             }
-        
+
+            Unmarshaller unmarshaller = null;
             try {
+                unmarshaller = unmarshallers.take();
                 harvested = unmarshaller.unmarshal(new StringReader(decodedString));
                 if (harvested != null && harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
@@ -736,6 +747,13 @@ public class CatalogueHarvester {
             } catch (JAXBException ex) {
                 logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
+            } catch (InterruptedException ex) {
+                    throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
+                                                 NO_APPLICABLE_CODE);
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallers.add(unmarshaller);
+                }
             }
         } catch (IOException ex) {
             logger.severe("The Distant service have made an error");

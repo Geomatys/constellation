@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // JAXB dependencies
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -152,15 +153,22 @@ public class CSWworkerTest {
     @Before
     public void setUp() throws Exception {
 
+        LinkedBlockingQueue<Unmarshaller> unmarshallers = new LinkedBlockingQueue<Unmarshaller>();
+        LinkedBlockingQueue<Marshaller> marshallers     = new LinkedBlockingQueue<Marshaller>();
+
         JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
+
         unmarshaller      = context.createUnmarshaller();
         Marshaller marshaller          = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
 
+        unmarshallers.add(unmarshaller);
+        marshallers.add(marshaller);
+
         File configDir = new File("CSWWorkerTest");
-        worker = new CSWworker("", unmarshaller, marshaller, configDir);
+        worker = new CSWworker("", unmarshallers, marshallers, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
     }

@@ -75,6 +75,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import javax.xml.bind.Marshaller;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -152,7 +153,7 @@ public final class WCSService extends OGCWebService {
                       "org.constellation.wcs.v111",
                       "http://www.opengis.net/wcs");
 
-        worker = new WCSWorker(marshaller, unmarshaller, getActingVersion());
+        worker = new WCSWorker(marshallers, unmarshallers, getActingVersion());
         LOGGER.info("WCS service running");
     }
 
@@ -168,9 +169,11 @@ public final class WCSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-    	
+
+        Marshaller marshaller = null;
         try {
-        	
+
+            marshaller = marshallers.take();
         	// Handle an empty request by sending a basic web page.
         	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
         		return Response.ok(getIndexPage(), Query.TEXT_HTML).build();
@@ -260,35 +263,11 @@ public final class WCSService extends OGCWebService {
         	 * for the protocol stream which JAXB, in this case, will then 
         	 * marshall and serialize into an XML message HTTP response.
         	 */
-        	
-        	// LOG THE EXCEPTION
-              // We do not want to log the full stack trace if this is an error 
-              // which seems to have been caused by the user.
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
-            {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            } else {
-                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
-            }
+        	return processExceptionResponse(ex, marshaller);
             
-            // SEND THE HTTP RESPONSE
-            final Object report;
-            if (getActingVersion().isOWS()) {
-                final String code = Util.transformCodeName(ex.getExceptionCode().name());
-                report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
-            } else {
-                report = new ServiceExceptionReport( getActingVersion(),
-                                                     new ServiceExceptionType(ex.getMessage(),
-                                                     (ExceptionCode) ex.getExceptionCode()));
-            }
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
-            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+
         } catch (Exception ex) {
             /*
              * /!\ This exception should not occur. /!\
@@ -314,7 +293,42 @@ public final class WCSService extends OGCWebService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
+    }
+
+    @Override
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+        // LOG THE EXCEPTION
+        // We do not want to log the full stack trace if this is an error
+        // which seems to have been caused by the user.
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
+        }
+
+        // SEND THE HTTP RESPONSE
+        final Object report;
+        if (getActingVersion().isOWS()) {
+            final String code = Util.transformCodeName(ex.getExceptionCode().name());
+            report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
+        } else {
+            report = new ServiceExceptionReport(getActingVersion(),
+                    new ServiceExceptionType(ex.getMessage(),
+                    (ExceptionCode) ex.getExceptionCode()));
+        }
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(report, sw);
+
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
     }
 
     /**

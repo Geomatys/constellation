@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBException;
 // geotools dependencies
 
 // Constellation dependencies
+import javax.xml.bind.Marshaller;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
@@ -75,7 +76,9 @@ public class SOService extends OGCWebService {
 
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        Marshaller marshaller = null;
          try {
+             marshaller = marshallers.take();
              worker.setServiceURL(getServiceURL());
              logParameters();
              String request = "";
@@ -159,33 +162,46 @@ public class SOService extends OGCWebService {
             }
              
          } catch (CstlServiceException ex) {
-            /* We don't print the stack trace:
-             * - if the user have forget a mandatory parameter.
-             * - if the version number is wrong.
-             */
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                ex.printStackTrace();
-            } else {
-                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
-            }
-            ServiceVersion version = ex.getVersion();
+            return processExceptionResponse(ex, marshaller);
+            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+            
+        } finally {
             if (marshaller != null) {
-                if (version == null) {
-                    version = getActingVersion();
-                }
-                StringWriter sw = new StringWriter();
-                ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
-                marshaller.marshal(report, sw);
-                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
-            } else {
-                return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
+                marshallers.add(marshaller);
             }
         }
     }
     
+    @Override
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+        /* We don't print the stack trace:
+         * - if the user have forget a mandatory parameter.
+         * - if the version number is wrong.
+         */
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            ex.printStackTrace();
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
+        }
+        ServiceVersion version = ex.getVersion();
+        if (workingContext) {
+            if (version == null) {
+                version = getActingVersion();
+            }
+            StringWriter sw = new StringWriter();
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
+            marshaller.marshal(report, sw);
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+        } else {
+            return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
+        }
+    }
+
     /**
      * Build a new getCapabilities request from kvp encoding
      */

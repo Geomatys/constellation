@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
+import javax.xml.bind.Marshaller;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.ExceptionReport;
@@ -82,6 +83,7 @@ public class WMTSService extends OGCWebService {
             worker = new WMTSWorker();
 
         } catch (JAXBException ex){
+            workingContext = false;
             LOGGER.severe("The WMTS service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
@@ -101,11 +103,13 @@ public class WMTSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        Marshaller marshaller = null;
         try {
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
                                               NO_APPLICABLE_CODE, getActingVersion());
             }
+            marshaller = marshallers.take();
             logParameters();
             String request = "";
 
@@ -166,7 +170,15 @@ public class WMTSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex);
+            return processExceptionResponse(ex, marshaller);
+            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
     }
 
@@ -341,17 +353,30 @@ public class WMTSService extends OGCWebService {
                                                   @PathParam("caps") String resourcename)
                                                                      throws JAXBException
     {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallers.take();
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
                                               NO_APPLICABLE_CODE, getActingVersion());
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(worker.getCapabilities(gc), sw);
             return Response.ok(sw.toString(), TEXT_XML).build();
+
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex);
+            return processExceptionResponse(ex, marshaller);
+
+        } catch (InterruptedException ex) {
+            String msg = "interruptedException in processCapabilites";
+            LOGGER.severe(msg);
+            return Response.ok(msg, TEXT_PLAIN).build();
+            
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
     }
 
@@ -393,7 +418,15 @@ public class WMTSService extends OGCWebService {
             }
             return Response.ok(worker.getTile(gt), mimeType).build();
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex);
+            Marshaller marshaller = null;
+            try {
+                marshaller = marshallers.take();
+                return processExceptionResponse(ex, marshaller);
+            } catch (InterruptedException exe) {
+                String msg = "interrupted exception in processGetTileRestful: " + exe.getMessage();
+                LOGGER.severe(msg);
+                return Response.ok(msg, TEXT_PLAIN).build();
+            }
         }
     }
 
@@ -412,7 +445,8 @@ public class WMTSService extends OGCWebService {
      *
      * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
-    private Response processExceptionResponse(final CstlServiceException ex) throws JAXBException {
+    @Override
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -426,16 +460,17 @@ public class WMTSService extends OGCWebService {
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
-        if (marshaller != null) {
-            ServiceVersion serviceVersion = ex.getVersion();
-            if (serviceVersion == null) {
-                serviceVersion = getActingVersion();
-            }
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
-                    ex.getLocator(), serviceVersion.toString());
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+
+        if (workingContext) {
+                ServiceVersion serviceVersion = ex.getVersion();
+                if (serviceVersion == null) {
+                    serviceVersion = getActingVersion();
+                }
+                final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
+                        ex.getLocator(), serviceVersion.toString());
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(report, sw);
+                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         } else {
             return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", TEXT_PLAIN).build();
         }

@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
+import javax.xml.bind.Marshaller;
 import org.constellation.map.ws.AbstractWMSWorker;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.query.QueryAdapter;
@@ -106,7 +107,7 @@ public class WMSService extends OGCWebService {
                       "org.geotools.internal.jaxb.v110.sld",
                       "http://www.opengis.net/wms");
 
-        worker = new WMSWorker(null, unmarshaller, getActingVersion());
+        worker = new WMSWorker(null, unmarshallers, getActingVersion());
         LOGGER.info("WMS service running");
     }
 
@@ -142,8 +143,20 @@ public class WMSService extends OGCWebService {
         //workaround because 1.1.1 is defined with a DTD rather than an XSD
         //we marshall the response and return the XML String
         final StringWriter sw = new StringWriter();
-        marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ? "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
-        marshaller.marshal(capabilities, sw);
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallers.take();
+            marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ? "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
+            marshaller.marshal(capabilities, sw);
+        } catch (InterruptedException ex) {
+            String msg = "interruptedException in processCapabilites";
+            LOGGER.severe(msg);
+            sw.append(msg);
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
+        }
         return Response.ok(sw.toString(), requestCapab.getFormat()).build();
 
     }
@@ -161,7 +174,19 @@ public class WMSService extends OGCWebService {
         final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
         //We need to marshall the string to XML
         final StringWriter sw = new StringWriter();
-        marshaller.marshal(response, sw);
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallers.take();
+            marshaller.marshal(response, sw);
+        } catch (InterruptedException ex) {
+            String msg = "interruptedException in processCapabilites";
+            LOGGER.severe(msg);
+            sw.append(msg);
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
+        }
         return Response.ok(sw.toString(), TEXT_XML).build();
     }
 
@@ -184,8 +209,9 @@ public class WMSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        Marshaller marshaller = null;
         try {
-
+            marshaller = marshallers.take();
             final String request = (String) getParameter(KEY_REQUEST, true);
             LOGGER.info("New request: " + request);
             logParameters();
@@ -212,20 +238,7 @@ public class WMSService extends OGCWebService {
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
             
         } catch (CstlServiceException ex) {
-            final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
-                    new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
-            {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            } else {
-                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
-            }
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            return processExceptionResponse(ex, marshaller);
         } catch (NumberFormatException n) {
             final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
                     new ServiceExceptionType(n.getMessage(), INVALID_PARAMETER_VALUE));
@@ -233,6 +246,10 @@ public class WMSService extends OGCWebService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+
         } catch (Exception ex) {
             /*
              * /!\ This exception should not occur. /!\
@@ -253,7 +270,28 @@ public class WMSService extends OGCWebService {
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
+    }
+
+    @Override
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+        final ServiceExceptionReport report = new ServiceExceptionReport(getActingVersion(),
+                new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
+        }
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(report, sw);
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
     }
 
     /**

@@ -21,6 +21,7 @@ package org.constellation.metadata.ws.soap;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 // JAX-WS dependencies
@@ -33,6 +34,7 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 
@@ -102,7 +104,7 @@ public class CSWService {
     /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    private Unmarshaller unmarshaller;
+    private LinkedBlockingQueue<Unmarshaller> unmarshallers;
     
     /**
      * The version of the service
@@ -126,8 +128,17 @@ public class CSWService {
                             ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
                             ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
 
-           unmarshaller = jbcontext.createUnmarshaller();
-           worker = new CSWworker("", unmarshaller, jbcontext.createMarshaller());
+           unmarshallers = new LinkedBlockingQueue<Unmarshaller>(4);
+           for (int i = 0; i < 4; i++) {
+               unmarshallers.add(jbcontext.createUnmarshaller());
+           }
+
+           LinkedBlockingQueue<Marshaller> marshallers = new LinkedBlockingQueue<Marshaller>(4);
+           for (int i = 0; i < 4; i++) {
+               marshallers.add(jbcontext.createMarshaller());
+           }
+
+           worker = new CSWworker("", unmarshallers, marshallers);
            //TODO find real url
            worker.setServiceURL("http://localhost:8080/SOServer/SOService");
            this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");
@@ -293,8 +304,18 @@ public class CSWService {
             
                File f = new File(path, fileName);
                logger.info(f.toString());
-               response = unmarshaller.unmarshal(f);
-               capabilities.put(fileName, response);
+               Unmarshaller unmarshaller = null;
+               try {
+                   unmarshaller = unmarshallers.take();
+                   response = unmarshaller.unmarshal(f);
+                   capabilities.put(fileName, response);
+               } catch (InterruptedException ex) {
+                   logger.severe("interrupted Exception in getCapabilities object:" + ex.getMessage());
+               } finally {
+                   if (unmarshaller != null) {
+                       unmarshallers.add(unmarshaller);
+                   }
+               }
            }
            
            return response;
