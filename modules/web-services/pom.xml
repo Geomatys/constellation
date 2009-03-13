@@ -84,6 +84,7 @@
         <module>wmts</module>
         <module>wcs</module>
         <module>configuration</module>
+        <module>embedded</module>
       </modules>
     </profile>
     <profile>

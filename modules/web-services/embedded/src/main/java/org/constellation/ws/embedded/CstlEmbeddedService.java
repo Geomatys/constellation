@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ws;
+package org.constellation.ws.embedded;
 
 import java.io.IOException;
 import java.net.URI;
@@ -86,7 +86,7 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  * @since 0.3
  *
  */
-public abstract class CstlEmbeddedService extends CommandLine {
+public class CstlEmbeddedService extends CommandLine {
 	
 	// THESE ARE INJECTED BY THE CommandLine CLASS
 	//   TODO: these default values clobber main's args; fixed in Geotidy
@@ -164,14 +164,18 @@ public abstract class CstlEmbeddedService extends CommandLine {
 	 */
 	protected void runREST() {
 		
-        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass", 
-        		                          "com.sun.jersey.api.core.PackagesResourceConfig");
+//        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
+//        		                          "com.sun.jersey.api.core.PackagesResourceConfig");
         
         System.out.println("Starting grizzly server at: " + f.format(new Date()));
 
         SelectorThread threadSelector = null;
         try {
-            threadSelector = GrizzlyWebContainerFactory.create(uri, GrizzlyWebContainerProperties);
+            if (GrizzlyWebContainerProperties.isEmpty()) {
+                threadSelector = GrizzlyWebContainerFactory.create(uri);
+            } else {
+                threadSelector = GrizzlyWebContainerFactory.create(uri, GrizzlyWebContainerProperties);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -245,4 +249,7 @@ public abstract class CstlEmbeddedService extends CommandLine {
 		}
 	}
 
+    public static void main(String[] args) {
+        new CstlEmbeddedService(args).runREST();
+    }
 }
