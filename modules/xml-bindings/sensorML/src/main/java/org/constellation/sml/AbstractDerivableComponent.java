@@ -25,4 +25,10 @@ public interface AbstractDerivableComponent extends AbstractProcess {
     
     public AbstractLocation getSMLLocation();
 
+    public void setSMLLocation(AbstractLocation location);
+
+    public AbstractPosition getPosition();
+
+    public void setPosition(AbstractPosition position);
+
 }

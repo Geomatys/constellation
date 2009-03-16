@@ -23,6 +23,8 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractDerivableComponent;
+import org.constellation.sml.AbstractLocation;
+import org.constellation.sml.AbstractPosition;
 import org.geotools.util.Utilities;
 
 
@@ -91,8 +93,10 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
         return location;
     }
     
-    public void setSMLLocation(Location location) {
-        this.location = location;
+    public void setSMLLocation(AbstractLocation location) {
+        if (location instanceof Location)
+            this.location = (Location) location;
+        else throw new IllegalArgumentException("Bad version of the location object");
     }
 
     /**
@@ -119,8 +123,10 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
     /**
      * @param position the position to set
      */
-    public void setPosition(Position position) {
-        this.position = position;
+    public void setPosition(AbstractPosition position) {
+        if (position instanceof Position)
+            this.position = (Position) position;
+        else throw new IllegalArgumentException("Bad version of the position object");
     }
     
     /**

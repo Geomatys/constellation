@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractPosition;
 import org.constellation.swe.v101.PositionType;
 import org.constellation.swe.v101.VectorType;
 import org.geotools.util.Utilities;
@@ -64,7 +65,7 @@ import org.geotools.util.Utilities;
     "vector"
 })
 @XmlRootElement(name = "position")
-public class Position {
+public class Position implements AbstractPosition {
 
     @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;

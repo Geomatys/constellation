@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.AbstractVector;
 import org.geotools.util.Utilities;
 
 
@@ -53,7 +54,7 @@ import org.geotools.util.Utilities;
     PositionType.class,
     VectorType.class
 })
-public abstract class AbstractVectorType extends AbstractDataRecordEntry {
+public abstract class AbstractVectorType extends AbstractDataRecordEntry implements AbstractVector {
 
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")

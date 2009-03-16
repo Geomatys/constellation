@@ -148,6 +148,7 @@ public class WMSService extends OGCWebService {
             marshaller = marshallers.take();
             marshaller.setProperty("com.sun.xml.bind.xmlHeaders", (requestCapab.getVersion().toString().equals("1.1.1")) ? "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" : "");
             marshaller.marshal(capabilities, sw);
+
         } catch (InterruptedException ex) {
             String msg = "interruptedException in processCapabilites";
             LOGGER.severe(msg);

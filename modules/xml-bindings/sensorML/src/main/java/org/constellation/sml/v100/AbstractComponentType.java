@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractComponent;
 import org.geotools.util.Utilities;
 
 
@@ -50,7 +51,7 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractComponentType")
 @XmlSeeAlso({ComponentType.class, SystemType.class})
-public abstract class AbstractComponentType extends AbstractDerivableComponentType {
+public abstract class AbstractComponentType extends AbstractDerivableComponentType implements AbstractComponent {
 
     private Inputs inputs;
     private Outputs outputs;

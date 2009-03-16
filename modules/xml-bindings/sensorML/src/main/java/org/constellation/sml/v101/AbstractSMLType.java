@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractFeatureEntry;
+import org.constellation.sml.AbstractSML;
 
 
 /**
@@ -56,6 +57,6 @@ import org.constellation.gml.v311.AbstractFeatureEntry;
 @XmlSeeAlso({
     AbstractProcessType.class
 })
-public abstract class AbstractSMLType extends AbstractFeatureEntry {
+public abstract class AbstractSMLType extends AbstractFeatureEntry implements AbstractSML {
 
 }

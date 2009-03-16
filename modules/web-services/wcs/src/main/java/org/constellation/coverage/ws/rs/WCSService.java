@@ -83,7 +83,7 @@ import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.GridLimitsType;
 import org.constellation.gml.v311.GridType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.ows.v100.ExceptionReport;
+import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.BoundingBoxType;

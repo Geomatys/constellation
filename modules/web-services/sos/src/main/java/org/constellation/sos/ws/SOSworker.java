@@ -1751,7 +1751,7 @@ public class SOSworker {
             if (catalinaPath != null) {
                 File dirCatalina = new File(catalinaPath);
                 if (dirCatalina != null && dirCatalina.exists()) {
-                    configDir = new File(dirCatalina, "webapps/ifremer-sos/WEB-INF/sos_configuration");
+                    configDir = new File(dirCatalina, "webapps/swe_WS/WEB-INF/sos_configuration");
                     if (configDir.exists()) {
                         logger.info("taking ifremer configuration from WEB-INF WAR directory");
                         return configDir;

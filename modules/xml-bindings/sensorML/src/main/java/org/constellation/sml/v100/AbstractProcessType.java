@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractProcess;
+import org.constellation.sml.AbstractValidTime;
 import org.geotools.util.Utilities;
 
 
@@ -180,8 +181,8 @@ public abstract class AbstractProcessType extends AbstractSMLType implements Abs
     /**
      * Sets the value of the validTime property.
      */
-    public void setValidTime(ValidTime value) {
-        this.validTime = value;
+    public void setValidTime(AbstractValidTime value) {
+        this.validTime = new ValidTime(value);
     }
 
     /**

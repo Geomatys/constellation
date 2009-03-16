@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.util.Utilities;
+import org.constellation.sml.System;
 
 
 /**
@@ -47,7 +48,7 @@ import org.geotools.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SystemType")
-public class SystemType extends AbstractComponentType {
+public class SystemType extends AbstractComponentType implements System {
 
     @XmlElement(required = true)
     private Components components;

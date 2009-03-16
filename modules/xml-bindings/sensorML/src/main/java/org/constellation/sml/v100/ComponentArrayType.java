@@ -80,5 +80,5 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ComponentArrayType")
-public class ComponentArrayType extends AbstractDerivableComponentType{
+public class ComponentArrayType extends AbstractDerivableComponentType {
 }

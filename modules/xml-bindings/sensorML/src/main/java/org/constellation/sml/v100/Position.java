@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractPosition;
 import org.constellation.swe.v100.PositionType;
 import org.constellation.swe.v100.VectorType;
 import org.geotools.util.Utilities;
@@ -64,7 +65,7 @@ import org.geotools.util.Utilities;
     "vector"
 })
 @XmlRootElement(name = "position")
-public class Position {
+public class Position implements AbstractPosition {
 
     @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;

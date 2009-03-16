@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
+import org.constellation.gml.v311.TimePositionType;
+import org.constellation.sml.AbstractValidTime;
 
 
 /**
@@ -52,7 +54,7 @@ import org.constellation.gml.v311.TimePeriodType;
     "timePeriod"
 })
 @XmlRootElement(name = "validTime")
-public class ValidTime {
+public class ValidTime implements AbstractValidTime {
 
     @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml")
     private TimeInstantType timeInstant;
@@ -63,12 +65,25 @@ public class ValidTime {
 
     }
 
+    public ValidTime(AbstractValidTime time) {
+        this.timeInstant = time.getTimeInstant();
+        this.timePeriod  = time.getTimePeriod();
+    }
+
     public ValidTime(TimeInstantType timeInstant) {
         this.timeInstant = timeInstant;
     }
 
     public ValidTime(TimePeriodType timePeriod) {
         this.timePeriod = timePeriod;
+    }
+
+    public ValidTime(String begin, String end) {
+        this.timePeriod = new TimePeriodType(begin, end);
+    }
+
+    public ValidTime(String instant) {
+        this.timeInstant = new TimeInstantType(new TimePositionType(instant));
     }
 
     /**

@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractDerivableComponent;
+import org.constellation.sml.AbstractLocation;
+import org.constellation.sml.AbstractPosition;
 
 
 /**
@@ -59,7 +61,8 @@ import org.constellation.sml.AbstractDerivableComponent;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractDerivableComponentType", propOrder = {
     "rest",
-    "location"
+    "location",
+    "position"
 })
 @XmlSeeAlso({
     ComponentArrayType.class,
@@ -71,13 +74,15 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
         @XmlElementRef(name = "temporalReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0.1", type = TemporalReferenceFrame.class),
         @XmlElementRef(name = "spatialReferenceFrame", namespace = "http://www.opengis.net/sensorML/1.0.1", type = SpatialReferenceFrame.class),
         @XmlElementRef(name = "timePosition", namespace = "http://www.opengis.net/sensorML/1.0.1", type = TimePosition.class),
-        @XmlElementRef(name = "interfaces", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Interfaces.class),
-        @XmlElementRef(name = "position", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Position.class)
+        @XmlElementRef(name = "interfaces", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Interfaces.class)
     })
     private List<Object> rest;
 
     @XmlElementRef(name = "location", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Location.class)
     private Location location;
+
+    @XmlElementRef(name = "position", namespace = "http://www.opengis.net/sensorML/1.0.1", type = Position.class)
+    private Position position;
     
     /**
      * Gets the rest of the content model. 
@@ -103,8 +108,22 @@ public abstract class AbstractDerivableComponentType extends AbstractProcessType
         return location;
     }
     
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setSMLLocation(AbstractLocation location) {
+        if (location instanceof Location)
+            this.location = (Location) location;
+        else throw new IllegalArgumentException("Bad version of the location object");
     }
 
+    /**
+     * @return the position
+     */
+    public Position getPosition() {
+        return position;
+    }
+    
+    public void setPosition(AbstractPosition position) {
+        if (position instanceof Position)
+            this.position = (Position) position;
+        else throw new IllegalArgumentException("Bad version of the position object");
+    }
 }

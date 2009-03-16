@@ -17,17 +17,20 @@
 
 package org.constellation.sml;
 
-import java.util.List;
+import org.constellation.gml.v311.TimeInstantType;
+import org.constellation.gml.v311.TimePeriodType;
 
 /**
- * Abstract super class for all the version of a SensorML document.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractSensorML {
+public interface AbstractValidTime {
 
-    public abstract List<? extends SMLMember> getMember();
+    public TimeInstantType getTimeInstant();
 
-    public abstract String getVersion();
+    public void setTimeInstant(TimeInstantType value);
 
+    public TimePeriodType getTimePeriod();
+
+    public void setTimePeriod(TimePeriodType value);
 }

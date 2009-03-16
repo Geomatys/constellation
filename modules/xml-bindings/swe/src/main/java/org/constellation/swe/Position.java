@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,19 +15,12 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sml;
-
-import java.util.List;
+package org.constellation.swe;
 
 /**
- * Abstract super class for all the version of a SensorML document.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractSensorML {
-
-    public abstract List<? extends SMLMember> getMember();
-
-    public abstract String getVersion();
+public interface Position {
 
 }

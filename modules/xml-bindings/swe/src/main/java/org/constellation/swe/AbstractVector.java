@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,20 +14,32 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-package org.constellation.sml;
-
-import java.util.List;
+package org.constellation.swe;
 
 /**
- * Abstract super class for all the version of a SensorML document.
  *
- * @author Guilhem Legal (Geomatys)
+ * @author guilhem Legal
  */
-public abstract class AbstractSensorML {
+public interface AbstractVector extends AbstractDataRecord {
 
-    public abstract List<? extends SMLMember> getMember();
+    /**
+     * Gets the value of the referenceFrame property.
+     */
+    public String getReferenceFrame();
 
-    public abstract String getVersion();
+    /**
+     * Sets the value of the referenceFrame property.
+     */
+    public void setReferenceFrame(String value);
+
+    /**
+     * Gets the value of the localFrame property.
+     */
+    public String getLocalFrame();
+
+    /**
+     * Sets the value of the localFrame property.
+     */
+    public void setLocalFrame(String value);
 
 }

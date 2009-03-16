@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.AbstractVector;
 
 
 /**
@@ -51,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
     EnvelopeType.class,
     PositionType.class
 })
-public abstract class AbstractVectorType extends AbstractDataRecordType {
+public abstract class AbstractVectorType extends AbstractDataRecordType implements AbstractVector {
 
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")

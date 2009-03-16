@@ -23,10 +23,13 @@ import java.util.List;
  *
  * @author Guilhem Legal
  */
-public interface AbstractProcess {
+public interface AbstractProcess extends AbstractSML {
 
     public List<? extends AbstractClassification> getClassification();
 
     public List<? extends AbstractIdentification> getIdentification();
-    
+
+    public AbstractValidTime getValidTime();
+
+    public void setValidTime(AbstractValidTime validTime);
 }

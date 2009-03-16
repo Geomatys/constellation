@@ -20,6 +20,7 @@ package org.constellation.sml.v101;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.System;
 
 
 /**
@@ -45,7 +46,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SystemType")
-public class SystemType extends AbstractComponentType {
+public class SystemType extends AbstractComponentType implements System {
 
 
 }

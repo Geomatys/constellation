@@ -17,17 +17,10 @@
 
 package org.constellation.sml;
 
-import java.util.List;
-
 /**
- * Abstract super class for all the version of a SensorML document.
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Guilhem Legal
  */
-public abstract class AbstractSensorML {
-
-    public abstract List<? extends SMLMember> getMember();
-
-    public abstract String getVersion();
+public interface AbstractComponent extends AbstractDerivableComponent {
 
 }

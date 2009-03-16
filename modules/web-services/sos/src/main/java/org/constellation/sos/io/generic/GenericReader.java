@@ -202,6 +202,14 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
+    protected Values loadData(String variable, List<String> parameter) {
+        return loadData(Arrays.asList(variable), parameter);
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
     protected Values loadData(List<String> variables) {
         List<String> s = null;
         return loadData(variables, s);

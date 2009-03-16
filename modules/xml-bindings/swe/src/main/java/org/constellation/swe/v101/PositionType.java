@@ -19,6 +19,7 @@ package org.constellation.swe.v101;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.swe.Position;
 
 
 /**
@@ -58,7 +59,7 @@ import javax.xml.bind.annotation.XmlType;
     "angularAcceleration",
     "state"
 })
-public class PositionType extends AbstractVectorType {
+public class PositionType extends AbstractVectorType implements Position {
 
     private TimePropertyType time;
     private VectorPropertyType location;

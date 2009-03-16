@@ -302,7 +302,10 @@ public class CSWService extends OGCWebService {
             }
         }
     }
-    
+
+    /**
+     * @inheritsDoc
+     */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
         /* We don't print the stack trace:

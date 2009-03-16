@@ -357,7 +357,7 @@ public class CSWworker {
      * In some implementations there is no sicade directory.
      * So if we don't find The .sicade/csw_configuration directory
      * IFREMER hack
-     * we search the CATALINA_HOME/webapps/sdn-csw/WEB-INF/csw_configuration
+     * we search the CATALINA_HOME/webapps/sdn-csw_WS/WEB-INF/csw_configuration
      */
     private File getConfigDirectory() {
         File configDir = new File(WebService.getSicadeDirectory(), "csw_configuration/");
@@ -373,7 +373,7 @@ public class CSWworker {
             if (catalinaPath != null) {
                 File dirCatalina = new File(catalinaPath);
                 if (dirCatalina != null && dirCatalina.exists()) {
-                    configDir = new File(dirCatalina, "webapps/sdn-csw/WEB-INF/csw_configuration");
+                    configDir = new File(dirCatalina, "webapps/sdn-csw_WS/WEB-INF/csw_configuration");
                     if (configDir.exists()) {
                         logger.info("taking ifremer configuration from WEB-INF WAR directory");
                         return configDir;

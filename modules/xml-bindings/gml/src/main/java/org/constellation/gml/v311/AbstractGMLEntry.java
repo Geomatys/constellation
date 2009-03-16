@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.catalog.Entry;
+import org.constellation.gml.AbstractGML;
 import org.geotools.util.Utilities;
 
 
@@ -38,7 +39,7 @@ import org.geotools.util.Utilities;
     "descriptionReference",
     "name"
 })
-public abstract class AbstractGMLEntry extends Entry {
+public abstract class AbstractGMLEntry extends Entry implements AbstractGML {
 
     //private List<MetaDataPropertyType> metaDataProperty;
     //private CodeWithAuthorityType identifier;

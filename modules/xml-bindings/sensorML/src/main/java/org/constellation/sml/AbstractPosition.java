@@ -15,19 +15,17 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.constellation.sml;
 
-import java.util.List;
+import org.constellation.swe.Position;
 
 /**
- * Abstract super class for all the version of a SensorML document.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractSensorML {
+public interface AbstractPosition {
 
-    public abstract List<? extends SMLMember> getMember();
-
-    public abstract String getVersion();
+    public Position getPosition();
 
 }

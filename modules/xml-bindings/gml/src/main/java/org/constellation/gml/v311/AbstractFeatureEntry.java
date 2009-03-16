@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.gml.AbstractFeature;
 import org.geotools.util.Utilities;
 
 
@@ -39,7 +40,7 @@ import org.geotools.util.Utilities;
     "boundedBy",
     "location"
 })
-public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
+public abstract class AbstractFeatureEntry extends AbstractGMLEntry implements AbstractFeature {
 
     private List<String> srsName;
     @XmlElement(nillable = true)
