@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractInputList;
+import org.constellation.sml.AbstractInputs;
 import org.geotools.util.Utilities;
 
 
@@ -68,7 +70,7 @@ import org.geotools.util.Utilities;
     "inputList"
 })
 @XmlRootElement(name = "inputs")
-public class Inputs {
+public class Inputs implements AbstractInputs {
 
     @XmlElement(name = "InputList")
     private Inputs.InputList inputList;
@@ -99,6 +101,19 @@ public class Inputs {
 
     public Inputs(InputList inputList) {
         this.inputList = inputList;
+    }
+
+    public Inputs(AbstractInputs inputs) {
+        this.inputList    = new InputList(inputs.getInputList());
+        this.actuate      = inputs.getActuate();
+        this.arcrole      = inputs.getArcrole();
+        this.href         = inputs.getHref();
+        this.remoteSchema = inputs.getRemoteSchema();
+        this.role         = inputs.getRole();
+        this.show         = inputs.getShow();
+        this.title        = inputs.getTitle();
+        this.type         = inputs.getType();
+
     }
     
     /**
@@ -386,7 +401,7 @@ public class Inputs {
     @XmlType(name = "", propOrder = {
         "input"
     })
-    public static class InputList {
+    public static class InputList implements AbstractInputList {
 
         @XmlElement(required = true)
         private List<IoComponentPropertyType> input;
@@ -403,7 +418,13 @@ public class Inputs {
         public InputList(List<IoComponentPropertyType> input) {
             this.input = input;
         }
-        
+
+        public InputList(AbstractInputList inputList) {
+            this.input = (List<IoComponentPropertyType>) inputList.getInput();
+            this.id    = inputList.getId();
+        }
+
+
         /**
          * Gets the value of the input property.
          */

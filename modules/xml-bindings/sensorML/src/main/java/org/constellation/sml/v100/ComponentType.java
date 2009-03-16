@@ -20,6 +20,7 @@ package org.constellation.sml.v100;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.Component;
 
 
 /**
@@ -43,7 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ComponentType")
-public class ComponentType extends AbstractComponentType {
+public class ComponentType extends AbstractComponentType implements Component {
 
     private MethodPropertyType method;
 

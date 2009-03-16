@@ -393,6 +393,16 @@ public class SOSworker {
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
+            String msg;
+            if (ex.getMessage() != null) {
+                msg = ex.getMessage();
+            } else {
+                if (ex.getLinkedException() != null) {
+                    msg = ex.getLinkedException().getMessage();
+                } else {
+                    msg = "no message";
+                }
+            }
             logger.severe("The SOS service is not running!" + '\n' + "cause: JAXBException:" + ex.getMessage());
             isStarted = false;
         } catch (FactoryNotFoundException ex) {

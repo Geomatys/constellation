@@ -698,6 +698,7 @@ public class CSWworker {
                     }
                     //we verify that the typeName is supported        
                     if (!SUPPORTED_TYPE_NAME.contains(type)) {
+                        System.out.println("TYPE:" + type + " LIST:" + SUPPORTED_TYPE_NAME);
                         String typeName = "null";
                         if (type != null)
                             typeName = type.getLocalPart();

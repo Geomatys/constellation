@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractInputs;
 import org.geotools.util.Utilities;
 
 
@@ -64,7 +65,7 @@ import org.geotools.util.Utilities;
     "inputList"
 })
 @XmlRootElement(name = "inputs")
-public class Inputs {
+public class Inputs implements AbstractInputs {
 
     @XmlElement(name = "InputList")
     private InputList inputList;
@@ -93,6 +94,19 @@ public class Inputs {
 
     public Inputs(InputList inputList) {
         this.inputList = inputList;
+    }
+
+    public Inputs(AbstractInputs inputs) {
+        this.inputList    = new InputList(inputs.getInputList());
+        this.actuate      = inputs.getActuate();
+        this.arcrole      = inputs.getArcrole();
+        this.href         = inputs.getHref();
+        this.remoteSchema = inputs.getRemoteSchema();
+        this.role         = inputs.getRole();
+        this.show         = inputs.getShow();
+        this.title        = inputs.getTitle();
+        this.type         = inputs.getType();
+
     }
 
     /**

@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.constellation.sml.IoComponent;
 import org.constellation.swe.v101.AbstractDataArrayEntry;
 import org.constellation.swe.v101.AbstractDataRecordEntry;
 import org.constellation.swe.v101.Category;
@@ -80,7 +81,7 @@ import org.geotools.util.Utilities;
     "abstractDataArray",
     "observableProperty"
 })
-public class IoComponentPropertyType {
+public class IoComponentPropertyType implements IoComponent {
 
     @XmlElement(name = "Count", namespace = "http://www.opengis.net/swe/1.0.1")
     private Count count;

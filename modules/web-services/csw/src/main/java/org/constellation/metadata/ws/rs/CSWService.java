@@ -450,14 +450,20 @@ public class CSWService extends OGCWebService {
         if (namespace != null) {
             tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf('=') != -1) {
-                    String prefix = token.substring(0, token.indexOf('='));
-                    String url    = token.substring(token.indexOf('=') + 1);
-                    namespaces.put(prefix, url);
+                String token = tokens.nextToken().trim();
+                if (token.startsWith("xmlns(") && token.endsWith(")")) {
+                    token = token.substring(6, token.length() -1);
+                    if (token.indexOf('=') != -1) {
+                        String prefix = token.substring(0, token.indexOf('='));
+                        String url    = token.substring(token.indexOf('=') + 1);
+                        namespaces.put(prefix, url);
+                    } else {
+                         throw new CstlServiceException("The namespace " + token + " is malformed",
+                                                       INVALID_PARAMETER_VALUE, "namespace");
+                    }
                 } else {
-                     throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, "namespace");
+                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
+                                                       INVALID_PARAMETER_VALUE, "namespace");
                 }
             }
         }
@@ -660,14 +666,20 @@ public class CSWService extends OGCWebService {
         if (namespace != null) {
             StringTokenizer tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf('=') != -1) {
-                    String prefix = token.substring(0, token.indexOf('='));
-                    String url    = token.substring(token.indexOf('=') + 1);
-                    namespaces.put(prefix, url);
+                String token = tokens.nextToken().trim();
+                if (token.startsWith("xmlns(") && token.endsWith(")")) {
+                    token = token.substring(6, token.length() -1);
+                    if (token.indexOf('=') != -1) {
+                        String prefix = token.substring(0, token.indexOf('='));
+                        String url    = token.substring(token.indexOf('=') + 1);
+                        namespaces.put(prefix, url);
+                    } else {
+                         throw new CstlServiceException("The namespace " + token + " is malformed",
+                                                       INVALID_PARAMETER_VALUE, "namespace");
+                    }
                 } else {
-                     throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, "namespace");
+                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
+                                                       INVALID_PARAMETER_VALUE, "namespace");
                 }
             }
         }
@@ -687,7 +699,7 @@ public class CSWService extends OGCWebService {
                 if (token.indexOf(':') != -1) {
                     String prefix    = token.substring(0, token.indexOf(':'));
                     String localPart = token.substring(token.indexOf(':') + 1);
-                    typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
+                    typeNames.add(new QName(namespaces.get(prefix), localPart, null));
                 } else {
                      throw new CstlServiceException("The QName " + token + " is malformed",
                                                    INVALID_PARAMETER_VALUE, "namespace");

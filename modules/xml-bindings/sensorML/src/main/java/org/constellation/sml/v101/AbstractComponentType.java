@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractComponent;
+import org.constellation.sml.AbstractInputs;
 import org.geotools.util.Utilities;
 
 
@@ -69,8 +70,8 @@ public abstract class AbstractComponentType extends AbstractDerivableComponentTy
     /**
      * @param inputs the inputs to set
      */
-    public void setInputs(Inputs inputs) {
-        this.inputs = inputs;
+    public void setInputs(AbstractInputs inputs) {
+        this.inputs = new Inputs(inputs);
     }
 
     /**

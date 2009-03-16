@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractInputList;
 import org.geotools.util.Utilities;
 
 /**
@@ -52,7 +53,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "", propOrder = {
     "input"
 })
-public class InputList {
+public class InputList implements AbstractInputList {
 
     @XmlElement(required = true)
     private List<IoComponentPropertyType> input;
@@ -66,6 +67,11 @@ public class InputList {
 
     public InputList(List<IoComponentPropertyType> input) {
         this.input = input;
+    }
+
+    public InputList(AbstractInputList inputList) {
+        this.input = (List<IoComponentPropertyType>) inputList.getInput();
+        this.id    = inputList.getId();
     }
 
     /**
