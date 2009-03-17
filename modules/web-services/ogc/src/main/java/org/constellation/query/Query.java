@@ -16,7 +16,7 @@
  */
 package org.constellation.query;
 
-import org.constellation.ws.ServiceVersion;
+import org.geotools.util.Version;
 
 
 /**
@@ -76,7 +76,7 @@ public abstract class Query {
     /**
      * Returns the version of the service chosen, or {@code null} if not specified.
      */
-    public abstract ServiceVersion getVersion();
+    public abstract Version getVersion();
 
     /**
      * Returns the exception format. Never {@code null}.

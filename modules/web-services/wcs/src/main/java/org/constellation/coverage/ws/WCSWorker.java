@@ -105,8 +105,6 @@ import org.constellation.wcs.v111.InterpolationMethodType;
 import org.constellation.wcs.v111.InterpolationMethods;
 import org.constellation.wcs.v111.RangeType;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 
 // Geotools dependencies
 import org.constellation.ws.rs.WebService;
@@ -170,11 +168,6 @@ public final class WCSWorker {
     private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
     /**
-     * The current version of the service, as asked into the request.
-     */
-    private ServiceVersion actingVersion;
-
-    /**
      * Defines a set of methods that a servlet uses to communicate with its servlet container,
      * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
      */
@@ -189,12 +182,11 @@ public final class WCSWorker {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public WCSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers,
-                                               final ServiceVersion actingVersion)
+    public WCSWorker(final LinkedBlockingQueue<Marshaller> marshallers,
+                     final LinkedBlockingQueue<Unmarshaller> unmarshallers)
     {
         this.marshallers   = marshallers;
         this.unmarshallers = unmarshallers;
-        this.actingVersion = actingVersion;
     }
 
     /**
@@ -216,12 +208,12 @@ public final class WCSWorker {
                                                   throws JAXBException, CstlServiceException
     {
         LOGGER.info("describeCoverage request processing");
-        this.actingVersion = new ServiceVersion(ServiceType.WCS, abstractRequest.getVersion());
+        //this.actingVersion = new ServiceVersion(ServiceType.WCS, abstractRequest.getVersion());
         //we begin by extracting the base attribute
         final String version = abstractRequest.getVersion();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
-                           MISSING_PARAMETER_VALUE, actingVersion, "version");
+                           MISSING_PARAMETER_VALUE, "version");
         }
 
         if (version.equals("1.0.0")) {
@@ -230,7 +222,7 @@ public final class WCSWorker {
             return describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
-                    "is not handled.", NO_APPLICABLE_CODE, actingVersion, "version");
+                    "is not handled.", NO_APPLICABLE_CODE, "version");
         }
     }
 
@@ -250,23 +242,23 @@ public final class WCSWorker {
     {
         if (request.getCoverage().size() == 0) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
-                    MISSING_PARAMETER_VALUE, actingVersion, "coverage");
+                    MISSING_PARAMETER_VALUE, "coverage");
         }
 
         //TODO: we should loop over the list
-        final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0));
+        final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), "1.0.0");
 
         final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
         final Set<Series> series = layerRef.getSeries();
         if (series == null || series.isEmpty()) {
             throw new CstlServiceException("The coverage " + layerRef.getName() + " is not defined.",
-                    LAYER_NOT_DEFINED, actingVersion);
+                    LAYER_NOT_DEFINED);
         }
         final GeographicBoundingBox inputGeoBox;
         try {
             inputGeoBox = layerRef.getGeographicBoundingBox();
         } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
         final LonLatEnvelopeType llenvelope;
@@ -275,7 +267,7 @@ public final class WCSWorker {
             try {
                 elevations = layerRef.getAvailableElevations();
             } catch (CatalogException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
             final List<Double> pos1 = new ArrayList<Double>();
             pos1.add(inputGeoBox.getWestBoundLongitude());
@@ -293,7 +285,7 @@ public final class WCSWorker {
             llenvelope = new LonLatEnvelopeType(pos, srsName);
         } else {
             throw new CstlServiceException("The geographic bbox for the layer is null !",
-                                           NO_APPLICABLE_CODE, actingVersion);
+                                           NO_APPLICABLE_CODE);
         }
         final Keywords keywords = new Keywords("WCS", layerRef.getName(),
                 Util.cleanSpecialCharacter(layerRef.getThematic()));
@@ -310,7 +302,7 @@ public final class WCSWorker {
         try {
             dates = layerRef.getAvailableTimes();
         } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         for (Date d : dates) {
             times.add(new TimePositionType(df.format(d)));
@@ -374,24 +366,24 @@ public final class WCSWorker {
     {
         if (request.getIdentifier().size() == 0) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
-                    MISSING_PARAMETER_VALUE, actingVersion, "identifier");
+                    MISSING_PARAMETER_VALUE, "identifier");
         }
 
         //TODO: we should loop over the list
-        final LayerDetails layer = getLayerReference(request.getIdentifier().get(0));
+        final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), "1.1.1");
 
         final org.constellation.ows.v110.ObjectFactory owsFactory =
                 new org.constellation.ows.v110.ObjectFactory();
         final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
         if (layer.getSeries().size() == 0) {
             throw new CstlServiceException("the coverage " + layer.getName() +
-                    " is not defined", LAYER_NOT_DEFINED, actingVersion);
+                    " is not defined", LAYER_NOT_DEFINED);
         }
         final GeographicBoundingBox inputGeoBox;
         try {
             inputGeoBox = layer.getGeographicBoundingBox();
         } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         final List<JAXBElement<? extends BoundingBoxType>> bboxs =
                 new ArrayList<JAXBElement<? extends BoundingBoxType>>();
@@ -434,7 +426,7 @@ public final class WCSWorker {
         try {
             dates = layer.getAvailableTimes();
         } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         for (Date d : dates) {
             times.add(new TimePositionType(df.format(d)));
@@ -493,7 +485,7 @@ public final class WCSWorker {
             version = "1.1.1";
         }
 
-        this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
+        //this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
         final String format;
 
         if (version.equals("1.0.0")) {
@@ -508,14 +500,14 @@ public final class WCSWorker {
                 format = formats.getOutputFormat().get(0);
                 if (!format.equals(TEXT_XML) && !format.equals(APP_XML)) {
                     throw new CstlServiceException("This format " + format + " is not allowed",
-                            INVALID_PARAMETER_VALUE, actingVersion, "format");
+                            INVALID_PARAMETER_VALUE, "format");
                 }
             }
 
             return getCapabilities111((org.constellation.wcs.v111.GetCapabilitiesType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, actingVersion, "version");
+                    "is not handled.", NO_APPLICABLE_CODE, "version");
         }
     }
 
@@ -545,7 +537,7 @@ public final class WCSWorker {
                 requestedSection = section;
             } else {
                 throw new CstlServiceException("The section " + section + " does not exist",
-                        INVALID_PARAMETER_VALUE, actingVersion);
+                        INVALID_PARAMETER_VALUE);
             }
             contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
         }
@@ -554,10 +546,10 @@ public final class WCSWorker {
         final WCSCapabilitiesType staticCapabilities;
         try {
             staticCapabilities = (WCSCapabilitiesType) ((JAXBElement<?>) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"))).getValue();
+                    servletContext.getRealPath("WEB-INF"), "1.0.0")).getValue();
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    NO_APPLICABLE_CODE, actingVersion);
+                    NO_APPLICABLE_CODE);
         }
         if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") ||
                                         requestedSection.equals("/"))
@@ -579,7 +571,7 @@ public final class WCSWorker {
                 return new WCSCapabilitiesType(staticCapabilities.getService());
             } else {
                 throw new CstlServiceException("Not a valid section requested: "+ requestedSection,
-                        NO_APPLICABLE_CODE, actingVersion);
+                        NO_APPLICABLE_CODE);
             }
         }
 
@@ -589,7 +581,7 @@ public final class WCSWorker {
                 new org.constellation.wcs.v100.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences();
+        final List<LayerDetails> layerRefs = getAllLayerReferences("1.0.0");
         try {
             for (LayerDetails layer : layerRefs) {
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
@@ -638,7 +630,7 @@ public final class WCSWorker {
             }
             contentMetadata = new ContentMetadata("1.0.0", offBrief);
         } catch (CatalogException exception) {
-            throw new CstlServiceException(exception, NO_APPLICABLE_CODE, actingVersion);
+            throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
 
         // The ContentMetadata has finally been filled, we can now return the response.
@@ -671,7 +663,7 @@ public final class WCSWorker {
             for (String sec : requestedSections) {
                 if (!SectionsType.getExistingSections("1.1.1").contains(sec)) {
                     throw new CstlServiceException("This sections " + sec + " is not allowed",
-                            INVALID_PARAMETER_VALUE, actingVersion);
+                            INVALID_PARAMETER_VALUE);
                 }
             }
         }
@@ -680,10 +672,10 @@ public final class WCSWorker {
         final Capabilities staticCapabilities;
         try {
             staticCapabilities = (Capabilities) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"));
+                    servletContext.getRealPath("WEB-INF"), "1.1.1");
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    NO_APPLICABLE_CODE, actingVersion);
+                    NO_APPLICABLE_CODE);
 
         }
 
@@ -716,7 +708,7 @@ public final class WCSWorker {
         org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences();
+        final List<LayerDetails> layerRefs = getAllLayerReferences("1.1.1");
         try {
             for (LayerDetails layer : layerRefs) {
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
@@ -753,7 +745,7 @@ public final class WCSWorker {
 
             contents = new Contents(summary, null, null, null);
         } catch (CatalogException exception) {
-            throw new CstlServiceException(exception, NO_APPLICABLE_CODE,actingVersion);
+            throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
 
         // Finally set the contents and return the full response.
@@ -779,9 +771,9 @@ public final class WCSWorker {
         final String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
-                           MISSING_PARAMETER_VALUE, actingVersion, "version");
+                           MISSING_PARAMETER_VALUE, "version");
         }
-        this.actingVersion = new ServiceVersion(ServiceType.WCS, inputVersion);
+        //this.actingVersion = new ServiceVersion(ServiceType.WCS, inputVersion);
 
         Date date = null;
         try {
@@ -798,13 +790,13 @@ public final class WCSWorker {
         if ( abstractRequest.getFormat().equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
-            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage());
+            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
 
             final Envelope envelope;
             try {
                 envelope = abstractRequest.getEnvelope();
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
@@ -813,11 +805,11 @@ public final class WCSWorker {
                         abstractRequest.getSize(), elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             } catch (CatalogException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
             return image;
@@ -826,13 +818,13 @@ public final class WCSWorker {
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support netcdf writing."),
-                                           NO_APPLICABLE_CODE, actingVersion);
+                                           NO_APPLICABLE_CODE);
 
         } else if( abstractRequest.getFormat().equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support geotiff writing."),
-                                           NO_APPLICABLE_CODE, actingVersion);
+                                           NO_APPLICABLE_CODE);
 
         } else {
             // We are in the case of an image format requested.
@@ -841,13 +833,13 @@ public final class WCSWorker {
             //NOTE: ADRIAN HACKED HERE
 
             // SCENE
-            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage());
+            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
             final Envelope envelope;
             try {
                 envelope = abstractRequest.getEnvelope();
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             renderParameters.put("TIME", date);
@@ -866,7 +858,7 @@ public final class WCSWorker {
                     refEnvel = new ReferencedEnvelope(envelope);
                 }
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, actingVersion);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
             final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel, azimuth);
@@ -887,7 +879,7 @@ public final class WCSWorker {
                 //if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
                 //    img = Cstl.Portrayal.writeInImage(ex, abstractRequest.getSize());
                 //} else {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE, actingVersion);
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 //}
             }
 
@@ -900,10 +892,11 @@ public final class WCSWorker {
      * If no such file is found, then this method returns {@code null}.
      *
      * @param home The home directory, where to search for configuration files.
+     * @param version The version of the GetCapabilities.
      * @return The capabilities Object, or {@code null} if none.
      */
-    private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
-       final String fileName = "WCSCapabilities" + actingVersion.toString() + ".xml";
+    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
+       final String fileName = "WCSCapabilities" + version + ".xml";
        final File changeFile = getFile("change.properties", home);
        final Properties p = new Properties();
 
@@ -971,24 +964,24 @@ public final class WCSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
+    private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
-	        if ( actingVersion.toString().equals("1.0.0") ) {
+	        if ( version.equals("1.0.0") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0 );
-	        } else if ( actingVersion.toString().equals("1.1.0") ) {
+	        } else if ( version.equals("1.1.0") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_0 );
-	        } else if ( actingVersion.toString().equals("1.1.1") ) {
+	        } else if ( version.equals("1.1.1") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_1 );
-	        } else if ( actingVersion.toString().equals("1.1.2") ) {
+	        } else if ( version.equals("1.1.2") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_2 );
 	        } else {
 	        	throw new CstlServiceException("WCS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRefs;
     }
@@ -996,22 +989,24 @@ public final class WCSWorker {
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getAllLayerReferences().
     //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
-    private LayerDetails getLayerReference(String layerName) throws CstlServiceException {
+    private LayerDetails getLayerReference(final String layerName, final String version)
+                                                             throws CstlServiceException
+    {
 
     	LayerDetails layerRef;
     	try { // WE catch the exception from either service version
-        	if ( actingVersion.toString().equals("1.0.0") ){
+        	if ( version.equals("1.0.0") ){
         		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_0_0, layerName);
-        	} else if ( actingVersion.toString().equals("1.1.1") ) {
+        	} else if ( version.equals("1.1.1") ) {
         		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_1, layerName);
-        	} else if ( actingVersion.toString().equals("1.1.2") ) {
+        	} else if ( version.equals("1.1.2") ) {
         		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, layerName);
         	} else {
         		throw new CstlServiceException("WCS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
         	}
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRef;
     }

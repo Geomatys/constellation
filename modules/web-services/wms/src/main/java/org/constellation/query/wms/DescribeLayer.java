@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ package org.constellation.query.wms;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
-import org.constellation.ws.ServiceVersion;
+import org.geotools.util.Version;
 
 
 /**
@@ -37,7 +37,7 @@ public class DescribeLayer extends WMSQuery {
     /**
      * Builds a {@code DescribeLayer} request, using the layer and mime-type specified.
      */
-    public DescribeLayer(final List<String> layers, final ServiceVersion version) {
+    public DescribeLayer(final List<String> layers, final Version version) {
         super(version);
         this.layers = layers;
     }

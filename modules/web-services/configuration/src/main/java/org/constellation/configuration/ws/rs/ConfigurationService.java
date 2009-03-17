@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,9 +39,10 @@ import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
-
-// constellation dependencies
 import javax.xml.bind.Marshaller;
+
+// Constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
@@ -50,14 +51,12 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.util.Util;
 import org.constellation.ows.OWSExceptionCode;
 import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
-// geotools dependencies
+// Geotools dependencies
 import org.geotools.metadata.note.Anchors;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryNotFoundException;
@@ -97,8 +96,6 @@ public class ConfigurationService extends WebService  {
         serviceDirectory.put("SOS",      new File(getSicadeDirectory(), "sos_configuration"));
         serviceDirectory.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
     }
-    
-    public static final ServiceVersion version = new ServiceVersion(ServiceType.OTHER, "0.3-SNAPSHOT");
     
     /**
      * Construct the ConfigurationService and configure its context.
@@ -173,7 +170,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                                                  OPERATION_NOT_SUPPORTED, "Request");
                 }
             }
 
@@ -193,7 +190,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                                                  OPERATION_NOT_SUPPORTED, "Request");
                 }
             }
             
@@ -208,7 +205,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                                                  OPERATION_NOT_SUPPORTED, "Request");
                 }
             }
             
@@ -217,21 +214,19 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, version, "Request");
+                                                  OPERATION_NOT_SUPPORTED, "Request");
                 }
             }
             
             
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, version, "Request");
+                                                 OPERATION_NOT_SUPPORTED, "Request");
             
         
         } catch (CstlServiceException ex) {
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
-            ServiceVersion v = ex.getVersion();
-            if (v == null)
-                v = version;
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), v.toString());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
+                                                               ServiceDef.CONFIG.exceptionVersion.toString());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                     !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
@@ -296,24 +291,24 @@ public class ConfigurationService extends WebService  {
         
         if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, version, "service");
+                                              MISSING_PARAMETER_VALUE, "service");
         } else if (!serviceDirectory.keySet().contains(service)) {
             String msg = "Invalid value for the service parameter: " + service + '\n' +
                          "accepted values are:";
             for (String s: serviceDirectory.keySet()) {
                 msg = msg + s + ',';
             }
-            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, version, "service");
+            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "service");
             
         }
         
         if (fileName == null) {
-             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, version, "fileName");
+             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
         }
         
         if (newProperties == null || newProperties.size() == 0) {
              throw new CstlServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
-                     version, "properties");
+                     "properties");
         }
         
         File configDir   = serviceDirectory.get(service);
@@ -326,13 +321,13 @@ public class ConfigurationService extends WebService  {
             }
         } else {
             throw new CstlServiceException("The file does not exist: " + propertiesFile.getPath(),
-                                          NO_APPLICABLE_CODE, version);
+                                          NO_APPLICABLE_CODE);
         }
         try {
             Util.storeProperties(prop, propertiesFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IOException xhile trying to store the properties files.",
-                                          NO_APPLICABLE_CODE, version);
+                                          NO_APPLICABLE_CODE);
         }
         
         return new AcknowlegementType("success", "properties file sucessfully updated");
@@ -376,7 +371,7 @@ public class ConfigurationService extends WebService  {
      *       download action for some users. Will probably be removed in a future version.
      */
     private File downloadFile() throws CstlServiceException {
-        throw new CstlServiceException("Not implemented", NO_APPLICABLE_CODE, version);
+        throw new CstlServiceException("Not implemented", NO_APPLICABLE_CODE);
     }
 
     /**

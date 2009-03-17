@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,7 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
@@ -59,8 +60,6 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
@@ -107,11 +106,6 @@ public class CSWService {
     private LinkedBlockingQueue<Unmarshaller> unmarshallers;
     
     /**
-     * The version of the service
-     */   
-    private ServiceVersion version;
-    
-    /**
      * Initialize the database connection.
      */
     public CSWService() {
@@ -141,7 +135,6 @@ public class CSWService {
            worker = new CSWworker("", unmarshallers, marshallers);
            //TODO find real url
            worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-           this.version = new ServiceVersion(ServiceType.OWS, "1.0.0");
        } catch (JAXBException ex){
            logger.severe("The CSW service is not running."       + '\n' +
                          " cause  : Error creating XML context." + '\n' +
@@ -155,6 +148,7 @@ public class CSWService {
      * 
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
+     * @throws SOAPServiceException
      */
     @WebMethod(action="getCapabilities")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
@@ -165,10 +159,8 @@ public class CSWService {
             return worker.getCapabilities(requestCapabilities);
             
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         } catch (JAXBException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }
@@ -183,10 +175,8 @@ public class CSWService {
             logger.info("received SOAP GetDomain request");
             return (GetDomainResponseType) worker.getDomain(requestGetDomain);
         } catch (CstlServiceException ex) {
-           ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     
@@ -200,10 +190,8 @@ public class CSWService {
             logger.info("received SOAP getRecordById request");
             return (GetRecordByIdResponseType) worker.getRecordById(requestRecordById);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     
@@ -216,10 +204,8 @@ public class CSWService {
             logger.info("received SOAP getRecords request");
             return worker.getRecords(requestRecords);
         } catch (CstlServiceException ex) {
-           ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     
@@ -232,10 +218,8 @@ public class CSWService {
             logger.info("received SOAP describeRecord request");
             return worker.describeRecord(requestDescribeRecord);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     
@@ -248,10 +232,8 @@ public class CSWService {
             logger.info("received SOAP harvest request");
             return worker.harvest(requestHarvest);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     
@@ -264,10 +246,8 @@ public class CSWService {
             logger.info("received SOAP transaction request");
             return worker.transaction(requestTransaction);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
         }
     }
     

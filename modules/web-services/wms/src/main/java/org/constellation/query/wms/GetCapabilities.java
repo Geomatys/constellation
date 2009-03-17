@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
-import org.constellation.ws.ServiceVersion;
+import org.geotools.util.Version;
 
 
 /**
@@ -35,11 +35,11 @@ public class GetCapabilities extends WMSQuery {
     /**
      * 
      */
-    public GetCapabilities(final ServiceVersion version) {
+    public GetCapabilities(final Version version) {
         this(version, null);
     }
 
-    public GetCapabilities(final ServiceVersion version, final String format) {
+    public GetCapabilities(final Version version, final String format) {
         super(version);
         this.format = format;
     }

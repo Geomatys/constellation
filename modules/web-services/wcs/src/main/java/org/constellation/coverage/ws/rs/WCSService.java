@@ -21,6 +21,7 @@ import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.Query.APP_XML;
+import static org.constellation.query.Query.TEXT_PLAIN;
 import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
@@ -76,6 +77,7 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import javax.xml.bind.Marshaller;
+import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.gml.v311.CodeType;
 import org.constellation.gml.v311.DirectPositionType;
@@ -102,8 +104,6 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 
@@ -143,8 +143,7 @@ public final class WCSService extends OGCWebService {
      */
     public WCSService() throws JAXBException {
 
-        super("WCS", new ServiceVersion(ServiceType.WCS, "1.1.1"),
-                     new ServiceVersion(ServiceType.WCS, "1.0.0"));
+        super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:" +
@@ -153,7 +152,7 @@ public final class WCSService extends OGCWebService {
                       "org.constellation.wcs.v111",
                       "http://www.opengis.net/wcs");
 
-        worker = new WCSWorker(marshallers, unmarshallers, getActingVersion());
+        worker = new WCSWorker(marshallers, unmarshallers);
         LOGGER.info("WCS service running");
     }
 
@@ -221,7 +220,7 @@ public final class WCSService extends OGCWebService {
                 String store = getParameter(KEY_STORE, false);
                 if (  store != null  &&  store.trim().equalsIgnoreCase("true")  ) {
                     throw new CstlServiceException("The service does not implement the store mechanism.",
-                                   NO_APPLICABLE_CODE, getActingVersion(), "store");
+                                   NO_APPLICABLE_CODE, "store");
                 }
                 
                 if (desccov == null) {
@@ -253,10 +252,9 @@ public final class WCSService extends OGCWebService {
             }
             
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
-                                           OPERATION_NOT_SUPPORTED, getActingVersion(), "request");
+                                           OPERATION_NOT_SUPPORTED, "request");
             
         } catch (CstlServiceException ex) {
-        	
         	/* 
         	 * This block handles all the exceptions which have been generated 
         	 * anywhere in the service and transforms them to a response message 
@@ -266,34 +264,8 @@ public final class WCSService extends OGCWebService {
         	return processExceptionResponse(ex, marshaller);
             
         } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-
-        } catch (Exception ex) {
-            /*
-             * /!\ This exception should not occur. /!\
-             * Sometimes an unexpected exception could happen, due to a source
-             * code error. In that case the client who emits the request will
-             * get a generic error message, and the full trace is logged for
-             * debugging purpose.
-             */
-
-            // LOG THE EXCEPTION
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-
-            // SEND AN HTTP RESPONSE
-            final Object report;
-            if (getActingVersion().isOWS()) {
-                report = new ExceptionReport(ex.getMessage(), NO_APPLICABLE_CODE.name(), null,
-                                             getActingVersion().toString());
-            } else {
-                report = new ServiceExceptionReport(getActingVersion(),
-                                                    new ServiceExceptionType(
-                                                        ex.getMessage(), NO_APPLICABLE_CODE));
-            }
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
-            
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncomingRequest",
+                    TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
                 marshallers.add(marshaller);
@@ -317,11 +289,12 @@ public final class WCSService extends OGCWebService {
 
         // SEND THE HTTP RESPONSE
         final Object report;
-        if (getActingVersion().isOWS()) {
+        if (isOWS(getActingVersion())) {
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
-            report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), getActingVersion().toString());
+            report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
+                                         getActingVersion().exceptionVersion.toString());
         } else {
-            report = new ServiceExceptionReport(getActingVersion(),
+            report = new ServiceExceptionReport(getActingVersion().exceptionVersion,
                     new ServiceExceptionType(ex.getMessage(),
                     (ExceptionCode) ex.getExceptionCode()));
         }
@@ -343,27 +316,26 @@ public final class WCSService extends OGCWebService {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
-                    MISSING_PARAMETER_VALUE, getActingVersion(), "service");
+                    MISSING_PARAMETER_VALUE, "service");
         }
         
         String inputVersion = getParameter(KEY_VERSION, false);
         if (inputVersion == null) {
             inputVersion = getParameter("acceptversions", false);
             if (inputVersion == null) {
-                inputVersion = getBestVersion(null).toString();
+                inputVersion = getBestVersion(null).version.toString();
             } else {
                 //we verify that the version is supported
                 isVersionSupported(inputVersion);
             }
         }
 
-        this.setActingVersion(getBestVersion(inputVersion).toString());
+        this.setActingVersion(getBestVersion(inputVersion).version.toString());
 
-        final String version = getActingVersion().toString();
-        if (version.equals("1.0.0")) {
+        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
             return new org.constellation.wcs.v100.GetCapabilitiesType(
                     getParameter(KEY_SECTION, false), null);
-        } else if (version.equals("1.1.1")) {
+        } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
             //We transform the String of sections in a list.
@@ -378,7 +350,7 @@ public final class WCSService extends OGCWebService {
                         requestedSections.add(token);
                     } else {
                         throw new CstlServiceException("The section " + token + " does not exist",
-                                INVALID_PARAMETER_VALUE, getActingVersion());
+                                INVALID_PARAMETER_VALUE);
                     }
                 }
             } else {
@@ -390,7 +362,7 @@ public final class WCSService extends OGCWebService {
             return (GetCapabilities) new org.constellation.wcs.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
         }
     }
 
@@ -402,14 +374,13 @@ public final class WCSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private DescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
-        final String version = getActingVersion().toString();
-        if (version.equals("1.0.0")) {
+        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
             return new org.constellation.wcs.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
-        } else if (version.equals("1.1.1")) {
+        } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
             return new org.constellation.wcs.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
         }
     }
     
@@ -422,14 +393,13 @@ public final class WCSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private GetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
-        final String version = getActingVersion().toString();
-        if (version.equals("1.0.0")) {
+        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
             return adaptKvpGetCoverageRequest100();
-         } else if (version.equals("1.1.1")) {
+         } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
             return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, getActingVersion(), "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
          }
     }
     
@@ -482,7 +452,7 @@ public final class WCSService extends OGCWebService {
 
         if ((width == null || height == null) && (resx == null || resy == null)) {
             throw new CstlServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified",
-                    INVALID_PARAMETER_VALUE, getActingVersion());
+                    INVALID_PARAMETER_VALUE);
         }
 
         final List<String> axis = new ArrayList<String>();
@@ -545,7 +515,7 @@ public final class WCSService extends OGCWebService {
                 temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
             } else {
                 throw new CstlServiceException("The service does not handle TimePeriod",
-                        INVALID_PARAMETER_VALUE, getActingVersion());
+                        INVALID_PARAMETER_VALUE);
             }
         }
 
@@ -560,8 +530,8 @@ public final class WCSService extends OGCWebService {
             bbox = bbox.substring(0, bbox.lastIndexOf(','));
         } else {
             throw new CstlServiceException("The correct pattern for BoundingBox parameter are" +
-                    " crs,minX,minY,maxX,maxY,CRS",
-                    INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
+                                           " crs,minX,minY,maxX,maxY,CRS",
+                                           INVALID_PARAMETER_VALUE, "boundingbox");
         }
         BoundingBoxType envelope = null;
 
@@ -574,8 +544,9 @@ public final class WCSService extends OGCWebService {
                 i++;
             }
             if (i < 4) {
-                throw new CstlServiceException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS",
-                        INVALID_PARAMETER_VALUE, getActingVersion(), "boundingbox");
+                throw new CstlServiceException("The correct pattern for BoundingBox parameter are" +
+                                               " crs,minX,minY,maxX,maxY,CRS",
+                                               INVALID_PARAMETER_VALUE, "boundingbox");
             }
             envelope = new BoundingBoxType(crs, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
@@ -591,7 +562,7 @@ public final class WCSService extends OGCWebService {
             //for now we don't handle Axis Identifiers
             if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
                 throw new CstlServiceException("The service does not handle axis identifiers",
-                        INVALID_PARAMETER_VALUE, getActingVersion(), "axis");
+                        INVALID_PARAMETER_VALUE, "axis");
             }
 
             final StringTokenizer tokens = new StringTokenizer(rangeSubset, ";");

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -77,7 +77,6 @@ import org.constellation.wms.v111.LatLonBoundingBox;
 import org.constellation.wms.v130.EXGeographicBoundingBox;
 import org.constellation.wms.v130.OperationType;
 import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 
@@ -95,6 +94,7 @@ import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
 import org.geotools.util.MeasurementRange;
+import org.geotools.util.Version;
 
 //Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -104,23 +104,23 @@ import static org.constellation.query.wms.WMSQuery.*;
 
 
 /**
- * A WMS worker for a local WMS service which handles requests from either REST 
+ * A WMS worker for a local WMS service which handles requests from either REST
  * or SOAP facades and issues appropriate responses.
  * <p>
- * The classes implementing the REST or SOAP facades to this service will have 
- * processed the requests sufficiently to ensure that all the information 
- * conveyed by the HTTP request is either in the method call parameters or is 
- * in one of the fields of the parent class which holds instances of the 
+ * The classes implementing the REST or SOAP facades to this service will have
+ * processed the requests sufficiently to ensure that all the information
+ * conveyed by the HTTP request is either in the method call parameters or is
+ * in one of the fields of the parent class which holds instances of the
  * injectible interface {@code Context} objects created by the JEE container.
  * </p>
  *
  * @version $Id$
- * 
+ *
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
 public class WMSWorker extends AbstractWMSWorker {
-    
+
     /**
      * The default debugging logger for the WMS service.
      */
@@ -134,25 +134,21 @@ public class WMSWorker extends AbstractWMSWorker {
     /**
      * The web service marshaller, which will use the web service name space.
      */
-    @SuppressWarnings("unused")
     private final LinkedBlockingQueue<Marshaller> marshallers;
-    
-    private ServiceVersion actingVersion;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
      */
     private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
-    public WMSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers, ServiceVersion actingVersion) {
+    public WMSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers) {
         this.marshallers   = marshallers;
         this.unmarshallers = unmarshallers;
-        this.actingVersion = actingVersion;
     }
 
     /**
      * Return a description of layers specified in the user's request.
-     * 
+     *
      * TODO: Does this actually do anything? why does this never access LayerDetails?
      * TODO: Is this broken?
      *
@@ -162,7 +158,6 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
-        this.actingVersion = descLayer.getVersion();
         final OnlineResourceType or = new OnlineResourceType();
         or.setHref(uriContext.getBaseUri().toString() + "wcs?");
 
@@ -186,32 +181,31 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
-        
-        final ServiceVersion queryVersion = getCapab.getVersion();
-        this.actingVersion = queryVersion;
-        
+
+        final String queryVersion = getCapab.getVersion().toString();
+
         //Add accepted CRS codes
         final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");  
-        crs.add("CRS:84");     
+        crs.add("EPSG:4326");
+        crs.add("CRS:84");
         crs.add("EPSG:3395");
-        crs.add("EPSG:27571"); 
-        crs.add("EPSG:27572"); 
-        crs.add("EPSG:27573"); 
+        crs.add("EPSG:27571");
+        crs.add("EPSG:27572");
+        crs.add("EPSG:27573");
         crs.add("EPSG:27574");
-        
-        
+
+
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
             inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"));
+                    servletContext.getRealPath("WEB-INF"), queryVersion);
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    e.getMessage(), NO_APPLICABLE_CODE, getCapab.getVersion());
+                    e.getMessage(), NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    ex.getMessage(), NO_APPLICABLE_CODE, getCapab.getVersion());
+                    ex.getMessage(), NO_APPLICABLE_CODE);
         }
         final String url = uriContext.getBaseUri().toString();
         inCapabilities.getService().getOnlineResource().setHref(url + "wms");
@@ -220,11 +214,11 @@ public class WMSWorker extends AbstractWMSWorker {
         updateURL(request.getGetCapabilities().getDCPType(), url);
         updateURL(request.getGetFeatureInfo().getDCPType(), url);
         updateURL(request.getGetMap().getDCPType(), url);
-        updateExtendedOperationURL(request, queryVersion, url);
-        
-        
-        
-//        /* ****************************************************************** * 
+        updateExtendedOperationURL(request, getCapab.getVersion(), url);
+
+
+
+//        /* ****************************************************************** *
 //         *   TODO: make this call Cstl.*
 //         * ****************************************************************** */
 ////        final List<LayerDetails> layerRefs = Cstl.REGISTER.getLayerReferencesForWMS();
@@ -243,10 +237,10 @@ public class WMSWorker extends AbstractWMSWorker {
 //            }
 //            layerRefs.add(layer);
 //        }
-//        /* ****************************************************************** * 
+//        /* ****************************************************************** *
 //         *   TODO: make this call Cstl.                                       *
 //         * ****************************************************************** */
-        final List<LayerDetails> layerRefs = getAllLayerReferences();
+        final List<LayerDetails> layerRefs = getAllLayerReferences(queryVersion);
 
         //Build the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
@@ -259,7 +253,7 @@ public class WMSWorker extends AbstractWMSWorker {
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
             } catch (CatalogException exception) {
-                throw new CstlServiceException(exception, NO_APPLICABLE_CODE, queryVersion);
+                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
             }
 
             // List of elevations, times and dim_range values.
@@ -280,7 +274,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 defaut = df.format(dates.last());
-                dim = (queryVersion.toString().equals("1.1.1")) ?
+                dim = (queryVersion.equals("1.1.1")) ?
                     new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null) :
                     new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
@@ -298,7 +292,7 @@ public class WMSWorker extends AbstractWMSWorker {
             }
             if (elevations != null && !(elevations.isEmpty())) {
                 defaut = elevations.first().toString();
-                dim = (queryVersion.toString().equals("1.1.1")) ?
+                dim = (queryVersion.equals("1.1.1")) ?
                     new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
@@ -327,7 +321,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 defaut = minRange + "," + maxRange;
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
-                dim = (queryVersion.toString().equals("1.1.1")) ?
+                dim = (queryVersion.equals("1.1.1")) ?
                     new org.constellation.wms.v111.Dimension("dim_range", unit, defaut,
                                                            minRange + "," + maxRange) :
                     new org.constellation.wms.v130.Dimension("dim_range", unit, defaut,
@@ -345,7 +339,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
             final int queryable = (layer.isQueryable(ServiceType.GETINFO) == true) ? 1 : 0;
             final AbstractLayer outputLayer;
-            if (queryVersion.toString().equals("1.1.1")) {
+            if (queryVersion.equals("1.1.1")) {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
@@ -354,7 +348,7 @@ public class WMSWorker extends AbstractWMSWorker {
                     new org.constellation.wms.v111.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion.toString()) :
+                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion) :
                     null;
 
                 // we build The Style part
@@ -401,7 +395,7 @@ public class WMSWorker extends AbstractWMSWorker {
                             inputGeoBox.getSouthBoundLatitude(),
                             inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0,
-                            queryVersion.toString()) :
+                            queryVersion) :
                     null;
 
                 // we build a Style Object
@@ -441,7 +435,7 @@ public class WMSWorker extends AbstractWMSWorker {
         }
 
         //we build the general layer and add it to the document
-        final AbstractLayer mainLayer = (queryVersion.toString().equals("1.1.1")) ?
+        final AbstractLayer mainLayer = (queryVersion.equals("1.1.1")) ?
             new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", crs, null, layers) :
             new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
@@ -456,13 +450,14 @@ public class WMSWorker extends AbstractWMSWorker {
      * If no such file is found, then this method returns {@code null}.
      *
      * @param home    The home directory, where to search for configuration files.
+     * @param version The version of the GetCapabilities.
      * @return The capabilities Object, or {@code null} if none.
      *
      * @throws JAXBException
      * @throws IOException
      */
-    private Object getStaticCapabilitiesObject(final String home) throws JAXBException, IOException {
-        final String fileName = "WMSCapabilities" + actingVersion.toString() + ".xml";
+    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
+        final String fileName = "WMSCapabilities" + version + ".xml";
         final File changeFile = getFile("change.properties", home);
         Properties p = new Properties();
 
@@ -490,7 +485,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 unmarshaller = unmarshallers.take();
                 response = unmarshaller.unmarshal(f);
                 capabilities.put(fileName, response);
-                
+
             } catch (InterruptedException ex) {
                 LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());
 
@@ -551,7 +546,7 @@ public class WMSWorker extends AbstractWMSWorker {
     /**
      * update The URL in capabilities document for the extended operation.
      */
-    private void updateExtendedOperationURL(final AbstractRequest request, final ServiceVersion version,
+    private void updateExtendedOperationURL(final AbstractRequest request, final Version version,
                                                                            final String url)
     {
 
@@ -590,24 +585,21 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public synchronized String getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
-    	
+
     	//
     	// Note this is almost the same logic as in getMap
     	//
-    	// 0. FIX WORKER VERSION
-        this.actingVersion = getFI.getVersion();
-
         // 1. SCENE
         //       -- get the List of layer references
         final List<String> layerNames = getFI.getLayers();
         final List<LayerDetails> layerRefs;
-        layerRefs = getLayerReferences(layerNames);
-        
+        layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
+
         //       -- build an equivalent style List
         //TODO: clean up the SLD vs. style logic
         final List<String> styleNames          = getFI.getStyles();
         final MutableStyledLayerDescriptor sld = getFI.getSld();
-        
+
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
@@ -635,14 +627,14 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
         Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
-        
-        
+
+
         // 2. VIEW
         final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getFI.getEnvelope());
         final double azimuth                   = getFI.getAzimuth();
         Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
-        
-        
+
+
         // 3. CANVAS
         final Dimension canvasDimension        = getFI.getSize();
         final Color background;
@@ -653,15 +645,15 @@ public class WMSWorker extends AbstractWMSWorker {
             background = (color == null) ? Color.WHITE : color;
         }
         Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
-    	
+
         // 4. SHAPE
-        //     a 
+        //     a
         final int PIXEL_TOLERANCE = 3;
-        final Rectangle selectionArea = new Rectangle( getFI.getX()-PIXEL_TOLERANCE, 
-        		                                      getFI.getY()-PIXEL_TOLERANCE, 
-        		                                      PIXEL_TOLERANCE*2, 
+        final Rectangle selectionArea = new Rectangle( getFI.getX()-PIXEL_TOLERANCE,
+        		                                      getFI.getY()-PIXEL_TOLERANCE,
+        		                                      PIXEL_TOLERANCE*2,
         		                                      PIXEL_TOLERANCE*2);
-        
+
         // 5. VISITOR
         String infoFormat = getFI.getInfoFormat();
         if (infoFormat == null) {
@@ -685,14 +677,14 @@ public class WMSWorker extends AbstractWMSWorker {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
                     ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
-                    INVALID_PARAMETER_VALUE, getFI.getVersion(), "info_format");
+                    INVALID_PARAMETER_VALUE, "info_format");
         }
 
         // We now build the response, according to the format chosen.
         try {
         	Cstl.getPortrayalService().visit(sdef,vdef,cdef,selectionArea,visitor);
         } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE, getFI.getVersion());
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
         return visitor.getResult();
@@ -710,9 +702,8 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
-    	this.actingVersion = getLegend.getVersion();
-        final LayerDetails layer = getLayerReference( getLegend.getLayer());
-        
+        final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
+
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
         final Dimension dims = new Dimension((width == null) ? 140 : width,
@@ -730,37 +721,33 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     @Override
     public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
-        
+
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
-
-        // 0. FIX THE ACTING VERSION
-        final ServiceVersion queryVersion = getMap.getVersion();
-        this.actingVersion = queryVersion;
         final String errorType = getMap.getExceptionFormat();
         final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
-        
-        
+
+
         // 1. SCENE
         //       -- get the List of layer references
         final List<String> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
         try{
-        	layerRefs = getLayerReferences(layerNames);
+        	layerRefs = getLayerReferences(layerNames, getMap.getVersion().toString());
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
                 return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
             } else {
-                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, queryVersion);
+                throw new CstlServiceException(ex, LAYER_NOT_DEFINED);
             }
         }
         //       -- build an equivalent style List
         //TODO: clean up the SLD vs. style logic
         final List<String> styleNames          = getMap.getStyles();
         final MutableStyledLayerDescriptor sld = getMap.getSld();
-        
+
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
@@ -788,14 +775,14 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
         Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
-        
-        
+
+
         // 2. VIEW
         final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getMap.getEnvelope());
         final double azimuth                   = getMap.getAzimuth();
         Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
-        
-        
+
+
         // 3. CANVAS
         final Dimension canvasDimension        = getMap.getSize();
         final Color background;
@@ -806,7 +793,7 @@ public class WMSWorker extends AbstractWMSWorker {
             background = (color == null) ? Color.WHITE : color;
         }
         Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
-        
+
         // 4. IMAGE
         BufferedImage image;
         try {
@@ -815,22 +802,21 @@ public class WMSWorker extends AbstractWMSWorker {
             if (errorInImage) {
                 return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
             } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, queryVersion);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
         }
-        
+
         return image;
     }
-    
-    
-    
+
+
+
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
+    private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
-    		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
 	        } else if ( version.equals("1.3.0") ) {
@@ -840,18 +826,19 @@ public class WMSWorker extends AbstractWMSWorker {
                         VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRefs;
     }
-    
+
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getLayerReferences(List<String> layerNames) throws CstlServiceException {
+    private List<LayerDetails> getLayerReferences(final List<String> layerNames, final String version)
+                                                                           throws CstlServiceException
+    {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
-    		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
 	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
 	        } else if ( version.equals("1.3.0") ) {
@@ -861,18 +848,19 @@ public class WMSWorker extends AbstractWMSWorker {
                         VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRefs;
     }
-    
+
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private LayerDetails getLayerReference(String layerName) throws CstlServiceException {
+    private LayerDetails getLayerReference(final String layerName, final String version)
+                                                             throws CstlServiceException
+    {
 
         LayerDetails layerRef;
     	try { // WE catch the exception from either service version
-    		String version = actingVersion.toString();
 	        if (  version.equals("1.1.1") ) {
 	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
 	        } else if ( version.equals("1.3.0") ) {
@@ -882,11 +870,11 @@ public class WMSWorker extends AbstractWMSWorker {
                         VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE, actingVersion);
+        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRef;
     }
-    
+
 
 
     private MutableStyle extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){

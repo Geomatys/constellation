@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.ServiceDef;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
@@ -80,11 +81,11 @@ public abstract class OGCWebService extends WebService {
     /**
      * The supported supportedVersions supported by this web serviceType.
      */
-    private final List<ServiceVersion> supportedVersions = new ArrayList<ServiceVersion>();
+    private final List<ServiceDef> supportedVersions = new ArrayList<ServiceDef>();
     /**
      * The version of the WMS specification for this request.
      */
-    private ServiceVersion actingVersion;
+    private ServiceDef actingVersion;
     /**
      * The version of the SLD profile for the WMS web serviceType. fixed a 1.1.0 for now.
      */
@@ -113,20 +114,21 @@ public abstract class OGCWebService extends WebService {
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
      */
-    public OGCWebService(String service, ServiceVersion... supportedVersions) {
+    public OGCWebService(ServiceDef... supportedVersions) {
         super();
-        this.serviceType = service;
 
-        for (final ServiceVersion element : supportedVersions) {
+        for (final ServiceDef element : supportedVersions) {
             this.supportedVersions.add(element);
         }
         if (this.supportedVersions.size() == 0) {
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
+        final ServiceDef firstDef = this.supportedVersions.get(0);
+        this.serviceType = firstDef.specification.toString();
         // We set that the current version is probably the highest one, the best one, which should
         // be the first in the list of supported version.
-        this.actingVersion = this.supportedVersions.get(0);
+        this.actingVersion = firstDef;
     }
 
     /**
@@ -152,8 +154,8 @@ public abstract class OGCWebService extends WebService {
         if (getVersionFromNumber(inputVersion) == null) {
 
             String message = "The parameter ";
-            for (ServiceVersion vers : supportedVersions) {
-                message += "VERSION=" + vers.toString() + " OR ";
+            for (ServiceDef vers : supportedVersions) {
+                message += "VERSION=" + vers.version.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
@@ -178,8 +180,8 @@ public abstract class OGCWebService extends WebService {
     protected void isVersionSupported(String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             String message = "The parameter ";
-            for (ServiceVersion vers : supportedVersions) {
-                message += "VERSION=" + vers.toString() + " OR ";
+            for (ServiceDef vers : supportedVersions) {
+                message += "VERSION=" + vers.version.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
@@ -190,7 +192,7 @@ public abstract class OGCWebService extends WebService {
     /**
      * Return the current version of the Web ServiceType.
      */
-    protected ServiceVersion getActingVersion() {
+    protected ServiceDef getActingVersion() {
         return this.actingVersion;
     }
 
@@ -234,13 +236,13 @@ public abstract class OGCWebService extends WebService {
      */
     @Override
     protected Object launchException(final String message, final String codeName, final String locator) {
-        if (getActingVersion().isOWS()) {
+        if (isOWS(getActingVersion())) {
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
             final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getActingVersion().toString());
             return report;
         } else {
             final ExceptionCode code = ExceptionCode.valueOf(codeName);
-            return new ServiceExceptionReport(getActingVersion(), new ServiceExceptionType(message, code));
+            return new ServiceExceptionReport(getActingVersion().exceptionVersion, new ServiceExceptionType(message, code));
         }
     }
 
@@ -251,7 +253,7 @@ public abstract class OGCWebService extends WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getStaticCapabilitiesObject() throws JAXBException {
-        return getStaticCapabilitiesObject(getActingVersion());
+        return getStaticCapabilitiesObject(getActingVersion().version);
     }
 
     /**
@@ -334,9 +336,9 @@ public abstract class OGCWebService extends WebService {
      * @param number the version number.
      * @return
      */
-    protected ServiceVersion getVersionFromNumber(String number) {
-        for (ServiceVersion v : supportedVersions) {
-            if (v.toString().equals(number)){
+    protected ServiceDef getVersionFromNumber(String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
                 return v;
             }
         }
@@ -350,25 +352,41 @@ public abstract class OGCWebService extends WebService {
      *               Can be {@code null}, in this case the best version specified is just returned.
      * @return The best version (the highest one) specified for this web service.
      */
-    protected ServiceVersion getBestVersion(final String number) {
-        for (ServiceVersion v : supportedVersions) {
-            if (v.toString().equals(number)){
+    protected ServiceDef getBestVersion(final String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
                 return v;
             }
         }
-        final ServiceVersion firstSpecifiedVersion = supportedVersions.get(0);
+        final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
         if (number == null || number.equals("")) {
             return firstSpecifiedVersion;
         }
-        final ServiceVersion wrongVersion = new ServiceVersion(null, number);
-        if (wrongVersion.compareTo(firstSpecifiedVersion) < 0) {
+        final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);
+        if (wrongVersion.compareTo(firstSpecifiedVersion.version) > 0) {
             return firstSpecifiedVersion;
         } else {
-            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1)) > 0) {
+            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1).version) < 0) {
                 return supportedVersions.get(supportedVersions.size() - 1);
             }
         }
         return firstSpecifiedVersion;
+    }
+
+    /**
+     * Returns whether the service is OWS, or not.
+     *
+     * @param def The service definition to consider.
+     * @return True if the service is OWS, false otherwise.
+     */
+    protected boolean isOWS(final ServiceDef def) {
+        if (def == null) {
+            throw new NullPointerException("Unable to know if the service is OWS because it is not defined.");
+        }
+        return (def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)       ||
+                def.equals(ServiceDef.PEP)       || def.equals(ServiceDef.SOS_1_0_0) ||
+                def.equals(ServiceDef.WCS_1_1_1) || def.equals(ServiceDef.WCS_1_1_0) ||
+                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0));
     }
 
     /**

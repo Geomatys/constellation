@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -50,7 +50,6 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
@@ -208,7 +207,7 @@ public abstract class AbstractCSWConfigurer {
             prop = Util.getPropertiesFromFile(cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while loading the cascading properties file",
-                            NO_APPLICABLE_CODE, version);
+                            NO_APPLICABLE_CODE);
         }
         
         if (!request.isAppend()) {
@@ -222,7 +221,7 @@ public abstract class AbstractCSWConfigurer {
             Util.storeProperties(prop, cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("unable to store the cascading properties file",
-                        NO_APPLICABLE_CODE, version);
+                        NO_APPLICABLE_CODE);
         }
         
         return new AcknowlegementType("success", "CSW cascaded servers list refreshed");

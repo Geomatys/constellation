@@ -29,8 +29,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-
 import javax.xml.bind.Marshaller;
+
+import org.constellation.ServiceDef;
 import org.constellation.ows.v110.AcceptFormatsType;
 import org.constellation.ows.v110.AcceptVersionsType;
 import org.constellation.ows.v110.ExceptionReport;
@@ -42,8 +43,6 @@ import org.constellation.wmts.v100.GetCapabilities;
 import org.constellation.wmts.v100.GetFeatureInfo;
 import org.constellation.wmts.v100.GetTile;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 import static org.constellation.ws.ExceptionCode.*;
@@ -75,7 +74,7 @@ public class WMTSService extends OGCWebService {
      * provides the version 1.0.0 of OGC WMTS standard, for the moment.
      */
     public WMTSService() {
-        super("WMTS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
+        super(ServiceDef.WMTS_1_0_0);
         try {
             setXMLContext("org.constellation.wmts.v100:" +
                           "org.constellation.ows.v110",
@@ -107,7 +106,7 @@ public class WMTSService extends OGCWebService {
         try {
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
-                                              NO_APPLICABLE_CODE, getActingVersion());
+                                              NO_APPLICABLE_CODE);
             }
             marshaller = marshallers.take();
             logParameters();
@@ -171,10 +170,8 @@ public class WMTSService extends OGCWebService {
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller);
-            
         } catch (InterruptedException ex) {
             return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-
         } finally {
             if (marshaller != null) {
                 marshallers.add(marshaller);
@@ -358,7 +355,7 @@ public class WMTSService extends OGCWebService {
             marshaller = marshallers.take();
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
-                                              NO_APPLICABLE_CODE, getActingVersion());
+                                              NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
             final StringWriter sw = new StringWriter();
@@ -406,7 +403,7 @@ public class WMTSService extends OGCWebService {
         try {
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
-                                              NO_APPLICABLE_CODE, getActingVersion());
+                                              NO_APPLICABLE_CODE);
             }
             final GetTile gt = createNewGetTileRequestRestful(layer, tileMatrixSet, tileMatrix,
                     tileRow, tileCol, format, null);
@@ -462,15 +459,11 @@ public class WMTSService extends OGCWebService {
         }
 
         if (workingContext) {
-                ServiceVersion serviceVersion = ex.getVersion();
-                if (serviceVersion == null) {
-                    serviceVersion = getActingVersion();
-                }
-                final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
-                        ex.getLocator(), serviceVersion.toString());
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(report, sw);
-                return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
+                    ex.getLocator(), getActingVersion().exceptionVersion.toString());
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         } else {
             return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", TEXT_PLAIN).build();
         }

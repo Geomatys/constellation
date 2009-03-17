@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,13 +30,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
-
-// geotools dependencies
+import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Marshaller;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
+import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ows.v110.AcceptFormatsType;
@@ -68,7 +65,7 @@ public class SOService extends OGCWebService {
      * Build a new Restfull SOS service.
      */
     public SOService() throws JAXBException, CstlServiceException {
-        super("SOS", new ServiceVersion(ServiceType.OWS, "1.0.0"));
+        super(ServiceDef.SOS_1_0_0);
         worker = new SOSworker(null);
         setXMLContext("org.constellation.sos.v100:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
                 "org.constellation.observation:org.constellation.sampling:org.constellation.sml.v100:org.constellation.sml.v101", "");
@@ -89,7 +86,7 @@ public class SOService extends OGCWebService {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
                     throw new CstlServiceException("The operation GetObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, getActingVersion(), "GetObservation");
+                                                     OPERATION_NOT_SUPPORTED, "GetObservation");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
@@ -100,7 +97,7 @@ public class SOService extends OGCWebService {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
                     throw new CstlServiceException("The operation DescribeSensor is only requestable in XML",
-                                                  OPERATION_NOT_SUPPORTED, getActingVersion(), "DescribeSensor");
+                                                  OPERATION_NOT_SUPPORTED, "DescribeSensor");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeSensor(ds), sw);
@@ -111,7 +108,7 @@ public class SOService extends OGCWebService {
                 InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
                     throw new CstlServiceException("The operation InsertObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, getActingVersion(), "InsertObservation");
+                                                     OPERATION_NOT_SUPPORTED, "InsertObservation");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.insertObservation(is), sw);
@@ -122,7 +119,7 @@ public class SOService extends OGCWebService {
                 GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
                     throw new CstlServiceException("The operation GetResult is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, getActingVersion(), "GetResult");
+                                                     OPERATION_NOT_SUPPORTED, "GetResult");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getResult(gr), sw);
@@ -133,7 +130,7 @@ public class SOService extends OGCWebService {
                 RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
                     throw new CstlServiceException("The operation RegisterSensor is only requestable in XML",
-                                                  OPERATION_NOT_SUPPORTED, getActingVersion(), "RegisterSensor");
+                                                  OPERATION_NOT_SUPPORTED, "RegisterSensor");
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.registerSensor(rs), sw);
@@ -158,7 +155,7 @@ public class SOService extends OGCWebService {
                     
             } else {
                 throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, getActingVersion(), "request");
+                                                 INVALID_PARAMETER_VALUE, "request");
             }
              
          } catch (CstlServiceException ex) {
@@ -188,13 +185,11 @@ public class SOService extends OGCWebService {
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
-        ServiceVersion version = ex.getVersion();
+
         if (workingContext) {
-            if (version == null) {
-                version = getActingVersion();
-            }
             StringWriter sw = new StringWriter();
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
+                                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         } else {
@@ -232,7 +227,7 @@ public class SOService extends OGCWebService {
                     requestedSections.add(token);
                 } else {
                     throw new CstlServiceException("The section " + token + " does not exist",
-                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "Sections");
+                                                  INVALID_PARAMETER_VALUE, "Sections");
                 }   
             }
         } else {
@@ -252,6 +247,7 @@ public class SOService extends OGCWebService {
      * Shutodown the SOS service.
      */
     @PreDestroy
+    @Override
     public void destroy() {
         LOGGER.info("Destroying SOS service");
         if (worker != null) {

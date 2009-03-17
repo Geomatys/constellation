@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,9 +21,9 @@ import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
 import org.constellation.util.StringUtilities;
-import org.constellation.ws.ServiceVersion;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.util.MeasurementRange;
+import org.geotools.util.Version;
 import org.opengis.geometry.Envelope;
 
 
@@ -72,7 +72,7 @@ public class GetFeatureInfo extends GetMap {
         this.featureCount = featureCount;
     }
 
-    public GetFeatureInfo(final Envelope envelope, final ServiceVersion version,
+    public GetFeatureInfo(final Envelope envelope, final Version version,
                   final String format, final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,

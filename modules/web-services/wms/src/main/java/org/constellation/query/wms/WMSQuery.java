@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@ package org.constellation.query.wms;
 
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
-import org.constellation.ws.ServiceVersion;
+import org.geotools.util.Version;
 
 
 /**
@@ -105,7 +105,7 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getMap */
     public static final String KEY_AZIMUTH = "AZIMUTH";
 
-    protected final ServiceVersion version;
+    protected final Version version;
 
     /**
      * {@inheritDoc}
@@ -115,7 +115,7 @@ public abstract class WMSQuery extends Query {
         return new QueryService.WMS();
     }
 
-    protected WMSQuery(final ServiceVersion version) {
+    protected WMSQuery(final Version version) {
         if (version == null) {
             throw new NullPointerException("Version should not be null !");
         }
@@ -126,7 +126,7 @@ public abstract class WMSQuery extends Query {
      * {@inheritDoc}
      */
     @Override
-    public final ServiceVersion getVersion() {
+    public final Version getVersion() {
         return version;
     }
 

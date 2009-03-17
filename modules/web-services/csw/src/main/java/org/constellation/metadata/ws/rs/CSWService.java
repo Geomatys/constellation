@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -41,6 +41,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.cat.csw.DescribeRecord;
 import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.cat.csw.GetDomain;
@@ -61,7 +62,6 @@ import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.metadata.CSWClassesContext;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.SortByType;
@@ -70,7 +70,6 @@ import org.constellation.ogc.SortPropertyType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.SectionsType;
-import org.constellation.ws.ServiceType;
 import org.constellation.metadata.CSWworker;
 import org.constellation.util.Util;
 import org.constellation.ows.v100.ExceptionReport;
@@ -94,27 +93,15 @@ public class CSWService extends OGCWebService {
      * Build a new Restfull CSW service.
      */
     public CSWService() {
-        super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
-        serviceID = "";
-        try {
-            setXMLContext("", CSWClassesContext.getAllClasses());
-            worker = new CSWworker(serviceID, unmarshallers, marshallers);
-            
-        } catch (JAXBException ex){
-            workingContext = false;
-            LOGGER.severe("The CSW service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' + 
-                          " details: " + ex.toString());
-        }
+        this("");
     }
 
     /**
      * Build a new Restfull CSW service.
      * used by subClasses.
      */
-    protected CSWService(String serviceID) {
-        super("CSW", new ServiceVersion(ServiceType.OWS, "2.0.2"));
+    protected CSWService(final String serviceID) {
+        super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
@@ -138,6 +125,7 @@ public class CSWService extends OGCWebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
+    @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
         try {
@@ -251,7 +239,7 @@ public class CSWService extends OGCWebService {
                 
                     if (t == null) {
                          throw new CstlServiceException("The Operation transaction is not available in KVP",
-                                                       OPERATION_NOT_SUPPORTED, getActingVersion(),"transaction");
+                                                       OPERATION_NOT_SUPPORTED, "transaction");
                     }
                 
                     StringWriter sw = new StringWriter();
@@ -283,11 +271,10 @@ public class CSWService extends OGCWebService {
                         request = "undefined request";
                 
                     throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                  INVALID_PARAMETER_VALUE, getActingVersion(), "request");
+                                                  INVALID_PARAMETER_VALUE, "request");
                 }
             } else {
-                throw new CstlServiceException("The CSW service is not running",
-                                              NO_APPLICABLE_CODE, getActingVersion());
+                throw new CstlServiceException("The CSW service is not running", NO_APPLICABLE_CODE);
             }
         
         } catch (CstlServiceException ex) {
@@ -322,11 +309,8 @@ public class CSWService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
         if (workingContext) {
-            ServiceVersion version = ex.getVersion();
-            if (version == null) {
-                version = getActingVersion();
-            }
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version.toString());
+            final String version = (getActingVersion() == null) ? null : getActingVersion().exceptionVersion.toString();
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
@@ -775,6 +759,7 @@ public class CSWService extends OGCWebService {
      * Destroy all the resource and close the connection when the web application is undeployed.
      */
     @PreDestroy
+    @Override
     public void destroy() {
         String id = "";
         if (serviceID != null && !serviceID.equals(""))

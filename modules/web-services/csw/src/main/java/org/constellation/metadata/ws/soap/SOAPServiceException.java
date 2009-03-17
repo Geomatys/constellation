@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.WebServiceException;
 import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ws.ServiceVersion;
-import org.constellation.ws.ServiceType;
+
 
 /**
  *
@@ -32,6 +31,7 @@ import org.constellation.ws.ServiceType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SOAPServiceException")
 public class SOAPServiceException extends WebServiceException {
+    private static final long serialVersionUID = 7201924662570181781L;
     
     /**
      * An OGC Web ServiceType exception report

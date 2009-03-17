@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,8 @@
  */
 package org.constellation.query.wms;
 
+import org.constellation.ServiceDef;
 import org.constellation.query.QueryRequest;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 
 
 /**
@@ -55,7 +54,7 @@ public class GetLegendGraphic extends WMSQuery {
     public GetLegendGraphic(final String layer, final String format,
                             final Integer width, final Integer height)
     {
-        super(new ServiceVersion(ServiceType.WMS, "1.1.1"));
+        super(ServiceDef.WMS_1_1_1_SLD.version);
         this.layer  = layer;
         this.format = format;
         this.width  = width;

@@ -23,19 +23,18 @@ import org.opengis.util.CodeList;
  * Reports a failure in a {@link WebService}.
  *
  * @version $Id$
+ *
  * @author Guihlem Legal
  * @author Cédric Briançon
  */
 public class CstlServiceException extends Exception {
+
+    private static final long serialVersionUID = 8631104938394896941L;
+
     /**
      * The exception code.
      */
     private final CodeList exceptionCode;
-
-    /**
-     * The service version.
-     */
-    private final ServiceVersion version;
 
     /**
      * The reason of the exception.
@@ -49,22 +48,9 @@ public class CstlServiceException extends Exception {
      * @param exceptionCode The exception code.
      * @param version The service version.
      */
-    public CstlServiceException(final String message, final CodeList exceptionCode,
-                               final ServiceVersion version)
-    {
-        this(message, exceptionCode, version, null);
-    }
-    
-    /**
-     * Creates an exception with the specified details message.
-     * There is no version specified here it will be specified at exception report build.
-     *
-     * @param message The detail message.
-     * @param exceptionCode The exception code.
-     */
     public CstlServiceException(final String message, final CodeList exceptionCode)
     {
-        this(message, exceptionCode, (String)null);
+        this(message, exceptionCode, null);
     }
 
     /**
@@ -72,34 +58,18 @@ public class CstlServiceException extends Exception {
      *
      * @param message The detail message.
      * @param exceptionCode The exception code.
-     * @param version The service version.
      * @param locator What causes the exception.
      */
     public CstlServiceException(final String message, final CodeList exceptionCode,
-                               final ServiceVersion version, final String locator)
+                                final String locator)
     {
         super(message);
         this.exceptionCode = exceptionCode;
-        this.version = version;
         this.locator = locator;
-    }
-    
-    /**
-     * Creates an exception with the specified details message.
-     * There is no version specified here it will be specified at exception report build.
-     *
-     * @param message The detail message.
-     * @param exceptionCode The exception code.
-     * @param locator What causes the exception.
-     */
-    public CstlServiceException(final String message, final CodeList exceptionCode, final String locator)
-    {
-        this(message, exceptionCode, null, locator);
     }
 
     /**
      * Creates an exception with the specified details message and cause.
-     * There is no version specified here it will be specified at exception report build.
      *
      * @param cause The cause of this exception.
      * @param exceptionCode The exception code.
@@ -107,22 +77,8 @@ public class CstlServiceException extends Exception {
      */
     public CstlServiceException(final Exception cause, final CodeList exceptionCode)
     {
-        this(cause, exceptionCode, null);
-    }
-
-    /**
-     * Creates an exception with the specified details message and cause.
-     *
-     * @param cause The cause of this exception.
-     * @param exceptionCode The exception code.
-     * @param version The service version.
-     */
-    public CstlServiceException(final Exception cause, final CodeList exceptionCode,
-            final ServiceVersion version)
-    {
         super(cause);
         this.exceptionCode = exceptionCode;
-        this.version = version;
         locator = null;
     }
 
@@ -135,20 +91,15 @@ public class CstlServiceException extends Exception {
      * @param version The service version.
      */
     public CstlServiceException(final String message, final Exception cause,
-                               final CodeList exceptionCode,  final ServiceVersion version)
+                               final CodeList exceptionCode)
     {
         super(message, cause);
         this.exceptionCode = exceptionCode;
-        this.version = version;
         this.locator = null;
     }
 
     public CodeList getExceptionCode() {
         return exceptionCode;
-    }
-
-    public ServiceVersion getVersion() {
-        return version;
     }
 
     public String getLocator() {

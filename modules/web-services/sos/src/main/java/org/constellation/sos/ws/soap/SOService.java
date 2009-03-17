@@ -36,8 +36,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
+import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.sml.AbstractSensorML;
@@ -52,8 +51,6 @@ import org.constellation.sos.v100.InsertObservationResponse;
 import org.constellation.sos.v100.RegisterSensor;
 import org.constellation.sos.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
-
-
 
 
 /**
@@ -94,11 +91,6 @@ public class SOService {
      */
     private Unmarshaller unmarshaller;
     
-     /**
-     * The version of the service
-     */   
-    private ServiceVersion version;
-    
     /**
      * Initialize the database connection.
      */
@@ -108,7 +100,6 @@ public class SOService {
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
-       version = new ServiceVersion(ServiceType.OWS, "1.0.0");
     }
     
     /**
@@ -116,6 +107,7 @@ public class SOService {
      * 
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
+     * @throws SOServiceException
      */
     @WebMethod(action="getCapabilities")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
@@ -125,10 +117,8 @@ public class SOService {
              
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         } catch (JAXBException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }
@@ -138,6 +128,7 @@ public class SOService {
      * Web service operation whitch return an sml description of the specified sensor.
      * 
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
+     * @throws SOServiceException
      */
     @WebMethod(action="describeSensor")
     public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
@@ -145,10 +136,8 @@ public class SOService {
             logger.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
     
@@ -158,6 +147,7 @@ public class SOService {
      * the restriction specified in the query.
      * 
      * @param requestObservation a document specifying the parameter of the request.
+     * @throws SOServiceException
      */
     @WebMethod(action="getObservation")
     public ObservationCollectionEntry getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
@@ -165,15 +155,15 @@ public class SOService {
             logger.info("received SOAP getObservation request");
             return worker.getObservation(requestObservation);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
     
     /**
      * Web service operation
+     *
+     * @throws SOServiceException
      */
     @WebMethod(action="getResult")
     public GetResultResponse getResult(@WebParam(name = "GetResult") GetResult requestResult) throws SOServiceException {
@@ -181,10 +171,8 @@ public class SOService {
             logger.info("received SOAP getResult request");
             return worker.getResult(requestResult);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
     
@@ -194,6 +182,7 @@ public class SOService {
      *
      * @param requestRegSensor A request containing a SensorML File describing a Sensor,
      *                         and an observation template for this sensor.
+     * @throws SOServiceException
      */
     @WebMethod(action="registerSensor")
     public RegisterSensorResponse registerSensor(@WebParam(name = "RegisterSensor") RegisterSensor requestRegSensor) throws SOServiceException {
@@ -201,10 +190,8 @@ public class SOService {
             logger.info("received SOAP registerSensor request");
             return worker.registerSensor(requestRegSensor);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
     
@@ -213,6 +200,7 @@ public class SOService {
      * in the O&M database.
      * 
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
+     * @throws SOServiceException
      */
     @WebMethod(action="InsertObservation")
     public InsertObservationResponse insertObservation(@WebParam(name = "InsertObservation") InsertObservation requestInsObs) throws SOServiceException {
@@ -220,10 +208,8 @@ public class SOService {
             logger.info("received SOAP insertObservation request");
             return worker.insertObservation(requestInsObs);
         } catch (CstlServiceException ex) {
-            ServiceVersion exVersion = ex.getVersion();
-            if (exVersion == null)
-                exVersion = version;
-            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(), exVersion.toString());
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
     
@@ -233,6 +219,7 @@ public class SOService {
      *
      * @param  version the version of the service.
      * @return The capabilities Object, or {@code null} if none.
+     * @throws JAXBException
      */
     public Object getCapabilitiesObject() throws JAXBException {
        String fileName = "SOSCapabilities1.0.0.xml";
