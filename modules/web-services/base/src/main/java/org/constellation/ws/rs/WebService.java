@@ -47,6 +47,7 @@ import javax.ws.rs.POST;
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -489,6 +490,9 @@ public abstract class WebService {
             }
             StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
+            if (result instanceof JAXBElement) {
+                result = ((JAXBElement)result).getValue();
+            }
             return result;
         } catch (JAXBException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +

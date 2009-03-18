@@ -71,6 +71,8 @@ import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.metadata.CSWworker;
+import org.constellation.ogc.PropertyIsLikeType;
+import org.constellation.ogc.PropertyNameType;
 import org.constellation.util.Util;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.ws.rs.OGCWebService;
@@ -521,15 +523,26 @@ public class CSWService extends OGCWebService {
         QueryConstraintType constraint = null;
         if (constLanguage != null) {
             String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", false);
-            String constraintObject = getParameter("CONSTRAINT", false);
             
             if (constLanguage.equalsIgnoreCase("CQL_TEXT")) {
-                
+
+                String constraintObject = getParameter("CONSTRAINT", false);
+                if (constraintObject == null) {
+                    constraintObject = "AnyText LIKE '%%'";
+                }
                 constraint = new QueryConstraintType(constraintObject, languageVersion);
                 
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
-                //TODO xml unmarshall?
-                constraint = new QueryConstraintType(new FilterType(), languageVersion);
+                Object constraintObject = getComplexParameter("CONSTRAINT", false);
+                if (constraintObject == null) {
+                    PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
+                    constraintObject = new FilterType(filter);
+                } else if (constraintObject instanceof FilterType){
+                    constraint = new QueryConstraintType((FilterType)constraintObject, languageVersion);
+                } else {
+                    throw new CstlServiceException("The filter type is not supported:" + constraintObject.getClass().getName(),
+                                                 INVALID_PARAMETER_VALUE, "Constraint");
+                }
                 
             } else {
                 throw new CstlServiceException("The constraint language " + constLanguage + " is not supported",
