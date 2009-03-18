@@ -126,7 +126,7 @@ public class InputList implements AbstractInputList {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[OutputList]").append("\n");
+        StringBuilder sb = new StringBuilder("[InputList]").append("\n");
         if (id != null) {
             sb.append("id: ").append(id).append('\n');
         }

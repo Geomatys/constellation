@@ -269,7 +269,7 @@ public class Inputs implements AbstractInputs {
                    Utilities.equals(this.role, that.role)                 &&
                    Utilities.equals(this.show, that.show)                 &&
                    Utilities.equals(this.title, that.title)               &&
-                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.getType(), that.getType())       &&
                    Utilities.equals(this.arcrole, that.arcrole);
         }
         return false;
