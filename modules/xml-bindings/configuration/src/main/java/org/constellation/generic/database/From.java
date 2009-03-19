@@ -47,6 +47,14 @@ public class From {
     @XmlValue
     private String value;
 
+    public From() {
+
+    }
+
+    public From(String value) {
+        this.value = value;
+    }
+
     /**
      * Gets the value of the alias property.
      */

@@ -32,7 +32,32 @@ public class Column {
     private String var;
     
     private String sql;
-    
+
+    public Column() {
+
+    }
+
+    public Column(String var, String sql) {
+        this.sql = sql;
+        this.var = var;
+    }
+
+    public String getVar() {
+        return var;
+    }
+
+    public void setVar(String var) {
+        this.var = var;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[Column]");
@@ -66,21 +91,5 @@ public class Column {
         hash = 13 * hash + (this.getVar() != null ? this.getVar().hashCode() : 0);
         hash = 13 * hash + (this.getSql() != null ? this.getSql().hashCode() : 0);
         return hash;
-    }
-
-    public String getVar() {
-        return var;
-    }
-
-    public void setVar(String var) {
-        this.var = var;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
     }
 }

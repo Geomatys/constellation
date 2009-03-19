@@ -70,6 +70,12 @@ public abstract class GenericReader  {
     private Map<PreparedStatement, List<String>> multipleStatements;
 
     /**
+     * A map binding the statements and the string query used for debug purpose.
+     * (because of the implementation of the SQL driver which don't implements the toString method (Oracle))
+     */
+    private Map<PreparedStatement, String> StringQueryMap;
+
+    /**
      * A precompiled Statement requesting all The identifiers
      */
     private PreparedStatement mainStatement;
@@ -95,6 +101,11 @@ public abstract class GenericReader  {
      * A list of predefined Values used in debug mode
      */
     private Map<List<String>, Values> debugValues;
+
+    /**
+     *
+     */
+    private HashMap<String, String> staticParameters;
 
     /**
      * Shared Thread Pool for parralele execution
@@ -126,6 +137,7 @@ public abstract class GenericReader  {
         this.debugValues   = debugValues;
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
+        StringQueryMap     = new HashMap<PreparedStatement, String>();
     }
 
     /**
@@ -137,9 +149,11 @@ public abstract class GenericReader  {
         // no main query in sos
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
+        StringQueryMap     = new HashMap<PreparedStatement, String>();
         Queries queries = configuration.getQueries();
         if (queries != null) {
 
+            staticParameters = queries.getParameters();
             // initialize the single statements
             Single single = queries.getSingle();
             if (single != null) {
@@ -150,10 +164,11 @@ public abstract class GenericReader  {
                             varNames.add(col.getVar());
                         }
                     }
-                    String textQuery = query.buildSQLQuery();
+                    String textQuery = query.buildSQLQuery(staticParameters);
                     logger.finer("new Single query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
+                    StringQueryMap.put(stmt, textQuery);
                 }
             } else {
                 logger.severe("The configuration file is probably malformed, there is no single query.");
@@ -169,10 +184,11 @@ public abstract class GenericReader  {
                             varNames.add(col.getVar());
                         }
                     }
-                    String textQuery = query.buildSQLQuery();
+                    String textQuery = query.buildSQLQuery(staticParameters);
                     logger.finer("new Multiple query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     multipleStatements.put(stmt, varNames);
+                    StringQueryMap.put(stmt, textQuery);
                 }
             } else {
                 logger.severe("The configuration file is probably malformed, there is no single query.");
@@ -180,6 +196,14 @@ public abstract class GenericReader  {
         } else {
             logger.severe("The configuration file is probably malformed, there is no queries part.");
         }
+    }
+
+    /**
+     * Load all the data for the specified Identifier from the database.
+     * @param identifier
+     */
+    protected Values loadData(String variable) {
+        return loadData(Arrays.asList(variable), new ArrayList<String>());
     }
 
     /**
@@ -223,6 +247,7 @@ public abstract class GenericReader  {
 
         Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
         Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
+        Values values = null;
         for (String var : variables) {
             PreparedStatement stmt = getStatementFromSingleVar(var);
             if (stmt != null) {
@@ -236,13 +261,19 @@ public abstract class GenericReader  {
                         subMultiStmts.add(stmt);
                     }
                 } else {
+                    if (staticParameters.get(var) != null) {
+                        values = new Values();
+                        values.singleValue.put(var, staticParameters.get(var));
+                    }
                     if (!debugMode)
                         logger.severe("no statement found for variable: " + var);
                 }
             }
         }
-
-        Values values;
+        if (values != null) {
+            return values;
+        }
+        
         if (debugMode) {
             values = debugLoading(variables, parameters);
         } else if (isThreadEnabled) {
@@ -487,8 +518,8 @@ public abstract class GenericReader  {
             varlist = "no variables";
         }
         logger.severe( ex.getClass().getSimpleName() +
-                      " occurs while executing query: " + '\n' +
-                      "query: " + stmt.toString()                + '\n' +
+                      " occurs while executing query: "          + '\n' +
+                      "query: " + StringQueryMap.get(stmt)       + '\n' +
                       "cause: " + ex.getMessage()                + '\n' +
                       "for variable: " + varlist                 + '\n');
     }

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,8 @@
 package org.constellation.generic.database;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -50,7 +52,31 @@ public class Query {
     private List<Where> where;
     private List<Orderby> orderBy;
     private Union union;
-    
+
+    public Query() {
+
+    }
+
+    public Query(String name, Select select, From from) {
+        this.name   = name;
+        this.select = select;
+        this.from   = Arrays.asList(from);
+    }
+
+    public Query(String name, Select select, From from, Where where) {
+        this.name   = name;
+        this.select = select;
+        this.from   = Arrays.asList(from);
+        this.where  = Arrays.asList(where);
+    }
+
+    public Query(String name, Select select, From from, Where where, Orderby orderBy) {
+        this.name    = name;
+        this.select  = select;
+        this.from    = Arrays.asList(from);
+        this.where   = Arrays.asList(where);
+        this.orderBy = Arrays.asList(orderBy);
+    }
 
     /**
      * Gets the value of the name property.
@@ -132,13 +158,19 @@ public class Query {
         this.union = union;
     }
 
+    public String buildSQLQuery() {
+        return buildSQLQuery(new HashMap<String, String>());
+    }
     /**
      * Return an textual SQL query for a preparedStatement (contains '?').
      * 
      * @param query
      * @return
      */
-    public String buildSQLQuery() {
+    public String buildSQLQuery(HashMap<String, String> staticParameters) {
+        if (staticParameters == null) {
+            staticParameters = new HashMap<String, String>();
+        }
         StringBuilder mainQuery = new StringBuilder("SELECT ");
 
         for (Column col : select.getCol()) {
@@ -162,8 +194,16 @@ public class Query {
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
             while (sql.indexOf(":${") != -1 && sql.indexOf("}") != -1) {
-                String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
-                sql = sql.replace(s, "?");
+                String paramName = sql.substring(sql.indexOf(":${") + 3, sql.indexOf("}"));
+                String paramValues = staticParameters.get(paramName);
+                if (paramValues != null) {
+                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
+                    sql = sql.replace(s, paramValues);
+                    
+                } else {
+                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
+                    sql = sql.replace(s, "?");
+                }
             }
             sql = sql.replace("':$'", "?");
             sql = sql.replace(":$", "?");

@@ -33,6 +33,19 @@ public class MultiFixed {
 
     private List<Query> query;
 
+    public MultiFixed() {
+
+    }
+
+    public MultiFixed(Query query) {
+        this.query = new ArrayList<Query>();
+        this.query.add(query);
+    }
+
+    public MultiFixed(List<Query> query) {
+        this.query = query;
+    }
+
     public List<Query> getQuery() {
         if (query == null)
             query = new ArrayList<Query>();

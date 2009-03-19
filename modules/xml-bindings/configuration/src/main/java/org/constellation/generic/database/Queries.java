@@ -18,6 +18,9 @@
 
 package org.constellation.generic.database;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotools.util.Utilities;
@@ -29,11 +32,30 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Queries {
 
+    private HashMap<String, String> parameters;
+
     private QueryPropertyType main;
     
     private Single single;
     
     private MultiFixed multiFixed;
+
+    public Queries() {
+
+    }
+
+    public Queries(QueryPropertyType main, Single single, MultiFixed multiFixed) {
+        this.main       = main;
+        this.single     = single;
+        this.multiFixed = multiFixed;
+    }
+
+    public Queries(QueryPropertyType main, Single single, MultiFixed multiFixed, HashMap<String, String> parameters) {
+        this.main       = main;
+        this.single     = single;
+        this.multiFixed = multiFixed;
+        this.parameters = parameters;
+    }
 
     public QueryPropertyType getMain() {
         return main;
@@ -50,10 +72,31 @@ public class Queries {
     public void setSingle(Single single) {
         this.single = single;
     }
-    
+
+    /**
+     * @return the parameters
+     */
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * @param parameters the parameters to set
+     */
+    public void setParameters(HashMap<String, String> parameters) {
+        this.parameters = parameters;
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[Queries]");
+        s.append("main: ").append(main).append('\n');
+        if (parameters != null) {
+            s.append("Parameters:\n");
+            for (String paramName : parameters.keySet()) {
+                s.append(paramName).append(':').append(parameters.get(paramName)).append('\n');
+            }
+        }
         s.append("main: ").append(main).append('\n');
         s.append("Single:").append(single).append('\n');
         s.append("Multifixed:").append(multiFixed).append('\n');

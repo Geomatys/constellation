@@ -31,8 +31,26 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Select {
 
-   List<Column> col;
-   
+   private List<Column> col;
+
+   public Select() {
+
+   }
+
+   public Select(String var, String sql) {
+       this.col = new ArrayList<Column>();
+       this.col.add(new Column(var, sql));
+   }
+
+   public Select(Column col) {
+       this.col = new ArrayList<Column>();
+       this.col.add(col);
+   }
+
+   public Select(List<Column> col) {
+       this.col = col;
+   }
+
     /**
      * Gets the value of the alias property.
      */
