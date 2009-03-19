@@ -31,7 +31,6 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
-import java.io.StringWriter;
 import java.util.concurrent.LinkedBlockingQueue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -221,7 +220,7 @@ public abstract class WebService {
      * @param locator
      * @return
      */
-    protected abstract Object launchException(String message, String codeName, String locator);
+    protected abstract Response launchException(String message, String codeName, String locator) throws JAXBException;
 
 
     /**
@@ -336,7 +335,7 @@ public abstract class WebService {
             } catch (UnmarshalException e) {
                 LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
 
-                return Response.ok(returnInvalidXMLException(), "text/xml").build();
+                return launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
             } finally {
                 if (unmarshaller != null)  {
                     unmarshallers.add(unmarshaller);
@@ -350,25 +349,6 @@ public abstract class WebService {
             return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", "text/plain").build();
-        }
-    }
-
-    private String returnInvalidXMLException() throws JAXBException {
-
-        final StringWriter sw = new StringWriter();
-        final Object obj = launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
-        Marshaller marshaller = null;
-        try {
-            marshaller = marshallers.take();
-            marshaller.marshal(obj, sw);
-            return sw.toString();
-        } catch (InterruptedException ex) {
-            LOGGER.severe("Interupted exception while trying to unmarshall a incomming request");
-            return "An exception occurs: The XML request is not valid ";
-        } finally {
-            if (marshaller != null) {
-                marshallers.add(marshaller);
-            }
         }
     }
 

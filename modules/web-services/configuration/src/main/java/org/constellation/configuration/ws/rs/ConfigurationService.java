@@ -257,11 +257,26 @@ public class ConfigurationService extends WebService  {
      * @return
      */
     @Override
-    protected Object launchException(final String message, final String codeName, final String locator) {
-        final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-        final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
+    protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallers.take();
+
+            final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+            final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
                                                            ServiceDef.CONFIG.exceptionVersion.toString());
-        return report;
+            StringWriter sw = new StringWriter();
+            marshaller.marshal(report, sw);
+            return Response.ok(sw.toString(), "text/xml").build();
+            
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in launchException", "text/plain").build();
+
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
+        }
     }
 
     /**

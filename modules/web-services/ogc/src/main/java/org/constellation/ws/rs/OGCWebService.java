@@ -242,14 +242,21 @@ public abstract class OGCWebService extends WebService {
      * @return
      */
     @Override
-    protected Object launchException(final String message, final String codeName, final String locator) {
-        if (isOWS(getActingVersion())) {
+    protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallers.take();
+
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            final ExceptionReport report = new ExceptionReport(message, code.name(), locator, getActingVersion().toString());
-            return report;
-        } else {
-            final ExceptionCode code = ExceptionCode.valueOf(codeName);
-            return new ServiceExceptionReport(getActingVersion().exceptionVersion, new ServiceExceptionType(message, code));
+            CstlServiceException ex = new CstlServiceException(message, code, locator);
+            return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
+        } catch (InterruptedException ex) {
+            return Response.ok("Interrupted Exception while getting the marshaller in launchException", "text/plain").build();
+
+        } finally {
+            if (marshaller != null) {
+                marshallers.add(marshaller);
+            }
         }
     }
 
