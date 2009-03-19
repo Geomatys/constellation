@@ -60,7 +60,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
 public class SOService extends OGCWebService {
 
     private SOSworker worker;
-    
+
     /**
      * Build a new Restfull SOS service.
      */
@@ -74,70 +74,86 @@ public class SOService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
-         try {
+        ServiceDef serviceDef = null;
+        try {
              marshaller = marshallers.take();
              worker.setServiceURL(getServiceURL());
              logParameters();
              String request = "";
              if (objectRequest == null)
                 request = (String) getParameter("REQUEST", true);
-             
+
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
                     throw new CstlServiceException("The operation GetObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "GetObservation");
                 }
+                serviceDef = getVersionFromNumber(go.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
-        
+
                 return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
+
+             }
+
+             if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
                     throw new CstlServiceException("The operation DescribeSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, "DescribeSensor");
                 }
+                serviceDef = getVersionFromNumber(ds.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeSensor(ds), sw);
 
                 return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
+
+             }
+
+             if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
                 InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
                     throw new CstlServiceException("The operation InsertObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "InsertObservation");
                 }
+                serviceDef = getVersionFromNumber(is.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.insertObservation(is), sw);
 
                 return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
+
+             }
+
+             if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
                 GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
                     throw new CstlServiceException("The operation GetResult is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "GetResult");
                 }
+                serviceDef = getVersionFromNumber(gr.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getResult(gr), sw);
 
                 return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
+
+             }
+
+             if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
                 RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
                     throw new CstlServiceException("The operation RegisterSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, "RegisterSensor");
                 }
+                serviceDef = getVersionFromNumber(rs.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.registerSensor(rs), sw);
 
                 return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
+
+             }
+
+             if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
@@ -145,34 +161,40 @@ public class SOService extends OGCWebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    
+
                     gc = createNewGetCapabilities();
                 }
+                serviceDef = getVersionFromNumber(gc.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
-        
+
                 return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                    
-            } else {
-                throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request");
-            }
-             
-         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller);
-            
+
+             }
+
+             throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                     INVALID_PARAMETER_VALUE, "request");
+
+
+        } catch (CstlServiceException ex) {
+            return processExceptionResponse(ex, marshaller, serviceDef);
+
         } catch (InterruptedException ex) {
             return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-            
+
         } finally {
             if (marshaller != null) {
                 marshallers.add(marshaller);
             }
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
+                                                ServiceDef serviceDef) throws JAXBException {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -187,9 +209,12 @@ public class SOService extends OGCWebService {
         }
 
         if (workingContext) {
+            if (serviceDef == null) {
+                serviceDef = getBestVersion(null);
+            }
             StringWriter sw = new StringWriter();
             ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
-                                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
+                                                         serviceDef.exceptionVersion.toString());
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         } else {
@@ -201,22 +226,22 @@ public class SOService extends OGCWebService {
      * Build a new getCapabilities request from kvp encoding
      */
     private GetCapabilities createNewGetCapabilities() throws CstlServiceException, JAXBException {
-        
+
         String version = getParameter("acceptVersions", false);
         AcceptVersionsType versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
                 version = version.substring(0, version.indexOf(','));
-            } 
+            }
             versions = new AcceptVersionsType(version);
         } else {
             versions = new AcceptVersionsType("1.0.0");
         }
-                    
+
         AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
-                        
+
         //We transform the String of sections in a list.
-        //In the same time we verify that the requested sections are valid. 
+        //In the same time we verify that the requested sections are valid.
         String section = getParameter("Sections", false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
@@ -228,7 +253,7 @@ public class SOService extends OGCWebService {
                 } else {
                     throw new CstlServiceException("The section " + token + " does not exist",
                                                   INVALID_PARAMETER_VALUE, "Sections");
-                }   
+                }
             }
         } else {
             //if there is no requested Sections we add all the sections
@@ -240,7 +265,7 @@ public class SOService extends OGCWebService {
                                    formats,
                                    null,
                                    getParameter("SERVICE", true));
-        
+
     }
 
     /**

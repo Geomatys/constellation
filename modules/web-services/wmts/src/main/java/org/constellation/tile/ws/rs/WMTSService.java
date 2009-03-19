@@ -103,6 +103,7 @@ public class WMTSService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
+        ServiceDef serviceDef = null;
         try {
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
@@ -131,7 +132,7 @@ public class WMTSService extends OGCWebService {
                      */
                     gc = createNewGetCapabilitiesRequest();
                 }
-
+                serviceDef = getVersionFromNumber(gc.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
@@ -147,7 +148,7 @@ public class WMTSService extends OGCWebService {
                      */
                     gt = createNewGetTileRequest();
                 }
-
+                serviceDef = getVersionFromNumber(gt.getVersion());
                 return Response.ok(worker.getTile(gt), gt.getFormat()).build();
             }
             if (request.equalsIgnoreCase("GetFeatureInfo") || (objectRequest instanceof GetFeatureInfo)) {
@@ -160,7 +161,7 @@ public class WMTSService extends OGCWebService {
                      */
                     gf = createNewGetFeatureInfoRequest();
                 }
-
+                serviceDef = getVersionFromNumber(gf.getVersion());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getFeatureInfo(gf), sw);
 
@@ -169,9 +170,9 @@ public class WMTSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller);
+            return processExceptionResponse(ex, marshaller, serviceDef);
         } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
                 marshallers.add(marshaller);
@@ -351,6 +352,7 @@ public class WMTSService extends OGCWebService {
                                                                      throws JAXBException
     {
         Marshaller marshaller = null;
+        ServiceDef serviceDef = null;
         try {
             marshaller = marshallers.take();
             if (worker == null) {
@@ -358,12 +360,13 @@ public class WMTSService extends OGCWebService {
                                               NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
+            serviceDef = getVersionFromNumber(gc.getVersion());
             final StringWriter sw = new StringWriter();
             marshaller.marshal(worker.getCapabilities(gc), sw);
             return Response.ok(sw.toString(), TEXT_XML).build();
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller);
+            return processExceptionResponse(ex, marshaller, serviceDef);
 
         } catch (InterruptedException ex) {
             String msg = "interruptedException in processCapabilites";
@@ -418,11 +421,15 @@ public class WMTSService extends OGCWebService {
             Marshaller marshaller = null;
             try {
                 marshaller = marshallers.take();
-                return processExceptionResponse(ex, marshaller);
+                return processExceptionResponse(ex, marshaller, null);
             } catch (InterruptedException exe) {
                 String msg = "interrupted exception in processGetTileRestful: " + exe.getMessage();
                 LOGGER.severe(msg);
                 return Response.ok(msg, TEXT_PLAIN).build();
+            } finally {
+                if (marshaller != null) {
+                    marshallers.add(marshaller);
+                }
             }
         }
     }
@@ -443,7 +450,9 @@ public class WMTSService extends OGCWebService {
      * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
+                                                ServiceDef serviceDef) throws JAXBException
+    {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -459,8 +468,11 @@ public class WMTSService extends OGCWebService {
         }
 
         if (workingContext) {
+            if (serviceDef == null) {
+                serviceDef = getBestVersion(null);
+            }
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
-                    ex.getLocator(), getActingVersion().exceptionVersion.toString());
+                    ex.getLocator(), serviceDef.exceptionVersion.toString());
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();

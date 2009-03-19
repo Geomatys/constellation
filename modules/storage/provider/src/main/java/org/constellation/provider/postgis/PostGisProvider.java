@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -33,11 +33,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
-import org.constellation.ws.rs.WebService;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -135,6 +135,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
@@ -142,6 +143,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<LayerDetails> getValueClass() {
         return LayerDetails.class;
     }
@@ -149,6 +151,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Set<String> getKeys() {
         return new ArraySet<String>(index);
     }
@@ -156,6 +159,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public boolean contains(String key) {
         return index.contains(key);
     }
@@ -163,6 +167,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public LayerDetails get(final String key) {
         if (!index.contains(key)) {
             return null;
@@ -188,6 +193,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void reload() {
         synchronized(this){
             index.clear();
@@ -198,6 +204,7 @@ public class PostGisProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void dispose() {
         synchronized(this){
             index.clear();
@@ -271,7 +278,7 @@ public class PostGisProvider implements LayerProvider{
             SAXException, IOException, NamingException
     {
 
-        String configFile = WebService.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
+        String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;

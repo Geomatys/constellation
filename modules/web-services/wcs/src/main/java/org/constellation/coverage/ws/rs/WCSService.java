@@ -46,14 +46,12 @@ import static org.constellation.query.wcs.WCSQuery.KEY_RESX;
 import static org.constellation.query.wcs.WCSQuery.KEY_RESY;
 import static org.constellation.query.wcs.WCSQuery.KEY_RESZ;
 import static org.constellation.query.wcs.WCSQuery.KEY_SECTION;
-import static org.constellation.query.wcs.WCSQuery.KEY_STORE;
 import static org.constellation.query.wcs.WCSQuery.KEY_TIME;
 import static org.constellation.query.wcs.WCSQuery.KEY_TIMESEQUENCE;
 import static org.constellation.query.wcs.WCSQuery.KEY_WIDTH;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
 import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
 
@@ -170,6 +168,7 @@ public final class WCSService extends OGCWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
 
         Marshaller marshaller = null;
+        ServiceDef serviceDef = null;
         try {
 
             marshaller = marshallers.take();
@@ -198,7 +197,7 @@ public final class WCSService extends OGCWebService {
                 if (getcaps == null) {
                     getcaps = adaptKvpGetCapabilitiesRequest();
                 }
-                
+                serviceDef = getVersionFromNumber(getcaps.getVersion());
                 //TODO: is this necessary?
                 worker.internal_initServletContext(servletContext);
                 worker.internal_initUriContext(uriContext);
@@ -214,19 +213,19 @@ public final class WCSService extends OGCWebService {
                 DescribeCoverage desccov = (DescribeCoverage)objectRequest;
                 
                 //TODO: move me into the worker.
-                verifyBaseParameter(0);
+                //verifyBaseParameter(0);
                 //TODO: move me into the worker.
                 //The Constellation WCS does not currently implement the "store" mechanism.
-                String store = getParameter(KEY_STORE, false);
+                /*String store = getParameter(KEY_STORE, false);
                 if (  store != null  &&  store.trim().equalsIgnoreCase("true")  ) {
                     throw new CstlServiceException("The service does not implement the store mechanism.",
                                    NO_APPLICABLE_CODE, "store");
-                }
+                }*/
                 
                 if (desccov == null) {
                     desccov = adaptKvpDescribeCoverageRequest();
                 }
-                
+                serviceDef = getVersionFromNumber(desccov.getVersion());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
@@ -238,11 +237,12 @@ public final class WCSService extends OGCWebService {
             {
                 GetCoverage getcov = (GetCoverage)objectRequest;
                 //TODO: move me into the worker.
-                verifyBaseParameter(0);
+                //verifyBaseParameter(0);
                 
                 if (getcov == null) {
                     getcov = adaptKvpGetCoverageRequest();
                 }
+                serviceDef = getVersionFromNumber(getcov.getVersion());
                 final RenderedImage rendered = worker.getCoverage(getcov);
                 String format = getcov.getFormat();
                 if (format.equalsIgnoreCase(MATRIX)) {
@@ -250,7 +250,7 @@ public final class WCSService extends OGCWebService {
                 }
                 return Response.ok(rendered, format).build();
             }
-            
+
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
                                            OPERATION_NOT_SUPPORTED, "request");
             
@@ -261,7 +261,7 @@ public final class WCSService extends OGCWebService {
         	 * for the protocol stream which JAXB, in this case, will then 
         	 * marshall and serialize into an XML message HTTP response.
         	 */
-        	return processExceptionResponse(ex, marshaller);
+        	return processExceptionResponse(ex, marshaller, serviceDef);
             
         } catch (InterruptedException ex) {
             return Response.ok("Interrupted Exception while getting the marshaller in treatIncomingRequest",
@@ -273,8 +273,13 @@ public final class WCSService extends OGCWebService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller,
+                                                final ServiceDef serviceDef) throws JAXBException
+    {
         // LOG THE EXCEPTION
         // We do not want to log the full stack trace if this is an error
         // which seems to have been caused by the user.
@@ -292,9 +297,9 @@ public final class WCSService extends OGCWebService {
         if (isOWS(getActingVersion())) {
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
             report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
-                                         getActingVersion().exceptionVersion.toString());
+                                         serviceDef.exceptionVersion.toString());
         } else {
-            report = new ServiceExceptionReport(getActingVersion().exceptionVersion,
+            report = new ServiceExceptionReport(serviceDef.exceptionVersion,
                     new ServiceExceptionType(ex.getMessage(),
                     (ExceptionCode) ex.getExceptionCode()));
         }
@@ -318,7 +323,7 @@ public final class WCSService extends OGCWebService {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
                     MISSING_PARAMETER_VALUE, "service");
         }
-        
+
         String inputVersion = getParameter(KEY_VERSION, false);
         if (inputVersion == null) {
             inputVersion = getParameter("acceptversions", false);
@@ -329,13 +334,11 @@ public final class WCSService extends OGCWebService {
                 isVersionSupported(inputVersion);
             }
         }
+        final ServiceDef finalVersion = getBestVersion(inputVersion);
 
-        this.setActingVersion(getBestVersion(inputVersion).version.toString());
-
-        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
-            return new org.constellation.wcs.v100.GetCapabilitiesType(
-                    getParameter(KEY_SECTION, false), null);
-        } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
+        if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
+            return new org.constellation.wcs.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
+        } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
             //We transform the String of sections in a list.
@@ -374,9 +377,13 @@ public final class WCSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private DescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
-        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
+        final String strVersion = getParameter(KEY_VERSION, true);
+        isVersionSupported(strVersion);
+        final ServiceDef serviceDef = getVersionFromNumber(strVersion);
+
+        if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
             return new org.constellation.wcs.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
-        } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
+        } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {
             return new org.constellation.wcs.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -393,9 +400,12 @@ public final class WCSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private GetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
-        if (getActingVersion().equals(ServiceDef.WCS_1_0_0)) {
+        final String strVersion = getParameter(KEY_VERSION, true);
+        isVersionSupported(strVersion);
+        final ServiceDef serviceDef = getVersionFromNumber(strVersion);
+        if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
             return adaptKvpGetCoverageRequest100();
-         } else if (getActingVersion().equals(ServiceDef.WCS_1_1_1)) {
+         } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {
             return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -414,14 +424,14 @@ public final class WCSService extends OGCWebService {
     private org.constellation.wcs.v100.GetCoverageType adaptKvpGetCoverageRequest100()
                                                     throws CstlServiceException
     {
-        String width = getParameter(KEY_WIDTH, false);
+        String width  = getParameter(KEY_WIDTH,  false);
         String height = getParameter(KEY_HEIGHT, false);
-        String depth = getParameter(KEY_DEPTH, false);
+        String depth  = getParameter(KEY_DEPTH,  false);
 
-        String resx = getParameter(KEY_RESX, false);
-        String resy = getParameter(KEY_RESY, false);
+        String resx   = getParameter(KEY_RESX,   false);
+        String resy   = getParameter(KEY_RESY,   false);
         @SuppressWarnings("unused")
-        String resz = getParameter(KEY_RESZ, false);
+        String resz   = getParameter(KEY_RESZ,   false);
 
         // temporal subset
         org.constellation.wcs.v100.TimeSequenceType temporal = null;

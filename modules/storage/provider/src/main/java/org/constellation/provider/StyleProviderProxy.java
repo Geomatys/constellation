@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,14 @@
 package org.constellation.provider;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.constellation.ws.rs.WebService;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotools.style.MutableStyle;
 
 
@@ -56,6 +54,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
@@ -63,6 +62,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<MutableStyle> getValueClass() {
         return MutableStyle.class;
     }
@@ -70,6 +70,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Set<String> getKeys() {
 
         final Set<String> keys = new HashSet<String>();
@@ -86,6 +87,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public boolean contains(String key) {
 
         for(StyleProviderService service : SERVICES){
@@ -100,6 +102,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public MutableStyle get(String key) {
 
         for(StyleProviderService service : SERVICES){
@@ -115,6 +118,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void reload() {
 
         for(StyleProviderService service : SERVICES){
@@ -128,6 +132,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void dispose() {
 
         for(StyleProviderService service : SERVICES){
@@ -165,7 +170,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
 
     public synchronized static StyleProviderProxy getInstance(){
         if(INSTANCE == null){
-            init(WebService.getConfigDirectory().getPath() + File.separator);
+            init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new StyleProviderProxy();
         }
         return INSTANCE;

@@ -140,7 +140,7 @@ public class ConfigurationService extends WebService  {
             if (objectRequest == null) {
                 request = (String) getParameter("REQUEST", true);
             }
-            
+
             if ("Restart".equalsIgnoreCase(request)) {
                 marshaller.marshal(restartService(), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
@@ -259,7 +259,8 @@ public class ConfigurationService extends WebService  {
     @Override
     protected Object launchException(final String message, final String codeName, final String locator) {
         final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-        final ExceptionReport report = new ExceptionReport(message, code.name(), locator, "1.0");
+        final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
+                                                           ServiceDef.CONFIG.exceptionVersion.toString());
         return report;
     }
 

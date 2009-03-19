@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -85,6 +85,7 @@ public abstract class OGCWebService extends WebService {
     /**
      * The version of the WMS specification for this request.
      */
+    @Deprecated
     private ServiceDef actingVersion;
     /**
      * The version of the SLD profile for the WMS web serviceType. fixed a 1.1.0 for now.
@@ -140,36 +141,36 @@ public abstract class OGCWebService extends WebService {
      *
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected void verifyBaseParameter(int sld) throws CstlServiceException {
-        if (sld == 2) {
-            if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throw new CstlServiceException("The parameter VERSION=" + sldVersion + " must be specified",
-                               MISSING_PARAMETER_VALUE);
-            } else {
-                return;
-            }
-        }
-        // if the version is not accepted we send an exception
-        String inputVersion = getParameter("VERSION", true);
-        if (getVersionFromNumber(inputVersion) == null) {
-
-            String message = "The parameter ";
-            for (ServiceDef vers : supportedVersions) {
-                message += "VERSION=" + vers.version.toString() + " OR ";
-            }
-            message = message.substring(0, message.length()-3);
-            message += " must be specified";
-            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
-        } else {
-            setActingVersion(inputVersion);
-        }
-        if (sld == 1) {
-            if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new CstlServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
-                               VERSION_NEGOTIATION_FAILED);
-            }
-        }
-    }
+//    protected void verifyBaseParameter(int sld) throws CstlServiceException {
+//        if (sld == 2) {
+//            if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
+//                throw new CstlServiceException("The parameter VERSION=" + sldVersion + " must be specified",
+//                               MISSING_PARAMETER_VALUE);
+//            } else {
+//                return;
+//            }
+//        }
+//        // if the version is not accepted we send an exception
+//        String inputVersion = getParameter("VERSION", true);
+//        if (getVersionFromNumber(inputVersion) == null) {
+//
+//            String message = "The parameter ";
+//            for (ServiceDef vers : supportedVersions) {
+//                message += "VERSION=" + vers.version.toString() + " OR ";
+//            }
+//            message = message.substring(0, message.length()-3);
+//            message += " must be specified";
+//            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
+//        } else {
+//            setActingVersion(inputVersion);
+//        }
+//        if (sld == 1) {
+//            if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
+//                throw new CstlServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
+//                               VERSION_NEGOTIATION_FAILED);
+//            }
+//        }
+//    }
 
     /**
      * Verify if the version is supported by this serviceType.
@@ -192,6 +193,7 @@ public abstract class OGCWebService extends WebService {
     /**
      * Return the current version of the Web ServiceType.
      */
+    @Deprecated
     protected ServiceDef getActingVersion() {
         return this.actingVersion;
     }
@@ -199,6 +201,7 @@ public abstract class OGCWebService extends WebService {
     /**
      * Return the current version of the Web ServiceType.
      */
+    @Deprecated
     protected void setActingVersion(String versionNumber) {
         actingVersion = getVersionFromNumber(versionNumber);
     }
@@ -220,12 +223,16 @@ public abstract class OGCWebService extends WebService {
      * </ul>
      * In both ways, the exception is then marshalled and returned to the client.
      *
-     * @param ex The exception that has been generated during the webservice operation requested.
+     * @param ex         The exception that has been generated during the webservice operation requested.
+     * @param marshaller The marshaller to use for the exception report.
+     * @param serviceDef The service definition, from which the version number of exception report will
+     *                   be extracted.
      * @return An XML representing the exception.
      *
      * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
-    protected abstract Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException;
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
+                                                         final ServiceDef serviceDef) throws JAXBException;
 
     /**
      * The shared method to build a service ExceptionReport.

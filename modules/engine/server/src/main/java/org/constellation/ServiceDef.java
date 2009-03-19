@@ -50,7 +50,7 @@ public enum ServiceDef {
 	CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0"),
 
     // Configuration service definition (custom service of Geomatys)
-    CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0.0"),
+    CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0"),
 
     // SOS service definition
     SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
@@ -125,6 +125,17 @@ public enum ServiceDef {
 	public int compareTo(String str){
 		return version.compareTo(new Version(str));
 	}
+
+    public static ServiceDef getServiceDefinition(final String spec, final String version) {
+        for (ServiceDef service : values()) {
+            if (service.version.toString().equalsIgnoreCase(version) &&
+                service.specification.toString().equalsIgnoreCase(spec))
+            {
+                return service;
+            }
+        }
+        return null;
+    }
 
     @Override
 	public String toString(){

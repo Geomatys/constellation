@@ -130,6 +130,7 @@ public class CSWService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
+        ServiceDef serviceDef = null;
         try {
             marshaller = marshallers.take();
 
@@ -159,6 +160,7 @@ public class CSWService extends OGCWebService {
                           */
                         gc = createNewGetCapabilitiesRequest();
                     }
+                    serviceDef = getVersionFromNumber(gc.getVersion());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                 
                     StringWriter sw = new StringWriter();
@@ -166,7 +168,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
-                } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsRequest)) {
+                }
+
+                if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsRequest)) {
                 
                     GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
                 
@@ -177,13 +181,15 @@ public class CSWService extends OGCWebService {
                         */
                         gr = createNewGetRecordsRequest();
                     }
-                
+                    serviceDef = getVersionFromNumber(gr.getVersion());
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecords(gr), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordById)) {
+                }
+
+                if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordById)) {
                 
                     GetRecordById grbi = (GetRecordById)objectRequest;
                 
@@ -194,13 +200,15 @@ public class CSWService extends OGCWebService {
                         */
                         grbi = createNewGetRecordByIdRequest();
                     }
-                
+                    serviceDef = getVersionFromNumber(grbi.getVersion());
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecordById(grbi), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecord)) {
+                }
+
+                if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecord)) {
                 
                     DescribeRecord dr = (DescribeRecord)objectRequest;
                 
@@ -211,13 +219,15 @@ public class CSWService extends OGCWebService {
                          */
                         dr = createNewDescribeRecordRequest();
                     }
-                
+                    serviceDef = getVersionFromNumber(dr.getVersion());
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.describeRecord(dr), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
+                }
+
+                if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
                 
                     GetDomain gd = (GetDomain)objectRequest;
                 
@@ -228,6 +238,7 @@ public class CSWService extends OGCWebService {
                         */
                         gd = createNewGetDomainRequest();
                     }
+                    serviceDef = getVersionFromNumber(gd.getVersion());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                     
                     StringWriter sw = new StringWriter();
@@ -235,7 +246,9 @@ public class CSWService extends OGCWebService {
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
+                }
+
+                if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
                 
                     Transaction t = (Transaction)objectRequest;
                 
@@ -243,13 +256,15 @@ public class CSWService extends OGCWebService {
                          throw new CstlServiceException("The Operation transaction is not available in KVP",
                                                        OPERATION_NOT_SUPPORTED, "transaction");
                     }
-                
+                    serviceDef = getVersionFromNumber(t.getVersion());
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.transaction(t), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } else if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
+                }
+
+                if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
                 
                     HarvestType h = (HarvestType)objectRequest;
                 
@@ -260,27 +275,29 @@ public class CSWService extends OGCWebService {
                          */
                         h = createNewHarvestRequest();
                     }
-                
+                    serviceDef = getVersionFromNumber(h.getVersion());
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.harvest(h), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-                } else {
-                    if (request.equals("") && objectRequest != null)
-                        request = objectRequest.getClass().getName();
-                    else if (request.equals("") && objectRequest == null)
-                        request = "undefined request";
-                
-                    throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                  INVALID_PARAMETER_VALUE, "request");
                 }
+
+                if (request.equals("") && objectRequest != null) {
+                    request = objectRequest.getClass().getName();
+                } else if (request.equals("") && objectRequest == null) {
+                    request = "undefined request";
+                }
+
+                throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
+
             } else {
                 throw new CstlServiceException("The CSW service is not running", NO_APPLICABLE_CODE);
             }
         
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller);
+            return processExceptionResponse(ex, marshaller, serviceDef);
 
         } catch (InterruptedException ex) {
             return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
@@ -293,10 +310,12 @@ public class CSWService extends OGCWebService {
     }
 
     /**
-     * @inheritsDoc
+     * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
+                                                ServiceDef serviceDef) throws JAXBException
+    {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -311,7 +330,10 @@ public class CSWService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
         if (workingContext) {
-            final String version = (getActingVersion() == null) ? null : getActingVersion().exceptionVersion.toString();
+            if (serviceDef == null) {
+                serviceDef = getBestVersion(null);
+            }
+            final String version = serviceDef.exceptionVersion.toString();
             ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);

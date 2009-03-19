@@ -207,9 +207,6 @@ public final class WCSWorker {
     public DescribeCoverageResponse describeCoverage(final DescribeCoverage abstractRequest)
                                                   throws JAXBException, CstlServiceException
     {
-        LOGGER.info("describeCoverage request processing");
-        //this.actingVersion = new ServiceVersion(ServiceType.WCS, abstractRequest.getVersion());
-        //we begin by extracting the base attribute
         final String version = abstractRequest.getVersion();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",

@@ -39,7 +39,6 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
-import org.constellation.ServiceDef;
 import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.DescribeRecordResponseType;
 import org.constellation.cat.csw.v202.DescribeRecordType;
@@ -99,7 +98,12 @@ public class CSWService {
      * The user directory where to store the configuration file on Windows platforms.
      */
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
-    
+
+    /**
+     * The maximum number of elements in a queue of marshallers and unmarshallers.
+     */
+    private static final int MAX_QUEUE_SIZE = 4;
+
     /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
@@ -122,13 +126,13 @@ public class CSWService {
                             ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
                             ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
 
-           unmarshallers = new LinkedBlockingQueue<Unmarshaller>(4);
-           for (int i = 0; i < 4; i++) {
+           unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
+           for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
                unmarshallers.add(jbcontext.createUnmarshaller());
            }
 
-           LinkedBlockingQueue<Marshaller> marshallers = new LinkedBlockingQueue<Marshaller>(4);
-           for (int i = 0; i < 4; i++) {
+           LinkedBlockingQueue<Marshaller> marshallers = new LinkedBlockingQueue<Marshaller>(MAX_QUEUE_SIZE);
+           for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
                marshallers.add(jbcontext.createMarshaller());
            }
 
@@ -159,10 +163,9 @@ public class CSWService {
             return worker.getCapabilities(requestCapabilities);
             
         } catch (CstlServiceException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion());
         } catch (JAXBException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), null);
+            throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), requestCapabilities.getVersion());
         }
     }
     
@@ -176,7 +179,7 @@ public class CSWService {
             return (GetDomainResponseType) worker.getDomain(requestGetDomain);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestGetDomain.getVersion());
         }
     }
     
@@ -191,7 +194,7 @@ public class CSWService {
             return (GetRecordByIdResponseType) worker.getRecordById(requestRecordById);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestRecordById.getVersion());
         }
     }
     
@@ -205,7 +208,7 @@ public class CSWService {
             return worker.getRecords(requestRecords);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestRecords.getVersion());
         }
     }
     
@@ -219,7 +222,7 @@ public class CSWService {
             return worker.describeRecord(requestDescribeRecord);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestDescribeRecord.getVersion());
         }
     }
     
@@ -233,7 +236,7 @@ public class CSWService {
             return worker.harvest(requestHarvest);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestHarvest.getVersion());
         }
     }
     
@@ -247,7 +250,7 @@ public class CSWService {
             return worker.transaction(requestTransaction);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           ServiceDef.CSW_2_0_2.exceptionVersion.toString());
+                                           requestTransaction.getVersion());
         }
     }
     

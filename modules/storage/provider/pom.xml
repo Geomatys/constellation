@@ -50,14 +50,9 @@
   -->
   <dependencies>
     <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-base</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.constellation.storage</groupId>
-        <artifactId>cstl-store-postgrid</artifactId>
-        <version>${project.version}</version>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-postgrid</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

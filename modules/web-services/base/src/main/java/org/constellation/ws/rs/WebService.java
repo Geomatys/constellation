@@ -139,6 +139,11 @@ public abstract class WebService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
+     * The maximum number of elements in a queue of marshallers and unmarshallers.
+     */
+    private static final int MAX_QUEUE_SIZE = 4;
+
+    /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
     protected LinkedBlockingQueue<Unmarshaller> unmarshallers;
@@ -183,12 +188,10 @@ public abstract class WebService {
     
     /**
      * Initialize the basic attribute of a web service.
-     *
-     * @param service The initials of the web service (CSW, WMS, WCS, SOS, ...)
      */
     public WebService() {
-        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(4);
-        marshallers   = new LinkedBlockingQueue<Marshaller>(4);
+        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
+        marshallers   = new LinkedBlockingQueue<Marshaller>(MAX_QUEUE_SIZE);
         serviceURL    = null;
     }
 
@@ -262,7 +265,7 @@ public abstract class WebService {
     private void initXMLContext(final JAXBContext jbcontext, final String rootNamespace)
             throws JAXBException
     {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
             Unmarshaller unmarshaller = jbcontext.createUnmarshaller();
             Marshaller marshaller = jbcontext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -401,7 +404,7 @@ public abstract class WebService {
      * @throw CstlServiceException
      */
     protected String getParameter(final String parameterName, final boolean mandatory)
-                                                            throws CstlServiceException
+                                                           throws CstlServiceException
     {
         final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
         final Set<String> keySet = parameters.keySet();
@@ -469,7 +472,9 @@ public abstract class WebService {
      * @return the parameter or null if not specified
      * @throw CstlServiceException
      */
-    protected Object getComplexParameter(String parameterName, boolean mandatory) throws CstlServiceException {
+    protected Object getComplexParameter(final String parameterName, final boolean mandatory)
+                                                                  throws CstlServiceException
+    {
 
         Unmarshaller unmarshaller = null;
         try {

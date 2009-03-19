@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,6 +40,7 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     /**
      * Update all the vocabularies skos files and the list of contact.
      */
+    @Override
     public AcknowlegementType updateVocabularies() throws CstlServiceException {
         throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
@@ -47,6 +48,7 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     /**
      * Update all the contact retrieved from files and the list of contact.
      */
+    @Override
     public AcknowlegementType updateContacts() throws CstlServiceException {
         throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }

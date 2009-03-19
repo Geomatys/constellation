@@ -19,31 +19,23 @@ package org.constellation.provider.shapefile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.naming.NamingException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.ws.rs.WebService;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.map.ElevationModel;
 import org.geotools.util.SoftValueHashMap;
 
-import org.xml.sax.SAXException;
 
 
 /**
@@ -105,6 +97,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
@@ -112,6 +105,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<LayerDetails> getValueClass() {
         return LayerDetails.class;
     }
@@ -119,6 +113,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public Set<String> getKeys() {
         return index.keySet();
     }
@@ -126,6 +121,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public boolean contains(final String key) {
         return index.containsKey(key);
     }
@@ -133,6 +129,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public LayerDetails get(final String key) {
         DataStore store = cache.get(key);
 
@@ -168,6 +165,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public void reload() {
         synchronized(this){
             index.clear();
@@ -179,6 +177,7 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * {@inheritDoc }
      */
+    @Override
     public void dispose() {
         synchronized(this){
             index.clear();

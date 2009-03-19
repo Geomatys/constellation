@@ -90,11 +90,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi</artifactId>
     </dependency>

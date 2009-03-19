@@ -132,25 +132,22 @@ public class WMSService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
+        ServiceDef version = null;
         try {
             marshaller = marshallers.take();
             final String request = (String) getParameter(KEY_REQUEST, true);
-            LOGGER.info("New request: " + request);
             logParameters();
-
-            String requestedVersion = (String) getParameter(KEY_VERSION, false);
-            if (requestedVersion != null) {
-                setActingVersion(requestedVersion);
-            }
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
                 final GetMap requestMap = adaptGetMap(true);
+                version = getVersionFromNumber(requestMap.getVersion().toString());
                 final BufferedImage map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
+                version = getVersionFromNumber(requestFeatureInfo.getVersion().toString());
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
                 //Need to reset the GML mime format to XML for browsers
                 String infoFormat = requestFeatureInfo.getInfoFormat();
@@ -161,6 +158,7 @@ public class WMSService extends OGCWebService {
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 final GetCapabilities requestCapab = adaptGetCapabilities();
+                version = getVersionFromNumber(requestCapab.getVersion().toString());
                 worker.initServletContext(servletContext);
                 worker.initUriContext(uriContext);
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
@@ -176,11 +174,13 @@ public class WMSService extends OGCWebService {
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
+                version = getVersionFromNumber(requestLegend.getVersion().toString());
                 final BufferedImage legend = worker.getLegendGraphic(requestLegend);
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
                 final DescribeLayer describeLayer = adaptDescribeLayer();
+                version = getVersionFromNumber(describeLayer.getVersion().toString());
                 worker.initUriContext(uriContext);
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
                 //We need to marshall the string to XML
@@ -188,12 +188,12 @@ public class WMSService extends OGCWebService {
                 marshaller.marshal(response, sw);
                 return Response.ok(sw.toString(), TEXT_XML).build();
             }
-            throw new CstlServiceException("The operation " + request +
-                    " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
+            throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                                           OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller);
+            return processExceptionResponse(ex, marshaller, version);
         } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
+            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
                 marshallers.add(marshaller);
@@ -201,9 +201,17 @@ public class WMSService extends OGCWebService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller) throws JAXBException {
-        final Version version = (getActingVersion() == null) ? null : getActingVersion().exceptionVersion;
+    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
+                                                ServiceDef serviceDef) throws JAXBException
+    {
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
+        }
+        final Version version = serviceDef.exceptionVersion;
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
                 new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
@@ -224,15 +232,19 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return The DescribeLayer request.
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * @throws CstlServiceException
      */
     private DescribeLayer adaptDescribeLayer() throws CstlServiceException {
-        final String strLayer  = getParameter(KEY_LAYERS,  true );
-        final String strVersion = getParameter(KEY_VERSION, false);
+        final String strVersion = getParameter(KEY_VERSION, true);
+        ServiceDef serviceDef = getVersionFromNumber(strVersion);
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
+        }
+        final String strLayer  = getParameter(KEY_LAYERS,  true);
         final List<String> layers = StringUtilities.toStringList(strLayer);
         setActingVersion(strVersion);
         isVersionSupported(strVersion);
-        return new DescribeLayer(layers, getActingVersion().version);
+        return new DescribeLayer(layers, serviceDef.version);
     }
 
     /**
@@ -240,13 +252,13 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return A GetCapabilities request.
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * @throws CstlServiceException
      */
     private GetCapabilities adaptGetCapabilities() throws CstlServiceException {
         final String version = getParameter(KEY_VERSION, false);
         if (version == null) {
-            setActingVersion(getBestVersion(null).toString());
-            return new GetCapabilities(getActingVersion().version);
+            final ServiceDef capsService = getBestVersion(null);
+            return new GetCapabilities(capsService.version);
         }
         final ServiceDef bestVersion = getBestVersion(version);
         final String service = getParameter(KEY_SERVICE, true);
@@ -268,12 +280,15 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return A GetFeatureInfo request.
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * @throws CstlServiceException
      */
     private GetFeatureInfo adaptGetFeatureInfo() throws CstlServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap(false);
         final String version = getParameter(KEY_VERSION, true);
-        setActingVersion(version);
+        ServiceDef serviceDef = getVersionFromNumber(version);
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
+        }
         isVersionSupported(version);
         final String strX    = getParameter(version.equals("1.1.1") ? KEY_I_v111 : KEY_I_v130, true);
         final String strY    = getParameter(version.equals("1.1.1") ? KEY_J_v111 : KEY_J_v130, true);
@@ -281,7 +296,7 @@ public class WMSService extends OGCWebService {
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
-        final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, getActingVersion().version);
+        final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
         final int x = StringUtilities.toInt(strX);
         final int y = StringUtilities.toInt(strY);
         final Integer featureCount;
@@ -298,7 +313,7 @@ public class WMSService extends OGCWebService {
      * of real java objects.
      *
      * @return The GetLegendGraphic request.
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * @throws CstlServiceException
      */
     private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
         final String strLayer  = getParameter(KEY_LAYER,  true );
@@ -333,11 +348,10 @@ public class WMSService extends OGCWebService {
      * @param fromGetMap {@code true} if the request is done for a GetMap, {@code false}
      *                   otherwise (in the case of a GetFeatureInfo for example).
      * @return The GetMap request.
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * @throws CstlServiceException
      */
     private GetMap adaptGetMap(final boolean fromGetMap) throws CstlServiceException {
         final String version         = getParameter(KEY_VERSION,         true);
-        setActingVersion(version);
         isVersionSupported(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         final String strCRS          = getParameter((version.equals("1.1.1")) ?
@@ -443,7 +457,7 @@ public class WMSService extends OGCWebService {
         }
 
         // Builds the request.
-        return new GetMap(env, getActingVersion().version, format, layers, styles, sld, elevation,
+        return new GetMap(env, new Version(version), format, layers, styles, sld, elevation,
                     date, dimRange, size, background, transparent, azimuth, strExceptions);
     }
 

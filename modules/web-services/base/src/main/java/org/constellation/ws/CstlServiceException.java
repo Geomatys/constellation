@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,7 @@ import org.opengis.util.CodeList;
  * @author Cédric Briançon
  */
 public class CstlServiceException extends Exception {
-
-    private static final long serialVersionUID = 8631104938394896941L;
+    private static final long serialVersionUID = 1156609900372258061L;
 
     /**
      * The exception code.
@@ -45,8 +44,16 @@ public class CstlServiceException extends Exception {
      * Creates an exception with the specified details message.
      *
      * @param message The detail message.
+     */
+    public CstlServiceException(final String message) {
+        this(message, ExceptionCode.NO_APPLICABLE_CODE);
+    }
+
+    /**
+     * Creates an exception with the specified details message and the exceptionCode chosen.
+     *
+     * @param message The detail message.
      * @param exceptionCode The exception code.
-     * @param version The service version.
      */
     public CstlServiceException(final String message, final CodeList exceptionCode)
     {
@@ -54,32 +61,45 @@ public class CstlServiceException extends Exception {
     }
 
     /**
-     * Creates an exception with the specified details message.
+     * Creates an exception with the specified details message, exception code and locator value.
      *
      * @param message The detail message.
      * @param exceptionCode The exception code.
      * @param locator What causes the exception.
      */
-    public CstlServiceException(final String message, final CodeList exceptionCode,
-                                final String locator)
-    {
-        super(message);
-        this.exceptionCode = exceptionCode;
-        this.locator = locator;
+    public CstlServiceException(final String message, final CodeList exceptionCode, final String locator) {
+        this(message, null, exceptionCode, locator);
     }
 
     /**
-     * Creates an exception with the specified details message and cause.
+     * Creates an exception with the specified exception cause.
+     *
+     * @param cause The cause of this exception.
+     */
+    public CstlServiceException(final Exception cause) {
+        this(cause, ExceptionCode.NO_APPLICABLE_CODE);
+    }
+
+    /**
+     * Creates an exception with the specified exception cause and code.
      *
      * @param cause The cause of this exception.
      * @param exceptionCode The exception code.
-     * @param version The service version.
+     * @param serviceDef The service definition.
      */
-    public CstlServiceException(final Exception cause, final CodeList exceptionCode)
-    {
-        super(cause);
-        this.exceptionCode = exceptionCode;
-        locator = null;
+    public CstlServiceException(final Exception cause, final CodeList exceptionCode) {
+        this(cause, exceptionCode, null);
+    }
+
+    /**
+     * Creates an exception with the specified exception cause and code, and locator value.
+     *
+     * @param cause The cause of this exception.
+     * @param exceptionCode The exception code.
+     * @param locator What causes the exception.
+     */
+    public CstlServiceException(final Exception cause, final CodeList exceptionCode, final String locator) {
+        this(cause.getMessage(), cause, exceptionCode, locator);
     }
 
     /**
@@ -88,14 +108,25 @@ public class CstlServiceException extends Exception {
      * @param message The detail message.
      * @param cause The cause for this exception.
      * @param exceptionCode The exception code.
-     * @param version The service version.
      */
-    public CstlServiceException(final String message, final Exception cause,
-                               final CodeList exceptionCode)
+    public CstlServiceException(final String message, final Exception cause, final CodeList exceptionCode) {
+        this(message, cause, exceptionCode, null);
+    }
+
+    /**
+     * Creates an exception with the specified exception cause and code, and locator value.
+     *
+     * @param message The detail message.
+     * @param cause The cause of this exception.
+     * @param exceptionCode The exception code.
+     * @param locator What causes the exception.
+     */
+    public CstlServiceException(final String message, final Exception cause, final CodeList exceptionCode,
+                                final String locator)
     {
         super(message, cause);
         this.exceptionCode = exceptionCode;
-        this.locator = null;
+        this.locator = locator;
     }
 
     public CodeList getExceptionCode() {

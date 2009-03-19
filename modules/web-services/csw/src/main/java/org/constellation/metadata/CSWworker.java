@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,14 +45,27 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
+// JAXB dependencies
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.namespace.QName;
+
+// Apache Lucene dependencies
+import org.apache.lucene.search.Sort;
+
 //Constellation dependencies
 import org.constellation.cat.csw.AbstractCswRequest;
 import org.constellation.cat.csw.AbstractResultType;
+import org.constellation.cat.csw.CswXmlFactory;
 import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.ElementSetName;
 import org.constellation.cat.csw.GetDomain;
 import org.constellation.cat.csw.GetRecordById;
 import org.constellation.cat.csw.RequestBase;
+import org.constellation.cat.csw.GetRecordByIdResponse;
 import org.constellation.cat.csw.GetRecordsRequest;
 import org.constellation.cat.csw.GetCapabilities;
 import org.constellation.cat.csw.Harvest;
@@ -117,25 +130,10 @@ import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.TypeNames.*;
 
-// Apache Lucene dependencies
-import org.apache.lucene.search.Sort;
-
 //geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistry;
-
-// JAXB dependencies
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.namespace.QName;
-
-// geotools dependencies
-import org.constellation.cat.csw.CswXmlFactory;
-import org.constellation.cat.csw.GetRecordByIdResponse;
+import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
@@ -1571,12 +1569,10 @@ public class CSWworker {
                     throw new CstlServiceException("version must be \"2.0.2\"!", VERSION_NEGOTIATION_FAILED, "version");
                 }
             } else {
-                throw new CstlServiceException("version must be specified!",
-                                              MISSING_PARAMETER_VALUE, "version");
+                throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
             }
          } else { 
-            throw new CstlServiceException("The request is null!",
-                                          NO_APPLICABLE_CODE);
+            throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
          }  
         
     }

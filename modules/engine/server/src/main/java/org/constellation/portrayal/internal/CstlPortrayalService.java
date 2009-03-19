@@ -100,7 +100,7 @@ public class CstlPortrayalService implements PortrayalServiceIF {
         final ReportMonitor monitor = new ReportMonitor();
 
         try{
-            return DefaultPortrayalService.portray(
+            BufferedImage buffer = DefaultPortrayalService.portray(
                     context,
                     vdef.envelope,
                     cdef.dimension,
@@ -108,6 +108,14 @@ public class CstlPortrayalService implements PortrayalServiceIF {
                     (float)vdef.azimuth,
                     monitor,
                     cdef.background);
+
+            Exception exp = monitor.getLastException();
+            if(exp != null){
+                throw exp;
+            }
+
+            return buffer;
+
         }catch(Exception ex){
             if (ex instanceof PortrayalException) {
                 throw (PortrayalException)ex;
@@ -221,8 +229,6 @@ public class CstlPortrayalService implements PortrayalServiceIF {
             lastError = ex;
             //request stop rendering
             stopRendering();
-            //log the error
-            LOGGER.log(level,"", ex);
         }
         
     }

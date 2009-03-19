@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,6 @@
 package org.constellation.provider;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,9 +24,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.ws.rs.WebService;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotools.map.ElevationModel;
 
 /**
@@ -56,6 +54,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
@@ -63,6 +62,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<LayerDetails> getValueClass() {
         return LayerDetails.class;
     }
@@ -70,6 +70,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Set<String> getKeys() {
 
         final Set<String> keys = new HashSet<String>();
@@ -86,6 +87,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public boolean contains(String key) {
 
         for(LayerProviderService service : SERVICES){
@@ -100,6 +102,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public LayerDetails get(String key) {
 
         for(LayerProviderService service : SERVICES){
@@ -144,6 +147,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void reload() {
 
         for(LayerProviderService service : SERVICES){
@@ -157,6 +161,7 @@ public class LayerProviderProxy implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void dispose() {
 
         for(LayerProviderService service : SERVICES){
@@ -195,7 +200,7 @@ public class LayerProviderProxy implements LayerProvider{
 
     public synchronized static LayerProviderProxy getInstance(){
         if(INSTANCE == null){
-            init(WebService.getConfigDirectory().getPath() + File.separator);
+            init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new LayerProviderProxy();
         }
         
