@@ -278,7 +278,7 @@ public final class WCSService extends OGCWebService {
      */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller,
-                                                final ServiceDef serviceDef) throws JAXBException
+                                                ServiceDef serviceDef) throws JAXBException
     {
         // LOG THE EXCEPTION
         // We do not want to log the full stack trace if this is an error
@@ -294,7 +294,10 @@ public final class WCSService extends OGCWebService {
 
         // SEND THE HTTP RESPONSE
         final Object report;
-        if (isOWS(getActingVersion())) {
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
+        }
+        if (isOWS(serviceDef)) {
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
             report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
                                          serviceDef.exceptionVersion.toString());
