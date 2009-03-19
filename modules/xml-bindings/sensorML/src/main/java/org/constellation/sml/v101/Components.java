@@ -30,6 +30,9 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractComponentList;
+import org.constellation.sml.AbstractComponents;
+import org.constellation.sml.ComponentProperty;
 
 
 /**
@@ -79,7 +82,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "componentList"
 })
 @XmlRootElement(name = "components")
-public class Components {
+public class Components implements AbstractComponents {
 
     @XmlElement(name = "ComponentList")
     private Components.ComponentList componentList;
@@ -103,6 +106,30 @@ public class Components {
     private String show;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
+
+    public Components() {
+        
+    }
+
+    public Components(ComponentList componentList) {
+        this.componentList = componentList;
+    }
+
+    public Components(List<Components.ComponentList.ComponentPropertyType> component) {
+        this.componentList = new ComponentList(component);
+    }
+
+    public Components(AbstractComponents components) {
+        this.actuate       = components.getActuate();
+        this.arcrole       = components.getArcrole();
+        this.componentList = new ComponentList(components.getComponentList());
+        this.href          = components.getHref();
+        this.remoteSchema  = components.getRemoteSchema();
+        this.role          = components.getRole();
+        this.show          = components.getShow();
+        this.title         = components.getTitle();
+        this.type          = components.getType();
+    }
 
     /**
      * Gets the value of the componentList property.
@@ -360,36 +387,29 @@ public class Components {
     @XmlType(name = "", propOrder = {
         "component"
     })
-    public static class ComponentList {
+    public static class ComponentList implements AbstractComponentList {
 
         @XmlElement(required = true)
-        private List<Components.ComponentList.Component> component;
+        private List<Components.ComponentList.ComponentPropertyType> component;
+
+        public ComponentList() {
+
+        }
+
+        public ComponentList(List<Components.ComponentList.ComponentPropertyType> component) {
+            this.component = component;
+        }
+
+        public ComponentList(AbstractComponentList component) {
+            this.component = (List<ComponentPropertyType>) component.getComponent();
+        }
 
         /**
          * Gets the value of the component property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the component property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getComponent().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Components.ComponentList.Component }
-         * 
-         * 
          */
-        public List<Components.ComponentList.Component> getComponent() {
+        public List<Components.ComponentList.ComponentPropertyType> getComponent() {
             if (component == null) {
-                component = new ArrayList<Components.ComponentList.Component>();
+                component = new ArrayList<Components.ComponentList.ComponentPropertyType>();
             }
             return this.component;
         }
@@ -420,7 +440,7 @@ public class Components {
         @XmlType(name = "", propOrder = {
             "process"
         })
-        public static class Component {
+        public static class ComponentPropertyType implements ComponentProperty {
 
             @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0.1", type = JAXBElement.class)
             private JAXBElement<? extends AbstractProcessType> process;

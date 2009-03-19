@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractOutputs;
 import org.geotools.util.Utilities;
 
 
@@ -64,7 +65,7 @@ import org.geotools.util.Utilities;
     "outputList"
 })
 @XmlRootElement(name = "outputs")
-public class Outputs {
+public class Outputs implements AbstractOutputs {
 
     @XmlElement(name = "OutputList")
     private OutputList outputList;
@@ -93,6 +94,23 @@ public class Outputs {
 
     public Outputs(OutputList outputList) {
         this.outputList = outputList;
+    }
+
+    public Outputs(List<IoComponentPropertyType> outputList) {
+        this.outputList = new OutputList(outputList);
+    }
+
+    public Outputs(AbstractOutputs outputs) {
+        this.outputList    = new OutputList(outputs.getOutputList());
+        this.actuate      = outputs.getActuate();
+        this.arcrole      = outputs.getArcrole();
+        this.href         = outputs.getHref();
+        this.remoteSchema = outputs.getRemoteSchema();
+        this.role         = outputs.getRole();
+        this.show         = outputs.getShow();
+        this.title        = outputs.getTitle();
+        this.type         = outputs.getType();
+
     }
 
     /**
@@ -251,13 +269,13 @@ public class Outputs {
 
             return Utilities.equals(this.actuate, that.actuate)           &&
                    Utilities.equals(this.href, that.href)                 &&
-                   Utilities.equals(this.outputList, that.outputList)       &&
+                   Utilities.equals(this.outputList, that.outputList)     &&
                    Utilities.equals(this.nilReason, that.nilReason)       &&
                    Utilities.equals(this.remoteSchema, that.remoteSchema) &&
                    Utilities.equals(this.role, that.role)                 &&
                    Utilities.equals(this.show, that.show)                 &&
                    Utilities.equals(this.title, that.title)               &&
-                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.getType(), that.getType())       &&
                    Utilities.equals(this.arcrole, that.arcrole);
         }
         return false;

@@ -743,8 +743,8 @@ public class ObjectFactory {
      * Create an instance of {@link Components.ComponentList.Component }
      * 
      */
-    public Components.ComponentList.Component createComponentsComponentListComponent() {
-        return new Components.ComponentList.Component();
+    public Components.ComponentList.ComponentPropertyType createComponentsComponentListComponentPropertyType() {
+        return new Components.ComponentList.ComponentPropertyType();
     }
 
     /**

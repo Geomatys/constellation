@@ -21,13 +21,6 @@ package org.constellation.sml;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractComponent extends AbstractDerivableComponent {
+public interface ComponentProperty {
 
-    public AbstractInputs getInputs();
-
-    public void setInputs(AbstractInputs inputs);
-
-    public AbstractOutputs getOutputs();
-
-    public void setOutputs(AbstractOutputs outputs);
 }

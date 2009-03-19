@@ -23,4 +23,7 @@ package org.constellation.sml;
  */
 public interface System extends AbstractComponent {
 
+    public AbstractComponents getComponents();
+
+    public void setComponents(AbstractComponents components);
 }

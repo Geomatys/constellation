@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractComponents;
 import org.geotools.util.Utilities;
 
 
@@ -75,7 +76,7 @@ import org.geotools.util.Utilities;
     "componentList"
 })
 @XmlRootElement(name = "components")
-public class Components {
+public class Components implements AbstractComponents {
 
     @XmlElement(name = "ComponentList")
     private ComponentList componentList;
@@ -104,6 +105,22 @@ public class Components {
 
     public Components(ComponentList componentList) {
         this.componentList = componentList;
+    }
+
+    public Components(List<ComponentPropertyType> component) {
+        this.componentList = new ComponentList(component);
+    }
+
+    public Components(AbstractComponents components) {
+        this.actuate       = components.getActuate();
+        this.arcrole       = components.getArcrole();
+        this.componentList = new ComponentList(components.getComponentList());
+        this.href          = components.getHref();
+        this.remoteSchema  = components.getRemoteSchema();
+        this.role          = components.getRole();
+        this.show          = components.getShow();
+        this.title         = components.getTitle();
+        this.type          = components.getType();
     }
 
     /**
@@ -298,15 +315,15 @@ public class Components {
         if (object instanceof Components) {
             final Components that = (Components) object;
 
-            return Utilities.equals(this.actuate, that.actuate)           &&
-                   Utilities.equals(this.href, that.href)                 &&
-                   Utilities.equals(this.componentList, that.componentList)             &&
-                   Utilities.equals(this.nilReason, that.nilReason)       &&
-                   Utilities.equals(this.remoteSchema, that.remoteSchema) &&
-                   Utilities.equals(this.role, that.role)                 &&
-                   Utilities.equals(this.show, that.show)                 &&
-                   Utilities.equals(this.title, that.title)               &&
-                   Utilities.equals(this.type, that.type)                 &&
+            return Utilities.equals(this.actuate, that.actuate)             &&
+                   Utilities.equals(this.href, that.href)                   &&
+                   Utilities.equals(this.componentList, that.componentList) &&
+                   Utilities.equals(this.nilReason, that.nilReason)         &&
+                   Utilities.equals(this.remoteSchema, that.remoteSchema)   &&
+                   Utilities.equals(this.role, that.role)                   &&
+                   Utilities.equals(this.show, that.show)                   &&
+                   Utilities.equals(this.title, that.title)                 &&
+                   Utilities.equals(this.getType(), that.getType())         &&
                    Utilities.equals(this.arcrole, that.arcrole);
         }
         return false;

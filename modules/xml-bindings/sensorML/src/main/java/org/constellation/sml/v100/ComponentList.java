@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractComponentList;
 import org.geotools.util.Utilities;
 
 /**
@@ -59,13 +60,17 @@ import org.geotools.util.Utilities;
 @XmlType(name = "", propOrder = {
     "component"
 })
-public class ComponentList {
+public class ComponentList implements AbstractComponentList {
 
     @XmlElement(required = true)
     private List<ComponentPropertyType> component;
 
     public ComponentList() {
 
+    }
+
+    public ComponentList(AbstractComponentList component) {
+        this.component = (List<ComponentPropertyType>) component.getComponent();
     }
 
     public ComponentList(List<ComponentPropertyType> component) {

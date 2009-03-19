@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.ComponentProperty;
 import org.geotools.util.Utilities;
 
 /**
@@ -53,7 +54,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "", propOrder = {
     "process"
 })
-public class ComponentPropertyType {
+public class ComponentPropertyType implements ComponentProperty {
 
     @XmlElementRef(name = "AbstractProcess", namespace = "http://www.opengis.net/sensorML/1.0", type = JAXBElement.class)
     private JAXBElement<? extends AbstractProcessType> process;
@@ -81,6 +82,10 @@ public class ComponentPropertyType {
 
     public ComponentPropertyType() {
 
+    }
+
+    public ComponentPropertyType(String href) {
+        this.href = href;
     }
 
     public ComponentPropertyType(String name, JAXBElement<? extends AbstractProcessType> process) {

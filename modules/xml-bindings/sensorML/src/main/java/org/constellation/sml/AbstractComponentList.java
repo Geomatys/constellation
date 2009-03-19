@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,14 @@
 
 package org.constellation.sml;
 
+import java.util.List;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractComponent extends AbstractDerivableComponent {
+public interface AbstractComponentList {
 
-    public AbstractInputs getInputs();
+    public List<? extends ComponentProperty> getComponent();
 
-    public void setInputs(AbstractInputs inputs);
-
-    public AbstractOutputs getOutputs();
-
-    public void setOutputs(AbstractOutputs outputs);
 }

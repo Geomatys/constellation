@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractOutputList;
 import org.geotools.util.Utilities;
 
 /**
@@ -53,7 +54,7 @@ import org.geotools.util.Utilities;
 @XmlType(name = "", propOrder = {
     "output"
 })
-public class OutputList {
+public class OutputList implements AbstractOutputList {
 
     @XmlElement(required = true)
     private List<IoComponentPropertyType> output;
@@ -67,6 +68,11 @@ public class OutputList {
 
     public OutputList(List<IoComponentPropertyType> output) {
         this.output = output;
+    }
+
+    public OutputList(AbstractOutputList outputList) {
+        this.output = (List<IoComponentPropertyType>) outputList.getOutput();
+        this.id    = outputList.getId();
     }
 
     /**

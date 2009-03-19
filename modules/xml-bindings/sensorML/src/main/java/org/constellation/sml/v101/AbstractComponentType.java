@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractComponent;
 import org.constellation.sml.AbstractInputs;
+import org.constellation.sml.AbstractOutputs;
 import org.geotools.util.Utilities;
 
 
@@ -84,8 +85,8 @@ public abstract class AbstractComponentType extends AbstractDerivableComponentTy
     /**
      * @param outputs the outputs to set
      */
-    public void setOutputs(Outputs outputs) {
-        this.outputs = outputs;
+    public void setOutputs(AbstractOutputs outputs) {
+        this.outputs = new Outputs(outputs);
     }
 
     /**

@@ -553,28 +553,28 @@ public class IoComponentPropertyType implements IoComponent {
             } else if (this.abstractDataArray == null && that.abstractDataArray == null) {
                 absDataArr = true;
             }
-            return Utilities.equals(this.actuate,      that.actuate)       &&
-                   Utilities.equals(this.arcrole,      that.arcrole)       &&
-                   Utilities.equals(this.href,         that.href)          &&
-                   absDataRec                                              &&
-                   absDataArr                                              &&
-                   Utilities.equals(this.remoteSchema, that.remoteSchema)  &&
-                   Utilities.equals(this.role,         that.role)          &&
-                   Utilities.equals(this.show,         that.show)          &&
-                   Utilities.equals(this.title,        that.title)         &&
-                   Utilities.equals(this._boolean,     that._boolean)      &&
-                   Utilities.equals(this.category,     that.category)      &&
-                   Utilities.equals(this.count,        that.count)         &&
-                   Utilities.equals(this.countRange,   that.countRange)    &&
-                   Utilities.equals(this.name,         that.name)          &&
-                   Utilities.equals(this.quantity,     that.quantity)      &&
-                   Utilities.equals(this.quantityRange,that.quantityRange) &&
-                   Utilities.equals(this.time,         that.time)          &&
-                   Utilities.equals(this.timeRange,    that.timeRange)     &&
-                   Utilities.equals(this.text,         that.text)          &&
-                   Utilities.equals(this.nilReason,    that.nilReason)     &&
+            return Utilities.equals(this.actuate,             that.actuate)            &&
+                   Utilities.equals(this.arcrole,             that.arcrole)            &&
+                   Utilities.equals(this.href,                that.href)               &&
+                   absDataRec                                                          &&
+                   absDataArr                                                          &&
+                   Utilities.equals(this.remoteSchema,        that.remoteSchema)       &&
+                   Utilities.equals(this.role,                that.role)               &&
+                   Utilities.equals(this.show,                that.show)               &&
+                   Utilities.equals(this.title,               that.title)              &&
+                   Utilities.equals(this._boolean,            that._boolean)           &&
+                   Utilities.equals(this.category,            that.category)           &&
+                   Utilities.equals(this.count,               that.count)              &&
+                   Utilities.equals(this.countRange,          that.countRange)         &&
+                   Utilities.equals(this.name,                that.name)               &&
+                   Utilities.equals(this.quantity,            that.quantity)           &&
+                   Utilities.equals(this.quantityRange,       that.quantityRange)      &&
+                   Utilities.equals(this.time,                that.time)               &&
+                   Utilities.equals(this.timeRange,           that.timeRange)          &&
+                   Utilities.equals(this.text,                that.text)               &&
+                   Utilities.equals(this.nilReason,           that.nilReason)          &&
                    Utilities.equals(this.observableProperty,  that.observableProperty) &&
-                   Utilities.equals(this.type,         that.type);
+                   Utilities.equals(this.getType(),           that.getType());
         }
         return false;
     }

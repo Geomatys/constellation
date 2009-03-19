@@ -19,8 +19,11 @@ package org.constellation.sml.v101;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractComponents;
 import org.constellation.sml.System;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -48,5 +51,80 @@ import org.constellation.sml.System;
 @XmlType(name = "SystemType")
 public class SystemType extends AbstractComponentType implements System {
 
+    @XmlElement(required = true)
+    private Components components;
+    @XmlElement(required = true)
+    private Positions positions;
+    @XmlElement(required = true)
+    private Connections connections;
+
+    /**
+     * @return the components
+     */
+    public Components getComponents() {
+        return components;
+    }
+
+    /**
+     * @param components the components to set
+     */
+    public void setComponents(AbstractComponents components) {
+        this.components = new Components(components);
+    }
+
+    /**
+     * @return the positions
+     */
+    public Positions getPositions() {
+        return positions;
+    }
+
+    /**
+     * @param positions the positions to set
+     */
+    public void setPositions(Positions positions) {
+        this.positions = positions;
+    }
+
+    /**
+     * @return the connections
+     */
+    public Connections getConnections() {
+        return connections;
+    }
+
+    /**
+     * @param connections the connections to set
+     */
+    public void setConnections(Connections connections) {
+        this.connections = connections;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof SystemType && super.equals(object)) {
+            final SystemType that = (SystemType) object;
+            return Utilities.equals(this.components,  that.components)  &&
+                   Utilities.equals(this.connections, that.connections) &&
+                   Utilities.equals(this.positions,   that.positions);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + (this.components != null ? this.components.hashCode() : 0);
+        hash = 71 * hash + (this.positions != null ? this.positions.hashCode() : 0);
+        hash = 71 * hash + (this.connections != null ? this.connections.hashCode() : 0);
+        return hash;
+    }
 
 }

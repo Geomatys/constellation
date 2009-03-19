@@ -17,17 +17,17 @@
 
 package org.constellation.sml;
 
+import java.util.List;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractComponent extends AbstractDerivableComponent {
+public interface AbstractOutputList {
 
-    public AbstractInputs getInputs();
+    public String getId();
 
-    public void setInputs(AbstractInputs inputs);
+    public void setId(String value);
 
-    public AbstractOutputs getOutputs();
-
-    public void setOutputs(AbstractOutputs outputs);
+    public List<? extends IoComponent> getOutput();
 }

@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractOutputList;
+import org.constellation.sml.AbstractOutputs;
 import org.geotools.util.Utilities;
 
 
@@ -69,7 +71,7 @@ import org.geotools.util.Utilities;
     "outputList"
 })
 @XmlRootElement(name = "outputs")
-public class Outputs {
+public class Outputs implements AbstractOutputs {
 
     @XmlElement(name = "OutputList")
     private Outputs.OutputList outputList;
@@ -101,7 +103,20 @@ public class Outputs {
     public Outputs(OutputList outputList) {
         this.outputList = outputList;
     }
-    
+
+    public Outputs(AbstractOutputs outputs) {
+        this.outputList    = new OutputList(outputs.getOutputList());
+        this.actuate      = outputs.getActuate();
+        this.arcrole      = outputs.getArcrole();
+        this.href         = outputs.getHref();
+        this.remoteSchema = outputs.getRemoteSchema();
+        this.role         = outputs.getRole();
+        this.show         = outputs.getShow();
+        this.title        = outputs.getTitle();
+        this.type         = outputs.getType();
+
+    }
+
     /**
      * Gets the value of the outputList property.
      * 
@@ -387,7 +402,7 @@ public class Outputs {
     @XmlType(name = "", propOrder = {
         "output"
     })
-    public static class OutputList {
+    public static class OutputList implements AbstractOutputList {
 
         @XmlElement(required = true)
         private List<IoComponentPropertyType> output;
@@ -404,7 +419,13 @@ public class Outputs {
         public OutputList(List<IoComponentPropertyType> output)  {
             this.output = output;
         }
-        
+
+        public OutputList(AbstractOutputList outputList) {
+            this.output = (List<IoComponentPropertyType>) outputList.getOutput();
+            this.id    = outputList.getId();
+        }
+
+
         /**
          * Gets the value of the output property.
          */
