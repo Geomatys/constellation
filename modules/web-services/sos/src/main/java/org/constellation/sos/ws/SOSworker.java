@@ -1748,9 +1748,9 @@ public class SOSworker {
      * we search the CATALINA_HOME/webapps/ifremer-sos/WEB-INF/sos_configuration
      */
     private File getConfigDirectory() {
-        File configDir = new File(WebService.getSicadeDirectory(), "sos_configuration/");
+        File configDir = new File(WebService.getConfigDirectory(), "sos_configuration/");
         if (configDir.exists()) {
-            logger.info("taking configuration from sicade directory");
+            logger.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
         } else {
 

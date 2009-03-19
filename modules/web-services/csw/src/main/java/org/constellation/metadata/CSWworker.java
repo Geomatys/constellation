@@ -358,9 +358,9 @@ public class CSWworker {
      * we search the CATALINA_HOME/webapps/sdn-csw_WS/WEB-INF/csw_configuration
      */
     private File getConfigDirectory() {
-        File configDir = new File(WebService.getSicadeDirectory(), "csw_configuration/");
+        File configDir = new File(WebService.getConfigDirectory(), "csw_configuration/");
         if (configDir.exists()) {
-            logger.info("taking configuration from sicade directory");
+            logger.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
         } else {
 
