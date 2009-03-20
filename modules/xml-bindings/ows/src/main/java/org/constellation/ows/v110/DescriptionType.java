@@ -163,18 +163,24 @@ public class DescriptionType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("class=DescriptionType").append('\n');
-        s.append("title:").append('\n');
-        for (LanguageStringType l:getTitle()) {
-             s.append(l).append('\n');
+        s.append("[").append(this.getClass().getSimpleName()).append(']').append('\n');
+        if (title != null) {
+            s.append("title:").append('\n');
+            for (LanguageStringType l:getTitle()) {
+                 s.append(l).append('\n');
+            }
         }
-        s.append("abstract:").append('\n');
-        for (LanguageStringType l:getAbstract()) {
-             s.append(l).append('\n');
+        if (_abstract != null) {
+            s.append("abstract:").append('\n');
+            for (LanguageStringType l:getAbstract()) {
+                 s.append(l).append('\n');
+            }
         }
-        s.append("keywords:").append('\n');
-        for (KeywordsType l:getKeywords()) {
-             s.append(l).append('\n');
+        if (keywords != null) {
+            s.append("keywords:").append('\n');
+            for (KeywordsType l:getKeywords()) {
+                 s.append(l).append('\n');
+            }
         }
         return s.toString();
     }

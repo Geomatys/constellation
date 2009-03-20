@@ -244,8 +244,7 @@ public abstract class GenericReader  {
      * @param identifier
      */
     protected Values loadData(List<String> variables) {
-        List<String> s = null;
-        return loadData(variables, s);
+        return loadData(variables, new ArrayList<String>());
     }
 
     /**
