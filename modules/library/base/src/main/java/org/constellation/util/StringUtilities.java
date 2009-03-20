@@ -140,12 +140,12 @@ public class StringUtilities {
             return null;
         }
         final String epsgTrimmed = epsg.trim();
-        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith("UNDEFINEDCRS")) {
-            //TODO fix this
-            //we should return the good EPSG 32662
-            return DefaultGeographicCRS.WGS84;
-        }
-        return CRS.decode(epsg);
+//        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith("UNDEFINEDCRS")) {
+//            //TODO fix this
+//            //we should return the good EPSG 32662
+//            return DefaultGeographicCRS.WGS84;
+//        }
+        return CRS.decode(epsg, true);
     }
 
     /**
