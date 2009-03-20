@@ -86,6 +86,11 @@
       <artifactId>cstl-xml-ows</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-gml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

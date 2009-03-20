@@ -149,7 +149,8 @@ public enum ServiceDef {
 		CSW("Catalog Service for the Web"),
 		SOS("Sensor Observation Service"),
 		WCS("Web Coverage Service"),
-		WMS("Web Map Service"),
+		WFS("Web Feature Service"),
+        WMS("Web Map Service"),
         WMTS("Web Map Tile Service"),
 		PEP("Policy Enforcement Point"),
 		PDP("Policy Decision Point");

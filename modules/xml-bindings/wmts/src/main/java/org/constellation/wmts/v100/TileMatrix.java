@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.gml.v311.PointType;
 import org.constellation.ows.v110.CodeType;
 import org.constellation.ows.v110.DescriptionType;
 
@@ -60,6 +61,7 @@ import org.constellation.ows.v110.DescriptionType;
     "identifier",
     "scaleDenominator",
     "topLeftCorner",
+    "topLeftPoint",
     "tileWidth",
     "tileHeight",
     "matrixWidth",
@@ -77,6 +79,8 @@ public class TileMatrix
     @XmlList
     @XmlElement(name = "TopLeftCorner", type = Double.class)
     protected List<Double> topLeftCorner;
+    @XmlElement(name = "TopPoint")
+    private PointType topLeftPoint;
     @XmlElement(name = "TileWidth", required = true)
     @XmlSchemaType(name = "positiveInteger")
     protected BigInteger tileWidth;
@@ -253,6 +257,20 @@ public class TileMatrix
      */
     public void setMatrixHeight(BigInteger value) {
         this.matrixHeight = value;
+    }
+
+    /**
+     * @return the topLeftPoint
+     */
+    public PointType getTopLeftPoint() {
+        return topLeftPoint;
+    }
+
+    /**
+     * @param topLeftPoint the topLeftPoint to set
+     */
+    public void setTopLeftPoint(PointType topLeftPoint) {
+        this.topLeftPoint = topLeftPoint;
     }
 
 }

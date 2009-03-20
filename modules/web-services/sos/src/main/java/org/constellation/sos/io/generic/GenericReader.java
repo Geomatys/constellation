@@ -130,7 +130,7 @@ public abstract class GenericReader  {
         isThreadEnabled = false;
     }
 
-    protected GenericReader(Map<List<String>, Values> debugValues) throws CstlServiceException {
+    protected GenericReader(Map<List<String>, Values> debugValues, HashMap<String, String> staticParameters) throws CstlServiceException {
         advancedJdbcDriver = true;
         debugMode          = true;
         isThreadEnabled    = false;
@@ -138,6 +138,11 @@ public abstract class GenericReader  {
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
         StringQueryMap     = new HashMap<PreparedStatement, String>();
+        if (staticParameters != null) {
+            this.staticParameters = staticParameters;
+        } else {
+            this.staticParameters = new HashMap<String, String>();
+        }
     }
 
     /**
@@ -154,6 +159,10 @@ public abstract class GenericReader  {
         if (queries != null) {
 
             staticParameters = queries.getParameters();
+            if (staticParameters == null) {
+                staticParameters = new HashMap<String, String>();
+            }
+            
             // initialize the single statements
             Single single = queries.getSingle();
             if (single != null) {
