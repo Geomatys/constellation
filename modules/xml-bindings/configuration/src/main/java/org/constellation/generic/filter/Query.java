@@ -18,6 +18,7 @@
 package org.constellation.generic.filter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -34,6 +35,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "parameters",
     "paramsSql",
     "select",
     "nestedSelect",
@@ -53,6 +55,9 @@ public class Query {
     @XmlAttribute
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String option;
+
+    private HashMap<String, String> parameters;
+
     @XmlElement(name = "params_sql")
     private ParamsSql paramsSql;
     @XmlElement(required = true)
@@ -236,6 +241,21 @@ public class Query {
         }
         return this.groupby;
     }
+
+    /**
+     * @return the parameters
+     */
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * @param parameters the parameters to set
+     */
+    public void setParameters(HashMap<String, String> parameters) {
+        this.parameters = parameters;
+    }
+    
 
     public String buildSQLQuery() {
         StringBuilder sb = new StringBuilder();

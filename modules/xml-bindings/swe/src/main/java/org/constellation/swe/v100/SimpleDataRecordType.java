@@ -51,6 +51,14 @@ public class SimpleDataRecordType extends AbstractDataRecordType {
 
     private List<AnyScalarPropertyType> field;
 
+    public SimpleDataRecordType() {
+
+    }
+
+    public SimpleDataRecordType(List<AnyScalarPropertyType> field) {
+        this.field = field;
+    }
+
     /**
      * Gets the value of the field property.
      */

@@ -17,6 +17,7 @@
 
 package org.constellation.generic.filter;
 
+import java.util.HashMap;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -106,6 +107,14 @@ public class Where {
             value = value.replaceAll('&' + varName, varValue);
     }
 
+
+
+    public void replaceVariable(HashMap<String, String> parameters) {
+        for (String paramName : parameters.keySet()) {
+            value = value.replaceAll('&' + paramName, parameters.get(paramName));
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[WHERE]:").append('\n');

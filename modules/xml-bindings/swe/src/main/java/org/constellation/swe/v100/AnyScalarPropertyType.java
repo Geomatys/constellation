@@ -97,6 +97,40 @@ public class AnyScalarPropertyType implements AnyScalar {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public AnyScalarPropertyType() {
+
+    }
+
+    public AnyScalarPropertyType(String name, Count count) {
+        this.name  = name;
+        this.count = count;
+    }
+
+    public AnyScalarPropertyType(String name, QuantityType quantity) {
+        this.name     = name;
+        this.quantity = quantity;
+    }
+
+    public AnyScalarPropertyType(String name, TimeType time) {
+        this.name  = name;
+        this.time  = time;
+    }
+
+    public AnyScalarPropertyType(String name, Boolean _boolean) {
+        this.name  = name;
+        this._boolean = _boolean;
+    }
+
+    public AnyScalarPropertyType(String name, Category category) {
+        this.name  = name;
+        this.category = category;
+    }
+
+    public AnyScalarPropertyType(String name, Text text) {
+        this.name  = name;
+        this.text  = text;
+    }
+
     /**
      * Gets the value of the count property.
      * 

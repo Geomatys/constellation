@@ -59,8 +59,9 @@ public class TimeType extends AbstractDataComponentEntry {
      */
     public TimeType(String definition, String uomCode, String uomHref) {
         super(null, definition, false);
-        this.uom = new UomPropertyType(uomCode, uomHref);
-        
+        if (uomCode != null || uomHref != null) {
+            this.uom = new UomPropertyType(uomCode, uomHref);
+        }
     }
     
     /**

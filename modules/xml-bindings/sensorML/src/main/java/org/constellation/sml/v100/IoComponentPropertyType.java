@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -41,6 +42,7 @@ import org.constellation.swe.v100.Text;
 import org.constellation.swe.v100.TimeType;
 import org.constellation.swe.v100.TimeRange;
 import org.constellation.swe.v100.AbstractDataRecordType;
+import org.constellation.swe.v100.SimpleDataRecordType;
 import org.geotools.util.Utilities;
 
 
@@ -129,6 +131,9 @@ public class IoComponentPropertyType implements IoComponent {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String type;
 
+    @XmlTransient
+    private org.constellation.swe.v100.ObjectFactory factory = new org.constellation.swe.v100.ObjectFactory();
+
     public IoComponentPropertyType() {
 
     }
@@ -146,6 +151,11 @@ public class IoComponentPropertyType implements IoComponent {
     public IoComponentPropertyType(String name, JAXBElement<? extends AbstractDataRecordType> abstractDataRecord) {
         this.name = name;
         this.abstractDataRecord = abstractDataRecord;
+    }
+
+    public IoComponentPropertyType(String name, SimpleDataRecordType abstractDataRecord) {
+        this.name = name;
+        this.abstractDataRecord = factory.createSimpleDataRecord(abstractDataRecord);
     }
 
     /**
