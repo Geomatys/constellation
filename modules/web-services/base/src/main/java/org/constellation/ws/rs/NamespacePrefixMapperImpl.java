@@ -215,6 +215,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
         else if("http://www.opengis.net/wmts/1.0.0".equals(namespaceUri) )
             prefix = "wmts";
+        
+        else if("urn:oasis:names:tc:xacml:2.0:context:schema:os".equals(namespaceUri) )
+            prefix = "xacml-context";
+        
+        else if("urn:oasis:names:tc:xacml:2.0:policy:schema:os".equals(namespaceUri) )
+            prefix = "xacml-policy";
 
         
         return prefix;
