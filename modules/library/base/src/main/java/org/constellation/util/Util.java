@@ -19,9 +19,13 @@
 package org.constellation.util;
 
 import java.awt.image.RenderedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -1392,5 +1396,39 @@ public final class Util {
         code = code.toLowerCase();
         result += firstToUpper(code);
         return result;
+    }
+    
+    /**
+     * Read the contents of a file into string.
+     * 
+     * @param f the file name
+     * @return The file contents as string
+     * @throws IOException if the file does not exist or cannot be read.
+     */
+    public static String stringFromFile(File f) throws IOException {
+        
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(new FileReader(f));
+        String line;
+        while ((line = br.readLine()) != null){
+            sb.append(line).append('\n');
+        }
+        br.close();
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Read the contents of a file into string.
+     * 
+     * @param f the file name
+     * @return The file contents as string
+     * @throws IOException if the file does not exist or cannot be read.
+     */
+    public static void stringToFile(File f, String s) throws IOException {
+        
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        bw.write(s);
+        bw.close();
     }
 }
