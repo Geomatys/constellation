@@ -19,6 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.List;
 
+import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
@@ -97,6 +98,15 @@ public interface ObservationFilter {
     public void setTimeDuring(Object time) throws CstlServiceException;
 
     /**
+     * Add a BBOX filter to the current request.
+     * ( this method is implemented only if isBoundedObservation() return true)
+     *
+     * @param e
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException;
+
+    /**
      * Execute the current query and return a list of observation result.
      * 
      * @return
@@ -115,4 +125,9 @@ public interface ObservationFilter {
      * Return informations about the implementation class.
      */
     public String getInfos();
+
+    /**
+     * Return true if each observation has a position
+     */
+    public boolean isBoundedObservation();
 }

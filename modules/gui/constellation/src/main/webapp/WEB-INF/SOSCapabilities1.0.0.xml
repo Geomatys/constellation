@@ -186,8 +186,9 @@
 		<ows:Operation name="DescribeSensor">
 			<ows:DCP>
 				<ows:HTTP>
+					<ows:Get xlink:href=""/>					
 					<ows:Post xlink:href=""/>
-				</ows:HTTP>
+       				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="version">
 				<ows:AllowedValues>

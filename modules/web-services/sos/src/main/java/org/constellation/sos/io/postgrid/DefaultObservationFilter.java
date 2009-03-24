@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
@@ -363,5 +364,13 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public String getInfos() {
         return "Constellation Postgrid O&M Filter 0.3";
+    }
+
+    public boolean isBoundedObservation() {
+        return false;
+    }
+
+    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 }

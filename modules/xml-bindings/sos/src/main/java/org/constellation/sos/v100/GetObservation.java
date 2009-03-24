@@ -386,6 +386,18 @@ public class GetObservation extends RequestBaseType {
         @XmlElement(name = "ObjectID")
         private List<String> objectID = new ArrayList<String>();
 
+        public FeatureOfInterest() {
+
+        }
+
+        public FeatureOfInterest(List<String> objectID) {
+            this.objectID = objectID;
+        }
+
+        public FeatureOfInterest(BBOXType bbox) {
+            this.bbox = bbox;
+        }
+
         /**
          * Return the spatial operator whitch is not null.If there is not return null.
          * SO your can only use this method to access all the spatial operator

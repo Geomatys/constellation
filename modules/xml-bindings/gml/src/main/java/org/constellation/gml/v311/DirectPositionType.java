@@ -58,7 +58,9 @@ public class DirectPositionType {
     /**
      * Empty constructor used by JAXB.
      */
-    DirectPositionType() {}
+    public DirectPositionType() {
+
+    }
 
     /**
      * Build a full Direct position.
@@ -184,11 +186,15 @@ public class DirectPositionType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[DirectPositionType]:");
-        s.append("srsName = ").append(srsName).append(" srsDimension = ").append(srsDimension);
-        s.append('\n').append(" value: ");
-
-        for(double v :value) {
-           s.append(v).append(' ');
+        if (srsName != null) {
+            s.append("srsName = ").append(srsName).append('\n');
+            s.append(" srsDimension = ").append(srsDimension).append('\n');
+        }
+        if (value != null) {
+            s.append(" value: ").append('\n');
+            for(double v :value) {
+                s.append(v).append(", ");
+            }
         }
         return s.toString();
     }

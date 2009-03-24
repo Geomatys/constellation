@@ -39,6 +39,7 @@ import org.constellation.generic.filter.From;
 import org.constellation.generic.filter.Query;
 import org.constellation.generic.filter.Select;
 import org.constellation.generic.filter.Where;
+import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimeInstantType;
 import org.constellation.gml.v311.TimePeriodType;
@@ -373,5 +374,13 @@ public class GenericObservationFilter implements ObservationFilter {
 
     public String getInfos() {
         return "Constellation Generic O&M Filter 0.3";
+    }
+
+    public boolean isBoundedObservation() {
+        return false;
+    }
+
+    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 }

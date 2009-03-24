@@ -417,14 +417,19 @@ public class MDWebMetadataReader extends MetadataReader {
         //we get the type of the data
         List<Value> typeValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("type")));
         String dataType         = null;
-        if (typeValues.size() != 0) {
-            TextValue value = (TextValue)typeValues.get(0);
-            int code = Integer.parseInt(value.getValue());
-            org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
-            CodeListElement element = codelist.getElementByCode(code);
-            dataType = element.getName();        
+        SimpleLiteral litType   = null;
+        try {
+            if (typeValues.size() != 0) {
+                TextValue value = (TextValue)typeValues.get(0);
+                int code = Integer.parseInt(value.getValue());
+                org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
+                CodeListElement element = codelist.getElementByCode(code);
+                dataType = element.getName();
+            }
+            litType = new SimpleLiteral(null, dataType);
+        } catch (NumberFormatException ex) {
+            logger.severe("Number format exception while trying to get the DC type");
         }
-        SimpleLiteral litType = new SimpleLiteral(null, dataType);
         
         
         // we get the keywords

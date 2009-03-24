@@ -540,7 +540,7 @@ public abstract class WebService {
                     }
                 }
             }else{
-                LOGGER.log(Level.WARNING,"config_dir is not defined in the Constelaltion JNDI resource.");
+                LOGGER.log(Level.WARNING,"config_dir is not defined in the Constellation JNDI resource.");
             }
 
         } catch (NamingException ex) {

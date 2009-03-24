@@ -274,8 +274,8 @@ public class SOService extends OGCWebService {
 
         return new DescribeSensor(getParameter("VERSION", true),
                                   getParameter("SERVICE", true),
-                                  getParameter("SENSORID", true),
-                                  getParameter("outputFormat", true));
+                                  getParameter("PROCEDURE", true),
+                                  getParameter("OUTPUTFORMAT", true));
 
 
     }

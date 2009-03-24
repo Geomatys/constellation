@@ -20,6 +20,7 @@ package org.constellation.sos.io.lucene;
 import java.util.List;
 import java.util.Properties;
 import org.constellation.generic.database.Automatic;
+import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.v100.ObservationOfferingEntry;
@@ -92,6 +93,14 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     public String getInfos() {
         return "Constellation Lucene O&M Filter 0.3";
+    }
+
+    public boolean isBoundedObservation() {
+        return false;
+    }
+
+    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
 }

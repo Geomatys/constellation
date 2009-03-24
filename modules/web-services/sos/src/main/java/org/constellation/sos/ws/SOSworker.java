@@ -715,7 +715,12 @@ public class SOSworker {
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
             if (!off.getSrsName().contains(requestObservation.getSrsName())) {
-                throw new CstlServiceException("This srs name is not advertised in the offering",
+                String availableSrs = "";
+                for (String s : off.getSrsName()) {
+                    availableSrs = availableSrs + s + '\n';
+                }
+                throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
+                                               "Available srs name are:\n" + availableSrs,
                                                 INVALID_PARAMETER_VALUE, "srsName");
             }
         }
@@ -814,27 +819,36 @@ public class SOSworker {
                         EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
                         boolean add     = false;
                         List<String> matchingFeatureOfInterest = new ArrayList<String>();
-                        for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
-                            SamplingPoint station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
-                            if (station == null)
-                                throw new CstlServiceException("the feature of interest is not registered",
-                                        INVALID_PARAMETER_VALUE);
-                            if (station instanceof SamplingPointEntry) {
-                                SamplingPointEntry sp = (SamplingPointEntry) station;
-                                if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
-                                        sp.getPosition().getPos().getValue().get(0) < e.getLowerCorner().getValue().get(0) &&
-                                        sp.getPosition().getPos().getValue().get(1) > e.getUpperCorner().getValue().get(1) &&
-                                        sp.getPosition().getPos().getValue().get(1) < e.getLowerCorner().getValue().get(1)) {
+                        if (OMFilter.isBoundedObservation()) {
+                            OMFilter.setBoundingBox(e);
+                        } else {
+                            for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
+                                SamplingPoint station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
+                                if (station == null)
+                                    throw new CstlServiceException("the feature of interest is not registered",
+                                            INVALID_PARAMETER_VALUE);
+                                if (station instanceof SamplingPointEntry) {
+                                    SamplingPointEntry sp = (SamplingPointEntry) station;
+                                    if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
+                                        if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
+                                            sp.getPosition().getPos().getValue().get(0) < e.getLowerCorner().getValue().get(0) &&
+                                            sp.getPosition().getPos().getValue().get(1) > e.getUpperCorner().getValue().get(1) &&
+                                            sp.getPosition().getPos().getValue().get(1) < e.getLowerCorner().getValue().get(1)) {
 
-                                    matchingFeatureOfInterest.add(sp.getId());
-                                    add = true;
-                                } else {
-                                    logger.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                                            matchingFeatureOfInterest.add(sp.getId());
+                                            add = true;
+                                        } else {
+                                            logger.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                                        }
+                                    } else {
+                                        logger.severe(" the feature of interest " + sp.getId() + " does not have proper position");
+                                    }
                                 }
                             }
+                            if (add) {
+                                OMFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                            }
                         }
-                        if (add)
-                            OMFilter.setFeatureOfInterest(matchingFeatureOfInterest);
                         
                     } else {
                         throw new CstlServiceException("the envelope is not build correctly",

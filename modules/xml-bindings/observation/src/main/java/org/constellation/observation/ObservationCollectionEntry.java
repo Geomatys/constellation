@@ -57,7 +57,6 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
         super(null, null, null);
         member = new ArrayList<ObservationPropertyType>();
         member.add(new ObservationPropertyType(title));
-        System.out.println("-----------------------------AQUI-----------------------------------");
     }
     
     /**
@@ -118,7 +117,7 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("Observation Collection:").append('\n');
+        s.append("[ObservationCollectionEnry]:").append('\n');
         s.append("super:").append(super.toString());
         int i = 1;
         for (ObservationPropertyType obs:member) {
