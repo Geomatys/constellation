@@ -36,7 +36,7 @@ import org.geotools.util.Utilities;
 @XmlType(propOrder = {
     "topLeftPoint"
 })
-@XmlRootElement(name="TopLeftPointPoint")
+@XmlRootElement(name="TopLeftPoint")
 public class TopLeftPoint {
 
     @XmlElementRef(name = "Point", namespace="http://www.opengis.net/gml")

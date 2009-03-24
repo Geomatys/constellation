@@ -21,7 +21,6 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -29,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.ows.v110.CodeType;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -38,7 +38,6 @@ import static org.junit.Assert.*;
  */
 public class WmtsXmlBindingTest {
 
-    private Logger       logger = Logger.getLogger("org.constellation.swe");
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
@@ -52,11 +51,13 @@ public class WmtsXmlBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext context = JAXBContext.newInstance("org.constellation.wmts.v100:org.constellation.gml.v311");
+        JAXBContext context = JAXBContext.newInstance("org.constellation.wmts.v100:" +
+                                                      "org.constellation.gml.v311:" +
+                                                      "org.constellation.ows.v110");
         unmarshaller           = context.createUnmarshaller();
         marshaller             = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wmts/1.0.0"));
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wmts/1.0"));
     }
 
     @After
@@ -71,7 +72,7 @@ public class WmtsXmlBindingTest {
     @Test
     public void unmarshallingTest() throws Exception {
 
-        String xml = "<TileMatrix xmlns=\"http://www.opengis.net/wmts/1.0.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:gml=\"http://www.opengis.net/gml\" >" + '\n' +
+        String xml = "<TileMatrix xmlns=\"http://www.opengis.net/wmts/1.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:gml=\"http://www.opengis.net/gml\" >" + '\n' +
                      "  <ows:Identifier>16d</ows:Identifier>" + '\n' +
                      "  <ScaleDenominator>55218.001386</ScaleDenominator>" + '\n' +
                      "  <TopLeftPoint>" + '\n' +
@@ -123,14 +124,14 @@ public class WmtsXmlBindingTest {
         marshaller.marshal(matrix, sw);
         String result = sw.toString();
 
-        System.out.println("RESULT:" + result);
+        //System.out.println("RESULT:" + result);
         
         //we remove the first line
         result = result.substring(result.indexOf("?>") + 3);
         //we remove the xmlmns
         result = result.replace(" xmlns:ows=\"http://www.opengis.net/ows/1.1\"", "");
         result = result.replace(" xmlns:gml=\"http://www.opengis.net/gml\"", "");
-        result = result.replace(" xmlns=\"http://www.opengis.net/wmts/1.0.0\"", "");
+        result = result.replace(" xmlns=\"http://www.opengis.net/wmts/1.0\"", "");
         result = result.replace(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"", "");
 
 
@@ -165,6 +166,7 @@ public class WmtsXmlBindingTest {
         this.rootNamespace = rootNamespace;
 
     }
+
     /**
      * Returns a preferred prefix for the given namespace URI.
      *
@@ -200,6 +202,7 @@ public class WmtsXmlBindingTest {
      *      If this method returns "" when requirePrefix=true, the return
      *      value will be ignored and the system will generate one.
      */
+    @Override
     public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
         String prefix = null;
 
@@ -311,7 +314,7 @@ public class WmtsXmlBindingTest {
         else if( "http://www.w3.org/1999/02/22-rdf-syntax-ns#".equals(namespaceUri) )
             prefix = "rdf";
 
-        else if( "http://www.opengis.net/wmts/1.0.0".equals(namespaceUri) )
+        else if( "http://www.opengis.net/wmts/1.0".equals(namespaceUri) )
             prefix = "wmts";
         
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
