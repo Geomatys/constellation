@@ -74,8 +74,18 @@ public class DescribeSensor extends RequestBaseType {
     /**
      * An empty constructor used by jaxB
      */
-     DescribeSensor(){}
-     
+     public DescribeSensor() {
+     }
+
+     /**
+     * Build a new DescribeSensor Request
+     */
+     public DescribeSensor(String version, String service, String procedure, String outputFormat) {
+         super(version, service);
+         this.outputFormat = outputFormat;
+         this.procedure    = procedure;
+     }
+
      /**
      * Build a new DescribeSensor Request
      */

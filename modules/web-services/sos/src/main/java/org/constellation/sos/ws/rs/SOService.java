@@ -100,8 +100,7 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
-                    throw new CstlServiceException("The operation DescribeSensor is only requestable in XML",
-                                                  OPERATION_NOT_SUPPORTED, "DescribeSensor");
+                    ds = createDescribeSensor();
                 }
                 serviceDef = getVersionFromNumber(ds.getVersion());
                 StringWriter sw = new StringWriter();
@@ -265,6 +264,19 @@ public class SOService extends OGCWebService {
                                    formats,
                                    null,
                                    getParameter("SERVICE", true));
+
+    }
+
+    /**
+     * Build a new getCapabilities request from kvp encoding
+     */
+    private DescribeSensor createDescribeSensor() throws CstlServiceException, JAXBException {
+
+        return new DescribeSensor(getParameter("VERSION", true),
+                                  getParameter("SERVICE", true),
+                                  getParameter("SENSORID", true),
+                                  getParameter("outputFormat", true));
+
 
     }
 

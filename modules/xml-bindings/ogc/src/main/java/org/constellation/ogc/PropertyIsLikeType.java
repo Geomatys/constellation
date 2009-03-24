@@ -119,7 +119,7 @@ public class PropertyIsLikeType extends ComparisonOpsType implements PropertyIsL
     /**
      * Gets the value of the matchCase property.
     */
-    public boolean isMatchCase() {
+    public boolean isMatchingCase() {
         if (matchCase == null) {
             return true;
         } else {

@@ -646,8 +646,9 @@ public class SOSworker {
         }
         String sensorId = requestDescSensor.getProcedure();
 
+        AbstractSensorML result = SMLReader.getSensor(sensorId);
         logger.info("describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
-        return SMLReader.getSensor(sensorId);
+        return result;
     }
     
     /**

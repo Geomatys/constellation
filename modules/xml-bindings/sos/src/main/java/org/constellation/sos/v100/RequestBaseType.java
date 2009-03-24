@@ -74,6 +74,14 @@ public class RequestBaseType {
     }
 
     /**
+     * Build a base request
+     */
+    public RequestBaseType(String version, String service) {
+        this.version = version;
+        this.service = service;
+    }
+
+    /**
      * Gets the value of the service property.
      */
     public String getService() {
