@@ -77,7 +77,8 @@ public class WMTSService extends OGCWebService {
         super(ServiceDef.WMTS_1_0_0);
         try {
             setXMLContext("org.constellation.wmts.v100:" +
-                          "org.constellation.ows.v110",
+                          "org.constellation.ows.v110:"  +
+                          "org.constellation.gml.v311",
                           "http://www.opengis.net/wmts");
             worker = new WMTSWorker();
 

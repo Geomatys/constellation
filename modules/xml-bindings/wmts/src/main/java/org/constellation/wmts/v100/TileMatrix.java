@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.ows.v110.CodeType;
 import org.constellation.ows.v110.DescriptionType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -68,31 +69,45 @@ import org.constellation.ows.v110.DescriptionType;
     "matrixHeight"
 })
 @XmlRootElement(name = "TileMatrix")
-public class TileMatrix
-    extends DescriptionType
-{
+public class TileMatrix extends DescriptionType {
 
     @XmlElement(name = "Identifier", namespace = "http://www.opengis.net/ows/1.1", required = true)
-    protected CodeType identifier;
+    private CodeType identifier;
     @XmlElement(name = "ScaleDenominator")
-    protected double scaleDenominator;
+    private double scaleDenominator;
     @XmlList
     @XmlElement(name = "TopLeftCorner", type = Double.class)
-    protected List<Double> topLeftCorner;
-    @XmlElement(name = "TopPoint")
-    private PointType topLeftPoint;
+    private List<Double> topLeftCorner;
+    @XmlElement(name = "TopLeftPoint")
+    private TopLeftPoint topLeftPoint;
+    
     @XmlElement(name = "TileWidth", required = true)
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger tileWidth;
+    private BigInteger tileWidth;
     @XmlElement(name = "TileHeight", required = true)
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger tileHeight;
+    private BigInteger tileHeight;
     @XmlElement(name = "MatrixWidth", required = true)
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger matrixWidth;
+    private BigInteger matrixWidth;
     @XmlElement(name = "MatrixHeight", required = true)
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger matrixHeight;
+    private BigInteger matrixHeight;
+
+    public TileMatrix() {
+
+    }
+
+    public TileMatrix(CodeType identifier, double scaleDenominator, TopLeftPoint topLeftPoint, BigInteger tileWidth, BigInteger tileHeight,
+            BigInteger matrixWidth, BigInteger matrixHeight) {
+        this.identifier       = identifier;
+        this.scaleDenominator = scaleDenominator;
+        this.matrixHeight     = matrixHeight;
+        this.matrixWidth      = matrixWidth;
+        this.tileHeight       = tileHeight;
+        this.tileWidth        = tileWidth;
+        this.topLeftPoint     = topLeftPoint;
+    }
 
     /**
      * Tile matrix identifier. Typically an abreviation of the ScaleDenominator value or its equivalent pixel size
@@ -262,15 +277,81 @@ public class TileMatrix
     /**
      * @return the topLeftPoint
      */
-    public PointType getTopLeftPoint() {
+    public TopLeftPoint getTopLeftPoint() {
         return topLeftPoint;
     }
 
     /**
      * @param topLeftPoint the topLeftPoint to set
      */
-    public void setTopLeftPoint(PointType topLeftPoint) {
+    public void setTopLeftPoint(TopLeftPoint topLeftPoint) {
         this.topLeftPoint = topLeftPoint;
+    }
+
+    /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof TileMatrix) {
+            final TileMatrix that = (TileMatrix) object;
+            return  Utilities.equals(this.identifier, that.identifier)     &&
+                    Utilities.equals(this.matrixHeight, that.matrixHeight) &&
+                    Utilities.equals(this.matrixWidth, that.matrixWidth)   &&
+                    Utilities.equals(this.scaleDenominator, that.scaleDenominator) &&
+                    Utilities.equals(this.tileHeight, that.tileHeight) &&
+                    Utilities.equals(this.tileWidth, that.tileWidth) &&
+                    Utilities.equals(this.topLeftCorner, that.topLeftCorner) &&
+                    Utilities.equals(this.topLeftPoint, that.topLeftPoint);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 41 * hash + (int) (Double.doubleToLongBits(this.scaleDenominator) ^ (Double.doubleToLongBits(this.scaleDenominator) >>> 32));
+        hash = 41 * hash + (this.topLeftCorner != null ? this.topLeftCorner.hashCode() : 0);
+        hash = 41 * hash + (this.topLeftPoint != null ? this.topLeftPoint.hashCode() : 0);
+        hash = 41 * hash + (this.tileWidth != null ? this.tileWidth.hashCode() : 0);
+        hash = 41 * hash + (this.tileHeight != null ? this.tileHeight.hashCode() : 0);
+        hash = 41 * hash + (this.matrixWidth != null ? this.matrixWidth.hashCode() : 0);
+        hash = 41 * hash + (this.matrixHeight != null ? this.matrixHeight.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString());
+        if (identifier != null) {
+            sb.append("identifier").append(identifier).append('\n');
+        }
+        sb.append("scaleDenominator").append(scaleDenominator).append('\n');
+
+        if (topLeftCorner != null) {
+            sb.append("topLeftCorner").append(topLeftCorner).append('\n');
+        }
+        if (topLeftPoint != null) {
+            sb.append("topLeftPoint").append(topLeftPoint).append('\n');
+        }
+        if (tileWidth != null) {
+            sb.append("tileWidth").append(tileWidth).append('\n');
+        }
+        if (tileHeight != null) {
+            sb.append("tileHeight").append(tileHeight).append('\n');
+        }
+        if (matrixWidth != null) {
+            sb.append("matrixWidth").append(matrixWidth).append('\n');
+        }
+        if (matrixHeight != null) {
+            sb.append("matrixHeight").append(matrixHeight).append('\n');
+        }
+        return sb.toString();
+
     }
 
 }

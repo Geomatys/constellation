@@ -42,7 +42,8 @@ public class TestGetCapabilities {
 
     public TestGetCapabilities() throws JAXBException {
         jaxbCtxt = JAXBContext.newInstance("org.constellation.wmts.v100:" +
-                                           "org.constellation.ows.v110");
+                                           "org.constellation.ows.v110:" +
+                                           "org.constellation.gml.v311");
     }
 
     @Test
