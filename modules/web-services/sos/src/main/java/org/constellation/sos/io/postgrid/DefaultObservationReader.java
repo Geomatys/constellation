@@ -48,6 +48,7 @@ import org.constellation.sampling.SamplingPointTable;
 import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.CompositePhenomenonEntry;
@@ -434,5 +435,13 @@ public class DefaultObservationReader implements ObservationReader {
 
     public String getInfos() {
         return "Constellation Postgrid O&M Reader 0.3";
+    }
+
+    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+        return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
+    }
+
+    public List<String> getResponseFormats() throws CstlServiceException {
+        return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 }

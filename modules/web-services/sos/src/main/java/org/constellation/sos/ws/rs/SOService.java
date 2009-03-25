@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ows.v110.AcceptFormatsType;
@@ -90,10 +91,25 @@ public class SOService extends OGCWebService {
                                                      OPERATION_NOT_SUPPORTED, "GetObservation");
                 }
                 serviceDef = getVersionFromNumber(go.getVersion());
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getObservation(go), sw);
+                Object response = worker.getObservation(go);
 
-                return Response.ok(sw.toString(), "text/xml").build();
+                String outputFormat = go.getResponseFormat();
+                if (outputFormat != null  && outputFormat.startsWith("text/xml")) {
+                    outputFormat = "text/xml";
+                }
+
+                String marshalled;
+                if (response instanceof ObservationCollectionEntry) {
+                     StringWriter sw = new StringWriter();
+                     marshaller.marshal(response, sw);
+                     marshalled = sw.toString();
+                } else if (response instanceof String) {
+                    marshalled = (String) response;
+                } else {
+                    throw new IllegalArgumentException("Unexpected response type from SOSWorker.getObservation()");
+                }
+
+                return Response.ok(marshalled, outputFormat).build();
 
              }
 

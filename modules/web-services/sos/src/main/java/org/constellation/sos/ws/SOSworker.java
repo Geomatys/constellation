@@ -266,6 +266,16 @@ public class SOSworker {
     private boolean isStarted;
     
     /**
+     * The supported Response Mode for GetObservation request (depends on reader capabilities)
+     */
+    private List<ResponseModeType> acceptedResponseMode;
+
+    /**
+     * The supported Response Format for GetObservation request (depends on reader capabilities)
+     */
+    private List<String> acceptedResponseFormat;
+
+    /**
      * Initialize the database connection.
      */
     public SOSworker(File configurationDirectory) {
@@ -385,6 +395,10 @@ public class SOSworker {
             OMWriter  = SOSfactory.getObservationWriter(OMWriterType, OMConfiguration);
             OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConfiguration);
 
+            //we initialize the variables depending on the Reader capabilities
+            this.acceptedResponseMode   = OMReader.getResponseModes();
+            this.acceptedResponseFormat = OMReader.getResponseFormats();
+            
             // we log some implementation informations
             logInfos();
 
@@ -591,6 +605,16 @@ public class SOSworker {
            //the feature of interest list
            go.updateParameter("featureOfInterest", OMReader.getFeatureOfInterestNames());
 
+           // the different responseMode available
+           List<String> arm = new ArrayList<String>();
+           for (ResponseModeType rm: acceptedResponseMode) {
+               arm.add(rm.value());
+           }
+           go.updateParameter("responseMode", arm);
+
+           // the different responseFormat available
+           go.updateParameter("responseFormat", acceptedResponseFormat);
+
            Operation ds = om.getOperation("DescribeSensor");
            ds.updateParameter("procedure", procNames);
 
@@ -657,7 +681,7 @@ public class SOSworker {
      * 
      * @param requestObservation a document specifying the parameter of the request.
      */
-    public ObservationCollectionEntry getObservation(GetObservation requestObservation) throws CstlServiceException {
+    public Object getObservation(GetObservation requestObservation) throws CstlServiceException {
         logger.info("getObservation request processing"  + '\n');
         long start = System.currentTimeMillis();
         
@@ -666,19 +690,28 @@ public class SOSworker {
 
         //we verify that the output format is good.     
         if (requestObservation.getResponseFormat() != null) {
-            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0.0\"")) {
-                throw new CstlServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat",
-                        INVALID_PARAMETER_VALUE, "responseFormat");
+            if (!acceptedResponseFormat.contains(requestObservation.getResponseFormat())) {
+                String arf = "";
+                for (String s : acceptedResponseFormat) {
+                    arf = arf + s + '\n';
+                }
+                throw new CstlServiceException(requestObservation.getResponseFormat() + " is not accepted for responseFormat.\n" +
+                                               "Accepted values are:\n" + arf,
+                                               INVALID_PARAMETER_VALUE, "responseFormat");
             }
         } else {
-            throw new CstlServiceException("Response format text/xml; subtype=\"om/1.0.0\" must be specify",
+            String arf = "";
+            for (String s : acceptedResponseFormat) {
+                arf = arf + s + '\n';
+            }
+            throw new CstlServiceException("Response format must be specify\n" +
+                    "Accepted values are:\n" + arf,
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
-        
-        //we get the mode of result
-        ObservationCollectionEntry response = new ObservationCollectionEntry();
 
-        boolean template  = false;
+        //we get the mode of result
+        boolean template   = false;
+        boolean outOfBand  = false;
         ResponseModeType mode;
         if (requestObservation.getResponseMode() == null) {
             mode = INLINE;
@@ -686,16 +719,32 @@ public class SOSworker {
             try {
                 mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
             } catch (IllegalArgumentException e) {
-                throw new CstlServiceException(" the response Mode: " + requestObservation.getResponseMode() + " is not supported by the service (inline or template available)!",
+                String arm = "";
+                for (ResponseModeType s : acceptedResponseMode) {
+                    arm = arm + s.value() + '\n';
+                }
+                throw new CstlServiceException("The response Mode: " + requestObservation.getResponseMode() + " is not supported by the service." +
+                                               "Supported Values are:\n" + arm,
                                                  INVALID_PARAMETER_VALUE, "responseMode");
             }
         }
-        OMFilter.initFilterObservation(mode);
+        try {
+            OMFilter.initFilterObservation(mode);
+        } catch (IllegalArgumentException ex) {
+            throw new CstlServiceException(ex);
+        }
 
-        if (mode == RESULT_TEMPLATE) {
+        if (mode == OUT_OF_BAND) {
+            outOfBand = true;
+        } else if (mode == RESULT_TEMPLATE) {
             template = true;
-        } else if (mode != INLINE) {
-            throw new CstlServiceException("This response Mode is not supported by the service (inline or template available)!",
+        } else if (!acceptedResponseMode.contains(mode)) {
+            String arm = "";
+            for (ResponseModeType s : acceptedResponseMode) {
+                arm = arm + s.value() + '\n';
+            }
+            throw new CstlServiceException("This response Mode is not supported by the service" + 
+                                           "Supported Values are:\n" + arm,
                                              OPERATION_NOT_SUPPORTED, "responseMode");
         }
 
@@ -924,65 +973,79 @@ public class SOSworker {
             }
         }
 
-        /*
-         * here we can have 2 different behaviour :
-         *
-         * (1) - We have separate observation filter and reader :
-         *        - The filter execute a request and return a list of identifiers.
-         *        - The reader retrieve each observation from the list of identifiers
-         *
-         * (2) - We have mixed observation filter and reader :
-         *        - The filterReader execute a request and return directly the observations
-         *
-         */
-        List<Observation> matchingResult = new ArrayList<Observation>();
+        Object response;
+        if (!outOfBand) {
 
-        // case (1)
-        if (!(OMFilter instanceof ObservationFilterReader)) {
-            List<String> observationIDs = OMFilter.filterObservation();
-            for (String observationID : observationIDs) {
-                matchingResult.add(OMReader.getObservation(observationID));
-            }
+            ObservationCollectionEntry OCresponse = new ObservationCollectionEntry();
+            
+            /*
+             * here we can have 2 different behaviour :
+             *
+             * (1) - We have separate observation filter and reader :
+             *        - The filter execute a request and return a list of identifiers.
+             *        - The reader retrieve each observation from the list of identifiers
+             *
+             * (2) - We have mixed observation filter and reader :
+             *        - The filterReader execute a request and return directly the observations
+             *
+             */
+            List<Observation> matchingResult = new ArrayList<Observation>();
 
-        // case (2)
-        } else {
-            ObservationFilterReader OMFR = (ObservationFilterReader) OMFilter;
-            if (template) {
-                matchingResult = OMFR.getObservationTemplates();
+            // case (1)
+            if (!(OMFilter instanceof ObservationFilterReader)) {
+                List<String> observationIDs = OMFilter.filterObservation();
+                for (String observationID : observationIDs) {
+                    matchingResult.add(OMReader.getObservation(observationID));
+                }
+
+            // case (2)
             } else {
-                matchingResult = OMFR.getObservations();
-            }
-        }
-
-        for (Observation o : matchingResult) {
-            if (template) {
-
-                String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
-                templates.put(temporaryTemplateId, temporaryTemplate);
-
-                // we launch a timer which will destroy the template in one hours
-                Timer t = new Timer();
-                //we get the date and time for now
-                Date d = new Date(System.currentTimeMillis() + templateValidTime);
-                logger.info("this template will be destroyed at:" + d.toString());
-                t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
-                schreduledTask.add(t);
-
-                response.add(temporaryTemplate);
-            } else {
-                response.add((ObservationEntry) o);
-
-                //we stop the request if its too big
-                if (response.getMember().size() > maxObservationByRequest) {
-                    throw new CstlServiceException("Your request is to voluminous please add filter and try again",
-                            NO_APPLICABLE_CODE);
+                ObservationFilterReader OMFR = (ObservationFilterReader) OMFilter;
+                if (template) {
+                    matchingResult = OMFR.getObservationTemplates();
+                } else {
+                    matchingResult = OMFR.getObservations();
                 }
             }
-        }
 
-        response.setBoundedBy(getCollectionBound(response));
-        response = normalizeDocument(response);
+            for (Observation o : matchingResult) {
+                if (template) {
+
+                    String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                    ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    templates.put(temporaryTemplateId, temporaryTemplate);
+
+                    // we launch a timer which will destroy the template in one hours
+                    Timer t = new Timer();
+                    //we get the date and time for now
+                    Date d = new Date(System.currentTimeMillis() + templateValidTime);
+                    logger.info("this template will be destroyed at:" + d.toString());
+                    t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
+                    schreduledTask.add(t);
+
+                    OCresponse.add(temporaryTemplate);
+                } else {
+                    OCresponse.add((ObservationEntry) o);
+
+                    //we stop the request if its too big
+                    if (OCresponse.getMember().size() > maxObservationByRequest) {
+                        throw new CstlServiceException("Your request is to voluminous please add filter and try again",
+                                NO_APPLICABLE_CODE);
+                    }
+                }
+            }
+            OCresponse.setBoundedBy(getCollectionBound(OCresponse));
+            OCresponse = normalizeDocument(OCresponse);
+            response = OCresponse;
+        } else {
+            String Sreponse = "";
+            if ((OMFilter instanceof ObservationFilterReader)) {
+                Sreponse = ((ObservationFilterReader)OMFilter).getOutOfBandResults();
+            } else {
+                throw new IllegalArgumentException("Out of band response mode has been implemented only for ObservationFilterReader for now");
+            }
+            response = Sreponse;
+        }
         logger.info("getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return response;
     }

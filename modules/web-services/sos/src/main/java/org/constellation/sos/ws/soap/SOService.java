@@ -153,7 +153,7 @@ public class SOService {
     public ObservationCollectionEntry getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
         try {
             logger.info("received SOAP getObservation request");
-            return worker.getObservation(requestObservation);
+            return (ObservationCollectionEntry) worker.getObservation(requestObservation);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());

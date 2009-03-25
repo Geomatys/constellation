@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 // Constellation dependencies
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.AnyResult;
 import org.constellation.ws.CstlServiceException;
 
@@ -146,6 +147,16 @@ public interface ObservationReader {
      */
     public List<String> getEventTime() throws CstlServiceException;
 
+    /**
+     * Return the list of supported response Mode
+     */
+    public List<ResponseModeType> getResponseModes() throws CstlServiceException;
+
+    /**
+     * Return the list of supported response Mode
+     */
+    public List<String> getResponseFormats() throws CstlServiceException;
+    
     /**
      * Return informations about the implementation class.
      */

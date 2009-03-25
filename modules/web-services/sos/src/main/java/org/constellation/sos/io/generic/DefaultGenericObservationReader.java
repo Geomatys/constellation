@@ -330,4 +330,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         return "Constellation Postgrid Generic O&M Reader 0.3";
     }
 
+    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+        return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
+    }
+
+    public List<String> getResponseFormats() throws CstlServiceException {
+        return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
+    }
 }

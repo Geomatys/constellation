@@ -32,6 +32,7 @@ import org.constellation.observation.ObservationEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.v100.ObservationOfferingEntry;
+import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.AnyResult;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.ws.CstlServiceException;
@@ -255,6 +256,14 @@ public class FileObservationReader implements ObservationReader {
 
     public String getInfos() {
         return "Constellation Filesystem O&M Reader 0.3";
+    }
+
+    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+        return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
+    }
+
+    public List<String> getResponseFormats() throws CstlServiceException {
+        return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
 }

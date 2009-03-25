@@ -33,4 +33,6 @@ public interface ObservationFilterReader extends ObservationFilter {
 
     public String getResults() throws CstlServiceException;
 
+    public String getOutOfBandResults() throws CstlServiceException;
+
 }

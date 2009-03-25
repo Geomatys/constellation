@@ -282,7 +282,7 @@ public class Query {
                 Where w = where.get(i);
                 String block = '(' + w.getvalue() + ')';
                 if (i + 1 < where.size()) {
-                    if (where.get(i + 1).getGroup().equals(w.getGroup())) {
+                    if (where.get(i + 1).getGroup().equals(w.getGroup()) && (!"AND".equals(w.getOperator()))) {
                         if (ORblock) {
                             sb.append(block).append(" OR ");
                         } else {
