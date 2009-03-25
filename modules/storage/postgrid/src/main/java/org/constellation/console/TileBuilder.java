@@ -355,6 +355,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                         }
                     }
                 }
+                // ---- TODO: Remove the "0" after the switch to Geotidy ----
                 manager = builder.createTileManager(tiles, 0, policy);
             }
         } catch (IOException e) {
