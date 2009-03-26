@@ -85,9 +85,6 @@ public class WMSServiceTest {
      */
     @Test
     public void testWrongRequest() {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-
         // Waiting for grizzly server to be completely started
         try {
             Thread.sleep(2 * 1000);
@@ -133,6 +130,7 @@ public class WMSServiceTest {
     public void testGetMapReturnedImage() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
 
         // Waiting for grizzly server to be completely started
         try {
@@ -184,6 +182,22 @@ public class WMSServiceTest {
             grizzly.interrupt();
         }
     }
+
+    /**
+     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
+     * available layers. It means the postgrid database, pointed by the postgrid.xml
+     * file in the configuration directory, contains this layer and can then be requested
+     * in WMS.
+     */
+    private static boolean containsTestLayer() {
+        for (LayerDetails layer : layers) {
+            if (layer.getName().equals("SST_tests")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Thread that launches a Grizzly server in a separate thread.
