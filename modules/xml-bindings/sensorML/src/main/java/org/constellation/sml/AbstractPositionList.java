@@ -17,17 +17,20 @@
 
 package org.constellation.sml;
 
+import java.util.List;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface System extends AbstractComponent {
+public interface AbstractPositionList {
 
-    public AbstractComponents getComponents();
+    public String getId();
 
-    public void setComponents(AbstractComponents components);
+    public void setId(String value);
 
-    public AbstractPositions getPositions();
+    public AbstractTimePosition getTimePosition();
 
-    public void setPositions(AbstractPositions positions);
+    public List<? extends AbstractPosition> getPosition();
+
 }

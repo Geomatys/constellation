@@ -14,7 +14,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.sml.v100;
+
+package org.constellation.sml.v101;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.sml.AbstractPositionList;
-import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -38,8 +39,8 @@ import org.geotools.util.Utilities;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}position" maxOccurs="unbounded"/>
- *         &lt;element ref="{http://www.opengis.net/sensorML/1.0}timePosition"/>
+ *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}position" maxOccurs="unbounded"/>
+ *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}timePosition"/>
  *       &lt;/choice>
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *     &lt;/restriction>
@@ -61,26 +62,22 @@ public class PositionList implements AbstractPositionList {
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
+    @XmlSchemaType(name = "ID")
     private String id;
 
     public PositionList() {
 
     }
 
-    public PositionList(String id , TimePosition timePosition) {
-        this.id           = id;
-        this.timePosition = timePosition;
-    }
-
-    public PositionList(String id , List<Position> position) {
-        this.position = position;
-        this.id       = id;
-    }
-
     public PositionList(AbstractPositionList pos) {
         this.id = pos.getId();
         this.timePosition = (TimePosition) pos.getTimePosition();
         this.position = (List<Position>) pos.getPosition();
+    }
+
+    public PositionList(String id, List<Position> position) {
+        this.id = id;
+        this.position = position;
     }
 
     /**
@@ -140,53 +137,4 @@ public class PositionList implements AbstractPositionList {
     public void setId(String value) {
         this.id = value;
     }
-
-    /**
-     * Verify if this entry is identical to specified object.
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-
-        if (object instanceof PositionList) {
-            final PositionList that = (PositionList) object;
-
-            return Utilities.equals(this.position, that.position) &&
-                   Utilities.equals(this.timePosition, that.timePosition) &&
-                   Utilities.equals(this.id, that.id);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 47 * hash + (this.position != null ? this.position.hashCode() : 0);
-        hash = 47 * hash + (this.timePosition != null ? this.timePosition.hashCode() : 0);
-        hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
-        return hash;
-    }
-
-
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("[OutputList]").append("\n");
-        if (id != null) {
-            sb.append("id: ").append(id).append('\n');
-        }
-        if (timePosition != null) {
-            sb.append("timePosition: ").append(timePosition).append('\n');
-        }
-        if (position != null) {
-            sb.append("positionList:").append('\n');
-            for (Position k : position) {
-                sb.append("position: ").append(k).append('\n');
-            }
-        }
-        return sb.toString();
-    }
 }
-

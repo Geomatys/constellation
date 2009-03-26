@@ -319,8 +319,8 @@ public class ObjectFactory {
      * Create an instance of {@link Positions.PositionList }
      * 
      */
-    public Positions.PositionList createPositionsPositionList() {
-        return new Positions.PositionList();
+    public PositionList createPositionList() {
+        return new PositionList();
     }
 
     /**

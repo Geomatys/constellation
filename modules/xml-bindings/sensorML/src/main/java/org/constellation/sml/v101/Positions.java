@@ -18,18 +18,14 @@
 
 package org.constellation.sml.v101;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractPositions;
 
 
 /**
@@ -69,10 +65,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "positionList"
 })
 @XmlRootElement(name = "positions")
-public class Positions {
+public class Positions implements AbstractPositions {
 
     @XmlElement(name = "PositionList")
-    private Positions.PositionList positionList;
+    private PositionList positionList;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -94,6 +90,22 @@ public class Positions {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    public Positions() {
+
+    }
+
+    public Positions(AbstractPositions positions) {
+        this.actuate      = positions.getActuate();
+        this.arcrole      = positions.getArcrole();
+        this.href         = positions.getHref();
+        this.positionList = new PositionList(positions.getPositionList());
+        this.remoteSchema = positions.getRemoteSchema();
+        this.role         = positions.getRole();
+        this.show         = positions.getShow();
+        this.title        = positions.getTitle();
+        this.type         = positions.getType();
+    }
+
     /**
      * Gets the value of the positionList property.
      * 
@@ -102,7 +114,7 @@ public class Positions {
      *     {@link Positions.PositionList }
      *     
      */
-    public Positions.PositionList getPositionList() {
+    public PositionList getPositionList() {
         return positionList;
     }
 
@@ -114,7 +126,7 @@ public class Positions {
      *     {@link Positions.PositionList }
      *     
      */
-    public void setPositionList(Positions.PositionList value) {
+    public void setPositionList(PositionList value) {
         this.positionList = value;
     }
 
@@ -313,121 +325,4 @@ public class Positions {
     public void setActuate(String value) {
         this.actuate = value;
     }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;choice>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}position" maxOccurs="unbounded"/>
-     *         &lt;element ref="{http://www.opengis.net/sensorML/1.0.1}timePosition"/>
-     *       &lt;/choice>
-     *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "position",
-        "timePosition"
-    })
-    public static class PositionList {
-
-        private List<Position> position;
-        private TimePosition timePosition;
-        @XmlAttribute
-        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlID
-        @XmlSchemaType(name = "ID")
-        private String id;
-
-        /**
-         * Gets the value of the position property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the position property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getPosition().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Position }
-         * 
-         * 
-         */
-        public List<Position> getPosition() {
-            if (position == null) {
-                position = new ArrayList<Position>();
-            }
-            return this.position;
-        }
-
-        /**
-         * Gets the value of the timePosition property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link TimePosition }
-         *     
-         */
-        public TimePosition getTimePosition() {
-            return timePosition;
-        }
-
-        /**
-         * Sets the value of the timePosition property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link TimePosition }
-         *     
-         */
-        public void setTimePosition(TimePosition value) {
-            this.timePosition = value;
-        }
-
-        /**
-         * Gets the value of the id property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Sets the value of the id property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setId(String value) {
-            this.id = value;
-        }
-
-    }
-
 }

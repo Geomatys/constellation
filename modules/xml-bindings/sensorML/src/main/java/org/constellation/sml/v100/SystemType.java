@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractComponents;
+import org.constellation.sml.AbstractPositions;
 import org.geotools.util.Utilities;
 import org.constellation.sml.System;
 
@@ -82,8 +83,8 @@ public class SystemType extends AbstractComponentType implements System {
     /**
      * @param positions the positions to set
      */
-    public void setPositions(Positions positions) {
-        this.positions = positions;
+    public void setPositions(AbstractPositions positions) {
+        this.positions = new Positions(positions);
     }
 
     /**

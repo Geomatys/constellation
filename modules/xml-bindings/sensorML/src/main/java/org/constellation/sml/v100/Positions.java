@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.sml.AbstractPositions;
 import org.geotools.util.Utilities;
 
 
@@ -66,7 +67,7 @@ import org.geotools.util.Utilities;
     "positionList"
 })
 @XmlRootElement(name = "positions")
-public class Positions {
+public class Positions implements AbstractPositions {
 
     @XmlElement(name = "PositionList")
     private PositionList positionList;
@@ -95,6 +96,22 @@ public class Positions {
 
     public Positions(PositionList positionList)  {
         this.positionList = positionList;
+    }
+
+    public Positions(String id , List<Position> position) {
+        this.positionList = new PositionList(id, position);
+    }
+
+    public Positions(AbstractPositions positions) {
+        this.actuate      = positions.getActuate();
+        this.arcrole      = positions.getArcrole();
+        this.href         = positions.getHref();
+        this.positionList = new PositionList(positions.getPositionList());
+        this.remoteSchema = positions.getRemoteSchema();
+        this.role         = positions.getRole();
+        this.show         = positions.getShow();
+        this.title        = positions.getTitle();
+        this.type         = positions.getType();
     }
 
     /**
@@ -347,7 +364,7 @@ public class Positions {
                    Utilities.equals(this.role, that.role)                 &&
                    Utilities.equals(this.show, that.show)                 &&
                    Utilities.equals(this.title, that.title)               &&
-                   Utilities.equals(this.type, that.type)                 &&
+                   Utilities.equals(this.getType(), that.getType())       &&
                    Utilities.equals(this.arcrole, that.arcrole);
         }
         return false;

@@ -84,7 +84,15 @@ public class QuantityType extends AbstractDataComponentType {
         this.uom   = uom;
         this.value = value;
     }
-    
+
+    public QuantityType(String axisID, String definition, UomPropertyType uom, Double value) {
+        super(definition);
+        this.axisID = axisID;
+        this.uom    = uom;
+        this.value  = value;
+    }
+
+  
     /**
      * Gets the value of the uom property.
      */

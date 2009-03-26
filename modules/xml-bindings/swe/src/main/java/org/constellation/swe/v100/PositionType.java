@@ -76,12 +76,24 @@ public class PositionType extends AbstractVectorType implements Position {
 
     }
 
+    public PositionType(String referenceFrame, String localFrame,VectorPropertyType location) {
+        super(referenceFrame, localFrame);
+        this.location    = location;
+    }
+
+
     public PositionType(String referenceFrame, String localFrame,VectorPropertyType location,
             VectorOrSquareMatrixPropertyType orientation) {
         super(referenceFrame, localFrame);
         this.location    = location;
         this.orientation = orientation;
     }
+
+    public PositionType(String referenceFrame, String localFrame, VectorType location) {
+        super(referenceFrame, localFrame);
+        this.location    = new VectorPropertyType(location);
+    }
+
 
     public PositionType(String referenceFrame, String localFrame, VectorType location,
             VectorType orientation) {

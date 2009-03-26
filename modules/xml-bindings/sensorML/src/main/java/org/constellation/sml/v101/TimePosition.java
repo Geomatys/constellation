@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.sml.AbstractTimePosition;
 import org.constellation.swe.v101.TimeType;
 
 
@@ -59,7 +60,7 @@ import org.constellation.swe.v101.TimeType;
     "process"
 })
 @XmlRootElement(name = "timePosition")
-public class TimePosition {
+public class TimePosition implements AbstractTimePosition {
 
     @XmlElement(name = "Time", namespace = "http://www.opengis.net/swe/1.0.1")
     private TimeType time;

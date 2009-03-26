@@ -21,13 +21,6 @@ package org.constellation.sml;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface System extends AbstractComponent {
+public interface AbstractTimePosition {
 
-    public AbstractComponents getComponents();
-
-    public void setComponents(AbstractComponents components);
-
-    public AbstractPositions getPositions();
-
-    public void setPositions(AbstractPositions positions);
 }
