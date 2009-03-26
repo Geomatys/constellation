@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractGMLEntry;
 import org.constellation.swe.AbstractDataComponent;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -110,6 +111,44 @@ public abstract class AbstractDataComponentType extends AbstractGMLEntry impleme
       */
     public void setDefinition(String value) {
         this.definition = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof AbstractDataComponentType && super.equals(object)) {
+            final AbstractDataComponentType that = (AbstractDataComponentType) object;
+
+            return Utilities.equals(this.definition, that.definition) &&
+                   Utilities.equals(this.fixed,      that.fixed);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.fixed != null ? this.fixed.hashCode() : 0);
+        hash = 29 * hash + (this.definition != null ? this.definition.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (fixed != null) {
+            s.append("fixed = ").append(fixed).append('\n');
+        }
+        if (definition != null) {
+            s.append(" definition = ").append(definition).append('\n');
+        }
+        return s.toString();
     }
 
 }

@@ -58,4 +58,25 @@ public abstract class AbstractDataRecordType extends AbstractDataComponentType {
     public AbstractDataRecordType(String definition) {
         super(definition);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        return (object instanceof AbstractDataRecordType && super.equals(object));
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

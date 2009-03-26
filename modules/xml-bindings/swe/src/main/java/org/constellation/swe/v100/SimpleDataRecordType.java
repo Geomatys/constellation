@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -67,6 +68,41 @@ public class SimpleDataRecordType extends AbstractDataRecordType {
             field = new ArrayList<AnyScalarPropertyType>();
         }
         return this.field;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (field != null) {
+            s.append("fields:").append('\n');
+            for (AnyScalarPropertyType f : field) {
+                s.append("field:").append(f).append('\n');
+            }
+        }
+        return s.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof SimpleDataRecordType && super.equals(object)) {
+            final SimpleDataRecordType that = (SimpleDataRecordType) object;
+            return Utilities.equals(this.field, that.field);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.field != null ? this.field.hashCode() : 0);
+        return hash;
     }
 
 }

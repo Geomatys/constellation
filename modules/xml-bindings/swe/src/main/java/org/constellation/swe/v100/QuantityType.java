@@ -174,7 +174,7 @@ public class QuantityType extends AbstractDataComponentType {
             return true;
         }
 
-        if (object instanceof QuantityType) {
+        if (object instanceof QuantityType && super.equals(object)) {
             final QuantityType that = (QuantityType) object;
 
             return Utilities.equals(this.axisID, that.axisID)   &&
@@ -197,6 +197,30 @@ public class QuantityType extends AbstractDataComponentType {
         hash = 67 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
         hash = 67 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (uom != null) {
+            s.append("uom = ").append(uom).append('\n');
+        }
+        if (constraint != null) {
+            s.append(" constraint = ").append(constraint).append('\n');
+        }
+        if (quality != null) {
+            s.append(" quality = ").append(quality).append('\n');
+        }
+        if (value != null) {
+            s.append(" value = ").append(value).append('\n');
+        }
+        if (referenceFrame != null) {
+            s.append(" referenceFrame = ").append(referenceFrame).append('\n');
+        }
+        if (axisID != null) {
+            s.append(" axisID = ").append(axisID).append('\n');
+        }
+        return s.toString();
     }
 
 }

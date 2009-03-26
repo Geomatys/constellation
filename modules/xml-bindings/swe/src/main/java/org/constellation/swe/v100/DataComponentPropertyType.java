@@ -567,6 +567,7 @@ public class DataComponentPropertyType implements DataComponentProperty {
         hash = 17 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         return hash;
     }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[DataComponentPropertyType]").append("\n");
@@ -632,8 +633,5 @@ public class DataComponentPropertyType implements DataComponentProperty {
         }
         return sb.toString();
     }
-
-
-
 }
 
