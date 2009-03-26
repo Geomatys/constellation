@@ -72,15 +72,15 @@ public final class ConfigDirectory {
                         folder.createNewFile();
                         return folder;
                     } catch (IOException ex) {
-                        LOGGER.log(Level.SEVERE,"", ex);
+                        LOGGER.log(Level.FINE,"", ex);
                     }
                 }
             }else{
-                LOGGER.log(Level.WARNING,"config_dir is not defined in the Constelaltion JNDI resource.");
+                LOGGER.log(Level.FINE,"config_dir is not defined in the Constelaltion JNDI resource.");
             }
 
         } catch (NamingException ex) {
-            LOGGER.log(Level.SEVERE,"", ex);
+            LOGGER.log(Level.FINE,"", ex);
         }
 
         return getSicadeDirectory();

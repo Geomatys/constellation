@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
@@ -87,7 +88,11 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  *
  */
 public class CstlEmbeddedService extends CommandLine {
-	
+    /**
+     * Logger for this service.
+     */
+	private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+
 	// THESE ARE INJECTED BY THE CommandLine CLASS
 	//   TODO: these default values clobber main's args; fixed in Geotidy
 	@Option
@@ -236,7 +241,8 @@ public class CstlEmbeddedService extends CommandLine {
 	        try {
 	            Thread.sleep(duration);
 	        } catch (InterruptedException iex) {
-	            iex.printStackTrace();
+	            LOGGER.fine("The grizzly thread has received an interrupted request.");
+                System.out.println("*Stopped grizzly server at: " + f.format(new Date()) + ".");
 	        }
 		} else {
 			//Listen and wait for <ENTER>

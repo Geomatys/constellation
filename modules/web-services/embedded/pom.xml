@@ -92,14 +92,21 @@
     </dependency>
     <!--  For the embedded service. -->
     <dependency>
-        <groupId>com.sun.grizzly</groupId>
-        <artifactId>grizzly-servlet-webserver</artifactId>
-        <version>1.8.6.3</version>
+      <groupId>com.sun.grizzly</groupId>
+      <artifactId>grizzly-servlet-webserver</artifactId>
+      <version>1.8.6.3</version>
     </dependency>
     <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt-epsg-hsql</artifactId>
-        <version>${geotools.version}</version>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <!-- For testing static methods -->
+    <dependency>
+      <groupId>org.constellation.engine</groupId>
+      <artifactId>cstl-engine-testing</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
