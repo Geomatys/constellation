@@ -185,7 +185,7 @@ public class GetCoverageType implements GetCoverage {
         {
             return null;
         }
-        final CoordinateReferenceSystem objCrs = CRS.decode(domainSubset.getSpatialSubSet().getEnvelope().getSrsName());
+        final CoordinateReferenceSystem objCrs = CRS.decode(domainSubset.getSpatialSubSet().getEnvelope().getSrsName(), true);
         final List<DirectPositionType> positions = domainSubset.getSpatialSubSet().getEnvelope().getPos();
 
         /*

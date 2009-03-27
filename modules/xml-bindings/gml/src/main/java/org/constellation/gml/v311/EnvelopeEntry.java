@@ -224,6 +224,7 @@ public class EnvelopeEntry extends Entry {
             int i = 0;
             for (DirectPositionType posi: pos) {
                 s.append('\n').append("pos").append(i).append(":").append(posi.toString());
+                i++;
             }
             s.append('\n');
         }
@@ -234,6 +235,7 @@ public class EnvelopeEntry extends Entry {
             int i = 0;
             for (String axis: axisLabels) {
                 s.append('\n').append("axis").append(i).append(":").append(axis);
+                i++;
             }
             s.append('\n');
         }
@@ -241,6 +243,7 @@ public class EnvelopeEntry extends Entry {
             int i = 0;
             for (String uom: uomLabels) {
                 s.append('\n').append("uom").append(i).append(":").append(uom);
+                i++;
             }
             s.append('\n');
         }

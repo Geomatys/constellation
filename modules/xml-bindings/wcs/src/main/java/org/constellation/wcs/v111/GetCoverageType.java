@@ -157,7 +157,7 @@ public class GetCoverageType implements GetCoverage {
             return null;
         }
         final BoundingBoxType boundingBox = domainSubset.getBoundingBox().getValue();
-        final CoordinateReferenceSystem objCrs = CRS.decode(boundingBox.getCrs());
+        final CoordinateReferenceSystem objCrs = CRS.decode(boundingBox.getCrs(), true);
 
         //final List<DirectPositionType> positions = domainSubset.getSpatialSubSet().getEnvelope().getPos();
 
