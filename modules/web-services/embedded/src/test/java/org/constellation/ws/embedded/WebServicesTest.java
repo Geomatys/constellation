@@ -254,8 +254,10 @@ public class WebServicesTest {
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
-        // TODO: fix WCS getCoverage image returned, seems weird.
-        //assertEquals(Commons.checksum(image), 3640849032L);
+        // The checksum value should be the same as the checksum on the same image produced by
+        // a getMap request. It is strange but they are slightly different, even if for the user
+        // both images are identical.
+        assertEquals(Commons.checksum(image), 3183786073L);
     }
 
     /**
