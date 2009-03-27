@@ -217,4 +217,31 @@ public class TimeType extends AbstractDataComponentType {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (uom != null) {
+            s.append("uom:").append(uom).append('\n');
+        }
+        if (constraint != null) {
+            s.append("constraint:").append(constraint).append('\n');
+        }
+        if (quality != null) {
+            s.append("quality:").append(quality).append('\n');
+        }
+        if (value != null) {
+            s.append("value:").append(value).append('\n');
+        }
+        if (referenceTime != null) {
+            s.append("referenceTime:").append(referenceTime).append('\n');
+        }
+        if (referenceFrame != null) {
+            s.append("referenceFrame:").append(referenceFrame).append('\n');
+        }
+        if (localFrame != null) {
+            s.append("localFrame").append(localFrame).append('\n');
+        }
+        return s.toString();
+    }
+
 }

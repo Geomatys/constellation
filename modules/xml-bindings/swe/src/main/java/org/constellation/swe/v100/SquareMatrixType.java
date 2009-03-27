@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -127,6 +128,49 @@ public class SquareMatrixType extends AbstractMatrixType {
      */
     public void setValues(DataValuePropertyType value) {
         this.values = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof SquareMatrixType && super.equals(object)) {
+            final SquareMatrixType  that = (SquareMatrixType) object;
+            return Utilities.equals(this.elementType, that.elementType) &&
+                   Utilities.equals(this.encoding,    that.encoding)    &&
+                   Utilities.equals(this.values,      that.values);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.elementType != null ? this.elementType.hashCode() : 0);
+        hash = 37 * hash + (this.encoding != null ? this.encoding.hashCode() : 0);
+        hash = 37 * hash + (this.values != null ? this.values.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (elementType != null) {
+            s.append("elementType:").append(elementType).append('\n');
+        }
+        if (encoding != null) {
+            s.append("encoding:").append(encoding).append('\n');
+        }
+        if (values != null) {
+            s.append("values:").append(values).append('\n');
+        }
+        return s.toString();
     }
 
 }

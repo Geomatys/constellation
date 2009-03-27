@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -88,6 +89,39 @@ public class VectorType extends AbstractVectorType {
             coordinate = new ArrayList<CoordinateType>();
         }
         return this.coordinate;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+
+        if (object instanceof VectorType && super.equals(object)) {
+            final VectorType  that = (VectorType ) object;
+            return Utilities.equals(this.coordinate, that.coordinate);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + (this.coordinate != null ? this.coordinate.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (coordinate != null) {
+            s.append("coordinate:").append(coordinate).append('\n');
+        }
+        return s.toString();
     }
 
 }

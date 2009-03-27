@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -141,6 +142,53 @@ public class CoordinateType {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Verify if this entry is identical to specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof CoordinateType) {
+            final CoordinateType  that = (CoordinateType) object;
+            return Utilities.equals(this.count,    that.count)    &&
+                   Utilities.equals(this.name,     that.name)     &&
+                   Utilities.equals(this.quantity, that.quantity) &&
+                   Utilities.equals(this.time,     that.time);
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + (this.count != null ? this.count.hashCode() : 0);
+        hash = 83 * hash + (this.quantity != null ? this.quantity.hashCode() : 0);
+        hash = 83 * hash + (this.time != null ? this.time.hashCode() : 0);
+        hash = 83 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[CoordinateType]");
+        if (count != null) {
+            s.append("count:").append(count).append('\n');
+        }
+        if (name != null) {
+            s.append("name:").append(name).append('\n');
+        }
+        if (quantity != null) {
+            s.append("quantity:").append(quantity).append('\n');
+        }
+        if (time != null) {
+            s.append("time:").append(time).append('\n');
+        }
+        return s.toString();
     }
 }
 

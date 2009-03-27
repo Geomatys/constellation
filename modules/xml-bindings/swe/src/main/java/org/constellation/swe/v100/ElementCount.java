@@ -14,66 +14,76 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.swe.v100;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.util.Utilities;
 
-
 /**
- * Time is a data-type so usually appears "by value" rather than by reference.
- * 
- * <p>Java class for TimePropertyType complex type.
- * 
+ * <p>Java class for anonymous complex type.
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
- * &lt;complexType name="TimePropertyType">
+ * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/swe/1.0}Time"/>
+ *       &lt;sequence minOccurs="0">
+ *         &lt;element ref="{http://www.opengis.net/swe/1.0}Count"/>
  *       &lt;/sequence>
+ *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TimePropertyType", propOrder = {
-    "time"
+@XmlType(name = "", propOrder = {
+    "count"
 })
-public class TimePropertyType {
+public class ElementCount {
 
-    @XmlElement(name = "Time", required = true)
-    private TimeType time;
+    @XmlElement(name = "Count")
+    private Count count;
+    @XmlAttribute
+    @XmlIDREF
+    @XmlSchemaType(name = "IDREF")
+    private Object ref;
 
-    public TimePropertyType() {
-
-    }
-
-    public TimePropertyType(TimeType time) {
-        this.time = time;
+    /**
+     * Gets the value of the count property.
+     */
+    public Count getCount() {
+        return count;
     }
 
     /**
-     * Gets the value of the time property.
+     * Sets the value of the count property.
      */
-    public TimeType getTime() {
-        return time;
+    public void setCount(Count value) {
+        this.count = value;
     }
 
     /**
-     * Sets the value of the time property.
+     * Gets the value of the ref property.
      */
-    public void setTime(TimeType value) {
-        this.time = value;
+    public Object getRef() {
+        return ref;
+    }
+
+    /**
+     * Sets the value of the ref property.
+     */
+    public void setRef(Object value) {
+        this.ref = value;
     }
 
     /**
@@ -85,27 +95,33 @@ public class TimePropertyType {
             return true;
         }
 
-        if (object instanceof TimePropertyType && super.equals(object)) {
-            final TimePropertyType  that = (TimePropertyType) object;
-            return Utilities.equals(this.time, that.time);
+        if (object instanceof ElementCount) {
+            final ElementCount  that = (ElementCount) object;
+            return Utilities.equals(this.count, that.count) &&
+                   Utilities.equals(this.ref,   that.ref);
+
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + (this.time != null ? this.time.hashCode() : 0);
+        int hash = 5;
+        hash = 61 * hash + (this.count != null ? this.count.hashCode() : 0);
+        hash = 61 * hash + (this.ref != null ? this.ref.hashCode() : 0);
         return hash;
     }
 
+
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder(super.toString());
-        if (time != null) {
-            s.append("time:").append(time).append('\n');
+        StringBuilder s = new StringBuilder("[ElementCount]");
+        if (count != null) {
+            s.append("count:").append(count).append('\n');
+        }
+        if (ref != null) {
+            s.append("ref:").append(ref).append('\n');
         }
         return s.toString();
     }
-
 }

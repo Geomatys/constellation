@@ -338,8 +338,8 @@ public class ObjectFactory {
      * Create an instance of {@link AbstractDataArrayType.ElementCount }
      * 
      */
-    public AbstractDataArrayType.ElementCount createAbstractDataArrayTypeElementCount() {
-        return new AbstractDataArrayType.ElementCount();
+    public ElementCount createElementCount() {
+        return new ElementCount();
     }
 
     /**
