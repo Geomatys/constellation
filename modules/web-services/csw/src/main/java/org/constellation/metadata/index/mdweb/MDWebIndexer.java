@@ -32,6 +32,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -267,6 +269,27 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
             ex.printStackTrace();
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeDocument(String identifier) {
+        try {
+            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, true);
+
+            //adding the document in a specific model. in this case we use a MDwebDocument.
+            writer.deleteDocuments(new TermQuery(new Term("identifier", identifier)));
+            logger.finer("Metadata: " + identifier + " removed from the index");
+
+            writer.optimize();
+            writer.close();
+
         } catch (CorruptIndexException ex) {
             logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
             ex.printStackTrace();

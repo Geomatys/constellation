@@ -128,6 +128,13 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      */
     public abstract void indexDocument(E object);
 
+    /**
+     * This method remove index of lucene a document identified by identifier.
+     *
+     * @param identifier
+     */
+    public abstract void removeDocument(String identifier);
+
 
     /**
     * Makes a document from the specified object.

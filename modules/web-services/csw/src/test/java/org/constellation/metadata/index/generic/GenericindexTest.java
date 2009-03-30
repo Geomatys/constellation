@@ -61,13 +61,16 @@ public class GenericindexTest {
 
     private static GenericIndexSearcher indexSearcher;
 
+    private static GenericIndexer indexer;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteIndex();
-        File configDirectory = new File("GenericIndexTest");
+        File configDirectory      = new File("GenericIndexTest");
         List<MetaDataImpl> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher          = new GenericIndexSearcher(configDirectory, "");
+        indexer                   = new GenericIndexer(object, null, configDirectory, "");
+        indexSearcher             = new GenericIndexSearcher(configDirectory, "");
+        
     }
 
     @AfterClass
@@ -521,6 +524,45 @@ public class GenericindexTest {
         logger.finer("identifier query 2:" + '\n' + result);
 
         expectedResult = "CTDF02";
+
+        assertEquals(expectedResult, result);
+    }
+
+    /**
+     *
+     * Test spatial lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void DeteteDocumentTest() throws Exception {
+        indexer.removeDocument("CTDF02");
+
+        indexSearcher.refresh();
+
+        /**
+         * Test 1
+         */
+
+        String identifier = "39727_22_19750113062500";
+        String result = indexSearcher.identifierQuery(identifier);
+
+        logger.finer("identifier query 1:" + '\n' + result);
+
+        String expectedResult = "39727_22_19750113062500";
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 2
+         */
+
+        identifier = "CTDF02";
+        result = indexSearcher.identifierQuery(identifier);
+
+        logger.finer("identifier query 2:" + '\n' + result);
+
+        expectedResult = null;
 
         assertEquals(expectedResult, result);
     }

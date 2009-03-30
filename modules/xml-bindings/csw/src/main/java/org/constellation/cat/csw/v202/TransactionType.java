@@ -95,6 +95,18 @@ public class TransactionType extends RequestBaseType implements Transaction {
         }
         verboseResponse = false;
     }
+
+    /**
+     * Build a new transaction request to delete a list of object
+     */
+    public TransactionType(String service, String version, DeleteType delete) {
+        super(service, version);
+        insertOrUpdateOrDelete = new ArrayList<Object>();
+        if (delete != null)
+            insertOrUpdateOrDelete.add(delete);
+
+        verboseResponse = false;
+    }
     
     /**
      * Gets the value of the insertOrUpdateOrDelete property.

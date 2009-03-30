@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 // Apache Lucene dependencies
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -136,6 +138,21 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             identifiers.add(i, metadataID);
         }
         logger.info(identifiers.size() + " records founded.");
+    }
+
+    /**
+     * Refresh the searcher (must be call after deleting document from the index for example)
+     *
+     * @throws org.constellation.lucene.IndexingException
+     */
+    public void refresh() throws IndexingException {
+        try {
+            initSearcher();
+        } catch (CorruptIndexException ex) {
+            throw new IndexingException("Corruption encountered during indexing", ex);
+        } catch (IOException ex) {
+            throw new IndexingException("IO Exception during indexing", ex);
+        }
     }
 
     /**

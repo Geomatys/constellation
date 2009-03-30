@@ -188,6 +188,17 @@ public abstract class MetadataWriter {
      * @return true if the storage succeed, false else.
      */
     public abstract boolean storeMetadata(Object obj) throws CstlServiceException;
+
+    /**
+     * Delete an object in the metadata database.
+     * @param metadataID The identifier of the metadata to delete.
+     */
+    public abstract boolean deleteMetadata(String metadataID) throws CstlServiceException;
+
+    /**
+     * Return true if the Writer supports the delete mecanism
+     */
+    public abstract boolean deleteSupported() throws CstlServiceException;
     
     /**
      * Destoy all the resource and close connection.

@@ -138,6 +138,14 @@ public class FileMetadataReader extends MetadataReader {
         return obj;
     }
 
+    /**
+     * Unmarshall The file designed by the path dataDirectory/identifier.xml
+     * If the file is not present or if it is impossible to unmarshall it it return an exception.
+     *
+     * @param identifier
+     * @return
+     * @throws org.constellation.ws.CstlServiceException
+     */
     private Object getObjectFromFile(String identifier) throws CstlServiceException {
         File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {

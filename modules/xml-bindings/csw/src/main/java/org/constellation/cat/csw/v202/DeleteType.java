@@ -70,6 +70,15 @@ public class DeleteType {
     @XmlSchemaType(name = "ID")
     private String handle;
 
+    public DeleteType() {
+
+    }
+
+    public DeleteType(String typeName, QueryConstraintType constraint) {
+        this.typeName   = typeName;
+        this.constraint = constraint;
+    }
+
     /**
      * Gets the value of the constraint property.
      */

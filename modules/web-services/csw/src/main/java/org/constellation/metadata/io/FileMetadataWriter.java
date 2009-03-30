@@ -89,4 +89,23 @@ public class FileMetadataWriter extends MetadataWriter {
     public void destroy() {
         super.destroy();
     }
+
+    @Override
+    public boolean deleteSupported() throws CstlServiceException {
+        return true;
+    }
+
+    @Override
+    public boolean deleteMetadata(String metadataID) throws CstlServiceException {
+        File metadataFile = new File (dataDirectory,  metadataID + ".xml");
+        if (metadataFile.exists()) {
+           boolean suceed =  metadataFile.delete();
+           if (suceed) {
+               indexer.removeDocument(metadataID);
+           }
+           return suceed;
+        } else {
+            throw new CstlServiceException("The metadataFile : " + metadataID + ".xml is not present", INVALID_PARAMETER_VALUE);
+        }
+    }
 }

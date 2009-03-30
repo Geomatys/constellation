@@ -41,6 +41,7 @@ import org.constellation.cat.csw.v202.AcknowledgementType;
 import org.constellation.cat.csw.v202.GetRecordsResponseType;
 import org.constellation.cat.csw.v202.BriefRecordType;
 import org.constellation.cat.csw.v202.Capabilities;
+import org.constellation.cat.csw.v202.DeleteType;
 import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
@@ -56,6 +57,8 @@ import org.constellation.cat.csw.v202.QueryType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
+import org.constellation.cat.csw.v202.TransactionResponseType;
+import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ogc.SortByType;
@@ -761,7 +764,7 @@ public class CSWworkerTest {
     }
 
     /**
-     * Tests the getcapabilities method
+     * Tests the getDomain method
      *
      * @throws java.lang.Exception
      */
@@ -809,6 +812,58 @@ public class CSWworkerTest {
 
         assertEquals(expResult200, result200);
 
+
+    }
+
+    /**
+     * Tests the transaction method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void transactionTest() throws Exception {
+
+        /*
+         *  TEST 1 : we delete the metadata 42292_5p_19900609195600
+         */
+
+        // first we must be sure that the metadata is present
+        GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+        GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+
+        assertTrue(GRresult != null);
+        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAny().size() == 1);
+        Object obj = GRresult.getAny().get(0);
+        assertTrue(obj instanceof MetaDataImpl);
+
+        MetaDataImpl isoResult = (MetaDataImpl) obj;
+        MetaDataImpl ExpResult1 = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        assertEquals(ExpResult1, isoResult);
+
+        // we delete the metadata
+        QueryConstraintType constraint = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
+        DeleteType delete = new DeleteType(null, constraint);
+        TransactionType request = new TransactionType("CSW", "2.0.2", delete);
+
+        TransactionResponseType result = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalDeleted(), 1);
+
+        CstlServiceException exe = null;
+        try {
+            GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+        } catch (CstlServiceException ex) {
+            exe = ex;
+        }
+
+        assertTrue(exe != null);
+
+        assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
+        assertEquals(exe.getLocator() , "id");
+        
+        
 
     }
 

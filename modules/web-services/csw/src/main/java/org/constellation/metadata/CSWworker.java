@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
@@ -1341,10 +1342,44 @@ public class CSWworker {
                         totalUpdated++;
                     }
                 }
+
             } else if (transaction instanceof DeleteType) {
-                DeleteType deleteRequest = (DeleteType)transaction;
-                throw new CstlServiceException("This kind of transaction (delete) is not yet supported by the service.",
+                if (MDWriter.deleteSupported()) {
+                    DeleteType deleteRequest = (DeleteType)transaction;
+                    String dataType = deleteRequest.getTypeName();
+                    if (deleteRequest.getConstraint() == null) {
+                        throw new CstlServiceException("A constraint must be specified.",
+                                                      MISSING_PARAMETER_VALUE, "constraint");
+                    }
+
+                    // build the lucene query from the specified filter
+                    SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
+                    logger.info("Lucene query obtained:" + luceneQuery);
+
+                    // we try to execute the query
+                    List<String> results = executeLuceneQuery(luceneQuery);
+
+                    for (String metadataID : results) {
+                       boolean deleted = MDWriter.deleteMetadata(metadataID);
+                       if (!deleted) {
+                           throw new CstlServiceException("The service does not succeed to delete the metadata:" + metadataID,
+                                                  NO_APPLICABLE_CODE);
+                       } else {
+                           totalDeleted++;
+                       }
+                    }
+                    if (totalDeleted > 0) {
+                        try {
+                            indexSearcher.refresh();
+                        } catch (IndexingException ex) {
+                            throw new CstlServiceException("The service does not succeed to refresh the index after deleting documents:" + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE);
+                        }
+                    }
+                } else {
+                    throw new CstlServiceException("This kind of transaction (delete) is not supported by this Writer implementation.",
                                                   NO_APPLICABLE_CODE, "TransactionType");
+                }
                 
                 
             } else if (transaction instanceof UpdateType) {

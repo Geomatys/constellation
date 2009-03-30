@@ -704,4 +704,14 @@ public class MDWebMetadataWriter extends MetadataWriter {
             LOGGER.info("SQL Exception while destroying Metadata writer");
         }
     }
+
+    @Override
+    public boolean deleteSupported() throws CstlServiceException {
+        return false;
+    }
+
+    @Override
+    public boolean deleteMetadata(String metadataID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -65,6 +65,10 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
             TermQuery query = new TermQuery(new Term("id", id));
             List<String> results = new ArrayList<String>();
             int maxRecords = searcher.maxDoc();
+            if (maxRecords == 0) {
+                logger.severe("There is no document in the index");
+                maxRecords = 1;
+            }
             logger.info("TermQuery: " + query.toString());
             TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {

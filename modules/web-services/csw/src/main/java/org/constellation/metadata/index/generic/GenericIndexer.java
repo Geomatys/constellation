@@ -38,11 +38,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // apache Lucene dependencies
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
@@ -225,7 +234,34 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             ex.printStackTrace();
         }
     }
-    
+
+     @Override
+    public void removeDocument(String identifier) {
+        try {
+            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false, MaxFieldLength.UNLIMITED);
+
+            //adding the document in a specific model. in this case we use a MDwebDocument.
+            Term t          = new Term("id", identifier);
+            TermQuery query = new TermQuery(t);
+            logger.info("Term query:" + query);
+
+
+            writer.deleteDocuments(query);
+            logger.info("Metadata: " + identifier + " removed from the index");
+
+            writer.commit();
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * This method add to index of lucene a new document based on a geotools Metadata object.
      * (implements AbstractIndex.indexDocument() )
