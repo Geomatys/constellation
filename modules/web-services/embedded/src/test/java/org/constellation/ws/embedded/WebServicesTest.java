@@ -33,7 +33,7 @@ import org.constellation.ServiceDef;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
-import org.constellation.testing.Commons;
+import org.constellation.test.Commons;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;

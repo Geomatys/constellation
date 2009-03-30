@@ -126,8 +126,19 @@ public enum ServiceDef {
 		return version.compareTo(new Version(str));
 	}
 
+    /**
+     * Try to find a {@link ServiceDef} matching with the specification name and the version
+     * specified. If there is no match, returns {@code null}.
+     *
+     * @param spec    The specification name.
+     * @param version The version.
+     * @return The {@link ServiceDef} for the spec and version chosen, or {@code null}.
+     */
     public static ServiceDef getServiceDefinition(final String spec, final String version) {
         for (ServiceDef service : values()) {
+            if (service.version == null || service.specification == null) {
+                continue;
+            }
             if (service.version.toString().equalsIgnoreCase(version) &&
                 service.specification.toString().equalsIgnoreCase(spec))
             {

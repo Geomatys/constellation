@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.testing;
+package org.constellation.test;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;

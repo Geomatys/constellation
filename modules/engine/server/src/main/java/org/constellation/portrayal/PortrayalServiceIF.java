@@ -20,8 +20,6 @@ package org.constellation.portrayal;
 import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import org.geotools.display.canvas.GraphicVisitor;
 import org.geotools.display.exception.PortrayalException;
