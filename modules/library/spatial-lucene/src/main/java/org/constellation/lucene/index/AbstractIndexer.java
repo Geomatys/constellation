@@ -18,6 +18,7 @@
 package org.constellation.lucene.index;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -25,9 +26,13 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 
 // Constellation dependencies
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 import org.constellation.lucene.IndexingException;
 import org.constellation.util.Util;
 
@@ -133,7 +138,30 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      *
      * @param identifier
      */
-    public abstract void removeDocument(String identifier);
+    public void removeDocument(String identifier) {
+        try {
+            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false, MaxFieldLength.UNLIMITED);
+
+            Term t          = new Term("id", identifier);
+            TermQuery query = new TermQuery(t);
+            logger.info("Term query:" + query);
+
+
+            writer.deleteDocuments(query);
+            logger.info("Metadata: " + identifier + " removed from the index");
+
+            writer.commit();
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            logger.severe("IOException while indexing document: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
 
 
     /**

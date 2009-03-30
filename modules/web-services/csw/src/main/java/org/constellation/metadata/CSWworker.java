@@ -1368,14 +1368,6 @@ public class CSWworker {
                            totalDeleted++;
                        }
                     }
-                    if (totalDeleted > 0) {
-                        try {
-                            indexSearcher.refresh();
-                        } catch (IndexingException ex) {
-                            throw new CstlServiceException("The service does not succeed to refresh the index after deleting documents:" + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE);
-                        }
-                    }
                 } else {
                     throw new CstlServiceException("This kind of transaction (delete) is not supported by this Writer implementation.",
                                                   NO_APPLICABLE_CODE, "TransactionType");
@@ -1397,6 +1389,14 @@ public class CSWworker {
                                               INVALID_PARAMETER_VALUE, "TransactionType");
             }
             
+        }
+        if (totalDeleted > 0 || totalInserted > 0 || totalUpdated > 0) {
+            try {
+                indexSearcher.refresh();
+            } catch (IndexingException ex) {
+                throw new CstlServiceException("The service does not succeed to refresh the index after deleting documents:" + ex.getMessage(),
+                        NO_APPLICABLE_CODE);
+            }
         }
         TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
                                                                     totalUpdated,

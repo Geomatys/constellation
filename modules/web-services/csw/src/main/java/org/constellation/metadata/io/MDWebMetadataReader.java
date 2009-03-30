@@ -297,9 +297,9 @@ public class MDWebMetadataReader extends MetadataReader {
         //we parse the identifier (Form_ID:Catalog_Code)
         try  {
             if (identifier.indexOf(":") != -1) {
-                catalogCode    = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
-                identifier = identifier.substring(0, identifier.indexOf(":"));
-                id         = Integer.parseInt(identifier);
+                catalogCode  = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
+                identifier   = identifier.substring(0, identifier.indexOf(":"));
+                id           = Integer.parseInt(identifier);
             } else {
                 throw new NumberFormatException();
             }

@@ -78,7 +78,7 @@ public abstract class MetadataWriter {
      * 
      * @return the founded title or "Unknow title"
      */
-    protected String findName(Object obj) {
+    protected String findTitle(Object obj) {
         
         //here we try to get the title
         AbstractSimpleLiteral titleSL = null;
@@ -179,6 +179,106 @@ public abstract class MetadataWriter {
                 LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
         }
         return title;
+    }
+
+
+    /**
+     * This method try to find a title to this object.
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
+     * else we try to find a getName() method.
+     *
+     * @param obj the object for wich we want a title
+     *
+     * @return the founded title or "Unknow title"
+     */
+    protected String findIdentifier(Object obj) {
+
+        //here we try to get the identifier
+        AbstractSimpleLiteral identifierSL = null;
+        String identifier = "unknow_identifier";
+        if (obj instanceof Record) {
+            identifierSL = ((Record) obj).getIdentifier();
+            
+            if (identifierSL == null) {
+                identifier = "unknow_identifier";
+            } else {
+                if (identifierSL.getContent().size() > 0)
+                    identifier = identifierSL.getContent().get(0);
+            }
+
+        } else if (obj instanceof MetaDataImpl) {
+            identifier = ((MetaDataImpl) obj).getFileIdentifier();
+
+        } else if (obj instanceof RegistryObject) {
+            identifier = ((RegistryObject) obj).getId();
+
+        } else {
+            Method nameGetter = null;
+            String methodName = "";
+            int i = 0;
+            while (i < 3) {
+                try {
+                    switch (i) {
+                        case 0: methodName = "getId";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 1: methodName = "getIdentifier";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 2: methodName = "getFileIdentifier";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                    }
+
+
+                } catch (NoSuchMethodException ex) {
+                    LOGGER.finer("there is no " + methodName + " method in " + obj.getClass().getSimpleName());
+                } catch (SecurityException ex) {
+                    LOGGER.severe(" security exception while getting the identifier of the object.");
+                }
+                if (nameGetter != null) {
+                    i = 3;
+                } else {
+                    i++;
+                }
+            }
+
+            if (nameGetter != null) {
+                try {
+                    Object objT = nameGetter.invoke(obj);
+                    if (objT instanceof String) {
+                        identifier = (String) obj;
+
+                    } else if (objT instanceof AbstractSimpleLiteral) {
+                        identifierSL = (AbstractSimpleLiteral) objT;
+                        if (identifierSL.getContent().size() > 0)
+                            identifier = identifierSL.getContent().get(0);
+                        else identifier = "unknow_identifier";
+
+                    } else {
+                        identifier = "unknow_identifier";
+                    }
+
+                    if (identifier == null)
+                        identifier = "unknow_identifier";
+                } catch (IllegalAccessException ex) {
+                    LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    LOGGER.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (InvocationTargetException ex) {
+                    LOGGER.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                                  "cause: " + ex.getMessage());
+                }
+            }
+
+            if (identifier.equals("unknow_identifier"))
+                LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find an identifier");
+        }
+        return identifier;
     }
     
     /**

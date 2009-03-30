@@ -151,7 +151,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         
         if (object != null) {
             //we try to find a title for the from
-            String title = findName(object);
+            String title = findTitle(object);
             if (title.equals("unknow title")) {
                 title = getAvailableTitle();
             }
@@ -673,8 +673,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 throw e;
                 //return false;
             } catch (SQLException e) {
-             throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
-                                            NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
+                        NO_APPLICABLE_CODE);
             }
             
             long time = System.currentTimeMillis() - start; 
@@ -707,11 +707,37 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean deleteSupported() throws CstlServiceException {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean deleteMetadata(String metadataID) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean deleteMetadata(String identifier) throws CstlServiceException {
+        LOGGER.info("metadata to delete:" + identifier);
+
+        int id;
+        String catalogCode = "";
+        //we parse the identifier (Form_ID:Catalog_Code)
+        try  {
+            if (identifier.indexOf(":") != -1) {
+                catalogCode    = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
+                identifier = identifier.substring(0, identifier.indexOf(":"));
+                id         = Integer.parseInt(identifier);
+            } else {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+             throw new CstlServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
+        }
+        try {
+            Catalog catalog = MDReader.getCatalog(catalogCode);
+            Form f = MDReader.getForm(catalog, id);
+
+            MDWriter.deleteForm(f);
+        } catch (SQLException ex) {
+            throw new CstlServiceException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
+                        NO_APPLICABLE_CODE);
+        }
+        indexer.removeDocument(identifier);
+        return true;
     }
 }

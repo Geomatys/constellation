@@ -51,6 +51,7 @@ import org.constellation.cat.csw.v202.GetDomainType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
 import org.constellation.cat.csw.v202.GetRecordByIdType;
 import org.constellation.cat.csw.v202.GetRecordsType;
+import org.constellation.cat.csw.v202.InsertType;
 import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
@@ -851,6 +852,7 @@ public class CSWworkerTest {
 
         assertEquals(result.getTransactionSummary().getTotalDeleted(), 1);
 
+        // we try to request the deleted metadata
         CstlServiceException exe = null;
         try {
             GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
@@ -858,11 +860,33 @@ public class CSWworkerTest {
             exe = ex;
         }
 
+        // we must receive an exception saying that the metadata is not present.
         assertTrue(exe != null);
-
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
+
+
+        /*
+         *  TEST 2 : we add again the metadata 42292_5p_19900609195600
+         */
+        InsertType insert = new InsertType(ExpResult1);
+        request = new TransactionType("CSW", "2.0.2", insert);
+        result  = worker.transaction(request);
         
+        assertEquals(result.getTransactionSummary().getTotalInserted(), 1);
+
+
+        // then we must be sure that the metadata is present again
+        GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+
+        assertTrue(GRresult != null);
+        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAny().size() == 1);
+        obj = GRresult.getAny().get(0);
+        assertTrue(obj instanceof MetaDataImpl);
+
+        isoResult = (MetaDataImpl) obj;
+        assertEquals(ExpResult1, isoResult);
         
 
     }

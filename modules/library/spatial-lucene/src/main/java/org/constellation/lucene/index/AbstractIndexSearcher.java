@@ -148,6 +148,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     public void refresh() throws IndexingException {
         try {
             initSearcher();
+            logger.info("refreshing index searcher");
         } catch (CorruptIndexException ex) {
             throw new IndexingException("Corruption encountered during indexing", ex);
         } catch (IOException ex) {

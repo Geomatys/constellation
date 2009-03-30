@@ -71,8 +71,7 @@ public class FileMetadataWriter extends MetadataWriter {
     public boolean storeMetadata(Object obj) throws CstlServiceException {
         File f = null;
         try {
-            //TODO find indentifier
-            String identifier = "testID";
+            String identifier = findIdentifier(obj);
             f = new File(dataDirectory, identifier + ".xml");
             f.createNewFile();
             marshaller.marshal(obj, f);
