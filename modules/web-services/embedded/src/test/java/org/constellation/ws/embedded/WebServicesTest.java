@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
-
-// Constellation dependencies
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+
+// Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.ows.v110.ExceptionReport;
@@ -87,7 +90,7 @@ public class WebServicesTest {
 
         // Waiting for grizzly server to be completely started
         try {
-            Thread.sleep(2 * 1000);
+            Thread.sleep(3 * 1000);
         } catch (InterruptedException ex) {
             assumeNoException(ex);
         }
@@ -130,7 +133,7 @@ public class WebServicesTest {
         }
     }
 
-        /**
+    /**
      * Ensure that a wrong value given in the request parameter for the WCS server
      * returned an error report for the user.
      */
@@ -180,24 +183,18 @@ public class WebServicesTest {
         final URL getMapUrl;
         try {
             getMapUrl = new URL("http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
-                                                         "format=image/png&width=1024&height=512&" +
-                                                         "srs=EPSG:4326&bbox=-180,-90,180,90&" +
-                                                         "layers=SST_tests&styles=");
+                                                          "format=image/png&width=1024&height=512&" +
+                                                          "srs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                          "layers=SST_tests&styles=");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
         }
 
-        // Try to get something from the url.
+        // Try to get a map from the url. The test is skipped in this method if it fails.
         final BufferedImage image;
         try {
-            final InputStream in = getMapUrl.openStream();
-            image = ImageIO.read(in);
-            in.close();
-//            JFrame frame = new JFrame();
-//            frame.setContentPane(new JLabel(new ImageIcon(image)));
-//            frame.setSize(new Dimension(1024, 512));
-//            frame.setVisible(true);
+            image = getImageFromURL(getMapUrl, "image/png");
         } catch (IOException ex) {
             assumeNoException(ex);
             return;
@@ -222,35 +219,23 @@ public class WebServicesTest {
         final URL getCoverageUrl;
         try {
             getCoverageUrl = new URL("http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
-                                                          "format=image/png&width=1024&height=512&" +
-                                                          "crs=EPSG:4326&bbox=-180,-90,180,90&" +
-                                                          "coverage=SST_tests");
+                                                               "format=image/png&width=1024&height=512&" +
+                                                               "crs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                               "coverage=SST_tests");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
         }
 
-        // Try to get something from the url.
+        // Try to get the coverage from the url.
         final BufferedImage image;
         try {
-            final InputStream in = getCoverageUrl.openStream();
-            image = ImageIO.read(in);
-            in.close();
-//            JFrame frame = new JFrame();
-//            frame.setContentPane(new JLabel(new ImageIcon(image)));
-//            frame.setSize(new Dimension(1024, 512));
-//            frame.setVisible(true);
+            image = getImageFromURL(getCoverageUrl, "image/png");
         } catch (IOException ex) {
             assumeNoException(ex);
             return;
         }
 
-        // Waiting for grizzly server to be completely started
-        try {
-            Thread.sleep(3 * 1000);
-        } catch (InterruptedException ex) {
-            assumeNoException(ex);
-        }
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
@@ -258,6 +243,44 @@ public class WebServicesTest {
         // a getMap request. It is strange but they are slightly different, even if for the user
         // both images are identical.
         assertEquals(Commons.checksum(image), 3183786073L);
+    }
+
+    /**
+     * Ensures a GetCoverage request with the output format matrix works fine.
+     *
+     * For now, this format is not well handled by the current Geotools. There are some
+     * errors in the reading of this format, and they will be corrected in the next version
+     * of Geotools.
+     *
+     * @TODO: do this test when moving of Geotools' version
+     */
+    @Test
+    @Ignore
+    public void testGetCoverageMatrixFormat() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetCoverage url.
+        final URL getCovMatrixUrl;
+        try {
+            getCovMatrixUrl = new URL("http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+                                                                "format=matrix&width=1024&height=512&" +
+                                                                "crs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                                "coverage=SST_tests");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getCovMatrixUrl, "application/matrix");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        //assertEquals(Commons.checksum(image), ...);
     }
 
     /**
@@ -404,6 +427,40 @@ public class WebServicesTest {
         return false;
     }
 
+    /**
+     * Returned the {@link BufferedImage} from an URL requesting an image.
+     *
+     * @param url  The url of a request of an image.
+     * @param mime The mime type of the image to return.
+     *
+     * @return The {@link BufferedImage} or {@code null} if an error occurs.
+     * @throws IOException
+     */
+    private BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
+        // Try to get the image from the url.
+        final InputStream in = url.openStream();
+        final ImageInputStream iis = ImageIO.createImageInputStream(in);
+        final Iterator<ImageReader> irs = ImageIO.getImageReadersByMIMEType(mime);
+        if (!irs.hasNext()) {
+            return null;
+        }
+        final ImageReader ir = irs.next();
+        ir.setInput(iis, true, true);
+        final BufferedImage image = ir.read(0);
+        iis.close();
+        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
+        // in order to see the image in a popup.
+//        JFrame frame = new JFrame();
+//        frame.setContentPane(new JLabel(new ImageIcon(image)));
+//        frame.setSize(new Dimension(1024, 512));
+//        frame.setVisible(true);
+//        try {
+//            Thread.sleep(3 * 1000);
+//        } catch (InterruptedException ex) {
+//            assumeNoException(ex);
+//        }
+        return image;
+    }
 
     /**
      * Thread that launches a Grizzly server in a separate thread.
