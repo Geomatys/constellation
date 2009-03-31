@@ -60,6 +60,7 @@ import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.TransactionResponseType;
 import org.constellation.cat.csw.v202.TransactionType;
+import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ogc.SortByType;
@@ -887,7 +888,51 @@ public class CSWworkerTest {
 
         isoResult = (MetaDataImpl) obj;
         assertEquals(ExpResult1, isoResult);
+
+        /*
+         *  TEST 3 : we update the metadata 42292_5p_19900609195600 by replacing
+         */
+
+        MetaDataImpl replacement = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
+        constraint        = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
+        UpdateType update = new UpdateType(replacement, constraint);
+        request           = new TransactionType("CSW", "2.0.2", update);
+        result  = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // we try to request the updated metadata
+        exe = null;
+        try {
+            GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+        } catch (CstlServiceException ex) {
+            exe = ex;
+        }
+
+        // we must receive an exception saying that the metadata is not present.
+        assertTrue(exe != null);
+        assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
+        assertEquals(exe.getLocator() , "id");
         
+        
+        // then we must be sure that the replacement metadata is present
+        requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("CTDF02"));
+        GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+
+        assertTrue(GRresult != null);
+        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAny().size() == 1);
+        obj = GRresult.getAny().get(0);
+        assertTrue(obj instanceof MetaDataImpl);
+
+        isoResult = (MetaDataImpl) obj;
+        assertEquals(replacement, isoResult);
+
+
+        
+
 
     }
 

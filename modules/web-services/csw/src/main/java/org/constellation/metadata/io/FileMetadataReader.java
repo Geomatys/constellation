@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -81,14 +84,19 @@ import org.geotools.metadata.iso.MetaDataImpl;
 public class FileMetadataReader extends MetadataReader {
 
     /**
+     * The maximum number of elements in a queue of marshallers and unmarshallers.
+     */
+    private static final int MAX_QUEUE_SIZE = 4;
+    
+    /**
      * The directory containing the data XML files.
      */
-    private File dataDirectory;
+    private final File dataDirectory;
     
     /**
      * A unmarshaller to get java object from metadata files.
      */
-    private final Unmarshaller unmarshaller;
+    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
 
     /**
      * A date formatter used to display the Date object for dublin core translation.
@@ -111,8 +119,12 @@ public class FileMetadataReader extends MetadataReader {
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
             throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
         }
+        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
         try {
-            unmarshaller = JAXBContext.newInstance(CSWClassesContext.getAllClasses()).createUnmarshaller();
+            JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
+            for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
+                  unmarshallers.add(context.createUnmarshaller());
+            }
         } catch (JAXBException ex) {
             throw new CstlServiceException("cause: JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
         }
@@ -149,16 +161,25 @@ public class FileMetadataReader extends MetadataReader {
     private Object getObjectFromFile(String identifier) throws CstlServiceException {
         File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
+            Unmarshaller unmarshaller = null;
             try {
+                unmarshaller = unmarshallers.take();
                 Object metadata = unmarshaller.unmarshal(metadataFile);
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
                 addInCache(identifier, metadata);
                 return metadata;
+            } catch (InterruptedException ex) {
+                throw new CstlServiceException("Interrupted Eception while unmarshalling the metadataFile : " + identifier + ".xml" + "\n" +
+                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallers.add(unmarshaller);
+                }
             }
         } else {
             throw new CstlServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
@@ -351,16 +372,25 @@ public class FileMetadataReader extends MetadataReader {
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
                 String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+                Unmarshaller unmarshaller = null;
                 try {
+                    unmarshaller = unmarshallers.take();
                     Object metadata = unmarshaller.unmarshal(f);
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
                     addInCache(identifier, metadata);
                     results.add(metadata);
+                } catch (InterruptedException ex) {
+                    throw new CstlServiceException("Interrupted Eception while unmarshalling the metadataFile : " + identifier + ".xml" + "\n" +
+                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                } finally {
+                    if (unmarshaller != null) {
+                        unmarshallers.add(unmarshaller);
+                    }
                 }
             } else {
                 throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);

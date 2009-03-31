@@ -34,6 +34,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
+import org.constellation.cat.csw.v202.RecordPropertyType;
 import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
@@ -706,8 +707,13 @@ public class MDWebMetadataWriter extends MetadataWriter {
     }
 
     @Override
-    public boolean deleteSupported() throws CstlServiceException {
+    public boolean deleteSupported() {
         return true;
+    }
+
+    @Override
+    public boolean updateSupported() {
+        return false;
     }
 
     @Override
@@ -739,5 +745,15 @@ public class MDWebMetadataWriter extends MetadataWriter {
         }
         indexer.removeDocument(identifier);
         return true;
+    }
+
+    @Override
+    public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -97,6 +97,18 @@ public class TransactionType extends RequestBaseType implements Transaction {
     }
 
     /**
+     * Build a new transaction request to insert a list of object
+     */
+    public TransactionType(String service, String version, UpdateType... updates) {
+        super(service, version);
+        insertOrUpdateOrDelete = new ArrayList<Object>();
+        for (UpdateType update: updates) {
+            insertOrUpdateOrDelete.add(update);
+        }
+        verboseResponse = false;
+    }
+
+    /**
      * Build a new transaction request to delete a list of object
      */
     public TransactionType(String service, String version, DeleteType delete) {

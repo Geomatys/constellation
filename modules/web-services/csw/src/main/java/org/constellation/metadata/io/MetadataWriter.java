@@ -23,10 +23,12 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 // constellation dependencies
 import org.constellation.cat.csw.Record;
+import org.constellation.cat.csw.v202.RecordPropertyType;
 import org.constellation.dublincore.AbstractSimpleLiteral;
 import org.constellation.ebrim.EbrimInternationalString;
 import org.constellation.ebrim.RegistryObject;
@@ -295,10 +297,33 @@ public abstract class MetadataWriter {
      */
     public abstract boolean deleteMetadata(String metadataID) throws CstlServiceException;
 
+
     /**
-     * Return true if the Writer supports the delete mecanism
+     * Replace an object in the metadata database.
+     *
+     * @param metadataID The identifier of the metadata to Replace.
+     * @param any The object to replace the matching metadata.
      */
-    public abstract boolean deleteSupported() throws CstlServiceException;
+    public abstract boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException;
+
+    /**
+     * Update an object in the metadata database.
+     *
+     * @param metadataID The identifier of the metadata to Replace.
+     * @param properties A List of property-value to replace in the specified metadata.
+     */
+    public abstract boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException;
+
+    /**
+     * Return true if the Writer supports the delete mecanism.
+     */
+    public abstract boolean deleteSupported();
+
+    /**
+     * Return true if the Writer supports the update mecanism.
+     */
+    public abstract boolean updateSupported();
+
     
     /**
      * Destoy all the resource and close connection.

@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -32,15 +33,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
+ * Update statements may replace an entire record or only update part of a record:
+ *
+ * 1) To replace an existing record, include a new instance of the record;
+ *
+ * 2) To update selected properties of an existing record, include a set of RecordProperty elements.
+ * The scope of the update statement is determined by the Constraint element.
  * 
- *             Update statements may replace an entire record or only update part 
- *             of a record:
- *             1) To replace an existing record, include a new instance of the 
- *                record;
- *             2) To update selected properties of an existing record, include
- *                a set of RecordProperty elements. The scope of the update
- *                statement  is determined by the Constraint element.
- *                The 'handle' is a local identifier for the action.
+ * The 'handle' is a local identifier for the action.
  *          
  * 
  * <p>Java class for UpdateType complex type.
@@ -88,6 +88,19 @@ public class UpdateType {
     @XmlSchemaType(name = "ID")
     private String handle;
 
+    public UpdateType() {
+
+    }
+
+    public UpdateType(Object any, QueryConstraintType query) {
+        this.any        = any;
+        this.constraint = query;
+    }
+
+    public UpdateType(List<RecordPropertyType> recordProperty, QueryConstraintType query) {
+        this.recordProperty = recordProperty;
+        this.constraint     = query;
+    }
     /**
      * Gets the value of the any property.
      */

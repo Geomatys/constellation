@@ -36,7 +36,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
@@ -1375,11 +1374,44 @@ public class CSWworker {
                 
                 
             } else if (transaction instanceof UpdateType) {
-                UpdateType updateRequest = (UpdateType)transaction;
-                throw new CstlServiceException("This kind of transaction (update) is not yet supported by the service.",
-                                              NO_APPLICABLE_CODE, "TransactionType");
-            
-                
+                if (MDWriter.updateSupported()) {
+                    UpdateType updateRequest = (UpdateType) transaction;
+                    if (updateRequest.getConstraint() == null) {
+                        throw new CstlServiceException("A constraint must be specified.",
+                                MISSING_PARAMETER_VALUE, "constraint");
+                    }
+                    if (updateRequest.getAny() == null && updateRequest.getRecordProperty().size() == 0) {
+                        throw new CstlServiceException("The any part or a list od RecordProperty must be specified.",
+                                MISSING_PARAMETER_VALUE, "MD_Metadata");
+                    } else if (updateRequest.getAny() != null && updateRequest.getRecordProperty().size() != 0) {
+                        throw new CstlServiceException("You must choose between the any part or a list of RecordProperty, you can't specify both.",
+                                MISSING_PARAMETER_VALUE, "MD_Metadata");
+                    }
+
+                    // build the lucene query from the specified filter
+                    SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
+                    logger.info("Lucene query obtained:" + luceneQuery);
+
+                    // we try to execute the query
+                    List<String> results = executeLuceneQuery(luceneQuery);
+                    for (String metadataID : results) {
+                        boolean updated;
+                        if (updateRequest.getAny() != null) {
+                            updated = MDWriter.replaceMetadata(metadataID, updateRequest.getAny());
+                        } else {
+                            updated = MDWriter.updateMetadata(metadataID, updateRequest.getRecordProperty());
+                        }
+                        if (!updated) {
+                            throw new CstlServiceException("The service does not succeed to update the metadata:" + metadataID,
+                                    NO_APPLICABLE_CODE);
+                        } else {
+                            totalUpdated++;
+                        }
+                    }
+                } else {
+                    throw new CstlServiceException("This kind of transaction (update) is not supported by this Writer implementation.",
+                            NO_APPLICABLE_CODE, "TransactionType");
+                }
             } else {
                 String className = " null object";
                 if (transaction != null) {

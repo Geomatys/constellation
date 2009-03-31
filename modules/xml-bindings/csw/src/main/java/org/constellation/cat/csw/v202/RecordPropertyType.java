@@ -18,6 +18,7 @@ package org.constellation.cat.csw.v202;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -53,6 +54,15 @@ public class RecordPropertyType {
     private String name;
     @XmlElement(name = "Value")
     private Object value;
+
+    public RecordPropertyType() {
+
+    }
+
+    public RecordPropertyType(String name, Object value) {
+        this.name  = name;
+        this.value = value;
+    }
 
     /**
      * Gets the value of the name property.

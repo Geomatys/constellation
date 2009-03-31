@@ -22,6 +22,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -42,9 +43,12 @@ import org.constellation.cat.csw.v202.GetRecordsType;
 import org.constellation.cat.csw.v202.ObjectFactory;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
+import org.constellation.cat.csw.v202.RecordPropertyType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
+import org.constellation.cat.csw.v202.TransactionType;
+import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.NotType;
@@ -1034,7 +1038,88 @@ public class CswXMLBindingTest {
         
  
     }
-    
+
+
+    /**
+     * Test simple Record Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void updateMarshalingTest() throws Exception {
+
+        // <TODO
+        SimpleLiteral id         = new SimpleLiteral("{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}");
+        SimpleLiteral title      = new SimpleLiteral("(JASON-1)");
+        SimpleLiteral type       = new SimpleLiteral("clearinghouse");
+
+        List<SimpleLiteral> subject = new ArrayList<SimpleLiteral>();
+        subject.add(new SimpleLiteral("oceans elevation NASA/JPL/JASON-1"));
+        subject.add(new SimpleLiteral("oceans elevation 2"));
+
+        SimpleLiteral modified   = new SimpleLiteral("2007-11-15 21:26:49");
+        SimpleLiteral Abstract   = new SimpleLiteral("Jason-1 is the first follow-on to the highly successful TOPEX/Poseidonmission that measured ocean surface topography to an accuracy of 4.2cm.");
+        SimpleLiteral references = new SimpleLiteral("http://keel.esri.com/output/TOOLKIT_Browse_Metadata_P7540_T8020_D1098.xml");
+        SimpleLiteral spatial    = new SimpleLiteral("northlimit=65.9999999720603; eastlimit=180; southlimit=-66.0000000558794; westlimit=-180;");
+
+        List<BoundingBoxType> bbox = new ArrayList<BoundingBoxType>();
+        bbox.add(new WGS84BoundingBoxType(180, -66.0000000558794, -180, 65.9999999720603));
+
+        RecordType record = new RecordType(id, title, type, subject, null, modified, null, Abstract, bbox, null, null, null, spatial, references);
+
+        QueryConstraintType query = new QueryConstraintType("identifier='{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}'", "1.1.0");
+        UpdateType update = new UpdateType(record, query);
+
+        TransactionType request = new TransactionType("CSW", "2.0.2", update);
+
+        //recordMarshaller202.marshal(request, System.out);
+
+        // TODO/>
+
+        RecordPropertyType recordProperty = new RecordPropertyType("/csw:Record/dc:contributor", "Jane");
+        query = new QueryConstraintType("identifier='{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}'", "1.1.0");
+        update = new UpdateType(Arrays.asList(recordProperty), query);
+        request = new TransactionType("CSW", "2.0.2", update);
+
+         String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:Transaction verboseResponse=\"false\" version=\"2.0.2\" service=\"CSW\" >"        + '\n' +
+        "    <csw:Update>"                                                                       + '\n' +
+        "        <csw:RecordProperty>"                                                           + '\n' +
+        "            <csw:Name>/csw:Record/dc:contributor</csw:Name>"                            + '\n' +
+        "            <csw:Value xsi:type=\"xsd:string\" >Jane</csw:Value>"                                                + '\n' +
+        "        </csw:RecordProperty>"                                                          + '\n' +
+        "        <csw:Constraint version=\"1.1.0\">"                                               + '\n' +
+        "            <csw:CqlText>identifier='{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}'</csw:CqlText>" + '\n' +
+        "        </csw:Constraint>"                                                                + '\n' +
+        "    </csw:Update>"                                                                       + '\n' +
+        "</csw:Transaction>"+ '\n';
+         
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(request, sw);
+        
+        String result = sw.toString();
+
+        result = removeXmlns(result);
+
+        assertEquals(expResult, result);
+
+    }
+
+    public String removeXmlns(String xml) {
+
+        String s = xml;
+        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
+
+        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
+
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
+
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
+
+
+        return s;
+    }
     
     class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
@@ -1117,7 +1202,8 @@ public class CswXMLBindingTest {
                 prefix = "wrs09";
             } else if ("http://www.cnig.gouv.fr/2005/fra".equals(namespaceUri)) {
                 prefix = "fra";
-            }
+            } else if("http://www.w3.org/2001/XMLSchema".equals(namespaceUri) )
+            prefix = "xsd";
             return prefix;
         }
 
