@@ -749,7 +749,10 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        boolean succeed = deleteMetadata(metadataID);
+        if (!succeed)
+            return false;
+        return storeMetadata(any);
     }
 
     @Override

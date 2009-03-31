@@ -854,7 +854,11 @@ public final class Util {
             logger.severe(baseMessage + "the class is not accessible.");
 
         } catch (IllegalArgumentException ex) {
-            logger.severe(baseMessage + "the given argument does not match that requrired by the method.");
+            String param = "null";
+            if (parameter != null)
+                param = parameter.getClass().getSimpleName();
+            logger.severe(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
+            return -1;
 
         } catch (InvocationTargetException ex) {
             logger.severe(baseMessage + "an Exception was thrown in the invoked method.");

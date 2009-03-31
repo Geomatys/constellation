@@ -40,8 +40,7 @@
                         <gmd:address>
                             <gmd:CI_Address>
                                 <gmd:deliveryPoint>
-                                    <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                    <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                 </gmd:deliveryPoint>
                                 <gmd:city>
                                     <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -275,9 +274,7 @@ BP 70</gco:CharacterString>
                                         <gmd:address>
                                             <gmd:CI_Address>
                                                 <gmd:deliveryPoint>
-                                                    <gco:CharacterString>Route des Peres Maristes
-BP 1386
-</gco:CharacterString>
+                                                    <gco:CharacterString>Route des Peres Maristes BP 1386</gco:CharacterString>
                                                 </gmd:deliveryPoint>
                                                 <gmd:city>
                                                     <gco:CharacterString>DAKAR - HANN</gco:CharacterString>
@@ -335,8 +332,7 @@ BP 1386
                                 <gmd:address>
                                     <gmd:CI_Address>
                                         <gmd:deliveryPoint>
-                                            <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                            <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                         </gmd:deliveryPoint>
                                         <gmd:city>
                                             <gco:CharacterString>PLOUZANE</gco:CharacterString>

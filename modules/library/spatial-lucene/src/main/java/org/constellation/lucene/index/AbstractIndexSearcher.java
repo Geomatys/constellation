@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 // Apache Lucene dependencies
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -148,11 +146,17 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     public void refresh() throws IndexingException {
         try {
             initSearcher();
+            initIdentifiersList();
+            cachedQueries.clear();
             logger.info("refreshing index searcher");
+        } catch (ParseException ex) {
+            throw new IndexingException("Parse exception encountered during refreshing the index", ex);
+        } catch (SearchingException ex) {
+            throw new IndexingException("Searching exception encountered during refreshing the index", ex);
         } catch (CorruptIndexException ex) {
-            throw new IndexingException("Corruption encountered during indexing", ex);
+            throw new IndexingException("Corruption exception encountered during refreshing the index", ex);
         } catch (IOException ex) {
-            throw new IndexingException("IO Exception during indexing", ex);
+            throw new IndexingException("IO Exception during refreshing the index", ex);
         }
     }
 

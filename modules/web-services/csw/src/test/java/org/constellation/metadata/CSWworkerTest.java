@@ -55,6 +55,7 @@ import org.constellation.cat.csw.v202.InsertType;
 import org.constellation.cat.csw.v202.ListOfValuesType;
 import org.constellation.cat.csw.v202.QueryConstraintType;
 import org.constellation.cat.csw.v202.QueryType;
+import org.constellation.cat.csw.v202.RecordPropertyType;
 import org.constellation.cat.csw.v202.RecordType;
 import org.constellation.cat.csw.v202.ResultType;
 import org.constellation.cat.csw.v202.SummaryRecordType;
@@ -81,6 +82,7 @@ import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
 import org.geotools.metadata.iso.MetaDataImpl;
 
 // JUnit dependencies
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -890,7 +892,7 @@ public class CSWworkerTest {
         assertEquals(ExpResult1, isoResult);
 
         /*
-         *  TEST 3 : we update the metadata 42292_5p_19900609195600 by replacing
+         *  TEST 3 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
 
         MetaDataImpl replacement = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
@@ -931,7 +933,245 @@ public class CSWworkerTest {
         assertEquals(replacement, isoResult);
 
 
+        /*
+         *  TEST 4 : we update the metadata 11325_158_19640418141800 by replacing a single Property
+         *  we replace the property MD_Metadata.language from en to fr.
+         */
+
+        // we perform a request to get the list of metadata matching language = en
+        constraint        = new QueryConstraintType("Language = 'eng'", "1.0.0");
+        QueryType query   = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        GetRecordsType gr = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        GetRecordsResponseType response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 5);
+
+        List<String> results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        List<String> expResult = new ArrayList<String>();
+        expResult.add("42292_9s_19900610041000");
+        expResult.add("40510_145_19930221211500");
+        expResult.add("39727_22_19750113062500");
+        expResult.add("11325_158_19640418141800");
+        expResult.add("CTDF02");
+
+        assertEquals(expResult, results);
+
+
+        // we update the metadata 11325_158_19640418141800 by replacing the language eng by fr
+        constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
+        List<RecordPropertyType> properties = new ArrayList<RecordPropertyType>();
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", "fr"));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+        // we perform again the getRecord request the modified metadata must not appears in the list
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 4);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("42292_9s_19900610041000");
+        expResult.add("40510_145_19930221211500");
+        expResult.add("39727_22_19750113062500");
+        expResult.add("CTDF02");
+
+        assertEquals(expResult, results);
+
+
+         // we make a getRecords request with language=fr to verify that the modified metadata is well indexed
+        constraint = new QueryConstraintType("Language = 'fra'", "1.0.0");
+        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
         
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 1);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("11325_158_19640418141800");
+
+        assertEquals(expResult, results);
+
+        /*
+         *  TEST 5 : we update the metadata 39727_22_19750113062500 by replacing a single Property
+         *  we replace the property MD_Metadata.identificationInfo.abstract from "Donnees CTD ANGOLA CAP 7501 78" to "Modified datas by CSW-T".
+         */
+
+        // first we make a getRecords request to verify that the metadata match the request on the Abstract field
+        constraint = new QueryConstraintType("Abstract = 'Donnees CTD ANGOLA CAP 7501 78'", "1.0.0");
+        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 1);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("39727_22_19750113062500");
+
+        assertEquals(expResult, results);
+
+
+        // we update the metadata 11325_158_19640418141800 by replacing the abstract field from "Donnees CTD ANGOLA CAP 7501 78" to "Modified datas by CSW-T".
+        constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
+        properties = new ArrayList<RecordPropertyType>();
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/abstract", "Modified datas by CSW-T"));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // we verify that the metadata does not appears anymore in the precedent getRecords request
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 0);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+
+        assertEquals(expResult, results);
+
+        // then we verify that the modified metadata is well modified and indexed
+        constraint = new QueryConstraintType("Abstract = 'Modified datas by CSW-T'", "1.0.0");
+        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 1);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("39727_22_19750113062500");
+
+        assertEquals(expResult, results);
+
+        /*
+         *  TEST 6 : we update the metadata 39727_22_19750113062500 by replacing a single Property
+         *  we replace the property MD_Metadata.dateStamp with "2009-03-31T12:00:00.000+01:00".
+         */
+
+        // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "2009-03-31T12:00:00.000+01:00".
+        constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
+        properties = new ArrayList<RecordPropertyType>();
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-03-31T12:00:00.000+01:00"));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+        // then we verify that the modified metadata is well modified and indexed
+        constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
+        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 1);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("39727_22_19750113062500");
+
+        assertEquals(expResult, results);
+
+        /*
+         *  TEST 7 : we update the metadata 39727_22_19750113062500 by replacing a complex Property
+         *  we replace the property MD_Metadata.identificationInfo.extent.geographicElement by a new Geographic bounding box".
+         */
+
+        // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
+        constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
+        properties = new ArrayList<RecordPropertyType>();
+        GeographicBoundingBoxImpl geographicElement = new GeographicBoundingBoxImpl(1.1, 1.1, 1.1, 1.1);
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", geographicElement));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+        
+        // then we verify that the modified metadata is well modified and indexed
+        constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
+        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertTrue(response.getSearchResults().getAny().size() == 1);
+
+        results = new ArrayList<String>();
+        for (Object objRec : response.getSearchResults().getAny()) {
+            MetaDataImpl meta = (MetaDataImpl) objRec;
+            results.add(meta.getFileIdentifier());
+        }
+
+        expResult = new ArrayList<String>();
+        expResult.add("39727_22_19750113062500");
+
+        assertEquals(expResult, results);
 
 
     }

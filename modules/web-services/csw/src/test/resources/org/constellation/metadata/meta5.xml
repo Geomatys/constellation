@@ -40,8 +40,7 @@
                         <gmd:address>
                             <gmd:CI_Address>
                                 <gmd:deliveryPoint>
-                                    <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                    <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                 </gmd:deliveryPoint>
                                 <gmd:city>
                                     <gco:CharacterString>PLOUZANE</gco:CharacterString>
