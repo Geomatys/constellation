@@ -1,6 +1,21 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.provider.postgrid;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,11 +23,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.AbstractProviderService;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
-import org.xml.sax.SAXException;
 
 import static org.constellation.provider.postgrid.PostGridProvider.*;
 
@@ -20,7 +35,7 @@ import static org.constellation.provider.postgrid.PostGridProvider.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridProviderService implements LayerProviderService {
+public class PostGridProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.
@@ -30,8 +45,6 @@ public class PostGridProviderService implements LayerProviderService {
 
     private static final Collection<PostGridProvider> PROVIDERS = new ArrayList<PostGridProvider>();
     private static final Collection<PostGridProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
-
-    private static File CONFIG_FILE = null;
 
     @Override
     public Collection<PostGridProvider> getProviders() {
@@ -44,35 +57,14 @@ public class PostGridProviderService implements LayerProviderService {
     }
 
     @Override
-    public synchronized void init(File file) {
-        if(file == null){
-            throw new NullPointerException("Configuration file can not be null");
-        }
+    public void init(ProviderConfig provConf) {
+        PROVIDERS.clear();
 
-        if(CONFIG_FILE != null){
-            throw new IllegalStateException("The postgrid provider service has already been initialize");
-        }
-
-        PostGridProviderService.CONFIG_FILE = file;
-
-        ProviderConfig config = null;
-        try {
-            config = ProviderConfig.read(file);
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
-        if(config == null) return;
-
-        for (final ProviderSource ps : config.sources) {
+        for (final ProviderSource ps : provConf.sources) {
             try {
                 PostGridProvider provider = new PostGridProvider(ps);
                 PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> postgrid provider created : " 
+                LOGGER.log(Level.INFO, "[PROVIDER]> postgrid provider created : "
                         + provider.getSource().parameters.get(KEY_DATABASE) + " > "
                         + provider.getSource().parameters.get(KEY_ROOT_DIRECTORY));
             } catch (IllegalArgumentException ex) {
@@ -83,7 +75,6 @@ public class PostGridProviderService implements LayerProviderService {
                 LOGGER.log(Level.WARNING, "[PROVIDER]> Invalide postgrid provider config", ex);
             }
         }
-
     }
 
 }

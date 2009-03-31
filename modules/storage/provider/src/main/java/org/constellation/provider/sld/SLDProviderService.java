@@ -1,22 +1,31 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
-
 package org.constellation.provider.sld;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
-import org.xml.sax.SAXException;
+import org.geotools.style.MutableStyle;
 
 import static org.constellation.provider.sld.SLDProvider.*;
 
@@ -25,7 +34,7 @@ import static org.constellation.provider.sld.SLDProvider.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDProviderService implements StyleProviderService{
+public class SLDProviderService extends AbstractProviderService<String,MutableStyle> implements StyleProviderService {
 
     /**
      * Default logger.
@@ -35,8 +44,6 @@ public class SLDProviderService implements StyleProviderService{
 
     private static final Collection<SLDProvider> PROVIDERS = new ArrayList<SLDProvider>();
     private static final Collection<SLDProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
-
-    private static File CONFIG_FILE = null;
 
     @Override
     public Collection<SLDProvider> getProviders() {
@@ -49,30 +56,8 @@ public class SLDProviderService implements StyleProviderService{
     }
 
     @Override
-    public void init(File file) {
-        if(file == null){
-            throw new NullPointerException("Configuration file can not be null");
-        }
-
-        if(CONFIG_FILE != null){
-            throw new IllegalStateException("The SLD provider service has already been initialize");
-        }
-
-        SLDProviderService.CONFIG_FILE = file;
-
-        ProviderConfig config = null;
-        try {
-            config = ProviderConfig.read(file);
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
-        if(config == null) return;
-
+    public void init(ProviderConfig config) {
+        PROVIDERS.clear();
         for (final ProviderSource ps : config.sources) {
             try {
                 SLDProvider provider = new SLDProvider(ps);

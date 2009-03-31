@@ -51,8 +51,6 @@ public class ProviderConfig {
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
-    private ProviderConfig(){}
-    
     public static final synchronized ProviderConfig read(final File configFile) 
             throws ParserConfigurationException, SAXException, IOException{
 

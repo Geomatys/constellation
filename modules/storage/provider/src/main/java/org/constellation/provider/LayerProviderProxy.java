@@ -19,6 +19,7 @@ package org.constellation.provider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -142,6 +143,10 @@ public class LayerProviderProxy implements LayerProvider{
         }
         
         return null;
+    }
+
+    public Collection<LayerProviderService> getServices() {
+        return Collections.unmodifiableCollection(SERVICES);
     }
 
     /**

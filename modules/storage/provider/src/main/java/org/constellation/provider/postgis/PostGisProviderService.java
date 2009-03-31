@@ -1,17 +1,32 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.provider.postgis;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.AbstractProviderService;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
-import org.xml.sax.SAXException;
 
 import static org.constellation.provider.postgis.PostGisProvider.*;
 
@@ -19,7 +34,7 @@ import static org.constellation.provider.postgis.PostGisProvider.*;
  *
  * @author Johann Sorel (Geoamtys)
  */
-public class PostGisProviderService implements LayerProviderService {
+public class PostGisProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.
@@ -29,8 +44,6 @@ public class PostGisProviderService implements LayerProviderService {
 
     private static final Collection<PostGisProvider> PROVIDERS = new ArrayList<PostGisProvider>();
     private static final Collection<PostGisProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
-
-    private static File CONFIG_FILE = null;
 
     @Override
     public Collection<PostGisProvider> getProviders() {
@@ -43,30 +56,8 @@ public class PostGisProviderService implements LayerProviderService {
     }
 
     @Override
-    public synchronized void init(File file) {
-        if(file == null){
-            throw new NullPointerException("Configuration file can not be null");
-        }
-
-        if(CONFIG_FILE != null){
-            throw new IllegalStateException("The postgis provider service has already been initialize");
-        }
-
-        PostGisProviderService.CONFIG_FILE = file;
-
-        ProviderConfig config = null;
-        try {
-            config = ProviderConfig.read(file);
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
-        if(config == null) return;
-
+    public void init(ProviderConfig config) {
+        PROVIDERS.clear();
         for (final ProviderSource ps : config.sources) {
             try {
                 PostGisProvider provider = new PostGisProvider(ps);

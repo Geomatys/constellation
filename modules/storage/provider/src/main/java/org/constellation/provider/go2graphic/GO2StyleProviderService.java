@@ -1,8 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
-
 package org.constellation.provider.go2graphic;
 
 import java.io.File;
@@ -12,12 +23,13 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.provider.StyleProviderService;
+import org.constellation.provider.configuration.ProviderConfig;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class GO2StyleProviderService implements StyleProviderService{
+public class GO2StyleProviderService implements StyleProviderService {
 
     /**
      * Default logger.
@@ -50,11 +62,17 @@ public class GO2StyleProviderService implements StyleProviderService{
             throw new IllegalStateException("The GO2 style provider service has already been initialize");
         }
 
-        //GO2 Style are hard coded java objects with no property configuration
-        PROVIDERS.add(new GO2StyleProvider());
+        init((ProviderConfig)null);
 
         LOGGER.log(Level.INFO, "[PROVIDER]> GO2 style provider created : " + "GO2:VectorField");
 
+    }
+
+    @Override
+    public void init(ProviderConfig config) {
+        PROVIDERS.clear();
+        //GO2 Style are hard coded java objects with no property configuration
+        PROVIDERS.add(new GO2StyleProvider());
     }
 
 }
