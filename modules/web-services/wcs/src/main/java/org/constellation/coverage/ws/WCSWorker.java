@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -920,7 +921,14 @@ public final class WCSWorker {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = unmarshallers.take();
-                response = unmarshaller.unmarshal(f);
+                // If the file is not present in the configuration directory, take the one in resource.
+                if (!f.exists()) {
+                    final InputStream in = getClass().getResourceAsStream(fileName);
+                    response = unmarshaller.unmarshal(in);
+                    in.close();
+                } else {
+                    response = unmarshaller.unmarshal(f);
+                }
                 capabilities.put(fileName, response);
             } catch (InterruptedException ex) {
                 LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());

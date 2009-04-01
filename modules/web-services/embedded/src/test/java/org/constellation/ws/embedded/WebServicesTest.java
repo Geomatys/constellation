@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
@@ -35,6 +36,12 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.postgrid.PostGridProvider;
+import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
@@ -76,6 +83,30 @@ public class WebServicesTest {
      */
     @BeforeClass
     public static void initServerAndLayerList() {
+        // Defines a PostGrid data provider
+        final ProviderSource source = new ProviderSource();
+        source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://test.geomatys.com/coverages-test");
+        source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
+        source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
+        source.parameters.put(PostGridProvider.KEY_READONLY, "true");
+        source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, "/media/geomatys/Données/PostGRID");
+        source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
+
+        final ProviderConfig config = new ProviderConfig();
+        config.sources.add(source);
+
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+            // Here we should have the postgrid data provider defined previously
+            if (service instanceof PostGridProviderService) {
+                service.init(config);
+                assumeTrue(!(service.getProviders().isEmpty()));
+                if (service.getProviders().isEmpty()) {
+                    return;
+                }
+                break;
+            }
+        }
+
         // Get the list of layers
         try {
             layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
@@ -367,12 +398,16 @@ public class WebServicesTest {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Object obj;
+        Object obj;
         try {
             final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wms.v111:" +
-                                                                "org.constellation.ows.v100");
+                                                                "org.constellation.wcs.v100:" +
+                                                                "org.constellation.ows.v100:" +
+                                                                "org.constellation.gml.v311");
             obj = context.createUnmarshaller().unmarshal(in);
+            if (obj instanceof JAXBElement) {
+                obj = ((JAXBElement) obj).getValue();
+            }
             assertTrue(obj instanceof WCSCapabilitiesType);
         } catch (JAXBException ex) {
             assumeNoException(ex);
@@ -386,13 +421,15 @@ public class WebServicesTest {
         assertFalse(coverages.isEmpty());
         boolean layerTestFound = false;
         for (CoverageOfferingBriefType coverage : coverages) {
-            if (coverage.getName().equals("SST_tests")) {
-                layerTestFound = true;
-                final LonLatEnvelopeType env = coverage.getLonLatEnvelope();
-                assertTrue(env.getPos().get(0).getValue().get(0) == -180d);
-                assertTrue(env.getPos().get(0).getValue().get(1) ==  180d);
-                assertTrue(env.getPos().get(1).getValue().get(0) ==  -90d);
-                assertTrue(env.getPos().get(1).getValue().get(1) ==   90d);
+            for (JAXBElement<String> elem : coverage.getRest()) {
+                if (elem.getValue().equals("SST_tests")) {
+                    layerTestFound = true;
+                    final LonLatEnvelopeType env = coverage.getLonLatEnvelope();
+                    assertTrue(env.getPos().get(0).getValue().get(0) == -180d);
+                    assertTrue(env.getPos().get(0).getValue().get(1) ==  -90d);
+                    assertTrue(env.getPos().get(1).getValue().get(0) ==  180d);
+                    assertTrue(env.getPos().get(1).getValue().get(1) ==   90d);
+                }
             }
         }
         if (layerTestFound == false) {

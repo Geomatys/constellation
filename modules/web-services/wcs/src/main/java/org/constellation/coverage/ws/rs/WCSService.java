@@ -147,7 +147,8 @@ public final class WCSService extends OGCWebService {
         setXMLContext("org.constellation.ws:" +
                       "org.constellation.ows.v100:" +
                       "org.constellation.wcs.v100:" +
-                      "org.constellation.wcs.v111",
+                      "org.constellation.wcs.v111:" +
+                      "org.constellation.gml.v311",
                       "http://www.opengis.net/wcs");
 
         worker = new WCSWorker(marshallers, unmarshallers);
