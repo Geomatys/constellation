@@ -32,7 +32,9 @@ import org.geotools.map.ElevationModel;
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
  * different kind of data sources, postgrid, shapefile ...
- * 
+ *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class LayerProviderProxy implements LayerProvider{

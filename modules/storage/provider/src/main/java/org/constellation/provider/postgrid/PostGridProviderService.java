@@ -33,6 +33,8 @@ import static org.constellation.provider.postgrid.PostGridProvider.*;
 
 /**
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {

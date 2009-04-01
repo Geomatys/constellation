@@ -44,7 +44,9 @@ import org.geotools.util.SoftValueHashMap;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
- * 
+ *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class SLDProvider implements StyleProvider{

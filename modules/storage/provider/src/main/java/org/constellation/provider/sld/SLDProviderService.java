@@ -32,6 +32,8 @@ import static org.constellation.provider.sld.SLDProvider.*;
 
 /**
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class SLDProviderService extends AbstractProviderService<String,MutableStyle> implements StyleProviderService {

@@ -32,6 +32,8 @@ import static org.constellation.provider.postgis.PostGisProvider.*;
 
 /**
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geoamtys)
  */
 public class PostGisProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {

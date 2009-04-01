@@ -27,6 +27,8 @@ import org.constellation.provider.configuration.ProviderConfig;
 
 /**
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class GO2StyleProviderService implements StyleProviderService {

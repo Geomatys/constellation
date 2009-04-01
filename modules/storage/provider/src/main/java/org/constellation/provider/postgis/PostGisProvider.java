@@ -55,6 +55,8 @@ import org.xml.sax.SAXException;
  * Shapefile Data provider. index and cache Datastores for the shapefiles
  * whithin the given folder.
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class PostGisProvider implements LayerProvider{

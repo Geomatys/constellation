@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
 
 /**
  * XML configuration file used for data providers.
+ *
+ * @version $Id$
  *
  * @author Johann Sorel (Geomatys)
  */

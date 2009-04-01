@@ -31,6 +31,8 @@ import static org.constellation.provider.shapefile.ShapeFileProvider.*;
 
 /**
  *
+ * @version $Id$
+ *
  * @author Johann Sorel (Geoamtys)
  */
 public class ShapeFileProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
