@@ -65,6 +65,8 @@ import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.ogc.SortByType;
+import org.constellation.ogc.SortOrderType;
+import org.constellation.ogc.SortPropertyType;
 import org.constellation.ows.v100.AcceptFormatsType;
 import org.constellation.ows.v100.AcceptVersionsType;
 import org.constellation.ows.v100.BoundingBoxType;
@@ -80,9 +82,9 @@ import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
 
 // geotools dependencies
 import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // JUnit dependencies
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -940,7 +942,9 @@ public class CSWworkerTest {
 
         // we perform a request to get the list of metadata matching language = en
         constraint        = new QueryConstraintType("Language = 'eng'", "1.0.0");
-        QueryType query   = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        SortPropertyType sp = new SortPropertyType("Identifier", SortOrderType.ASC);
+        SortByType sort   = new SortByType(Arrays.asList(sp));
+        QueryType query   = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
         GetRecordsType gr = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         GetRecordsResponseType response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -956,10 +960,10 @@ public class CSWworkerTest {
         }
 
         List<String> expResult = new ArrayList<String>();
-        expResult.add("42292_9s_19900610041000");
-        expResult.add("40510_145_19930221211500");
-        expResult.add("39727_22_19750113062500");
         expResult.add("11325_158_19640418141800");
+        expResult.add("39727_22_19750113062500");
+        expResult.add("40510_145_19930221211500");
+        expResult.add("42292_9s_19900610041000");
         expResult.add("CTDF02");
 
         assertEquals(expResult, results);
@@ -989,9 +993,9 @@ public class CSWworkerTest {
         }
 
         expResult = new ArrayList<String>();
-        expResult.add("42292_9s_19900610041000");
-        expResult.add("40510_145_19930221211500");
         expResult.add("39727_22_19750113062500");
+        expResult.add("40510_145_19930221211500");
+        expResult.add("42292_9s_19900610041000");
         expResult.add("CTDF02");
 
         assertEquals(expResult, results);
