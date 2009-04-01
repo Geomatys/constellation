@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>engine</artifactId>
     <version>0.3-SNAPSHOT</version>
   </parent>
 
@@ -17,10 +17,10 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-xacml</artifactId>
+  <groupId>org.constellation.engine</groupId>
+  <artifactId>cstl-engine-xacml</artifactId>
   <packaging>jar</packaging>
-  <name>Library providing XACML</name>
+  <name>Constellation XACML Engine</name>
   <description>
     The sunxacml.sf.net library as improved by JBoss, reviewed and redesigned 
     for Constellation.
