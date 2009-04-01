@@ -337,7 +337,7 @@ public class WebServicesTest {
             return;
         }
 
-        // Try to get something from the wrong url.
+        // Creates a valid GetCapabilities url.
         final InputStream in;
         try {
             in = getCapsUrl.openStream();
@@ -391,7 +391,7 @@ public class WebServicesTest {
             return;
         }
 
-        // Try to get something from the wrong url.
+        // Creates a valid GetCapabilities url.
         final InputStream in;
         try {
             in = getCapsUrl.openStream();
@@ -401,7 +401,7 @@ public class WebServicesTest {
         }
 
         // Try to marshall something from the response returned by the server.
-        // The response should be a WMT_MS_Capabilities.
+        // The response should be a WCSCapabilitiesType.
         Object obj;
         try {
             final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
@@ -451,7 +451,7 @@ public class WebServicesTest {
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
 
-        // Creates a valid GetMap url.
+        // Creates a valid GetFeatureInfo url.
         final URL gfi;
         try {
             gfi = new URL("http://localhost:9090/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
@@ -486,6 +486,40 @@ public class WebServicesTest {
         // Tests on the returned value
         assertNotNull(value);
         assertTrue   (value.startsWith("28.35"));
+    }
+
+    /**
+     * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetLegendGraphic() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetLegendGraphic url.
+        final URL getLegendUrl;
+        try {
+            getLegendUrl = new URL("http://localhost:9090/wms?request=GetLegendGraphic&service=wms&width=200&height=40&" +
+                                                          "layer=SST_tests&format=image/png&version=1.1.0");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getLegendUrl, "image/png");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 200);
+        assertEquals(image.getHeight(), 40);
+        assertEquals(Commons.checksum(image), 1522814217L);
     }
 
     /**
@@ -535,6 +569,7 @@ public class WebServicesTest {
         final ImageReader ir = irs.next();
         ir.setInput(iis, true, true);
         final BufferedImage image = ir.read(0);
+        ir.dispose();
         iis.close();
         // For debugging, uncomment the JFrame creation and the Thread.sleep further,
         // in order to see the image in a popup.
