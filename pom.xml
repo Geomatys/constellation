@@ -523,6 +523,19 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <nonFilteredFileExtensions>
+            <nonFilteredFileExtension>utf</nonFilteredFileExtension>
+            <nonFilteredFileExtension>tif</nonFilteredFileExtension>
+            <nonFilteredFileExtension>tiff</nonFilteredFileExtension>
+            <nonFilteredFileExtension>serialized</nonFilteredFileExtension>
+          </nonFilteredFileExtensions>
+        </configuration>
+      </plugin> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <warName>constellation</warName>

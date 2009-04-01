@@ -89,6 +89,8 @@ public class WebServicesTest {
         source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
         source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
         source.parameters.put(PostGridProvider.KEY_READONLY, "true");
+        // assume that a NFS mount has been done on the Geomatys server that host the data.
+        // TODO: put the image somewhere accessible from outside of Geomatys network.
         source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, "/media/geomatys/Données/PostGRID");
         source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
 
