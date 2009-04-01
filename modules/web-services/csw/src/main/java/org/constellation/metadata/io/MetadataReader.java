@@ -113,7 +113,17 @@ public abstract class MetadataReader {
      * Destroy all the resource used by this reader.
      */
     public abstract void destroy();
-    
+
+    /**
+     * Add a metadata to the cache.
+     * @param identifier The metadata identifier.
+     * @param metadata The object to put in cache.
+     */
+    public void removeFromCache(String identifier) {
+        if (isCacheEnabled)
+            metadatas.remove(identifier);
+    }
+
     /**
      * Add a metadata to the cache.
      * @param identifier The metadata identifier.

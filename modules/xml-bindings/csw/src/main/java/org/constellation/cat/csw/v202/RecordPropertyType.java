@@ -18,10 +18,14 @@ package org.constellation.cat.csw.v202;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+// xerces dependencies
+import org.apache.xerces.dom.ElementNSImpl;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * <p>Java class for RecordPropertyType complex type.
@@ -75,6 +79,42 @@ public class RecordPropertyType {
      * Gets the value of the value property.
      */
     public Object getValue() {
+        if (value instanceof ElementNSImpl) {
+            value = getXMLFromElementNSImpl((ElementNSImpl)value);
+        }
         return value;
+    }
+
+    private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+        StringBuilder s = new StringBuilder();
+        //s.append('<').append(elt.getLocalName()).append('>');
+        Node node = elt.getFirstChild();
+        s.append(getXMLFromNode(node)).toString();
+
+        //s.append("</").append(elt.getLocalName()).append('>');
+        return s.toString();
+    }
+
+    private  StringBuilder getXMLFromNode(Node node) {
+        StringBuilder temp = new StringBuilder();
+        if (!node.getNodeName().equals("#text")){
+            temp.append("<" + node.getNodeName());
+            NamedNodeMap attrs = node.getAttributes();
+            for(int i=0;i<attrs.getLength();i++){
+                temp.append(" "+attrs.item(i).getNodeName()+"=\""+attrs.item(i).getTextContent()+"\" ");
+            }
+            temp.append(">");
+        }
+        if (node.hasChildNodes()) {
+            NodeList nodes = node.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                temp.append(getXMLFromNode(nodes.item(i)));
+            }
+        }
+        else{
+            temp.append(node.getTextContent());
+        }
+        if (!node.getNodeName().equals("#text")) temp.append("</" + node.getNodeName() + ">");
+        return temp;
     }
 }

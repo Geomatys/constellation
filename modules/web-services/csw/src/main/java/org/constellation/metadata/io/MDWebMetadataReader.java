@@ -318,7 +318,10 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 if (result == null) {
                     Form f = MDReader.getForm(catalog, id);
+                    logger.info("FORM:" + f);
                     result = getObjectFromForm(identifier, f);
+                } else {
+                    logger.info("getting from cache: " + identifier);
                 }
 
                 result = applyElementSet(result, type, elementName);
@@ -1229,5 +1232,41 @@ public class MDWebMetadataReader extends MetadataReader {
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return new HashMap<String, List<String>>();
+    }
+
+    /**
+     * Add a metadata to the cache.
+     * @param identifier The metadata identifier.
+     * @param metadata The object to put in cache.
+     */
+    @Override
+    public void removeFromCache(String identifier) {
+        if (super.isCacheEnabled()) {
+            int id;
+            String catalogCode = "";
+
+            //we parse the identifier (Form_ID:Catalog_Code)
+            try {
+                if (identifier.indexOf(":") != -1) {
+                    catalogCode = identifier.substring(identifier.indexOf(":") + 1, identifier.length());
+                    identifier = identifier.substring(0, identifier.indexOf(":"));
+                    id = Integer.parseInt(identifier);
+                } else {
+                    throw new NumberFormatException();
+                }
+
+                Catalog catalog = MDReader.getCatalog(catalogCode);
+
+                MDReader.removeFormFromCache(catalog, id);
+
+            } catch (SQLException ex) {
+                logger.severe("SQLException while removing " + identifier + " from the cache");
+                return;
+            } catch (NumberFormatException e) {
+                logger.severe("NumberFormat while removing " + identifier + " from the cache");
+                return;
+            }
+            super.removeFromCache(identifier);
+        }
     }
 }

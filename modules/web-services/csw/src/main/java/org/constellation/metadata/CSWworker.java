@@ -1405,6 +1405,7 @@ public class CSWworker {
                             throw new CstlServiceException("The service does not succeed to update the metadata:" + metadataID,
                                     NO_APPLICABLE_CODE);
                         } else {
+                            MDReader.removeFromCache(metadataID);
                             totalUpdated++;
                         }
                     }

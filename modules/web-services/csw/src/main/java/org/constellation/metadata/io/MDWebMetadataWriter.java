@@ -713,7 +713,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean updateSupported() {
-        return false;
+        return true;
     }
 
     @Override
@@ -757,6 +757,110 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        LOGGER.info("metadataID: " + metadataID);
+        int id;
+        String catalogCode = "";
+        Form f = null;
+        //we parse the identifier (Form_ID:Catalog_Code)
+        try  {
+            if (metadataID.indexOf(":") != -1) {
+                catalogCode    = metadataID.substring(metadataID.indexOf(":") + 1, metadataID.length());
+                metadataID = metadataID.substring(0, metadataID.indexOf(":"));
+                id         = Integer.parseInt(metadataID);
+            } else {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+             throw new CstlServiceException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
+        }
+        try {
+            Catalog catalog = MDReader.getCatalog(catalogCode);
+            f = MDReader.getForm(catalog, id);
+
+        } catch (SQLException ex) {
+            throw new CstlServiceException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
+                        NO_APPLICABLE_CODE);
+        }
+
+        for (RecordPropertyType property : properties) {
+            try {
+                String xpath = property.getName();
+                Object value = property.getValue();
+
+                Path p = getMDWPathFromXPath(xpath);
+                LOGGER.info("PATH :" + p);
+                List<Value> matchingValues = f.getValueFromPath(p);
+                for(Value v : matchingValues) {
+                    LOGGER.info("value:" + v);
+                    if (v instanceof TextValue && value instanceof String) {
+                        LOGGER.info("textValue updated");
+                        MDWriter.updateTextValue((TextValue) v, (String) value);
+                    } else {
+                        LOGGER.info("returned false " + value.getClass().getSimpleName());
+                        return false;
+                    }
+                }
+            } catch (SQLException ex) {
+                throw new CstlServiceException(ex);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Return an MDWeb path from a Xpath.
+     *
+     * @param xpath An XPath
+     *
+     * @return An MDWeb path
+     * @throws java.sql.SQLException
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    private Path getMDWPathFromXPath(String xpath) throws SQLException, CstlServiceException {
+
+        //we remove the first '/'
+        if (xpath.startsWith("/")) {
+            xpath = xpath.substring(1);
+        }
+
+        String typeName = xpath.substring(0, xpath.indexOf('/'));
+        if (typeName.contains(":")) {
+            typeName = typeName.substring(typeName.indexOf(':') + 1);
+        }
+        xpath = xpath.substring(xpath.indexOf(typeName) + typeName.length() + 1);
+        
+        Classe type;
+        Standard stan;
+        // we look for a know metadata type
+        if (typeName.equals("MD_Metadata")) {
+            stan = Standard.ISO_19115;
+            type = MDReader.getClasse("MD_Metadata", stan);
+        } else if (typeName.equals("Record")) {
+            stan = Standard.CSW;
+            type = MDReader.getClasse("Record", stan);
+        } else {
+            throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
+        }
+
+        Path p = new Path(stan, type);
+        while (xpath.indexOf('/') != -1) {
+            //Then we get the next Property name
+            String propertyName = xpath.substring(0, xpath.indexOf('/'));
+            LOGGER.info("propertyName:" + propertyName);
+            Property property = type.getPropertyByName(propertyName);
+            if (property == null) {
+                throw new CstlServiceException("There is no property:" + propertyName + "in the class " + typeName, INVALID_PARAMETER_VALUE);
+            }
+            p = new Path(p, property);
+            xpath = xpath.substring(xpath.indexOf('/') + 1);
+        }
+        
+        LOGGER.info("last propertyName:" + xpath);
+        Property property = type.getPropertyByName(xpath);
+        if (property == null) {
+            throw new CstlServiceException("There is no property:" + xpath + "in the class " + typeName, INVALID_PARAMETER_VALUE);
+        }
+        p = new Path(p, property);
+        return p;
     }
 }
