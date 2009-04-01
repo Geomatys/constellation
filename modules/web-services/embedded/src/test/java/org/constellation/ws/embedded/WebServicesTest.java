@@ -18,8 +18,10 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
@@ -134,7 +136,7 @@ public class WebServicesTest {
      * returned an error report for the user.
      */
     @Test
-    public void testWrongWMSRequest() {
+    public void testWMSWrongRequest() {
         // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
         final URL wrongUrl;
         try {
@@ -171,7 +173,7 @@ public class WebServicesTest {
      * returned an error report for the user.
      */
     @Test
-    public void testWrongWCSRequest() {
+    public void testWCSWrongRequest() {
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         final URL wrongUrl;
         try {
@@ -207,7 +209,7 @@ public class WebServicesTest {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testGetMapReturnedImage() {
+    public void testWMSGetMap() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -243,7 +245,7 @@ public class WebServicesTest {
      * Ensures that a valid GetCoverage request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testGetCoverageReturnedImage() {
+    public void testWCSGetCoverage() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -289,7 +291,7 @@ public class WebServicesTest {
      */
     @Test
     @Ignore
-    public void testGetCoverageMatrixFormat() {
+    public void testWCSGetCoverageMatrixFormat() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -437,6 +439,53 @@ public class WebServicesTest {
         if (layerTestFound == false) {
             throw new AssertionError("The layer \"SST_tests\" was not found in the returned GetCapabilities.");
         }
+    }
+
+    /**
+     * Ensures that the {@code WMS GetFeatureInfo} request on a particular point of the
+     * testing layer produces the whished result.
+     */
+    @Test
+    public void testWMSGetFeatureInfo() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetMap url.
+        final URL gfi;
+        try {
+            gfi = new URL("http://localhost:9090/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
+                                                    "format=image/png&width=1024&height=512&" +
+                                                    "srs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                    "layers=SST_tests&styles=&query_layers=SST_tests&" +
+                                                    "info_format=text/plain&X=300&Y=200");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        String value = null;
+        try {
+            final InputStream inGfi = gfi.openStream();
+            final InputStreamReader isr = new InputStreamReader(inGfi);
+            final BufferedReader reader = new BufferedReader(isr);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Verify that the line starts with a number, only the one with the value
+                // should begin like this.
+                if (line.matches("[0-9]+.*")) {
+                    // keep the line with the value
+                    value = line;
+                }
+            }
+            reader.close();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+        }
+
+        // Tests on the returned value
+        assertNotNull(value);
+        assertTrue   (value.startsWith("28.35"));
     }
 
     /**
