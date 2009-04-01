@@ -199,6 +199,10 @@ public class FilterFactoryImpl implements FilterFactory2 {
         return new PropertyIsEqualToType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
     }
 
+    public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2) {
+        return new PropertyIsNotEqualToType((LiteralType) expr2, (PropertyNameType) expr1, null);
+    }
+
     public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2, boolean matchCase) {
         return new PropertyIsNotEqualToType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
     }
@@ -207,12 +211,28 @@ public class FilterFactoryImpl implements FilterFactory2 {
         return new PropertyIsGreaterThanType((LiteralType) expr2, (PropertyNameType) expr1, null);
     }
 
+    public PropertyIsGreaterThan greater(Expression expr1, Expression expr2, boolean matchCase) {
+        return new PropertyIsGreaterThanType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
+    }
+
     public PropertyIsGreaterThanOrEqualTo greaterOrEqual(Expression expr1, Expression expr2) {
         return new PropertyIsGreaterThanOrEqualToType((LiteralType) expr2, (PropertyNameType) expr1, null);
     }
 
+    public PropertyIsGreaterThanOrEqualTo greaterOrEqual(Expression expr1, Expression expr2, boolean matchCase) {
+        return new PropertyIsGreaterThanOrEqualToType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
+    }
+
+    public PropertyIsLessThan less(Expression expr1, Expression expr2, boolean matchCase) {
+        return new PropertyIsLessThanType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
+    }
+
     public PropertyIsLessThan less(Expression expr1, Expression expr2) {
         return new PropertyIsLessThanType((LiteralType) expr2, (PropertyNameType) expr1, null);
+    }
+
+    public PropertyIsLessThanOrEqualTo lessOrEqual(Expression expr1, Expression expr2, boolean matchCase) {
+        return new PropertyIsLessThanOrEqualToType((LiteralType) expr2, (PropertyNameType) expr1, matchCase);
     }
 
     public PropertyIsLessThanOrEqualTo lessOrEqual(Expression expr1, Expression expr2) {
@@ -223,11 +243,22 @@ public class FilterFactoryImpl implements FilterFactory2 {
         return like(expr, pattern, "*", "?", "\\");
     }
 
+    public PropertyIsLike like(Expression expr, String pattern, boolean isMatchingCase) {
+        return like(expr, pattern, "*", "?", "\\", isMatchingCase);
+    }
+
     public PropertyIsLike like(Expression expr, String pattern, String wildcard, String singleChar, String escape) {
         //SQLBuilder add a white space at then end of the pattern we remove it
         if (pattern != null && pattern.lastIndexOf(' ') == pattern.length() -1)
             pattern = pattern.substring(0, pattern.length() -1);
         return new PropertyIsLikeType(expr, pattern, wildcard, singleChar, escape);
+    }
+
+    public PropertyIsLike like(Expression expr, String pattern, String wildcard, String singleChar, String escape, boolean isMatchingCase) {
+        //SQLBuilder add a white space at then end of the pattern we remove it
+        if (pattern != null && pattern.lastIndexOf(' ') == pattern.length() -1)
+            pattern = pattern.substring(0, pattern.length() -1);
+        return new PropertyIsLikeType(expr, pattern, wildcard, singleChar, escape, isMatchingCase);
     }
 
     public PropertyIsNull isNull(Expression expr) {
