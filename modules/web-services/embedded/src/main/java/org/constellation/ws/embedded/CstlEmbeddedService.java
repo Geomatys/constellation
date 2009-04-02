@@ -157,7 +157,12 @@ public class CstlEmbeddedService extends CommandLine {
 	protected CstlEmbeddedService(String[] args){
 		
 		super(args);
-		
+
+        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
+                "org.constellation.map.ws.rs;" +
+                "org.constellation.coverage.ws.rs;" +
+                "org.constellation.ws.rs.provider");
+
 		String base = "http://" + host + "/";
     	uri = UriBuilder.fromUri(base).port(port).build();
 		
@@ -169,8 +174,8 @@ public class CstlEmbeddedService extends CommandLine {
 	 */
 	protected void runREST() {
 		
-//        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
-//        		                          "com.sun.jersey.api.core.PackagesResourceConfig");
+        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
+        		                          "com.sun.jersey.api.core.PackagesResourceConfig");
         
         System.out.println("Starting grizzly server at: " + f.format(new Date()));
 
