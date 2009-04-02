@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.GetRecordById;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -131,5 +132,55 @@ public class GetRecordByIdType extends RequestBaseType implements GetRecordById 
      */
     public String getOutputSchema() {
         return outputSchema;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof GetRecordByIdType && super.equals(object)) {
+            final GetRecordByIdType that = (GetRecordByIdType) object;
+            return Utilities.equals(this.elementSetName, that.elementSetName) &&
+                   Utilities.equals(this.outputFormat,   that.outputFormat)   &&
+                   Utilities.equals(this.outputSchema,   that.outputSchema)   &&
+                   Utilities.equals(this.id,             that.id);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 59 * hash + (this.elementSetName != null ? this.elementSetName.hashCode() : 0);
+        hash = 59 * hash + (this.outputFormat != null ? this.outputFormat.hashCode() : 0);
+        hash = 59 * hash + (this.outputSchema != null ? this.outputSchema.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+
+        if (elementSetName != null) {
+            s.append("elementSetName: ").append(elementSetName).append('\n');
+        }
+        if (outputFormat != null) {
+            s.append("outputFormat: ").append(outputFormat).append('\n');
+        }
+        if (outputSchema != null) {
+            s.append("outputSchema: ").append(outputSchema).append('\n');
+        }
+        if (id != null) {
+            s.append("id: ").append('\n');
+            for (String i : id) {
+                s.append(i).append('\n');
+            }
+        }
+        return s.toString();
     }
 }

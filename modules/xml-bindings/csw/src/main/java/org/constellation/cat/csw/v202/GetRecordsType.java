@@ -311,7 +311,7 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         if (object == this) {
             return true;
         }
-        if (object instanceof GetRecordsType) {
+        if (object instanceof GetRecordsType && super.equals(object)) {
             final GetRecordsType that = (GetRecordsType) object;
             return Utilities.equals(this.abstractQuery,  that.abstractQuery)   &&
                    Utilities.equals(this.distributedSearch,  that.distributedSearch)   &&
@@ -343,9 +343,9 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         return hash;
     }
     
-     @Override
+    @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[GetRecordsType]").append('\n');
+        StringBuilder s = new StringBuilder(super.toString());
         
         if (distributedSearch != null) {
             s.append("distributedSearch: ").append(distributedSearch).append('\n');
@@ -377,7 +377,6 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
         if (maxRecords != null) {
             s.append("maxRecords: ").append(maxRecords).append('\n');
         }
-       
         return s.toString();
     }
 }

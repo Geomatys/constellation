@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 import org.constellation.cat.csw.Harvest;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -192,5 +193,57 @@ public class HarvestType extends RequestBaseType implements Harvest {
     }
 
     public void setOutputFormat(String value) {}
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof HarvestType && super.equals(object)) {
+            final HarvestType that = (HarvestType) object;
+            return Utilities.equals(this.harvestInterval,  that.harvestInterval) &&
+                   Utilities.equals(this.resourceFormat,   that.resourceFormat)  &&
+                   Utilities.equals(this.resourceType,     that.resourceType)    &&
+                   Utilities.equals(this.responseHandler,  that.responseHandler) &&
+                   Utilities.equals(this.source,           that.source);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + (this.source != null ? this.source.hashCode() : 0);
+        hash = 43 * hash + (this.resourceType != null ? this.resourceType.hashCode() : 0);
+        hash = 43 * hash + (this.resourceFormat != null ? this.resourceFormat.hashCode() : 0);
+        hash = 43 * hash + (this.harvestInterval != null ? this.harvestInterval.hashCode() : 0);
+        hash = 43 * hash + (this.responseHandler != null ? this.responseHandler.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+
+        if (harvestInterval != null) {
+            s.append("harvestInterval: ").append(harvestInterval).append('\n');
+        }
+        if (responseHandler != null) {
+            s.append("responseHandler: ").append(responseHandler).append('\n');
+        }
+        if (resourceFormat != null) {
+            s.append("resourceFormat: ").append(resourceFormat).append('\n');
+        }
+        if (resourceType != null) {
+            s.append("resourceType: ").append(resourceType).append('\n');
+        }
+        if (source != null) {
+            s.append("source: ").append(source).append('\n');
+        }
+        return s.toString();
+    }
 
 }

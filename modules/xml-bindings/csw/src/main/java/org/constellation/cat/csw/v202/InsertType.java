@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -112,5 +113,50 @@ public class InsertType {
      */
     public String getHandle() {
         return handle;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof InsertType) {
+            final InsertType that = (InsertType) object;
+            return Utilities.equals(this.any,      that.any)    &&
+                   Utilities.equals(this.handle,   that.handle) &&
+                   Utilities.equals(this.typeName, that.typeName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.any != null ? this.any.hashCode() : 0);
+        hash = 47 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+        hash = 47 * hash + (this.handle != null ? this.handle.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[InsertType]").append('\n');
+
+        if (any != null) {
+            s.append("any: ").append('\n');
+            for (Object o : any) {
+                s.append(o).append('\n');
+            }
+        }
+        if (handle != null) {
+            s.append("handle: ").append(handle).append('\n');
+        }
+        if (typeName != null) {
+            s.append("typeName: ").append(typeName).append('\n');
+        }
+        return s.toString();
     }
 }

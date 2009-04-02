@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.DescribeRecord;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -133,5 +134,47 @@ public class DescribeRecordType extends RequestBaseType implements DescribeRecor
         } else {
             return schemaLanguage;
         }
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DescribeRecordType && super.equals(object)) {
+            final DescribeRecordType that = (DescribeRecordType) object;
+            return Utilities.equals(this.outputFormat,   that.outputFormat)   &&
+                   Utilities.equals(this.schemaLanguage, that.schemaLanguage) &&
+                   Utilities.equals(this.typeName,       that.typeName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+        hash = 53 * hash + (this.outputFormat != null ? this.outputFormat.hashCode() : 0);
+        hash = 53 * hash + (this.schemaLanguage != null ? this.schemaLanguage.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+
+        if (outputFormat != null) {
+            s.append("outputFormat: ").append(outputFormat).append('\n');
+        }
+        if (schemaLanguage != null) {
+            s.append("schemaLanguage: ").append(schemaLanguage).append('\n');
+        }
+        if (typeName != null) {
+            s.append("typeName: ").append(typeName).append('\n');
+        }
+        return s.toString();
     }
 }

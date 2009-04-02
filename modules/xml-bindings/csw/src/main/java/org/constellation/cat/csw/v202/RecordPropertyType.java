@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
 
 // xerces dependencies
 import org.apache.xerces.dom.ElementNSImpl;
+import org.geotools.util.Utilities;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,36 +86,63 @@ public class RecordPropertyType {
         return value;
     }
 
-    private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+    private  String getXMLFromElementNSImpl(final ElementNSImpl elt) {
         StringBuilder s = new StringBuilder();
-        //s.append('<').append(elt.getLocalName()).append('>');
         Node node = elt.getFirstChild();
         s.append(getXMLFromNode(node)).toString();
-
-        //s.append("</").append(elt.getLocalName()).append('>');
         return s.toString();
     }
 
-    private  StringBuilder getXMLFromNode(Node node) {
+    private  StringBuilder getXMLFromNode(final Node node) {
         StringBuilder temp = new StringBuilder();
         if (!node.getNodeName().equals("#text")){
-            temp.append("<" + node.getNodeName());
-            NamedNodeMap attrs = node.getAttributes();
-            for(int i=0;i<attrs.getLength();i++){
-                temp.append(" "+attrs.item(i).getNodeName()+"=\""+attrs.item(i).getTextContent()+"\" ");
-            }
-            temp.append(">");
+            throw new IllegalArgumentException("You must specify the data type of the Value.\n" +
+                                               "If you still have this message, this means that the JAXBContext does not know this data type");
         }
         if (node.hasChildNodes()) {
-            NodeList nodes = node.getChildNodes();
-            for (int i = 0; i < nodes.getLength(); i++) {
-                temp.append(getXMLFromNode(nodes.item(i)));
-            }
-        }
-        else{
+            throw new IllegalArgumentException("You must specify the data type of the Value.\n" +
+                                               "If you still have this message, this means that the JAXBContext does not know this data type");
+        } else {
             temp.append(node.getTextContent());
         }
-        if (!node.getNodeName().equals("#text")) temp.append("</" + node.getNodeName() + ">");
+        
         return temp;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof RecordPropertyType) {
+            final RecordPropertyType that = (RecordPropertyType) object;
+            return Utilities.equals(this.name,  that.name) &&
+                   Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 59 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[RecordPropertyType]").append('\n');
+
+        if (name != null) {
+            s.append("name: ").append(name).append('\n');
+        }
+        if (value != null) {
+            s.append("value: ").append(value).append('\n');
+        }
+        return s.toString();
     }
 }

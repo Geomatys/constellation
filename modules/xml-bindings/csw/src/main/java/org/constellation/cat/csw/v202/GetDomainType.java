@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.GetDomain;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -108,4 +109,42 @@ public class GetDomainType extends RequestBaseType implements GetDomain {
     }
 
     public void setOutputFormat(String value) {}
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof GetDomainType && super.equals(object)) {
+            final GetDomainType that = (GetDomainType) object;
+            return Utilities.equals(this.parameterName, that.parameterName) &&
+                   Utilities.equals(this.propertyName,  that.propertyName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + (this.propertyName != null ? this.propertyName.hashCode() : 0);
+        hash = 67 * hash + (this.parameterName != null ? this.parameterName.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+
+        if (parameterName != null) {
+            s.append("parameterName: ").append(parameterName).append('\n');
+        }
+        if (propertyName != null) {
+            s.append("propertyName: ").append(propertyName).append('\n');
+        }
+
+        return s.toString();
+    }
 }

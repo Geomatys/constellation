@@ -28,6 +28,8 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.cat.csw.v202.RecordPropertyType;
 import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.csw.v202.UpdateType;
+import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -53,7 +55,7 @@ public class RecordPropertyTypeTest {
     @Before
     public void setUp() throws Exception {
 
-        JAXBContext jbcontext202 = JAXBContext.newInstance("org.constellation.cat.csw.v202");
+        JAXBContext jbcontext202 = JAXBContext.newInstance(org.constellation.cat.csw.v202.ObjectFactory.class, MetaDataImpl.class);
         unmarshaller    = jbcontext202.createUnmarshaller();
         marshaller      = jbcontext202.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -173,7 +175,62 @@ public class RecordPropertyTypeTest {
 
         RecordPropertyType property = update.getRecordProperty().get(0);
 
-        System.out.println(property.getValue());
+        boolean launched = false;
+        try {
+            property.getValue();
+        } catch (IllegalArgumentException ex) {
+            launched = true;
+        }
+
+        assertTrue(launched);
+
+        xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:Transaction xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\" verboseResponse=\"false\" version=\"2.0.2\" service=\"CSW\" >" + '\n' +
+        "    <csw:Update>"                                                                           + '\n' +
+        "        <csw:RecordProperty>"                                                               + '\n' +
+        "            <csw:Name>/csw:Record/dc:contributor</csw:Name>"                                + '\n' +
+        "            <csw:Value xsi:type=\"gmd:EX_GeographicBoundingBox\" >"                         + '\n' +
+        "                    <gmd:extentTypeCode>"                                                   + '\n' +
+        "                        <gco:Boolean>true</gco:Boolean>"                                    + '\n' +
+        "                    </gmd:extentTypeCode>"                                                  + '\n' +
+        "                    <gmd:westBoundLongitude>"                                               + '\n' +
+        "                        <gco:Decimal>1.1667</gco:Decimal>"                                  + '\n' +
+        "                    </gmd:westBoundLongitude>"                                              + '\n' +
+        "                    <gmd:eastBoundLongitude>"                                               + '\n' +
+        "                        <gco:Decimal>1.1667</gco:Decimal>"                                  + '\n' +
+        "                    </gmd:eastBoundLongitude>"                                              + '\n' +
+        "                    <gmd:southBoundLatitude>"                                               + '\n' +
+        "                         <gco:Decimal>36.6</gco:Decimal>"                                   + '\n' +
+        "                    </gmd:southBoundLatitude>"                                              + '\n' +
+        "                    <gmd:northBoundLatitude>"                                               + '\n' +
+        "                         <gco:Decimal>36.6</gco:Decimal>"                                   + '\n' +
+        "                    </gmd:northBoundLatitude>"                                              + '\n' +
+        "            </csw:Value>"                                                                   + '\n' +
+        "        </csw:RecordProperty>"                                                              + '\n' +
+        "        <csw:Constraint version=\"1.1.0\">"                                                 + '\n' +
+        "            <csw:CqlText>identifier='{8C71082D-5B3B-5F9D-FC40-F7807C8AB645}'</csw:CqlText>" + '\n' +
+        "        </csw:Constraint>"                                                                  + '\n' +
+        "    </csw:Update>"                                                                          + '\n' +
+        "</csw:Transaction>"+ '\n';
+
+        result = (TransactionType) unmarshaller.unmarshal(new StringReader(xml));
+
+        assertTrue(result.getInsertOrUpdateOrDelete().size() == 1);
+        assertTrue(result.getInsertOrUpdateOrDelete().get(0) instanceof UpdateType);
+
+        update = (UpdateType) result.getInsertOrUpdateOrDelete().get(0);
+
+        assertTrue(update.getRecordProperty().size() == 1);
+
+        property = update.getRecordProperty().get(0);
+
+        assertTrue(property.getValue() instanceof GeographicBoundingBoxImpl);
+
+        GeographicBoundingBoxImpl expResult = new GeographicBoundingBoxImpl(1.1667, 1.1667, 36.6, 36.6);
+
+        assertEquals(expResult, property.getValue());
+
     }
 
 

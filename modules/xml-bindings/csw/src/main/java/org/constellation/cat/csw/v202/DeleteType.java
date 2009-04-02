@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -98,5 +99,47 @@ public class DeleteType {
      */
     public String getHandle() {
         return handle;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof DeleteType) {
+            final DeleteType that = (DeleteType) object;
+            return Utilities.equals(this.constraint, that.constraint) &&
+                   Utilities.equals(this.handle,     that.handle)     &&
+                   Utilities.equals(this.typeName,   that.typeName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 19 * hash + (this.constraint != null ? this.constraint.hashCode() : 0);
+        hash = 19 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+        hash = 19 * hash + (this.handle != null ? this.handle.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[DeleteType]").append('\n');
+
+        if (constraint != null) {
+            s.append("constraint: ").append(constraint).append('\n');
+        }
+        if (handle != null) {
+            s.append("handle: ").append(handle).append('\n');
+        }
+        if (typeName != null) {
+            s.append("typeName: ").append(typeName).append('\n');
+        }
+        return s.toString();
     }
 }

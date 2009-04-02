@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.Transaction;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -154,4 +155,49 @@ public class TransactionType extends RequestBaseType implements Transaction {
     }
 
     public void setOutputFormat(String value) {}
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof TransactionType && super.equals(object)) {
+            final TransactionType that = (TransactionType) object;
+            return Utilities.equals(this.insertOrUpdateOrDelete, that.insertOrUpdateOrDelete) &&
+                   Utilities.equals(this.requestId,              that.requestId)              &&
+                   Utilities.equals(this.verboseResponse,        that.verboseResponse);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 19 * hash + (this.insertOrUpdateOrDelete != null ? this.insertOrUpdateOrDelete.hashCode() : 0);
+        hash = 19 * hash + (this.verboseResponse != null ? this.verboseResponse.hashCode() : 0);
+        hash = 19 * hash + (this.requestId != null ? this.requestId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+
+        if (insertOrUpdateOrDelete != null) {
+            s.append("insertOrUpdateOrDelete: ").append('\n');
+            for (Object o : insertOrUpdateOrDelete) {
+                s.append(o).append('\n');
+            }
+        }
+        if (requestId != null) {
+            s.append("requestId: ").append(requestId).append('\n');
+        }
+        if (verboseResponse != null) {
+            s.append("verboseResponse: ").append(verboseResponse).append('\n');
+        }
+        return s.toString();
+    }
 }

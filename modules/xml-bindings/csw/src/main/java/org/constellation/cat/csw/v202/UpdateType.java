@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -131,5 +132,55 @@ public class UpdateType {
      */
     public String getHandle() {
         return handle;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof UpdateType) {
+            final UpdateType that = (UpdateType) object;
+            return Utilities.equals(this.constraint,     that.constraint) &&
+                   Utilities.equals(this.handle,         that.handle)     &&
+                   Utilities.equals(this.any,            that.any)        &&
+                   Utilities.equals(this.recordProperty, that.recordProperty);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.any != null ? this.any.hashCode() : 0);
+        hash = 97 * hash + (this.recordProperty != null ? this.recordProperty.hashCode() : 0);
+        hash = 97 * hash + (this.constraint != null ? this.constraint.hashCode() : 0);
+        hash = 97 * hash + (this.handle != null ? this.handle.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[UpdateType]").append('\n');
+
+        if (constraint != null) {
+            s.append("constraint: ").append(constraint).append('\n');
+        }
+        if (handle != null) {
+            s.append("handle: ").append(handle).append('\n');
+        }
+        if (any != null) {
+            s.append("any: ").append(any).append('\n');
+        }
+        if (recordProperty != null) {
+            s.append("recordProperties: ").append('\n');
+            for (RecordPropertyType rp : recordProperty) {
+                s.append(rp).append('\n');
+            }
+        }
+        return s.toString();
     }
 }
