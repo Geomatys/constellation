@@ -55,6 +55,11 @@ public abstract class AbstractGrizzlyServer {
     protected static GrizzlyThread grizzly = null;
 
     /**
+     * The layer to test.
+     */
+    protected static final String LAYER_TEST = "SST_tests";
+
+    /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */

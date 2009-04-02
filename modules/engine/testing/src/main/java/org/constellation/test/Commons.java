@@ -16,14 +16,18 @@
  */
 package org.constellation.test;
 
+// J2SE dependencies
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.zip.CRC32;
 import javax.media.jai.operator.AffineDescriptor;
 
+// JUnit dependencies
 import static org.junit.Assert.*;
 
 
@@ -70,6 +74,26 @@ public final class Commons {
             }
         }
         return sum.getValue();
+    }
+
+    /**
+     * Verifies that a {@link BufferedImage} is empty or not.
+     *
+     * @param image The image for which to test the emptiness.
+     * @return {@code true} if the image is empty, {@code false} if not.
+     */
+    public static boolean isImageEmpty(final BufferedImage image) {
+        final WritableRaster wr = image.getRaster();
+        for (int b=wr.getNumBands(); --b >= 0;) {
+            for (int y=image.getHeight(); --y >= 0;) {
+                for (int x=image.getWidth(); --x >= 0;) {
+                    if (wr.getSample(x, y, b) != 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**

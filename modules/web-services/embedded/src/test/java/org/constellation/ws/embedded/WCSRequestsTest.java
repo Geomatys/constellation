@@ -59,6 +59,27 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     private static List<LayerDetails> layers;
 
     /**
+     * URLs which will be tested on the server.
+     */
+    private static final String WCS_FALSE_REQUEST =
+            "http://localhost:9090/wcs?request=SomethingElse";
+
+    private static final String WCS_GETCOVERAGE =
+            "http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "crs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                      "coverage="+ LAYER_TEST;
+
+    private static final String WCS_GETCOVERAGE_MATRIX =
+            "http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+                                      "format=matrix&width=1024&height=512&" +
+                                      "crs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                      "coverage="+ LAYER_TEST;
+
+    private static final String WCS_GETCAPABILITIES =
+            "http://localhost:9090/wcs?request=GetCapabilities&service=WCS&version=1.0.0";
+
+    /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
@@ -81,7 +102,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         final URL wrongUrl;
         try {
-            wrongUrl = new URL("http://localhost:9090/wcs?request=SomethingElse");
+            wrongUrl = new URL(WCS_FALSE_REQUEST);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -121,10 +142,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
-            getCoverageUrl = new URL("http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
-                                                               "format=image/png&width=1024&height=512&" +
-                                                               "crs=EPSG:4326&bbox=-180,-90,180,90&" +
-                                                               "coverage=SST_tests");
+            getCoverageUrl = new URL(WCS_GETCOVERAGE);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -167,10 +185,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
         try {
-            getCovMatrixUrl = new URL("http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
-                                                                "format=matrix&width=1024&height=512&" +
-                                                                "crs=EPSG:4326&bbox=-180,-90,180,90&" +
-                                                                "coverage=SST_tests");
+            getCovMatrixUrl = new URL(WCS_GETCOVERAGE_MATRIX);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -199,7 +214,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // Creates a valid GetMap url.
         final URL getCapsUrl;
         try {
-            getCapsUrl = new URL("http://localhost:9090/wcs?request=GetCapabilities&service=WCS&version=1.0.0");
+            getCapsUrl = new URL(WCS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -240,7 +255,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         boolean layerTestFound = false;
         for (CoverageOfferingBriefType coverage : coverages) {
             for (JAXBElement<String> elem : coverage.getRest()) {
-                if (elem.getValue().equals("SST_tests")) {
+                if (elem.getValue().equals(LAYER_TEST)) {
                     layerTestFound = true;
                     final LonLatEnvelopeType env = coverage.getLonLatEnvelope();
                     assertTrue(env.getPos().get(0).getValue().get(0) == -180d);
@@ -251,7 +266,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             }
         }
         if (layerTestFound == false) {
-            throw new AssertionError("The layer \"SST_tests\" was not found in the returned GetCapabilities.");
+            throw new AssertionError("The layer \""+ LAYER_TEST +"\" was not found in the returned GetCapabilities.");
         }
     }
 
@@ -271,7 +286,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      */
     private static boolean containsTestLayer() {
         for (LayerDetails layer : layers) {
-            if (layer.getName().equals("SST_tests")) {
+            if (layer.getName().equals(LAYER_TEST)) {
                 return true;
             }
         }
