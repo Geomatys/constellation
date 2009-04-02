@@ -1,0 +1,306 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.constellation.ws.embedded;
+
+// J2SE dependencies
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+// Constellation dependencies
+import org.constellation.Cstl;
+import org.constellation.ServiceDef;
+import org.constellation.provider.LayerDetails;
+import org.constellation.register.RegisterException;
+import org.constellation.test.Commons;
+import org.constellation.wms.v111.LatLonBoundingBox;
+import org.constellation.wms.v111.Layer;
+import org.constellation.wms.v111.WMT_MS_Capabilities;
+import org.constellation.ws.ServiceExceptionReport;
+
+// JUnit dependencies
+import org.junit.*;
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
+
+
+/**
+ * A set of methods that request a Grizzly server which embeds a WMS service.
+ *
+ * @version $Id$
+ *
+ * @author Cédric Briançon (Geomatys)
+ * @since 0.3
+ */
+public class WMSRequestsTest extends AbstractGrizzlyServer {
+    /**
+     * A list of available layers to be requested in WMS.
+     */
+    private static List<LayerDetails> layers;
+
+    /**
+     * Initialize the list of layers from the defined providers in Constellation's configuration.
+     */
+    @BeforeClass
+    public static void initLayerList() {
+        // Get the list of layers
+        try {
+            layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
+        } catch (RegisterException ex) {
+            layers = null;
+            assumeNoException(ex);
+        }
+    }
+
+    /**
+     * Ensure that a wrong value given in the request parameter for the WMS server
+     * returned an error report for the user.
+     */
+    @Test
+    public void testWMSWrongRequest() {
+        // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
+        final URL wrongUrl;
+        try {
+            wrongUrl = new URL("http://localhost:9090/wms?request=SomethingElse");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get something from the wrong url.
+        final InputStream in;
+        try {
+            in = wrongUrl.openStream();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a ServiceExceptionReport.
+        try {
+            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
+                                                                "org.constellation.wms.v111");
+            final Object obj = context.createUnmarshaller().unmarshal(in);
+            assertTrue(obj instanceof ServiceExceptionReport);
+        } catch (JAXBException ex) {
+            assumeNoException(ex);
+            return;
+        }
+    }
+
+    /**
+     * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetMap() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+                                                          "format=image/png&width=1024&height=512&" +
+                                                          "srs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                          "layers=SST_tests&styles=");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getMapUrl, "image/png");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 1024);
+        assertEquals(image.getHeight(), 512);
+        assertEquals(Commons.checksum(image), 3640849032L);
+    }
+
+    /**
+     * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
+     * document representing the server capabilities in the WMS version 1.1.1 standard.
+     */
+    @Test
+    public void testWMSGetCapabilities() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetMap url.
+        final URL getCapsUrl;
+        try {
+            getCapsUrl = new URL("http://localhost:9090/wms?request=GetCapabilities&service=WMS&version=1.1.1");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Creates a valid GetCapabilities url.
+        final InputStream in;
+        try {
+            in = getCapsUrl.openStream();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        final Object obj;
+        try {
+            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
+                                                                "org.constellation.wms.v111:" +
+                                                                "org.geotools.internal.jaxb.v110.sld");
+            obj = context.createUnmarshaller().unmarshal(in);
+            assertTrue(obj instanceof WMT_MS_Capabilities);
+        } catch (JAXBException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        final WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
+        final Layer layer = (Layer) responseCaps.getLayerFromName("SST_tests");
+
+        assertNotNull(layer);
+        assertEquals(layer.getSRS().get(0), "EPSG:4326");
+        final LatLonBoundingBox bboxGeo = (LatLonBoundingBox) layer.getLatLonBoundingBox();
+        assertTrue(bboxGeo.getWestBoundLongitude() == -180d);
+        assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
+        assertTrue(bboxGeo.getEastBoundLongitude() ==  180d);
+        assertTrue(bboxGeo.getNorthBoundLatitude() ==   90d);
+    }
+
+    /**
+     * Ensures that the {@code WMS GetFeatureInfo} request on a particular point of the
+     * testing layer produces the whished result.
+     */
+    @Test
+    public void testWMSGetFeatureInfo() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetFeatureInfo url.
+        final URL gfi;
+        try {
+            gfi = new URL("http://localhost:9090/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
+                                                    "format=image/png&width=1024&height=512&" +
+                                                    "srs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                                    "layers=SST_tests&styles=&query_layers=SST_tests&" +
+                                                    "info_format=text/plain&X=300&Y=200");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        String value = null;
+        try {
+            final InputStream inGfi = gfi.openStream();
+            final InputStreamReader isr = new InputStreamReader(inGfi);
+            final BufferedReader reader = new BufferedReader(isr);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Verify that the line starts with a number, only the one with the value
+                // should begin like this.
+                if (line.matches("[0-9]+.*")) {
+                    // keep the line with the value
+                    value = line;
+                }
+            }
+            reader.close();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+        }
+
+        // Tests on the returned value
+        assertNotNull(value);
+        assertTrue   (value.startsWith("28.35"));
+    }
+
+    /**
+     * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetLegendGraphic() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetLegendGraphic url.
+        final URL getLegendUrl;
+        try {
+            getLegendUrl = new URL("http://localhost:9090/wms?request=GetLegendGraphic&service=wms&width=200&height=40&" +
+                                                          "layer=SST_tests&format=image/png&version=1.1.0");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getLegendUrl, "image/png");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 200);
+        assertEquals(image.getHeight(), 40);
+        assertEquals(Commons.checksum(image), 1522814217L);
+    }
+
+    /**
+     * Free some resources.
+     */
+    @AfterClass
+    public static void finish() {
+        layers = null;
+    }
+
+    /**
+     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
+     * available layers. It means the postgrid database, pointed by the postgrid.xml
+     * file in the configuration directory, contains this layer and can then be requested
+     * in WMS.
+     */
+    private static boolean containsTestLayer() {
+        for (LayerDetails layer : layers) {
+            if (layer.getName().equals("SST_tests")) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

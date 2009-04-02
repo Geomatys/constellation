@@ -16,11 +16,13 @@
  */
 package org.constellation.test;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.util.zip.CRC32;
+import javax.media.jai.operator.AffineDescriptor;
 
 import static org.junit.Assert.*;
 
@@ -35,6 +37,8 @@ import static org.junit.Assert.*;
  *
  * @author Cédric Briançon (Geomatys)
  * @author Martin Desruisseaux (Geomatys)
+ *
+ * @since 0.3
  */
 public final class Commons {
     /**
@@ -42,8 +46,8 @@ public final class Commons {
      * the data type are {@link DataBuffer#TYPE_BYTE}. Note that this computation is sensitive
      * to image tiling, if there is any.
      *
-     * This method comes from Geotidy (module build/tools/gt-test), and will be removed when moving
-     * to the Geotidy source code for Constellation.
+     * TODO: this method comes from Geotidy (module build/tools/gt-test), and has to be removed
+     *       when moving to the Geotidy source code for Constellation.
      *
      * @param  image The image for which to compute the checksum.
      * @return The checksum of the given image.
@@ -66,5 +70,17 @@ public final class Commons {
             }
         }
         return sum.getValue();
+    }
+
+    /**
+     * Flip a {@link RenderedImage}. The given image should not be {@code null}.
+     *
+     * @param image An image to flip. Should not be {@code null}.
+     * @return The flipped image.
+     */
+    public static RenderedImage flip(final RenderedImage image) {
+        final AffineTransform flip = new AffineTransform(0, 1, 1, 0, 0, 0);
+        final RenderedImage imageFlipped = AffineDescriptor.create(image, flip, null, null, null);
+        return imageFlipped;
     }
 }
