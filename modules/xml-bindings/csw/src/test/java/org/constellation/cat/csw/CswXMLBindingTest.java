@@ -1203,7 +1203,7 @@ public class CswXMLBindingTest {
 
         xml =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
-        "<csw:Transaction verboseResponse=\"false\" version=\"2.0.2\" service=\"CSW\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">"             + '\n' +
+        "<csw:Transaction verboseResponse=\"false\" version=\"2.0.2\" service=\"CSW\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
         "    <csw:Update>"                                                                           + '\n' +
         "        <csw:RecordProperty>"                                                               + '\n' +
         "            <csw:Name>/gmd:MD_Metadata/identificationInfo/extent/geographicElement</csw:Name>" + '\n' +

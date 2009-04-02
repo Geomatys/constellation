@@ -318,10 +318,9 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 if (result == null) {
                     Form f = MDReader.getForm(catalog, id);
-                    logger.info("FORM:" + f);
                     result = getObjectFromForm(identifier, f);
                 } else {
-                    logger.info("getting from cache: " + identifier);
+                    logger.finer("getting from cache: " + identifier);
                 }
 
                 result = applyElementSet(result, type, elementName);

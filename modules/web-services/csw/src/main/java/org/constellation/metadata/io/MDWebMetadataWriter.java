@@ -42,6 +42,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotools.util.Utilities;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -216,13 +217,16 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param form The created form.
      * 
      */
-    private void addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
+    private List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
+
+        List<Value> result = new ArrayList<Value>();
+
         //if the path is not already in the database we write it
         if (MDReader.getPath(path.getId()) == null) {
            MDWriter.writePath(path);
         } 
         if (object == null) {
-            return;
+            return result;
         }             
         
         //if the object is a collection we call the method on each child
@@ -230,10 +234,10 @@ public class MDWebMetadataWriter extends MetadataWriter {
         if (object instanceof Collection) {
             Collection c = (Collection) object;
             for (Object obj: c) {
-                addValueFromObject(form, obj, path, parentValue);
+                result.addAll(addValueFromObject(form, obj, path, parentValue));
                 
             }
-            return;
+            return result;
             
         //if the object is a JAXBElement we desencapsulate it    
         } else {
@@ -246,7 +250,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         
         //if we don't have found the class we stop here
         if (classe == null) {
-            return;
+            return result;
         }
         
         //we try to find the good ordinal
@@ -307,18 +311,21 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
             
             TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
+            result.add(textValue);
             LOGGER.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
             LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
+            result.add(value);
             LOGGER.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.
         } else {
         
             Value value = new Value(path, form, ordinal, classe, parentValue);
+            result.add(value);
             LOGGER.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             //we add this object to the listed of already write element
             alreadyWrite.put(object, value);
@@ -340,16 +347,16 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                 if (MDReader.getPath(childPath.getId()) == null) {
                                     MDWriter.writePath(childPath);
                                 }
-                                addValueFromObject(form, propertyValue, childPath, value);
+                                result.addAll(addValueFromObject(form, propertyValue, childPath, value));
                             } 
                     
                         } catch (IllegalAccessException e) {
                             LOGGER.severe("The class is not accessible");
-                            return;
+                            return result;
                         } catch (java.lang.reflect.InvocationTargetException e) {
                             LOGGER.severe("Exception throw in the invokated getter: " + getter.toGenericString() + '\n' +
                                           "Cause: " + e.getMessage());
-                            return;
+                            return result;
                         }   
                     }
                 }
@@ -359,6 +366,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 }
             } while (classe != null);
         }
+        return result;
     }
     
     /**
@@ -456,7 +464,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         List<Standard> availableStandards = new ArrayList<Standard>();
         
         // ISO 19115 and its sub standard (ISO 19119, 19110)
-        if (mainStandard.equals(Standard.ISO_19115)) {
+        if (Standard.ISO_19115.equals(mainStandard)) {
             availableStandards.add(Standard.ISO_19115_FRA);
             availableStandards.add(mainStandard);
             availableStandards.add(Standard.ISO_19108);
@@ -465,21 +473,21 @@ public class MDWebMetadataWriter extends MetadataWriter {
             availableStandards.add(MDReader.getStandard("ISO 19110"));
         
         // CSW standard    
-        } else if (mainStandard.equals(Standard.CSW)) {
+        } else if (Standard.CSW.equals(mainStandard)) {
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.DUBLINCORE);
             availableStandards.add(Standard.DUBLINCORE_TERMS);
             availableStandards.add(Standard.OWS);
         
         // Ebrim v3 standard    
-        } else if (mainStandard.equals(Standard.EBRIM_V3)) {
+        } else if (Standard.EBRIM_V3.equals(mainStandard)) {
             availableStandards.add(Standard.EBRIM_V3);
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.OGC_FILTER);
             availableStandards.add(Standard.MDWEB);
             
         // Ebrim v2.5 tandard    
-        } else if (mainStandard.equals(Standard.EBRIM_V2_5)) {
+        } else if (Standard.EBRIM_V2_5.equals(mainStandard)) {
             availableStandards.add(Standard.EBRIM_V2_5);
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.OGC_FILTER);
@@ -786,9 +794,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             try {
                 String xpath = property.getName();
                 Object value = property.getValue();
-
-                Path p = getMDWPathFromXPath(xpath);
-                LOGGER.info("PATH :" + p);
+                Path p       = getMDWPathFromXPath(xpath);
+                
                 List<Value> matchingValues = f.getValueFromPath(p);
                 for(Value v : matchingValues) {
                     LOGGER.info("value:" + v);
@@ -796,11 +803,25 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         LOGGER.info("textValue updated");
                         MDWriter.updateTextValue((TextValue) v, (String) value);
                     } else {
-                        LOGGER.info("returned false " + value.getClass().getSimpleName());
-                        return false;
+                        Classe requestType = getClasseFromObject(value);
+                        Classe valueType   = v.getType();
+                        if (!Utilities.equals(requestType, valueType)) {
+                            throw new CstlServiceException("The type of the replacement value (" + requestType.getName() +
+                                                           ") does not match with the value type :" + valueType.getName(),
+                                    INVALID_PARAMETER_VALUE);
+                        } else {
+                            LOGGER.info("value updated");
+                            MDWriter.deleteValue(v);
+                            List<Value> toInsert = addValueFromObject(f, value, p, v.getParent());
+                            for (Value ins : toInsert) {
+                                MDWriter.writeValue(ins);
+                            }
+                        }
                     }
                 }
             } catch (SQLException ex) {
+                throw new CstlServiceException(ex);
+            } catch (IllegalArgumentException ex) {
                 throw new CstlServiceException(ex);
             }
         }
@@ -833,34 +854,51 @@ public class MDWebMetadataWriter extends MetadataWriter {
         Standard stan;
         // we look for a know metadata type
         if (typeName.equals("MD_Metadata")) {
-            stan = Standard.ISO_19115;
-            type = MDReader.getClasse("MD_Metadata", stan);
+            mainStandard = Standard.ISO_19115;
+            type = MDReader.getClasse("MD_Metadata", mainStandard);
         } else if (typeName.equals("Record")) {
-            stan = Standard.CSW;
-            type = MDReader.getClasse("Record", stan);
+            mainStandard = Standard.CSW;
+            type = MDReader.getClasse("Record", mainStandard);
         } else {
             throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
         }
 
-        Path p = new Path(stan, type);
+        Path p = new Path(mainStandard, type);
         while (xpath.indexOf('/') != -1) {
             //Then we get the next Property name
             String propertyName = xpath.substring(0, xpath.indexOf('/'));
             LOGGER.info("propertyName:" + propertyName);
-            Property property = type.getPropertyByName(propertyName);
-            if (property == null) {
-                throw new CstlServiceException("There is no property:" + propertyName + "in the class " + typeName, INVALID_PARAMETER_VALUE);
-            }
+            Property property = getProperty(type, propertyName);
             p = new Path(p, property);
+            type = property.getType();
             xpath = xpath.substring(xpath.indexOf('/') + 1);
         }
         
         LOGGER.info("last propertyName:" + xpath);
-        Property property = type.getPropertyByName(xpath);
-        if (property == null) {
-            throw new CstlServiceException("There is no property:" + xpath + "in the class " + typeName, INVALID_PARAMETER_VALUE);
-        }
+        Property property = getProperty(type, xpath);
         p = new Path(p, property);
         return p;
+    }
+
+    private Property getProperty(final Classe type, String propertyName) throws SQLException, CstlServiceException {
+        // Special case for a bug in MDWeb
+        if (propertyName.equals("geographicElement")) {
+            propertyName = "geographicElement2";
+        }
+        Property property = type.getPropertyByName(propertyName);
+        if (property == null) {
+            // if the property is null we search in the sub-classes
+            List<Classe> subclasses = MDReader.getSubClasses(type);
+            for (Classe subClasse : subclasses) {
+                property = subClasse.getPropertyByName(propertyName);
+                if (property != null) {
+                    break;
+                }
+            }
+            if (property == null) {
+                throw new CstlServiceException("There is no property:" + propertyName + " in the class " + type.getName(), INVALID_PARAMETER_VALUE);
+            }
+        }
+        return property;
     }
 }

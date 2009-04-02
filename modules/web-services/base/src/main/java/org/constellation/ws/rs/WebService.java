@@ -333,9 +333,17 @@ public abstract class WebService {
                 return Response.ok(msg, "text/xml").build();
 
             } catch (UnmarshalException e) {
-                LOGGER.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
+                String errorMsg = e.getMessage();
+                if (errorMsg == null) {
+                    if (e.getCause() != null && e.getCause().getMessage() != null) {
+                        errorMsg = e.getCause().getMessage();
+                    } else if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
+                        errorMsg = e.getLinkedException().getMessage();
+                    }
+                }
+                LOGGER.severe("UNMARSHALL EXCEPTION: " + errorMsg);
 
-                return launchException("The XML request is not valid", INVALID_REQUEST.name(), null);
+                return launchException("The XML request is not valid.\nCause:" + errorMsg, INVALID_REQUEST.name(), null);
             } finally {
                 if (unmarshaller != null)  {
                     unmarshallers.add(unmarshaller);
