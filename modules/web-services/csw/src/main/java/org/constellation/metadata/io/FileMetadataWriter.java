@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -42,6 +43,7 @@ import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
@@ -90,8 +92,12 @@ public class FileMetadataWriter extends MetadataWriter {
         try {
             JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
             for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-                  marshallers.add(context.createMarshaller());
-                  unmarshallers.add(context.createUnmarshaller());
+                Marshaller m = context.createMarshaller();
+                m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
+                m.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+                marshallers.add(m);
+                unmarshallers.add(context.createUnmarshaller());
             }
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
@@ -188,7 +194,7 @@ public class FileMetadataWriter extends MetadataWriter {
                 } else {
                     throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
                 }
-                LOGGER.info("update type:" + type);
+                LOGGER.finer("update type:" + type);
                 
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!metadata.getClass().equals(type)) {
@@ -202,8 +208,24 @@ public class FileMetadataWriter extends MetadataWriter {
                 while (xpath.indexOf('/') != -1) {
                     
                     //Then we get the next Property name
+                    int ordinal = -1;
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
-                    LOGGER.info("propertyName:" + propertyName);
+
+                    //we extract the ordinal if there is one
+                    if (propertyName.indexOf('[') != -1) {
+                        if (propertyName.indexOf(']') != -1) {
+                            try {
+                                String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                                ordinal = Integer.parseInt(ordinalValue);
+                            } catch (NumberFormatException ex) {
+                                throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                            }
+                            propertyName = propertyName.substring(0, propertyName.indexOf('['));
+                        } else {
+                            throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                        }
+                    }
+                    LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
 
                     Class parentClass;
                     if (parent instanceof Collection) {
@@ -218,26 +240,43 @@ public class FileMetadataWriter extends MetadataWriter {
                     }
 
                     //we try to find a getter for this property
-                    Method m = Util.getGetterFromName(propertyName, parentClass);
-                    if (m == null) {
+                    Method getter = Util.getGetterFromName(propertyName, parentClass);
+                    if (getter == null) {
                         throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
                     } else {
-                        // we execute the setter
+                        // we execute the getter
                         if (!(parent instanceof Collection)) {
-                            parent = Util.invokeMethod(parent, m);
+                            parent = Util.invokeMethod(parent, getter);
                         } else {
                             Collection tmp = new ArrayList();
-                            for (Object child : (Collection)parent) {
-                                tmp.add(Util.invokeMethod(child, m));
+                            for (Object child : (Collection) parent) {
+                                tmp.add(Util.invokeMethod(child, getter));
                             }
                             parent = tmp;
                         }
                     }
 
+                    if (ordinal != -1) {
+
+                        if (!(parent instanceof Collection)) {
+                            throw new CstlServiceException("The property:" + propertyName + " in the class:" + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
+                        }
+                        Object tmp = null;
+                        for (Object child : (Collection) parent) {
+                            int i = 1;
+                            for (Object o : (Collection) child) {
+                                if (i == ordinal) {
+                                    tmp = o;
+                                }
+                                i++;
+                            }
+                        }
+                        parent = tmp;
+                    }
                     xpath = xpath.substring(xpath.indexOf('/') + 1);
                 }
 
-                // we try to find a setter for this propertie
+                // we update the metadata
                 Object value = property.getValue();
                 
                 updateObjects(parent, xpath, value);
@@ -263,12 +302,34 @@ public class FileMetadataWriter extends MetadataWriter {
     private void updateObjects(Object parent, String propertyName, Object value) throws CstlServiceException {
 
         Class parameterType = value.getClass();
-        LOGGER.info("parameter type:" + parameterType);
+        LOGGER.finer("parameter type:" + parameterType);
+
+        String fullPropertyName = propertyName;
+        //we extract the ordinal if there is one
+        int ordinal = -1;
+        if (propertyName.indexOf('[') != -1) {
+            if (propertyName.indexOf(']') != -1) {
+                try {
+                    String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                    ordinal = Integer.parseInt(ordinalValue);
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                }
+                propertyName = propertyName.substring(0, propertyName.indexOf('['));
+            } else {
+                throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+            }
+        }
 
         //Special case for language
         if (propertyName.equalsIgnoreCase("language")) {
             parameterType = Locale.class;
-            value = new Locale((String) value);
+            if (value instanceof String) {
+                value = new Locale((String) value);
+            } else {
+                throw new CstlServiceException("The value's type of the recordProperty does not match the specified property type language accept only string type",
+                        INVALID_PARAMETER_VALUE);
+            }
         }
 
         //Special case for dateStamp
@@ -283,37 +344,151 @@ public class FileMetadataWriter extends MetadataWriter {
 
         if (parent instanceof Collection) {
             for (Object single : (Collection) parent) {
-                updateObjects(single, propertyName, value);
+                updateObjects(single, fullPropertyName, value);
             }
         } else {
-            updateObject(propertyName, parent, value, parameterType);
+            updateObject(propertyName, parent, value, parameterType, ordinal);
         }
     }
 
-    private void updateObject(String propertyName, Object parent, Object value, Class parameterType) throws CstlServiceException {
-        Method m = Util.getSetterFromName(propertyName, parameterType, parent.getClass());
+    private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws CstlServiceException {
+        Method setter = Util.getSetterFromName(propertyName, parameterType, parent.getClass());
 
         // with the geotools implementation we sometimes have to used InternationalString instead of String.
-        if (m == null && parameterType.equals(String.class)) {
-            m = Util.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
+        if (setter == null && parameterType.equals(String.class)) {
+            setter = Util.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
             value = new SimpleInternationalString((String) value);
         }
 
-        if (m == null) {
-            throw new CstlServiceException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
-        } else {
-            // we execute the setter
-            if (m.getParameterTypes().length == 1 && m.getParameterTypes()[0] == Collection.class) {
-                Collection c = new ArrayList(1);
-                c.add(value);
-                Util.invokeMethod(m, parent, c);
-            } else {
-                Util.invokeMethod(m, parent, value);
+        //if there is an ordinal we must get the existant Collection
+        if (ordinal != -1) {
+            Method getter = Util.getGetterFromName(propertyName, parent.getClass());
+            if (getter == null) {
+                throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+            }
+            Object existant = Util.invokeMethod(parent, getter);
+
+            if (!(existant instanceof Collection)) {
+                throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
+            } 
+
+            Collection c = (Collection) existant;
+            if (c.size() < ordinal) {
+                throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
             }
 
+            if (parameterType.equals(String.class) && c.iterator().hasNext() && c.iterator().next() instanceof InternationalString) {
+                value = new SimpleInternationalString((String) value);
+            }
+
+            // ISSUE how to add in a Collection at a predefined index
+            if (c instanceof List) {
+               List l = (List) c;
+               l.remove(ordinal);
+               l.add(ordinal, value);
+            } else {
+                int i = 1;
+                Object toDelete = null;
+                for (Object o : c) {
+                    if (i == ordinal) {
+                        toDelete = o;
+                    }
+                    i++;
+                }
+                c.remove(toDelete);
+                c.add(value);
+            }
+            value = existant;
+        }
+
+        if (setter == null) {
+            throw new CstlServiceException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+        } else {
+            String baseMessage = "Unable to invoke the method " + setter + ": ";
+            try {
+                // we execute the setter
+                if (setter.getParameterTypes().length == 1 && setter.getParameterTypes()[0] == Collection.class) {
+                    if (value instanceof String) {
+                        invokeMethodStrColl(setter, parent, (String) value);
+                    } else {
+                        Collection c;
+                        if (value instanceof Collection) {
+                            c = (Collection) value;
+                        } else {
+                            c = new ArrayList(1);
+                            c.add(value);
+                        }
+                        Util.invokeMethodEx(setter, parent, c);
+                    }
+                } else {
+                    Util.invokeMethodEx(setter, parent, value);
+                }
+            } catch (IllegalAccessException ex) {
+                throw new CstlServiceException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
+
+            } catch (IllegalArgumentException ex) {
+                String param = "null";
+                if (value != null) {
+                    param = value.getClass().getSimpleName();
+                }
+                throw new CstlServiceException(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
+
+            } catch (InvocationTargetException ex) {
+                String errorMsg = ex.getMessage();
+                if (errorMsg == null && ex.getCause() != null) {
+                    errorMsg = ex.getCause().getMessage();
+                }
+                if (errorMsg == null && ex.getTargetException() != null) {
+                    errorMsg = ex.getTargetException().getMessage();
+                }
+                throw new CstlServiceException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+            }
         }
     }
 
+    public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws CstlServiceException {
+        String baseMessage = "Unable to invoke the method " + method + ": ";
+        Object result = null;
+        if (method != null) {
+            int i = 0;
+            CstlServiceException exe = null;
+            while (i < 2) {
+                try {
+                    Collection c = new ArrayList(1);
+                    if (i == 0) {
+                        c.add(parameter);
+                    } else {
+                        c.add(new SimpleInternationalString(parameter));
+                    }
+                    result = method.invoke(object, c);
+                    return result;
+
+                } catch (IllegalAccessException ex) {
+                    throw new CstlServiceException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
+
+                } catch (IllegalArgumentException ex) {
+
+                    throw new CstlServiceException(baseMessage + "the given argument does not match that required by the method.( argument type was String)");
+
+                } catch (InvocationTargetException ex) {
+                    String errorMsg = ex.getMessage();
+                    if (errorMsg == null && ex.getCause() != null) {
+                        errorMsg = ex.getCause().getMessage();
+                    }
+                    if (errorMsg == null && ex.getTargetException() != null) {
+                        errorMsg = ex.getTargetException().getMessage();
+                    }
+                    if (i == 1) {
+                        throw new CstlServiceException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+                    }
+                    i++;
+                }
+            }
+        } else {
+            LOGGER.severe("Unable to invoke the method reference is null.");
+        }
+        return result;
+    }
 
     /**
      * Unmarshall The file designed by the path dataDirectory/identifier.xml
