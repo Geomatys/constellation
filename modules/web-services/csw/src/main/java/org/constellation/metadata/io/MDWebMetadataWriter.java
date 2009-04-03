@@ -794,9 +794,13 @@ public class MDWebMetadataWriter extends MetadataWriter {
             try {
                 String xpath = property.getName();
                 Object value = property.getValue();
-                Path p       = getMDWPathFromXPath(xpath);
-                
-                List<Value> matchingValues = f.getValueFromPath(p);
+                MixedPath mp = getMDWPathFromXPath(xpath);
+                LOGGER.info("IDValue: " + mp.idValue);
+                List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
+
+                if (matchingValues.size() == 0) {
+                    throw new CstlServiceException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
+                }
                 for(Value v : matchingValues) {
                     LOGGER.info("value:" + v);
                     if (v instanceof TextValue && value instanceof String) {
@@ -812,7 +816,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         } else {
                             LOGGER.info("value updated");
                             MDWriter.deleteValue(v);
-                            List<Value> toInsert = addValueFromObject(f, value, p, v.getParent());
+                            List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
                             for (Value ins : toInsert) {
                                 MDWriter.writeValue(ins);
                             }
@@ -837,8 +841,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @throws java.sql.SQLException
      * @throws org.constellation.ws.CstlServiceException
      */
-    private Path getMDWPathFromXPath(String xpath) throws SQLException, CstlServiceException {
-
+    private MixedPath getMDWPathFromXPath(String xpath) throws SQLException, CstlServiceException {
+        String idValue = "";
         //we remove the first '/'
         if (xpath.startsWith("/")) {
             xpath = xpath.substring(1);
@@ -863,21 +867,66 @@ public class MDWebMetadataWriter extends MetadataWriter {
             throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
         }
 
-        Path p = new Path(mainStandard, type);
+        Path p  = new Path(mainStandard, type);
+        idValue = mainStandard.getName() + ':' + type.getName() + ".*";
         while (xpath.indexOf('/') != -1) {
             //Then we get the next Property name
             String propertyName = xpath.substring(0, xpath.indexOf('/'));
-            LOGGER.info("propertyName:" + propertyName);
+
+            //we look for an ordinal
+            int ordinal = -1;
+            if (propertyName.indexOf('[') != -1) {
+                if (propertyName.indexOf(']') != -1) {
+                    try {
+                        String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                        ordinal = Integer.parseInt(ordinalValue);
+                    } catch (NumberFormatException ex) {
+                        throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                    }
+                    propertyName = propertyName.substring(0, propertyName.indexOf('['));
+                } else {
+                    throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                }
+            }
+
+            LOGGER.info("propertyName:" + propertyName + " ordinal:" + ordinal);
+            idValue = idValue + ':' + propertyName + '.';
+            if (ordinal == -1) {
+                idValue = idValue + '*';
+            } else {
+                idValue = idValue + ordinal;
+            }
             Property property = getProperty(type, propertyName);
             p = new Path(p, property);
             type = property.getType();
             xpath = xpath.substring(xpath.indexOf('/') + 1);
         }
-        
-        LOGGER.info("last propertyName:" + xpath);
+
+        //we look for an ordinal
+        int ordinal = -1;
+        if (xpath.indexOf('[') != -1) {
+            if (xpath.indexOf(']') != -1) {
+                try {
+                    String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
+                    ordinal = Integer.parseInt(ordinalValue);
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                }
+                xpath = xpath.substring(0, xpath.indexOf('['));
+            } else {
+                throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+            }
+        }
+        idValue = idValue + ':' + xpath + '.';
+        if (ordinal == -1) {
+            idValue = idValue + '*';
+        } else {
+            idValue = idValue + ordinal;
+        }
+        LOGGER.info("last propertyName:" + xpath + " ordinal:" + ordinal);
         Property property = getProperty(type, xpath);
         p = new Path(p, property);
-        return p;
+        return new MixedPath(p, idValue);
     }
 
     private Property getProperty(final Classe type, String propertyName) throws SQLException, CstlServiceException {
@@ -900,5 +949,18 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
         }
         return property;
+    }
+
+    private class MixedPath {
+
+        public Path path;
+
+        public String idValue;
+
+        public MixedPath(Path path, String idValue) {
+            this.path    = path;
+            this.idValue = idValue;
+        }
+
     }
 }
