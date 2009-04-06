@@ -34,7 +34,9 @@ import org.constellation.ows.v110.ExceptionReport;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
+import org.constellation.wcs.v100.CoverageDescription;
 import org.constellation.wcs.v100.CoverageOfferingBriefType;
+import org.constellation.wcs.v100.CoverageOfferingType;
 import org.constellation.wcs.v100.LonLatEnvelopeType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;
 
@@ -78,6 +80,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     private static final String WCS_GETCAPABILITIES =
             "http://localhost:9090/wcs?request=GetCapabilities&service=WCS&version=1.0.0";
+
+    private static final String WCS_DESCRIBECOVERAGE =
+            "http://localhost:9090/wcs?request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -211,7 +216,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
 
-        // Creates a valid GetMap url.
+        // Creates a valid GetCapabilities url.
         final URL getCapsUrl;
         try {
             getCapsUrl = new URL(WCS_GETCAPABILITIES);
@@ -220,7 +225,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Creates a valid GetCapabilities url.
+        // Try to get the result of this request from the url.
         final InputStream in;
         try {
             in = getCapsUrl.openStream();
@@ -268,6 +273,59 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         if (layerTestFound == false) {
             throw new AssertionError("The layer \""+ LAYER_TEST +"\" was not found in the returned GetCapabilities.");
         }
+    }
+
+    /**
+     * Ensures that a valid DescribeCoverage request returns indeed a valid document.
+     */
+    @Test
+    public void testWCSDescribeCoverage() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid DescribeCoverage url.
+        final URL getCapsUrl;
+        try {
+            getCapsUrl = new URL(WCS_DESCRIBECOVERAGE);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get the result of the DescribeCoverage request from the url.
+        final InputStream in;
+        try {
+            in = getCapsUrl.openStream();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WCSCapabilitiesType.
+        Object obj;
+        try {
+            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
+                                                                "org.constellation.wcs.v100:" +
+                                                                "org.constellation.ows.v100:" +
+                                                                "org.constellation.gml.v311");
+            obj = context.createUnmarshaller().unmarshal(in);
+            if (obj instanceof JAXBElement) {
+                obj = ((JAXBElement) obj).getValue();
+            }
+            assertTrue(obj instanceof CoverageDescription);
+        } catch (JAXBException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        final CoverageDescription responseDesc = (CoverageDescription)obj;
+        assertNotNull(responseDesc);
+        final List<CoverageOfferingType> coverageOffs = responseDesc.getCoverageOffering();
+        assertFalse(coverageOffs.isEmpty());
+        assertEquals(coverageOffs.get(0).getRest().get(1).getValue(), LAYER_TEST);
+        // TODO: add more tests on returned XML doc
     }
 
     /**

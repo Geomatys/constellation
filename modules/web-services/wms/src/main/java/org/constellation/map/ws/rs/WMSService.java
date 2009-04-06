@@ -235,15 +235,14 @@ public class WMSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private DescribeLayer adaptDescribeLayer() throws CstlServiceException {
-        final String strVersion = getParameter(KEY_VERSION, true);
-        ServiceDef serviceDef = getVersionFromNumber(strVersion);
+        final String version = getParameter(KEY_VERSION, true);
+        ServiceDef serviceDef = getVersionFromNumber(version);
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
+        isVersionSupported(version);
         final String strLayer  = getParameter(KEY_LAYERS,  true);
         final List<String> layers = StringUtilities.toStringList(strLayer);
-        setActingVersion(strVersion);
-        isVersionSupported(strVersion);
         return new DescribeLayer(layers, serviceDef.version);
     }
 

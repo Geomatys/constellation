@@ -40,6 +40,9 @@ import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.ws.ServiceExceptionReport;
 
 // JUnit dependencies
+import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
+import org.geotools.internal.jaxb.v110.sld.TypeNameType;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -85,6 +88,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     private static final String WMS_GETLEGENDGRAPHIC =
             "http://localhost:9090/wms?request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
+
+    private static final String WMS_DESCRIBELAYER =
+            "http://localhost:9090/wms?request=DescribeLayer&service=WMS&" +
+            "version=1.1.1&layers="+ LAYER_TEST;
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -298,6 +305,55 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertEquals(image.getWidth(), 200);
         assertEquals(image.getHeight(), 40);
         assertEquals(Commons.isImageEmpty(image), false);
+    }
+
+    /**
+     * Ensures that a valid DescribeLayer request produces a valid document.
+     */
+    @Test
+    public void testWMSDescribeLayer() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid DescribeLayer url.
+        final URL describeUrl;
+        try {
+            describeUrl = new URL(WMS_DESCRIBELAYER);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        final InputStream in;
+        try {
+            in = describeUrl.openStream();
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        final Object obj;
+        try {
+            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
+                                                                "org.constellation.wms.v111:" +
+                                                                "org.geotools.internal.jaxb.v110.sld");
+            obj = context.createUnmarshaller().unmarshal(in);
+            assertTrue(obj instanceof DescribeLayerResponseType);
+        } catch (JAXBException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Tests on the response
+        final DescribeLayerResponseType desc = (DescribeLayerResponseType)obj;
+        final List<LayerDescriptionType> layerDescs = desc.getLayerDescription();
+        assertFalse(layerDescs.isEmpty());
+        final List<TypeNameType> typeNames = layerDescs.get(0).getTypeName();
+        assertFalse(typeNames.isEmpty());
+        assertEquals(typeNames.get(0).getCoverageName(), LAYER_TEST);
     }
 
     /**
