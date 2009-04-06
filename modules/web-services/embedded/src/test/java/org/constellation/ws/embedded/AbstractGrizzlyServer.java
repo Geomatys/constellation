@@ -27,6 +27,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 // Constellation dependencies
+import org.constellation.data.PostgridTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -48,7 +49,7 @@ import static org.junit.Assume.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class AbstractGrizzlyServer {
+public abstract class AbstractGrizzlyServer extends PostgridTestCase {
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -83,9 +84,8 @@ public abstract class AbstractGrizzlyServer {
         source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
         source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
         source.parameters.put(PostGridProvider.KEY_READONLY, "true");
-        // assume that a NFS mount has been done on the Geomatys server that host the data.
-        // TODO: put the image somewhere accessible from outside of Geomatys network.
-        source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, "/media/geomatys/Données/PostGRID");
+        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+        source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
         source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
 
         final ProviderConfig config = new ProviderConfig();
