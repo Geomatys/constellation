@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.geotools.metadata.note.Anchors;
+import org.geotools.util.Utilities;
 
 /**
  *
@@ -95,6 +96,29 @@ public class RDF {
                
             }
         } 
+    }
+
+    /*
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof RDF) {
+            final RDF that = (RDF) object;
+
+            return Utilities.equals(this.concept, that.concept);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + (this.concept != null ? this.concept.hashCode() : 0);
+        return hash;
     }
     
 }

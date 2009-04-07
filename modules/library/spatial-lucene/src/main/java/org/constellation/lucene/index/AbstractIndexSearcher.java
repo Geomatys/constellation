@@ -80,6 +80,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     private final boolean isCacheEnabled;
 
     /**
+     * A flag indicating if the multiLingual system for query is enabled.
+     */
+    private boolean isMultiLingualEnabled;
+
+    /**
      * A list of metadata ID ordered by DocID.
      */
     private  List<String> identifiers;
@@ -95,7 +100,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         super(analyzer);
         try {
             setFileDirectory(new File(configDir, serviceID + "index"));
-            isCacheEnabled = true;
+            isCacheEnabled        = true;
+            isMultiLingualEnabled = false;
             initSearcher();
             initIdentifiersList();
 
@@ -184,7 +190,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      *
      * @param query The lucene query string with spatials filters.
      *
-     * @return      A List of id.
+     * @return      A List of metadata identifiers.
      */
     public List<String> doSearch(SpatialQuery spatialQuery) throws SearchingException {
         try {
@@ -316,9 +322,10 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
     /**
      * Add a query and its results to the cache.
-     * if the map has reach the maximum size the older query is rtemoved from the cache.
-     * @param query
-     * @param results
+     * if the map has reach the maximum size the older query is removed from the cache.
+     *
+     * @param query a Lucene spatial query.
+     * @param results A list of metadataIdentifier.
      */
     private void putInCache(SpatialQuery query, List<String> results) {
         if (isCacheEnabled) {
@@ -330,6 +337,9 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         }
     }
 
+    /**
+     * Free the resources when closing the searcher.
+     */
     public void destroy() {
         try {
             if (searcher != null)
@@ -337,6 +347,13 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         } catch (IOException ex) {
             logger.info("IOException while closing the indexer");
         }
+    }
+
+    /**
+     * @param isMultiLingualEnabled the isMultiLingualEnabled to set
+     */
+    public void setIsMultiLingualEnabled(boolean isMultiLingualEnabled) {
+        this.isMultiLingualEnabled = isMultiLingualEnabled;
     }
 
 }

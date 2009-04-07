@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -137,5 +138,33 @@ public class CoordinatesType {
         s.append("ts: ").append(getTs()).append(" cs: ").append(getCs()).append(" decimal: ").append(getDecimal());
         return s.toString();
     }
-    
+
+    /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof CoordinatesType) {
+            final CoordinatesType that = (CoordinatesType) object;
+
+            return Utilities.equals(this.cs,      that.cs)      &&
+                   Utilities.equals(this.decimal, that.decimal) &&
+                   Utilities.equals(this.ts,      that.ts)      &&
+                   Utilities.equals(this.value,   that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 79 * hash + (this.cs != null ? this.cs.hashCode() : 0);
+        hash = 79 * hash + (this.decimal != null ? this.decimal.hashCode() : 0);
+        hash = 79 * hash + (this.ts != null ? this.ts.hashCode() : 0);
+        return hash;
+    }
 }
