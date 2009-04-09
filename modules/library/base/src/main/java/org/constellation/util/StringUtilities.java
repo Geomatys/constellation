@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
@@ -386,5 +388,60 @@ public class StringUtilities {
             styles.add(token.nextToken());
         }
         return styles;
+    }
+
+    /**
+     * Search in each String of the list if it matche with the specified String(could be a regex).
+     *
+     * @param list A list of String.
+     * @param str The value searched (could be a regex).
+     *
+     * @return true if the list got an element which contains the specified string (could be a regex).
+     */
+    public static boolean containsMatch(List<String> list, String str) {
+        boolean str_available = false;
+        Pattern pattern = Pattern.compile(str, Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
+        if (list != null)  {
+            for (String s : list) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    str_available = true;
+                    break;
+                }
+            }
+        }
+        return str_available;
+    }
+
+    /**
+     * Returns true if the list contains a string in one of the list elements.
+     * This test is not case sensitive.
+     *
+     * @param list A list of String.
+     * @param str The value searched.
+     * @return
+     */
+    public static boolean containsIgnoreCase(List<String> list, String str) {
+        boolean str_available = false;
+        if (list != null) {
+            for (String s : list) {
+                if (s.equalsIgnoreCase(str)) {
+                    str_available = true;
+                    break;
+                }
+            }
+        }
+        return str_available;
+    }
+
+    /**
+     * Returns true if <code>string1</code> starts with <code>string2</code> (ignoring case).
+     * @param string1 the first string
+     * @param string2 the second string
+     * @return true if <code>string1</code> starts with <code>string2</code>; false otherwise
+     */
+    public static boolean startsWithIgnoreCase(String string1, String string2) {
+        // this could be optimized, but anyway it doesn't seem to be a performance killer
+        return string1.toUpperCase().startsWith(string2.toUpperCase());
     }
 }

@@ -149,6 +149,11 @@ public class Concept {
         this.about = about;
     }
 
+    public Concept(String about, String prefLabel) {
+        this.about     = about;
+        this.prefLabel = prefLabel;
+    }
+
     public Concept(String about, String externalID, String prefLabel, String altLabel, String definition, String date) {
         this.about      = about;
         this.altLabel   = Arrays.asList(altLabel);
@@ -615,6 +620,7 @@ public class Concept {
     @Override
     public int hashCode() {
         int hash = 7;
+        hash = 47 * hash + (this.about != null ? this.about.hashCode() : 0);
         hash = 47 * hash + (this.externalID != null ? this.externalID.hashCode() : 0);
         return hash;
     }
