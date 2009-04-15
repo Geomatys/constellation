@@ -131,12 +131,12 @@ public class Capabilities extends CapabilitiesBaseType {
         StringBuilder s = new StringBuilder();
         s.append(super.toString());
         if (this.contents != null) {
-            s.append(contents.toString()).append('\n');
+            s.append("contents: ").append(contents).append('\n');
         } else {
             s.append("contents is null").append('\n');
         }
         if (this.filterCapabilities != null) {
-             s.append(filterCapabilities.toString()).append('\n');
+             s.append("filterCapabilities: ").append(filterCapabilities).append('\n');
         } else {
             s.append("filterCapabilities is null").append('\n');
         }

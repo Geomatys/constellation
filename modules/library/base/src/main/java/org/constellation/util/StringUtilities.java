@@ -444,4 +444,25 @@ public class StringUtilities {
         // this could be optimized, but anyway it doesn't seem to be a performance killer
         return string1.toUpperCase().startsWith(string2.toUpperCase());
     }
+
+    /**
+     * This method clean a string encoded in a database LATIN1, this is a performed method.
+     * @param str
+     * @return
+     */
+    public static String cleanString(String str) {
+        if (str != null) {
+            str = str.replaceAll("Ã©", "é");
+            str = str.replaceAll("Ãª", "ê");
+            str = str.replaceAll("Ã¨", "è");
+            str = str.replaceAll("\"", "'");
+            str = str.replaceAll("Â°", "°");
+            str = str.replaceAll("Ã¯", "ï");
+            str = str.replaceAll("Ã´", "ô");
+            str = str.replaceAll("à§", "ç");
+            str = str.replaceAll("Ã", "à");
+            str = str.replaceAll("Â", "");
+        }
+        return str;
+    }
 }
