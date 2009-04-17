@@ -35,6 +35,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.v202.AbstractRecordType;
 import org.constellation.cat.csw.v202.BriefRecordType;
+import org.constellation.cat.csw.v202.Capabilities;
 import org.constellation.cat.csw.v202.ElementSetNameType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
@@ -49,11 +50,17 @@ import org.constellation.cat.csw.v202.SummaryRecordType;
 import org.constellation.cat.csw.v202.TransactionType;
 import org.constellation.cat.csw.v202.UpdateType;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.constellation.inspire.DocumentType;
+import org.constellation.inspire.InspireCapabilitiesType;
+import org.constellation.inspire.LanguagesType;
+import org.constellation.inspire.MultiLingualCapabilities;
+import org.constellation.inspire.TranslatedCapabilitiesType;
 import org.constellation.ogc.FilterType;
 import org.constellation.ogc.NotType;
 import org.constellation.ogc.PropertyIsLikeType;
 import org.constellation.ogc.PropertyNameType;
 import org.constellation.ows.v100.BoundingBoxType;
+import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
 
 // Geotools dependencies
@@ -1245,7 +1252,102 @@ public class CswXMLBindingTest {
 
     }
 
-    private String removeXmlns(String xml) {
+    /**
+     * Test capabilities with INSPIRE extendedCapabilities unmarshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void InspireUnmarshalingTest() throws Exception {
+
+        String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+        "<csw:Capabilities version=\"2.0.2\"  xmlns:ows=\"http://www.opengis.net/ows\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\">"  + '\n' +
+        "   <ows:OperationsMetadata>"                                                                                                        + '\n' +
+        "       <ows:ExtendedCapabilities>"                                                                                                  + '\n' +
+        "           <ins:MultiLingualCapabilities xmlns:ins=\"http://www.inspire.org\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">"         + '\n' +
+        "               <ins:Languages>"                                                                                                     + '\n' +
+        "                   <ins:Language>GER</ins:Language>"                                                                                + '\n' +
+        "                   <ins:Language>DUT</ins:Language>"                                                                                + '\n' +
+        "               </ins:Languages>"                                                                                                    + '\n' +
+        "               <ins:TranslatedCapabilities>"                                                                                        + '\n' +
+        "                   <ins:Document xlink:href=\"http://www.somehost.com/capabilities_german.xml\" language=\"GER\"/>"                 + '\n' +
+        "                   <ins:Document xlink:href=\"http://www.somehost.com/capabilities_dutch.xml\"  language=\"DUT\"/>"                 + '\n' +
+        "               </ins:TranslatedCapabilities>"                                                                                       + '\n' +
+        "          </ins:MultiLingualCapabilities>"                                                                                           + '\n' +
+        "      </ows:ExtendedCapabilities>"                                                                                                  + '\n' +
+        "   </ows:OperationsMetadata>"                                                                                                       + '\n' +
+        "</csw:Capabilities>"+ '\n';
+
+        Capabilities result = (Capabilities) recordUnmarshaller202.unmarshal(new StringReader(xml));
+
+        OperationsMetadata om = new OperationsMetadata();
+
+        LanguagesType languages = new LanguagesType(Arrays.asList("GER", "DUT"));
+        List<DocumentType> docs = Arrays.asList(new DocumentType("http://www.somehost.com/capabilities_german.xml", "GER"),
+                                                new DocumentType("http://www.somehost.com/capabilities_dutch.xml", "DUT"));
+        TranslatedCapabilitiesType trans = new TranslatedCapabilitiesType(docs);
+        InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(languages, trans);
+        MultiLingualCapabilities m = new MultiLingualCapabilities();
+        m.setMultiLingualCapabilities(inspireCapa);
+        om.setExtendedCapabilities(m);
+
+        Capabilities expResult = new Capabilities(null, null, om, "2.0.2", null, null);
+
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test capabilities with INSPIRE extendedCapabilities unmarshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void InspireMarshalingTest() throws Exception {
+
+        String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                                                        + '\n' +
+        "<csw:Capabilities version=\"2.0.2\" >"                                                                                + '\n' +
+        "    <ows:OperationsMetadata>"                                                                                         + '\n' +
+        "        <ows:ExtendedCapabilities>"                                                                                   + '\n' +
+        "            <ins:MultiLingualCapabilities>"                                                                           + '\n' +
+        "                <ins:Languages>"                                                                                      + '\n' +
+        "                    <ins:Language>GER</ins:Language>"                                                                 + '\n' +
+        "                    <ins:Language>DUT</ins:Language>"                                                                 + '\n' +
+        "                </ins:Languages>"                                                                                     + '\n' +
+        "                <ins:TranslatedCapabilities>"                                                                         + '\n' +
+        "                    <ins:Document language=\"GER\" xlink:href=\"http://www.somehost.com/capabilities_german.xml\"/>"  + '\n' +
+        "                    <ins:Document language=\"DUT\" xlink:href=\"http://www.somehost.com/capabilities_dutch.xml\"/>"   + '\n' +
+        "                </ins:TranslatedCapabilities>"                                                                        + '\n' +
+        "            </ins:MultiLingualCapabilities>"                                                                          + '\n' +
+        "        </ows:ExtendedCapabilities>"                                                                                  + '\n' +
+        "    </ows:OperationsMetadata>"                                                                                        + '\n' +
+        "</csw:Capabilities>"+ '\n';
+
+        OperationsMetadata om = new OperationsMetadata();
+
+        LanguagesType languages = new LanguagesType(Arrays.asList("GER", "DUT"));
+        List<DocumentType> docs = Arrays.asList(new DocumentType("http://www.somehost.com/capabilities_german.xml", "GER"),
+                                                new DocumentType("http://www.somehost.com/capabilities_dutch.xml", "DUT"));
+        TranslatedCapabilitiesType trans = new TranslatedCapabilitiesType(docs);
+        InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(languages, trans);
+        MultiLingualCapabilities m = new MultiLingualCapabilities();
+        m.setMultiLingualCapabilities(inspireCapa);
+        om.setExtendedCapabilities(m);
+
+        Capabilities capa = new Capabilities(null, null, om, "2.0.2", null, null);
+
+        StringWriter sw = new StringWriter();
+        recordMarshaller202.marshal(capa, sw);
+
+        String result = sw.toString();
+
+        result = removeXmlns(result);
+
+        assertEquals(expResult, result);
+    }
+
+    public String removeXmlns(String xml) {
 
         String s = xml;
         s = s.replaceAll("xmlns=\"[^\"]*\" ", "");

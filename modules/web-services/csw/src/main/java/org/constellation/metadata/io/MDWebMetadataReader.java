@@ -57,6 +57,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ows.v100.BoundingBoxType;
+import org.constellation.util.StringUtilities;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.TypeNames.*;
@@ -539,8 +540,8 @@ public class MDWebMetadataReader extends MetadataReader {
             RecordType result = new RecordType();
             for (QName qn : elementName) {
 
-                String getterName = "get" + Util.firstToUpper(qn.getLocalPart());
-                String setterName = "set" + Util.firstToUpper(qn.getLocalPart());
+                String getterName = "get" + StringUtilities.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + StringUtilities.firstToUpper(qn.getLocalPart());
                 try {
                     Method getter = Util.getMethod(getterName, RecordType.class);
                     Object param  = Util.invokeMethod(fullResult, getter);
@@ -704,8 +705,8 @@ public class MDWebMetadataReader extends MetadataReader {
 
             for (QName qn : elementName) {
 
-                String getterName = "get" + Util.firstToUpper(qn.getLocalPart());
-                String setterName = "set" + Util.firstToUpper(qn.getLocalPart());
+                String getterName = "get" + StringUtilities.firstToUpper(qn.getLocalPart());
+                String setterName = "set" + StringUtilities.firstToUpper(qn.getLocalPart());
                 String currentMethodName = getterName + "()";
                 try {
                     Method getter = Util.getMethod(getterName, recordClass);

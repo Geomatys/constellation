@@ -144,7 +144,7 @@ public class ServiceIdentification extends DescriptionType {
         if (object == this) {
             return true;
         }
-        if (object instanceof ServiceIdentification) {
+        if (object instanceof ServiceIdentification && super.equals(object)) {
             final ServiceIdentification that = (ServiceIdentification) object;
             return Utilities.equals(this.accessConstraints,  that.accessConstraints) &&
                    Utilities.equals(this.fees,               that.fees)              &&
@@ -162,5 +162,29 @@ public class ServiceIdentification extends DescriptionType {
         hash = 37 * hash + (this.fees != null ? this.fees.hashCode() : 0);
         hash = 37 * hash + (this.accessConstraints != null ? this.accessConstraints.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString());
+        if (serviceType != null) {
+            sb.append("serviceType:").append(serviceType).append('\n');
+        }
+        if (serviceTypeVersion != null) {
+            sb.append("serviceTypeVersion:").append('\n');
+            for (String k : serviceTypeVersion) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (accessConstraints != null) {
+            sb.append("accessConstraints:").append('\n');
+            for (String k : accessConstraints) {
+                sb.append(k).append('\n');
+            }
+        }
+        if (fees != null) {
+            sb.append("fees:").append(fees).append('\n');
+        }
+        return sb.toString();
     }
 }

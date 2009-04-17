@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.inspire.MultiLingualCapabilities;
 import org.geotoolkit.util.Utilities;
 
 
@@ -65,20 +66,22 @@ public class OperationsMetadata {
     private List<DomainType> parameter;
     @XmlElement(name = "Constraint")
     private List<DomainType> constraint;
+
+    // TODO find a way to set the type to AbstractExtendedCapabilitiesType
     @XmlElement(name = "ExtendedCapabilities")
-    private Object extendedCapabilities;
+    private MultiLingualCapabilities extendedCapabilities;
 
     /**
      * Empty constructor used by JAXB.
      */
-    OperationsMetadata(){
+    public OperationsMetadata(){
     }
     
     /**
      * Build a new operation metadata.
      */
-    OperationsMetadata(List<Operation> operation, List<DomainType> parameter, List<DomainType> constraint,
-            Object extendedCapabilities){
+    public OperationsMetadata(List<Operation> operation, List<DomainType> parameter, List<DomainType> constraint,
+            MultiLingualCapabilities extendedCapabilities){
         
         this.constraint           = constraint;
         this.extendedCapabilities = extendedCapabilities;
@@ -181,8 +184,16 @@ public class OperationsMetadata {
      * Gets the value of the extendedCapabilities property.
      * 
      */
-    public Object getExtendedCapabilities() {
+    public MultiLingualCapabilities getExtendedCapabilities() {
         return extendedCapabilities;
+    }
+
+    /**
+     * Gets the value of the extendedCapabilities property.
+     *
+     */
+    public void setExtendedCapabilities(MultiLingualCapabilities extendedCapabilities) {
+        this.extendedCapabilities = extendedCapabilities;
     }
 
     /**
@@ -218,36 +229,31 @@ public class OperationsMetadata {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append("Constraint:").append('\n');
-        if (constraint == null) {
-            s.append("null");
-        } else {
+        StringBuilder s = new StringBuilder("[OperationsMetadata]\n");
+        if (constraint != null) {
+            s.append("Constraint:").append('\n');
             for (int i = 0; i < constraint.size(); i++) {
-                s.append(constraint.get(i).toString()).append('\n');
+                s.append(constraint.get(i)).append('\n');
             }
         }
-        s.append("Operation:").append('\n');
-        if (operation == null) {
-            s.append("null");
-        } else {
+        
+        if (operation != null) {
+            s.append("Operation:").append('\n');
             for (int i = 0; i < operation.size(); i++) {
-                if (operation.get(i)!= null)
-                    s.append(operation.get(i).toString()).append('\n');
+                if (operation.get(i) != null)
+                    s.append(operation.get(i)).append('\n');
                 else
                     s.append("operation n" + i + " is null").append('\n');
             }
         }
-        s.append("Parameter:").append('\n');
-        if (parameter == null) {
-            s.append("null");
-        } else {
+        if (parameter != null) {
+            s.append("Parameter:").append('\n');
             for (int i = 0; i < parameter.size(); i++) {
-                s.append(parameter.get(i).toString()).append('\n');
+                s.append(parameter.get(i)).append('\n');
             }
         }
         if (extendedCapabilities != null) {
-            s.append(extendedCapabilities.toString());
+            s.append("extended capabilities:").append(extendedCapabilities).append('\n');
         }
         return s.toString();
     }

@@ -174,6 +174,26 @@ public class StringUtilities {
     }
 
     /**
+     * Generate a {@code String} whose first character will be in upper case.
+     * <p>
+     * For example: {@code firstToUpper("hello")} would return {@code "Hello"},
+     * while {@code firstToUpper("Hi!") would return {@code "Hi!"} unchanged.
+     *
+     * @param s The {@code String} to evaluate, not {@code null}.
+     *
+     * @return A {@code String} with the first character in upper case.
+     */
+    public static String firstToUpper(final String s) {
+        if (s != null && !s.equals("")) {
+            String first = s.substring(0, 1);
+            String result = s.substring(1);
+            result = first.toUpperCase() + result;
+            return result;
+        }
+        return s;
+    }
+    
+    /**
      * Converts a string representing the bbox coordinates into a {@link GeneralEnvelope}.
      *
      * @param bbox Coordinates of the bounding box, seperated by comas.

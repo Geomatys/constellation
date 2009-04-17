@@ -46,7 +46,15 @@ import org.geotoolkit.util.Utilities;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "OnlineResourceType")
+@XmlType(name = "OnlineResourceType", propOrder={
+    "type",
+    "href",
+    "role",
+    "arcrole",
+    "title",
+    "show",
+    "actuate"
+})
 @XmlSeeAlso({
     RequestMethodType.class
 })
@@ -183,7 +191,7 @@ public class OnlineResourceType extends AbstractOnlineResourceType {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder('[').append(this.getClass().getSimpleName()).append(']');
        
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

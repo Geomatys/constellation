@@ -124,12 +124,13 @@ public class ServiceProvider {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append("class: ServiceProvider name= ").append(providerName).append('\n');
+        StringBuilder s = new StringBuilder("[serviceProvider]").append('\n');
+        if (providerName != null)
+            s.append("provider name:").append(providerName).append('\n');
         if(providerSite != null)
-            s.append("providerSite").append(providerSite.toString()).append('\n');
+            s.append("provider site:").append(providerSite).append('\n');
         if (serviceContact != null)
-            s.append("ServiceContact").append(serviceContact.toString()).append('\n');
+            s.append("ServiceContact:").append(serviceContact).append('\n');
         return s.toString();
     }
 

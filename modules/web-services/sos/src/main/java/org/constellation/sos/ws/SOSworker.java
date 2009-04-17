@@ -1834,12 +1834,18 @@ public class SOSworker {
 
             /* Ifremer's server does not contain any .sicade directory, so the
              * configuration file is put under the WEB-INF directory of constellation.
+             * TODO find a proper way to do this.
              */
             final String catalinaPath = System.getenv().get("CATALINA_HOME");
             if (catalinaPath != null) {
                 File dirCatalina = new File(catalinaPath);
                 if (dirCatalina != null && dirCatalina.exists()) {
                     configDir = new File(dirCatalina, "webapps/swe_WS/WEB-INF/sos_configuration");
+                    if (configDir.exists()) {
+                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
+                        return configDir;
+                    }
+                    configDir = new File(dirCatalina, "webapps/swe_WS/WEB-INF/configuration");
                     if (configDir.exists()) {
                         logger.info("taking ifremer configuration from WEB-INF WAR directory");
                         return configDir;

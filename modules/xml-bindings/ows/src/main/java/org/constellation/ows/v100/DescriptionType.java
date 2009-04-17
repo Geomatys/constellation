@@ -146,4 +146,22 @@ public class DescriptionType {
         hash = 17 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
         return hash;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[").append(this.getClass().getSimpleName()).append(']').append('\n');
+        if (_abstract != null) {
+            sb.append("abstract:").append(_abstract).append('\n');
+        }
+        if (title != null) {
+            sb.append("title:").append(title).append('\n');
+        }
+        if (keywords != null) {
+            sb.append("keywords:").append('\n');
+            for (KeywordsType k : keywords) {
+                sb.append(k).append('\n');
+            }
+        }
+        return sb.toString();
+    }
 }

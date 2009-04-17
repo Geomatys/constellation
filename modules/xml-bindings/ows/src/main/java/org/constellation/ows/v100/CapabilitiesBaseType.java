@@ -173,27 +173,23 @@ public class CapabilitiesBaseType {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder('[').append(this.getClass().getSimpleName()).append(']');
+
         if (operationsMetadata != null)
-            s.append(operationsMetadata.toString()).append('\n');
-        else
-            s.append("OperationMetadata is null").append('\n');
+            s.append("operations metadata:").append(operationsMetadata).append('\n');
+        
         if (serviceIdentification != null)
-            s.append(serviceIdentification.toString()).append('\n');
-        else
-            s.append("serviceIdentification is null").append('\n');
+            s.append("service identification:").append(serviceIdentification).append('\n');
+        
         if (serviceProvider != null)
-            s.append(serviceProvider.toString()).append('\n');
-        else
-            s.append("serviceProvider is null").append('\n');
+            s.append("service provider:").append(serviceProvider).append('\n');
+        
         if (updateSequence != null)
-            s.append(updateSequence.toString()).append('\n');
-        else
-            s.append("updateSequence is null").append('\n');
+            s.append("updateSequence:").append(updateSequence).append('\n');
+        
         if (version != null)
-            s.append(version.toString()).append('\n');
-        else
-            s.append("version is null").append('\n');
+            s.append("version:").append(version).append('\n');
+        
         
         return s.toString();
     }

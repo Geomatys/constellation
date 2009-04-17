@@ -299,6 +299,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link KeywordsType }
+     *
+     */
+    public AbstractExtendedCapabilitiesType createAbstractExtendedCapabilitiesType() {
+        return new AbstractExtendedCapabilitiesType();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetCapabilitiesType }{@code >}}
      * 
      */

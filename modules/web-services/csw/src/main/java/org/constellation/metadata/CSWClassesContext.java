@@ -65,6 +65,8 @@ public class CSWClassesContext {
         //ISO 19115 French profile class
         classeList.addAll(fraClasses);
 
+        // Inspire classes
+        classeList.add(org.constellation.inspire.ObjectFactory.class);
         //CSW 2.0.2 classes
         classeList.addAll(Arrays.asList(org.constellation.cat.csw.v202.ObjectFactory.class,
                                         ExceptionReport.class,

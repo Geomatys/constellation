@@ -115,23 +115,6 @@ public final class Util {
     }
     
     /**
-     * Generate a {@code String} whose first character will be in upper case.
-     * <p>
-     * For example: {@code firstToUpper("hello")} would return {@code "Hello"}, 
-     * while {@code firstToUpper("Hi!") would return {@code "Hi!"} unchanged.
-     * 
-     * @param s The {@code String} to evaluate, not {@code null}.
-     * 
-     * @return A {@code String} with the first character in upper case.
-     */
-    public static String firstToUpper(final String s) {
-        String first = s.substring(0, 1);
-        String result = s.substring(1);
-        result = first.toUpperCase() + result;
-        return result;
-    }
-    
-    /**
      * Generate a {@code Date} object from a {@code String} which represents an 
      * instant encoded in the ISO-8601 format, e.g. {@code 2009.01.20T17:04Z}.
      * <p>
@@ -989,7 +972,7 @@ public final class Util {
             return null;
         }
         
-        String methodName = "get" + Util.firstToUpper(propertyName);
+        String methodName = "get" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;
         
         while (occurenceType < 4) {
@@ -1049,7 +1032,7 @@ public final class Util {
             propertyName = "ending";
         } 
         
-        String methodName = "set" + Util.firstToUpper(propertyName);
+        String methodName = "set" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;
         
         //TODO look all interfaces
@@ -1422,11 +1405,11 @@ public final class Util {
         String result = "";
         while (code.indexOf('_') != -1) {
             final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
-            result += firstToUpper(tmp);
+            result += StringUtilities.firstToUpper(tmp);
             code = code.substring(code.indexOf('_') + 1, code.length());
         }
         code = code.toLowerCase();
-        result += firstToUpper(code);
+        result += StringUtilities.firstToUpper(code);
         return result;
     }
     

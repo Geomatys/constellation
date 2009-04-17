@@ -26,6 +26,7 @@ import org.constellation.ows.v100.CapabilitiesBaseType;
 import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.ServiceIdentification;
 import org.constellation.ows.v100.ServiceProvider;
+import org.geotoolkit.util.Utilities;
 
 
 /**
@@ -64,7 +65,7 @@ public class Capabilities extends CapabilitiesBaseType {
     /**
      * An empty constructor used by JAXB
      */
-    Capabilities(){
+    public Capabilities(){
     }
     
     /**
@@ -81,5 +82,36 @@ public class Capabilities extends CapabilitiesBaseType {
      */
     public FilterCapabilities getFilterCapabilities() {
         return filterCapabilities;
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Capabilities && super.equals(object)) {
+            final Capabilities that = (Capabilities) object;
+            return Utilities.equals(this.filterCapabilities, that.filterCapabilities);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 29 * hash + (this.filterCapabilities != null ? this.filterCapabilities.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString());
+        if ( filterCapabilities != null) {
+            sb.append("filter capabilities:").append(filterCapabilities).append('\n');
+        }
+        return sb.toString();
     }
 }

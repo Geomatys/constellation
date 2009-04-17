@@ -97,6 +97,9 @@ import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
+import org.constellation.inspire.InspireCapabilitiesType;
+import org.constellation.inspire.LanguagesType;
+import org.constellation.inspire.MultiLingualCapabilities;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.lucene.SearchingException;
 import org.constellation.lucene.IndexingException;
@@ -369,7 +372,12 @@ public class CSWworker {
                     if (configDir.exists()) {
                         logger.info("taking ifremer configuration from WEB-INF WAR directory");
                         return configDir;
-                    } 
+                    }
+                    configDir = new File(dirCatalina, "webapps/sdn-csw_WS/WEB-INF/configuration");
+                    if (configDir.exists()) {
+                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
+                        return configDir;
+                    }
                 }
             }
             return null;
@@ -515,16 +523,18 @@ public class CSWworker {
                 
             om = skeletonCapabilities.getOperationsMetadata();
             
-             //we remove the operation not supported in this profile (transactional/discovery)
-            if (profile == DISCOVERY) {
-                om.removeOperation("Harvest");
-                om.removeOperation("Transaction");
-            }
-            
-            //we update the URL
             if (om != null) {
+
+                // we remove the operation not supported in this profile (transactional/discovery)
+                if (profile == DISCOVERY) {
+                    om.removeOperation("Harvest");
+                    om.removeOperation("Transaction");
+                }
+            
+                // we update the URL
                 OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
-                
+
+                // we add the cascaded services (if there is some)
                 DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
                 if (cascadedCSW == null) {
                     if (cascadedCSWservers != null && cascadedCSWservers.size() != 0) {
@@ -538,8 +548,7 @@ public class CSWworker {
                         om.removeConstraint(cascadedCSW);
                 }
                 
-                
-                //we update the operation parameters 
+                // we update the operation parameters
                 Operation gr = om.getOperation("GetRecords");
                 if (gr != null) {
                     DomainType os = gr.getParameter("outputSchema");
@@ -604,6 +613,13 @@ public class CSWworker {
                         tn.setValue(values);
                     }
                 }
+
+                //we add the INSPIRE extend capabilties
+                LanguagesType languages = new LanguagesType("FR");
+                InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(languages, null);
+                MultiLingualCapabilities m = new MultiLingualCapabilities();
+                m.setMultiLingualCapabilities(inspireCapa);
+                om.setExtendedCapabilities(m);
             }
         }
             

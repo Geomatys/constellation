@@ -155,16 +155,16 @@ public class UtilTest {
     public void firstToUpperTest() throws Exception {
 
         String tmp = "hola";
-        assertEquals("Hola", Util.firstToUpper(tmp));
+        assertEquals("Hola", StringUtilities.firstToUpper(tmp));
 
         tmp = "Bonjour";
-        assertEquals("Bonjour", Util.firstToUpper(tmp));
+        assertEquals("Bonjour", StringUtilities.firstToUpper(tmp));
 
         tmp = "STUFF";
-        assertEquals("STUFF", Util.firstToUpper(tmp));
+        assertEquals("STUFF", StringUtilities.firstToUpper(tmp));
 
         tmp = "sTUFF";
-        assertEquals("STUFF", Util.firstToUpper(tmp));
+        assertEquals("STUFF", StringUtilities.firstToUpper(tmp));
 
     }
 
