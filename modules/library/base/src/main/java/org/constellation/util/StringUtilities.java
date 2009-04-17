@@ -29,14 +29,13 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.referencing.crs.DefaultVerticalCRS;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
+import org.geotoolkit.resources.Errors;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
@@ -207,12 +206,12 @@ public class StringUtilities {
             while (tokens.hasMoreTokens()) {
             final double value = toDouble(tokens.nextToken());
             if (index >= coordinates.length) {
-                    throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+                    throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
                 }
             coordinates[index++] = value;
             }
         if ((index & 1) != 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1));
+            throw new IllegalArgumentException(Errors.format(Errors.Keys.ODD_ARRAY_LENGTH_$1));
             }
         // Fallthrough in every cases.
         switch (index) {
@@ -239,7 +238,7 @@ public class StringUtilities {
             final double minimum = envelope.getMinimum(index);
             final double maximum = envelope.getMaximum(index);
             if (!(minimum < maximum)) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2));
+                throw new IllegalArgumentException(Errors.format(Errors.Keys.BAD_RANGE_$2));
             }
         }
         return envelope;
@@ -280,13 +279,13 @@ public class StringUtilities {
             while (tokens.hasMoreTokens()) {
                     values[index] = toDouble(tokens.nextToken());
                 if (index >= 4) {
-                    throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+                    throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
                 }
                 index++;
             }
 
             if(index != 5){
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3));
+                throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
             }
 
             dimX[0] = values[0];

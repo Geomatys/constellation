@@ -23,10 +23,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.imageio.spi.ImageReaderSpi;
-import org.geotools.resources.image.ImageUtilities;
 
 import org.junit.*;
 import junit.framework.TestCase;
+import org.geotoolkit.image.jai.Registry;
 
 
 /**
@@ -40,7 +40,7 @@ import junit.framework.TestCase;
  */
 public class DatabaseTest extends TestCase {
     static {
-        ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, false);
+        Registry.setNativeCodecAllowed("png", ImageReaderSpi.class, false);
     }
 
     /**

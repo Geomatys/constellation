@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.sml.AbstractPosition;
 import org.constellation.swe.v100.PositionType;
 import org.constellation.swe.v100.VectorType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

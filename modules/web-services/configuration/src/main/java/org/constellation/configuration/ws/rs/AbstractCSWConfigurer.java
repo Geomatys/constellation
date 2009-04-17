@@ -53,9 +53,8 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.metadata.note.Anchors;
+import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.factory.FactoryRegistry;
 
 // MDWeb dependencies
 import org.mdweb.utils.GlobalUtils;
@@ -280,7 +279,6 @@ public abstract class AbstractCSWConfigurer {
             }
         }
         //then we restart the services
-        Anchors.clear();
         restart();
     }
 

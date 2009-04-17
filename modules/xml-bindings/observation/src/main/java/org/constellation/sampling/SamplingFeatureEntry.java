@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractFeatureEntry;
 import org.constellation.observation.ObservationEntry;
 import org.constellation.observation.SurveyProcedureEntry;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;

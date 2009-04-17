@@ -26,7 +26,7 @@ import org.constellation.ebrim.v250.RegistryObjectType;
 import org.constellation.ebrim.v300.IdentifiableType;
 import org.constellation.ows.v100.ExceptionReport;
 import org.constellation.util.Util;
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 /**
  *
@@ -36,6 +36,22 @@ import org.geotools.metadata.iso.MetaDataImpl;
 public class CSWClassesContext {
 
     private static Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+
+    /**
+     * List of classes for the french profile of metadata.
+     */
+    public static final List<Class> fraClasses = new ArrayList<Class>();
+
+    static {
+        fraClasses.addAll(Arrays.asList(
+                org.geotoolkit.metadata.fra.FRA_Constraints.class,
+                org.geotoolkit.metadata.fra.FRA_DataIdentification.class,
+                org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
+                org.geotoolkit.metadata.fra.FRA_IndirectReferenceSystem.class,
+                org.geotoolkit.metadata.fra.FRA_LegalConstraints.class,
+                org.geotoolkit.metadata.fra.FRA_SecurityConstraints.class));
+    }
+
     /**
      * Return the list of all the marshallable classes
      *
@@ -44,10 +60,10 @@ public class CSWClassesContext {
     public static Class[] getAllClasses() {
         List<Class> classeList = new ArrayList<Class>();
         //ISO 19115 class
-        classeList.add(MetaDataImpl.class);
+        classeList.add(DefaultMetaData.class);
 
         //ISO 19115 French profile class
-        classeList.add(org.constellation.metadata.fra.ObjectFactory.class);
+        classeList.addAll(fraClasses);
 
         //CSW 2.0.2 classes
         classeList.addAll(Arrays.asList(org.constellation.cat.csw.v202.ObjectFactory.class,

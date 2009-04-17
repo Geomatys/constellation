@@ -71,19 +71,19 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.util.ProgressListener;
 
 import org.geotools.coverage.FactoryFinder;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.coverage.OrdinateOutsideCoverageException;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.logging.Logging;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.grid.GridGeometry2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverageFactory;
+import org.geotoolkit.coverage.OrdinateOutsideCoverageException;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.util.logging.Logging;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Classes;
-import org.geotools.math.Statistics;
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.math.Statistics;
+import org.geotoolkit.util.DateRange;
 
 import org.constellation.image.operation.Equalizer;
 import org.constellation.coverage.catalog.WritableGridCoverageTable;
@@ -614,7 +614,7 @@ public class CoverageBuilder {
         }
         final GeographicBoundingBox area;
         if (xmin!=null && xmax!=null && ymin!=null && ymax!=null) {
-            area = new GeographicBoundingBoxImpl(xmin, xmax, ymin, ymax);
+            area = new DefaultGeographicBoundingBox(xmin, xmax, ymin, ymax);
         } else {
             area = null;
         }

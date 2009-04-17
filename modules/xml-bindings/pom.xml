@@ -79,7 +79,6 @@
       </activation>
       <modules>
         <module>ebrim</module>
-        <module>metadata-FRA</module>
         <module>sensorML</module>
         <module>skos</module>
       </modules>
@@ -88,7 +87,6 @@
       <id>csw</id>
       <modules>
         <module>ebrim</module>
-        <module>metadata-FRA</module>
         <module>skos</module>
       </modules>
     </profile>

@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.RequestBase;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

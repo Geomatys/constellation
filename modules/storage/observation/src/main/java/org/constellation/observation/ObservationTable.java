@@ -52,7 +52,7 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 
 // geotools dependencies
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

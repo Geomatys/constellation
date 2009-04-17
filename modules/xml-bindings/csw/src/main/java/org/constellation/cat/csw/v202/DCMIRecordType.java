@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.cat.csw.DCMIRecord;
 import org.constellation.dublincore.v2.elements.SimpleLiteral;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

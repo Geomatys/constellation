@@ -22,9 +22,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -32,6 +31,7 @@ import org.constellation.ows.v100.WGS84BoundingBoxType;
 import org.constellation.util.Util;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -40,34 +40,29 @@ import static org.junit.Assert.*;
  * @author Guilhem Legal (Geomatys)
  */
 public class WfsXMLBindingTest {
-    private Logger       logger = Logger.getLogger("org.constellation.wfs");
+    private MarshallerPool pool;
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
-    public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.wfs.v110");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
-
+    public void setUp() throws JAXBException {
+        pool = new MarshallerPool("org.constellation.wfs.v110");
+        unmarshaller = pool.acquireUnmarshaller();
+        marshaller   = pool.acquireMarshaller();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
+        if (marshaller != null) {
+            pool.release(marshaller);
+        }
     }
 
     @Test
-    public void unmarshallingTest() throws Exception {
+    public void unmarshallingTest() throws JAXBException {
 
         InputStream is = Util.getResourceAsStream("org/constellation/wfs/v110/capabilities.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
@@ -94,7 +89,7 @@ public class WfsXMLBindingTest {
     }
 
     @Test
-    public void marshallingTest() throws Exception {
+    public void marshallingTest() throws JAXBException {
 
         WFSCapabilitiesType capa = new WFSCapabilitiesType();
         List<FeatureTypeType> featList = new ArrayList<FeatureTypeType>();

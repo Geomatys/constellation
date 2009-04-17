@@ -37,15 +37,15 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.display.primitive.GraphicCoverageJ2D;
-import org.geotools.display.primitive.ProjectedFeature;
-import org.geotools.geometry.GeneralDirectPosition;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotools.display2d.primitive.GraphicCoverageJ2D;
+import org.geotools.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureMapLayer;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.CRS;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.metadata.iso.citation.Citations;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;

@@ -43,7 +43,7 @@ import org.constellation.swe.v100.TimeType;
 import org.constellation.swe.v100.TimeRange;
 import org.constellation.swe.v100.AbstractDataRecordType;
 import org.constellation.swe.v100.SimpleDataRecordType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

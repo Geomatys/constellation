@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.util.MeasurementRange;
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.DateRange;
 
 import org.constellation.catalog.Element;
 import org.constellation.catalog.CatalogException;
@@ -212,7 +212,7 @@ public interface Layer extends Element {
 
     /**
      * Returns a legend of the specified dimension. The legend is a
-     * {@linkplain org.geotools.gui.swing.image.ColorRamp color ramp}
+     * {@linkplain org.geotoolkit.gui.swing.image.ColorRamp color ramp}
      * with gratuation on it.
      *
      * @param  dimension The dimension of the image to be returned.

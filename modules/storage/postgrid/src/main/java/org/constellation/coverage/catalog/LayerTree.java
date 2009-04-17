@@ -24,8 +24,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.geotools.gui.swing.tree.NamedTreeNode;
-import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.gui.swing.tree.NamedTreeNode;
+import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.CatalogException;
@@ -107,7 +107,7 @@ public class LayerTree extends Table {
      * Cette méthode peut construire les {@linkplain Element éléments} correspondant à chaque noeud,
      * (ce qui a un certain coût), ou simplement stocker les noms de chaque noeuds. Ce comportement
      * est contrôlé par le paramètre {@code createEntries}. S'il a la valeur {@code true}, alors
-     * l'{@linkplain org.geotools.gui.swing.tree.TreeNode#getUserObject objet utilisateur} de chaque
+     * l'{@linkplain org.geotoolkit.gui.swing.tree.TreeNode#getUserObject objet utilisateur} de chaque
      * noeud sera un {@linkplain Element élément} complètement formé.
      *
      * @param  depth La profondeur de l'arborescence.

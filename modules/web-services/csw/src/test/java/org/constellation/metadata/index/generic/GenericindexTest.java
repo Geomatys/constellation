@@ -38,13 +38,13 @@ import org.apache.lucene.search.Sort;
 import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.util.Util;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // GeoAPI dependencies
 
 //Junit dependencies
-import org.geotools.referencing.CRS;
+import org.geotoolkit.referencing.CRS;
 import org.junit.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
@@ -67,7 +67,7 @@ public class GenericindexTest {
     public static void setUpClass() throws Exception {
         deleteIndex();
         File configDirectory      = new File("GenericIndexTest");
-        List<MetaDataImpl> object = fillTestData();
+        List<DefaultMetaData> object = fillTestData();
         indexer                   = new GenericIndexer(object, null, configDirectory, "");
         indexSearcher             = new GenericIndexSearcher(configDirectory, "");
         
@@ -567,49 +567,49 @@ public class GenericindexTest {
         assertEquals(expectedResult, result);
     }
 
-    public static List<MetaDataImpl> fillTestData() throws JAXBException {
-        List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
-        JAXBContext context       = JAXBContext.newInstance(MetaDataImpl.class);
+    public static List<DefaultMetaData> fillTestData() throws JAXBException {
+        List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
+        JAXBContext context       = JAXBContext.newInstance(DefaultMetaData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl");
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta3.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta4.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
-        if (obj instanceof MetaDataImpl) {
-            result.add((MetaDataImpl) obj);
+        if (obj instanceof DefaultMetaData) {
+            result.add((DefaultMetaData) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }

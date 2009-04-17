@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.swe.AnyScalar;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

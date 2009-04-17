@@ -39,7 +39,7 @@ import org.opengis.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
-import org.geotools.coverage.SpatioTemporalCoverage3D;
+import org.geotoolkit.coverage.SpatioTemporalCoverage3D;
 
 // Constellation dependencies
 import org.constellation.observation.CatalogException;

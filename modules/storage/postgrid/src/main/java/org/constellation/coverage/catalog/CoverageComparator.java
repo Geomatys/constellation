@@ -22,7 +22,6 @@ import java.rmi.RemoteException;
 import javax.measure.unit.Unit;
 import javax.measure.unit.NonSI;
 
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -32,10 +31,11 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.geometry.Envelope;
 
-import org.geotools.util.logging.Logging;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.factory.AuthorityFactoryFinder;
+import org.geotoolkit.referencing.datum.DefaultEllipsoid;
+import org.opengis.coverage.grid.GridEnvelope;
 
 
 /**
@@ -69,7 +69,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
     /**
      * Object à utiliser pour construire des transformations de coordonnées.
      */
-    private final CoordinateOperationFactory factory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
+    private final CoordinateOperationFactory factory = AuthorityFactoryFinder.getCoordinateOperationFactory(null);
 
     /**
      * Système de reference des coordonnées dans lequel faire les comparaisons. Il s'agit
@@ -311,9 +311,9 @@ final class CoverageComparator implements Comparator<CoverageReference> {
                 if (orientation.equals(AxisDirection.EAST  )) xDim = i;
                 if (orientation.equals(AxisDirection.NORTH )) yDim = i;
             }
-            final GridRange range = entry.getGridGeometry().getGridRange();
-            width  = (xDim>=0) ? range.getLength(xDim) : 0;
-            height = (yDim>=0) ? range.getLength(yDim) : 0;
+            final GridEnvelope range = entry.getGridGeometry().getGridRange();
+            width  = (xDim>=0) ? range.getSpan(xDim) : 0;
+            height = (yDim>=0) ? range.getSpan(yDim) : 0;
         }
 
         /**

@@ -17,7 +17,7 @@
  */
 package org.constellation.ws;
 
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
 
 
 /**

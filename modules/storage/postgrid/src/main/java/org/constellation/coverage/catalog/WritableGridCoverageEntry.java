@@ -36,11 +36,10 @@ import javax.measure.quantity.Duration;
 import javax.measure.unit.Unit;
 import javax.measure.unit.SI;
 
-import org.geotools.util.DateRange;
-import org.geotools.resources.Classes;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.image.io.mosaic.Tile;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.resources.Errors;
+import org.geotoolkit.image.io.mosaic.Tile;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
@@ -139,7 +138,7 @@ public class WritableGridCoverageEntry {
         } else if (input instanceof CharSequence) {
             inputFile = new File(input.toString());
         } else {
-            throw new IIOException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
+            throw new IIOException(Errors.format(Errors.Keys.UNKNOW_TYPE_$1,
                     Classes.getShortClassName(input)));
         }
         path = inputFile.getParentFile();

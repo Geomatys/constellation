@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.geotools.resources.Classes;
-import org.geotools.resources.XArray;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.util.XArrays;
 
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
@@ -140,12 +140,12 @@ public class Query {
         final IndexedSqlElement[] old;
         if (element instanceof Column) {
             old = columns;
-            columns = XArray.resize(columns, old.length + 1);
+            columns = XArrays.resize(columns, old.length + 1);
 //          columns = Arrays.copyOf(columns, old.length + 1);  // Java 6
             columns[old.length] = (Column) element;
         } else if (element instanceof Parameter) {
             old = parameters;
-            parameters = XArray.resize(parameters, old.length + 1);
+            parameters = XArrays.resize(parameters, old.length + 1);
 //          parameters = Arrays.copyOf(parameters, old.length + 1);  // Java 6
             parameters[old.length] = (Parameter) element;
         } else {

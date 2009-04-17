@@ -109,12 +109,12 @@ import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
 import org.constellation.ws.rs.WebService;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotools.display.exception.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 // GeoAPI dependencies
-import org.geotools.referencing.CRS;
+import org.geotoolkit.referencing.CRS;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 

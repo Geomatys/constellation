@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 // Geotools dependencies
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.geotools.resources.SwingUtilities;
 
 // Constellation

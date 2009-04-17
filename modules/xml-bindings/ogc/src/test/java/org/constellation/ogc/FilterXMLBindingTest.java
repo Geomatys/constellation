@@ -17,14 +17,13 @@
 package org.constellation.ogc;
 
 // J2SE dependencies
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -33,71 +32,68 @@ import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.EnvelopeEntry;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
  * A Test suite verifying that the Record are correctly marshalled/unmarshalled
- * 
+ *
  * @author Guilhem Legal
  */
 public class FilterXMLBindingTest {
-    
+
     private Logger       logger = Logger.getLogger("org.constellation.filter");
+
+    private MarshallerPool pool;
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
-    
-   
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @Before
-    public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
-        
+    public void setUp() throws JAXBException {
+        pool = new MarshallerPool("org.constellation.ogc:org.constellation.gml.v311");
+        marshaller = pool.acquireMarshaller();
+        unmarshaller = pool.acquireUnmarshaller();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
+        if (marshaller != null) {
+            pool.release(marshaller);
+        }
     }
-    
+
     /**
-     * Test simple Record Marshalling. 
-     * 
-     * @throws java.lang.Exception
+     * Test simple Record Marshalling.
+     *
+     * @throws JAXBException
      */
     @Test
-    public void filterMarshalingTest() throws Exception {
-        
+    public void filterMarshalingTest() throws JAXBException {
+
         /*
          * Test marshalling spatial filter
          */
         DirectPositionType lowerCorner = new DirectPositionType(10.0, 11.0);
         DirectPositionType upperCorner = new DirectPositionType(10.0, 11.0);
         EnvelopeEntry envelope         = new EnvelopeEntry("env-id", lowerCorner, upperCorner, "EPSG:4326");
-        
+
         OverlapsType filterElement     = new OverlapsType(new PropertyNameType("boundingBox"), envelope);
-        FilterType filter              = new FilterType(filterElement); 
-        
+        FilterType filter              = new FilterType(filterElement);
+
         StringWriter sw = new StringWriter();
         marshaller.marshal(filter, sw);
-        
+
         String result = sw.toString();
         //we remove the xmlmns
         result = result.replace(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"", "");
         result = result.replace(" xmlns:gml=\"http://www.opengis.net/gml\"", "");
         result = result.replace(" xmlns:ogc=\"http://www.opengis.net/ogc\"", "");
 
-        String expResult = 
+        String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
         "<ogc:Filter>" + '\n' +
         "    <ogc:Overlaps>"                                                                                                                           + '\n' +
@@ -109,27 +105,27 @@ public class FilterXMLBindingTest {
         "        </gml:Envelope>"                                                                                                                      + '\n' +
         "    </ogc:Overlaps>"                                                                                                                          + '\n' +
         "</ogc:Filter>" + '\n';
-    
+
         logger.finer("result" + result);
         logger.finer("expected" + expResult);
         assertEquals(expResult, result);
-        
-        
+
+
     }
-    
+
     /**
-     * Test simple Record Marshalling. 
-     * 
-     * @throws java.lang.Exception
+     * Test simple Record Marshalling.
+     *
+     * @throws JAXBException
      */
     @Test
-    public void filterUnmarshalingTest() throws Exception {
-        
+    public void filterUnmarshalingTest() throws JAXBException {
+
         /*
          * Test Unmarshalling spatial filter.
          */
-        
-        String xml = 
+
+        String xml =
        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
         "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
         "    <ogc:Overlaps>"                                                                                                                           + '\n' +
@@ -141,67 +137,23 @@ public class FilterXMLBindingTest {
         "        </gml:Envelope>"                                                                                                                      + '\n' +
         "    </ogc:Overlaps>"                                                                                                                          + '\n' +
         "</ogc:Filter>" + '\n';
-        
+
         StringReader sr = new StringReader(xml);
-        
+
         JAXBElement jb =  (JAXBElement) unmarshaller.unmarshal(sr);
         FilterType result = (FilterType) jb.getValue();
-        
+
         DirectPositionType lowerCorner = new DirectPositionType(10.0, 11.0);
         DirectPositionType upperCorner = new DirectPositionType(10.0, 11.0);
         EnvelopeEntry envelope         = new EnvelopeEntry("env-id", lowerCorner, upperCorner, "EPSG:4326");
-        
+
         OverlapsType filterElement     = new OverlapsType(new PropertyNameType("boundingBox"), envelope);
-        FilterType expResult           = new FilterType(filterElement); 
-        
-        
+        FilterType expResult           = new FilterType(filterElement);
+
+
         assertEquals(expResult.getSpatialOps().getValue(), result.getSpatialOps().getValue());
         assertEquals(expResult, result);
-        
-    }
-    
-    class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
-        /**
-         * if set this namespace will be the root of the document with no prefix.
-         */
-        private String rootNamespace;
-
-        public NamespacePrefixMapperImpl(String rootNamespace) {
-            super();
-            this.rootNamespace = rootNamespace;
-
-        }
-
-        /**
-         * Returns a preferred prefix for the given namespace URI.
-         */
-        public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-            String prefix = null;
-
-            if (rootNamespace != null && rootNamespace.equals(namespaceUri)) {
-                prefix = "";
-            } else if ("http://www.opengis.net/gml".equals(namespaceUri)) {
-                prefix = "gml";
-            } else if ("http://www.opengis.net/ogc".equals(namespaceUri)) {
-                prefix = "ogc";
-            } else if ("http://www.w3.org/1999/xlink".equals(namespaceUri)) {
-                prefix = "xlink";
-            } else if ("http://www.opengis.net/sa/1.0".equals(namespaceUri)) {
-                prefix = "sa";
-            }
-
-            return prefix;
-        }
-
-        /**
-         * Returns a list of namespace URIs that should be declared
-         * at the root element.
-         */
-        @Override
-        public String[] getPreDeclaredNamespaceUris() {
-            return new String[]{};
-        }
     }
 }
 

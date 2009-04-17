@@ -74,18 +74,18 @@ import java.text.Format;
 import javax.units.Unit;
 
 // Geotools dependencies
-import org.geotools.util.RangeSet;
-import org.geotools.gui.swing.ZoomPane;
-import org.geotools.gui.swing.ExceptionMonitor;
-import org.geotools.resources.ClassChanger;
+import org.geotoolkit.util.collection.RangeSet;
+import org.geotoolkit.gui.swing.ZoomPane;
+import org.geotoolkit.gui.swing.ExceptionMonitor;
+import org.geotoolkit.util.converter.ConverterRegistry;
 
 // Axis and graduation
 //import org.geotools.units.Unit;
-import org.geotools.axis.Axis2D;
-import org.geotools.axis.Graduation;
-import org.geotools.axis.DateGraduation;
-import org.geotools.axis.NumberGraduation;
-import org.geotools.axis.AbstractGraduation;
+import org.geotoolkit.display.axis.Axis2D;
+import org.geotoolkit.display.axis.Graduation;
+import org.geotoolkit.display.axis.DateGraduation;
+import org.geotoolkit.display.axis.NumberGraduation;
+import org.geotoolkit.display.axis.AbstractGraduation;
 
 // Resources
 import org.constellation.resources.i18n.Resources;
@@ -1710,13 +1710,13 @@ public class RangeBars extends ZoomPane {
             double maximum = this.maximum;
             try {
                 if (Double.isNaN(minimum)) {
-                    final Number min = ClassChanger.toNumber(RangeBars.this.getMinimum());
+                    final Number min = ConverterRegistry.toNumber(RangeBars.this.getMinimum());
                     if (min != null) {
                         minimum = min.doubleValue();
                     }
                 }
                 if (Double.isNaN(maximum)) {
-                    final Number max = ClassChanger.toNumber(RangeBars.this.getMaximum());
+                    final Number max = ConverterRegistry.toNumber(RangeBars.this.getMaximum());
                     if (max != null) {
                         maximum = max.doubleValue();
                     }

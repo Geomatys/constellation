@@ -49,9 +49,9 @@ import static org.constellation.ows.OWSExceptionCode.*;
 // Geotools dependencies
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies
 import org.opengis.referencing.FactoryException;

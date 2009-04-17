@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import java.util.logging.Level;
 import javax.swing.JTree;
 import javax.swing.JTable;
 import javax.swing.JFrame;
@@ -35,11 +36,12 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Classes;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.gui.swing.tree.Trees;
-import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.util.logging.Logging;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.gui.swing.tree.Trees;
+import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.util.logging.Logging;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
@@ -240,7 +242,7 @@ public final class Console extends Arguments {
                             continue;
                         }
                         final GridCoverage2D c = coverage.getCoverage(null);
-                        if (c.geophysics(true) != c.geophysics(false)) {
+                        if (c.view(ViewType.GEOPHYSICS) != c.view(ViewType.RENDERED)) {
                             continue;
                         }
                         message = "Pas de vue géophysique.";
@@ -339,7 +341,7 @@ public final class Console extends Arguments {
      * de données ainsi que le bon fonctionnement du paquet.
      */
     public static void main(String[] args) {
-        Logging.ALL.forceMonolineConsoleOutput();
+        Logging.ALL.forceMonolineConsoleOutput(Level.INFO);
         final Console console = new Console(args);
         try {
             console.run();

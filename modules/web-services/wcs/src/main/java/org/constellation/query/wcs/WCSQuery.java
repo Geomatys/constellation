@@ -18,7 +18,7 @@ package org.constellation.query.wcs;
 
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
 
 
 /**

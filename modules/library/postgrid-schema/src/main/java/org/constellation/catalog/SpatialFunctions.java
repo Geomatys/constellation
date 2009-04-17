@@ -19,7 +19,7 @@ package org.constellation.catalog;
 
 import java.util.Arrays;
 import org.opengis.geometry.Envelope;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 
 
 /**

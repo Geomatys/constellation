@@ -120,7 +120,6 @@ import org.constellation.ows.v100.ServiceProvider;
 import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
@@ -131,12 +130,13 @@ import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.TypeNames.*;
 
 //geotools dependencies
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.util.logging.MonolineFormatter;
+import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.factory.FactoryRegistry;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
+import org.geotoolkit.xml.XML;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -208,11 +208,6 @@ public class CSWworker {
     private CatalogueHarvester catalogueHarvester;
     
     /**
-     * Used to map a prefix with a namespace URI.
-     */
-    private NamespacePrefixMapperImpl prefixMapper;
-    
-    /**
      * A list of the supported Type name 
      */
     private List<QName> SUPPORTED_TYPE_NAME;
@@ -280,7 +275,6 @@ public class CSWworker {
     protected CSWworker(final String serviceID, final LinkedBlockingQueue<Unmarshaller> unmarshallers, final LinkedBlockingQueue<Marshaller> marshallers, File configDir) {
 
         this.unmarshallers = unmarshallers;
-        prefixMapper      = new NamespacePrefixMapperImpl("");
         if (configDir == null) {
             configDir    = getConfigDirectory();
             if (configDir == null) {
@@ -556,7 +550,7 @@ public class CSWworker {
                     if (tn != null) {
                         List<String> values = new ArrayList<String>();
                         for (QName qn : SUPPORTED_TYPE_NAME) {
-                            values.add(prefixMapper.getPreferredPrefix(qn.getNamespaceURI(), "", true) + ':' + qn.getLocalPart());
+                            values.add(XML.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
                     }
@@ -605,7 +599,7 @@ public class CSWworker {
                     if (tn != null) {
                         List<String> values = new ArrayList<String>();
                         for (QName qn : SUPPORTED_TYPE_NAME) {
-                            values.add(prefixMapper.getPreferredPrefix(qn.getNamespaceURI(), "", true) + ':' + qn.getLocalPart());
+                            values.add(XML.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
                     }
@@ -992,7 +986,7 @@ public class CSWworker {
             
         //we build ISO 19139 object    
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
-           List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
+           List<DefaultMetaData> records = new ArrayList<DefaultMetaData>();
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
@@ -1006,8 +1000,8 @@ public class CSWworker {
                 
                 //we get the metadata object
                 Object o = MDReader.getMetadata(id, ISO_19115, set, null);
-                if (o instanceof MetaDataImpl) {
-                    records.add((MetaDataImpl)o);
+                if (o instanceof DefaultMetaData) {
+                    records.add((DefaultMetaData)o);
                 } else {
                     logger.severe("the form " + id + " is not a ISO object");
                 }
@@ -1694,7 +1688,7 @@ public class CSWworker {
                 ID = ID + '-';
             }
             FileHandler handler  = new FileHandler(filePath + '/'+ ID + "cstl-csw.log");
-            handler.setFormatter(new MonolineFormatter());
+            handler.setFormatter(new MonolineFormatter(handler));
             logger.addHandler(handler);
         } catch (IOException ex) {
             logger.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());

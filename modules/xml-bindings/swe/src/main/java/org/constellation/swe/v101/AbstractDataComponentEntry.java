@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.constellation.catalog.Entry;
 import org.constellation.swe.AbstractDataComponent;
 /**

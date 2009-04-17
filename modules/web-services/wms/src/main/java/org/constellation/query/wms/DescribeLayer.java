@@ -19,7 +19,7 @@ package org.constellation.query.wms;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
 
 
 /**

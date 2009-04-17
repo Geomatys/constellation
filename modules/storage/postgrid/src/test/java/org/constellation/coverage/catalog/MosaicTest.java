@@ -24,8 +24,8 @@ import java.util.Set;
 import java.io.File;
 import org.junit.*;
 
-import org.geotools.coverage.grid.ViewType;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.constellation.catalog.DatabaseTest;

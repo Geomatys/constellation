@@ -23,7 +23,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.awt.image.RenderedImage;
 import javax.media.jai.RenderedOp;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import static org.constellation.coverage.model.CoverageBuilder.FACTORY;
 
 

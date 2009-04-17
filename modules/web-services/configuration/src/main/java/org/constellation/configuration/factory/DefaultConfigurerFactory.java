@@ -29,7 +29,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 public class DefaultConfigurerFactory extends AbstractConfigurerFactory {
 
     public DefaultConfigurerFactory() {
-        super(4);
+        super();
     }
     
     @Override

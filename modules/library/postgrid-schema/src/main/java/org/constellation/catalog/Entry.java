@@ -20,7 +20,7 @@ package org.constellation.catalog;
 import java.util.UUID;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlTransient;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

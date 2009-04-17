@@ -19,7 +19,7 @@ package org.constellation.coverage.catalog;
 
 import java.rmi.Remote;
 import java.io.IOException;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 
 
 /**

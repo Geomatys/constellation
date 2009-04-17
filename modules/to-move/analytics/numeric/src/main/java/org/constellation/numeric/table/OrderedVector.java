@@ -30,7 +30,7 @@ import static java.lang.Math.abs;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.System.arraycopy;
-import static org.geotools.resources.XArray.isSorted;
+import static org.geotoolkit.util.XArrays.isSorted;
 
 
 /**

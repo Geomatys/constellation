@@ -26,9 +26,9 @@ import java.text.ParseException;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.Category;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.IllegalRecordException;
 import org.constellation.catalog.Table;
@@ -36,8 +36,7 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -96,7 +95,7 @@ final class SampleDimensionTable extends Table {
                 } else try {
                     unit = (Unit) (UnitFormat.getInstance().parseObject(unitSymbol));
                 } catch (ParseException e) {
-                    throw new CatalogException(Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
+                    throw new CatalogException(Errors.format(Errors.Keys.UNPARSABLE_STRING_$2,
                             "unit(" + unitSymbol + ')',
                             unitSymbol.substring(Math.max(0, e.getErrorOffset()))), e);
                 }

@@ -29,8 +29,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.coverage.AbstractCoverage;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.coverage.AbstractCoverage;
+import org.geotoolkit.geometry.GeneralEnvelope;
 
 import org.constellation.catalog.CRS;
 

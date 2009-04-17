@@ -18,7 +18,7 @@
 package org.constellation.coverage.catalog;
 
 import org.opengis.coverage.SampleDimension;
-import org.geotools.coverage.Category;
+import org.geotoolkit.coverage.Category;
 
 
 /**

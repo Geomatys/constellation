@@ -21,11 +21,10 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.constellation.catalog.Entry;
 import org.constellation.ws.ServiceType;
-import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotoolkit.resources.Vocabulary;
 
 
 /**
@@ -266,7 +265,7 @@ final class SeriesEntry extends Entry implements Series {
     public String toString() {
         String name = super.toString();
         if (!isVisible()) {
-            name = name + " (" + Vocabulary.format(VocabularyKeys.HIDEN) + ')';
+            name = name + " (" + Vocabulary.format(Vocabulary.Keys.HIDEN) + ')';
         }
         return name;
     }

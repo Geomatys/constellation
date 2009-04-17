@@ -32,15 +32,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 
-import org.geotools.util.Utilities;
-import org.geotools.referencing.CRS;
-import org.geotools.resources.XArray;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.XArrays;
 import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GeneralGridGeometry;
-import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.referencing.AbstractIdentifiedObject;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.referencing.operation.matrix.MatrixFactory;
+import org.geotoolkit.referencing.operation.transform.ProjectiveTransform;
 
 
 /**
@@ -146,7 +146,7 @@ final class SpatialRefSysEntry {
             }
             return;
         }
-        elements = XArray.resize(elements, count);
+        elements = XArrays.resize(elements, count);
         Map<String,?> properties = AbstractIdentifiedObject.getProperties(crs);
         if (verticalCRS != null) {
             String name = crs.getName().getCode();
@@ -162,7 +162,7 @@ final class SpatialRefSysEntry {
             if (--count == 1) {
                 timelessCRS = elements[0];
             } else {
-                elements = XArray.resize(elements, count);
+                elements = XArrays.resize(elements, count);
                 timelessCRS = factory.createCompoundCRS(properties, elements);
             }
         }

@@ -20,7 +20,7 @@ package org.constellation.coverage.model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.geotools.resources.CharUtilities;
+import org.geotoolkit.util.Characters;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.SingletonTable;
@@ -136,7 +136,7 @@ public class DescriptorTable extends SingletonTable<Descriptor> {
                 final StringBuilder builder = new StringBuilder(name);
                 for (int i=builder.length(); --i>=0;) {
                     final char c = builder.charAt(i);
-                    final char n = CharUtilities.toSubScript(c);
+                    final char n = Characters.toSubScript(c);
                     if (c == n) {
                         break;
                     }

@@ -33,18 +33,16 @@ import javax.imageio.spi.ImageWriterSpi;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.referencing.CRS;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.image.io.mosaic.Tile;
-import org.geotools.image.io.mosaic.LargeTile;
-import org.geotools.image.io.mosaic.TileManager;
-import org.geotools.image.io.mosaic.MosaicBuilder;
-import org.geotools.image.io.mosaic.TileWritingPolicy;
-import org.geotools.image.io.mosaic.TileManagerFactory;
-import org.geotools.util.FrequencySortedSet;
-import org.geotools.util.logging.Logging;
-import org.geotools.console.Option;
-import org.geotools.resources.image.ImageUtilities;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.geometry.Envelope2D;
+import org.geotoolkit.image.io.mosaic.Tile;
+import org.geotoolkit.image.io.mosaic.TileManager;
+import org.geotoolkit.image.io.mosaic.MosaicBuilder;
+import org.geotoolkit.image.io.mosaic.TileWritingPolicy;
+import org.geotoolkit.image.io.mosaic.TileManagerFactory;
+import org.geotoolkit.util.collection.FrequencySortedSet;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.console.Option;
 import org.geotools.console.ExternalyConfiguredCommandLine;
 
 import org.constellation.catalog.Database;
@@ -52,6 +50,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.coverage.catalog.WritableGridCoverageEntry;
 import org.constellation.coverage.catalog.WritableGridCoverageTable;
+import org.geotoolkit.image.jai.Registry;
 
 
 /**
@@ -130,39 +129,39 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Write the tiles to the target directory, skipping existing ones.")
+    @Option(/*description="Write the tiles to the target directory, skipping existing ones."*/)
     private boolean write;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Write the tiles to the target directory, overwriting existing ones.")
+    @Option(/*description="Write the tiles to the target directory, overwriting existing ones."*/)
     private boolean overwrite;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Do not ommit empty tiles (default is to skip them).")
+    @Option(/*description="Do not ommit empty tiles (default is to skip them)."*/)
     private boolean empty;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Insert the tiles metadata in the database.")
+    @Option(/*description="Insert the tiles metadata in the database."*/)
     private boolean insert;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Print the SQL statements rather than executing them (for debugging only).")
+    @Option(/*description="Print the SQL statements rather than executing them (for debugging only)."*/)
     private boolean pretend;
 
     /**
      * Disables JAI codecs. Experience shows that the coded bundled in J2SE work better.
      */
     static {
-        ImageUtilities.allowNativeCodec("PNG", ImageReaderSpi.class, false);
-        ImageUtilities.allowNativeCodec("PNG", ImageWriterSpi.class, false);
+        Registry.setNativeCodecAllowed("PNG", ImageReaderSpi.class, false);
+        Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
     }
 
     /**
@@ -251,7 +250,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                 if (sourceDirectory != null && !file.isAbsolute()) {
                     file = new File(sourceDirectory, filename);
                 }
-                final Tile tile = new LargeTile(null, file, 0, origin, null);
+                // TODO: was LargeTile
+                final Tile tile = new Tile(null, file, 0, origin, null);
                 tiles.add(tile);
             }
         }
@@ -293,7 +293,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                             + " is identical to the one for " + existing);
                     warnings++;
                 }
-                final Tile tile = new LargeTile(null, file, 0, null, tr);
+                // TODO: was LargeTile
+                final Tile tile = new Tile(null, file, 0, null, tr);
                 tiles.add(tile);
             }
         }

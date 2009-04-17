@@ -41,13 +41,14 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotools.resources.Arguments;
 
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
-import org.geotools.image.io.metadata.GeographicMetadata;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.image.io.metadata.GeographicMetadata;
 
 
 /**
@@ -249,7 +250,7 @@ public final class ImageViewer {
             final String name = names.get(format.getKey());
             out.print("  ");
             out.print(name);
-            out.print(org.geotools.util.Utilities.spaces(length - name.length()));
+            out.print(org.geotoolkit.util.Utilities.spaces(length - name.length()));
             out.print(" (");
             out.print(format.getValue());
             out.println(')');
@@ -315,7 +316,7 @@ public final class ImageViewer {
             for (final String file : args) {
                 final CoverageReference ref = coverages.getEntry(file);
                 final GridCoverage2D coverage = ref.getCoverage(null);
-                final RenderedImage image = coverage.geophysics(false).getRenderedImage();
+                final RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
                 printProperties(image, out);
                 if (show) {
                     show(image, file);

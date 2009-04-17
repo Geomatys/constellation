@@ -37,9 +37,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.gui.swing.ExceptionMonitor;
-import org.geotools.gui.swing.image.OperationTreeBrowser;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.gui.swing.ExceptionMonitor;
+import org.geotoolkit.gui.swing.image.OperationTreeBrowser;
 import org.geotools.resources.Arguments;
 
 import org.constellation.catalog.CatalogException;
@@ -162,7 +163,7 @@ public final class CoverageBrowser {
                 ExceptionMonitor.show(desktop, e);
             }
         }
-        final OperationTreeBrowser browser = new OperationTreeBrowser(coverage.geophysics(false).getRenderedImage());
+        final OperationTreeBrowser browser = new OperationTreeBrowser(coverage.view(ViewType.RENDERED).getRenderedImage());
         final JInternalFrame frame = new JInternalFrame(name, true, true, true, true);
         frame.add(browser);
         frame.setSize(400, 400);

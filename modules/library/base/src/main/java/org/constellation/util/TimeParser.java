@@ -21,9 +21,8 @@ import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.util.logging.LoggedFormat;
+import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.logging.LoggedFormat;
 
 
 /**
@@ -230,7 +229,7 @@ public final class TimeParser {
     static long parsePeriod(final String period) throws ParseException {
         final int length = period.length();
         if (length!=0 && Character.toUpperCase(period.charAt(0)) != 'P') {
-            throw new ParseException(Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
+            throw new ParseException(Errors.format(Errors.Keys.UNPARSABLE_STRING_$2,
                     period, period.substring(0,1)), 0);
         }
         long millis = 0;
@@ -248,7 +247,7 @@ public final class TimeParser {
             letter = period.charAt(upper);
             while (!Character.isLetter(letter) || letter == 'e' || letter == 'E') {
                 if (++upper >= length) {
-                    throw new ParseException(Errors.format(ErrorKeys.UNEXPECTED_END_OF_STRING), lower);
+                    throw new ParseException(Errors.format(Errors.Keys.UNEXPECTED_END_OF_STRING), lower);
                 }
                 letter = period.charAt(upper);
             }
@@ -259,7 +258,7 @@ public final class TimeParser {
                 value = Double.parseDouble(number);
             } catch (NumberFormatException exception) {
                 ParseException e = new ParseException(Errors.format(
-                        ErrorKeys.UNPARSABLE_NUMBER_$1, number), lower);
+                        Errors.Keys.UNPARSABLE_NUMBER_$1, number), lower);
                 e.initCause(exception);
                 throw e;
             }

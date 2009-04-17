@@ -29,7 +29,7 @@ import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

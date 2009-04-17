@@ -16,7 +16,7 @@
  */
 package org.constellation.query;
 
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
 
 
 /**

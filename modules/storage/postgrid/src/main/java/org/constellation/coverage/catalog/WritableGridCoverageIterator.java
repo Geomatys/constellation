@@ -25,7 +25,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import java.lang.reflect.UndeclaredThrowableException;
-import org.geotools.image.io.mosaic.Tile;
+import org.geotoolkit.image.io.mosaic.Tile;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 

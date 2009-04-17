@@ -31,8 +31,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.util.NumberRange;
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.DateRange;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Operation;

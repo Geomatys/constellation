@@ -18,7 +18,7 @@ package org.constellation.sos.v100;
 
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

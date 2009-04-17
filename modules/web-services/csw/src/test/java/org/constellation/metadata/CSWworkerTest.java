@@ -28,7 +28,6 @@ import java.util.List;
 
 // JAXB dependencies
 import java.util.concurrent.LinkedBlockingQueue;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -73,8 +72,7 @@ import org.constellation.ows.v100.BoundingBoxType;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.geotools.metadata.iso.ExtendedElementInformationImpl;
+import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import static org.constellation.ows.OWSExceptionCode.*;
 import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
 import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
@@ -82,12 +80,13 @@ import static org.constellation.metadata.TypeNames.*;
 import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
 
 // geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 
 // JUnit dependencies
-import org.geotools.util.SimpleInternationalString;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
@@ -103,17 +102,15 @@ public class CSWworkerTest {
 
     private CSWworker worker;
 
-    private Unmarshaller unmarshaller;
+    private static MarshallerPool pool;
+    private static Unmarshaller unmarshaller;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        JAXBContext context = JAXBContext.newInstance(org.constellation.generic.database.ObjectFactory.class);
-        Marshaller marshaller          = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+        pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
+        unmarshaller = pool.acquireUnmarshaller();
 
         File configDir = new File("CSWWorkerTest");
         if (!configDir.exists()) {
@@ -131,8 +128,9 @@ public class CSWworkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+            final Marshaller marshaller = pool.acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-
+            pool.release(marshaller);
         }
 
     }
@@ -140,6 +138,7 @@ public class CSWworkerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         deleteTemporaryFile();
+        pool.release(unmarshaller);
     }
 
     public static void deleteTemporaryFile() {
@@ -171,13 +170,9 @@ public class CSWworkerTest {
         LinkedBlockingQueue<Unmarshaller> unmarshallers = new LinkedBlockingQueue<Unmarshaller>();
         LinkedBlockingQueue<Marshaller> marshallers     = new LinkedBlockingQueue<Marshaller>();
 
-        JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
-
-        unmarshaller      = context.createUnmarshaller();
-        Marshaller marshaller          = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
+        unmarshaller = pool.acquireUnmarshaller();
+        final Marshaller marshaller = pool.acquireMarshaller();
 
         unmarshallers.add(unmarshaller);
         marshallers.add(marshaller);
@@ -190,6 +185,9 @@ public class CSWworkerTest {
 
     @After
     public void tearDown() throws Exception {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
     }
 
     /**
@@ -322,11 +320,11 @@ public class CSWworkerTest {
         assertTrue(result.getAbstractRecord().size() == 0);
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
-        assertTrue(obj instanceof MetaDataImpl);
+        assertTrue(obj instanceof DefaultMetaData);
 
-        MetaDataImpl isoResult = (MetaDataImpl) obj;
+        DefaultMetaData isoResult = (DefaultMetaData) obj;
 
-        MetaDataImpl ExpResult1 = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         assertEquals(ExpResult1, isoResult);
 
@@ -848,10 +846,10 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof MetaDataImpl);
+        assertTrue(obj instanceof DefaultMetaData);
 
-        MetaDataImpl isoResult = (MetaDataImpl) obj;
-        MetaDataImpl ExpResult1 = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetaData isoResult = (DefaultMetaData) obj;
+        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
         assertEquals(ExpResult1, isoResult);
 
         // we delete the metadata
@@ -888,7 +886,7 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
-        MetaDataImpl ExpResult1 = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         InsertType insert       = new InsertType(ExpResult1);
         TransactionType request = new TransactionType("CSW", "2.0.2", insert);
@@ -906,9 +904,9 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof MetaDataImpl);
+        assertTrue(obj instanceof DefaultMetaData);
 
-        MetaDataImpl isoResult = (MetaDataImpl) obj;
+        DefaultMetaData isoResult = (DefaultMetaData) obj;
         assertEquals(ExpResult1, isoResult);
 
     }
@@ -925,7 +923,7 @@ public class CSWworkerTest {
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
 
-        MetaDataImpl replacement        = (MetaDataImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
+        DefaultMetaData replacement        = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
         QueryConstraintType constraint  = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
         UpdateType update               = new UpdateType(replacement, constraint);
         TransactionType request         = new TransactionType("CSW", "2.0.2", update);
@@ -959,9 +957,9 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof MetaDataImpl);
+        assertTrue(obj instanceof DefaultMetaData);
 
-        MetaDataImpl isoResult = (MetaDataImpl) obj;
+        DefaultMetaData isoResult = (DefaultMetaData) obj;
         assertEquals(replacement, isoResult);
 
 
@@ -985,7 +983,7 @@ public class CSWworkerTest {
 
         List<String> results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1018,7 +1016,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1044,7 +1042,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1071,7 +1069,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1101,7 +1099,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1122,7 +1120,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1159,7 +1157,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1176,7 +1174,7 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
         properties = new ArrayList<RecordPropertyType>();
-        GeographicBoundingBoxImpl geographicElement = new GeographicBoundingBoxImpl(1.1, 1.1, 1.1, 1.1);
+        DefaultGeographicBoundingBox geographicElement = new DefaultGeographicBoundingBox(1.1, 1.1, 1.1, 1.1);
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", geographicElement));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1198,7 +1196,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1228,7 +1226,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1240,7 +1238,7 @@ public class CSWworkerTest {
 
         // we update the metadata 11325_158_19640418141800 by replacing the language eng by a responsibleParty
         constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
-        ResponsiblePartyImpl value = new ResponsiblePartyImpl(Role.AUTHOR);
+        DefaultResponsibleParty value = new DefaultResponsibleParty(Role.AUTHOR);
         properties = new ArrayList<RecordPropertyType>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/language",value));
         update     = new UpdateType(properties, constraint);
@@ -1265,7 +1263,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1308,7 +1306,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1326,7 +1324,7 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
         properties = new ArrayList<RecordPropertyType>();
-        value = new ResponsiblePartyImpl(Role.AUTHOR);
+        value = new DefaultResponsibleParty(Role.AUTHOR);
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", value));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1353,7 +1351,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1381,7 +1379,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1413,7 +1411,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1436,7 +1434,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1463,7 +1461,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1495,7 +1493,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1518,7 +1516,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            MetaDataImpl meta = (MetaDataImpl) objRec;
+            DefaultMetaData meta = (DefaultMetaData) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1547,7 +1545,7 @@ public class CSWworkerTest {
         }
 
         assertTrue(exe != null);
-        assertEquals("The property:abstract in the class:class org.geotools.metadata.iso.identification.DataIdentificationImpl is not a collection", exe.getMessage());
+        assertEquals("The property:abstract in the class:class org.geotoolkit.metadata.iso.identification.DefaultDataIdentification is not a collection", exe.getMessage());
 
         /*
          *  TEST 12 : we try to update the metadata 42292_9s_1990061004100 by replacing a numeroted single Property
@@ -1569,7 +1567,7 @@ public class CSWworkerTest {
         }
 
         assertTrue(exe != null);
-        assertEquals("The property:distributionInfo in the class:class org.geotools.metadata.iso.MetaDataImpl is not a collection", exe.getMessage());
+        assertEquals("The property:distributionInfo in the class:class org.geotoolkit.metadata.iso.DefaultMetaData is not a collection", exe.getMessage());
 
 
         /*
@@ -1580,7 +1578,7 @@ public class CSWworkerTest {
         // we update the metadata 42292_9s_1990061004100 by replacing the abstract field from "Salinity of the water column" to "something".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<RecordPropertyType>();
-        ExtendedElementInformationImpl ext = new ExtendedElementInformationImpl("extendedName",
+        DefaultExtendedElementInformation ext = new DefaultExtendedElementInformation("extendedName",
                                                                                 new SimpleInternationalString("some definition"),
                                                                                 new SimpleInternationalString("some condition"),
                                                                                 Datatype.ABSTRACT_CLASS, null, null, null);
@@ -1601,14 +1599,14 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof MetaDataImpl);
+        assertTrue(obj instanceof DefaultMetaData);
 
-        isoResult = (MetaDataImpl) obj;
-        ExtendedElementInformationImpl extResult = null;
+        isoResult = (DefaultMetaData) obj;
+        DefaultExtendedElementInformation extResult = null;
         boolean removed = true;
         for (ExtendedElementInformation ex : isoResult.getMetadataExtensionInfo().iterator().next().getExtendedElementInformation()) {
             if (ex.getName().equals("extendedName")) {
-                extResult = (ExtendedElementInformationImpl) ex;
+                extResult = (DefaultExtendedElementInformation) ex;
             } else if (ex.getName().equals("SDN:L031:2:")) {
                 removed = false;
             }

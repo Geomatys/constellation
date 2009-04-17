@@ -52,7 +52,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 
 // Geotools dependencies
-import org.geotools.gui.swing.DisjointLists;
+import org.geotoolkit.gui.swing.DisjointLists;
 import org.geotools.resources.SwingUtilities;
 
 // J2SE dependencies

@@ -36,15 +36,15 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.util.DateRange;
-import org.geotools.util.NumberRange;
-import org.geotools.util.Utilities;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import static org.geotools.referencing.CRS.getCoordinateOperationFactory;
-import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
-import static org.geotools.referencing.CRS.transform;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.display.shape.FloatDimension2D;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import static org.geotoolkit.referencing.CRS.getCoordinateOperationFactory;
+import static org.geotoolkit.referencing.CRS.equalsIgnoreMetadata;
+import static org.geotoolkit.referencing.CRS.transform;
 
 
 /**
@@ -282,7 +282,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         boolean changed = false;
         final CRS crsType = getDatabase().crsType;
         if (crsType.xdim >= 0 && crsType.ydim >= 0) {
-            final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(
+            final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(
                     envelope.getMinimum(crsType.xdim),
                     envelope.getMaximum(crsType.xdim),
                     envelope.getMinimum(crsType.ydim),
@@ -316,7 +316,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @see #trimEnvelope
      */
     public synchronized GeographicBoundingBox getGeographicBoundingBox() {
-        return new GeographicBoundingBoxImpl(xMin, xMax, yMin, yMax);
+        return new DefaultGeographicBoundingBox(xMin, xMax, yMin, yMax);
     }
 
     /**
@@ -357,7 +357,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @see #trimEnvelope
      */
     public synchronized NumberRange getVerticalRange() {
-        return new NumberRange(zMin, zMax);
+        return NumberRange.create(zMin, zMax);
     }
 
     /**
@@ -473,7 +473,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     public synchronized Dimension2D getPreferredResolution() {
         if (xResolution > 0 || yResolution > 0) {
-            return new XDimension2D.Float(xResolution, yResolution);
+            return new FloatDimension2D(xResolution, yResolution);
         } else {
             return null;
         }

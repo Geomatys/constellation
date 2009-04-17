@@ -38,12 +38,12 @@ import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.util.Utilities;
-import org.geotools.util.DateRange;
-import org.geotools.util.MeasurementRange;
-import org.geotools.resources.XArray;
-import org.geotools.coverage.CoverageStack;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.XArrays;
+import org.geotoolkit.coverage.CoverageStack;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 
 import org.constellation.catalog.Entry;
 import org.constellation.catalog.CatalogException;
@@ -279,7 +279,7 @@ final class LayerEntry extends Entry implements Layer {
                         length = candidates.length;
                     } else {
                         length = ranges.length;
-                        ranges = XArray.resize(ranges, candidates.length);
+                        ranges = XArrays.resize(ranges, candidates.length);
                         System.arraycopy(candidates, length, ranges, length, candidates.length - length);
                     }
                     for (int i=0; i<length; i++) {
@@ -334,7 +334,7 @@ final class LayerEntry extends Entry implements Layer {
             }
             return data.getGeographicBoundingBox();
         }
-        return GeographicBoundingBoxImpl.WORLD;
+        return DefaultGeographicBoundingBox.WORLD;
     }
 
     /**

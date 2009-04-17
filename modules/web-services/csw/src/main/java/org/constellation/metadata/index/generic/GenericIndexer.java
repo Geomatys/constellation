@@ -56,7 +56,7 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotools.temporal.object.DefaultInstant;
 
 // geoAPI dependencies
@@ -212,7 +212,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.finer("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
+            logger.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
 
         } catch (SQLException ex) {
             logger.severe("SQLException " + ex.getMessage());
@@ -238,7 +238,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.finer("Metadata: " + ((MetaDataImpl)meta).getFileIdentifier() + " indexed");
+            logger.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
 
             writer.optimize();
             writer.close();
@@ -267,7 +267,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         final Document doc = new Document();
         CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
-        doc.add(new Field("id", ((MetaDataImpl)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("id", ((DefaultMetaData)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
 
         final StringBuilder anyText = new StringBuilder();
@@ -343,13 +343,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
                 }
             } else {
-                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
             }
 
         } catch (NumberFormatException e) {
             if (!coord.equals("null")) {
-                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause:  unable to parse double: " + coord);
             }
         }
@@ -427,13 +427,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
                 }
             } else {
-                logger.severe("unable to spatially index form: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
             }
             
         } catch (NumberFormatException e) {
             if (!coord.equals("null"))
-                logger.severe("unable to spatially index metadata: " + ((MetaDataImpl)metadata).getFileIdentifier() + '\n' +
+                logger.severe("unable to spatially index metadata: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
 

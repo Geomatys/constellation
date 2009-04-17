@@ -129,9 +129,9 @@ import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingPoint;
 
 //geotools dependencies
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.util.logging.MonolineFormatter;
+import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.factory.FactoryRegistry;
+import org.geotoolkit.util.logging.MonolineFormatter;
 
 /**
  *
@@ -1864,7 +1864,7 @@ public class SOSworker {
                 ID = ID + '-';
             }
             FileHandler handler  = new FileHandler(filePath + '/'+ ID + "cstl-sos.log");
-            handler.setFormatter(new MonolineFormatter());
+            handler.setFormatter(new MonolineFormatter(handler));
             logger.addHandler(handler);
         } catch (IOException ex) {
             logger.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());

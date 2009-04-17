@@ -28,7 +28,8 @@ import java.util.Set;
 
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.configuration.ProviderSource;
-import org.geotools.factory.CommonFactoryFinder;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotools.sld.MutableLayer;
 import org.geotools.sld.MutableLayerStyle;
 import org.geotools.sld.MutableNamedLayer;
@@ -36,11 +37,11 @@ import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.sld.MutableUserLayer;
 import org.geotools.style.MutableFeatureTypeStyle;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.StyleFactory;
-import org.geotools.style.sld.Specification.StyledLayerDescriptor;
-import org.geotools.style.sld.Specification.SymbologyEncoding;
-import org.geotools.style.sld.XMLUtilities;
-import org.geotools.util.SoftValueHashMap;
+import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotools.style.MutableStyleFactory;
+import org.geotools.style.xml.Specification.StyledLayerDescriptor;
+import org.geotools.style.xml.Specification.SymbologyEncoding;
+import org.geotools.style.xml.XMLUtilities;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
@@ -54,7 +55,8 @@ public class SLDProvider implements StyleProvider{
     public static final String KEY_FOLDER_PATH = "path";
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.sld");
-    private static final StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
+    private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
     private static final Collection<String> masks = new ArrayList<String>();
 
     static{

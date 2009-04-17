@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Configuration for the "xacml-security" module of Constellation project.
   Version: $Id$
@@ -52,11 +52,11 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-referencing</artifactId>
+      <artifactId>gtm-referencing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-coverage</artifactId>
+      <artifactId>gtm-coverage</artifactId>
     </dependency>
   </dependencies>
 

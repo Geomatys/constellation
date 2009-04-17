@@ -19,8 +19,8 @@ package org.constellation.coverage.model;
 
 import java.util.List;
 import org.opengis.coverage.Coverage;
-import org.geotools.resources.XArray;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.XArrays;
+import org.geotoolkit.util.Utilities;
 import org.constellation.catalog.Entry;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
@@ -92,8 +92,8 @@ abstract class ModelEntry extends Entry implements Model {
                     index[count++] = i;
                 }
             }
-            this.distributions = distributions = XArray.resize(distributions, count);
-            this.index         = index         = XArray.resize(index,         count);
+            this.distributions = distributions = XArrays.resize(distributions, count);
+            this.index         = index         = XArrays.resize(index,         count);
         }
         for (int i=0; i<index.length; i++) {
             final int n = index[i];

@@ -27,11 +27,10 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
 
-import org.geotools.console.Option;
-import org.geotools.console.CommandLine;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.image.ImageUtilities;
+import org.geotoolkit.console.Option;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -44,31 +43,31 @@ public final class Reformat extends CommandLine implements FileFilter {
     /**
      * The target format, or {@code null} if nothing should be written.
      */
-    @Option(description="The target format (omitted if nothing should be written).")
+    @Option(/*description="The target format (omitted if nothing should be written)."*/)
     private String format;
 
     /**
      * The color model as one of RGB or ARGB constants, or {@code null} if no change.
      */
-    @Option(description="The color model. One of \"RGB\" or \"ARGB\".")
+    @Option(/*description="The color model. One of \"RGB\" or \"ARGB\"."*/)
     private String model;
 
     /**
      * The target directory. If omitted, will be the same than the source images.
      */
-    @Option(name="target-directory", description="The flat target directory. Default is same directory than source.")
+    @Option(name="target-directory"/*, description="The flat target directory. Default is same directory than source."*/)
     private String targetDirectory;
 
     /**
      * A file listing the images to process, or {@code null} if none.
      */
-    @Option(description="The images to process as a file listing them.")
+    @Option(/*description="The images to process as a file listing them."*/)
     private String file;
 
     /**
      * {@code true} for scanning recursively into directories.
      */
-    @Option(description="Scan recursively into directories.")
+    @Option(/*description="Scan recursively into directories."*/)
     private boolean recursive;
 
     /**
@@ -90,28 +89,29 @@ public final class Reformat extends CommandLine implements FileFilter {
      * Creates an instance of {@code Reformat} for the given arguments.
      */
     private Reformat(final String[] args) {
-        super(args, Integer.MAX_VALUE);
+        super(null, args);
     }
 
     /**
      * Executes the command for every files given on the command-line.
      */
-    private void run() throws IOException {
+    @Override
+    public void run() {
         if (model != null) {
             if (model.equalsIgnoreCase("ARGB")) {
                 destinationType = BufferedImage.TYPE_INT_ARGB;
             } else if (model.equalsIgnoreCase("RGB")) {
                 destinationType = BufferedImage.TYPE_INT_RGB;
             } else {
-                err.println(Errors.format(ErrorKeys.UNKNOW_PARAMETER_$1, model));
+                err.println(Errors.format(Errors.Keys.UNKNOW_PARAMETER_$1, model));
                 System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
             }
         }
         if (format != null) {
-            ImageUtilities.allowNativeCodec(format, ImageWriterSpi.class, false);
+            Registry.setNativeCodecAllowed(format, ImageWriterSpi.class, false);
             final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName(format);
             if (!it.hasNext()) {
-                err.println(Errors.format(ErrorKeys.UNKNOW_IMAGE_FORMAT_$1, format));
+                err.println(Errors.format(Errors.Keys.UNKNOW_IMAGE_FORMAT_$1, format));
                 System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
             }
             writer = it.next();
@@ -119,18 +119,28 @@ public final class Reformat extends CommandLine implements FileFilter {
             suffix = (suffixes != null && suffixes.length != 0) ? suffixes[0] : format;
         }
         if (file != null) {
-            final BufferedReader in = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.length() != 0 && line.charAt(0) != '#') {
-                    run(new File(line));
+            try {
+                final BufferedReader in = new BufferedReader(new FileReader(file));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    line = line.trim();
+                    if (line.length() != 0 && line.charAt(0) != '#') {
+                        run(new File(line));
+                    }
                 }
+                in.close();
+            } catch (IOException ex) {
+                err.println(ex);
+                System.exit(IO_EXCEPTION_EXIT_CODE);
             }
-            in.close();
         }
         for (final String filename : arguments) {
-            run(new File(filename));
+            try {
+                run(new File(filename));
+            } catch (IOException ex) {
+                err.println(ex);
+                System.exit(IO_EXCEPTION_EXIT_CODE);
+            }
         }
         if (writer != null) {
             writer.dispose();
@@ -230,11 +240,6 @@ public final class Reformat extends CommandLine implements FileFilter {
      */
     public static void main(String[] args) {
         final Reformat worker = new Reformat(args);
-        try {
-            worker.run();
-        } catch (IOException e) {
-            worker.err.println(e);
-            System.exit(IO_EXCEPTION_EXIT_CODE);
-        }
+        worker.run();
     }
 }

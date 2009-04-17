@@ -22,7 +22,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
-import org.geotools.resources.Classes;
+import org.geotoolkit.util.converter.Classes;
 
 
 /**

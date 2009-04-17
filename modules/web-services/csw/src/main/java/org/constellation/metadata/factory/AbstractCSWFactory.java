@@ -30,16 +30,16 @@ import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
-import org.geotools.factory.AbstractFactory;
+import org.geotoolkit.factory.Factory;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractCSWFactory extends AbstractFactory {
+public abstract class AbstractCSWFactory extends Factory {
 
-    public AbstractCSWFactory(int priority) {
-        super(priority);
+    public AbstractCSWFactory() {
+        super();
     }
     
     public abstract MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException;

@@ -52,28 +52,27 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import org.geotools.image.io.IIOListeners;
+import org.geotoolkit.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
-import org.geotools.image.io.mosaic.MosaicImageReadParam;
-import org.geotools.image.io.mosaic.TileManager;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.ViewType;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-
-import org.geotools.util.Utilities;
-import org.geotools.util.DateRange;
-import org.geotools.util.NumberRange;
-import org.geotools.util.logging.Logging;
-import org.geotools.referencing.CRS;
-import org.geotools.resources.Classes;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotoolkit.image.io.mosaic.MosaicImageReadParam;
+import org.geotoolkit.image.io.mosaic.TileManager;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.coverage.grid.GridGeometry2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverageFactory;
+import org.geotoolkit.display.shape.FloatDimension2D;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.referencing.operation.matrix.XAffineTransform;
 
 import org.constellation.catalog.Entry;
 import org.constellation.coverage.model.Operation;
@@ -765,7 +764,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         if (settings.resolution == null) {
             return true;
         }
-        final XDimension2D.Float resolution = new XDimension2D.Float();
+        final FloatDimension2D resolution = new FloatDimension2D();
         try {
             return computeBounds(null, resolution) && resolution.width <= 1 && resolution.height <= 1;
         } catch (TransformException exception) {
@@ -850,7 +849,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             buffer.append(" (").append(settings.format(new Date((startTime+endTime)/2))).append(')');
         }
         buffer.append(' ')
-              .append(GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
+              .append(DefaultGeographicBoundingBox.toString(getGeographicBoundingBox(),
                       GridCoverageTable.ANGLE_PATTERN, null))
               .append(']');
         return buffer.toString();

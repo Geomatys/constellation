@@ -31,12 +31,12 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import org.geotools.util.Utilities;
-import org.geotools.coverage.grid.GeneralGridGeometry;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
-import org.geotools.referencing.operation.matrix.XMatrix;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.referencing.operation.transform.AffineTransform2D;
+import org.geotoolkit.referencing.operation.matrix.MatrixFactory;
+import org.geotoolkit.referencing.operation.matrix.XMatrix;
 
 import org.constellation.catalog.Entry;
 
@@ -203,14 +203,14 @@ final class GridGeometryEntry extends Entry {
     /**
      * Returns a copy of the geographic bounding box. This copy can be freely modified.
      */
-    public GeographicBoundingBoxImpl getGeographicBoundingBox() {
+    public DefaultGeographicBoundingBox getGeographicBoundingBox() {
         Rectangle2D bounds;
         if (geographicBoundingShape instanceof Rectangle2D) {
             bounds = (Rectangle2D) geographicBoundingShape;
         } else {
             bounds = geographicBoundingShape.getBounds2D();
         }
-        return new GeographicBoundingBoxImpl(bounds);
+        return new DefaultGeographicBoundingBox(bounds);
     }
 
     /**

@@ -31,8 +31,8 @@ import org.constellation.catalog.UpdatePolicy;
 import org.constellation.catalog.ServerException;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.WritableGridCoverageTable;
-import org.geotools.console.CommandLine;
-import org.geotools.console.Option;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.console.Option;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.jdom.Element;
 import static org.constellation.catalog.UpdatePolicy.*;
@@ -69,49 +69,49 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Print SQL statements rather than executing them (for debugging only).")
+    @Option(/*description="Print SQL statements rather than executing them (for debugging only)."*/)
     private boolean pretend;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Replace existing records.")
+    @Option(/*description="Replace existing records."*/)
     private boolean replace;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Clear records before adding new ones.")
+    @Option(/*description="Clear records before adding new ones."*/)
     private boolean clear;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Path where to collect data.")
+    @Option(/*description="Path where to collect data."*/)
     protected String path;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Variable in Netcdf files to consider.")
+    @Option(/*description="Variable in Netcdf files to consider."*/)
     private String variable;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Layer to consider.", mandatory=true)
+    @Option(/*description="Layer to consider.", mandatory=true*/)
     protected String layer;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Serie's format.", mandatory=true)
+    @Option(/*description="Serie's format.", mandatory=true*/)
     protected String format;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Type of process to launch. Should be : \"ncml\", \"opendap\" or \"caraibes\".")
+    @Option(/*description="Type of process to launch. Should be : \"ncml\", \"opendap\" or \"caraibes\"."*/)
     protected String type;
 
     /**
@@ -120,7 +120,7 @@ public class Collector extends CommandLine {
      * @param args An array of arguments.
      */
     public Collector(final String[] args) {
-        super(args, 0);
+        super(null, args);
         updatePolicy = clear ? CLEAR_BEFORE_UPDATE : replace ? REPLACE_EXISTING : SKIP_EXISTING;
     }
 

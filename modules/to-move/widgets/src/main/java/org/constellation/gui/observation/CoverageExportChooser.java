@@ -62,18 +62,18 @@ import java.util.LinkedHashSet;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.Operations;
-import org.geotools.image.io.IIOListeners;
-import org.geotools.gui.swing.ProgressWindow;
-import org.geotools.gui.swing.ExceptionMonitor;
+import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.processing.Operations;
+import org.geotoolkit.image.io.IIOListeners;
+import org.geotoolkit.gui.swing.ProgressWindow;
+import org.geotoolkit.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.io.MetadataBuilder;
 import org.geotools.util.ProgressListener;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.CRSUtilities;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 
 // Constellation
 import org.constellation.coverage.catalog.CoverageReference;

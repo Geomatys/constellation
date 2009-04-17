@@ -23,8 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
-import org.geotools.console.CommandLine;
-import org.geotools.console.Option;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.console.Option;
 
 
 /**
@@ -39,55 +39,55 @@ public class PrepareDatabase extends CommandLine {
     /**
      * Layer name.
      */
-    @Option(name="layer", description="Layer name.", mandatory=true)
+    @Option(name="layer", /*description="Layer name.",*/ mandatory=true)
     private String layerName;
 
     /**
      * Thematic for this layer.
      */
-    @Option(description="Layer thematic.")
+    @Option(/*description="Layer thematic."*/)
     private String thematic;
 
     /**
      * Procedure for this layer.
      */
-    @Option(description="Layer procedure.")
+    @Option(/*description="Layer procedure."*/)
     private String procedure;
 
     /**
      * Period for this layer.
      */
-    @Option(description="Layer period.")
+    @Option(/*description="Layer period."*/)
     private Double period;
 
     /**
      * Thematic for this layer.
      */
-    @Option(description="Layer description.")
+    @Option(/*description="Layer description."*/)
     private String description;
 
     /**
      * Identifier for the serie.
      */
-    @Option(description="Serie identifier.")
+    @Option(/*description="Serie identifier."*/)
     private String identifier;
 
     /**
      * Identifier for the serie.
      */
-    @Option(description="File extension for this serie.")
+    @Option(/*description="File extension for this serie."*/)
     private String extension;
 
     /**
      * Identifier for the serie.
      */
-    @Option(name="pathname", description="Serie path on the server")
+    @Option(name="pathname"/*, description="Serie path on the server"*/)
     private String pathName;
 
     /**
      * Identifier for the serie.
      */
-    @Option(description="Serie format. This value should be contained in the 'Formats' table.")
+    @Option(/*description="Serie format. This value should be contained in the 'Formats' table."*/)
     private String format;
 
     /**
@@ -100,7 +100,7 @@ public class PrepareDatabase extends CommandLine {
      * given.
      */
     public PrepareDatabase(String[] args) {
-        super(args, 0);
+        super(null, args);
     }
 
     /**

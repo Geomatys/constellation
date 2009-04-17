@@ -23,7 +23,7 @@ import java.util.BitSet;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 

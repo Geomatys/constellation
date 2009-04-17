@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractComponentList;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  * <p>Java class for anonymous complex type.

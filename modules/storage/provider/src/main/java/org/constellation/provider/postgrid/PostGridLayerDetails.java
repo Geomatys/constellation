@@ -45,21 +45,22 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotools.coverage.io.CoverageReader;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.ElevationModel;
 import org.geotools.map.MapLayer;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
 import org.geotools.style.StyleConstants;
 import org.geotools.style.function.InterpolationPoint;
 import org.geotools.style.function.Method;
 import org.geotools.style.function.Mode;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
@@ -134,7 +135,7 @@ class PostGridLayerDetails implements LayerDetails {
         //Create BBOX-----------------------------------------------------------
         final GeographicBoundingBox bbox;
         try {
-            bbox = new GeographicBoundingBoxImpl(renv);
+            bbox = new DefaultGeographicBoundingBox(renv);
         } catch (TransformException ex) {
             throw new CatalogException(ex);
         }
@@ -142,7 +143,7 @@ class PostGridLayerDetails implements LayerDetails {
         //Create resolution-----------------------------------------------------
         final double w = renv.toRectangle2D().getWidth()  / width;
         final double h = renv.toRectangle2D().getHeight() / height;
-        final Dimension2D resolution = new org.geotools.resources.geometry.XDimension2D.Double(w, h);
+        final Dimension2D resolution = new DoubleDimension2D(w, h);
 
         GridCoverageTable table = reader.getTable();
         table = new GridCoverageTable(table);
@@ -322,18 +323,18 @@ class PostGridLayerDetails implements LayerDetails {
     private MutableStyle toStyle(final MeasurementRange dimRange) {
         final List<InterpolationPoint> values = new ArrayList<InterpolationPoint>();
         values.add(STYLE_FACTORY.interpolationPoint(
-                        STYLE_FACTORY.colorExpression(Color.WHITE), dimRange.getMinimum()));
+                        STYLE_FACTORY.literal(Color.WHITE), dimRange.getMinimum()));
         values.add(STYLE_FACTORY.interpolationPoint(
-                        STYLE_FACTORY.colorExpression(Color.BLUE), dimRange.getMaximum()));
+                        STYLE_FACTORY.literal(Color.BLUE), dimRange.getMaximum()));
         final Literal lookup = StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
         final Literal fallback = StyleConstants.DEFAULT_FALLBACK;
         final Function interpolateFunction = STYLE_FACTORY.interpolateFunction(
                 lookup, values, Method.COLOR, Mode.LINEAR, fallback);
 
         final ChannelSelection selection = STYLE_FACTORY.channelSelection(
-                STYLE_FACTORY.selectedChannelType("0", STYLE_FACTORY.literalExpression(1)));
+                STYLE_FACTORY.selectedChannelType("0", FILTER_FACTORY.literal(1)));
 
-        final Expression opacity = STYLE_FACTORY.literalExpression(1f);
+        final Expression opacity = FILTER_FACTORY.literal(1f);
         final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
         final ColorMap colorMap = STYLE_FACTORY.colorMap(interpolateFunction);
         final ContrastEnhancement enhanced = StyleConstants.DEFAULT_CONTRAST_ENHANCEMENT;

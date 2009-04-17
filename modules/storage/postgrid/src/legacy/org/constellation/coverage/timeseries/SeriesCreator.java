@@ -28,13 +28,13 @@ import org.opengis.coverage.Coverage;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.geometry.GeneralEnvelope;
-//import org.geotools.gui.headless.ProgressPrinter;
+import org.geotoolkit.geometry.GeneralEnvelope;
+//import org.geotoolkit.gui.headless.ProgressPrinter;
 
 // Constellation dependencies
 import org.constellation.coverage.catalog.Catalog;
 import org.constellation.catalog.CatalogException;
-import org.geotools.resources.image.ImageUtilities;
+import org.geotoolkit.internal.image.ImageUtilities;
 
 
 /**

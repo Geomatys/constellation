@@ -16,7 +16,7 @@
  */
 package org.constellation.catalog;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

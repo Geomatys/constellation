@@ -23,20 +23,21 @@ import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.io.CoverageReader;
-import org.geotools.coverage.processing.ColorMap;
-import org.geotools.factory.CommonFactoryFinder;
+import org.geotoolkit.coverage.processing.ColorMap;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotools.feature.NameImpl;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.AbstractMapLayer;
 import org.geotools.map.CoverageMapLayer;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.StyleFactory;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
+import org.geotools.style.MutableStyleFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -138,7 +139,8 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
     }
 
     private static final MutableStyle createDefaultRasterStyle() {
-        final StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+        final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
         final RasterSymbolizer symbol =sf.rasterSymbolizer();
         return sf.style(symbol);
     }

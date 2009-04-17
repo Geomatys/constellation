@@ -44,8 +44,8 @@ import org.constellation.lucene.filter.WithinFilter;
 import org.constellation.ogc.FilterType;
 
 // Geotools dependencies
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
 import org.junit.*;

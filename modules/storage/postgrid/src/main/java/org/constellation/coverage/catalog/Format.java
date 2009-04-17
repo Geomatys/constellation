@@ -21,9 +21,9 @@ import java.util.Locale;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import org.constellation.catalog.Element;
-import org.geotools.util.MeasurementRange;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.gui.swing.tree.MutableTreeNode;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.gui.swing.tree.MutableTreeNode;
 
 
 /**
@@ -65,7 +65,7 @@ public interface Format extends Element {
 
     /**
      * Returns a legend of the specified dimension. The legend is a
-     * {@linkplain org.geotools.gui.swing.image.ColorRamp color ramp}
+     * {@linkplain org.geotoolkit.gui.swing.image.ColorRamp color ramp}
      * with gratuation on it.
      *
      * @param  dimension The dimension of the image to be returned.
@@ -75,7 +75,7 @@ public interface Format extends Element {
 
     /**
      * Returns a tree representation of this format, including {@linkplain SampleDimension
-     * sample dimensions} and {@linkplain org.geotools.coverage.Category categories}.
+     * sample dimensions} and {@linkplain org.geotoolkit.coverage.Category categories}.
      *
      * @param  locale The locale to use for formatting labels in the tree.
      * @return The tree root.

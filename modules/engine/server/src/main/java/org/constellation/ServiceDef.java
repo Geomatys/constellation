@@ -103,7 +103,7 @@ public enum ServiceDef {
         exceptionVersion = (excVerStr == null) ? null : new Version(excVerStr);
 	}
 
-	public static class Version extends org.geotools.util.Version {
+	public static class Version extends org.geotoolkit.util.Version {
 
 		private static final long serialVersionUID = -1004484794380489333L;
 
@@ -117,7 +117,7 @@ public enum ServiceDef {
      *
      * @param str A string containing a version number.
      *
-     * @see org.geotools.util.Version#compareTo(org.geotools.util.Version)
+     * @see org.geotoolkit.util.Version#compareTo(org.geotoolkit.util.Version)
      *
      * @return A negative value if this version is lower than the supplied version, a positive
      *         value if it is higher, or 0 if they are equal.

@@ -40,7 +40,7 @@ import org.constellation.swe.v101.QuantityRange;
 import org.constellation.swe.v101.Text;
 import org.constellation.swe.v101.TimeType;
 import org.constellation.swe.v101.TimeRange;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 

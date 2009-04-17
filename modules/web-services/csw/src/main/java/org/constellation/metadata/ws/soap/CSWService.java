@@ -64,7 +64,7 @@ import org.constellation.metadata.CSWworker;
 import org.constellation.ows.v100.ExceptionReport;
 
 //geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 /**
  *
@@ -115,7 +115,7 @@ public class CSWService {
     public CSWService() {
 
        try {
-           JAXBContext jbcontext = JAXBContext.newInstance(MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
+           JAXBContext jbcontext = JAXBContext.newInstance(DefaultMetaData.class, Capabilities.class, DescribeRecordType.class
                             ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                             ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
                             ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class

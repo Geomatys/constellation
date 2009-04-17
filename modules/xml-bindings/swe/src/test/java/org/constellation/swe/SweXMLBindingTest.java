@@ -19,10 +19,8 @@ package org.constellation.swe;
 
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.swe.v101.AnyScalarPropertyType;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
@@ -30,6 +28,7 @@ import org.constellation.swe.v101.Text;
 import org.constellation.swe.v101.TextBlockEntry;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -39,39 +38,29 @@ import static org.junit.Assert.*;
  */
 public class SweXMLBindingTest {
 
-    private Logger       logger = Logger.getLogger("org.constellation.swe");
-    private Unmarshaller unmarshaller;
+    private MarshallerPool pool;
     private Marshaller   marshaller;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
-    public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.swe.v101");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
-
+    public void setUp() throws JAXBException {
+        pool = new MarshallerPool("org.constellation.swe.v101");
+        marshaller = pool.acquireMarshaller();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
+        if (marshaller != null) {
+            pool.release(marshaller);
+        }
     }
 
     /**
      * Test simple Record Marshalling.
      *
-     * @throws java.lang.Exception
+     * @throws JAXBException
      */
     @Test
-    public void marshallingTest() throws Exception {
+    public void marshallingTest() throws JAXBException {
 
         Text text = new Text("definition", "some value");
 
@@ -134,7 +123,5 @@ public class SweXMLBindingTest {
                     "</swe:DataArray>" + '\n';
 
         assertEquals(expResult, result);
-
     }
-
 }

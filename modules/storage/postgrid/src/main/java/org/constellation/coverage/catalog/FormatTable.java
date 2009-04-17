@@ -19,7 +19,7 @@ package org.constellation.coverage.catalog;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.SingletonTable;

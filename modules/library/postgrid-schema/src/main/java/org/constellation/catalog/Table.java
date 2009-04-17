@@ -26,9 +26,8 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.geotools.util.Utilities;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -179,7 +178,7 @@ public class Table {
      */
     public final Database getDatabase() throws IllegalStateException {
         if (query.database == null) {
-            throw new IllegalStateException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
+            throw new IllegalStateException(Errors.format(Errors.Keys.NO_DATA_SOURCE));
         }
         return query.database;
     }
@@ -516,7 +515,7 @@ public class Table {
             throws IllegalArgumentException
     {
         if (value == null) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+            throw new IllegalArgumentException(Errors.format(Errors.Keys.NULL_ARGUMENT_$1, name));
         }
     }
 

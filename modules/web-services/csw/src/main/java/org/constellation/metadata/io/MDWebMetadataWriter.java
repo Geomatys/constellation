@@ -42,7 +42,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies

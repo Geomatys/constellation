@@ -56,23 +56,23 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-go2</artifactId>
+      <artifactId>gtm-go2</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-go2-style-extension</artifactId>
+      <artifactId>gtm-go2-style-extension</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-shapefile</artifactId>
+      <artifactId>gtm-shapefile</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-sld</artifactId>
+      <artifactId>gtm-sld</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-postgis</artifactId>
+      <artifactId>gtm-postgis</artifactId>
     </dependency>
   </dependencies>
 

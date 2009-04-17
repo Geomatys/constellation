@@ -18,7 +18,7 @@ package org.constellation.coverage.catalog;
 
 import org.constellation.catalog.Entry;
 import org.constellation.ws.ServiceType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

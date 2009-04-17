@@ -21,13 +21,13 @@ import java.sql.SQLException;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import org.opengis.geometry.Envelope;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.TableTest;
 
 import org.junit.*;
+import org.opengis.coverage.grid.GridEnvelope;
 
 
 /**
@@ -52,11 +52,11 @@ public class GridGeometryTableTest extends TableTest {
     public void testSelectAndList() throws CatalogException, SQLException {
         final GridGeometryTable table = new GridGeometryTable(database);
         final GridGeometryEntry entry = table.getEntry(SAMPLE_NAME);
-        final GridRange gridRange = entry.geometry.getGridRange();
+        final GridEnvelope gridRange = entry.geometry.getGridRange();
         final GeographicBoundingBox box = entry.getGeographicBoundingBox();
-        assertEquals( 720, gridRange.getLength(0));
-        assertEquals( 499, gridRange.getLength(1));
-        assertEquals(  59, gridRange.getLength(2));
+        assertEquals( 720, gridRange.getSpan(0));
+        assertEquals( 499, gridRange.getSpan(1));
+        assertEquals(  59, gridRange.getSpan(2));
         assertEquals(-180, box.getWestBoundLongitude(), 0.0);
         assertEquals(+180, box.getEastBoundLongitude(), 0.0);
         assertEquals( -77, box.getSouthBoundLatitude(), 0.5);

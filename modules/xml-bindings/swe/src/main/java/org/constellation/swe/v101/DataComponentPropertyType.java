@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.swe.DataComponentProperty;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

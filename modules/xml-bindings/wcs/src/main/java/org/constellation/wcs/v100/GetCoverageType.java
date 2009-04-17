@@ -34,10 +34,10 @@ import org.constellation.gml.v311.TimePositionType;
 import org.constellation.util.StringUtilities;
 import org.constellation.wcs.GetCoverage;
 
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.crs.DefaultVerticalCRS;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;

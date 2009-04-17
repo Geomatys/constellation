@@ -19,18 +19,16 @@ package org.geotools.referencing.factory.wkt;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import org.geotools.factory.Hints;
+import org.geotoolkit.factory.Hints;
 
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
-import org.geotools.io.TableWriter;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.factory.DirectAuthorityFactory;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotoolkit.io.TableWriter;
+import org.geotoolkit.metadata.iso.citation.Citations;
+import org.geotoolkit.referencing.factory.DirectAuthorityFactory;
+import org.geotoolkit.resources.Errors;
+import org.geotoolkit.resources.Vocabulary;
 
 
 /**
@@ -56,7 +54,7 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
      * @param connection The connection to the database.
      */
     public DirectSqlAuthorityFactory(final Hints hints, final Connection connection) {
-        super(hints, NORMAL_PRIORITY);
+        super(hints);
         this.connection = connection;
     }
 
@@ -67,7 +65,7 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
      */
     protected Connection getConnection() throws SQLException {
         if (connection == null) {
-            throw new SQLException(Errors.format(ErrorKeys.DISPOSED_FACTORY));
+            throw new SQLException(Errors.format(Errors.Keys.DISPOSED_FACTORY));
         }
         return connection;
     }
@@ -83,7 +81,7 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
         CharSequence cs;
         if ((cs=authority.getEdition()) != null) {
             final String identifier = Citations.getIdentifier(authority);
-            table.write(resources.getString(VocabularyKeys.VERSION_OF_$1, identifier));
+            table.write(resources.getString(Vocabulary.Keys.VERSION_OF_$1, identifier));
             table.write(':');
             table.nextColumn();
             table.write(cs.toString());
@@ -93,17 +91,17 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
             String s;
             final DatabaseMetaData metadata = getConnection().getMetaData();
             if ((s=metadata.getDatabaseProductName()) != null) {
-                table.write(resources.getLabel(VocabularyKeys.DATABASE_ENGINE));
+                table.write(resources.getLabel(Vocabulary.Keys.DATABASE_ENGINE));
                 table.nextColumn();
                 table.write(s);
                 if ((s=metadata.getDatabaseProductVersion()) != null) {
                     table.write(' ');
-                    table.write(resources.getString(VocabularyKeys.VERSION_$1, s));
+                    table.write(resources.getString(Vocabulary.Keys.VERSION_$1, s));
                 }
                 table.nextLine();
             }
             if ((s=metadata.getURL()) != null) {
-                table.write(resources.getLabel(VocabularyKeys.DATABASE_URL));
+                table.write(resources.getLabel(Vocabulary.Keys.DATABASE_URL));
                 table.nextColumn();
                 table.write(s);
                 table.nextLine();
@@ -116,13 +114,11 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
 
     /**
      * Releases resources immediately instead of waiting for the garbage collector.
-     *
-     * @throws FactoryException if an error occured while disposing the factory.
      */
     @Override
-    public synchronized void dispose() throws FactoryException {
+    public synchronized void dispose(final boolean shutdown) {
         connection = null; // Don't close the connection, since we may not own it.
-        super.dispose();
+        super.dispose(shutdown);
     }
 
     /**
@@ -142,9 +138,9 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
             if (type != null) {
                 typeName = type.getSimpleName();
             } else {
-                typeName = Vocabulary.format(VocabularyKeys.UNKNOW);
+                typeName = Vocabulary.format(Vocabulary.Keys.UNKNOW);
             }
-            message = Errors.format(ErrorKeys.DATABASE_FAILURE_$2, typeName, code) + ": " + message;
+            message = Errors.format(Errors.Keys.DATABASE_FAILURE_$2, typeName, code) + ": " + message;
         }
         return new FactoryException(message, exception);
     }

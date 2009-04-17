@@ -35,14 +35,13 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
-import org.geotools.factory.Hints;
-import org.geotools.util.GenericName;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.logging.Logging;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.wkt.Parser;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.metadata.iso.citation.Citations;
+import org.geotoolkit.io.wkt.WKTFormat;
+import org.geotoolkit.naming.DefaultNameSpace;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -235,10 +234,10 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
         final StringBuilder sql = new StringBuilder("SELECT CASE WHEN ")
                 .append(CODE_COLUMN).append('=').append(PRIMARY_KEY).append(" THEN ")
                 .append(PRIMARY_KEY).append("::text ELSE ").append(AUTHORITY_COLUMN)
-                .append(" || '").append(GenericName.DEFAULT_SEPARATOR).append("' || ")
+                .append(" || '").append(DefaultNameSpace.DEFAULT_SEPARATOR).append("' || ")
                 .append(CODE_COLUMN).append(" END AS code");
         appendFrom(sql);
-        final String type = Parser.getNameOf(category);
+        final String type = WKTFormat.getNameOf(category);
         if (type != null) {
             sql.append(" WHERE srtext ILIKE '").append(type).append("%'");
         }
@@ -280,7 +279,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      */
     public synchronized int getPrimaryKey(String code) throws FactoryException {
         code = code.trim();
-        final int separator = code.lastIndexOf(GenericName.DEFAULT_SEPARATOR);
+        final int separator = code.lastIndexOf(DefaultNameSpace.DEFAULT_SEPARATOR);
         final String authority  = (separator >= 0) ? code.substring(0, separator).trim() : "";
         final String identifier = code.substring(separator+1).trim();
         int srid;
@@ -394,7 +393,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
             if (!results.wasNull()) {
                 if (value != null && !candidate.equals(value)) {
                     results.close();
-                    throw new FactoryException(Errors.format(ErrorKeys.DUPLICATED_VALUES_$1, code));
+                    throw new FactoryException(Errors.format(Errors.Keys.DUPLICATED_VALUES_$1, code));
                 }
                 value = type.cast(candidate);
             }
@@ -412,7 +411,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      * @throws FactoryException if an error occured while disposing the factory.
      */
     @Override
-    public synchronized void dispose() throws FactoryException {
+    public synchronized void dispose(final boolean shutdown) {
         try {
             if (select != null) {
                 select.close();
@@ -423,10 +422,10 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
                 selectPK = null;
             }
         } catch (SQLException exception) {
-            throw databaseFailure(null, null, exception);
+            Logging.unexpectedException(PostgisAuthorityFactory.class, "dispose", exception);
         }
         authority   = null;
         authorities = null;
-        super.dispose();
+        super.dispose(shutdown);
     }
 }

@@ -25,7 +25,8 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.geotools.geometry.Envelope2D;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.geometry.Envelope2D;
 
 
 /**
@@ -50,7 +51,7 @@ public class ExternalyConfiguredCommandLine extends CommandLine {
      * @param  args The command-line arguments.
      */
     protected ExternalyConfiguredCommandLine(final String[] args) {
-        super(args, 1);
+        super(null, args);
         if (arguments.length != 1) {
             err.println("Missing argument: properties file");
             System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);

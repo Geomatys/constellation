@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.geotools.util.logging.Logging;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -113,7 +113,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      * Returns a CRS for the specified code from the {@code "spatial_ref_sys"} table.
      * This is mostly a convenience method leveraging the current connection for querying
      * the table. This method does <strong>not</strong> look in other CRS databases like what
-     * {@link org.geotools.referencing.CRS#decode(String)} does.
+     * {@link org.geotoolkit.referencing.CRS#decode(String)} does.
      *
      * @param  code The CRS identifier.
      * @return The coordinate reference system for the given code.

@@ -24,7 +24,7 @@ import javax.imageio.ImageReader;
 import org.constellation.catalog.CatalogException;
 import org.junit.Test;
 
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.DateRange;
 
 import org.constellation.catalog.Element;
 import org.constellation.catalog.DatabaseTest;

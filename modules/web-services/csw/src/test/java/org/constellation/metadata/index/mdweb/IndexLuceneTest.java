@@ -39,8 +39,8 @@ import org.apache.lucene.search.Sort;
 
 // geotools dependencies
 import org.constellation.lucene.filter.BBOXFilter;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Classe;

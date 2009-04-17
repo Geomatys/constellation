@@ -27,10 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -70,7 +66,8 @@ import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.xml.MarshallerPool;
 
 
 /**
@@ -96,7 +93,7 @@ public class FileMetadataReader extends MetadataReader {
     /**
      * A unmarshaller to get java object from metadata files.
      */
-    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final MarshallerPool marshallerPool;
 
     /**
      * A date formatter used to display the Date object for dublin core translation.
@@ -119,14 +116,10 @@ public class FileMetadataReader extends MetadataReader {
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
             throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
         }
-        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
         try {
-            JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
-            for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-                  unmarshallers.add(context.createUnmarshaller());
-            }
+            marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
-            throw new CstlServiceException("cause: JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("cause: JAXB excepiton while creating unmarshaller", ex, NO_APPLICABLE_CODE);
         }
     }
     
@@ -144,8 +137,8 @@ public class FileMetadataReader extends MetadataReader {
     @Override
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         Object obj = getObjectFromFile(identifier);
-        if (obj instanceof MetaDataImpl && mode == DUBLINCORE) {
-            obj = translateISOtoDC((MetaDataImpl)obj, type, elementName);
+        if (obj instanceof DefaultMetaData && mode == DUBLINCORE) {
+            obj = translateISOtoDC((DefaultMetaData)obj, type, elementName);
         }
         return obj;
     }
@@ -163,22 +156,19 @@ public class FileMetadataReader extends MetadataReader {
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 Object metadata = unmarshaller.unmarshal(metadataFile);
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
                 addInCache(identifier, metadata);
                 return metadata;
-            } catch (InterruptedException ex) {
-                throw new CstlServiceException("Interrupted Eception while unmarshalling the metadataFile : " + identifier + ".xml" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
         } else {
@@ -186,7 +176,7 @@ public class FileMetadataReader extends MetadataReader {
         }
     }
 
-    private AbstractRecordType translateISOtoDC(MetaDataImpl metadata, ElementSet type, List<QName> elementName) {
+    private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSet type, List<QName> elementName) {
         if (metadata != null) {
 
             RecordType customRecord = new RecordType();
@@ -282,6 +272,9 @@ public class FileMetadataReader extends MetadataReader {
             Distribution distribution   = metadata.getDistributionInfo();
             if (distribution != null) {
                 for (Format f: distribution.getDistributionFormats()) {
+                    if (f == null || f.getName() == null) {
+                        continue;
+                    }
                     formats.add(new SimpleLiteral(f.getName().toString()));
                 }
             }
@@ -374,22 +367,19 @@ public class FileMetadataReader extends MetadataReader {
                 String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = unmarshallers.take();
+                    unmarshaller = marshallerPool.acquireUnmarshaller();
                     Object metadata = unmarshaller.unmarshal(f);
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
                     addInCache(identifier, metadata);
                     results.add(metadata);
-                } catch (InterruptedException ex) {
-                    throw new CstlServiceException("Interrupted Eception while unmarshalling the metadataFile : " + identifier + ".xml" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 } finally {
                     if (unmarshaller != null) {
-                        unmarshallers.add(unmarshaller);
+                        marshallerPool.release(unmarshaller);
                     }
                 }
             } else {
@@ -407,6 +397,7 @@ public class FileMetadataReader extends MetadataReader {
     /**
      * Return the list of Additional queryable element (0 in MDWeb).
      */
+    @Override
     public List<QName> getAdditionalQueryableQName() {
         return new ArrayList<QName>();
     }

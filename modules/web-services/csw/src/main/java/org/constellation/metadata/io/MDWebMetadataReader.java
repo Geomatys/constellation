@@ -73,7 +73,7 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
 
 // geotools/GeoAPI dependencies
-import org.geotools.metadata.iso.MetadataEntity;
+import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.mdweb.sql.v20.Reader20;
 import org.opengis.util.CodeList;
 

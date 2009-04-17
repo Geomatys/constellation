@@ -30,15 +30,16 @@ import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.RandomStyleFactory;
-import org.geotools.style.StyleFactory;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
+import org.geotools.style.MutableStyleFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -55,7 +56,10 @@ public interface LayerDetails {
     public static final String KEY_ELEVATION = "ELEVATION";
     public static final String KEY_TIME      = "TIME";
 
-    static final StyleFactory STYLE_FACTORY = CommonFactoryFinder.getStyleFactory(null);
+    static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+    static final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
+                            new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
     static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
     
     /**

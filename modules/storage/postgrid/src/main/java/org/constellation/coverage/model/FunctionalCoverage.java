@@ -34,9 +34,9 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.DirectPosition;
-import org.geotools.coverage.AbstractCoverage;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import static org.geotools.referencing.CRS.getTemporalCRS;
+import org.geotoolkit.coverage.AbstractCoverage;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import static org.geotoolkit.referencing.CRS.getTemporalCRS;
 
 import org.constellation.catalog.CRS;
 import org.constellation.coverage.catalog.GridCoverage;

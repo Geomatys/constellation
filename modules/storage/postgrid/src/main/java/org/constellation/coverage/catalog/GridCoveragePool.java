@@ -22,9 +22,9 @@ import java.awt.image.RenderedImage;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.geotools.util.CanonicalSet;
-import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotoolkit.util.collection.CanonicalSet;
+import org.geotoolkit.coverage.CoverageFactoryFinder;
+import org.geotoolkit.coverage.grid.GridCoverageFactory;
 
 
 /**

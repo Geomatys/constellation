@@ -34,14 +34,13 @@ import javax.imageio.IIOException;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 
-import org.geotools.image.io.mosaic.Tile;
-import org.geotools.image.io.mosaic.TileManager;
-import org.geotools.image.io.mosaic.TileManagerFactory;
-import org.geotools.util.Utilities;
-import org.geotools.util.SoftValueHashMap;
-import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
+import org.geotoolkit.image.io.mosaic.Tile;
+import org.geotoolkit.image.io.mosaic.TileManager;
+import org.geotoolkit.image.io.mosaic.TileManagerFactory;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotoolkit.util.XArrays;
+import org.geotoolkit.resources.Errors;
 
 import org.constellation.catalog.Table;
 import org.constellation.catalog.Database;
@@ -183,7 +182,7 @@ final class TileTable extends Table {
         Iterator<ImageReaderSpi> providers = registry.getServiceProviders(ImageReaderSpi.class, true);
         while (providers.hasNext()) {
             final ImageReaderSpi provider = providers.next();
-            if (XArray.contains(provider.getFormatNames(), format)) {
+            if (XArrays.contains(provider.getFormatNames(), format)) {
                 return provider;
             }
         }
@@ -196,11 +195,11 @@ final class TileTable extends Table {
         providers = registry.getServiceProviders(ImageReaderSpi.class, true);
         while (providers.hasNext()) {
             final ImageReaderSpi provider = providers.next();
-            if (XArray.contains(provider.getMIMETypes(), format)) {
+            if (XArrays.contains(provider.getMIMETypes(), format)) {
                 return provider;
             }
         }
-        throw new IIOException(Errors.format(ErrorKeys.NO_IMAGE_READER));
+        throw new IIOException(Errors.format(Errors.Keys.NO_IMAGE_READER));
     }
 
     /**

@@ -21,7 +21,7 @@ import java.util.Date;
 import javax.imageio.ImageReader;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.WritableGridCoverageEntry;
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.DateRange;
 
 
 /**

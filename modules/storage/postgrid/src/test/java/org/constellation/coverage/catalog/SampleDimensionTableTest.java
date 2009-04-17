@@ -17,7 +17,7 @@
 package org.constellation.coverage.catalog;
 
 import java.sql.SQLException;
-import org.geotools.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.GridSampleDimension;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.TableTest;

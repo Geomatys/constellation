@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.swe.AnyResult;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.

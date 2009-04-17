@@ -55,19 +55,19 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-referencing</artifactId>
+      <artifactId>gtm-referencing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-coverage</artifactId>
+      <artifactId>gtm-coverage</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-widgets-swing</artifactId>
+      <artifactId>gtm-widgets-swing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-go</artifactId>
+      <artifactId>gtm-go</artifactId>
       <version>${geotools.version}</version>
     </dependency>
     <dependency>

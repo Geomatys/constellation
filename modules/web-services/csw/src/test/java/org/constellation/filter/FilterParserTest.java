@@ -38,8 +38,8 @@ import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.ogc.FilterType;
 
 // geotools dependencies
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
 import org.junit.*;

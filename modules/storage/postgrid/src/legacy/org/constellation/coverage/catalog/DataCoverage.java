@@ -30,13 +30,13 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.operation.TransformException;
 
-import org.geotools.coverage.CoverageStack;
-import org.geotools.coverage.AbstractCoverage;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.TransformedDirectPosition;
-import org.geotools.util.UnsupportedImplementationException;
+import org.geotoolkit.coverage.CoverageStack;
+import org.geotoolkit.coverage.AbstractCoverage;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.TransformedDirectPosition;
+import org.geotoolkit.util.UnsupportedImplementationException;
 
 import org.constellation.coverage.model.Operation;
 import org.constellation.coverage.model.Descriptor;

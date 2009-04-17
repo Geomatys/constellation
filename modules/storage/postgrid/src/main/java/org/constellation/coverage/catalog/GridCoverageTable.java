@@ -34,14 +34,14 @@ import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.coverage.CoverageStack;
-import org.geotools.util.NumberRange;
-import org.geotools.util.RangeSet;
-import org.geotools.util.Utilities;
-import org.geotools.resources.Classes;
-import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.image.io.mosaic.TileManager;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.coverage.CoverageStack;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.collection.RangeSet;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.display.shape.XRectangle2D;
+import org.geotoolkit.image.io.mosaic.TileManager;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.model.Operation;
@@ -294,7 +294,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         if (change) {
             flush();
             log("setGeographicArea", Level.CONFIG, ResourceKeys.SET_GEOGRAPHIC_AREA_$2, new String[] {
-                GeographicBoundingBoxImpl.toString(area, ANGLE_PATTERN, getDatabase().getLocale()),
+                DefaultGeographicBoundingBox.toString(area, ANGLE_PATTERN, getDatabase().getLocale()),
                 getLayerName()
             });
         }
@@ -816,7 +816,7 @@ loop:   for (final CoverageReference newReference : entries) {
      */
     @Override
     public final String toString() {
-        final String area = GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
+        final String area = DefaultGeographicBoundingBox.toString(getGeographicBoundingBox(),
                     ANGLE_PATTERN, getDatabase().getLocale());
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append("[\"").append(String.valueOf(layer)).append("\": ").append(area).append(']');

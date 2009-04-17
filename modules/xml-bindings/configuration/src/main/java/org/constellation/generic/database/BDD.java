@@ -24,8 +24,8 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.geotools.resources.JDBC;
-import org.geotools.util.Utilities;
+import org.geotoolkit.internal.jdbc.JDBC;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

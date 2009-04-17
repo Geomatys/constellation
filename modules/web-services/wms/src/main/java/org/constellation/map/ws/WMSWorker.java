@@ -94,8 +94,8 @@ import org.geotools.sld.MutableNamedLayer;
 import org.geotools.sld.MutableNamedStyle;
 import org.geotools.sld.MutableStyledLayerDescriptor;
 import org.geotools.style.MutableStyle;
-import org.geotools.util.MeasurementRange;
-import org.geotools.util.Version;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.Version;
 
 //Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;

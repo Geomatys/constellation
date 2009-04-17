@@ -25,13 +25,13 @@ import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import org.geotools.resources.Classes;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.referencing.operation.matrix.MatrixFactory;
+import org.geotoolkit.referencing.operation.transform.ProjectiveTransform;
+import org.geotoolkit.referencing.operation.transform.ConcatenatedTransform;
+import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.InvalidGridGeometryException;
+import org.geotoolkit.coverage.grid.InvalidGridGeometryException;
 
 
 /**

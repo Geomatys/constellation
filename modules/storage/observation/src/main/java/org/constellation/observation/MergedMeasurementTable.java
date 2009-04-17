@@ -35,7 +35,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 // Geotools dependencies
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 // Constellation dependencies
 import org.constellation.catalog.Database;

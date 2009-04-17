@@ -29,16 +29,16 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import org.geotools.factory.AbstractFactory;
+import org.geotoolkit.factory.Factory;
 
 /**
  *
  * @author Guilhem Legal
  */
-public abstract class AbstractSOSFactory extends AbstractFactory {
+public abstract class AbstractSOSFactory extends Factory {
 
-    public AbstractSOSFactory(int priority) {
-        super(priority);
+    public AbstractSOSFactory() {
+        super();
     }
 
     public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;

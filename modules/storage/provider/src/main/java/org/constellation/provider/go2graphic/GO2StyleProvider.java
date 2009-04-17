@@ -21,10 +21,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.StyleProvider;
-import org.geotools.display.ext.vectorfield.VectorFieldSymbolizer;
-import org.geotools.factory.CommonFactoryFinder;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotools.display2d.ext.vectorfield.VectorFieldSymbolizer;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.StyleFactory;
+import org.geotools.style.MutableStyleFactory;
 import org.opengis.style.Symbolizer;
 
 /**
@@ -72,11 +73,12 @@ public class GO2StyleProvider implements StyleProvider{
     }
     
     private void visit() {
-        StyleFactory SF = CommonFactoryFinder.getStyleFactory(null);
+        MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
         //TODO : find another way to load special styles.
         Symbolizer symbol = new VectorFieldSymbolizer();
 
-        index.put("GO2:VectorField", SF.style(symbol));
+        index.put("GO2:VectorField", sf.style(symbol));
     }
     
 }

@@ -17,19 +17,15 @@
 
 package org.constellation.skos;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotools.metadata.note.Anchors;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -80,22 +76,6 @@ public class RDF {
             }
         } 
         return map;
-    }
-    
-    public void fillAnchors() {
-        if (getConcept().size() != 0) {
-            for (Concept c : getConcept()) {
-                try {
-                    URI uri = new URI(c.getExternalID());
-                    Anchors.create(c.getPrefLabel() , uri);
-                } catch (URISyntaxException ex) {
-                    Logger.getAnonymousLogger().severe("Unable to create an URI from: " + c.getExternalID());
-                } catch (IllegalArgumentException ex) {
-                    Logger.getAnonymousLogger().finer(ex.getMessage());
-                }
-               
-            }
-        } 
     }
 
     /*

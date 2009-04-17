@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.util.Utilities;
-import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.coverage.processing.AbstractCoverageProcessor;
 
 import org.constellation.catalog.Entry;
 
@@ -34,9 +34,9 @@ import org.constellation.catalog.Entry;
  * {@link #doOperation} enchaîne les opérateurs d'images suivants, dans cet ordre:
  * <p>
  * <ul>
- *   <li>{@link org.geotools.coverage.processing.operation.NodataFilter}</li>
+ *   <li>{@link org.geotoolkit.coverage.processing.operation.NodataFilter}</li>
  *   <li>L'opération spécifiée au moment de la construction de cette entrée</li>
- *   <li>{@link org.geotools.coverage.processing.operation.Interpolate}</li>
+ *   <li>{@link org.geotoolkit.coverage.processing.operation.Interpolate}</li>
  * </ul>
  *
  * @version $Id$
@@ -108,7 +108,7 @@ final class OperationEntry extends Entry implements Operation {
      *
      * @param name      Le nom de cette opération.
      * @param prefix    Le préfix à utiliser dans les noms composites.
-     * @param operation Un nom d'opération compris par le {@linkplain AbstractProcessor processeur}.
+     * @param operation Un nom d'opération compris par le {@linkplain AbstractCoverageProcessor processeur}.
      *                  Exemple: {@code "GradientMagnitude"}.
      * @param remarks   Des commentaires, ou {@code null} s'il n'y en a pas.
      */
@@ -183,8 +183,8 @@ final class OperationEntry extends Entry implements Operation {
     /**
      * Returns the processor to use. For now a shared instance, later maybe a field.
      */
-    private static AbstractProcessor getProcessor() {
-        return AbstractProcessor.getInstance();
+    private static AbstractCoverageProcessor getProcessor() {
+        return AbstractCoverageProcessor.getInstance();
     }
 
     /**

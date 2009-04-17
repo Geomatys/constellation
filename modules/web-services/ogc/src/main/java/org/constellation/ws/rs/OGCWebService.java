@@ -34,10 +34,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef;
-import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ows.AbstractDCP;
@@ -46,8 +43,7 @@ import org.constellation.ows.AbstractOperation;
 import org.constellation.ows.OWSExceptionCode;
 
 // Geotools dependencies
-import org.constellation.ows.v110.ExceptionReport;
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
 
 import static org.constellation.ws.ExceptionCode.*;
 

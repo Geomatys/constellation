@@ -62,11 +62,11 @@ import org.constellation.ws.rs.OGCWebService;
 //Geotools dependencies
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.style.sld.XMLUtilities;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
 //Geoapi dependencies
-import org.geotools.util.Version;
+import org.geotoolkit.util.Version;
+import org.geotools.style.xml.XMLUtilities;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -428,14 +428,14 @@ public class WMSService extends OGCWebService {
             final XMLUtilities sldparser = new XMLUtilities();
             try {
                 sld = sldparser.readSLD(in,
-                        org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_0_0);
+                        org.geotools.style.xml.Specification.StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }
             if (sld == null) {
                 try {
                     sld = sldparser.readSLD(in,
-                            org.geotools.style.sld.Specification.StyledLayerDescriptor.V_1_1_0);
+                            org.geotools.style.xml.Specification.StyledLayerDescriptor.V_1_1_0);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
                 }

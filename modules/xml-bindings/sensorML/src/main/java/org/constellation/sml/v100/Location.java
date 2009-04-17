@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractCurveType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.sml.AbstractLocation;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

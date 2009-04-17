@@ -18,8 +18,8 @@ package org.constellation.coverage.catalog;
 
 import java.awt.geom.Dimension2D;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.util.DateRange;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.Utilities;
 import org.constellation.catalog.Entry;
 
 

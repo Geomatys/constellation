@@ -17,7 +17,7 @@
  */
 package org.constellation.coverage.model;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.constellation.catalog.Entry;
 
 import static java.lang.Double.compare;

@@ -27,7 +27,7 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.SingletonTable;
 import static org.constellation.catalog.QueryType.*;
 import org.constellation.catalog.QueryType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *  Connexion vers la table des {@linkplain SimpleDataRecord simpleDataRecord}.

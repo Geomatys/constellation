@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
-import org.geotools.util.WeakValueHashMap;
+import org.geotoolkit.util.collection.WeakValueHashMap;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 

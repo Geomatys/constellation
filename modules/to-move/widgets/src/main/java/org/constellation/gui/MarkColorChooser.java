@@ -44,7 +44,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 
 // Geotools dependencies
-import org.geotools.display.geom.Arrow2D;
+import org.geotoolkit.display.shape.Arrow2D;
 
 
 /**

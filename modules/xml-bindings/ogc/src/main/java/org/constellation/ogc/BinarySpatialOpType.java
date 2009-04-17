@@ -28,7 +28,7 @@ import org.constellation.gml.v311.EnvelopeEntry;
 import org.constellation.gml.v311.LineStringType;
 import org.constellation.gml.v311.PointType;
 import org.constellation.gml.v311.PolygonType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 

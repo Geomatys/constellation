@@ -30,10 +30,10 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.geotools.util.NumberRange;
-import org.geotools.coverage.Category;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.image.io.PaletteFactory;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.coverage.Category;
+import org.geotoolkit.factory.AuthorityFactoryFinder;
+import org.geotoolkit.image.io.PaletteFactory;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ServerException;
@@ -46,7 +46,7 @@ import org.constellation.catalog.QueryType;
 /**
  * Connection to a table of {@linkplain Category categories}. This table creates a list of
  * {@link Category} objects for a given sample dimension. Categories are one of the components
- * required for creating a {@link org.geotools.coverage.grid.GridCoverage2D}; they are not an
+ * required for creating a {@link org.geotoolkit.coverage.grid.GridCoverage2D}; they are not an
  * {@link org.constellation.catalog.Element} subinterface.
  *
  * @author Martin Desruisseaux
@@ -126,7 +126,7 @@ final class CategoryTable extends Table {
              * (deuxième cas), ou quantitative et logarithmique (troisième cas).
              */
             Category category;
-            final NumberRange range = new NumberRange(lower, upper);
+            final NumberRange range = NumberRange.create(lower, upper);
             if (!isQuantifiable) {
                 // Catégorie qualitative.
                 if (colors == null) {
@@ -139,7 +139,7 @@ final class CategoryTable extends Table {
                 if (function != null) {
                     if (function.equalsIgnoreCase("log")) try {
                         // Catégorie quantitative et logarithmique.
-                        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
+                        final MathTransformFactory factory = AuthorityFactoryFinder.getMathTransformFactory(null);
                         if (exponential == null) {
                             final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
                             param.parameter("base").setValue(10.0); // Must be a 'double'

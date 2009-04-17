@@ -19,7 +19,7 @@ package org.constellation.metadata.io;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import org.geotools.resources.JDBC;
+import org.geotoolkit.internal.jdbc.JDBC;
 
 /**
  *

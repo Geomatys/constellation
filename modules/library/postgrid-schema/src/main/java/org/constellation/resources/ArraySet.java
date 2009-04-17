@@ -26,7 +26,7 @@ import java.util.AbstractSet;
 import java.util.NoSuchElementException;
 import java.io.Serializable;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

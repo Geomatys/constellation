@@ -33,10 +33,10 @@ import static java.lang.reflect.Array.getDouble;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.util.CanonicalSet;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.geotoolkit.util.collection.CanonicalSet;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.operation.transform.AffineTransform2D;
+import org.geotoolkit.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 
 import org.constellation.catalog.CatalogException;
@@ -107,7 +107,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     /**
      * Returns a CRS for the specified code from the {@code "spatial_ref_sys"} table.
      * This method does <strong>not</strong> look in other CRS databases like what
-     * {@link org.geotools.referencing.CRS#decode(String)} does.
+     * {@link org.geotoolkit.referencing.CRS#decode(String)} does.
      *
      * @param  code The CRS identifier.
      * @return The coordinate reference system for the given code.
@@ -489,10 +489,8 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     @Override
     protected void notifySleeping() {
-        if (crsFactory != null) try {
-            crsFactory.dispose();
-        } catch (FactoryException e) {
-            logWarning("notifySleeping", e);
+        if (crsFactory != null) {
+            crsFactory.dispose(false);
         }
         crsFactory = null;
         super.notifySleeping();

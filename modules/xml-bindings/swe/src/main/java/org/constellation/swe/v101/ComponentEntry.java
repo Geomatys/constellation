@@ -18,7 +18,7 @@
 package org.constellation.swe.v101;
 
 import org.constellation.catalog.Entry;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  * Une liste de phénomèmene pour un phenoméne composé.

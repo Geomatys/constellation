@@ -70,9 +70,9 @@ import org.constellation.lucene.filter.WithinFilter;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotools.referencing.CRS;
+import org.geotoolkit.referencing.CRS;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;

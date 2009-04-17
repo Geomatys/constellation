@@ -67,11 +67,15 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-temporal</artifactId>
+      <artifactId>gtm-temporal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-cql</artifactId>
+      <artifactId>gtm-cql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>gto-metadata-fra</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
@@ -97,12 +101,7 @@
      <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-csw</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-metadata-FRA</artifactId>
-      <version>${project.version}</version>
-    </dependency>  
+    </dependency> 
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>

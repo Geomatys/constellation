@@ -54,7 +54,7 @@ import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.MetaData;
 
 // geotools dependencies
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Observation observation}.

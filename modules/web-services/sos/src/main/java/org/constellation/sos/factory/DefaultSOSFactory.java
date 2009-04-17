@@ -49,7 +49,7 @@ import org.constellation.ws.CstlServiceException;
 public class DefaultSOSFactory extends AbstractSOSFactory {
 
     public DefaultSOSFactory() {
-        super(4);
+        super();
     }
 
     @Override

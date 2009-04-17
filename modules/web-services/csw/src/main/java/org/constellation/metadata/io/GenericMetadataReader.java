@@ -63,11 +63,11 @@ import org.constellation.ows.v100.BoundingBoxType;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.metadata.iso.citation.CitationDateImpl;
-import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.util.SimpleInternationalString;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.util.SimpleInternationalString;
 
 //geoAPI dependencies
 import org.opengis.metadata.citation.DateType;
@@ -354,9 +354,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role) {
         if (contacts != null) {
-            ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
+            DefaultResponsibleParty result = (DefaultResponsibleParty)contacts.get(contactIdentifier);
             if (result != null) {
-                result = new ResponsiblePartyImpl(result);
+                result = new DefaultResponsibleParty(result);
                 result.setRole(role);
             }
             return result;
@@ -371,9 +371,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected ResponsibleParty getContact(String contactIdentifier, Role role, String individualName) {
-        ResponsiblePartyImpl result = (ResponsiblePartyImpl)contacts.get(contactIdentifier);
+        DefaultResponsibleParty result = (DefaultResponsibleParty)contacts.get(contactIdentifier);
         if (result != null) {
-            result = new ResponsiblePartyImpl(result);
+            result = new DefaultResponsibleParty(result);
             result.setRole(role);
             if (individualName != null)
                 result.setIndividualName(individualName);
@@ -701,7 +701,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param identifier
      * @return
      */
-    protected abstract MetaDataImpl getISO(String identifier);
+    protected abstract DefaultMetaData getISO(String identifier);
     
     /**
      * Return a list of variables name used for the dublicore representation.
@@ -757,7 +757,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected CitationDate createRevisionDate(String date) {
-        CitationDateImpl revisionDate = new CitationDateImpl();
+        DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
         Date d = parseDate(date);
         if (d != null)
@@ -773,7 +773,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected CitationDate createPublicationDate(String date) {
-        CitationDateImpl revisionDate = new CitationDateImpl();
+        DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.PUBLICATION);
         Date d = parseDate(date);
         if (d != null)
@@ -871,7 +871,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 logger.severe("Number format exception while parsing boundingBox: " + '\n' +
                         "current box: " + westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
             }
-            GeographicExtent geo = new GeographicBoundingBoxImpl(west, east, south, north);
+            GeographicExtent geo = new DefaultGeographicBoundingBox(west, east, south, north);
             result.add(geo);
         }
         return result;
@@ -941,11 +941,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    public List<MetaDataImpl> getAllEntries() throws CstlServiceException {
-        List<MetaDataImpl> result = new ArrayList<MetaDataImpl>();
+    public List<DefaultMetaData> getAllEntries() throws CstlServiceException {
+        List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
         List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
-            result.add((MetaDataImpl) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
+            result.add((DefaultMetaData) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
         }
         return result;
     }

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.sml.AbstractComponents;
 import org.constellation.sml.AbstractPositions;
 import org.constellation.sml.System;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

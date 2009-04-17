@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.catalog.Entry;
 import org.constellation.swe.AbstractEncoding;
 import org.constellation.swe.DataBlockDefinition;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  * Resultat d'une observation de type DataBlockDefinition.

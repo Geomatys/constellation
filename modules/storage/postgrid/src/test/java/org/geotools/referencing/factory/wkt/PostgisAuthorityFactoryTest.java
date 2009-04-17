@@ -24,9 +24,9 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.metadata.iso.citation.Citations;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.metadata.iso.citation.Citations;
 import org.constellation.catalog.DatabaseTest;
 
 import org.junit.*;
@@ -86,6 +86,6 @@ public class PostgisAuthorityFactoryTest extends DatabaseTest {
         assertTrue(crs instanceof GeographicCRS);
         assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
 
-        factory.dispose();
+        factory.dispose(false);
     }
 }

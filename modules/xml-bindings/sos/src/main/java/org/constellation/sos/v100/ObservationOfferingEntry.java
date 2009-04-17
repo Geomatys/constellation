@@ -35,7 +35,7 @@ import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.TimeGeometricPrimitivePropertyType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

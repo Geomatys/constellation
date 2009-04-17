@@ -25,7 +25,7 @@ import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
 import org.constellation.sos.v100.OfferingResponseModeEntry;
 import org.constellation.sos.v100.ResponseModeType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

@@ -29,8 +29,8 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
 
-import org.geotools.console.CommandLine;
-import org.geotools.console.Option;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.console.Option;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
@@ -156,7 +156,7 @@ public class CstlEmbeddedService extends CommandLine {
 	 */
 	protected CstlEmbeddedService(String[] args){
 		
-		super(args);
+		super(null, args);
 
         GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
                 "org.constellation.map.ws.rs;" +

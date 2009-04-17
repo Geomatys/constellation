@@ -57,9 +57,8 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotools.metadata.note.Anchors;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.factory.FactoryNotFoundException;
+import org.geotoolkit.factory.FactoryRegistry;
+import org.geotoolkit.factory.FactoryNotFoundException;
 
 /**
  * Web service for administration and configuration operations.
@@ -286,7 +285,6 @@ public class ConfigurationService extends WebService  {
      */
     private AcknowlegementType restartService() {
         LOGGER.info("\n restart requested \n");
-        Anchors.clear();
         cn.reload();
         return new AcknowlegementType("success", "services succefully restarted");
     }

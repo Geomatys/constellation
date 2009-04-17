@@ -17,7 +17,7 @@
 package org.constellation.coverage.timeseries;
 
 import org.constellation.catalog.CRS;
-import org.geotools.coverage.AbstractCoverage;
+import org.geotoolkit.coverage.AbstractCoverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;

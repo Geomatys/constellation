@@ -20,7 +20,7 @@ package org.constellation.coverage.model;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.GridCoverage;
 import org.constellation.catalog.CatalogException;

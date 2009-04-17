@@ -28,11 +28,11 @@ import org.constellation.provider.LayerDetails;
 import org.geotools.display.canvas.GraphicVisitor;
 import org.geotools.display.canvas.control.FailOnErrorMonitor;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.service.DefaultPortrayalService;
+import org.geotools.display2d.service.DefaultPortrayalService;
 import org.geotools.map.MapBuilder;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
 
 

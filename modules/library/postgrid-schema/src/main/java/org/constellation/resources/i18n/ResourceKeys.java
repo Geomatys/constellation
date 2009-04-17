@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *    
  *    THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!
- *    Generated with: org.geotools.resources.IndexedResourceCompiler
+ *    Generated with: org.geotoolkit.resources.IndexedResourceCompiler
  */
 package org.constellation.resources.i18n;
 
@@ -27,8 +27,8 @@ package org.constellation.resources.i18n;
  * classes compiled against the interface, provided that no class
  * implements this interface.
  *
- * @see org.geotools.resources.IndexedResourceBundle
- * @see org.geotools.resources.IndexedResourceCompiler
+ * @see org.geotoolkit.resources.IndexedResourceBundle
+ * @see org.geotoolkit.resources.IndexedResourceCompiler
  * @source $URL$
  */
 public final class ResourceKeys {

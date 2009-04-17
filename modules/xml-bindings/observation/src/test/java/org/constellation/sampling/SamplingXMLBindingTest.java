@@ -21,14 +21,15 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.PointType;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -39,29 +40,25 @@ import static org.junit.Assert.*;
 public class SamplingXMLBindingTest {
 
     private Logger       logger = Logger.getLogger("org.constellation.metadata.fra");
+    private MarshallerPool pool;
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
-    public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.sampling:org.constellation.observation:org.constellation.gml.v311");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
-
+    public void setUp() throws JAXBException {
+        pool = new MarshallerPool("org.constellation.sampling:org.constellation.observation:org.constellation.gml.v311");
+        unmarshaller = pool.acquireUnmarshaller();
+        marshaller   = pool.acquireMarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
+        if (marshaller != null) {
+            pool.release(marshaller);
+        }
     }
 
     /**
@@ -70,7 +67,7 @@ public class SamplingXMLBindingTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void marshallingTest() throws Exception {
+    public void marshallingTest() throws JAXBException {
 
         DirectPositionType pos = new DirectPositionType("urn:ogc:crs:espg:4326", 2, Arrays.asList(3.2, 6.5));
         PointType location = new PointType("point-ID", pos);
@@ -110,7 +107,7 @@ public class SamplingXMLBindingTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void UnmarshalingTest() throws Exception {
+    public void UnmarshalingTest() throws JAXBException {
 
         /*
          * Test Unmarshalling spatial filter.

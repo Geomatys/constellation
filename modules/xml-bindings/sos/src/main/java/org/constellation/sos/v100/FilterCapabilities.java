@@ -25,7 +25,7 @@ import org.constellation.ogc.IdCapabilitiesType;
 import org.constellation.ogc.ScalarCapabilitiesType;
 import org.constellation.ogc.SpatialCapabilitiesType;
 import org.constellation.ogc.TemporalCapabilitiesType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

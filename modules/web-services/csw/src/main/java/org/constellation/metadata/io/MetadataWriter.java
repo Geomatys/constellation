@@ -36,7 +36,7 @@ import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 
 //geotools dependencies
-import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // geotools dependencies
 import org.opengis.metadata.identification.Identification;
@@ -98,8 +98,8 @@ public abstract class MetadataWriter {
                     title = titleSL.getContent().get(0);
             }
                             
-        } else if (obj instanceof MetaDataImpl) {
-            Collection<Identification> idents = ((MetaDataImpl) obj).getIdentificationInfo();
+        } else if (obj instanceof DefaultMetaData) {
+            Collection<Identification> idents = ((DefaultMetaData) obj).getIdentificationInfo();
             if (idents.size() != 0) {
                 Identification ident = idents.iterator().next();
                 if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
@@ -208,8 +208,8 @@ public abstract class MetadataWriter {
                     identifier = identifierSL.getContent().get(0);
             }
 
-        } else if (obj instanceof MetaDataImpl) {
-            identifier = ((MetaDataImpl) obj).getFileIdentifier();
+        } else if (obj instanceof DefaultMetaData) {
+            identifier = ((DefaultMetaData) obj).getFileIdentifier();
 
         } else if (obj instanceof RegistryObject) {
             identifier = ((RegistryObject) obj).getId();

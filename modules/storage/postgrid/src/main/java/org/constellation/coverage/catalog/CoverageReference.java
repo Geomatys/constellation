@@ -28,13 +28,13 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotools.image.io.IIOListeners;
-import org.geotools.coverage.CoverageStack;
-import org.geotools.coverage.GridSampleDimension;  // For javadoc
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.util.NumberRange;
-import org.geotools.util.DateRange;
+import org.geotoolkit.image.io.IIOListeners;
+import org.geotoolkit.coverage.CoverageStack;
+import org.geotoolkit.coverage.GridSampleDimension;  // For javadoc
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridGeometry2D;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.DateRange;
 
 import org.constellation.catalog.Element;
 
@@ -107,7 +107,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     GeographicBoundingBox getGeographicBoundingBox();
 
     /**
-     * For {@link org.geotools.coverage.CoverageStack.Element} implementation only.
+     * For {@link org.geotoolkit.coverage.CoverageStack.Element} implementation only.
      */
     NumberRange getZRange();
 

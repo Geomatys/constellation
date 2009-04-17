@@ -72,8 +72,8 @@ import org.apache.lucene.search.Filter;
 
 // geotools dependencies
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies
 import org.opengis.referencing.FactoryException;

@@ -41,8 +41,8 @@ import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 import java.lang.reflect.UndeclaredThrowableException;
 
-import org.geotools.util.DateRange;
-import org.geotools.image.io.mosaic.Tile;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.image.io.mosaic.Tile;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
@@ -51,8 +51,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -175,7 +174,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         } else {
             series = layer.getSeries(name);
             if (series == null) {
-                throw new NoSuchRecordException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "name", name));
+                throw new NoSuchRecordException(Errors.format(Errors.Keys.ILLEGAL_ARGUMENT_$2, "name", name));
             }
         }
     }
@@ -249,7 +248,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * and {@linkplain ImageReader#getImageMetadata metadata} conform to the Geotools
      * {@linkplain GeographicMetadata geographic metadata}.
      *
-     * {@link org.geotools.image.io.mosaic.Tile} input are also accepted, and in some case
+     * {@link org.geotoolkit.image.io.mosaic.Tile} input are also accepted, and in some case
      * {@link File}, {@link URL} or {@link String}.
      * <p>
      * This method will typically not read the full image, but only the metadata required.

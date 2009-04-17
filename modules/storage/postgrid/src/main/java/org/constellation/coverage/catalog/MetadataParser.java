@@ -34,23 +34,22 @@ import org.opengis.util.CodeList;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.metadata.spatial.PixelOrientation;
-import org.geotools.metadata.iso.spatial.PixelTranslation;
-import org.geotools.image.io.GeographicImageReader;
-import org.geotools.image.io.metadata.Axis;
-import org.geotools.image.io.metadata.ImageGeometry;
-import org.geotools.image.io.metadata.ImageReferencing;
-import org.geotools.image.io.metadata.GeographicMetadata;
-import org.geotools.image.io.metadata.GeographicMetadataFormat;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.util.MeasurementRange;
-import org.geotools.util.NumberRange;
-import org.geotools.util.DateRange;
-import org.geotools.util.Ranks;
+import org.geotoolkit.metadata.iso.spatial.PixelTranslation;
+import org.geotoolkit.image.io.GeographicImageReader;
+import org.geotoolkit.image.io.metadata.Axis;
+import org.geotoolkit.image.io.metadata.ImageGeometry;
+import org.geotoolkit.image.io.metadata.ImageReferencing;
+import org.geotoolkit.image.io.metadata.GeographicMetadata;
+import org.geotoolkit.image.io.metadata.GeographicMetadataFormat;
+import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.Ranks;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
-import org.geotools.image.io.metadata.Identification;
+import org.geotoolkit.image.io.metadata.Identification;
 
 
 /**
@@ -127,7 +126,7 @@ final class MetadataParser {
         if (units != null) try {
             return units.asType(type);
         } catch (ClassCastException e) {
-            throw new CatalogException(Errors.format(ErrorKeys.INCOMPATIBLE_UNIT_$1, units));
+            throw new CatalogException(Errors.format(Errors.Keys.INCOMPATIBLE_UNIT_$1, units));
         }
         return null;
     }

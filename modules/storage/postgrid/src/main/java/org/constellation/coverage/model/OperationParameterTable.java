@@ -30,13 +30,14 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.geotools.resources.XMath;
 
 import org.constellation.catalog.Table;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.IllegalRecordException;
+
+import org.geotoolkit.util.converter.Classes;
 
 
 /**
@@ -81,7 +82,7 @@ public class OperationParameterTable extends Table {
             try {
                 final ParameterValue parameter = parameters.parameter(name);
                 Class type = ((ParameterDescriptor) parameter.getDescriptor()).getValueClass();
-                type = XMath.primitiveToWrapper(type);
+                type = Classes.primitiveToWrapper(type);
                 /*
                  * Cas des booléens. Certaines bases de données se chargent d'interpréter des
                  * caractères comme 'Y' et 'N'. On laissera la base base de données faire elle-

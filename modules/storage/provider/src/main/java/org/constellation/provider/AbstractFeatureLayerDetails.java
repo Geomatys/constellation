@@ -36,23 +36,23 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.container.GlyphLegendFactory;
+import org.geotools.display2d.service.DefaultGlyphService;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapLayer;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -73,7 +73,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider");
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
-            new GeographicBoundingBoxImpl(-180, 180, -77, +77);
+            new DefaultGeographicBoundingBox(-180, 180, -77, +77);
     /**
      * Defines the number of pixels we want to add to the specified coordinates given by
      * the GetFeatureInfo request.
@@ -179,7 +179,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             }
 
             if(renv != null){
-                GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(renv);
+                GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(renv);
                 return bbox;
             }
 
@@ -318,8 +318,8 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      */
     @Override
     public BufferedImage getLegendGraphic(final Dimension dimension) {
-        final GlyphLegendFactory sldFact = new GlyphLegendFactory();
-        return sldFact.create(RANDOM_FACTORY.createDefaultVectorStyle(fs), dimension);
+        final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
+        return DefaultGlyphService.create(style, dimension);
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // JUnit dependencies
@@ -47,6 +47,7 @@ import static org.junit.Assert.*;
  */
 public class CSWorkerInitialisationTest {
 
+    private MarshallerPool pool;
     private LinkedBlockingQueue<Unmarshaller> unmarshallers;
     private LinkedBlockingQueue<Marshaller>  marshallers;
 
@@ -100,18 +101,15 @@ public class CSWorkerInitialisationTest {
     @Before
     public void setUp() throws Exception {
         emptyConfigurationDirectory();
-        JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
 
         unmarshallers = new LinkedBlockingQueue<Unmarshaller>(1);
         marshallers   = new LinkedBlockingQueue<Marshaller>(1);
 
-        Unmarshaller u = context.createUnmarshaller();
+        pool = new MarshallerPool(CSWClassesContext.getAllClasses());
+        Unmarshaller u = pool.acquireUnmarshaller();
         unmarshallers.add(u);
 
-        Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        m.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+        Marshaller m = pool.acquireMarshaller();
         marshallers.add(m);
         
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));

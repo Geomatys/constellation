@@ -17,7 +17,6 @@
  */
 package org.constellation.coverage.model;
 
-import org.constellation.catalog.*;
 import org.constellation.coverage.catalog.*;
 import java.util.Set;
 import java.util.Date;
@@ -34,11 +33,11 @@ import java.sql.SQLException;
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import org.geotools.coverage.CoverageStack;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.coverage.SpatioTemporalCoverage3D;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotoolkit.coverage.CoverageStack;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.coverage.SpatioTemporalCoverage3D;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 
 import org.constellation.catalog.DatabaseTest;
 import org.constellation.catalog.CatalogException;
@@ -98,7 +97,7 @@ public class IntegrationTest extends DatabaseTest {
         final Date d = dateFormat.parse(date);
         final GeneralDirectPosition position = new GeneralDirectPosition(database.getCoordinateReferenceSystem());
         final DefaultTemporalCRS crs = DefaultTemporalCRS.wrap(
-                org.geotools.referencing.CRS.getTemporalCRS(position.getCoordinateReferenceSystem()));
+                org.geotoolkit.referencing.CRS.getTemporalCRS(position.getCoordinateReferenceSystem()));
         position.setOrdinate(0, longitude);
         position.setOrdinate(1, latitude);
         position.setOrdinate(2, crs.toValue(d));
@@ -162,7 +161,7 @@ public class IntegrationTest extends DatabaseTest {
         final LayerTable table = new LayerTable(database.getTable(LayerTable.class));
         final Set<Layer> all = table.getEntries();
         assertFalse(all.isEmpty());
-        final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-60, 40, 15, 80);
+        final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-60, 40, 15, 80);
         table.setGeographicBoundingBox(bbox);
         assertEquals(bbox, table.getGeographicBoundingBox());
         table.trimEnvelope(); // Should have no effect when the selection contains world rasters.

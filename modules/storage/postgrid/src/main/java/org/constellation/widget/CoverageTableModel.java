@@ -55,10 +55,10 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CannotRedoException;
 
-import org.geotools.util.DateRange;
-import org.geotools.resources.XArray;
-import org.geotools.image.io.IIOListeners;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.util.DateRange;
+import org.geotoolkit.util.XArrays;
+import org.geotoolkit.image.io.IIOListeners;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
@@ -436,7 +436,7 @@ public class CoverageTableModel extends AbstractTableModel {
             if (index != null) {
                 // Cas où le même nom serait demandé plusieurs fois.
                 final int length = index.length;
-                index = XArray.resize(index, length+1);
+                index = XArrays.resize(index, length+1);
                 index[length] = i;
                 map.put(names[i], index);
             }
@@ -523,7 +523,7 @@ public class CoverageTableModel extends AbstractTableModel {
                 if (upper != lower) {
                     if (entries == oldEntries) {
                         // Créé une copie, de façon à ne pas modifier le tableau 'entries' original.
-                        entries = XArray.remove(entries, lower, upper-lower);
+                        entries = XArrays.remove(entries, lower, upper-lower);
                     } else {
                         // Si le tableau est déjà une copie, travaille directement sur lui.
                         System.arraycopy(entries, upper, entries, lower, entriesLength-upper);
@@ -534,7 +534,7 @@ public class CoverageTableModel extends AbstractTableModel {
                 upper=i;
             }
         }
-        this.entries = XArray.resize(entries, entriesLength);
+        this.entries = XArrays.resize(entries, entriesLength);
         commitEdit(oldEntries, this.entries, ResourceKeys.DELETE);
     }
 

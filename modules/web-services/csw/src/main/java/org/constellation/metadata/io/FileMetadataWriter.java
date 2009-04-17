@@ -30,8 +30,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.LinkedBlockingQueue;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -43,9 +41,9 @@ import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
-import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.util.SimpleInternationalString;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.InternationalString;
 import static org.constellation.ows.OWSExceptionCode.*;
 
@@ -63,12 +61,7 @@ public class FileMetadataWriter extends MetadataWriter {
     /**
      * A marshaller to store object from harvested resource.
      */
-    private final  LinkedBlockingQueue<Marshaller> marshallers;
-
-    /**
-     * A marshaller to store object from harvested resource.
-     */
-    private final  LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final  MarshallerPool marshallerPool;
     
     /**
      * A directory in witch the metadata files are stored.
@@ -87,18 +80,9 @@ public class FileMetadataWriter extends MetadataWriter {
         if (dataDirectory == null || !dataDirectory.exists()) {
             throw new CstlServiceException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
-        marshallers   = new LinkedBlockingQueue<Marshaller>(MAX_QUEUE_SIZE);
-        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
+        
         try {
-            JAXBContext context = JAXBContext.newInstance(CSWClassesContext.getAllClasses());
-            for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-                Marshaller m = context.createMarshaller();
-                m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-                m.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-                marshallers.add(m);
-                unmarshallers.add(context.createUnmarshaller());
-            }
+            marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
         }
@@ -110,22 +94,20 @@ public class FileMetadataWriter extends MetadataWriter {
         File f = null;
         Marshaller marshaller = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
             String identifier = findIdentifier(obj);
             f = new File(dataDirectory, identifier + ".xml");
             f.createNewFile();
             marshaller.marshal(obj, f);
             indexer.indexDocument(obj);
             
-        } catch (InterruptedException ex) {
-            throw new CstlServiceException("interruptedException while marshalling the object: " + obj, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             throw new CstlServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new CstlServiceException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
         return true;
@@ -188,7 +170,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
                 // we look for a know metadata type
                 if (typeName.equals("MD_Metadata")) {
-                    type = MetaDataImpl.class;
+                    type = DefaultMetaData.class;
                 } else if (typeName.equals("Record")) {
                     type = RecordType.class;
                 } else {
@@ -503,21 +485,18 @@ public class FileMetadataWriter extends MetadataWriter {
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 Object metadata = unmarshaller.unmarshal(metadataFile);
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
                 return metadata;
-            } catch (InterruptedException ex) {
-                throw new CstlServiceException("InterruptedException while unnmarshalling the metadataFile : " + identifier + ".xml" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
         } else {

@@ -51,11 +51,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 
-import org.geotools.io.TableWriter;
-import org.geotools.resources.JDBC;
-import org.geotools.resources.Classes;
+import org.geotoolkit.io.TableWriter;
+import org.geotoolkit.internal.jdbc.JDBC;
+import org.geotoolkit.util.converter.Classes;
 import org.geotools.resources.Arguments;
-import org.geotools.util.logging.Logging;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

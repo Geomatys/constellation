@@ -28,10 +28,10 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.util.Utilities;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.util.Utilities;
 import org.constellation.coverage.model.Operation;
 
 

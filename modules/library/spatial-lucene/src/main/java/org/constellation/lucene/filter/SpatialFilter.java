@@ -31,10 +31,10 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
 
 // geotools dependencies
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
-import org.geotools.util.Utilities;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.Utilities;
 
 // GeoAPI dependencies
 import org.opengis.referencing.FactoryException;

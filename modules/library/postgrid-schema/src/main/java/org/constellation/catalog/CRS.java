@@ -21,10 +21,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.metadata.iso.extent.ExtentImpl;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.metadata.iso.extent.DefaultExtent;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.TemporalCRS;
 
 
@@ -105,7 +105,7 @@ public enum CRS {
     static {
         final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(CoordinateReferenceSystem.NAME_KEY, "WGS84");
-        properties.put(CoordinateReferenceSystem.DOMAIN_OF_VALIDITY_KEY, ExtentImpl.WORLD);
+        properties.put(CoordinateReferenceSystem.DOMAIN_OF_VALIDITY_KEY, DefaultExtent.WORLD);
 
         XY  .crs = DefaultGeographicCRS.WGS84;
         XYZ .crs = DefaultGeographicCRS.WGS84_3D;

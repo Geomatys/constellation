@@ -21,9 +21,9 @@ package org.constellation.lucene.filter;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.util.Utilities;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.util.Utilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 

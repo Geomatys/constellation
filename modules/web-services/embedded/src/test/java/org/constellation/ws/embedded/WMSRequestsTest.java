@@ -39,10 +39,12 @@ import org.constellation.wms.v111.Layer;
 import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.ws.ServiceExceptionReport;
 
-// JUnit dependencies
+// Geotools dependencies
 import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
 import org.geotools.internal.jaxb.v110.sld.TypeNameType;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;

@@ -52,21 +52,21 @@ import javax.media.jai.JAI;
 import javax.media.jai.operator.BandMergeDescriptor;
 import com.sun.media.imageio.stream.RawImageInputStream;
 
-import org.geotools.util.Utilities;
-import org.geotools.util.NumberRange;
-import org.geotools.util.MeasurementRange;
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.gui.swing.image.ColorRamp;
-import org.geotools.gui.swing.tree.MutableTreeNode;
-import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.image.io.IIOListeners;
-import org.geotools.image.io.RawBinaryImageReadParam;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.NumberRange;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.coverage.Category;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.gui.swing.image.ColorRamp;
+import org.geotoolkit.gui.swing.tree.MutableTreeNode;
+import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.image.io.IIOListeners;
+import org.geotoolkit.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
-import org.geotools.image.io.mosaic.MosaicImageReader;
-import org.geotools.image.io.mosaic.MosaicImageReadParam;
-import org.geotools.resources.Classes;
-import org.geotools.resources.XArray;
+import org.geotoolkit.image.io.mosaic.MosaicImageReader;
+import org.geotoolkit.image.io.mosaic.MosaicImageReadParam;
+import org.geotoolkit.util.converter.Classes;
+import org.geotoolkit.util.XArrays;
 
 import org.constellation.catalog.Entry;
 import org.constellation.resources.i18n.Resources;
@@ -436,7 +436,7 @@ final class FormatEntry extends Entry implements Format {
              * the later is a subclass of ImageInputStream which is supported by every readers.
              * Looking for it cause this code to be executed for every formats, not just RAW.
              */
-            if (inputStream != null && XArray.containsIgnoreCase(spi.getFormatNames(), "raw")) {
+            if (inputStream != null && XArrays.containsIgnoreCase(spi.getFormatNames(), "raw")) {
                 // Patch contributed by Sam Hiatt
                 // NOTE this fix requires a patched version of jai-imageio.jar
                 // contact me if you have any questions about that.
@@ -509,7 +509,7 @@ final class FormatEntry extends Entry implements Format {
                 .add(reader));                     // L'objet à utiliser pour la lecture.
             this.reader = null;                    // N'utilise qu'un ImageReader par opération.
 
-            if (inputStream != null && XArray.containsIgnoreCase(spi.getFormatNames(), "raw")) {
+            if (inputStream != null && XArrays.containsIgnoreCase(spi.getFormatNames(), "raw")) {
             // workaround to mask out no-data values in the new image
             // TODO: add no-data specification in Formats table, or somewhere
                 double[] lower = { -9999 };  //TODO: get these from the database

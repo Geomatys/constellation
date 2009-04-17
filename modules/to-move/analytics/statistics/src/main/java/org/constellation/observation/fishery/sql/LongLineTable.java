@@ -31,7 +31,7 @@ import org.opengis.observation.sampling.SamplingFeatureCollection;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.sampling.SamplingFeatureTable;
-import org.geotools.util.DateRange;
+import org.geotoolkit.util.DateRange;
 
 
 

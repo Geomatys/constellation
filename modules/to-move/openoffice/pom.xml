@@ -56,11 +56,11 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-referencing</artifactId>
+      <artifactId>gtm-referencing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-openoffice</artifactId>
+      <artifactId>gtm-openoffice</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation</groupId>
@@ -98,7 +98,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>        <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
-      <artifactId>gt-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
+      <artifactId>gtm-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
       <scope>provided</scope>
     </dependency>
   </dependencies>

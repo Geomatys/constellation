@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 
-import org.geotools.io.TableWriter;
-import org.geotools.util.Utilities;
+import org.geotoolkit.io.TableWriter;
+import org.geotoolkit.util.Utilities;
 import org.geotools.resources.Arguments;
 
 import org.constellation.catalog.Database;

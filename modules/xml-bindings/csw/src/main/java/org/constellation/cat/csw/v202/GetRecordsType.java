@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.constellation.cat.csw.GetRecordsRequest;
 import org.constellation.ogc.FilterType;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 
 /**

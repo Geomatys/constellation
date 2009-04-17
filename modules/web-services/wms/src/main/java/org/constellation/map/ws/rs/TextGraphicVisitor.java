@@ -19,7 +19,7 @@
 package org.constellation.map.ws.rs;
 
 import org.constellation.query.wms.GetFeatureInfo;
-import org.geotools.display.canvas.AbstractGraphicVisitor;
+import org.geotools.display2d.canvas.AbstractGraphicVisitor;
 
 /**
  *

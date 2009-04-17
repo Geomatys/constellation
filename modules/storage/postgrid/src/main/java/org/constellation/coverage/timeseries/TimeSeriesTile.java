@@ -32,24 +32,25 @@ import javax.media.jai.RasterFactory;
 import org.opengis.util.ProgressListener;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-import org.geotools.util.logging.Logging;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.coverage.grid.GeneralGridGeometry;
-import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.coverage.CoverageFactoryFinder;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.grid.GeneralGridEnvelope;
+import org.geotoolkit.coverage.grid.GridCoverageFactory;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.resources.Errors;
 
 
 /**
@@ -195,15 +196,15 @@ public class TimeSeriesTile {
         this.varyingDimension = varyingDimension;
         final int dimension   = coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
         if (envelope.getDimension() != dimension) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+            throw new MismatchedDimensionException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3,
                                                    "envelope", envelope.getDimension(), dimension));
         }
         if (step.length != dimension) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+            throw new MismatchedDimensionException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3,
                                                    "step", step.length, dimension));
         }
         if (varyingDimension < 0 || varyingDimension >= dimension) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+            throw new IllegalArgumentException(Errors.format(Errors.Keys.ILLEGAL_ARGUMENT_$2,
                                                "varyingDimension", varyingDimension));
         }
         /*
@@ -224,7 +225,7 @@ public class TimeSeriesTile {
         size = new int[dimension];
         for (int i=0; i<dimension; i++) {
             final double s   = step[i];
-            final int    n   = size[i] = (int) Math.floor(envelope.getLength(i)/s + EPS);
+            final int    n   = size[i] = (int) Math.floor(envelope.getSpan(i)/s + EPS);
             final double min = envelope.getMinimum(i);
             this.envelope.setRange(i, min, min + n*s);
             if (i != varyingDimension) {
@@ -244,7 +245,7 @@ public class TimeSeriesTile {
          * (à ne pas confondre avec une éventuelle grille du 'coverage' source) vers les
          * coordonnées géographiques.
          */
-        final GeneralGridRange gridRange = new GeneralGridRange(new int[size.length], size);
+        final GridEnvelope gridRange = new GeneralGridEnvelope(new int[size.length], size, false);
         final GeneralGridGeometry gridGeometry = new GeneralGridGeometry(gridRange, envelope);
         gridToCRS = gridGeometry.getGridToCRS();
         /*
@@ -432,7 +433,7 @@ public class TimeSeriesTile {
             // TODO : trouver un nom plus générique pour les images... ATTENTION au chemin !!!
             final String fileName = "C:\\Documents and Settings\\Antoine\\Bureau\\TestTimeSeriesTile\\imageT";
             ImageIO.write(
-                    gridCoverage.geophysics(false).getRenderedImage(),
+                    gridCoverage.view(ViewType.RENDERED).getRenderedImage(),
                     "png",
                     new File(fileName + j + ".png"));
         }

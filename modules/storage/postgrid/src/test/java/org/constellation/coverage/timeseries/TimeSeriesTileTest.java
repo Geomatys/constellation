@@ -18,7 +18,7 @@
 package org.constellation.coverage.timeseries;
 
 import junit.framework.*;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.opengis.geometry.Envelope;
 
 

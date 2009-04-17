@@ -27,7 +27,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.NoninvertibleTransformException;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotoolkit.referencing.operation.matrix.XAffineTransform;
 
 // Graphics
 import java.awt.Paint;
@@ -72,10 +72,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 // Resources
-import org.geotools.resources.XMath;
-import org.geotools.resources.XArray;
-import org.geotools.util.Utilities;
-import org.geotools.gui.swing.ExceptionMonitor;
+import org.geotoolkit.math.XMath;
+import org.geotoolkit.util.XArrays;
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.gui.swing.ExceptionMonitor;
 
 
 /**
@@ -1380,7 +1380,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
         if (editors == null) {
             editors = new Control[1];
         } else {
-            editors = (Control[]) XArray.resize(editors, editors.length + 1);
+            editors = (Control[]) XArrays.resize(editors, editors.length + 1);
         }
         editors[editors.length - 1] = control;
         return component;
@@ -1396,7 +1396,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
         if (editors != null) {
             for (int i = 0; i < editors.length; i++) {
                 if (editors[i].editor == editor) {
-                    editors = (Control[])  XArray.remove(editors, i, 1);
+                    editors = (Control[])  XArrays.remove(editors, i, 1);
                     /*
                      * In principal, there should be no more objects to 
                      * remove from the table.  But we let the loop continue

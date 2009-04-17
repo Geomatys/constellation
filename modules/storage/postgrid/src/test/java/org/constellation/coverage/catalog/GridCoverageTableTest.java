@@ -28,14 +28,14 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.TableTest;
 
 import org.junit.*;
-import static org.geotools.referencing.CRS.getHorizontalCRS;
+import static org.geotoolkit.referencing.CRS.getHorizontalCRS;
 
 
 /**

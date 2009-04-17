@@ -155,7 +155,8 @@
     be the one declared below.
   -->
   <properties>
-    <geotools.version>2.9-SNAPSHOT</geotools.version>
+    <geotools.version>2.6-SNAPSHOT</geotools.version>
+    <geotoolkit.version>3.00-SNAPSHOT</geotoolkit.version>
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
     <constellation.map>org.constellation.map.ws.rs</constellation.map>
@@ -198,16 +199,6 @@
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-server</artifactId>
         <version>1.0.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.1.5</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.2</version>
       </dependency>
       <dependency>
         <groupId>javax.xml.ws</groupId>
@@ -314,93 +305,104 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-api</artifactId>
+        <artifactId>gtm-api</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-coverage</artifactId>
+        <artifactId>gtm-coverage</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-coverageio</artifactId>
+        <artifactId>gtm-coverageio</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-coverageio-netcdf</artifactId>
+        <artifactId>gtm-coverageio-netcdf</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-cql</artifactId>
+        <artifactId>gtm-cql</artifactId>
          <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-epsg-hsql</artifactId>
+        <artifactId>gtm-go2</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-go2</artifactId>
+        <artifactId>gtm-go2-style-extension</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-go2-style-extension</artifactId>
+        <artifactId>gtm-main</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-main</artifactId>
+        <artifactId>gtm-metadata</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-metadata</artifactId>
+        <artifactId>gtm-openoffice</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-openoffice</artifactId>
+        <artifactId>gtm-postgis</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-postgis</artifactId>
+        <artifactId>gtm-referencing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-referencing</artifactId>
+        <artifactId>gtm-render</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-render</artifactId>
+        <artifactId>gtm-shapefile</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-shapefile</artifactId>
+        <artifactId>gtm-sld</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-sld</artifactId>
+        <artifactId>gtm-temporal</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-temporal</artifactId>
+        <artifactId>gtm-widgets-swing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
+      <!-- Geotoolkit version -->
       <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt-widgets-swing</artifactId>
-        <version>${geotools.version}</version>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>gto-epsg-postgresql</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>gto-metadata-fra</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>gto-utility</artifactId>
+        <version>${geotoolkit.version}</version>
       </dependency>
       <!-- database driver -->
       <dependency>

@@ -17,7 +17,7 @@
 
 package org.constellation.generic.database;
 
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 
 /**
  *

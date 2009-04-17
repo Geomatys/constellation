@@ -27,7 +27,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 
-import org.geotools.util.NumberRange;
+import org.geotoolkit.util.NumberRange;
 import org.constellation.catalog.TableTest;
 import org.constellation.catalog.CatalogException;
 

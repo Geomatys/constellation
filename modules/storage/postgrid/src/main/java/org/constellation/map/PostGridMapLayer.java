@@ -34,32 +34,34 @@ import javax.media.jai.Interpolation;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
 
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridEnvelope;
-import org.geotools.coverage.grid.GeneralGridGeometry;
-import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.grid.GeneralGridEnvelope;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotools.coverage.io.CoverageReadParam;
-import org.geotools.coverage.processing.ColorMap;
-import org.geotools.coverage.processing.CoverageProcessingException;
-import org.geotools.coverage.processing.Operations;
+import org.geotoolkit.coverage.processing.ColorMap;
+import org.geotoolkit.coverage.processing.CoverageProcessingException;
+import org.geotoolkit.coverage.processing.Operations;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotools.display.exception.PortrayalException;
-import org.geotools.display.primitive.GraphicJ2D;
-import org.geotools.display.renderer.RenderingContext;
-import org.geotools.display.renderer.RenderingContext2D;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.display2d.primitive.GraphicJ2D;
+import org.geotools.display.canvas.RenderingContext;
+import org.geotools.display2d.canvas.RenderingContext2D;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.AbstractMapLayer;
 import org.geotools.map.DynamicMapLayer;
 import org.geotools.map.GraphicBuilder;
 import org.geotools.map.MapLayer;
 import org.geotools.map.MapBuilder;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.style.MutableStyle;
-import org.geotools.style.StyleFactory;
-import org.geotools.util.MeasurementRange;
+import org.geotoolkit.util.MeasurementRange;
 
+import org.geotools.style.MutableStyleFactory;
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.geometry.Envelope;
@@ -319,7 +321,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                 }
             }
         }
-        coverage = coverage.geophysics(false);
+        coverage = coverage.view(ViewType.RENDERED);
         final RenderedImage img = coverage.getRenderableImage(0, 1).createDefaultRendering();
 
         //normal image rendering
@@ -481,7 +483,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
                     }
                 }
             }
-            coverage = coverage.geophysics(false);
+            coverage = coverage.view(ViewType.RENDERED);
             img = coverage.getRenderableImage(0, 1).createDefaultRendering();
             
             try {
@@ -627,7 +629,8 @@ public class PostGridMapLayer extends AbstractMapLayer implements DynamicMapLaye
     }
 
     private static final MutableStyle createDefaultRasterStyle() {
-        final StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+        final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
         final RasterSymbolizer symbol =sf.rasterSymbolizer();
         return sf.style(symbol);
     }

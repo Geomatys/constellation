@@ -52,14 +52,6 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-csw</artifactId>
       <version>${project.version}</version>

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.metadata.ResponsiblePartyEntry;
-import org.geotools.util.Utilities;
+import org.geotoolkit.util.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SurveyProcedure;

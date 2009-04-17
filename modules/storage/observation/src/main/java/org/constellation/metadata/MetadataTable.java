@@ -29,8 +29,8 @@ import org.opengis.metadata.quality.DataQuality;
 
 // Geotools dependencies
 import org.geotools.metadata.sql.MetadataSource;
-import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.metadata.iso.quality.DataQualityImpl;
+import org.geotoolkit.metadata.iso.citation.DefaultCitation;
+import org.geotoolkit.metadata.iso.quality.DefaultDataQuality;
 
 
 /**
@@ -94,7 +94,7 @@ public class MetadataTable extends Table {
                 // TODO
             }
             if (candidate instanceof Citation) {
-                candidate = type.cast(new CitationImpl((Citation) candidate));
+                candidate = type.cast(new DefaultCitation((Citation) candidate));
             }
             p.put(identifier, candidate);
         }

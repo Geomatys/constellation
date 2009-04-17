@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.Date;
 import java.sql.SQLException;
 
-import org.geotools.util.NumberRange;
+import org.geotoolkit.util.NumberRange;
 import org.constellation.catalog.TableTest;
 import org.constellation.catalog.CatalogException;
 
