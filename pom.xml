@@ -391,11 +391,6 @@
       <!-- Geotoolkit version -->
       <dependency>
         <groupId>org.geotoolkit</groupId>
-        <artifactId>gto-epsg-postgresql</artifactId>
-        <version>${geotoolkit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotoolkit</groupId>
         <artifactId>gto-metadata-fra</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
@@ -413,7 +408,7 @@
       <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>8.1-407.jdbc3</version>
+        <version>8.3-603.jdbc4</version>
       </dependency>
       <dependency>
         <groupId>org.postgis</groupId>
@@ -467,14 +462,9 @@
       <url>http://maven.geomatys.fr/repository</url>
     </repository>
     <repository>
-      <id>geotools</id>
-      <name>Geotools et ses dépendances spécifiques</name>
-      <url>http://maven.geotools.fr/repository</url>
-    </repository>
-    <repository>
-      <id>geotidy</id>
-      <name>Geotidy et ses dépendances spécifiques</name>
-      <url>http://geotidy.geomatys.fr/repository</url>
+      <id>geotoolkit</id>
+      <name>GeoToolkit repository</name>
+      <url>http://maven.geotoolkit.org/</url>
     </repository>
     <repository>
       <id>apache</id>
@@ -490,6 +480,9 @@
     </pluginRepository>
     <pluginRepository>
       <id>geotools</id>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <name>Geotools et ses dépendances spécifiques</name>
       <url>http://maven.geotools.fr/repository</url>
     </pluginRepository>

@@ -51,23 +51,23 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-     <dependency>
+    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
     </dependency>
     <dependency>
-       <groupId>org.geotools</groupId>
-       <artifactId>gtm-referencing</artifactId>
+      <groupId>org.geotools</groupId>
+      <artifactId>gtm-referencing</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>gto-epsg-postgresql</artifactId>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-       <groupId>org.constellation.library</groupId>
-       <artifactId>cstl-lib-base</artifactId>
-       <version>${project.version}</version>
     </dependency>
   </dependencies>
 
