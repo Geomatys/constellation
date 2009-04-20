@@ -33,7 +33,7 @@ import org.constellation.wms.AbstractWMSCapabilities;
 import org.constellation.ws.CstlServiceException;
 
 //Geotools dependencies
-import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
 
 
 /**

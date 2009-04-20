@@ -110,7 +110,7 @@ import org.constellation.ws.CstlServiceException;
 // Geotools dependencies
 import org.constellation.ws.rs.WebService;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotools.display.exception.PortrayalException;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 // GeoAPI dependencies

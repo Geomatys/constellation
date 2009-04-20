@@ -55,20 +55,20 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-go2</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-go2</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-go2-style-extension</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-go2-style-extension</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gtm-shapefile</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-sld</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-sld</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

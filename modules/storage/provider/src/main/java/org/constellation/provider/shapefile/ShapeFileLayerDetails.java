@@ -27,9 +27,9 @@ import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.map.MapBuilder;
-import org.geotools.map.MapLayer;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableStyle;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;

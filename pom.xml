@@ -330,16 +330,6 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gtm-go2</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gtm-go2-style-extension</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
         <artifactId>gtm-main</artifactId>
         <version>${geotools.version}</version>
       </dependency>
@@ -365,17 +355,7 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gtm-render</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
         <artifactId>gtm-shapefile</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gtm-sld</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
@@ -388,6 +368,7 @@
         <artifactId>gtm-widgets-swing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
+
       <!-- Geotoolkit version -->
       <dependency>
         <groupId>org.geotoolkit</groupId>
@@ -399,6 +380,30 @@
         <artifactId>gto-utility</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
+
+      <!-- Geotoolkit pending version -->
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-go2</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-go2-style-extension</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-render</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-sld</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+
+
       <!-- database driver -->
       <dependency>
         <groupId>ojdbc</groupId>

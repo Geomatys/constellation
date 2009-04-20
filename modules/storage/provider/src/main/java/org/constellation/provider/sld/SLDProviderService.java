@@ -21,11 +21,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
-import org.geotools.style.MutableStyle;
+
+import org.geotoolkit.style.MutableStyle;
 
 import static org.constellation.provider.sld.SLDProvider.*;
 

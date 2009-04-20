@@ -33,12 +33,12 @@ import org.constellation.ws.ServiceType;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotools.display.exception.PortrayalException;
-import org.geotools.map.MapLayer;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.style.MutableStyleFactory;
 
-import org.geotools.style.MutableStyleFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;

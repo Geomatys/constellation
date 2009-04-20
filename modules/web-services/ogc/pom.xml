@@ -109,8 +109,8 @@
       <artifactId>ojdbc</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-sld</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-sld</artifactId>
     </dependency>
     
   </dependencies>

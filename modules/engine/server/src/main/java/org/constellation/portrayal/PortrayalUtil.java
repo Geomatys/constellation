@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.constellation.provider.LayerDetails;
-import org.geotools.sld.MutableLayer;
-import org.geotools.sld.MutableLayerStyle;
-import org.geotools.sld.MutableNamedLayer;
-import org.geotools.sld.MutableNamedStyle;
-import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.sld.MutableLayer;
+import org.geotoolkit.sld.MutableLayerStyle;
+import org.geotoolkit.sld.MutableNamedLayer;
+import org.geotoolkit.sld.MutableNamedStyle;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.style.MutableStyle;
 
 /**
  * Utility methods for the Portrayal system.

@@ -40,9 +40,9 @@ import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.ws.ServiceExceptionReport;
 
 // Geotools dependencies
-import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
-import org.geotools.internal.jaxb.v110.sld.TypeNameType;
+import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotoolkit.internal.jaxb.v110.sld.LayerDescriptionType;
+import org.geotoolkit.internal.jaxb.v110.sld.TypeNameType;
 
 // JUnit dependencies
 import org.junit.*;
@@ -213,7 +213,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         try {
             final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
                                                                 "org.constellation.wms.v111:" +
-                                                                "org.geotools.internal.jaxb.v110.sld");
+                                                                "org.geotoolkit.internal.jaxb.v110.sld");
             obj = context.createUnmarshaller().unmarshal(in);
             assertTrue(obj instanceof WMT_MS_Capabilities);
         } catch (JAXBException ex) {
@@ -341,7 +341,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         try {
             final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
                                                                 "org.constellation.wms.v111:" +
-                                                                "org.geotools.internal.jaxb.v110.sld");
+                                                                "org.geotoolkit.internal.jaxb.v110.sld");
             obj = context.createUnmarshaller().unmarshal(in);
             assertTrue(obj instanceof DescribeLayerResponseType);
         } catch (JAXBException ex) {

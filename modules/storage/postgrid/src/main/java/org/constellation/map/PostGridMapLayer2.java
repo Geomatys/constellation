@@ -31,13 +31,13 @@ import org.geotoolkit.factory.Hints;
 import org.geotools.feature.NameImpl;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.AbstractMapLayer;
-import org.geotools.map.CoverageMapLayer;
+import org.geotoolkit.map.AbstractMapLayer;
+import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.style.MutableStyleFactory;
 
-import org.geotools.style.MutableStyleFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

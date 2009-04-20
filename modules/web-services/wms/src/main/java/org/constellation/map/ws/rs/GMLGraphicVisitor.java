@@ -38,11 +38,11 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotools.display2d.primitive.GraphicCoverageJ2D;
-import org.geotools.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.GraphicCoverageJ2D;
+import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.FeatureMapLayer;
+import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.MeasurementRange;

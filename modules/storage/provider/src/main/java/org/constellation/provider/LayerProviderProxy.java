@@ -27,7 +27,7 @@ import java.util.Set;
 
 import java.util.logging.Logger;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.geotools.map.ElevationModel;
+import org.geotoolkit.map.ElevationModel;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 

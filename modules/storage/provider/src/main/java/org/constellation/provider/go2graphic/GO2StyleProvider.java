@@ -23,9 +23,9 @@ import java.util.Set;
 import org.constellation.provider.StyleProvider;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotools.display2d.ext.vectorfield.VectorFieldSymbolizer;
-import org.geotools.style.MutableStyle;
-import org.geotools.style.MutableStyleFactory;
+import org.geotoolkit.display2d.ext.vectorfield.VectorFieldSymbolizer;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
 import org.opengis.style.Symbolizer;
 
 /**

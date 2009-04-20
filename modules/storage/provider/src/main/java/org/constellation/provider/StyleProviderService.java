@@ -17,7 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Collection;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 
 /**

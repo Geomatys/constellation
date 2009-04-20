@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 
 /**

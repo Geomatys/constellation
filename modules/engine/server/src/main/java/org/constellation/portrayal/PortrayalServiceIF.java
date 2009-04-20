@@ -21,8 +21,8 @@ import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
-import org.geotools.display.canvas.GraphicVisitor;
-import org.geotools.display.exception.PortrayalException;
+import org.geotoolkit.display.canvas.GraphicVisitor;
+import org.geotoolkit.display.exception.PortrayalException;
 
 /**
  * The interface for portrayal methods provided by Constellation.

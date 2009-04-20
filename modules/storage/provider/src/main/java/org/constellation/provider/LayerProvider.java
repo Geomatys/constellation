@@ -16,7 +16,7 @@
  */
 package org.constellation.provider;
 
-import org.geotools.map.ElevationModel;
+import org.geotoolkit.map.ElevationModel;
 
 
 /**

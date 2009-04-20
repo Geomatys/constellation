@@ -16,7 +16,7 @@
  */
 package org.constellation.provider;
 
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 /**
  *

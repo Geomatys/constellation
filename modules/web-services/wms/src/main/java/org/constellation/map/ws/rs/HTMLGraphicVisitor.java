@@ -26,9 +26,9 @@ import java.util.Map;
 import javax.measure.unit.Unit;
 
 import org.constellation.query.wms.GetFeatureInfo;
-import org.geotools.display2d.primitive.GraphicCoverageJ2D;
-import org.geotools.display2d.primitive.ProjectedFeature;
-import org.geotools.map.FeatureMapLayer;
+import org.geotoolkit.display2d.primitive.GraphicCoverageJ2D;
+import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.map.FeatureMapLayer;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;

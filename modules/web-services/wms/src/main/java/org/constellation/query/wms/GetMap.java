@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
-import org.geotools.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 import org.opengis.geometry.Envelope;

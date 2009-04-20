@@ -30,18 +30,18 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotools.sld.MutableLayer;
-import org.geotools.sld.MutableLayerStyle;
-import org.geotools.sld.MutableNamedLayer;
-import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.sld.MutableUserLayer;
-import org.geotools.style.MutableFeatureTypeStyle;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.sld.MutableLayer;
+import org.geotoolkit.sld.MutableLayerStyle;
+import org.geotoolkit.sld.MutableNamedLayer;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.MutableUserLayer;
+import org.geotoolkit.style.MutableFeatureTypeStyle;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.SoftValueHashMap;
-import org.geotools.style.MutableStyleFactory;
-import org.geotools.style.xml.Specification.StyledLayerDescriptor;
-import org.geotools.style.xml.Specification.SymbologyEncoding;
-import org.geotools.style.xml.XMLUtilities;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.style.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.style.xml.XMLUtilities;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.

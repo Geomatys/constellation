@@ -82,18 +82,18 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
-import org.geotools.display.exception.PortrayalException;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.internal.jaxb.v110.se.OnlineResourceType;
-import org.geotools.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.geotools.internal.jaxb.v110.sld.LayerDescriptionType;
-import org.geotools.internal.jaxb.v110.sld.TypeNameType;
-import org.geotools.sld.MutableLayer;
-import org.geotools.sld.MutableLayerStyle;
-import org.geotools.sld.MutableNamedLayer;
-import org.geotools.sld.MutableNamedStyle;
-import org.geotools.sld.MutableStyledLayerDescriptor;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.internal.jaxb.v110.se.OnlineResourceType;
+import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotoolkit.internal.jaxb.v110.sld.LayerDescriptionType;
+import org.geotoolkit.internal.jaxb.v110.sld.TypeNameType;
+import org.geotoolkit.sld.MutableLayer;
+import org.geotoolkit.sld.MutableLayerStyle;
+import org.geotoolkit.sld.MutableNamedLayer;
+import org.geotoolkit.sld.MutableNamedStyle;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 

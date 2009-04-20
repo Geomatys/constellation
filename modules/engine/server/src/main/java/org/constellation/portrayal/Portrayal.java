@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 
 /**

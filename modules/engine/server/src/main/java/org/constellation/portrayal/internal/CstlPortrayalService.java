@@ -25,15 +25,16 @@ import java.util.logging.Logger;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.portrayal.PortrayalServiceIF;
 import org.constellation.provider.LayerDetails;
-import org.geotools.display.canvas.GraphicVisitor;
-import org.geotools.display.canvas.control.FailOnErrorMonitor;
-import org.geotools.display.exception.PortrayalException;
-import org.geotools.display2d.service.DefaultPortrayalService;
-import org.geotools.map.MapBuilder;
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
+
+import org.geotoolkit.display.canvas.GraphicVisitor;
+import org.geotoolkit.display.canvas.control.FailOnErrorMonitor;
+import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotools.style.MutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 
 /**

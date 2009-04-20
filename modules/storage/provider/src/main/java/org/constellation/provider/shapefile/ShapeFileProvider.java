@@ -33,7 +33,7 @@ import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.map.ElevationModel;
+import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.collection.SoftValueHashMap;
 
 

@@ -39,8 +39,8 @@ import org.constellation.provider.LayerProvider;
 
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.geotools.map.ElevationModel;
-import org.geotools.map.MapBuilder;
+import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.collection.SoftValueHashMap;
 
 
