@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 // JAXB dependencies
-import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -167,22 +166,17 @@ public class CSWworkerTest {
     @Before
     public void setUp() throws Exception {
 
-        LinkedBlockingQueue<Unmarshaller> unmarshallers = new LinkedBlockingQueue<Unmarshaller>();
-        LinkedBlockingQueue<Marshaller> marshallers     = new LinkedBlockingQueue<Marshaller>();
-
         pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
         unmarshaller = pool.acquireUnmarshaller();
-        final Marshaller marshaller = pool.acquireMarshaller();
 
-        unmarshallers.add(unmarshaller);
-        marshallers.add(marshaller);
 
         File configDir = new File("CSWWorkerTest");
-        worker = new CSWworker("", unmarshallers, marshallers, configDir);
+        worker = new CSWworker("", pool, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
-    }
 
+    }
+    
     @After
     public void tearDown() throws Exception {
         if (unmarshaller != null) {

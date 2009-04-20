@@ -48,8 +48,6 @@ import static org.junit.Assert.*;
 public class CSWorkerInitialisationTest {
 
     private MarshallerPool pool;
-    private LinkedBlockingQueue<Unmarshaller> unmarshallers;
-    private LinkedBlockingQueue<Marshaller>  marshallers;
 
     private static File configurationDirectory = new File("CSWorkerInitialisationTest");
 
@@ -102,17 +100,11 @@ public class CSWorkerInitialisationTest {
     public void setUp() throws Exception {
         emptyConfigurationDirectory();
 
-        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(1);
-        marshallers   = new LinkedBlockingQueue<Marshaller>(1);
-
         pool = new MarshallerPool(CSWClassesContext.getAllClasses());
         Unmarshaller u = pool.acquireUnmarshaller();
-        unmarshallers.add(u);
-
-        Marshaller m = pool.acquireMarshaller();
-        marshallers.add(m);
         
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
+        pool.release(u);
 
     }
 
@@ -131,7 +123,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        CSWworker worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        CSWworker worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         boolean exceptionLaunched = false;
@@ -154,7 +146,7 @@ public class CSWorkerInitialisationTest {
         File configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
         
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -178,16 +170,14 @@ public class CSWorkerInitialisationTest {
 
         Marshaller m = null;
         try {
-             m = marshallers.take();
+             m = pool.acquireMarshaller();
              m.marshal(request, configFile);
-        } catch (InterruptedException ex) {
-            System.out.println("InterruptedException in initialisation Test");
         } finally {
-            marshallers.add(m);
+            pool.release(m);
         }
 
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -213,7 +203,7 @@ public class CSWorkerInitialisationTest {
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -239,7 +229,7 @@ public class CSWorkerInitialisationTest {
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -265,7 +255,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -291,7 +281,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -316,7 +306,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -341,7 +331,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -366,7 +356,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
@@ -391,7 +381,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", unmarshallers, marshallers, configurationDirectory);
+        worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
