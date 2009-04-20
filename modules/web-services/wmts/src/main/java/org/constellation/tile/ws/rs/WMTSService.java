@@ -110,7 +110,7 @@ public class WMTSService extends OGCWebService {
                 throw new CstlServiceException("The WMTS service is not running",
                                               NO_APPLICABLE_CODE);
             }
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
             logParameters();
             String request = "";
 
@@ -172,11 +172,9 @@ public class WMTSService extends OGCWebService {
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, serviceDef);
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }
@@ -355,7 +353,7 @@ public class WMTSService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
             if (worker == null) {
                 throw new CstlServiceException("The WMTS service is not running",
                                               NO_APPLICABLE_CODE);
@@ -369,14 +367,9 @@ public class WMTSService extends OGCWebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, serviceDef);
 
-        } catch (InterruptedException ex) {
-            String msg = "interruptedException in processCapabilites";
-            LOGGER.severe(msg);
-            return Response.ok(msg, TEXT_PLAIN).build();
-            
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }
@@ -421,15 +414,11 @@ public class WMTSService extends OGCWebService {
         } catch (CstlServiceException ex) {
             Marshaller marshaller = null;
             try {
-                marshaller = marshallers.take();
+                marshaller = marshallerPool.acquireMarshaller();
                 return processExceptionResponse(ex, marshaller, null);
-            } catch (InterruptedException exe) {
-                String msg = "interrupted exception in processGetTileRestful: " + exe.getMessage();
-                LOGGER.severe(msg);
-                return Response.ok(msg, TEXT_PLAIN).build();
             } finally {
                 if (marshaller != null) {
-                    marshallers.add(marshaller);
+                    marshallerPool.release(marshaller);
                 }
             }
         }

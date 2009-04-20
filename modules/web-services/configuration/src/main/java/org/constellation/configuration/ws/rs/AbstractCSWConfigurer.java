@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -57,6 +56,7 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 
 // MDWeb dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.mdweb.utils.GlobalUtils;
 
 /**
@@ -103,7 +103,8 @@ public abstract class AbstractCSWConfigurer {
         }
         
         try {
-            Unmarshaller configUnmarshaller = JAXBContext.newInstance("org.constellation.generic.database").createUnmarshaller();
+            MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
+            Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
             CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
 
             for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
@@ -114,6 +115,7 @@ public abstract class AbstractCSWConfigurer {
                 config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
+            pool.release(configUnmarshaller);
             
         } catch (JAXBException ex) {
             throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());

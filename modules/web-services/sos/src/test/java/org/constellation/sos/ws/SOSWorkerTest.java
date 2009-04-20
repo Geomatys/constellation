@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -39,7 +38,7 @@ import org.constellation.sos.v100.DescribeSensor;
 import org.constellation.sos.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // JUnit dependencies
@@ -54,18 +53,16 @@ public class SOSWorkerTest {
 
     private SOSworker worker;
 
-    private Unmarshaller unmarshaller;
+    private MarshallerPool marshallerPool;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        JAXBContext context = JAXBContext.newInstance(org.constellation.configuration.ObjectFactory.class);
-        Marshaller marshaller          = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-
+        MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);
+        Marshaller marshaller =  pool.acquireMarshaller();
+        
+        
         File configDir = new File("SOSWorkerTest");
         if (!configDir.exists()) {
             configDir.mkdir();
@@ -102,7 +99,7 @@ public class SOSWorkerTest {
             marshaller.marshal(configuration, configFile);
 
         }
-
+        pool.release(marshaller);
     }
 
     @AfterClass
@@ -159,17 +156,14 @@ public class SOSWorkerTest {
     @Before
     public void setUp() throws Exception {
 
-        JAXBContext context = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.observation:org.constellation.sml.v100");
-        unmarshaller      = context.createUnmarshaller();
-        Marshaller marshaller          = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("");
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-
+        marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.observation:org.constellation.sml.v100");
+        
         File configDir = new File("SOSWorkerTest");
         worker = new SOSworker(configDir);
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         worker.setSkeletonCapabilities(stcapa);
+        marshallerPool.release(unmarshaller);
     }
 
     @After
@@ -318,6 +312,7 @@ public class SOSWorkerTest {
      */
     @Test
     public void DescribeSensorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML result = (AbstractSensorML) worker.describeSensor(request);
 
@@ -331,6 +326,7 @@ public class SOSWorkerTest {
         expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
 
         assertEquals(expResult, result);
+        marshallerPool.release(unmarshaller);
     }
 
 

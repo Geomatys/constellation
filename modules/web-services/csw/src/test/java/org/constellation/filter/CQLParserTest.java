@@ -21,10 +21,6 @@ package org.constellation.filter;
 import java.awt.geom.Line2D;
 import java.util.logging.Logger;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 // Constellation dependencies 
 import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.BeyondFilter;
@@ -60,7 +56,6 @@ public class CQLParserTest {
     
     private LuceneFilterParser filterParser;
     private Logger       logger = Logger.getLogger("org.constellation.filter");
-    private Unmarshaller filterUnmarshaller;
     private FilterFactoryImpl filterFactory = new FilterFactoryImpl();
     
     @BeforeClass
@@ -74,8 +69,6 @@ public class CQLParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new LuceneFilterParser();
-        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
-        filterUnmarshaller = jbcontext.createUnmarshaller();
     }
 
     @After

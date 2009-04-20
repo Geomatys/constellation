@@ -128,7 +128,7 @@ public class ConfigurationService extends WebService  {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
             String request  = "";
             StringWriter sw = new StringWriter();
 
@@ -237,12 +237,9 @@ public class ConfigurationService extends WebService  {
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
         
@@ -259,7 +256,7 @@ public class ConfigurationService extends WebService  {
     protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
 
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
             final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
@@ -268,12 +265,9 @@ public class ConfigurationService extends WebService  {
             marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();
             
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in launchException", "text/plain").build();
-
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }

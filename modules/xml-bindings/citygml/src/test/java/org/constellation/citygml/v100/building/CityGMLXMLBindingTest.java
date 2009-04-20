@@ -19,11 +19,11 @@
 package org.constellation.citygml.v100.building;
 
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -33,10 +33,10 @@ import static org.junit.Assert.*;
  */
 public class CityGMLXMLBindingTest {
 
-    private Logger       logger = Logger.getLogger("org.constellation.filter");
-    private Unmarshaller Unmarshaller;
-    private Marshaller   Marshaller;
-
+    private Logger         logger = Logger.getLogger("org.constellation.filter");
+    private Unmarshaller   Unmarshaller;
+    private Marshaller     Marshaller;
+    private MarshallerPool pool;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -48,16 +48,21 @@ public class CityGMLXMLBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.citygml.v100:org.constellation.gml.v311:org.constellation.citygml.v100.building");
-        Unmarshaller          = jbcontext.createUnmarshaller();
-        Marshaller            = jbcontext.createMarshaller();
-        Marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        //Marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+        pool         = new MarshallerPool("org.constellation.citygml.v100:org.constellation.gml.v311:org.constellation.citygml.v100.building");
+        Unmarshaller = pool.acquireUnmarshaller();
+        Marshaller   = pool.acquireMarshaller();
         
     }
 
     @After
     public void tearDown() throws Exception {
+        if (Marshaller != null) {
+            pool.release(Marshaller);
+        }
+
+        if (Unmarshaller != null) {
+            pool.release(Unmarshaller);
+        }
     }
     
     /**

@@ -151,7 +151,7 @@ public final class WCSService extends OGCWebService {
                       "org.constellation.gml.v311",
                       "http://www.opengis.net/wcs");
 
-        worker = new WCSWorker(marshallers, unmarshallers);
+        worker = new WCSWorker(marshallerPool);
         LOGGER.info("WCS service running");
     }
 
@@ -172,7 +172,7 @@ public final class WCSService extends OGCWebService {
         ServiceDef serviceDef = null;
         try {
 
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
         	// Handle an empty request by sending a basic web page.
         	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
         		return Response.ok(getIndexPage(), Query.TEXT_HTML).build();
@@ -264,12 +264,9 @@ public final class WCSService extends OGCWebService {
         	 */
         	return processExceptionResponse(ex, marshaller, serviceDef);
             
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncomingRequest",
-                    TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }

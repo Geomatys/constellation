@@ -28,7 +28,6 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -69,6 +68,7 @@ import org.constellation.ows.v100.OperationsMetadata;
 import org.constellation.ows.v100.RequestMethodType;
 import org.constellation.ows.v100.SectionsType;
 import org.constellation.util.Util;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 /**
@@ -124,14 +124,9 @@ public class CatalogueHarvester {
     private final static QName _Dataset_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
     
     /**
-     * A Marshaller to send request to another CSW services.
+     * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
      */
-    private final LinkedBlockingQueue<Marshaller> marshallers;
-    
-    /**
-     * A unMarshaller to get object from harvested resource.
-     */
-    protected final LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final MarshallerPool marshallerPool;
     
     /**
      * A flag indicating that we are harvesting a CSW special case 1
@@ -151,9 +146,8 @@ public class CatalogueHarvester {
     /**
      * Build a new catalogue harvester with the write part.
      */
-    public CatalogueHarvester(LinkedBlockingQueue<Marshaller> marshallers, LinkedBlockingQueue<Unmarshaller> unmarshallers, MetadataWriter metadataWriter) {
-        this.marshallers    = marshallers;
-        this.unmarshallers  = unmarshallers;
+    public CatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) {
+        this.marshallerPool    = marshallerPool;
         this.metadataWriter = metadataWriter;
         initializeRequest();
     }
@@ -673,17 +667,14 @@ public class CatalogueHarvester {
                 StringWriter sw = new StringWriter();
                 Marshaller marshaller = null;
                 try {
-                    marshaller = marshallers.take();
+                    marshaller = marshallerPool.acquireMarshaller();
                     marshaller.marshal(request, sw);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE);
-                } catch (InterruptedException ex) {
-                    throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE);
                 } finally {
                     if (marshaller != null) {
-                        marshallers.add(marshaller);
+                        marshallerPool.release(marshaller);
                     }
                 }
                 String XMLRequest = sw.toString();
@@ -739,7 +730,7 @@ public class CatalogueHarvester {
 
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(new StringReader(decodedString));
                 if (harvested != null && harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
@@ -747,12 +738,9 @@ public class CatalogueHarvester {
             } catch (JAXBException ex) {
                 logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
-            } catch (InterruptedException ex) {
-                    throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
         } catch (IOException ex) {

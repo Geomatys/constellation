@@ -107,7 +107,7 @@ public class CSWService extends OGCWebService {
         this.serviceID = serviceID;
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
-            worker = new CSWworker(serviceID, unmarshallers, marshallers);
+            worker = new CSWworker(serviceID, marshallerPool);
 
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
@@ -132,7 +132,7 @@ public class CSWService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
 
             if (worker != null) {
             
@@ -299,12 +299,9 @@ public class CSWService extends OGCWebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, serviceDef);
 
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-            
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }

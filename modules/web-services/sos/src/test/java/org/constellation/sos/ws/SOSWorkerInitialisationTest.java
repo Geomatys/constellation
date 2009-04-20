@@ -30,6 +30,7 @@ import static org.constellation.ows.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -51,9 +52,10 @@ public class SOSWorkerInitialisationTest {
             configurationDirectory.mkdir();
         }
 
-        JAXBContext context = JAXBContext.newInstance("org.constellation.sos.v100");
-        Unmarshaller unmarshaller      = context.createUnmarshaller();
-        skeletonCapabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
+        MarshallerPool pool       = new MarshallerPool("org.constellation.sos.v100");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        skeletonCapabilities      = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
+        pool.release(unmarshaller);
     }
 
     @AfterClass

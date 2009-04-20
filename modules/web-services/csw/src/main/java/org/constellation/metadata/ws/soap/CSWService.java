@@ -21,7 +21,6 @@ package org.constellation.metadata.ws.soap;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 // JAX-WS dependencies
@@ -32,9 +31,7 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 
@@ -65,6 +62,7 @@ import org.constellation.ows.v100.ExceptionReport;
 
 //geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
@@ -107,7 +105,7 @@ public class CSWService {
     /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    private LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private MarshallerPool marshallerPool;
     
     /**
      * Initialize the database connection.
@@ -115,7 +113,8 @@ public class CSWService {
     public CSWService() {
 
        try {
-           JAXBContext jbcontext = JAXBContext.newInstance(DefaultMetaData.class, Capabilities.class, DescribeRecordType.class
+           marshallerPool =
+                   new MarshallerPool(DefaultMetaData.class, Capabilities.class, DescribeRecordType.class
                             ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                             ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
                             ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
@@ -126,17 +125,7 @@ public class CSWService {
                             ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
                             ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
 
-           unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
-           for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-               unmarshallers.add(jbcontext.createUnmarshaller());
-           }
-
-           LinkedBlockingQueue<Marshaller> marshallers = new LinkedBlockingQueue<Marshaller>(MAX_QUEUE_SIZE);
-           for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-               marshallers.add(jbcontext.createMarshaller());
-           }
-
-           worker = new CSWworker("", unmarshallers, marshallers);
+           worker = new CSWworker("", marshallerPool);
            //TODO find real url
            worker.setServiceURL("http://localhost:8080/SOServer/SOService");
        } catch (JAXBException ex){
@@ -289,14 +278,12 @@ public class CSWService {
                logger.info(f.toString());
                Unmarshaller unmarshaller = null;
                try {
-                   unmarshaller = unmarshallers.take();
+                   unmarshaller = marshallerPool.acquireUnmarshaller();
                    response = unmarshaller.unmarshal(f);
                    capabilities.put(fileName, response);
-               } catch (InterruptedException ex) {
-                   logger.severe("interrupted Exception in getCapabilities object:" + ex.getMessage());
                } finally {
                    if (unmarshaller != null) {
-                       unmarshallers.add(unmarshaller);
+                       marshallerPool.release(unmarshaller);
                    }
                }
            }

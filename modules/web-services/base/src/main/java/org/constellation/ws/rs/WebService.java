@@ -31,7 +31,6 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
-import java.util.concurrent.LinkedBlockingQueue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -45,17 +44,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
 // JAXB xml binding dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.AbstractRequest;
 
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ws.ExceptionCode.*;
 
 /**
@@ -145,12 +143,7 @@ public abstract class WebService {
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
-    protected LinkedBlockingQueue<Unmarshaller> unmarshallers;
-
-    /**
-     * A pool of JAXB marshaller used to transform Java objects into XML String.
-     */
-    protected LinkedBlockingQueue<Marshaller> marshallers;
+    protected MarshallerPool marshallerPool;
 
     /**
      * Provides access to the URI used in the method call, for instance, to
@@ -189,8 +182,6 @@ public abstract class WebService {
      * Initialize the basic attribute of a web service.
      */
     public WebService() {
-        unmarshallers = new LinkedBlockingQueue<Unmarshaller>(MAX_QUEUE_SIZE);
-        marshallers   = new LinkedBlockingQueue<Marshaller>(MAX_QUEUE_SIZE);
         serviceURL    = null;
     }
 
@@ -234,8 +225,7 @@ public abstract class WebService {
     protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
                     " packages: " + packagesName);
-        final JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
-        initXMLContext(jbcontext, rootNamespace);
+       marshallerPool = new MarshallerPool(rootNamespace, packagesName);
     }
 
     /**
@@ -248,34 +238,8 @@ public abstract class WebService {
      */
     protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
-        final JAXBContext jbcontext = JAXBContext.newInstance(classes);
-        initXMLContext(jbcontext, rootNamespace);
+        marshallerPool = new MarshallerPool(rootNamespace, classes);
     }
-
-    /**
-     * Initialize the marshaller and unmarshaller, with the {@linkplain JAXBContext Jaxb Context}
-     * and the default namespace sepcified.
-     *
-     * @param jbcontext A {@linkplain JAXBContext Jaxb Context} to use for (un)marshalling processes.
-     * @param rootNamespace The root namespace to use when no namespace is defined.
-     *
-     * @throws JAXBException
-     */
-    private void initXMLContext(final JAXBContext jbcontext, final String rootNamespace)
-            throws JAXBException
-    {
-        for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-            Unmarshaller unmarshaller = jbcontext.createUnmarshaller();
-            Marshaller marshaller = jbcontext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
-            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
-            
-            marshallers.add(marshaller);
-            unmarshallers.add(unmarshaller);
-        }
-    }
-
 
     /**
      * Treat the incoming GET request.
@@ -321,17 +285,12 @@ public abstract class WebService {
     @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
         LOGGER.info("request POST xml: ");
-        if (unmarshallers != null) {
+        if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 request = unmarshaller.unmarshal(is);
-            } catch (InterruptedException ex) {
-                String msg = "Interupted exeception while trying to unmarshall a incomming request";
-                LOGGER.severe(msg);
-                return Response.ok(msg, "text/xml").build();
-
             } catch (UnmarshalException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -346,7 +305,7 @@ public abstract class WebService {
                 return launchException("The XML request is not valid.\nCause:" + errorMsg, INVALID_REQUEST.name(), null);
             } finally {
                 if (unmarshaller != null)  {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
 
@@ -466,7 +425,7 @@ public abstract class WebService {
 
         Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = unmarshallers.take();
+            unmarshaller = marshallerPool.acquireUnmarshaller();
             MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
             LinkedList<String> list = (LinkedList<String>) parameters.get(parameterName);
             if (list == null) {
@@ -490,12 +449,9 @@ public abstract class WebService {
         } catch (JAXBException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
-        } catch (InterruptedException ex) {
-             throw new CstlServiceException("InteruptedException while unmarshalling a complex parameter" + '\n' +
-                            ex, NO_APPLICABLE_CODE);
         } finally {
             if (unmarshaller != null) {
-                unmarshallers.add(unmarshaller);
+                marshallerPool.release(unmarshaller);
             }
         }
     }

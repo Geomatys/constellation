@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -46,6 +45,7 @@ import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.v101.DataArrayEntry;
 import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.SimpleDataRecordEntry;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSworker.*;
 
 // Junit dependencies
@@ -69,8 +69,9 @@ public class SosIOTest {
 
     private SOSworker genericWorker;
 
-    private Marshaller marshaller;
+    private MarshallerPool marshallerPool;
 
+    private Marshaller marshaller;
     private final boolean configFilesExist;
 
     @BeforeClass
@@ -83,25 +84,28 @@ public class SosIOTest {
 
     @Before
     public void setUp() throws Exception {
+        marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.ows.v110");
+        marshaller = marshallerPool.acquireMarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
+        if (marshaller != null) {
+            marshallerPool.release(marshaller);
+        }
     }
 
     public SosIOTest() throws Exception {
         File capabilitiesFile = new File("sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
         Capabilities staticCapabilities = null;
         if (capabilitiesFile.exists()) {
-            JAXBContext context = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.ows.v110");
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
             Object obj = unmarshaller.unmarshal(capabilitiesFile);
             if (obj instanceof Capabilities) {
                 staticCapabilities = (Capabilities) obj;
             }
+            marshallerPool.release(unmarshaller);
         } else {
             configFilesExist = false;
             return;

@@ -18,11 +18,11 @@
 package org.constellation.xsd.v2001;
 
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -32,12 +32,15 @@ import static org.junit.Assert.*;
  */
 public class XsdXMLBindingTest {
 
-    private Logger       logger = Logger.getLogger("org.constellation.wfs");
+    private Logger logger = Logger.getLogger("org.constellation.wfs");
+    private static MarshallerPool pool;
+
     private Unmarshaller unmarshaller;
     private Marshaller   marshaller;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        pool = new MarshallerPool("org.constellation.xsd.v2001");
     }
 
     @AfterClass
@@ -46,9 +49,9 @@ public class XsdXMLBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.xsd.v2001");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
+        
+        unmarshaller           = pool.acquireUnmarshaller();
+        marshaller             = pool.acquireMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
     }

@@ -42,7 +42,6 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContext;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -78,6 +77,7 @@ import org.constellation.wms.v130.Service;
 import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.wms.v130.WMSCapabilities;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
@@ -182,13 +182,10 @@ public class ServicesBean {
      */
     private File[] capabilitiesFile;
     /**
-     * The marshaller to store the updates
+     * The marshaller/unmarshaller pool to store the updates/ read the bases capabilities files.
      */
-    private Marshaller marshaller;
-    /**
-     * The a unmarshaller to read the bases capabilities files.
-     */
-    private Unmarshaller unmarshaller;
+    private MarshallerPool marshallerPool;
+   
     /**
      * A servlet context allowing to find the path to deployed file.
      */
@@ -235,16 +232,14 @@ public class ServicesBean {
         addWebServices();
 
 
-        //we create the JAXBContext and read the selected file 
-        JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
-                                                        WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
-                                                        org.constellation.cat.csw.v202.Capabilities.class, UserData.class,
-                                                        org.constellation.sos.v100.Capabilities.class);
-
-        unmarshaller = JBcontext.createUnmarshaller();
-        marshaller = JBcontext.createMarshaller();
-
-
+        //we create the JAXBContext and read the selected file
+        marshallerPool = new MarshallerPool(Capabilities.class,
+                                            WMSCapabilities.class,
+                                            WMT_MS_Capabilities.class,
+                                            WCSCapabilitiesType.class,
+                                            org.constellation.cat.csw.v202.Capabilities.class,
+                                            UserData.class,
+                                            org.constellation.sos.v100.Capabilities.class);
     }
 
     /**
@@ -737,6 +732,7 @@ public class ServicesBean {
      */
     private void storeCapabilitiesFile() throws JAXBException {
         try {
+            Marshaller marshaller = marshallerPool.acquireMarshaller();
             int i = 0;
             for (File f : capabilitiesFile) {
                 OutputStream out = new FileOutputStream(f);
@@ -745,7 +741,8 @@ public class ServicesBean {
                 logger.info("store " + f.getAbsolutePath());
                 i++;
             }
-            
+            marshallerPool.release(marshaller);
+
             if (webServiceMode.equals("WMS")) {
                 userData.setWMSCapabilities(capabilities);
             
@@ -760,7 +757,7 @@ public class ServicesBean {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.severe("IO Exception while storing capabilities file");
         }
     }
 
@@ -772,13 +769,15 @@ public class ServicesBean {
     private void loadUserData(File f) throws FileNotFoundException, IOException {
         try {
             if (f != null) {
+                Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             	userData = (UserData) unmarshaller.unmarshal(f);
+                marshallerPool.release(unmarshaller);
             } else {
-		logger.severe("File uploaded null");
-	        return;
-	    }
-            userData = (UserData) unmarshaller.unmarshal(f);
-            
+                logger.severe("File uploaded null");
+                return;
+            }
+
+            Marshaller marshaller = marshallerPool.acquireMarshaller();
             // we extract and update WMS user data
             if (userData.getWMSCapabilities() != null) {
                 
@@ -897,6 +896,8 @@ public class ServicesBean {
             FileOutputStream out = new FileOutputStream(change);
             p.store(out, "updated from JSF interface");
             out.close();
+
+            marshallerPool.release(marshaller);
             
         } catch (JAXBException ex) {
             Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -910,7 +911,9 @@ public class ServicesBean {
         File f = new File(url);
         //f.setWritable(true);
         setExistPrefrence(true);
-       marshaller.marshal(userData, f);
+        Marshaller marshaller = marshallerPool.acquireMarshaller();
+        marshaller.marshal(userData, f);
+        marshallerPool.release(marshaller);
     }
     
     
@@ -919,12 +922,13 @@ public class ServicesBean {
         webServiceMode    = "WMS";
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         //we begin to read the high lvl document
         String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-
+            
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromWMS((WMSCapabilities) capabilities[0]);
 
@@ -942,7 +946,8 @@ public class ServicesBean {
         } else {
             logger.severe("WMS capabilities file version 1.1.1 not found at :" + path);
         }
-
+        marshallerPool.release(unmarshaller);
+        
         return "fillForm";
 
     }
@@ -952,12 +957,13 @@ public class ServicesBean {
         webServiceMode = "WCS";
         capabilities = new Object[2];
         capabilitiesFile = new File[2];
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         //we begin to read the high lvl document
         String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-
+            
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS110((Capabilities) capabilities[0]);
 
@@ -971,10 +977,11 @@ public class ServicesBean {
         if (capabilitiesFile[1].exists()) {
 
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
-
+            
         } else {
             logger.severe("WCS capabilities file version 1.0.0 not found at :" + path);
         }
+        marshallerPool.release(unmarshaller);
 
         return "fillForm";
 
@@ -990,9 +997,10 @@ public class ServicesBean {
         String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-
+            Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS110((CapabilitiesBaseType) capabilities[0]);
+            marshallerPool.release(unmarshaller);
 
         } else {
             logger.severe("SOS capabilities file version 1.0.0 not found at :" + path);
@@ -1011,9 +1019,10 @@ public class ServicesBean {
         String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-
+            Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS100((org.constellation.ows.v100.CapabilitiesBaseType) capabilities[0]);
+            marshallerPool.release(unmarshaller);
 
         } else {
             logger.severe("CSW capabilities file version 2.0.2 not found at :" + path);

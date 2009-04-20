@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -39,6 +38,7 @@ import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
@@ -483,8 +483,8 @@ public class StandardAnalyzerTest {
 
     public static List<DefaultMetaData> fillTestData() throws JAXBException {
         List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        JAXBContext context       = JAXBContext.newInstance(DefaultMetaData.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
+        MarshallerPool pool          = new MarshallerPool(DefaultMetaData.class);
+        Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
         if (obj instanceof DefaultMetaData) {
@@ -527,6 +527,7 @@ public class StandardAnalyzerTest {
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
+        pool.release(unmarshaller);
 
         return result;
     }

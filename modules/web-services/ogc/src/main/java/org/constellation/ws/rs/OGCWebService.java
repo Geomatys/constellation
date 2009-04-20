@@ -241,17 +241,14 @@ public abstract class OGCWebService extends WebService {
     protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
 
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
             CstlServiceException ex = new CstlServiceException(message, code, locator);
             return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in launchException", "text/plain").build();
-
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }
@@ -308,14 +305,11 @@ public abstract class OGCWebService extends WebService {
                File f = getFile(fileName);
                Unmarshaller unmarshaller = null;
                try {
-                   unmarshaller = unmarshallers.take();
+                   unmarshaller = marshallerPool.acquireUnmarshaller();
                    response = unmarshaller.unmarshal(f);
-               } catch (InterruptedException ex) {
-                   LOGGER.severe("Interrupted Exception in getCapabilities Object");
-
                } finally {
                    if (unmarshaller != null) {
-                       unmarshallers.add(unmarshaller);
+                       marshallerPool.release(unmarshaller);
                    }
                }
                if (response != null) {

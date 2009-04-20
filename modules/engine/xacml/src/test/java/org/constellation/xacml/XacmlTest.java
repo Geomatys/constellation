@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
 // Constellation dependencies
@@ -64,6 +63,7 @@ import org.constellation.xacml.policy.SubjectAttributeDesignatorType;
 import org.constellation.xacml.policy.TargetType;
 
 // Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -94,6 +94,8 @@ public class XacmlTest {
      * A policy unmarshaller
      */
     private Unmarshaller unmarshaller;
+
+    private MarshallerPool pool;
     
     /**
      * A policy marshaller
@@ -117,9 +119,9 @@ public class XacmlTest {
     @Before
     public void setUp() throws Exception {
         
-         JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.xacml.policy");
-         unmarshaller           = jbcontext.createUnmarshaller();
-         marshaller             = jbcontext.createMarshaller();
+         pool = new MarshallerPool("org.constellation.xacml.policy");
+         unmarshaller = pool.acquireUnmarshaller();
+         marshaller   = pool.acquireMarshaller();
          marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
          //we construct an example policy
@@ -140,6 +142,13 @@ public class XacmlTest {
 
     @After
     public void tearDown() throws Exception {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
+
+        if (marshaller != null) {
+            pool.release(marshaller);
+        }
     }
     
     /**
@@ -500,9 +509,9 @@ public class XacmlTest {
         }
         Object p = null;
         try {
-            JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.xacml.policy");
-            Unmarshaller policyUnmarshaller = jbcontext.createUnmarshaller();
-            p = policyUnmarshaller.unmarshal(is);
+            
+            
+            p = unmarshaller.unmarshal(is);
         } catch (JAXBException e) {
             logger.severe("JAXB exception while unmarshalling policyFile " + "csw" + "Policy.xml");
         }

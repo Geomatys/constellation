@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
@@ -48,7 +47,6 @@ import org.w3c.dom.Document;
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
@@ -139,6 +137,7 @@ import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.XML;
 import org.opengis.filter.sort.SortOrder;
 
@@ -183,7 +182,7 @@ public class CSWworker {
     /**
      * A unMarshaller to get object from harvested resource.
      */
-    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final MarshallerPool marshallerPool;
     
     /**
      * A lucene index searcher to make quick search on the metadatas.
@@ -263,8 +262,8 @@ public class CSWworker {
      * @param unmarshaller
      * @param marshaller
      */
-    public CSWworker(final String serviceID, final LinkedBlockingQueue<Unmarshaller> unmarshallers, final LinkedBlockingQueue<Marshaller> marshallers) {
-        this(serviceID, unmarshallers, marshallers, null);
+    public CSWworker(final String serviceID, final MarshallerPool marshallerPool) {
+        this(serviceID, marshallerPool, null);
     }
     
     /**
@@ -275,9 +274,9 @@ public class CSWworker {
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      */
-    protected CSWworker(final String serviceID, final LinkedBlockingQueue<Unmarshaller> unmarshallers, final LinkedBlockingQueue<Marshaller> marshallers, File configDir) {
+    protected CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
 
-        this.unmarshallers = unmarshallers;
+        this.marshallerPool = marshallerPool;
         if (configDir == null) {
             configDir    = getConfigDirectory();
             if (configDir == null) {
@@ -315,7 +314,7 @@ public class CSWworker {
                 AbstractIndexer indexer = CSWfactory.getIndexer(configuration, MDReader, serviceID);
                 indexSearcher = CSWfactory.getIndexSearcher(datasourceType, configDir, serviceID);
                 MDWriter      = CSWfactory.getMetadataWriter(configuration, indexer);
-                catalogueHarvester = new CatalogueHarvester(marshallers, unmarshallers, MDWriter);
+                catalogueHarvester = new CatalogueHarvester(marshallerPool, MDWriter);
                 
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
@@ -1485,7 +1484,7 @@ public class CSWworker {
             Unmarshaller unmarshaller = null;
             try {
 
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 // if the resource is a simple record
                 if (sourceURL.endsWith("xml")) {
                     
@@ -1545,12 +1544,9 @@ public class CSWworker {
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, "Source");
-            } catch (InterruptedException ex) {
-                throw new CstlServiceException("The service has throw an InterruptedException: " + ex.getMessage(),
-                                              NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
             

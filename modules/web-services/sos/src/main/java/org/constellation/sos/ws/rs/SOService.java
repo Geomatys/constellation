@@ -77,7 +77,7 @@ public class SOService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-             marshaller = marshallers.take();
+             marshaller = marshallerPool.acquireMarshaller();
              worker.setServiceURL(getServiceURL());
              logParameters();
              String request = "";
@@ -194,12 +194,9 @@ public class SOService extends OGCWebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, serviceDef);
 
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", "text/plain").build();
-
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }

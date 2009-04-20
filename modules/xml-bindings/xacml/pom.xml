@@ -51,6 +51,10 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gtm-metadata</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

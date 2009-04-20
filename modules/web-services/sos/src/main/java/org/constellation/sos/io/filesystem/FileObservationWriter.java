@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -34,6 +33,7 @@ import org.constellation.sos.v100.OfferingPhenomenonEntry;
 import org.constellation.sos.v100.OfferingProcedureEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -59,7 +59,7 @@ public class FileObservationWriter implements ObservationWriter {
 
     private File resultDirectory;
 
-    private Marshaller marshaller;
+    private MarshallerPool marshallerPool;
 
     public FileObservationWriter(Automatic configuration) throws CstlServiceException {
         super();
@@ -73,8 +73,7 @@ public class FileObservationWriter implements ObservationWriter {
             resultDirectory      = new File(dataDirectory, "results");
         }
         try {
-            JAXBContext context = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.observation");
-            marshaller = context.createMarshaller();
+            marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.observation");
         } catch(JAXBException ex) {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader",  NO_APPLICABLE_CODE);
         }
@@ -84,7 +83,9 @@ public class FileObservationWriter implements ObservationWriter {
 
     @Override
     public String writeObservation(Observation observation) throws CstlServiceException {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallerPool.acquireMarshaller();
             File observationFile = new File(observationDirectory, observation.getName() + ".xml");
             observationFile.createNewFile();
             marshaller.marshal(observation, observationFile);
@@ -93,12 +94,18 @@ public class FileObservationWriter implements ObservationWriter {
             throw new CstlServiceException("JAXB exception while marshalling the observation file.",  NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while marshalling the observation file.",  NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
         }
     }
 
     @Override
     public String writeMeasurement(Measurement measurement) throws CstlServiceException {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallerPool.acquireMarshaller();
             File observationFile = new File(observationDirectory, measurement.getName() + ".xml");
             observationFile.createNewFile();
             marshaller.marshal(measurement, observationFile);
@@ -107,12 +114,18 @@ public class FileObservationWriter implements ObservationWriter {
             throw new CstlServiceException("JAXB exception while marshalling the observation file.",  NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while marshalling the observation file.",  NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
         }
     }
 
     @Override
     public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallerPool.acquireMarshaller();
             File offeringFile = new File(offeringDirectory, offering.getName() + ".xml");
             offeringFile.createNewFile();
             marshaller.marshal(offering, offeringFile);
@@ -121,6 +134,10 @@ public class FileObservationWriter implements ObservationWriter {
             throw new CstlServiceException("JAXB exception while marshalling the offering file.",  NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while marshalling the offering file.",  NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
         }
     }
 

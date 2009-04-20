@@ -28,7 +28,6 @@ import java.sql.Savepoint;
 
 // JAXB dependencies
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,7 +39,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.sml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.NamespacePrefixMapperImpl;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -96,9 +95,9 @@ public class MDWebSensorWriter implements SensorWriter {
     private final PreparedStatement newSensorIdStmt;
     
     /**
-     * A JAXB marshaller used to provide xml to the XMLReader.
+     * A JAXB marshaller pool used to provide xml to the XMLReader.
      */
-    private Marshaller marshaller;
+    private MarshallerPool marshallerPool;
 
     public MDWebSensorWriter(Automatic configuration, String sensorIdBase) throws CstlServiceException {
         if (configuration == null) {
@@ -119,12 +118,8 @@ public class MDWebSensorWriter implements SensorWriter {
              //we build the prepared Statement
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
 
-            //we initialize the unmarshaller
-            JAXBContext context = JAXBContext.newInstance("org.constellation.sml.v100:org.constellation.sml.v101");
-            marshaller        = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl("http://www.opengis.net/sensorML/1.0");
-            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+            //we initialize the marshaller
+            marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.constellation.sml.v100:org.constellation.sml.v101");
 
         } catch (JAXBException ex) {
             ex.printStackTrace();
@@ -135,7 +130,9 @@ public class MDWebSensorWriter implements SensorWriter {
     }
 
      public void writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
+        Marshaller marshaller = null;
         try {
+            marshaller = marshallerPool.acquireMarshaller();
 
             //we create a new Tempory File SensorML
             File sensorFile = File.createTempFile("sml", "xml");
@@ -178,6 +175,10 @@ public class MDWebSensorWriter implements SensorWriter {
             ex.printStackTrace();
             throw new CstlServiceException("the service has throw an JAXBException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
         }
     }
 

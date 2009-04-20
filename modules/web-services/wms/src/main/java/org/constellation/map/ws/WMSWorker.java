@@ -37,13 +37,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
@@ -98,6 +96,7 @@ import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 
 //Geoapi dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import static org.constellation.ws.ExceptionCode.*;
@@ -133,18 +132,12 @@ public class WMSWorker extends AbstractWMSWorker {
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
     /**
-     * The web service marshaller, which will use the web service name space.
-     */
-    private final LinkedBlockingQueue<Marshaller> marshallers;
-
-    /**
      * The web service unmarshaller, which will use the web service name space.
      */
-    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final MarshallerPool marshallerPool;
 
-    public WMSWorker(final LinkedBlockingQueue<Marshaller> marshallers, final LinkedBlockingQueue<Unmarshaller> unmarshallers) {
-        this.marshallers   = marshallers;
-        this.unmarshallers = unmarshallers;
+    public WMSWorker(final MarshallerPool marshallerPool) {
+        this.marshallerPool = marshallerPool;
     }
 
     /**
@@ -483,7 +476,7 @@ public class WMSWorker extends AbstractWMSWorker {
             File f = getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (!f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
@@ -494,12 +487,9 @@ public class WMSWorker extends AbstractWMSWorker {
                 }
                 capabilities.put(fileName, response);
 
-            } catch (InterruptedException ex) {
-                LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());
-
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
 

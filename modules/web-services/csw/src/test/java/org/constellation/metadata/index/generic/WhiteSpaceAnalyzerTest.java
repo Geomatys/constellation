@@ -23,22 +23,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
+// JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// Lucene dependencies
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+
+// constellation dependencies
 import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.util.Util;
+
+// Geotoolkit dependencies
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
@@ -484,8 +491,8 @@ public class WhiteSpaceAnalyzerTest {
 
     public static List<DefaultMetaData> fillTestData() throws JAXBException {
         List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        JAXBContext context       = JAXBContext.newInstance(DefaultMetaData.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
+        MarshallerPool pool          = new MarshallerPool(DefaultMetaData.class);
+        Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
         if (obj instanceof DefaultMetaData) {
@@ -529,6 +536,7 @@ public class WhiteSpaceAnalyzerTest {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
+        pool.release(unmarshaller);
         return result;
     }
 

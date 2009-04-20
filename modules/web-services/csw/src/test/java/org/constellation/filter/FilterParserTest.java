@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
@@ -42,6 +41,7 @@ import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -55,6 +55,7 @@ public class FilterParserTest {
     private LuceneFilterParser filterParser;
     private Logger       logger = Logger.getLogger("org.constellation.filter");
     private Unmarshaller filterUnmarshaller;
+    private MarshallerPool pool;
    
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -67,12 +68,15 @@ public class FilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new LuceneFilterParser();
-        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
-        filterUnmarshaller = jbcontext.createUnmarshaller();
+        pool = new MarshallerPool("org.constellation.ogc:org.constellation.gml.v311");
+        filterUnmarshaller = pool.acquireUnmarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
+        if (filterUnmarshaller != null) {
+            pool.release(filterUnmarshaller);
+        }
     }
     
     /**

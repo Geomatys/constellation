@@ -39,7 +39,6 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -48,7 +47,6 @@ import javax.xml.namespace.QName;
 import org.constellation.cat.csw.DomainValues;
 import org.constellation.cat.csw.ElementSet;
 import org.constellation.cat.csw.v202.AbstractRecordType;
-import org.constellation.cat.csw.v202.DomainValuesType;
 import org.constellation.cat.csw.v202.ElementSetType;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.ws.CstlServiceException;
@@ -70,6 +68,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.util.SimpleInternationalString;
 
 //geoAPI dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.CitationDate;
@@ -99,7 +98,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * An unmarshaller used for getting EDMO data.
      */
-    protected final Unmarshaller unmarshaller;
+    protected final MarshallerPool marshallerPool;
     
     /**
      * A list of precompiled SQL request returning single value.
@@ -175,13 +174,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
         }
         this.configuration = configuration;
         try {
-            this.connection        = db.getConnection();
+            this.connection  = db.getConnection();
             initStatement();
-            singleValue            = new HashMap<String, String>();
-            multipleValue          = new HashMap<String, List<String>>();
-            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
-            unmarshaller           = context.createUnmarshaller();
-            contacts               = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
+            singleValue      = new HashMap<String, String>();
+            multipleValue    = new HashMap<String, List<String>>();
+            marshallerPool   = new MarshallerPool(getJAXBContext());
+            contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -210,14 +208,13 @@ public abstract class GenericMetadataReader extends MetadataReader {
         }
         this.configuration = configuration;
         try {
-            this.connection        = db.getConnection();
+            this.connection  = db.getConnection();
             initStatement();
-            singleValue            = new HashMap<String, String>();
-            multipleValue          = new HashMap<String, List<String>>();
-            contacts               = new HashMap<String, ResponsibleParty>();
-            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
-            unmarshaller           = context.createUnmarshaller();
-            contacts               = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
+            singleValue      = new HashMap<String, String>();
+            multipleValue    = new HashMap<String, List<String>>();
+            contacts         = new HashMap<String, ResponsibleParty>();
+            marshallerPool   = new MarshallerPool(getJAXBContext());
+            contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -241,14 +238,13 @@ public abstract class GenericMetadataReader extends MetadataReader {
         }
         this.configuration = configuration;
         try {
-            this.connection        = null;
+            this.connection    = null;
             singleStatements   = new HashMap<PreparedStatement, List<String>>();
             multipleStatements = new HashMap<PreparedStatement, List<String>>();
-            singleValue            = new HashMap<String, String>();
-            multipleValue          = new HashMap<String, List<String>>();
-            this.contacts          = contacts;
-            JAXBContext context    = JAXBContext.newInstance(getJAXBContext());
-            unmarshaller           = context.createUnmarshaller();
+            singleValue        = new HashMap<String, String>();
+            multipleValue      = new HashMap<String, List<String>>();
+            this.contacts      = contacts;
+            marshallerPool     = new MarshallerPool(getJAXBContext());
 
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
@@ -328,7 +324,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
             }
             for (File f : contactDirectory.listFiles()) {
                 if (f.getName().startsWith("EDMO.") && f.getName().endsWith(".xml")) {
+                    Unmarshaller unmarshaller = null;
                     try {
+                        unmarshaller = marshallerPool.acquireUnmarshaller();
                         Object obj = unmarshaller.unmarshal(f);
                         if (obj instanceof ResponsibleParty) {
                             ResponsibleParty contact = (ResponsibleParty) obj;
@@ -339,6 +337,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     } catch (JAXBException ex) {
                         logger.severe("Unable to unmarshall the contact file : " + f.getPath());
                         ex.printStackTrace();
+                    } finally {
+                        if (unmarshaller != null) {
+                            marshallerPool.release(unmarshaller);
+                        }
                     }
                 }
             }

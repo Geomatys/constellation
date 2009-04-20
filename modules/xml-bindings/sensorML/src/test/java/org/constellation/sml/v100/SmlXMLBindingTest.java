@@ -38,9 +38,7 @@ import org.constellation.swe.v100.UomPropertyType;
 import org.constellation.util.Util;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
@@ -63,6 +61,7 @@ import org.constellation.swe.v100.VectorPropertyType;
 import org.constellation.swe.v100.VectorType;
 
 //Junit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -73,8 +72,7 @@ import static org.junit.Assert.*;
 public class SmlXMLBindingTest {
 
     private Logger       logger = Logger.getLogger("org.constellation.filter");
-    private Unmarshaller unmarshaller;
-    private Marshaller   marshaller;
+    private MarshallerPool marshallerPool;
     private ObjectFactory sml100Factory = new ObjectFactory();
     private org.constellation.swe.v100.ObjectFactory swe100Factory = new org.constellation.swe.v100.ObjectFactory();
 
@@ -89,12 +87,7 @@ public class SmlXMLBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext  = JAXBContext.newInstance("org.constellation.sml.v100");
-        unmarshaller           = jbcontext.createUnmarshaller();
-        marshaller             = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-//        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
-
+        marshallerPool = new MarshallerPool("org.constellation.sml.v100");
     }
 
     @After
@@ -120,6 +113,8 @@ public class SmlXMLBindingTest {
      */
     @Test
     public void ComponentUnmarshallMarshalingTest() throws Exception {
+
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         InputStream is = Util.getResourceAsStream("org/constellation/sml/component.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
@@ -264,6 +259,8 @@ public class SmlXMLBindingTest {
         assertEquals(expectedResult.getMember().get(0), result.getMember().get(0));
         assertEquals(expectedResult.getMember(), result.getMember());
         assertEquals(expectedResult, result);
+
+        marshallerPool.release(unmarshaller);
     }
 
     /**
@@ -273,6 +270,8 @@ public class SmlXMLBindingTest {
      */
     @Test
     public void SystemUnmarshallMarshalingTest() throws Exception {
+
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         InputStream is = Util.getResourceAsStream("org/constellation/sml/system.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
@@ -575,6 +574,8 @@ public class SmlXMLBindingTest {
         assertEquals(expectedResult.getMember().get(0), result.getMember().get(0));
         assertEquals(expectedResult.getMember(), result.getMember());
         assertEquals(expectedResult, result);
+
+        marshallerPool.release(unmarshaller);
     }
 
 }

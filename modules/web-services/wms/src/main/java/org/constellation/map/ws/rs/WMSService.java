@@ -108,7 +108,7 @@ public class WMSService extends OGCWebService {
                       "org.geotools.internal.jaxb.v110.sld",
                       "http://www.opengis.net/wms");
 
-        worker = new WMSWorker(null, unmarshallers);
+        worker = new WMSWorker(marshallerPool);
         LOGGER.info("WMS service running");
     }
 
@@ -134,7 +134,7 @@ public class WMSService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef version = null;
         try {
-            marshaller = marshallers.take();
+            marshaller = marshallerPool.acquireMarshaller();
             final String request = (String) getParameter(KEY_REQUEST, true);
             logParameters();
 
@@ -192,11 +192,9 @@ public class WMSService extends OGCWebService {
                                            OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, version);
-        } catch (InterruptedException ex) {
-            return Response.ok("Interrupted Exception while getting the marshaller in treatIncommingRequest", TEXT_PLAIN).build();
         } finally {
             if (marshaller != null) {
-                marshallers.add(marshaller);
+                marshallerPool.release(marshaller);
             }
         }
     }

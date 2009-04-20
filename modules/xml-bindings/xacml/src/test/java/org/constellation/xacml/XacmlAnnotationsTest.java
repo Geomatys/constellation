@@ -22,7 +22,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.junit.Test;
+import org.geotoolkit.xml.MarshallerPool;
+import org.junit.*;
 import static org.junit.Assert.*;
 
 
@@ -34,10 +35,24 @@ import static org.junit.Assert.*;
 public class XacmlAnnotationsTest {
      private Logger logger = Logger.getLogger("org.constellation.xacml");
 
+    private MarshallerPool pool;
+    private Unmarshaller unmarshaller;
+
+    @Before
+    public void setUp() throws JAXBException {
+        pool = new MarshallerPool("org.constellation.xacml.policy:org.constellation.xacml.policy:org.constellation.xacml.context");
+        unmarshaller = pool.acquireUnmarshaller();
+    }
+
+    @After
+    public void tearDown() {
+        if (unmarshaller != null) {
+            pool.release(unmarshaller);
+        }
+    }
+
     @Test
     public void testPolicyAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy");
-        final Unmarshaller unmarshaller = context.createUnmarshaller();
         File f = new File("/home/cedr/Bureau/GeoXACML/example/policy.xml");
         if (f.exists())  {
             final Object policy = unmarshaller.unmarshal(f);
@@ -45,12 +60,11 @@ public class XacmlAnnotationsTest {
         } else {
             logger.info("unable to find file skipping test");
         }
+
     }
 
     @Test
     public void testRequestAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy:org.constellation.xacml.context");
-        final Unmarshaller unmarshaller = context.createUnmarshaller();
         File f = new File("/home/cedr/Bureau/GeoXACML/example/request.xml");
         if (f.exists()) {
             final Object request = unmarshaller.unmarshal(f);
@@ -62,8 +76,6 @@ public class XacmlAnnotationsTest {
 
     @Test
     public void testResponseAnnotation() throws JAXBException {
-        final JAXBContext context = JAXBContext.newInstance("org.constellation.xacml.policy:org.constellation.xacml.context");
-        final Unmarshaller unmarshaller = context.createUnmarshaller();
         File f = new File("/home/cedr/Bureau/GeoXACML/example/response.xml");
         if (f.exists()) {
             final Object response = unmarshaller.unmarshal(f);

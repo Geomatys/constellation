@@ -108,7 +108,7 @@ public class FileMetadataReader extends MetadataReader {
      *
      * @throws org.constellation.ws.CstlServiceException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
-     * If the creation of a JAXBContext throw a JAXBException.
+     * If the creation of a MarshallerPool throw a JAXBException.
      */
     public FileMetadataReader(Automatic configuration) throws CstlServiceException {
         super(true, false);

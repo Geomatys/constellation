@@ -19,9 +19,10 @@ package org.constellation.wmts.v100;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -38,17 +39,17 @@ public class TestGetCapabilities {
     /**
      * The context to use for marshalling/unmarshalling processes.
      */
-    private final JAXBContext jaxbCtxt;
+    private final MarshallerPool pool;
 
     public TestGetCapabilities() throws JAXBException {
-        jaxbCtxt = JAXBContext.newInstance("org.constellation.wmts.v100:" +
-                                           "org.constellation.ows.v110:" +
-                                           "org.constellation.gml.v311");
+        pool = new MarshallerPool("org.constellation.wmts.v100:" +
+                                  "org.constellation.ows.v110:" +
+                                  "org.constellation.gml.v311");
     }
 
     @Test
     public void testUnmarshalling() throws JAXBException, IOException {
-        final Unmarshaller unmarsh = jaxbCtxt.createUnmarshaller();
+        final Unmarshaller unmarsh =  pool.acquireUnmarshaller();
         final InputStream getCapsResponse = this.getClass().getResourceAsStream("wmtsGetCapabilities_response.xml");
         assertFalse("The getCapabilities response in the resources folder was not found !",
                     getCapsResponse.available() <= 0);
@@ -64,6 +65,7 @@ public class TestGetCapabilities {
         final LayerType firstLayer = layers.get(0);
         assertEquals(firstLayer.getTitle().get(0).getValue(), "Coastlines");
         //System.out.println(firstLayer.toString());
+        pool.release(unmarsh);
     }
 
 }

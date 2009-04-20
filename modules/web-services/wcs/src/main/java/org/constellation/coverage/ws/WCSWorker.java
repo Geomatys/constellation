@@ -38,14 +38,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
@@ -115,6 +113,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 
 // GeoAPI dependencies
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -161,12 +160,7 @@ public final class WCSWorker {
     /**
      * The web service marshaller, which will use the web service name space.
      */
-    private final LinkedBlockingQueue<Marshaller> marshallers;
-
-    /**
-     * The web service unmarshaller, which will use the web service name space.
-     */
-    private final LinkedBlockingQueue<Unmarshaller> unmarshallers;
+    private final MarshallerPool marshallerPool;
 
     /**
      * Defines a set of methods that a servlet uses to communicate with its servlet container,
@@ -183,11 +177,8 @@ public final class WCSWorker {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public WCSWorker(final LinkedBlockingQueue<Marshaller> marshallers,
-                     final LinkedBlockingQueue<Unmarshaller> unmarshallers)
-    {
-        this.marshallers   = marshallers;
-        this.unmarshallers = unmarshallers;
+    public WCSWorker(final MarshallerPool marshallerPool) {
+        this.marshallerPool = marshallerPool;
     }
 
     /**
@@ -920,7 +911,7 @@ public final class WCSWorker {
             final File f = getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = unmarshallers.take();
+                unmarshaller = marshallerPool.acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (!f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
@@ -930,11 +921,9 @@ public final class WCSWorker {
                     response = unmarshaller.unmarshal(f);
                 }
                 capabilities.put(fileName, response);
-            } catch (InterruptedException ex) {
-                LOGGER.severe("Interrupted exception in getSaticCapabiltiesObject:" + ex.getMessage());
             } finally {
                 if (unmarshaller != null) {
-                    unmarshallers.add(unmarshaller);
+                    marshallerPool.release(unmarshaller);
                 }
             }
                 p.put("update", "false");

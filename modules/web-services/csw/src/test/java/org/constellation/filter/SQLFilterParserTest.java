@@ -22,11 +22,11 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.ogc.FilterType;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -41,7 +41,8 @@ public class SQLFilterParserTest {
     private Unmarshaller filterUnmarshaller;
     private final static QName _ExtrinsicObject25_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
     private final static QName _Association25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
-    
+    private MarshallerPool pool;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -53,12 +54,15 @@ public class SQLFilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new SQLFilterParser();
-        JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.ogc:org.constellation.gml.v311");
-        filterUnmarshaller = jbcontext.createUnmarshaller();
+        pool = new MarshallerPool("org.constellation.ogc:org.constellation.gml.v311");
+        filterUnmarshaller = pool.acquireUnmarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
+        if (filterUnmarshaller != null) {
+            pool.release(filterUnmarshaller);
+        }
     }
     
     /**
