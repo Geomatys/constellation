@@ -51,8 +51,8 @@ import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.AbstractRequest;
 
+import org.geotoolkit.util.Versioned;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ws.ExceptionCode.*;
 
@@ -309,9 +309,9 @@ public abstract class WebService {
                 }
             }
 
-            if (request != null && request instanceof AbstractRequest) {
-                AbstractRequest ar = (AbstractRequest) request;
-                uriContext.getQueryParameters().add("VERSION", ar.getVersion());
+            if (request != null && request instanceof Versioned) {
+                Versioned ar = (Versioned) request;
+                uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
             }
             return treatIncomingRequest(request);
         } else {

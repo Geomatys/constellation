@@ -199,7 +199,7 @@ public final class WCSWorker {
     public DescribeCoverageResponse describeCoverage(final DescribeCoverage abstractRequest)
                                                   throws JAXBException, CstlServiceException
     {
-        final String version = abstractRequest.getVersion();
+        final String version = abstractRequest.getVersion().toString();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
                            MISSING_PARAMETER_VALUE, "version");
@@ -469,7 +469,7 @@ public final class WCSWorker {
                                   throws JAXBException, CstlServiceException
     {
         //we begin by extract the base attribute
-        String version = abstractRequest.getVersion();
+        String version = abstractRequest.getVersion().toString();
         if (version == null) {
             version = "1.1.1";
         }
@@ -757,7 +757,7 @@ public final class WCSWorker {
     public RenderedImage getCoverage(final GetCoverage abstractRequest) throws JAXBException,
                                                                          CstlServiceException
     {
-        final String inputVersion = abstractRequest.getVersion();
+        final String inputVersion = abstractRequest.getVersion().toString();
         if(inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, "version");

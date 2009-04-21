@@ -179,7 +179,7 @@ public class SOService extends OGCWebService {
 
                     gc = createNewGetCapabilities();
                 }
-                serviceDef = getVersionFromNumber(gc.getVersion());
+                serviceDef = getVersionFromNumber(gc.getVersion().toString());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 

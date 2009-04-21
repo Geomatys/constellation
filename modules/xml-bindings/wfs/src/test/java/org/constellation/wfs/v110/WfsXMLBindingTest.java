@@ -17,6 +17,7 @@
 
 package org.constellation.wfs.v110;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.ows.v100.WGS84BoundingBoxType;
-import org.constellation.util.Util;
 
 //Junit dependencies
 import org.geotoolkit.xml.MarshallerPool;
@@ -62,9 +62,9 @@ public class WfsXMLBindingTest {
     }
 
     @Test
-    public void unmarshallingTest() throws JAXBException {
+    public void unmarshallingTest() throws JAXBException, FileNotFoundException {
 
-        InputStream is = Util.getResourceAsStream("org/constellation/wfs/v110/capabilities.xml");
+        InputStream is = WfsXMLBindingTest.class.getResourceAsStream("/org/constellation/wfs/v110/capabilities.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
         if (unmarshalled instanceof JAXBElement) {
             unmarshalled = ((JAXBElement)unmarshalled).getValue();

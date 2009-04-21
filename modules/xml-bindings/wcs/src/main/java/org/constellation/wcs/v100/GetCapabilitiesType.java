@@ -30,6 +30,7 @@ import org.constellation.wcs.GetCapabilities;
 import org.constellation.ows.AcceptFormats;
 import org.constellation.ows.AcceptVersions;
 import org.constellation.ows.Sections;
+import org.geotoolkit.util.Version;
 
 
 /**
@@ -113,11 +114,11 @@ public class GetCapabilitiesType implements GetCapabilities {
      * Gets the value of the version property.
      */
     @Override
-    public String getVersion() {
+    public Version getVersion() {
         if (version == null) {
-            return "1.0.0";
+            return new Version("1.0.0");
         } else {
-            return version;
+            return new Version(version);
         }
     }
 

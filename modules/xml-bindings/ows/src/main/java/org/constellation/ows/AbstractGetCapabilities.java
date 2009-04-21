@@ -17,14 +17,15 @@
 
 package org.constellation.ows;
 
-import org.constellation.ws.AbstractRequest;
+import org.geotoolkit.util.Versioned;
+
 
 /**
  *  Super abstract type for all the different versions of GetCapabilities request.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface AbstractGetCapabilities extends AbstractRequest {
+public interface AbstractGetCapabilities extends Versioned {
 
     public AcceptVersions getAcceptVersions();
 

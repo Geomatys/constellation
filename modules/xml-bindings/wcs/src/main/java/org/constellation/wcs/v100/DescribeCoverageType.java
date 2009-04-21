@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.wcs.DescribeCoverage;
+import org.geotoolkit.util.Version;
 
 
 /**
@@ -124,8 +125,8 @@ public class DescribeCoverageType implements DescribeCoverage {
      * Return the version of the service.
      */
     @Override
-    public String getVersion() {
-        return version;
+    public Version getVersion() {
+        return new Version(version);
     }
 
     @Override

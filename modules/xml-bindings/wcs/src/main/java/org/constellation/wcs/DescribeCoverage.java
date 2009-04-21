@@ -16,13 +16,13 @@
  */
 package org.constellation.wcs;
 
-import org.constellation.ws.AbstractRequest;
+import org.geotoolkit.util.Versioned;
 
 /**
  *  Super abstract type for all the different versions of DescribeCoverage request.
  *
  * @author Guilhem Legal
  */
-public interface DescribeCoverage extends AbstractRequest {
+public interface DescribeCoverage extends Versioned {
     public String toKvp();
 }

@@ -198,7 +198,7 @@ public final class WCSService extends OGCWebService {
                 if (getcaps == null) {
                     getcaps = adaptKvpGetCapabilitiesRequest();
                 }
-                serviceDef = getVersionFromNumber(getcaps.getVersion());
+                serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
                 //TODO: is this necessary?
                 worker.internal_initServletContext(servletContext);
                 worker.internal_initUriContext(uriContext);
@@ -226,7 +226,7 @@ public final class WCSService extends OGCWebService {
                 if (desccov == null) {
                     desccov = adaptKvpDescribeCoverageRequest();
                 }
-                serviceDef = getVersionFromNumber(desccov.getVersion());
+                serviceDef = getVersionFromNumber(desccov.getVersion().toString());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
@@ -243,7 +243,7 @@ public final class WCSService extends OGCWebService {
                 if (getcov == null) {
                     getcov = adaptKvpGetCoverageRequest();
                 }
-                serviceDef = getVersionFromNumber(getcov.getVersion());
+                serviceDef = getVersionFromNumber(getcov.getVersion().toString());
                 final RenderedImage rendered = worker.getCoverage(getcov);
                 String format = getcov.getFormat();
                 if (format.equalsIgnoreCase(MATRIX)) {

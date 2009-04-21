@@ -59,15 +59,7 @@
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-swe</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    
-    <!--  TEST SCOPE -->
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
+    </dependency>    
   </dependencies>
 
 </project>

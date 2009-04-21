@@ -35,7 +35,6 @@ import org.constellation.swe.v100.QuantityRange;
 import org.constellation.swe.v100.QuantityType;
 import org.constellation.swe.v100.TimeRange;
 import org.constellation.swe.v100.UomPropertyType;
-import org.constellation.util.Util;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -116,7 +115,7 @@ public class SmlXMLBindingTest {
 
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
-        InputStream is = Util.getResourceAsStream("org/constellation/sml/component.xml");
+        InputStream is = SmlXMLBindingTest.class.getResourceAsStream("/org/constellation/sml/component.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
         if (unmarshalled instanceof JAXBElement) {
             unmarshalled = ((JAXBElement)unmarshalled).getValue();
@@ -273,7 +272,7 @@ public class SmlXMLBindingTest {
 
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
-        InputStream is = Util.getResourceAsStream("org/constellation/sml/system.xml");
+        InputStream is = SmlXMLBindingTest.class.getResourceAsStream("/org/constellation/sml/system.xml");
         Object unmarshalled = unmarshaller.unmarshal(is);
         if (unmarshalled instanceof JAXBElement) {
             unmarshalled = ((JAXBElement)unmarshalled).getValue();

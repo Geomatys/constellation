@@ -133,7 +133,7 @@ public class WMTSService extends OGCWebService {
                      */
                     gc = createNewGetCapabilitiesRequest();
                 }
-                serviceDef = getVersionFromNumber(gc.getVersion());
+                serviceDef = getVersionFromNumber(gc.getVersion().toString());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
@@ -359,7 +359,7 @@ public class WMTSService extends OGCWebService {
                                               NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
-            serviceDef = getVersionFromNumber(gc.getVersion());
+            serviceDef = getVersionFromNumber(gc.getVersion().toString());
             final StringWriter sw = new StringWriter();
             marshaller.marshal(worker.getCapabilities(gc), sw);
             return Response.ok(sw.toString(), TEXT_XML).build();

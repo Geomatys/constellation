@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.ows.AbstractGetCapabilities;
 import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.Version;
 
 
 /**
@@ -122,14 +123,7 @@ public class GetCapabilitiesType implements AbstractGetCapabilities {
         return updateSequence;
     }
 
-    /**
-     * inherited method from AbstractGetCapabilties
-     */
-    public String getVersion() {
-        if (acceptVersions!= null && acceptVersions.getVersion().size()!= 0) {
-            return acceptVersions.getVersion().get(0);
-        } return null;
-    }
+    
     
     /**
      * Verify that this entry is identical to the specified object.
@@ -157,6 +151,16 @@ public class GetCapabilitiesType implements AbstractGetCapabilities {
         hash = 73 * hash + (this.acceptFormats != null ? this.acceptFormats.hashCode() : 0);
         hash = 73 * hash + (this.updateSequence != null ? this.updateSequence.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * inherited method from AbstractGetCapabilties
+     */
+    @Override
+    public Version getVersion() {
+        if (acceptVersions!= null && acceptVersions.getVersion().size()!= 0) {
+            return new Version(acceptVersions.getVersion().get(0));
+        } return null;
     }
 
 }

@@ -69,11 +69,6 @@
     </dependency>
     <dependency>
      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>

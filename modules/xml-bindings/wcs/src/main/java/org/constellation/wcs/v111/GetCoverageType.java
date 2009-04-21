@@ -30,14 +30,15 @@ import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.TimePositionType;
 import org.constellation.ows.v110.BoundingBoxType;
 import org.constellation.ows.v110.CodeType;
-import org.constellation.util.StringUtilities;
 import org.constellation.wcs.GetCoverage;
 
+import org.constellation.wcs.StringUtilities;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 
+import org.geotoolkit.util.Version;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -144,8 +145,8 @@ public class GetCoverageType implements GetCoverage {
      * {@inheritDoc}
      */
     @Override
-    public String getVersion() {
-        return version;
+    public Version getVersion() {
+        return new Version(version);
     }
 
     /**

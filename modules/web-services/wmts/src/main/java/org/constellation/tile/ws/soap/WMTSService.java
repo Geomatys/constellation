@@ -86,7 +86,7 @@ public class WMTSService {
 
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           requestCapabilities.getVersion());
+                                           requestCapabilities.getVersion().toString());
         }
     }
 

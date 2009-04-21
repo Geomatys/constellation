@@ -152,9 +152,9 @@ public class CSWService {
             return worker.getCapabilities(requestCapabilities);
             
         } catch (CstlServiceException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion());
+            throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion().toString());
         } catch (JAXBException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), requestCapabilities.getVersion());
+            throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), requestCapabilities.getVersion().toString());
         }
     }
     

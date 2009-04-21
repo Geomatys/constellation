@@ -17,7 +17,7 @@
 package org.constellation.wcs;
 
 import java.awt.Dimension;
-import org.constellation.ws.AbstractRequest;
+import org.geotoolkit.util.Versioned;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -29,7 +29,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Guilhem Legal
  * @author Cédric Briançon (Geomatys)
  */
-public interface GetCoverage extends AbstractRequest {
+public interface GetCoverage extends Versioned {
 
     /**
      * Returns the {@link CoordinateReferenceSystem} of the request, or {@code null}
