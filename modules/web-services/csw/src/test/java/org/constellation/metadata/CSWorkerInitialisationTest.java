@@ -19,7 +19,6 @@ package org.constellation.metadata;
 
 // JAXB dependencies
 import java.io.File;
-import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;

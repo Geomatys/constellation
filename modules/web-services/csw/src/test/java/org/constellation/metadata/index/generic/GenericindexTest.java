@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,31 +23,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-// Constellation dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// Constellation dependencies
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.lucene.filter.BBOXFilter;
+import org.constellation.lucene.filter.SpatialFilter;
+import org.constellation.util.Util;
 
 // lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
 // geotools dependencies
-import org.constellation.lucene.filter.BBOXFilter;
-import org.constellation.lucene.filter.SpatialFilter;
-import org.constellation.util.Util;
+import org.constellation.metadata.CSWClassesContext;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // GeoAPI dependencies
+import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
+import org.geotools.temporal.object.DefaultPeriod;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 
 /**
@@ -76,7 +79,7 @@ public class GenericindexTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteIndex();
+        //deleteIndex();
     }
 
     public static void deleteIndex() {
@@ -570,7 +573,9 @@ public class GenericindexTest {
 
     public static List<DefaultMetaData> fillTestData() throws JAXBException {
         List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        MarshallerPool pool          = new MarshallerPool(DefaultMetaData.class);
+        final List<Class> classes = CSWClassesContext.fraClasses;
+        classes.add(DefaultMetaData.class);
+        MarshallerPool pool          = new MarshallerPool(classes.toArray(new Class[1]));
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
