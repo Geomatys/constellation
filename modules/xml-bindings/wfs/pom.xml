@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Configuration of "cstl-xml-wps" module from Constellation project.
-  Version: $Id: pom.xml 1413 2009-02-25 22:39:08Z acuster $
+  Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
