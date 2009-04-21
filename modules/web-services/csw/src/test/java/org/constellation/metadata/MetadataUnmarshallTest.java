@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -45,7 +44,6 @@ import static org.junit.Assert.*;
 import org.constellation.util.Util;
 
 // geotools dependencies
-import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceIdentifierMetadata;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
@@ -72,14 +70,11 @@ import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
 import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
 import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
-import org.geotoolkit.naming.DefaultLocalName;
-import org.geotoolkit.referencing.AbstractReferenceSystem;
 import org.geotoolkit.referencing.NamedIdentifier;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;
 import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
-import org.geotoolkit.resources.Vocabulary;
 import org.geotools.temporal.object.DefaultInstant;
 import org.geotools.temporal.object.DefaultPeriod;
 import org.geotools.temporal.object.DefaultPosition;
@@ -103,10 +98,8 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
-import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 /**
@@ -114,24 +107,11 @@ import org.opengis.util.InternationalString;
  * @author Guilhem Legal
  */
 public class MetadataUnmarshallTest {
-
-    private Logger logger = Logger.getLogger("org.constellation.metadata");
-
     private AnchorPool testPool;
     private Unmarshaller unmarshaller;
     private Marshaller marshaller;
 
-
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -158,6 +138,7 @@ public class MetadataUnmarshallTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Ignore
     public void unmarshallTest() throws Exception {
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
@@ -165,7 +146,7 @@ public class MetadataUnmarshallTest {
         assertTrue(obj instanceof DefaultMetaData);
         DefaultMetaData result = (DefaultMetaData) obj;
 
-         DefaultMetaData expResult     = new DefaultMetaData();
+        DefaultMetaData expResult = new DefaultMetaData();
 
         /*
          * static part
@@ -751,11 +732,14 @@ public class MetadataUnmarshallTest {
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAlias(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAlias());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0));
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias());
+        assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension());
+        assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers());
 
-        Object a = (expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem());
-        Object b = (resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem());
+        Object a = (expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
+        Object b = (resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
         System.out.println(a.equals(b));
 
+        assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getVerticalDatumType(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getVerticalDatumType());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getName(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getName());
@@ -961,12 +945,10 @@ public class MetadataUnmarshallTest {
         RScitation.setEdition(new SimpleInternationalString("2"));
 
         ReferenceIdentifierMetadata Nidentifier = new ReferenceIdentifierMetadata(RScitation, "L101", code);
-        AbstractReferenceSystem rs = new AbstractReferenceSystem(
-                Collections.singletonMap(AbstractReferenceSystem.NAME_KEY, Nidentifier));
+        ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
         set = new HashSet();
         set.add(rs);
         metadata.setReferenceSystemInfo(set);
-
 
         /*
          * extension information
@@ -1385,13 +1367,13 @@ public class MetadataUnmarshallTest {
 
         assertEquals(expResult1, result1);
 
-        startPosition     = expResult1.length();
+        startPosition     += expResult1.length();
         String expResult2 = expResult.substring(startPosition, expResult.indexOf("</gmd:dateStamp>"));
         String result2    =    result.substring(startPosition, result.indexOf("</gmd:dateStamp>"));
 
         assertEquals(expResult2, result2);
 
-        startPosition     = startPosition + expResult2.length();
+        startPosition     += expResult2.length();
         String expResult3 = expResult.substring(startPosition, expResult.indexOf("</gmd:referenceSystemInfo>"));
         String result3    =    result.substring(startPosition, result.indexOf("</gmd:referenceSystemInfo>"));
 
@@ -1442,7 +1424,6 @@ public class MetadataUnmarshallTest {
         startPosition     = startPosition + expResult10.length();
         String expResult11 = expResult.substring(startPosition, expResult.indexOf("</gmd:distributor>"));
         String result11    =    result.substring(startPosition, result.indexOf("</gmd:distributor>"));
-
 
         assertEquals(expResult11, result11);
 

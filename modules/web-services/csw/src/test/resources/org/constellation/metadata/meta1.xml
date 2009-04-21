@@ -392,10 +392,10 @@
                                         <gml:VerticalCS gml:id="coordinate-system">
                                             <gml:identifier codeSpace="">meters</gml:identifier>
                                             <gml:axis>
-                                                <gml:CoordinateSystemAxis gml:uom="m" gml:id="coordinate-system-axis">
+                                                <gml:CoordinateSystemAxis gml:id="coordinate-system-axis" uom="m">
                                                     <gml:identifier codeSpace="">meters</gml:identifier>
                                                     <gml:axisAbbrev>meters</gml:axisAbbrev>
-                                                    <gml:axisDirection codeSpace="">down</gml:axisDirection>
+                                                    <gml:axisDirection codeSpace="EPSG">down</gml:axisDirection>
                                                 </gml:CoordinateSystemAxis>
                                             </gml:axis>
                                         </gml:VerticalCS>
