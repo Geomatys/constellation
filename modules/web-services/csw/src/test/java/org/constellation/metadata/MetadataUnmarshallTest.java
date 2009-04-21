@@ -24,7 +24,6 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +45,6 @@ import org.constellation.util.Util;
 // geotools dependencies
 import org.geotoolkit.internal.jaxb.metadata.ReferenceIdentifierMetadata;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
-import org.geotoolkit.internal.jaxb.referencing.TemporalPrimitiveAdapter;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.metadata.iso.DefaultMetadataExtensionInformation;
@@ -121,7 +119,6 @@ public class MetadataUnmarshallTest {
         testPool = new AnchorPool(classes);
         marshaller = testPool.acquireMarshaller();
         unmarshaller = testPool.acquireUnmarshaller();
-        System.out.println("-<<<<<<<<<<<<<<<<<<<<<<<<"+ marshaller.getAdapter(TemporalPrimitiveAdapter.class));
     }
 
     @After
@@ -736,11 +733,6 @@ public class MetadataUnmarshallTest {
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers());
-
-        Object a = (expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
-        Object b = (resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
-        System.out.println(a.equals(b));
-
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getAuthority(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getAuthority());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getCodeSpace(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getCodeSpace());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
@@ -762,8 +754,6 @@ public class MetadataUnmarshallTest {
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next(), resDataIdent.getExtent().iterator().next().getVerticalElements().iterator().next());
         assertEquals(expDataIdent.getExtent().iterator().next().getVerticalElements(), resDataIdent.getExtent().iterator().next().getVerticalElements());
         assertEquals(expDataIdent.getExtent().iterator().next().getTemporalElements(), resDataIdent.getExtent().iterator().next().getTemporalElements());
-        System.out.println("ex temporal:" + expDataIdent.getExtent().iterator().next().getTemporalElements());
-        System.out.println("res temporal:" + resDataIdent.getExtent().iterator().next().getTemporalElements());
         assertEquals(expDataIdent.getExtent().iterator().next(), resDataIdent.getExtent().iterator().next());
         assertEquals(expDataIdent.getExtent(), resDataIdent.getExtent());
         assertEquals(expDataIdent.getLanguage(), resDataIdent.getLanguage());

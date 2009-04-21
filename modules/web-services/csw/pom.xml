@@ -55,9 +55,6 @@
     </developer>
   </developers>
 
-  <properties>
-    <maven.test.skip>true</maven.test.skip>
-  </properties>
 
   <!--
     Required dependencies for building. These dependencies will be included
