@@ -50,24 +50,24 @@
 
 
   <!--
-    Dépendences.
+    Dépendences.  It doesnt build but we don't care
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-referencing</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-referencing</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-coverage</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-coverage</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-widgets-swing</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-widgets-swing</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-go</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-go</artifactId>
       <version>${geotools.version}</version>
     </dependency>
     <dependency>

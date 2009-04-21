@@ -48,19 +48,19 @@
 
 
   <!--
-    Dépendences.
+    Dépendences. It doesnt build but we don't care
   -->
   <properties>
     <openoffice.version>1.9</openoffice.version>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-referencing</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-referencing</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-openoffice</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-openoffice</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation</groupId>
@@ -97,8 +97,8 @@
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>        <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
-      <artifactId>gtm-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
+      <groupId>org.geotoolkit</groupId>        <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
+      <artifactId>geotk-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
       <scope>provided</scope>
     </dependency>
   </dependencies>

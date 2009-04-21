@@ -49,12 +49,12 @@
 
 
   <!--
-    Dépendences.
+    Dépendences. It doesnt build but we don't care
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-referencing</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-referencing</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -73,10 +73,6 @@
       <artifactId>gtm-temporal</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-cql</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-metadata-fra</artifactId>
     </dependency>

@@ -51,8 +51,12 @@
   -->
   <dependencies>
     <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-coverage</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gtm-coverage</artifactId>
+      <artifactId>gtm-metadata</artifactId>
     </dependency>
   </dependencies>
 

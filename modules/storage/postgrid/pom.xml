@@ -95,14 +95,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gtm-referencing</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-coverage</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gtm-coverageio</artifactId>
     </dependency>
     <dependency>
@@ -110,16 +102,12 @@
       <artifactId>gtm-coverageio-netcdf</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-main</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-go2</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-widgets-swing</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-widgets-swing</artifactId>
     </dependency>
 
 

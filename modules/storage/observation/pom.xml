@@ -104,10 +104,6 @@
       <artifactId>cstl-xml-sos</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-metadata</artifactId>
-    </dependency>
   </dependencies>
 
 
