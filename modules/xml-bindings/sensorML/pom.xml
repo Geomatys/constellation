@@ -52,10 +52,6 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-metadata</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-swe</artifactId>
       <version>${project.version}</version>

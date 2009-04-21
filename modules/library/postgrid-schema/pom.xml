@@ -52,10 +52,6 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gtm-referencing</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gtm-coverage</artifactId>
     </dependency>
   </dependencies>
