@@ -156,7 +156,7 @@
   -->
   <properties>
     <geotools.version>2.6-SNAPSHOT</geotools.version>
-    <geotoolkit.version>3.00-SNAPSHOT</geotoolkit.version>
+    <geotoolkit.version>SNAPSHOT</geotoolkit.version>
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
     <constellation.map>org.constellation.map.ws.rs</constellation.map>
@@ -372,12 +372,12 @@
       <!-- Geotoolkit version -->
       <dependency>
         <groupId>org.geotoolkit</groupId>
-        <artifactId>gto-metadata-fra</artifactId>
+        <artifactId>geotk-metadata-fra</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
-        <artifactId>gto-utility</artifactId>
+        <artifactId>geotk-utility</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
 

@@ -78,7 +78,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
-      <artifactId>gto-metadata-fra</artifactId>
+      <artifactId>geotk-metadata-fra</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>

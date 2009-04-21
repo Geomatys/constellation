@@ -73,7 +73,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
-      <artifactId>gto-utility</artifactId>
+      <artifactId>geotk-utility</artifactId>
     </dependency>
   </dependencies>
 
