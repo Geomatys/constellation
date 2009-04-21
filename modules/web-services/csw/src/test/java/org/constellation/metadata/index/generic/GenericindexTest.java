@@ -79,7 +79,7 @@ public class GenericindexTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        //deleteIndex();
+        deleteIndex();
     }
 
     public static void deleteIndex() {
