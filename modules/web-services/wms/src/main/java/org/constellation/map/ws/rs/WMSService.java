@@ -105,7 +105,7 @@ public class WMSService extends OGCWebService {
         setXMLContext("org.constellation.ws:" +
         		      "org.constellation.wms.v111:" +
                       "org.constellation.wms.v130:" +
-                      "org.geotools.internal.jaxb.v110.sld",
+                      "org.geotoolkit.internal.jaxb.v110.sld",
                       "http://www.opengis.net/wms");
 
         worker = new WMSWorker(marshallerPool);
