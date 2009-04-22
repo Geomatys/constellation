@@ -83,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-metadata</artifactId>
+      <artifactId>geotk-referencing</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

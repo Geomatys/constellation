@@ -21,6 +21,7 @@ package org.constellation.metadata;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -106,28 +108,28 @@ import org.opengis.util.InternationalString;
  * @author Guilhem Legal
  */
 public class MetadataUnmarshallTest {
-    private AnchorPool testPool;
-    private Unmarshaller unmarshaller;
-    private Marshaller marshaller;
+    private static AnchorPool testPool;
+    private static Unmarshaller unmarshaller;
+    private static Marshaller marshaller;
 
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws JAXBException, URISyntaxException {
         final List<Class> classes = CSWClassesContext.fraClasses;
         classes.add(DefaultMetaData.class);
         testPool = new AnchorPool(classes);
-        marshaller = testPool.acquireMarshaller();
-        unmarshaller = testPool.acquireUnmarshaller();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void releaseMarshallers() {
         if (marshaller != null) {
             testPool.release(marshaller);
+            marshaller = null;
         }
         if (unmarshaller != null) {
             testPool.release(unmarshaller);
+            unmarshaller = null;
         }
     }
 
@@ -138,7 +140,7 @@ public class MetadataUnmarshallTest {
      */
     @Test
     public void unmarshallTest() throws Exception {
-
+        unmarshaller = testPool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         assertTrue(obj instanceof DefaultMetaData);
@@ -1339,6 +1341,7 @@ public class MetadataUnmarshallTest {
         metadata.setDistributionInfo(distributionInfo);
 
         StringWriter sw = new StringWriter();
+        marshaller = testPool.acquireMarshaller();
         marshaller.marshal(metadata, sw);
         String result = sw.toString();
 
