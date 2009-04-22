@@ -165,7 +165,7 @@ public class WMSService extends OGCWebService {
                 //workaround because 1.1.1 is defined with a DTD rather than an XSD
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
-                marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
+                marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders",
                            (requestCapab.getVersion().toString().equals("1.1.1")) ?
                            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" :
                            "");

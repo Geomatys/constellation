@@ -25,10 +25,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
@@ -45,6 +45,7 @@ import org.geotoolkit.internal.jaxb.v110.sld.LayerDescriptionType;
 import org.geotoolkit.internal.jaxb.v110.sld.TypeNameType;
 
 // JUnit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -63,6 +64,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * A list of available layers to be requested in WMS.
      */
     private static List<LayerDetails> layers;
+
+    private static MarshallerPool pool;
 
     /**
      * URLs which will be tested on the server.
@@ -99,7 +102,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() {
+    public static void initLayerList() throws JAXBException {
         // Get the list of layers
         try {
             layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
@@ -107,6 +110,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             layers = null;
             assumeNoException(ex);
         }
+        pool = new MarshallerPool("org.constellation.ws:" +
+                                  "org.constellation.wms.v111:" +
+                                  "org.geotoolkit.internal.jaxb.v110.sld");
     }
 
     /**
@@ -114,7 +120,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
-    public void testWMSWrongRequest() {
+    public void testWMSWrongRequest() throws JAXBException {
         // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
         final URL wrongUrl;
         try {
@@ -135,15 +141,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wms.v111");
-            final Object obj = context.createUnmarshaller().unmarshal(in);
-            assertTrue(obj instanceof ServiceExceptionReport);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        final Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        assertTrue(obj instanceof ServiceExceptionReport);
     }
 
     /**
@@ -184,7 +185,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WMS version 1.1.1 standard.
      */
     @Test
-    public void testWMSGetCapabilities() {
+    public void testWMSGetCapabilities() throws JAXBException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -209,17 +210,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Object obj;
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wms.v111:" +
-                                                                "org.geotoolkit.internal.jaxb.v110.sld");
-            obj = context.createUnmarshaller().unmarshal(in);
-            assertTrue(obj instanceof WMT_MS_Capabilities);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        final Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        assertTrue(obj instanceof WMT_MS_Capabilities);
 
         final WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
         final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST);
@@ -313,7 +307,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    public void testWMSDescribeLayer() {
+    public void testWMSDescribeLayer() throws JAXBException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -337,17 +331,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Object obj;
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wms.v111:" +
-                                                                "org.geotoolkit.internal.jaxb.v110.sld");
-            obj = context.createUnmarshaller().unmarshal(in);
-            assertTrue(obj instanceof DescribeLayerResponseType);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        final Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        assertTrue(obj instanceof DescribeLayerResponseType);
 
         // Tests on the response
         final DescribeLayerResponseType desc = (DescribeLayerResponseType)obj;

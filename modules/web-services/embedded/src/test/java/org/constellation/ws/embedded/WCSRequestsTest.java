@@ -23,11 +23,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.ows.v110.ExceptionReport;
@@ -41,6 +41,7 @@ import org.constellation.wcs.v100.LonLatEnvelopeType;
 import org.constellation.wcs.v100.WCSCapabilitiesType;
 
 // JUnit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -59,6 +60,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * A list of available layers to be requested in WCS.
      */
     private static List<LayerDetails> layers;
+
+    private static MarshallerPool pool;
 
     /**
      * URLs which will be tested on the server.
@@ -88,7 +91,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() {
+    public static void initLayerList() throws JAXBException {
         // Get the list of layers
         try {
             layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0);
@@ -96,6 +99,10 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             layers = null;
             assumeNoException(ex);
         }
+        pool = new MarshallerPool("org.constellation.ws:" +
+                                  "org.constellation.wcs.v100:" +
+                                  "org.constellation.ows.v100:" +
+                                  "org.constellation.gml.v311");
     }
 
     /**
@@ -103,7 +110,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
-    public void testWCSWrongRequest() {
+    public void testWCSWrongRequest() throws JAXBException {
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         final URL wrongUrl;
         try {
@@ -124,15 +131,10 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wcs.v100");
-            final Object obj = context.createUnmarshaller().unmarshal(in);
-            assertTrue(obj instanceof ExceptionReport);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        final Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        assertTrue(obj instanceof ExceptionReport);
     }
 
     /**
@@ -211,7 +213,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WCS version 1.0.0 standard.
      */
     @Test
-    public void testWCSGetCapabilities() {
+    public void testWCSGetCapabilities() throws JAXBException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -236,21 +238,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
-        Object obj;
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wcs.v100:" +
-                                                                "org.constellation.ows.v100:" +
-                                                                "org.constellation.gml.v311");
-            obj = context.createUnmarshaller().unmarshal(in);
-            if (obj instanceof JAXBElement) {
-                obj = ((JAXBElement) obj).getValue();
-            }
-            assertTrue(obj instanceof WCSCapabilitiesType);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
         }
+        assertTrue(obj instanceof WCSCapabilitiesType);
 
         final WCSCapabilitiesType responseCaps = (WCSCapabilitiesType)obj;
         final List<CoverageOfferingBriefType> coverages = responseCaps.getContentMetadata().getCoverageOfferingBrief();
@@ -279,7 +273,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeCoverage request returns indeed a valid document.
      */
     @Test
-    public void testWCSDescribeCoverage() {
+    public void testWCSDescribeCoverage() throws JAXBException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -304,21 +298,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
-        Object obj;
-        try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.ws:" +
-                                                                "org.constellation.wcs.v100:" +
-                                                                "org.constellation.ows.v100:" +
-                                                                "org.constellation.gml.v311");
-            obj = context.createUnmarshaller().unmarshal(in);
-            if (obj instanceof JAXBElement) {
-                obj = ((JAXBElement) obj).getValue();
-            }
-            assertTrue(obj instanceof CoverageDescription);
-        } catch (JAXBException ex) {
-            assumeNoException(ex);
-            return;
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(in);
+        pool.release(unmarshaller);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
         }
+        assertTrue(obj instanceof CoverageDescription);
 
         final CoverageDescription responseDesc = (CoverageDescription)obj;
         assertNotNull(responseDesc);

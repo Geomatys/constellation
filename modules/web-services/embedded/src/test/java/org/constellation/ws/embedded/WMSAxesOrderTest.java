@@ -32,7 +32,6 @@ import org.constellation.test.Commons;
 
 // JUnit dependencies
 import org.junit.*;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
