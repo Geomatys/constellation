@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -31,7 +30,7 @@ import org.geotoolkit.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BaseUnit")
-public class UnitOfMeasureEntry extends Entry { //implements BaseUnit {
+public class UnitOfMeasureEntry { //implements BaseUnit {
     /**
      * l'identifiant de l'unité ( exemple cm, és, ...)
      */
@@ -62,7 +61,6 @@ public class UnitOfMeasureEntry extends Entry { //implements BaseUnit {
      * Créé une nouvelle unité de mesure.
      */
     public UnitOfMeasureEntry(String id, String name, String quantityType, String unitsSystem) {
-        super(name);
         this.id           = id;
         this.name         = name;
         this.quantityType = quantityType;
@@ -74,6 +72,13 @@ public class UnitOfMeasureEntry extends Entry { //implements BaseUnit {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Retourne l'identifiant.
+     */
+    public String getName() {
+        return name;
     }
     
     /**
@@ -103,6 +108,16 @@ public class UnitOfMeasureEntry extends Entry { //implements BaseUnit {
                Utilities.equals(this.id,   that.id) &&
                Utilities.equals(this.quantityType, that.quantityType) &&
                Utilities.equals(this.unitsSystem, that.unitsSystem);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 61 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 61 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 61 * hash + (this.quantityType != null ? this.quantityType.hashCode() : 0);
+        hash = 61 * hash + (this.unitsSystem != null ? this.unitsSystem.hashCode() : 0);
+        return hash;
     }
     
     /**

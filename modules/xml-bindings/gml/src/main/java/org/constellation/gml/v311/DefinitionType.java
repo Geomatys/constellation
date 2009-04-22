@@ -73,7 +73,6 @@ public class DefinitionType extends DefinitionBaseType {
     /**
      * Gets the value of the remarks property.
      */
-    @Override
     public String getRemarks() {
         return remarks;
     }

@@ -283,8 +283,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name), off.getName());
             statement.setString(indexOf(query.id), id);
-            if (off.getRemarks() != null) {
-                statement.setString(indexOf(query.description),  off.getRemarks());
+            if (off.getDescription() != null) {
+                statement.setString(indexOf(query.description),  off.getDescription());
             } else {
                 statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
             }

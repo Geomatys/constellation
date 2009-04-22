@@ -18,6 +18,7 @@
 package org.constellation.catalog;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 import org.geotoolkit.util.collection.WeakValueHashMap;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.util.Util;
 
 
 /**
@@ -299,7 +301,14 @@ public abstract class SingletonTable<E> extends Table {
          * name, uses the entry's String instance in order to reduce the number of objects
          * to be managed by the garbage collector.
          */
-        final String name = ((Entry)entry).getName(); // TODO: unsafe cast.
+        final String name;
+        if (entry instanceof Element) {
+            name = ((Element)entry).getName();
+        } else {
+            Method m = Util.getGetterFromName("name", entry.getClass());
+            name = (String) Util.invokeMethod(entry, m);
+        }
+        
         if (key.equals(name)) {
             key = name; // Use the same instance (slight memory saver).
         } else {
@@ -422,7 +431,14 @@ public abstract class SingletonTable<E> extends Table {
             while (results.next()) {
                 E entry = createEntry(results, null, indexByName);
                 if (accept(entry)) {
-                    final String name = ((Entry)entry).getName();// TODO entry.getName();
+
+                    final String name;
+                    if (entry instanceof Element) {
+                        name = ((Element) entry).getName();
+                    } else {
+                        Method m = Util.getGetterFromName("name", entry.getClass());
+                        name = (String) Util.invokeMethod(entry, m);
+                    }
                     /*
                      * Si une entrée existait déjà dans la cache, réutilise cette entrée en se
                      * souvenant que postCreateEntry(...) n'a pas besoin d'être appelée pour elle.

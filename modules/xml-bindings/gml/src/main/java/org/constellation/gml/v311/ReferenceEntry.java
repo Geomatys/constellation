@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -33,7 +32,7 @@ import org.geotoolkit.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Reference")
-public class ReferenceEntry extends Entry implements Reference{
+public class ReferenceEntry implements Reference{
     
     /**
      * L'identifiant de la reference.
@@ -72,7 +71,6 @@ public class ReferenceEntry extends Entry implements Reference{
      * Créé une nouvelle reference. reduit pour l'instant a voir en fontion des besoins.
      */
     public ReferenceEntry(String id, String href) {
-        super(id);
         this.id   = id;
         this.href = href;
     }
@@ -81,6 +79,13 @@ public class ReferenceEntry extends Entry implements Reference{
      * retourne l'identifiant de la reference.
      */
     public String getId() {
+        return id;
+    }
+
+    /**
+     * retourne l'identifiant de la reference.
+     */
+    public String getName() {
         return id;
     }
 

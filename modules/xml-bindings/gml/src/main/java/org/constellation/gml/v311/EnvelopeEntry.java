@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 
@@ -61,7 +60,7 @@ import org.geotoolkit.util.Utilities;
     "pos",
     "coordinates"
 })
-public class EnvelopeEntry extends Entry {
+public class EnvelopeEntry {
 
     private String id;
     private DirectPositionType lowerCorner;
@@ -87,7 +86,6 @@ public class EnvelopeEntry extends Entry {
      */
     public EnvelopeEntry(String id, DirectPositionType lowerCorner, DirectPositionType upperCorner
             , String srsName) {
-        super(id);
         this.lowerCorner = lowerCorner;
         this.upperCorner = upperCorner;
         this.id          = id;
@@ -101,6 +99,10 @@ public class EnvelopeEntry extends Entry {
         this.srsName      = srsName;
         this.pos          = pos;
         this.srsDimension = null;
+    }
+
+    public String getId() {
+        return id;
     }
     /**
      * Gets the value of the lowerCorner property.

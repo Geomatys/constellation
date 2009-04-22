@@ -93,15 +93,15 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
         boolean success = false;
         transactionBegin();
         try {
-            if (envelope.getName() != null) {
+            if (envelope.getId() != null) {
                 PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), envelope.getName());
+                statement.setString(indexOf(query.id), envelope.getId());
                 ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
-                    return envelope.getName();
+                    return envelope.getId();
                 } else {
-                    id = envelope.getName();
+                    id = envelope.getId();
                 }
             } else {
                 id = searchFreeIdentifier("envelope:");

@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.catalog.Entry;
 import org.constellation.gml.AbstractGML;
 import org.geotoolkit.util.Utilities;
 
@@ -39,7 +38,7 @@ import org.geotoolkit.util.Utilities;
     "descriptionReference",
     "name"
 })
-public abstract class AbstractGMLEntry extends Entry implements AbstractGML {
+public abstract class AbstractGMLEntry implements AbstractGML {
 
     //private List<MetaDataPropertyType> metaDataProperty;
     //private CodeWithAuthorityType identifier;
@@ -60,12 +59,12 @@ public abstract class AbstractGMLEntry extends Entry implements AbstractGML {
      *  Simple super constructor to initialise the entry name.
      */
     public AbstractGMLEntry(String id) {
-        super(id);
+        //super(id);
         this.id = id;
     }
     
     public AbstractGMLEntry(String id, String name, String description, ReferenceEntry descriptionReference) {
-        super(id);
+        //super(id);
         this.id = id;
         this.name = name;
         this.description = description;
@@ -94,7 +93,6 @@ public abstract class AbstractGMLEntry extends Entry implements AbstractGML {
     }
 
 
-    @Override
     public String getName() {
         return name;
     }

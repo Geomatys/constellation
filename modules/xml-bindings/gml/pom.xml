@@ -68,9 +68,8 @@
       <artifactId>onm</artifactId> 
     </dependency>
     <dependency>
-     <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-postgrid</artifactId>
-      <version>${project.version}</version>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-utility</artifactId>
     </dependency>
   </dependencies>
 

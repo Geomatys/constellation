@@ -124,7 +124,7 @@ public class DefaultObservationReader implements ObservationReader {
         // we get the database informations
         BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
         }
         try {
             PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
@@ -191,13 +191,19 @@ public class DefaultObservationReader implements ObservationReader {
             loo.addAll(set);
             return loo;
         } catch (SQLException ex) {
+            System.out.println("trowing SQL");
             ex.printStackTrace();
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
+            System.out.println("trowing cat");
             ex.printStackTrace();
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
+                    NO_APPLICABLE_CODE);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new CstlServiceException("the service has throw a Runtime Exception:" + e.getMessage(),
                     NO_APPLICABLE_CODE);
         }
     }

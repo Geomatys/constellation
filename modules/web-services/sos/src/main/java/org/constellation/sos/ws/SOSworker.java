@@ -626,7 +626,6 @@ public class SOSworker {
             fc = skeletonCapabilities.getFilterCapabilities();
         }
 
-
         if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
             // we add the list of observation ofeerings 
             ObservationOfferingList ool = new ObservationOfferingList(OMReader.getObservationOfferings());
