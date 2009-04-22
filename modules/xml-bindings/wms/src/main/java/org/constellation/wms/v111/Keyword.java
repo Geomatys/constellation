@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.constellation.wms.AbstractKeyword;
 
 
 /**
@@ -35,7 +36,7 @@ import javax.xml.bind.annotation.XmlValue;
     "value"
 })
 @XmlRootElement(name = "Keyword")
-public class Keyword {
+public class Keyword implements AbstractKeyword{
 
     @XmlValue
     private String value;
@@ -67,6 +68,7 @@ public class Keyword {
     /**
      * Gets the value of the value property.
      */
+    @Override
     public String getValue() {
         return value;
     }
@@ -74,6 +76,7 @@ public class Keyword {
    /**
     * Gets the value of the vocabulary property.
     */
+    @Override
     public String getVocabulary() {
         return vocabulary;
     }

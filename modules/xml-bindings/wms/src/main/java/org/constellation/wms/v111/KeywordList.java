@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.constellation.wms.AbstractKeywordList;
 
 
 /**
@@ -37,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
     "keyword"
 })
 @XmlRootElement(name = "KeywordList")
-public class KeywordList {
+public class KeywordList implements AbstractKeywordList{
 
     @XmlElement(name = "Keyword")
     private List<Keyword> keyword = new ArrayList<Keyword>();
@@ -68,6 +69,7 @@ public class KeywordList {
     /**
      * Gets the value of the keyword property.
      */
+    @Override
     public List<Keyword> getKeyword() {
        return Collections.unmodifiableList(keyword);
     }

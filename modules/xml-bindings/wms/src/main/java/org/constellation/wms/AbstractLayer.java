@@ -32,4 +32,10 @@ public abstract class AbstractLayer {
      */
     public abstract List<AbstractDimension> getAbstractDimension();
 
+    /**
+     * Gets the value of the keywordList property.
+     *
+     */
+    public abstract AbstractKeywordList getKeywordList();
+    
 }
