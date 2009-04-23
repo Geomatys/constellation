@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.catalog.Entry;
 import org.constellation.swe.AbstractEncoding;
 import org.constellation.swe.DataBlockDefinition;
 import org.geotoolkit.util.Utilities;
@@ -41,7 +40,7 @@ import org.geotoolkit.util.Utilities;
 @XmlType(name = "DataBlockDefinition", propOrder = {
     "components",
     "encoding"})
-    public class DataBlockDefinitionEntry extends Entry implements DataBlockDefinition {
+    public class DataBlockDefinitionEntry implements DataBlockDefinition {
     
     /**
      * L'identifiant du resultat.
@@ -77,7 +76,6 @@ import org.geotoolkit.util.Utilities;
      */
     public DataBlockDefinitionEntry(final String id, final Collection<? extends AbstractDataComponentEntry> components,
             final AbstractEncodingEntry encoding) {
-        super(id);
         this.id         = id;
         this.components = components;
         this.encoding   = new AbstractEncodingPropertyType(encoding);
@@ -89,14 +87,11 @@ import org.geotoolkit.util.Utilities;
     public String getId() {
         return id;
     }
-    
-    /**
-     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
-     */
-    @Override
-    protected String createName() {
-        return null;
+
+    public String getName() {
+        return id;
     }
+    
     /**
      * {@inheritDoc}
      */

@@ -96,12 +96,13 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>onm</artifactId> 
-    </dependency>
-    <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-sos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

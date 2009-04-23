@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.catalog.Entry;
 import org.constellation.swe.AbstractEncoding;
 import org.geotoolkit.util.Utilities;
 
@@ -39,7 +38,7 @@ import org.geotoolkit.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({TextBlockEntry.class})
 @XmlType(name="AbstractEncoding")
-public class AbstractEncodingEntry extends Entry implements AbstractEncoding {
+public class AbstractEncodingEntry implements AbstractEncoding {
     
     /**
      * The encoding identifier.
@@ -58,11 +57,14 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding {
      *  An abstract encoding. used like super constructor
      */
     protected AbstractEncodingEntry(String id) {
-        super(id);
         this.id = id;
     }
     
     public String getId() {
+        return id;
+    }
+
+    public String getName() {
         return id;
     }
     

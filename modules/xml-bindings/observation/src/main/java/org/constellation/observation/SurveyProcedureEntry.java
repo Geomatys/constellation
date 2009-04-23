@@ -21,9 +21,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
-import org.constellation.metadata.ResponsiblePartyEntry;
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.util.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;
@@ -40,13 +39,16 @@ import org.opengis.util.GenericName;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SurveyProcedure")
-public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
+public class SurveyProcedureEntry implements SurveyProcedure {
     
     
     /**
      */
     @XmlTransient
-    private ResponsiblePartyEntry operator;
+    private DefaultResponsibleParty operator;
+
+    @XmlTransient
+    private String name;
     
     // JAXB issue  private Datum elevationDatum;
     
@@ -71,7 +73,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     /** Creates a new instance of SurveyProcedureEntry */
     public SurveyProcedureEntry( final String name,
-            final ResponsiblePartyEntry operator,
+            final DefaultResponsibleParty operator,
             final Datum elevationDatum,
             final ProcessEntry elevationMethod,
             final MeasureEntry elevationAccuracy,
@@ -81,7 +83,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
             final GenericName projection,
             final AbstractTimeGeometricPrimitiveType surveyTime) 
     {
-        super(name);
+        this.name  = name;
         this.operator = operator;
        // JAXB issue  this.elevationDatum = elevationDatum;
         this.elevationMethod = elevationMethod;
@@ -93,7 +95,14 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         this.surveyTime = surveyTime;
                 
     }
-    
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
     public ResponsibleParty getOperator() {
         return operator;
     }
@@ -151,7 +160,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof SurveyProcedureEntry && super.equals(object)) {
             final SurveyProcedureEntry that = (SurveyProcedureEntry) object;
             return Utilities.equals(this.operator,          that.operator)   &&
                    //Utilities.equals(this.elevationDatum,    that.elevationDatum)   && 
@@ -164,6 +173,4 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         }
         return false;
     }
-
-    
 }

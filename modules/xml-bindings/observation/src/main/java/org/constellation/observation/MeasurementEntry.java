@@ -22,9 +22,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
-import org.constellation.metadata.MetaDataEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.swe.v101.PhenomenonEntry;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
 
@@ -72,7 +72,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final ElementEntry           quality,
             final MeasureEntry           result,
             final AbstractTimeGeometricPrimitiveType    samplingTime,
-            final MetaDataEntry          observationMetadata,
+            final DefaultMetaData        observationMetadata,
             final AbstractTimeGeometricPrimitiveType    procedureTime,
             final Object                 procedureParameter) {
         super(name, definition, station, observedProperty, procedure, quality, result,
@@ -101,15 +101,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    protected String createName() {
-        final StringBuilder newName = new StringBuilder(super.createName()).append(" = ");
-        
-        return newName.toString();
-    }
-    
+    @Override
     public Measure getResult() {
        return (Measure)super.getResult();
     }
@@ -124,11 +116,11 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof MeasurementEntry && super.equals(object)) {
             final MeasurementEntry that = (MeasurementEntry) object;
             return this.getResult().equals(that.getResult());
         }
         return false;
     }
-    
+
 }

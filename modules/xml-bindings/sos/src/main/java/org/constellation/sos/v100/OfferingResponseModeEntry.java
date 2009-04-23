@@ -16,14 +16,13 @@
  */
 package org.constellation.sos.v100;
 
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class OfferingResponseModeEntry extends Entry{
+public class OfferingResponseModeEntry {
 
     /**
      * L'identifiant de l'offering.
@@ -39,9 +38,15 @@ public class OfferingResponseModeEntry extends Entry{
      * Cree une nouveau lien entre une procedure et un offering. 
      */
     public OfferingResponseModeEntry(String idOffering, ResponseModeType mode) {
-        super(mode.value());
         this.idOffering = idOffering;
         this.mode  = mode;
+    }
+
+    public String getName() {
+        if (mode != null) {
+            return mode.value();
+        }
+        return null;
     }
 
     /**

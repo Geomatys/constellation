@@ -16,7 +16,6 @@
  */
 package org.constellation.sos.v100;
 
-import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.geotoolkit.util.Utilities;
 
@@ -24,7 +23,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author legal
  */
-public class OfferingProcedureEntry extends Entry {
+public class OfferingProcedureEntry {
 
     /**
      * The offering identifier.
@@ -40,9 +39,15 @@ public class OfferingProcedureEntry extends Entry {
      * Build a new link between a procedure and an offering. 
      */
     public OfferingProcedureEntry(String idOffering, ReferenceEntry component) {
-        super(component.getHref());
         this.idOffering = idOffering;
         this.component  = component;
+    }
+
+     public String getName() {
+        if (component != null) {
+            return component.getHref();
+        }
+        return null;
     }
 
     /**

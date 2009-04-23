@@ -71,14 +71,6 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     }
 
     /**
-     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
-     */
-    @Override
-    protected String createName() {
-        return null;
-    }
-    
-    /**
      * {@inheritDoc}
      */
     public String getTokenSeparator() {
@@ -107,7 +99,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (object instanceof TextBlockEntry && super.equals(object)) {
             final TextBlockEntry that = (TextBlockEntry) object;
             return Utilities.equals(this.tokenSeparator,          that.tokenSeparator)   &&
                    Utilities.equals(this.blockSeparator,    that.blockSeparator)   && 

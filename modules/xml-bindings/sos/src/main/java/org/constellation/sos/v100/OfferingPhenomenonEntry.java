@@ -16,7 +16,6 @@
  */
 package org.constellation.sos.v100;
 
-import org.constellation.catalog.Entry;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.geotoolkit.util.Utilities;
 
@@ -24,7 +23,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem legal
  */
-public class OfferingPhenomenonEntry extends Entry {
+public class OfferingPhenomenonEntry {
     
     /**
      * The offering identifier.
@@ -40,9 +39,15 @@ public class OfferingPhenomenonEntry extends Entry {
      * Build a new link between a procedure and an offering. 
      */
     public OfferingPhenomenonEntry(String idOffering, PhenomenonEntry component) {
-        super(component.getId());
         this.idOffering = idOffering;
         this.component  = component;
+    }
+
+    public String getName() {
+        if (component != null) {
+            return component.getId();
+        }
+        return null;
     }
 
     /**

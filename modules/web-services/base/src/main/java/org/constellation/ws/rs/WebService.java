@@ -311,7 +311,8 @@ public abstract class WebService {
 
             if (request != null && request instanceof Versioned) {
                 Versioned ar = (Versioned) request;
-                uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
+                if (ar.getVersion() != null)
+                    uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
             }
             return treatIncomingRequest(request);
         } else {

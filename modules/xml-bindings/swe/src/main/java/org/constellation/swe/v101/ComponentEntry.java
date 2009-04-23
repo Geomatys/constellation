@@ -17,7 +17,6 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -26,7 +25,7 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ComponentEntry extends Entry {
+public class ComponentEntry {
     
     /**
      * L'identifiant du phénomène composé.
@@ -42,11 +41,16 @@ public class ComponentEntry extends Entry {
      * Crée une nouvelle liste de phénomene. 
      */
     public ComponentEntry(String idCompositePhenomenon, PhenomenonEntry component) {
-        super(component.getId());
         this.idCompositePhenomenon = idCompositePhenomenon;
         this.component             = component;
     }
 
+    public String getName() {
+        if (component != null)
+            return component.getId();
+        return null;
+    }
+    
     /**
      * Retourne l'id du phénomène composé.
      */

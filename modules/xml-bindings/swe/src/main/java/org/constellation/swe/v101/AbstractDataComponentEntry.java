@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.geotoolkit.util.Utilities;
-import org.constellation.catalog.Entry;
 import org.constellation.swe.AbstractDataComponent;
 /**
  *
@@ -34,7 +33,7 @@ import org.constellation.swe.AbstractDataComponent;
 @XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class, Text.class})
 @XmlType(name="AbstractDataComponent")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent {
+public class AbstractDataComponentEntry implements AbstractDataComponent {
     
     /**
      * The identifier of the component (override from abstractGML Type).
@@ -64,7 +63,6 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
      * a simple constructor used by the sub classes to initialize l'Entry.
      */
     public AbstractDataComponentEntry(String id, String definition, boolean fixed) {
-        super(id);
         this.id         = id;
         this.definition = definition;
         this.fixed      = fixed;
@@ -74,6 +72,13 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
      * Return the identifier of this data record.
      */
     public String getId() {
+        return id;
+    }
+
+    /**
+     * Return the identifier of this data record.
+     */
+    public String getName() {
         return id;
     }
 

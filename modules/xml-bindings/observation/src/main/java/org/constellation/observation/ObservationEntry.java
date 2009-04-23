@@ -28,16 +28,11 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 // Constellation dependencies 
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Entry;
-
-// openGis dependencies
 import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
 import org.constellation.gml.v311.FeaturePropertyType;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.gml.v311.TimePositionType;
-import org.constellation.metadata.MetaDataEntry;
 import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingPointEntry;
 import org.constellation.swe.v101.AnyResultEntry;
@@ -46,6 +41,8 @@ import org.constellation.swe.v101.DataArrayPropertyType;
 import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonPropertyType;
 import org.constellation.swe.v101.TimeGeometricPrimitivePropertyType;
+
+// openGis dependencies
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -55,6 +52,7 @@ import org.opengis.metadata.MetaData;
 
 // geotools dependencies
 import org.geotoolkit.util.Utilities;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Observation observation}.
@@ -78,7 +76,7 @@ import org.geotoolkit.util.Utilities;
 })
 @XmlRootElement(name = "Observation")
 @XmlSeeAlso({ MeasurementEntry.class})
-public class ObservationEntry extends Entry implements Observation {
+public class ObservationEntry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -149,7 +147,7 @@ public class ObservationEntry extends Entry implements Observation {
       *
       */
      @XmlTransient
-     private MetaDataEntry observationMetadata;
+     private DefaultMetaData observationMetadata;
      
     /**
      * 
@@ -184,11 +182,10 @@ public class ObservationEntry extends Entry implements Observation {
                             final ElementEntry         quality,
                             final Object               result,
                             final AbstractTimeGeometricPrimitiveType  samplingTime,
-                            final MetaDataEntry        observationMetadata,
+                            final DefaultMetaData      observationMetadata,
                             final AbstractTimeGeometricPrimitiveType  procedureTime,
                             final Object               procedureParameter) 
     {
-        super(name);
         this.name                = name;
         this.definition          = definition;
         if (featureOfInterest instanceof SamplingPointEntry) {
@@ -222,7 +219,6 @@ public class ObservationEntry extends Entry implements Observation {
                             final Object                result,
                             final AbstractTimeGeometricPrimitiveType   samplingTime)
     {
-        super(name);
         this.name                = name;
         this.definition          = definition;
         if (featureOfInterest instanceof SamplingPointEntry) {
@@ -342,9 +338,9 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * fixe le resultat de l'observation
      */
-    public void setResult(Object result) throws CatalogException {
+    public void setResult(Object result) {
         if (!(result instanceof ReferenceEntry) && !(result instanceof AnyResultEntry)) {
-            throw new CatalogException("this type " + result.getClass().getSimpleName() +
+            throw new IllegalArgumentException("this type " + result.getClass().getSimpleName() +
                                            " is not allowed in result");
         }
         this.result = result;
@@ -450,6 +446,7 @@ public class ObservationEntry extends Entry implements Observation {
                
         
     }
+    
     /**
      * Retourne un code représentant cette observation.
      */
@@ -466,7 +463,7 @@ public class ObservationEntry extends Entry implements Observation {
         if (object == this) {
             return true;
         }
-        if (object instanceof ObservationEntry && super.equals(object)) {
+        if (object instanceof ObservationEntry) {
             final ObservationEntry that = (ObservationEntry) object;
             return Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
                    Utilities.equals(this.observedProperty,    that.observedProperty)    &&

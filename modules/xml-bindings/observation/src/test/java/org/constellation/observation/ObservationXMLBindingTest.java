@@ -182,6 +182,19 @@ public class ObservationXMLBindingTest {
         TimePeriodType samplingTime = new TimePeriodType("2007-01-01", "2008-09-09");
         ObservationEntry expResult = new ObservationEntry("urn:Observation-007", "observation definition", sp, observedProperty, procedure, null, samplingTime);
 
+        assertEquals(expResult.getFeatureOfInterest(), result.getFeatureOfInterest());
+        assertEquals(expResult.getDefinition(), result.getDefinition());
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(expResult.getObservationMetadata(), result.getObservationMetadata());
+        assertEquals(expResult.getObservedProperty(), result.getObservedProperty());
+        assertEquals(expResult.getProcedure(), result.getProcedure());
+        assertEquals(expResult.getProcedureParameter(), result.getProcedureParameter());
+        assertEquals(expResult.getProcedureTime(), result.getProcedureTime());
+        assertEquals(expResult.getPropertyFeatureOfInterest(), result.getPropertyFeatureOfInterest());
+        assertEquals(expResult.getPropertyObservedProperty(), result.getPropertyObservedProperty());
+        assertEquals(expResult.getQuality(), result.getQuality());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult.getSamplingTime(), result.getSamplingTime());
         assertEquals(expResult, result);
 
     }

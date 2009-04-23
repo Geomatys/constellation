@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.constellation.swe.AnyScalar;
 import org.geotoolkit.util.Utilities;
 
@@ -58,7 +57,7 @@ import org.geotoolkit.util.Utilities;
     "text",
     "name"
 })
-public class AnyScalarPropertyType extends Entry implements AnyScalar {
+public class AnyScalarPropertyType implements AnyScalar {
 
     @XmlTransient
     private String idDataRecord;
@@ -110,7 +109,6 @@ public class AnyScalarPropertyType extends Entry implements AnyScalar {
      * Build a new component Property.
      */
     public AnyScalarPropertyType(String idDataRecord, String name, AbstractDataComponentEntry component) {
-        super(name);
         this.name         = name;
         this.idDataRecord = idDataRecord;
         if (component instanceof TimeType) {

@@ -45,6 +45,8 @@ public class SOSConfiguration {
 
     private String observationIdBase;
 
+    private String phenomenonIdBase;
+
     private String observationTemplateIdBase;
 
     private String sensorIdBase;
@@ -154,6 +156,14 @@ public class SOSConfiguration {
      */
     public void setObservationIdBase(String observationIdBase) {
         this.observationIdBase = observationIdBase;
+    }
+
+    public String getPhenomenonIdBase() {
+        return phenomenonIdBase;
+    }
+
+    public void setPhenomenonIdBase(String phenomenonIdBase) {
+        this.phenomenonIdBase = phenomenonIdBase;
     }
 
     /**

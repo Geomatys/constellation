@@ -22,7 +22,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.Process;
-import org.constellation.catalog.Entry;
 import org.geotoolkit.util.Utilities;
 
 
@@ -34,7 +33,7 @@ import org.geotoolkit.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="Process")
-public class ProcessEntry extends Entry implements Process {
+public class ProcessEntry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -57,37 +56,24 @@ public class ProcessEntry extends Entry implements Process {
      * @param name Le nom de la procédure.
      */
     public ProcessEntry(final String name) {
-        super(name);
         this.href = name;
         
     }
 
-    /** 
-     * Construit une nouvelle procédure du nom spécifié avec les remarques spécifiées.
-     *
-     * @param name    Le nom de la procédure.
-     * @param remarks Remarques s'appliquant à cette procédure, ou {@code null}.
-     */
-    public ProcessEntry(final String name, final String remarks) {
-        super(name, remarks);
-        this.href = name;
-    }
-    
-     /**
-     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
-     */
-    @Override
-    protected String createName() {
-        return null;
-    }
-    
     /**
      * Retourne la reference du capteur.
      */
     public String getHref() {
         return href;
     }
-    
+
+    /**
+     * Retourne la reference du capteur.
+     */
+    public String getName() {
+        return href;
+    }
+
     
      /**
      * Verifie si cette entree est identique a l'objet specifie.
@@ -115,6 +101,6 @@ public class ProcessEntry extends Entry implements Process {
      */
     @Override
     public String toString() {
-        return  super.toString() + " href=" + this.getHref();
+        return  " href=" + this.getHref();
     }
 }

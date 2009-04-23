@@ -22,11 +22,10 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
-import org.constellation.metadata.CitationEntry;
-import org.constellation.metadata.IdentifierEntry;
-import org.constellation.metadata.InternationalStringEntry;
-import org.constellation.metadata.ResultEntry;
+import org.geotoolkit.metadata.iso.DefaultIdentifier;
+import org.geotoolkit.metadata.iso.citation.DefaultCitation;
+import org.geotoolkit.metadata.iso.quality.AbstractResult;
+import org.geotoolkit.util.SimpleInternationalString;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.Element;
@@ -41,22 +40,22 @@ import org.opengis.util.InternationalString;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Element")
-public class ElementEntry extends Entry implements Element {
+public class ElementEntry implements Element {
     
     /**
      * Name of the test applied to the data.
      */
-    private Collection<InternationalStringEntry> namesOfMeasure;
+    private Collection<SimpleInternationalString> namesOfMeasure;
 
     /**
      * Code identifying a registered standard procedure, or {@code null} if none.
      */
-    private IdentifierEntry measureIdentification;
+    private DefaultIdentifier measureIdentification;
 
     /**
      * Description of the measure being determined.
      */
-    private InternationalStringEntry measureDescription;
+    private SimpleInternationalString measureDescription;
 
     /**
      * Type of method used to evaluate quality of the dataset, or {@code null} if unspecified.
@@ -67,12 +66,12 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Description of the evaluation method.
      */
-    private InternationalStringEntry evaluationMethodDescription;
+    private SimpleInternationalString evaluationMethodDescription;
 
     /**
      * Reference to the procedure information, or {@code null} if none.
      */
-    private CitationEntry evaluationProcedure;
+    private DefaultCitation evaluationProcedure;
 
     /**
      * Date that the metadata was created.
@@ -99,7 +98,7 @@ public class ElementEntry extends Entry implements Element {
      *
      * @deprecated Replaced by {@link #getResults}.
      */
-    private ResultEntry result;
+    private AbstractResult result;
 
     /**
      * Value (or set of values) obtained from applying a data quality measure or the out
@@ -108,7 +107,7 @@ public class ElementEntry extends Entry implements Element {
      *
      * @since GeoAPI 2.1
      */
-    private Collection<? extends ResultEntry> results;
+    private Collection<? extends AbstractResult> results;
     /**
      *
      */
@@ -188,7 +187,7 @@ public class ElementEntry extends Entry implements Element {
      *
      * @deprecated Replaced by {@link #getResults}.
      */
-    public Result getResult(){ 
+    public AbstractResult getResult(){
         return result;
     }
 

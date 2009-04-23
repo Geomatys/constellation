@@ -175,7 +175,7 @@ public class SOSworker {
     /**
      * The base for phenomenon id.
      */ 
-    private final String phenomenonIdBase = "urn:ogc:def:phenomenon:OGC:1.0.30:";
+    private String phenomenonIdBase;
     
     /**
      * The valid time for a getObservation template (in ms).
@@ -365,6 +365,9 @@ public class SOSworker {
 
             sensorIdBase              = configuration.getSensorIdBase() != null ?
             configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
+
+            phenomenonIdBase              = configuration.getPhenomenonIdBase() != null ?
+            configuration.getPhenomenonIdBase() : "urn:ogc:def:phenomenon:OGC:1.0.30:";
 
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
@@ -816,9 +819,11 @@ public class SOSworker {
             List<String> singlePhenomenons    = new ArrayList<String>();
             List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
+                logger.info("phenomenon:" + phenomenonName + " phenomenonIdBase:" + phenomenonIdBase);
                 if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                     phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                 }
+                logger.info("phenomenon:" + phenomenonName);
                 Phenomenon phen = OMReader.getPhenomenon(phenomenonName);
                 if (phen == null) {
                     throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",

@@ -58,8 +58,7 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      */
     protected ProcessEntry createEntry(final ResultSet results) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
-        return new ProcessEntry(results.getString(indexOf(query.name   )),
-                results.getString(indexOf(query.remarks)));
+        return new ProcessEntry(results.getString(indexOf(query.name)));
     }
     
     /**
@@ -91,7 +90,7 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
             PreparedStatement statement = getStatement(QueryType.INSERT);
         
             statement.setString(indexOf(query.name), id);
-            statement.setString(indexOf(query.remarks), proc.getRemarks());
+            statement.setNull(indexOf(query.remarks), java.sql.Types.VARCHAR);
             updateSingleton(statement);
             success = true;
         } finally {

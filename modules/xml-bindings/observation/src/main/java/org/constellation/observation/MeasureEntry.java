@@ -21,7 +21,6 @@ package org.constellation.observation;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.UnitOfMeasureEntry;
 
 // GeoTools dependencies
@@ -37,7 +36,7 @@ import org.opengis.observation.Measure;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Measure")
-public class MeasureEntry extends Entry { //implements Measure{
+public class MeasureEntry { //implements Measure{
     
     /**
      * Le non de l'unité de mesure.
@@ -70,10 +69,13 @@ public class MeasureEntry extends Entry { //implements Measure{
                         final UnitOfMeasureEntry uom,
                         final float              value)
     {
-        super(name);
         this.name = name;
         this.uom   = uom;
         this.value = value;        
+    }
+
+    public String getName() {
+        return name;
     }
     
     /**

@@ -16,7 +16,6 @@
  */
 package org.constellation.sos.v100;
 
-import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.geotoolkit.util.Utilities;
 
@@ -24,7 +23,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingSamplingFeatureEntry extends Entry {
+public class OfferingSamplingFeatureEntry {
 
     /**
      * The offering identifier.
@@ -40,9 +39,15 @@ public class OfferingSamplingFeatureEntry extends Entry {
      * Cree une nouveau lien entre une Station et un offering. 
      */
     public OfferingSamplingFeatureEntry(String idOffering, ReferenceEntry component) {
-        super(component.getId());
         this.idOffering = idOffering;
         this.component  = component;
+    }
+
+     public String getName() {
+        if (component != null) {
+            return component.getId();
+        }
+        return null;
     }
 
     /**

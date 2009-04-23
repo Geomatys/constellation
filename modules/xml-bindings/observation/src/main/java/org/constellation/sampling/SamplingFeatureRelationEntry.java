@@ -16,8 +16,8 @@
  */
 package org.constellation.sampling;
 
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.util.GenericName;
 
@@ -27,12 +27,14 @@ import org.opengis.util.GenericName;
  * @author Guilhem Legal
  */
 @XmlType(name="SamplingFeatureRelation")
-public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatureRelation {
+public class SamplingFeatureRelationEntry implements SamplingFeatureRelation {
     
     // JAXBISSUE private GenericNameEntry role;
     
     private SamplingFeatureEntry target;
     
+    @XmlTransient
+    private String name;
     /**
      * Constructeur vide utilisé par JAXB
      */
@@ -41,7 +43,7 @@ public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatu
     /**
      */
     public SamplingFeatureRelationEntry(String name, SamplingFeatureEntry target) {
-        super(name);
+        this.name = name;
         //this.role   = role;
         this.target = target;
     }
@@ -52,6 +54,10 @@ public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatu
     public GenericName getRole(){
         throw new UnsupportedOperationException("Not supported yet.");
         //return role;
+    }
+
+    public String getName() {
+        return name;
     }
     
     /**

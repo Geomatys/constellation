@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.catalog.Entry;
 import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.swe.AnyResult;
 import org.geotoolkit.util.Utilities;
@@ -36,7 +35,7 @@ import org.geotoolkit.util.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Any")
-public class AnyResultEntry extends Entry implements AnyResult {
+public class AnyResultEntry implements AnyResult {
     
     /**
      * The result identifier.
@@ -66,7 +65,6 @@ public class AnyResultEntry extends Entry implements AnyResult {
      * @param reference The reference identifier.
      */
     public AnyResultEntry(String id, ReferenceEntry reference) {
-        super(null);
         this.id = id;
         this.reference = reference;
     }
@@ -78,7 +76,6 @@ public class AnyResultEntry extends Entry implements AnyResult {
      * @param reference The reference identifier.
      */
     public AnyResultEntry(String id, DataArrayEntry array) {
-        super(null);
         this.id = id;
         this.array = new DataArrayPropertyType(array);
     }
@@ -87,6 +84,10 @@ public class AnyResultEntry extends Entry implements AnyResult {
      * Return the result identifier.
      */
     public String getId() {
+        return id;
+    }
+
+    public String getName() {
         return id;
     }
 

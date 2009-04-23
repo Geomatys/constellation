@@ -97,7 +97,7 @@ public class SamplingXMLBindingTest {
                            "        <gml:pos srsName=\"urn:ogc:crs:espg:4326\" srsDimension=\"2\">3.2 6.5</gml:pos>" + '\n' +
                            "    </sa:position>" + '\n' +
                            "</sa:SamplingPoint>" + '\n' ;
-        logger.info("RESULT:" + result);
+        logger.finer("RESULT:" + result);
         assertEquals(expResult, result);
     }
 
