@@ -239,8 +239,14 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
             final Object data = verticalOrdinates.getArray();
             final int length = getLength(data);
             altitudes = new double[length];
+            final Number[] asNumbers = (data instanceof Number[]) ? (Number[]) data : null;
             for (int i=0; i<length; i++) {
-                final double z = getDouble(data, i);
+                final double z;
+                if (asNumbers != null) {
+                    z = asNumbers[i].doubleValue();
+                } else {
+                    z = getDouble(data, i);
+                }
                 altitudes[i] = z;
             }
 //          altitudes.free(); // TODO: uncomment when we will be allowed to use Java 6.
