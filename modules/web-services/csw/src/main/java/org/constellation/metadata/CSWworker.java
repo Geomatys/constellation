@@ -138,7 +138,7 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 
 // GeoAPI dependencies
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.xml.XML;
+import org.geotoolkit.xml.Namespaces;
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -558,7 +558,7 @@ public class CSWworker {
                     if (tn != null) {
                         List<String> values = new ArrayList<String>();
                         for (QName qn : SUPPORTED_TYPE_NAME) {
-                            values.add(XML.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
                     }
@@ -607,7 +607,7 @@ public class CSWworker {
                     if (tn != null) {
                         List<String> values = new ArrayList<String>();
                         for (QName qn : SUPPORTED_TYPE_NAME) {
-                            values.add(XML.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
                     }

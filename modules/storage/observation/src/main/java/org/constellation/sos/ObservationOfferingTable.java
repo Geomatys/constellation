@@ -46,7 +46,7 @@ import org.constellation.sos.v100.OfferingResponseModeEntry;
 import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.swe.v101.PhenomenonPropertyType;
-import org.geotoolkit.xml.XML;
+import org.geotoolkit.xml.Namespaces;
 
 /**
  *
@@ -234,7 +234,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          String namespace        = results.getString(indexOf(query.resultModelNamespace));
          resultModel.add(new QName(namespace,
                                    results.getString(indexOf(query.resultModelLocalPart)),
-                                   XML.getPreferredPrefix(namespace, "")));
+                                   Namespaces.getPreferredPrefix(namespace, "")));
 
          List<String> srsName = new ArrayList<String>();
          srsName.add(results.getString(indexOf(query.srsName)));
