@@ -94,9 +94,9 @@ import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import static org.constellation.ws.ExceptionCode.*;
@@ -268,7 +268,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 defaut = df.format(dates.last());
-                dim = (queryVersion.equals("1.1.1")) ?
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                     new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null) :
                     new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
@@ -286,7 +286,7 @@ public class WMSWorker extends AbstractWMSWorker {
             }
             if (elevations != null && !(elevations.isEmpty())) {
                 defaut = elevations.first().toString();
-                dim = (queryVersion.equals("1.1.1")) ?
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                     new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
@@ -315,7 +315,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 defaut = minRange + "," + maxRange;
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
-                dim = (queryVersion.equals("1.1.1")) ?
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                     new org.constellation.wms.v111.Dimension("dim_range", unit, defaut,
                                                            minRange + "," + maxRange) :
                     new org.constellation.wms.v130.Dimension("dim_range", unit, defaut,
@@ -333,7 +333,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
             final int queryable = (layer.isQueryable(ServiceType.GETINFO) == true) ? 1 : 0;
             final AbstractLayer outputLayer;
-            if (queryVersion.equals("1.1.1")) {
+            if (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
@@ -429,7 +429,7 @@ public class WMSWorker extends AbstractWMSWorker {
         }
 
         //we build the general layer and add it to the document
-        final AbstractLayer mainLayer = (queryVersion.equals("1.1.1")) ?
+        final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
             new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", crs, null, layers) :
             new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
@@ -815,7 +815,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
-	        if (  version.equals("1.1.1") ) {
+	        if (  version.equals(ServiceDef.WMS_1_1_1.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
 	        } else if ( version.equals("1.3.0") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0 );

@@ -37,9 +37,9 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 //Constellation dependencies
-import javax.xml.bind.Marshaller;
 import org.constellation.ServiceDef;
 import org.constellation.map.ws.AbstractWMSWorker;
 import org.constellation.map.ws.WMSWorker;
@@ -63,10 +63,10 @@ import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.MeasurementRange;
-
-//Geoapi dependencies
 import org.geotoolkit.util.Version;
 import org.geotoolkit.style.xml.XMLUtilities;
+
+//Geoapi dependencies
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -166,7 +166,7 @@ public class WMSService extends OGCWebService {
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
                 marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
-                           (requestCapab.getVersion().toString().equals("1.1.1")) ?
+                           (requestCapab.getVersion().toString().equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" :
                            "");
                 marshaller.marshal(capabilities, sw);
@@ -287,8 +287,8 @@ public class WMSService extends OGCWebService {
             serviceDef = getBestVersion(null);
         }
         isVersionSupported(version);
-        final String strX    = getParameter(version.equals("1.1.1") ? KEY_I_v111 : KEY_I_v130, true);
-        final String strY    = getParameter(version.equals("1.1.1") ? KEY_J_v111 : KEY_J_v130, true);
+        final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_v111 : KEY_I_v130, true);
+        final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_v111 : KEY_J_v130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
@@ -351,7 +351,7 @@ public class WMSService extends OGCWebService {
         final String version         = getParameter(KEY_VERSION,         true);
         isVersionSupported(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
-        final String strCRS          = getParameter((version.equals("1.1.1")) ?
+        final String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                                             KEY_CRS_v111 : KEY_CRS_v130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
@@ -368,7 +368,7 @@ public class WMSService extends OGCWebService {
         final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)
-                && (version.equals("1.1.1"))) ? false : fromGetMap);
+                && (version.equals(ServiceDef.WMS_1_1_1.version.toString()))) ? false : fromGetMap);
 
         final CoordinateReferenceSystem crs;
         try {

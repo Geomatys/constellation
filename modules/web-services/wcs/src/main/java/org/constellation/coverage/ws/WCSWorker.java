@@ -104,18 +104,19 @@ import org.constellation.wcs.v111.InterpolationMethodType;
 import org.constellation.wcs.v111.InterpolationMethods;
 import org.constellation.wcs.v111.RangeType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.WebService;
 
 // Geotools dependencies
-import org.constellation.ws.rs.WebService;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-
-// GeoAPI dependencies
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
+
+// GeoAPI dependencies
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
 
 import static org.constellation.query.Query.APP_XML;
 import static org.constellation.query.Query.TEXT_XML;
@@ -127,7 +128,6 @@ import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
 import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
-import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -205,9 +205,9 @@ public final class WCSWorker {
                            MISSING_PARAMETER_VALUE, "version");
         }
 
-        if (version.equals("1.0.0")) {
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
             return describeCoverage100((org.constellation.wcs.v100.DescribeCoverageType) abstractRequest);
-        } else if (version.equals("1.1.1")) {
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             return describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
@@ -235,7 +235,7 @@ public final class WCSWorker {
         }
 
         //TODO: we should loop over the list
-        final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), "1.0.0");
+        final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), ServiceDef.WCS_1_0_0.version.toString());
 
         final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
         final Set<Series> series = layerRef.getSeries();
@@ -336,7 +336,7 @@ public final class WCSWorker {
                 layerRef.getName(), Util.cleanSpecialCharacter(layerRef.getRemarks()), llenvelope,
                 keywords, domainSet, rangeSet, supCRS, supForm, supInt);
         coverages.add(coverage);
-        return new CoverageDescription(coverages, "1.0.0");
+        return new CoverageDescription(coverages, ServiceDef.WCS_1_0_0.version.toString());
     }
 
     /**
@@ -359,7 +359,7 @@ public final class WCSWorker {
         }
 
         //TODO: we should loop over the list
-        final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), "1.1.1");
+        final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
 
         final org.constellation.ows.v110.ObjectFactory owsFactory =
                 new org.constellation.ows.v110.ObjectFactory();
@@ -471,15 +471,16 @@ public final class WCSWorker {
         //we begin by extract the base attribute
         String version = abstractRequest.getVersion().toString();
         if (version == null) {
-            version = "1.1.1";
+            // For the moment the only version that we really support is this one.
+            version = "1.0.0";
         }
 
         //this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
         final String format;
 
-        if (version.equals("1.0.0")) {
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
             return getCapabilities100((org.constellation.wcs.v100.GetCapabilitiesType) abstractRequest);
-        } else if (version.equals("1.1.1")) {
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
                     ((org.constellation.wcs.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
@@ -522,7 +523,7 @@ public final class WCSWorker {
         String requestedSection = null;
         boolean contentMeta = false;
         if (section != null) {
-            if (SectionsType.getExistingSections("1.0.0").contains(section)) {
+            if (SectionsType.getExistingSections(ServiceDef.WCS_1_0_0.version.toString()).contains(section)) {
                 requestedSection = section;
             } else {
                 throw new CstlServiceException("The section " + section + " does not exist",
@@ -535,7 +536,7 @@ public final class WCSWorker {
         final WCSCapabilitiesType staticCapabilities;
         try {
             staticCapabilities = (WCSCapabilitiesType) ((JAXBElement<?>) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"), "1.0.0")).getValue();
+                    servletContext.getRealPath("WEB-INF"), ServiceDef.WCS_1_0_0.version.toString())).getValue();
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                     NO_APPLICABLE_CODE);
@@ -570,7 +571,7 @@ public final class WCSWorker {
                 new org.constellation.wcs.v100.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences("1.0.0");
+        final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_0_0.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
@@ -617,7 +618,7 @@ public final class WCSWorker {
 
                 offBrief.add(co);
             }
-            contentMetadata = new ContentMetadata("1.0.0", offBrief);
+            contentMetadata = new ContentMetadata(ServiceDef.WCS_1_0_0.version.toString(), offBrief);
         } catch (CatalogException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
@@ -645,12 +646,12 @@ public final class WCSWorker {
                                                            throws CstlServiceException, JAXBException
     {
         // First we try to extract only the requested section.
-        List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
+        List<String> requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
 
         if (request.getSections() != null && request.getSections().getSection().size() > 0) {
             requestedSections = request.getSections().getSection();
             for (String sec : requestedSections) {
-                if (!SectionsType.getExistingSections("1.1.1").contains(sec)) {
+                if (!SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString()).contains(sec)) {
                     throw new CstlServiceException("This sections " + sec + " is not allowed",
                             INVALID_PARAMETER_VALUE);
                 }
@@ -661,7 +662,7 @@ public final class WCSWorker {
         final Capabilities staticCapabilities;
         try {
             staticCapabilities = (Capabilities) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"), "1.1.1");
+                    servletContext.getRealPath("WEB-INF"), ServiceDef.WCS_1_1_1.version.toString());
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                     NO_APPLICABLE_CODE);
@@ -683,7 +684,7 @@ public final class WCSWorker {
             //we update the url in the static part.
             updateOWSURL(om.getOperation(), uriContext.getBaseUri().toString(), "WCS");
         }
-        final Capabilities responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
+        final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 
         // if the user does not request the contents section we can return the result.
         if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
@@ -697,7 +698,7 @@ public final class WCSWorker {
         org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences("1.1.1");
+        final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();

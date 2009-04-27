@@ -21,7 +21,6 @@ import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.Query.APP_XML;
-import static org.constellation.query.Query.TEXT_PLAIN;
 import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
@@ -72,9 +71,9 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Marshaller;
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.gml.v311.CodeType;
@@ -350,7 +349,7 @@ public final class WCSService extends OGCWebService {
                 final StringTokenizer tokens = new StringTokenizer(section, ",;");
                 while (tokens.hasMoreTokens()) {
                     final String token = tokens.nextToken().trim();
-                    if (SectionsType.getExistingSections("1.1.1").contains(token)) {
+                    if (SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString()).contains(token)) {
                         requestedSections.add(token);
                     } else {
                         throw new CstlServiceException("The section " + token + " does not exist",
@@ -359,10 +358,10 @@ public final class WCSService extends OGCWebService {
                 }
             } else {
                 //if there is no requested Sections we add all the sections
-                requestedSections = SectionsType.getExistingSections("1.1.1");
+                requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
             }
             SectionsType sections = new SectionsType(requestedSections);
-            AcceptVersionsType versions = new AcceptVersionsType("1.1.1");
+            AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
             return (GetCapabilities) new org.constellation.wcs.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
