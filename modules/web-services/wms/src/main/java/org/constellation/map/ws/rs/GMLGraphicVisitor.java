@@ -130,7 +130,7 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
 
         if(results == null) return;
 
-        final String layerName = coverage.getName();
+        final String layerName = coverage.getUserObject().getName();
         List<String> strs = values.get(layerName);
         if(strs == null){
             strs = new ArrayList<String>();
@@ -148,7 +148,7 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
             if (unit != null) {
                 builder.append(" ").append(unit.toString());
             }
-            builder.append(" [").append(i).append(']');
+            //builder.append(" [").append(i).append(']');
         }
 
         final String result = builder.toString();
