@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
 // Constellation dependencies
 import org.constellation.util.Util;
 
-// geotools dependencies
+// geotoolkit dependencies
 import org.geotoolkit.internal.jaxb.metadata.ReferenceIdentifierMetadata;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
@@ -76,9 +76,9 @@ import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;
 import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
-import org.geotools.temporal.object.DefaultInstant;
-import org.geotools.temporal.object.DefaultPeriod;
-import org.geotools.temporal.object.DefaultPosition;
+import org.geotoolkit.temporal.object.DefaultInstant;
+import org.geotoolkit.temporal.object.DefaultPeriod;
+import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies

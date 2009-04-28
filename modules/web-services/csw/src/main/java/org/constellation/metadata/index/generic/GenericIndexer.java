@@ -55,12 +55,12 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
-// geotools dependencies
+// geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
-import org.geotools.temporal.object.DefaultInstant;
+import org.geotoolkit.temporal.object.DefaultInstant;
+import org.geotoolkit.temporal.object.DefaultPosition;
 
 // geoAPI dependencies
-import org.geotools.temporal.object.DefaultPosition;
 import org.opengis.util.InternationalString;
 
 

@@ -46,7 +46,7 @@ import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // GeoAPI dependencies
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotools.temporal.object.DefaultPeriod;
+import org.geotoolkit.temporal.object.DefaultPeriod;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies

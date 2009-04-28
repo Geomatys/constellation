@@ -334,11 +334,6 @@
         <artifactId>gtm-shapefile</artifactId>
         <version>${geotools.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gtm-temporal</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
 
       <!-- Geotoolkit version -->
       <dependency>
@@ -386,6 +381,11 @@
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-render</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-temporal</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
       <dependency>
