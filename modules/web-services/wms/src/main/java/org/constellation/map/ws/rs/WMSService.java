@@ -107,7 +107,7 @@ public class WMSService extends OGCWebService {
         		      "org.geotoolkit.wms.xml.v111:" +
                       "org.geotoolkit.wms.xml.v130:" +
                       "org.geotoolkit.sld.xml.v110",
-                      "http://www.opengis.net/wms");
+                      "");
 
         worker = new WMSWorker(marshallerPool);
         LOGGER.info("WMS service running");
