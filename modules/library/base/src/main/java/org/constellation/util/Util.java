@@ -942,12 +942,12 @@ public final class Util {
 
         //special case and corrections
         if (propertyName.equals("beginPosition")) {
-            if (rootClass.getName().equals("org.geotools.temporal.object.DefaultInstant"))
+            if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
                 return null;
             else
                 propertyName = "beginning";
         } else if (propertyName.equals("endPosition")) {
-            if (rootClass.getName().equals("org.geotools.temporal.object.DefaultInstant"))
+            if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
                 return null;
             else
                 propertyName = "ending";
@@ -968,7 +968,7 @@ public final class Util {
             return null;
         } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox")) {
             return null;
-        } if (propertyName.equals("position") && (rootClass.getName().equals("org.geotools.temporal.object.DefaultPeriod"))) {
+        } if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
             return null;
         }
         
