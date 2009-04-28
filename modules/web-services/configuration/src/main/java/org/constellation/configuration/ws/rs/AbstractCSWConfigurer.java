@@ -34,7 +34,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.constellation.cat.csw.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
@@ -49,7 +49,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotoolkit.factory.FactoryNotFoundException;

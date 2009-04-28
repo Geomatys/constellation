@@ -26,14 +26,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.constellation.cat.csw.v202.Capabilities;
-import org.constellation.cat.csw.v202.GetCapabilitiesType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.junit.*;

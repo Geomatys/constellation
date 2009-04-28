@@ -24,6 +24,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 
 /**
  *  Connexion vers la table des {@linkplain TextBlock textBlock}.

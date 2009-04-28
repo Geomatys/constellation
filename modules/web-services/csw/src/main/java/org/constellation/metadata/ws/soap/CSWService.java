@@ -36,29 +36,29 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
-import org.constellation.cat.csw.v202.Capabilities;
-import org.constellation.cat.csw.v202.DescribeRecordResponseType;
-import org.constellation.cat.csw.v202.DescribeRecordType;
-import org.constellation.cat.csw.v202.DistributedSearchType;
-import org.constellation.cat.csw.v202.ElementSetNameType;
-import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilitiesType;
-import org.constellation.cat.csw.v202.GetDomainResponseType;
-import org.constellation.cat.csw.v202.GetDomainType;
-import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
-import org.constellation.cat.csw.v202.GetRecordByIdType;
-import org.constellation.cat.csw.v202.GetRecordsResponseType;
-import org.constellation.cat.csw.v202.GetRecordsType;
-import org.constellation.cat.csw.v202.HarvestResponseType;
-import org.constellation.cat.csw.v202.HarvestType;
-import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.cat.csw.v202.QueryType;
-import org.constellation.cat.csw.v202.ResultType;
-import org.constellation.cat.csw.v202.TransactionResponseType;
-import org.constellation.cat.csw.v202.TransactionType;
+import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
+import org.geotoolkit.csw.xml.v202.DescribeRecordType;
+import org.geotoolkit.csw.xml.v202.DistributedSearchType;
+import org.geotoolkit.csw.xml.v202.ElementSetNameType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
+import org.geotoolkit.csw.xml.v202.GetDomainType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
+import org.geotoolkit.csw.xml.v202.HarvestResponseType;
+import org.geotoolkit.csw.xml.v202.HarvestType;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.ResultType;
+import org.geotoolkit.csw.xml.v202.TransactionResponseType;
+import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
-import org.constellation.ows.v100.ExceptionReport;
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
 
 //geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
@@ -122,8 +122,8 @@ public class CSWService {
                             ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
                             ,DescribeRecordResponseType.class, GetDomainResponseType.class
                             ,TransactionResponseType.class, HarvestResponseType.class
-                            ,ExceptionReport.class, org.constellation.ows.v110.ExceptionReport.class
-                            ,org.constellation.dublincore.v2.terms.ObjectFactory.class);
+                            ,ExceptionReport.class, org.geotoolkit.ows.xml.v110.ExceptionReport.class
+                            ,org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.class);
 
            worker = new CSWworker("", marshallerPool);
            //TODO find real url

@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-import org.constellation.cat.csw.DomainValues;
-import org.constellation.cat.csw.ElementSet;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
 import org.constellation.ws.CstlServiceException;
 
 /**

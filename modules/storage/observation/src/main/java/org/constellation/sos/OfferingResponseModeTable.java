@@ -23,8 +23,8 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.sos.v100.OfferingResponseModeEntry;
-import org.constellation.sos.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.v100.OfferingResponseModeEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.util.Utilities;
 
 /**

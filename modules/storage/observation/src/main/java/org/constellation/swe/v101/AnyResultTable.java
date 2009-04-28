@@ -24,8 +24,11 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.ReferenceTable;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 
 /**
  * Connexion vers la table des {@linkplain AnyResultEntry AnyResult}.

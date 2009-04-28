@@ -32,8 +32,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.xacml.context.ObjectFactory;
-import org.constellation.xacml.context.RequestType;
+import org.geotoolkit.xacml.xml.context.ObjectFactory;
+import org.geotoolkit.xacml.xml.context.RequestType;
 import org.constellation.xacml.api.RequestContext;
 
 import org.w3c.dom.Document;

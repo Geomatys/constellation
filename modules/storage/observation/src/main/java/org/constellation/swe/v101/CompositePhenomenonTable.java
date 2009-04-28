@@ -28,6 +28,9 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.swe.xml.v101.ComponentEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 
 /**
  * Connexion vers la table des {@linkplain CompositePhenomenon phénoménes composé}.

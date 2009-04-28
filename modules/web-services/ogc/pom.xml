@@ -85,9 +85,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-ows</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ows</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
@@ -110,7 +109,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-sld</artifactId>
+      <artifactId>geotk-xml-sld</artifactId>
     </dependency>
     
   </dependencies>

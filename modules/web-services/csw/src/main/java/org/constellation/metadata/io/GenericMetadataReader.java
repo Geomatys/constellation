@@ -44,10 +44,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.constellation.cat.csw.DomainValues;
-import org.constellation.cat.csw.ElementSet;
-import org.constellation.cat.csw.v202.AbstractRecordType;
-import org.constellation.cat.csw.v202.ElementSetType;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
@@ -57,8 +57,8 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.constellation.ows.v100.BoundingBoxType;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
@@ -1000,10 +1000,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
         return results;
     }
     
+    @Override
     public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
          throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    @Override
     public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -1011,6 +1013,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * close all the statements and clear the maps.
      */
+    @Override
     public void destroy() {
         try {
             for (PreparedStatement stmt : singleStatements.keySet()) {

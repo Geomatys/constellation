@@ -23,10 +23,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.v100.Capabilities;
-import org.constellation.sos.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
@@ -52,7 +52,7 @@ public class SOSWorkerInitialisationTest {
             configurationDirectory.mkdir();
         }
 
-        MarshallerPool pool       = new MarshallerPool("org.constellation.sos.v100");
+        MarshallerPool pool       = new MarshallerPool("org.geotoolkit.sos.xml.v100");
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         skeletonCapabilities      = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         pool.release(unmarshaller);
@@ -162,7 +162,7 @@ public class SOSWorkerInitialisationTest {
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        Marshaller marshaller = JAXBContext.newInstance("org.constellation.sos.v100").createMarshaller();
+        Marshaller marshaller = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100").createMarshaller();
         marshaller.marshal(request, configFile);
 
         worker = new SOSworker(configurationDirectory);

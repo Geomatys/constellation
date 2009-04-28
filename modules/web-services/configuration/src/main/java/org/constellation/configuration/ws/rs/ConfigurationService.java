@@ -49,12 +49,12 @@ import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.util.Util;
-import org.constellation.ows.OWSExceptionCode;
-import org.constellation.ows.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotoolkit.factory.FactoryRegistry;
@@ -102,7 +102,7 @@ public class ConfigurationService extends WebService  {
     public ConfigurationService() {
         super();
         try {
-            setXMLContext("org.constellation.ows.v110:org.constellation.configuration:org.constellation.skos", "");
+            setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml", "");
             AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             CSWFunctionEnabled = true;

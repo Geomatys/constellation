@@ -34,16 +34,16 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
-import org.constellation.cat.csw.v202.RecordPropertyType;
-import org.constellation.ebrim.v250.RegistryObjectType;
-import org.constellation.ebrim.v300.IdentifiableType;
+import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
+import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.util.Utilities;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;

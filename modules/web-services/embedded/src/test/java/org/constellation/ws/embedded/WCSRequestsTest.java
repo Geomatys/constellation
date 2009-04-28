@@ -30,15 +30,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.ows.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
-import org.constellation.wcs.v100.CoverageDescription;
-import org.constellation.wcs.v100.CoverageOfferingBriefType;
-import org.constellation.wcs.v100.CoverageOfferingType;
-import org.constellation.wcs.v100.LonLatEnvelopeType;
-import org.constellation.wcs.v100.WCSCapabilitiesType;
+import org.geotoolkit.wcs.xml.v100.CoverageDescription;
+import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
+import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
+import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 
 // JUnit dependencies
 import org.geotoolkit.xml.MarshallerPool;
@@ -100,9 +100,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             assumeNoException(ex);
         }
         pool = new MarshallerPool("org.constellation.ws:" +
-                                  "org.constellation.wcs.v100:" +
-                                  "org.constellation.ows.v100:" +
-                                  "org.constellation.gml.v311");
+                                  "org.geotoolkit.wcs.xml.v100:" +
+                                  "org.geotoolkit.ows.xml.v100:" +
+                                  "org.geotoolkit.gml.xml.v311modified");
     }
 
     /**

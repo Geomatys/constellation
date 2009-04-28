@@ -77,9 +77,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-wcs</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-wcs</artifactId>
     </dependency>
   </dependencies>
 

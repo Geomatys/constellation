@@ -27,11 +27,11 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.sml.AbstractSensorML;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -49,7 +49,7 @@ public class FileSensorReader implements SensorReader {
     public FileSensorReader(Automatic configuration) throws CstlServiceException  {
         try {
             //we initialize the unmarshaller
-            marshallerPool = new MarshallerPool("org.constellation.sml.v100:org.constellation.sml.v101");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
             this.dataDirectory  = configuration.getdataDirectory();
         } catch (JAXBException ex) {
@@ -75,8 +75,7 @@ public class FileSensorReader implements SensorReader {
                     throw new CstlServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
                 }
             } catch (JAXBException ex) {
-                ex.printStackTrace();
-                throw new CstlServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("JAXBException while unmarshalling the sensor", ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -92,6 +91,7 @@ public class FileSensorReader implements SensorReader {
     public void destroy() {
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Filesystem Sensor Reader 0.3";
     }

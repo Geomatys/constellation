@@ -26,17 +26,17 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.ResponseModeType;
-import org.constellation.swe.AnyResult;
-import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.AnyResult;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -80,9 +80,9 @@ public class FileObservationReader implements ObservationReader {
             resultDirectory      = new File(dataDirectory, "results");
         }
         try {
-            marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.observation");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100");
         } catch(JAXBException ex) {
-            throw new CstlServiceException("JAXB exception while initializing the file observation reader",  NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }
 
     }
@@ -111,7 +111,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -179,7 +179,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 throw new CstlServiceException("The file " + phenomenonFile + " does not contains an phenomenon Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + phenomenonFile, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + phenomenonFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -213,7 +213,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 throw new CstlServiceException("The file " + samplingFeatureFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + samplingFeatureFile, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + samplingFeatureFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -236,7 +236,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 throw new CstlServiceException("The file " + observationFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + observationFile, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + observationFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -259,7 +259,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 throw new CstlServiceException("The file " + AnyResultFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + AnyResultFile, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + AnyResultFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -289,14 +289,17 @@ public class FileObservationReader implements ObservationReader {
         
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Filesystem O&M Reader 0.3";
     }
 
+    @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }

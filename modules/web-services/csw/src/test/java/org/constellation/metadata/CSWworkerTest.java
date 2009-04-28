@@ -33,50 +33,43 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constyellation dependencies
-import org.constellation.cat.csw.DomainValues;
-import org.constellation.cat.csw.GetDomainResponse;
-import org.constellation.cat.csw.v202.AcknowledgementType;
-import org.constellation.cat.csw.v202.GetRecordsResponseType;
-import org.constellation.cat.csw.v202.BriefRecordType;
-import org.constellation.cat.csw.v202.Capabilities;
-import org.constellation.cat.csw.v202.DeleteType;
-import org.constellation.cat.csw.v202.DomainValuesType;
-import org.constellation.cat.csw.v202.ElementSetNameType;
-import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilitiesType;
-import org.constellation.cat.csw.v202.GetDomainResponseType;
-import org.constellation.cat.csw.v202.GetDomainType;
-import org.constellation.cat.csw.v202.GetRecordByIdResponseType;
-import org.constellation.cat.csw.v202.GetRecordByIdType;
-import org.constellation.cat.csw.v202.GetRecordsType;
-import org.constellation.cat.csw.v202.InsertType;
-import org.constellation.cat.csw.v202.ListOfValuesType;
-import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.cat.csw.v202.QueryType;
-import org.constellation.cat.csw.v202.RecordPropertyType;
-import org.constellation.cat.csw.v202.RecordType;
-import org.constellation.cat.csw.v202.ResultType;
-import org.constellation.cat.csw.v202.SummaryRecordType;
-import org.constellation.cat.csw.v202.TransactionResponseType;
-import org.constellation.cat.csw.v202.TransactionType;
-import org.constellation.cat.csw.v202.UpdateType;
-import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.GetDomainResponse;
+import org.geotoolkit.csw.xml.v202.AcknowledgementType;
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.DeleteType;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ElementSetNameType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
+import org.geotoolkit.csw.xml.v202.GetDomainType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
+import org.geotoolkit.csw.xml.v202.InsertType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.ResultType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.csw.xml.v202.TransactionResponseType;
+import org.geotoolkit.csw.xml.v202.TransactionType;
+import org.geotoolkit.csw.xml.v202.UpdateType;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
-import org.constellation.ogc.SortByType;
-import org.constellation.ogc.SortOrderType;
-import org.constellation.ogc.SortPropertyType;
-import org.constellation.ows.v100.AcceptFormatsType;
-import org.constellation.ows.v100.AcceptVersionsType;
-import org.constellation.ows.v100.BoundingBoxType;
-import org.constellation.ows.v100.SectionsType;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
-import static org.constellation.ows.OWSExceptionCode.*;
-import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
-import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.constellation.metadata.TypeNames.*;
-import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
 // geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
@@ -84,6 +77,13 @@ import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 
 // JUnit dependencies
+import org.geotoolkit.ogc.xml.v110modified.SortByType;
+import org.geotoolkit.ogc.xml.v110modified.SortOrderType;
+import org.geotoolkit.ogc.xml.v110modified.SortPropertyType;
+import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
@@ -796,11 +796,11 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : getDomain 2.0.0 parameterName = GetCapabilities.sections
          */
-        org.constellation.cat.csw.v200.GetDomainType request200 = new org.constellation.cat.csw.v200.GetDomainType("CSW", "2.0.0", null, "GetCapabilities.sections");
+        org.geotoolkit.csw.xml.v200.GetDomainType request200 = new org.geotoolkit.csw.xml.v200.GetDomainType("CSW", "2.0.0", null, "GetCapabilities.sections");
 
         GetDomainResponse result200 = worker.getDomain(request200);
 
-        assertTrue(result200 instanceof org.constellation.cat.csw.v200.GetDomainResponseType);
+        assertTrue(result200 instanceof org.geotoolkit.csw.xml.v200.GetDomainResponseType);
 
         List<DomainValues> domainValues200 = new ArrayList<DomainValues>();
         List<String> list = new ArrayList<String>();
@@ -809,10 +809,10 @@ public class CSWworkerTest {
         list.add("ServiceProvider");
         list.add("OperationsMetadata");
         list.add("Filter_Capabilities");
-        org.constellation.cat.csw.v200.ListOfValuesType values200 = new org.constellation.cat.csw.v200.ListOfValuesType(list);
-        org.constellation.cat.csw.v200.DomainValuesType value200  = new org.constellation.cat.csw.v200.DomainValuesType("GetCapabilities.sections", null, values200, _Capabilities_QNAME);
+        org.geotoolkit.csw.xml.v200.ListOfValuesType values200 = new org.geotoolkit.csw.xml.v200.ListOfValuesType(list);
+        org.geotoolkit.csw.xml.v200.DomainValuesType value200  = new org.geotoolkit.csw.xml.v200.DomainValuesType("GetCapabilities.sections", null, values200, _Capabilities_QNAME);
         domainValues200.add(value200);
-        GetDomainResponse expResult200 = new org.constellation.cat.csw.v200.GetDomainResponseType(domainValues200);
+        GetDomainResponse expResult200 = new org.geotoolkit.csw.xml.v200.GetDomainResponseType(domainValues200);
 
         assertEquals(expResult200, result200);
 

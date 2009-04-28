@@ -51,64 +51,64 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.gml.v311.CodeListType;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.ows.AbstractDCP;
-import org.constellation.ows.AbstractOnlineResourceType;
-import org.constellation.ows.AbstractOperation;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.BoundingBoxType;
-import org.constellation.ows.v110.KeywordsType;
-import org.constellation.ows.v110.LanguageStringType;
-import org.constellation.ows.v110.OperationsMetadata;
-import org.constellation.ows.v110.SectionsType;
-import org.constellation.ows.v110.ServiceIdentification;
-import org.constellation.ows.v110.ServiceProvider;
-import org.constellation.ows.v110.WGS84BoundingBoxType;
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.KeywordsType;
+import org.geotoolkit.ows.xml.v110.LanguageStringType;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.ows.xml.v110.ServiceIdentification;
+import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
-import org.constellation.wcs.DescribeCoverage;
-import org.constellation.wcs.DescribeCoverageResponse;
-import org.constellation.wcs.GetCoverage;
-import org.constellation.wcs.GetCapabilities;
-import org.constellation.wcs.GetCapabilitiesResponse;
-import org.constellation.wcs.v100.ContentMetadata;
-import org.constellation.wcs.v100.CoverageDescription;
-import org.constellation.wcs.v100.CoverageOfferingBriefType;
-import org.constellation.wcs.v100.CoverageOfferingType;
-import org.constellation.wcs.v100.DCPTypeType;
-import org.constellation.wcs.v100.DCPTypeType.HTTP.Get;
-import org.constellation.wcs.v100.DCPTypeType.HTTP.Post;
-import org.constellation.wcs.v100.DomainSetType;
-import org.constellation.wcs.v100.Keywords;
-import org.constellation.wcs.v100.LonLatEnvelopeType;
-import org.constellation.wcs.v100.RangeSet;
-import org.constellation.wcs.v100.RangeSetType;
-import org.constellation.wcs.v100.SupportedCRSsType;
-import org.constellation.wcs.v100.SupportedFormatsType;
-import org.constellation.wcs.v100.SupportedInterpolationsType;
-import org.constellation.wcs.v100.WCSCapabilitiesType;
-import org.constellation.wcs.v100.WCSCapabilityType.Request;
-import org.constellation.wcs.v111.Capabilities;
-import org.constellation.wcs.v111.Contents;
-import org.constellation.wcs.v111.CoverageDescriptionType;
-import org.constellation.wcs.v111.CoverageDescriptions;
-import org.constellation.wcs.v111.CoverageDomainType;
-import org.constellation.wcs.v111.CoverageSummaryType;
-import org.constellation.wcs.v111.FieldType;
-import org.constellation.wcs.v111.InterpolationMethodType;
-import org.constellation.wcs.v111.InterpolationMethods;
-import org.constellation.wcs.v111.RangeType;
+import org.geotoolkit.wcs.xml.DescribeCoverage;
+import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
+import org.geotoolkit.wcs.xml.GetCoverage;
+import org.geotoolkit.wcs.xml.GetCapabilities;
+import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.v100.ContentMetadata;
+import org.geotoolkit.wcs.xml.v100.CoverageDescription;
+import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
+import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
+import org.geotoolkit.wcs.xml.v100.DCPTypeType;
+import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
+import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
+import org.geotoolkit.wcs.xml.v100.DomainSetType;
+import org.geotoolkit.wcs.xml.v100.Keywords;
+import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
+import org.geotoolkit.wcs.xml.v100.RangeSet;
+import org.geotoolkit.wcs.xml.v100.RangeSetType;
+import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
+import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
+import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
+import org.geotoolkit.wcs.xml.v111.Capabilities;
+import org.geotoolkit.wcs.xml.v111.Contents;
+import org.geotoolkit.wcs.xml.v111.CoverageDescriptionType;
+import org.geotoolkit.wcs.xml.v111.CoverageDescriptions;
+import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
+import org.geotoolkit.wcs.xml.v111.CoverageSummaryType;
+import org.geotoolkit.wcs.xml.v111.FieldType;
+import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
+import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
+import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 
 // Geotools dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.gml.xml.v311modified.CodeListType;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311modified.TimePositionType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
@@ -206,9 +206,9 @@ public final class WCSWorker {
         }
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            return describeCoverage100((org.constellation.wcs.v100.DescribeCoverageType) abstractRequest);
+            return describeCoverage100((org.geotoolkit.wcs.xml.v100.DescribeCoverageType) abstractRequest);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
-            return describeCoverage111((org.constellation.wcs.v111.DescribeCoverageType) abstractRequest);
+            return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, "version");
@@ -218,7 +218,7 @@ public final class WCSWorker {
     /**
      * Returns the description of the coverage requested in version 1.0.0 of WCS standard.
      *
-     * @param request a {@linkplain org.constellation.wcs.v100.DescribeCoverage describe coverage}
+     * @param request a {@linkplain org.geotoolkit.wcs.xml.v100.DescribeCoverage describe coverage}
      *                request done by the user.
      * @return an XML document giving the full description of a coverage, in version 1.0.0.
      *
@@ -226,7 +226,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      */
     private DescribeCoverageResponse describeCoverage100(
-            final org.constellation.wcs.v100.DescribeCoverageType request)
+            final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
         if (request.getCoverage().size() == 0) {
@@ -280,8 +280,8 @@ public final class WCSWorker {
                 Util.cleanSpecialCharacter(layerRef.getThematic()));
 
         //Spatial metadata
-        final org.constellation.wcs.v100.SpatialDomainType spatialDomain =
-                new org.constellation.wcs.v100.SpatialDomainType(llenvelope);
+        final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
+                new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
 
         // temporal metadata
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -296,8 +296,8 @@ public final class WCSWorker {
         for (Date d : dates) {
             times.add(new TimePositionType(df.format(d)));
         }
-        final org.constellation.wcs.v100.TimeSequenceType temporalDomain =
-                new org.constellation.wcs.v100.TimeSequenceType(times);
+        final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain =
+                new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
         final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
         //TODO complete
         final RangeSetType rangeSetT = new RangeSetType(null, layerRef.getName(),
@@ -323,13 +323,13 @@ public final class WCSWorker {
                               nativeFormat, new ArrayList<CodeListType>(formats));
 
         //supported interpolations
-        final List<org.constellation.wcs.v100.InterpolationMethod> interpolations =
-                new ArrayList<org.constellation.wcs.v100.InterpolationMethod>();
-        interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BILINEAR);
-        interpolations.add(org.constellation.wcs.v100.InterpolationMethod.BICUBIC);
-        interpolations.add(org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+        final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> interpolations =
+                new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
+        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
+        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
         final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
-                org.constellation.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+                org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
         //we build the coverage offering for this layer/coverage
         final CoverageOfferingType coverage = new CoverageOfferingType(null, layerRef.getName(),
@@ -342,7 +342,7 @@ public final class WCSWorker {
     /**
      * Returns the description of the coverage requested in version 1.1.1 of WCS standard.
      *
-     * @param request a {@linkplain org.constellation.wcs.v111.DescribeCoverage describe coverage}
+     * @param request a {@linkplain org.geotoolkit.wcs.xml.v111.DescribeCoverage describe coverage}
      *                request done by the user.
      * @return an XML document giving the full description of a coverage, in version 1.1.1.
      *
@@ -350,7 +350,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      */
     private DescribeCoverageResponse describeCoverage111(
-            final org.constellation.wcs.v111.DescribeCoverageType request)
+            final org.geotoolkit.wcs.xml.v111.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
         if (request.getIdentifier().size() == 0) {
@@ -361,8 +361,8 @@ public final class WCSWorker {
         //TODO: we should loop over the list
         final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
 
-        final org.constellation.ows.v110.ObjectFactory owsFactory =
-                new org.constellation.ows.v110.ObjectFactory();
+        final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
+                new org.geotoolkit.ows.xml.v110.ObjectFactory();
         final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
         if (layer.getSeries().size() == 0) {
             throw new CstlServiceException("the coverage " + layer.getName() +
@@ -404,8 +404,8 @@ public final class WCSWorker {
                 new LanguageStringType(layer.getName())));
 
         // spatial metadata
-        final org.constellation.wcs.v111.SpatialDomainType spatial =
-                new org.constellation.wcs.v111.SpatialDomainType(bboxs);
+        final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
+                new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
 
         // temporal metadata
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -420,23 +420,23 @@ public final class WCSWorker {
         for (Date d : dates) {
             times.add(new TimePositionType(df.format(d)));
         }
-        final org.constellation.wcs.v111.TimeSequenceType temporalDomain =
-                new org.constellation.wcs.v111.TimeSequenceType(times);
+        final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
+                new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
 
         final CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
 
         //supported interpolations
         final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
         intList.add(new InterpolationMethodType(
-                org.constellation.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
+                org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR.value(), null));
         intList.add(new InterpolationMethodType(
-                org.constellation.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
+                org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC.value(), null));
         intList.add(new InterpolationMethodType(
-                org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+                org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
         final InterpolationMethods interpolations = new InterpolationMethods(
-                intList, org.constellation.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+                intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
         final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(layer.getThematic()),
-                null, new org.constellation.ows.v110.CodeType("0.0"), interpolations));
+                null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
         //supported CRS
         final List<String> supportedCRS = new ArrayList<String>();
@@ -479,11 +479,11 @@ public final class WCSWorker {
         final String format;
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            return getCapabilities100((org.constellation.wcs.v100.GetCapabilitiesType) abstractRequest);
+            return getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) abstractRequest);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
-                    ((org.constellation.wcs.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
+                    ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
                 format = TEXT_XML;
             } else {
@@ -494,7 +494,7 @@ public final class WCSWorker {
                 }
             }
 
-            return getCapabilities111((org.constellation.wcs.v111.GetCapabilitiesType) abstractRequest);
+            return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, "version");
@@ -512,7 +512,7 @@ public final class WCSWorker {
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private GetCapabilitiesResponse getCapabilities100(
-            final org.constellation.wcs.v100.GetCapabilitiesType request)
+            final org.geotoolkit.wcs.xml.v100.GetCapabilitiesType request)
                            throws CstlServiceException, JAXBException
     {
         /*
@@ -567,8 +567,8 @@ public final class WCSWorker {
 
         final ContentMetadata contentMetadata;
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
-        final org.constellation.wcs.v100.ObjectFactory wcs100Factory =
-                new org.constellation.wcs.v100.ObjectFactory();
+        final org.geotoolkit.wcs.xml.v100.ObjectFactory wcs100Factory =
+                new org.geotoolkit.wcs.xml.v100.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_0_0.version.toString());
@@ -642,7 +642,7 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Capabilities getCapabilities111(final org.constellation.wcs.v111.GetCapabilitiesType request)
+    private Capabilities getCapabilities111(final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
                                                            throws CstlServiceException, JAXBException
     {
         // First we try to extract only the requested section.
@@ -694,8 +694,8 @@ public final class WCSWorker {
         // Generate the Contents part of the GetCapabilities.
         final Contents contents;
         List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
-        org.constellation.wcs.v111.ObjectFactory wcs111Factory = new org.constellation.wcs.v111.ObjectFactory();
-        org.constellation.ows.v110.ObjectFactory owsFactory = new org.constellation.ows.v110.ObjectFactory();
+        org.geotoolkit.wcs.xml.v111.ObjectFactory wcs111Factory = new org.geotoolkit.wcs.xml.v111.ObjectFactory();
+        org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory = new org.geotoolkit.ows.xml.v110.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());

@@ -390,9 +390,60 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-sld</artifactId>
+        <artifactId>geotk-xml-sld</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-csw</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-ebrim</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-ows</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-sensorML</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-skos</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-sos</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-xacml</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-wcs</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-wms</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-wmts</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+
 
 
       <!-- database driver -->
@@ -562,9 +613,9 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>jar-collector</artifactId>
-        <version>${geotools.version}</version>
+        <groupId>org.geotoolkit.project</groupId>
+        <artifactId>geotk-jar-collector</artifactId>
+        <version>${geotoolkit.version}</version>
         <executions>
           <execution>
             <goals>
@@ -625,6 +676,7 @@
             <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
             <link>http://javadoc.geotools.fr/snapshot</link>
+            <link>http://javadoc.geotoolkit.org</link>
             <link>http://jscience.org/api/</link>
           </links>
           <excludePackageNames>org.constellation.resources</excludePackageNames>

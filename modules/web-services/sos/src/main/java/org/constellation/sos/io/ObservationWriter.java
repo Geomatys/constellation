@@ -18,14 +18,14 @@
 package org.constellation.sos.io;
 
 // constellation dependencies
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.OfferingPhenomenonEntry;
-import org.constellation.sos.v100.OfferingProcedureEntry;
-import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI dependencies
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 

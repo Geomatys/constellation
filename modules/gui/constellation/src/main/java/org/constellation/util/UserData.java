@@ -22,10 +22,10 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.constellation.wcs.v100.WCSCapabilitiesType;
-import org.constellation.wcs.v111.Capabilities;
-import org.constellation.wms.v111.WMT_MS_Capabilities;
-import org.constellation.wms.v130.WMSCapabilities;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
+import org.geotoolkit.wcs.xml.v111.Capabilities;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.WMSCapabilities;
 
 
 /**
@@ -50,7 +50,7 @@ public class UserData {
     })
     private Object[] WCSCapabilities;
     
-    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = org.constellation.cat.csw.v202.Capabilities.class)
+    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = org.geotoolkit.csw.xml.v202.Capabilities.class)
     private Object[] CSWCapabilities;
     
     private Object[] SOSCapabilities;

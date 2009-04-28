@@ -33,22 +33,22 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.constellation.cat.csw.DomainValues;
-import org.constellation.cat.csw.ElementSet;
-import org.constellation.cat.csw.v202.AbstractRecordType;
-import org.constellation.cat.csw.v202.BriefRecordType;
-import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.RecordType;
-import org.constellation.cat.csw.v202.SummaryRecordType;
-import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
-import org.constellation.ows.v100.BoundingBoxType;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
-import static org.constellation.dublincore.v2.elements.ObjectFactory.*;
-import static org.constellation.dublincore.v2.terms.ObjectFactory.*;
-import static org.constellation.ows.v100.ObjectFactory._BoundingBox_QNAME;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;

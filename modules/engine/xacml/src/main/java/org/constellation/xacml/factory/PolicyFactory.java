@@ -29,10 +29,10 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 
 import org.constellation.xacml.api.XACMLPolicy;
-import org.constellation.xacml.policy.ObjectFactory;
-import org.constellation.xacml.policy.PolicyType;
 import org.constellation.xacml.CstlXACMLPolicy;
-import org.constellation.xacml.policy.PolicySetType;
+import org.geotoolkit.xacml.xml.policy.ObjectFactory;
+import org.geotoolkit.xacml.xml.policy.PolicySetType;
+import org.geotoolkit.xacml.xml.policy.PolicyType;
 
 
 /**

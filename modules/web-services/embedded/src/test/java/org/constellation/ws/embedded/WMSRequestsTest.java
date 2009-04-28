@@ -34,17 +34,17 @@ import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
-import org.constellation.wms.v111.LatLonBoundingBox;
-import org.constellation.wms.v111.Layer;
-import org.constellation.wms.v111.WMT_MS_Capabilities;
 import org.constellation.ws.ServiceExceptionReport;
 
 // Geotools dependencies
-import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.geotoolkit.internal.jaxb.v110.sld.LayerDescriptionType;
-import org.geotoolkit.internal.jaxb.v110.sld.TypeNameType;
 
 // JUnit dependencies
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
+import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
+import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
+import org.geotoolkit.wms.xml.v111.Layer;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -111,8 +111,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             assumeNoException(ex);
         }
         pool = new MarshallerPool("org.constellation.ws:" +
-                                  "org.constellation.wms.v111:" +
-                                  "org.geotoolkit.internal.jaxb.v110.sld");
+                                  "org.geotoolkit.wms.xml.v111:" +
+                                  "org.geotoolkit.sld.xml.v110");
     }
 
     /**

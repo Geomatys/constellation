@@ -25,12 +25,12 @@ import java.util.Enumeration;
 import org.constellation.xacml.api.PolicyDecisionPoint;
 import org.constellation.xacml.api.RequestContext;
 import org.constellation.xacml.api.ResponseContext;
-import org.constellation.xacml.context.ActionType;
-import org.constellation.xacml.context.AttributeType;
-import org.constellation.xacml.context.EnvironmentType;
-import org.constellation.xacml.context.RequestType;
-import org.constellation.xacml.context.ResourceType;
-import org.constellation.xacml.context.SubjectType;
+import org.geotoolkit.xacml.xml.context.ActionType;
+import org.geotoolkit.xacml.xml.context.AttributeType;
+import org.geotoolkit.xacml.xml.context.EnvironmentType;
+import org.geotoolkit.xacml.xml.context.RequestType;
+import org.geotoolkit.xacml.xml.context.ResourceType;
+import org.geotoolkit.xacml.xml.context.SubjectType;
 import org.constellation.xacml.factory.RequestAttributeFactory;
 
 /**

@@ -43,24 +43,24 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyAttributeFactory;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
-import org.constellation.xacml.policy.ActionMatchType;
-import org.constellation.xacml.policy.ActionType;
-import org.constellation.xacml.policy.ActionsType;
-import org.constellation.xacml.policy.ApplyType;
-import org.constellation.xacml.policy.AttributeValueType;
-import org.constellation.xacml.policy.ConditionType;
-import org.constellation.xacml.policy.EffectType;
-import org.constellation.xacml.policy.ExpressionType;
-import org.constellation.xacml.policy.FunctionType;
-import org.constellation.xacml.policy.ObjectFactory;
-import org.constellation.xacml.policy.PolicySetType;
-import org.constellation.xacml.policy.PolicyType;
-import org.constellation.xacml.policy.ResourceMatchType;
-import org.constellation.xacml.policy.ResourceType;
-import org.constellation.xacml.policy.ResourcesType;
-import org.constellation.xacml.policy.RuleType;
-import org.constellation.xacml.policy.SubjectAttributeDesignatorType;
-import org.constellation.xacml.policy.TargetType;
+import org.geotoolkit.xacml.xml.policy.ActionMatchType;
+import org.geotoolkit.xacml.xml.policy.ActionType;
+import org.geotoolkit.xacml.xml.policy.ActionsType;
+import org.geotoolkit.xacml.xml.policy.ApplyType;
+import org.geotoolkit.xacml.xml.policy.AttributeValueType;
+import org.geotoolkit.xacml.xml.policy.ConditionType;
+import org.geotoolkit.xacml.xml.policy.EffectType;
+import org.geotoolkit.xacml.xml.policy.ExpressionType;
+import org.geotoolkit.xacml.xml.policy.FunctionType;
+import org.geotoolkit.xacml.xml.policy.ObjectFactory;
+import org.geotoolkit.xacml.xml.policy.PolicySetType;
+import org.geotoolkit.xacml.xml.policy.PolicyType;
+import org.geotoolkit.xacml.xml.policy.ResourceMatchType;
+import org.geotoolkit.xacml.xml.policy.ResourceType;
+import org.geotoolkit.xacml.xml.policy.ResourcesType;
+import org.geotoolkit.xacml.xml.policy.RuleType;
+import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
+import org.geotoolkit.xacml.xml.policy.TargetType;
 
 // Junit dependencies
 import org.geotoolkit.xml.MarshallerPool;
@@ -119,7 +119,7 @@ public class XacmlTest {
     @Before
     public void setUp() throws Exception {
         
-         pool = new MarshallerPool("org.constellation.xacml.policy");
+         pool = new MarshallerPool("org.geotoolkit.xacml.xml.policy");
          unmarshaller = pool.acquireUnmarshaller();
          marshaller   = pool.acquireMarshaller();
          marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -495,7 +495,7 @@ public class XacmlTest {
     /**
      * Initialize the policy Decision Point and load all the correspounding policy file.
      */
-    private void initializePolicyDecisionPoint() {
+    private void initializePolicyDecisionPoint() throws FactoryException {
         
         //we create a new PDP
         PDP = new CstlPDP();
@@ -812,11 +812,11 @@ public class XacmlTest {
      * @return
      * @throws java.lang.Exception
      */
-    private org.constellation.xacml.policy.PolicyType getExamplePolicy() throws Exception {
+    private org.geotoolkit.xacml.xml.policy.PolicyType getExamplePolicy() throws Exception {
         
         ObjectFactory objectFactory = new ObjectFactory();
         String PERMIT_OVERRIDES = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
-        org.constellation.xacml.policy.PolicyType policyType = new org.constellation.xacml.policy.PolicyType();
+        org.geotoolkit.xacml.xml.policy.PolicyType policyType = new org.geotoolkit.xacml.xml.policy.PolicyType();
         policyType.setPolicyId("ExamplePolicy");
         policyType.setVersion("2.0");
         policyType.setRuleCombiningAlgId(PERMIT_OVERRIDES);
@@ -1012,7 +1012,7 @@ public class XacmlTest {
         policySet.setTarget(new TargetType());
          
         //we add the policies to the policy set
-        org.constellation.xacml.policy.ObjectFactory factory = new org.constellation.xacml.policy.ObjectFactory();
+        org.geotoolkit.xacml.xml.policy.ObjectFactory factory = new org.geotoolkit.xacml.xml.policy.ObjectFactory();
         
         for (PolicyType p : policies) {
             JAXBElement<PolicyType> jb = factory.createPolicy(p);
@@ -1041,7 +1041,7 @@ public class XacmlTest {
         policySet.setTarget(new TargetType());
          
         //we add the policies to the policy set
-        org.constellation.xacml.policy.ObjectFactory factory = new org.constellation.xacml.policy.ObjectFactory();
+        org.geotoolkit.xacml.xml.policy.ObjectFactory factory = new org.geotoolkit.xacml.xml.policy.ObjectFactory();
         
         for (PolicyType p : policies) {
             JAXBElement<PolicyType> jb = factory.createPolicy(p);

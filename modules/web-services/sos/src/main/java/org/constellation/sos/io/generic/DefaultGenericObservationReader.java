@@ -26,33 +26,33 @@ import javax.xml.namespace.QName;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.PointType;
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.observation.ProcessEntry;
-import org.constellation.sampling.SamplingFeatureEntry;
-import org.constellation.sampling.SamplingPointEntry;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.ResponseModeType;
-import org.constellation.swe.v101.AbstractDataComponentEntry;
-import org.constellation.swe.v101.AnyResultEntry;
-import org.constellation.swe.v101.AnyScalarPropertyType;
-import org.constellation.swe.v101.BooleanType;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
-import org.constellation.swe.v101.DataArrayEntry;
-import org.constellation.swe.v101.DataArrayPropertyType;
-import org.constellation.swe.v101.PhenomenonEntry;
-import org.constellation.swe.v101.PhenomenonPropertyType;
-import org.constellation.swe.v101.QuantityType;
-import org.constellation.swe.v101.SimpleDataRecordEntry;
-import org.constellation.swe.v101.TextBlockEntry;
-import org.constellation.swe.v101.TimeType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
+import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
+import org.geotoolkit.swe.xml.v101.BooleanType;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.geotoolkit.swe.xml.v101.QuantityType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.TimeType;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311modified.PointType;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import static org.constellation.sos.ws.SOSworker.*;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *

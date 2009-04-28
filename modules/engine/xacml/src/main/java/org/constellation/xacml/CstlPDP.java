@@ -41,8 +41,8 @@ import org.constellation.xacml.api.RequestContext;
 import org.constellation.xacml.api.ResponseContext;
 import org.constellation.xacml.api.XACMLPolicy;
 import org.constellation.xacml.locators.JBossPolicyLocator;
-import org.constellation.xacml.policy.PolicySetType;
-import org.constellation.xacml.policy.PolicyType;
+import org.geotoolkit.xacml.xml.policy.PolicySetType;
+import org.geotoolkit.xacml.xml.policy.PolicyType;
 
 
 

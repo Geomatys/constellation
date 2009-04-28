@@ -34,23 +34,23 @@ import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.observation.ObservationCollectionEntry;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ows.v110.SectionsType;
-import org.constellation.sos.v100.Capabilities;
-import org.constellation.sos.v100.DescribeSensor;
-import org.constellation.sos.v100.GetCapabilities;
-import org.constellation.sos.v100.GetObservation;
-import org.constellation.sos.v100.GetResult;
-import org.constellation.sos.v100.InsertObservation;
-import org.constellation.sos.v100.RegisterSensor;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.v100.GetResult;
+import org.geotoolkit.sos.xml.v100.InsertObservation;
+import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.util.Util;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -68,8 +68,8 @@ public class SOService extends OGCWebService {
     public SOService() throws JAXBException, CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
         worker = new SOSworker(null);
-        setXMLContext("org.constellation.sos.v100:org.constellation.gml.v311:org.constellation.swe.v100:org.constellation.swe.v101:" +
-                "org.constellation.observation:org.constellation.sampling:org.constellation.sml.v100:org.constellation.sml.v101", "");
+        setXMLContext("org.geotoolkit.sos.xml.v100:org.geotoolkit.gml.xml.v311modified:org.geotoolkit.swe.xml.v100:org.geotoolkit.swe.xml.v101:" +
+                "org.geotoolkit.observation.xml:org.geotoolkit.sampling.xml:org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101", "");
     }
 
     @Override

@@ -51,7 +51,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
-import org.constellation.wms.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
@@ -60,11 +60,12 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
 //Geotools dependencies
-import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
-import org.geotoolkit.style.xml.XMLUtilities;
 
 //Geoapi dependencies
 import org.opengis.geometry.Envelope;
@@ -103,9 +104,9 @@ public class WMSService extends OGCWebService {
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:" +
-        		      "org.constellation.wms.v111:" +
-                      "org.constellation.wms.v130:" +
-                      "org.geotoolkit.internal.jaxb.v110.sld",
+        		      "org.geotoolkit.wms.xml.v111:" +
+                      "org.geotoolkit.wms.xml.v130:" +
+                      "org.geotoolkit.sld.xml.v110",
                       "http://www.opengis.net/wms");
 
         worker = new WMSWorker(marshallerPool);
@@ -426,14 +427,14 @@ public class WMSService extends OGCWebService {
             final XMLUtilities sldparser = new XMLUtilities();
             try {
                 sld = sldparser.readSLD(in,
-                        org.geotoolkit.style.xml.Specification.StyledLayerDescriptor.V_1_0_0);
+                        StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }
             if (sld == null) {
                 try {
                     sld = sldparser.readSLD(in,
-                            org.geotoolkit.style.xml.Specification.StyledLayerDescriptor.V_1_1_0);
+                            StyledLayerDescriptor.V_1_1_0);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
                 }

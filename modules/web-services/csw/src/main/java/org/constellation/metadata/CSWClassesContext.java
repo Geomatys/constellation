@@ -21,12 +21,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import org.constellation.cat.wrs.v100.ExtrinsicObjectType;
-import org.constellation.ebrim.v250.RegistryObjectType;
-import org.constellation.ebrim.v300.IdentifiableType;
-import org.constellation.ows.v100.ExceptionReport;
+
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.constellation.util.Util;
+
+import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
+import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.wrs.xml.v100.ExtrinsicObjectType;
 
 /**
  *
@@ -66,26 +68,26 @@ public class CSWClassesContext {
         classeList.addAll(fraClasses);
 
         // Inspire classes
-        classeList.add(org.constellation.inspire.ObjectFactory.class);
+        classeList.add(org.geotoolkit.inspire.xml.ObjectFactory.class);
         //CSW 2.0.2 classes
-        classeList.addAll(Arrays.asList(org.constellation.cat.csw.v202.ObjectFactory.class,
+        classeList.addAll(Arrays.asList(org.geotoolkit.csw.xml.v202.ObjectFactory.class,
                                         ExceptionReport.class,
-                                        org.constellation.ows.v110.ExceptionReport.class,  // TODO remove
-                                        org.constellation.dublincore.v2.terms.ObjectFactory.class));
+                                        org.geotoolkit.ows.xml.v110.ExceptionReport.class,  // TODO remove
+                                        org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.class));
 
            //CSW 2.0.0 classes
-           classeList.addAll(Arrays.asList(org.constellation.cat.csw.v200.ObjectFactory.class,
-                                           org.constellation.dublincore.v1.terms.ObjectFactory.class));
+           classeList.addAll(Arrays.asList(org.geotoolkit.csw.xml.v200.ObjectFactory.class,
+                                           org.geotoolkit.dublincore.xml.v1.terms.ObjectFactory.class));
 
            //Ebrim classes
            classeList.add(IdentifiableType.class);
            classeList.add(ExtrinsicObjectType.class);
-           classeList.add(org.constellation.ebrim.v300.ObjectFactory.class);
-           classeList.add(org.constellation.cat.wrs.v100.ObjectFactory.class);
+           classeList.add(org.geotoolkit.ebrim.xml.v300.ObjectFactory.class);
+           classeList.add(org.geotoolkit.wrs.xml.v100.ObjectFactory.class);
 
            classeList.add(RegistryObjectType.class);
-           classeList.add(org.constellation.ebrim.v250.ObjectFactory.class);
-           classeList.add(org.constellation.cat.wrs.v090.ObjectFactory.class);
+           classeList.add(org.geotoolkit.ebrim.xml.v250.ObjectFactory.class);
+           classeList.add(org.geotoolkit.wrs.xml.v090.ObjectFactory.class);
 
            // we add the extensions classes
            classeList.addAll(loadExtensionsClasses());

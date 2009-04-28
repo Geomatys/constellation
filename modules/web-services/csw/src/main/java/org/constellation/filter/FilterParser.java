@@ -34,23 +34,24 @@ import javax.xml.namespace.QName;
 import org.apache.lucene.search.Filter;
 
 // constellation dependencies
-import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.gml.v311.CoordinatesType;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.LineStringType;
-import org.constellation.gml.v311.PointType;
-import org.constellation.ogc.ComparisonOpsType;
-import org.constellation.ogc.FilterType;
-import org.constellation.ogc.LogicOpsType;
-import org.constellation.ogc.SpatialOpsType;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.csw.xml.QueryConstraint;
+import org.geotoolkit.filter.FilterFactoryImpl;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.gml.xml.v311modified.CoordinatesType;
+import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311modified.LineStringType;
+import org.geotoolkit.gml.xml.v311modified.PointType;
+import org.geotoolkit.ogc.xml.v110modified.ComparisonOpsType;
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
+import org.geotoolkit.ogc.xml.v110modified.LogicOpsType;
+import org.geotoolkit.ogc.xml.v110modified.SpatialOpsType;
 import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies

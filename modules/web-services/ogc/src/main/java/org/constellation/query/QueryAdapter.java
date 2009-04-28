@@ -24,10 +24,10 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
-import org.geotoolkit.style.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.style.xml.XMLUtilities;
 
 
 /**

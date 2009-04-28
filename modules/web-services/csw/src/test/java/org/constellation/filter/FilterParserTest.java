@@ -34,13 +34,13 @@ import org.constellation.lucene.filter.IntersectFilter;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.ogc.FilterType;
 
 // geotools dependencies
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -68,7 +68,7 @@ public class FilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new LuceneFilterParser();
-        pool = new MarshallerPool("org.constellation.ogc:org.constellation.gml.v311");
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110modified:org.geotoolkit.gml.xml.v311modified");
         filterUnmarshaller = pool.acquireUnmarshaller();
     }
 

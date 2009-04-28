@@ -26,6 +26,7 @@ import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
 
 // OpenGis dependencies
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.opengis.observation.Phenomenon;
 
 

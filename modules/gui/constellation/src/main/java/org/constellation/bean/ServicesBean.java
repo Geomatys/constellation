@@ -47,36 +47,36 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import org.constellation.gml.v311.CodeListType;
-import org.constellation.ows.v110.AddressType;
-import org.constellation.ows.v110.CapabilitiesBaseType;
-import org.constellation.ows.v110.CodeType;
-import org.constellation.ows.v110.ContactType;
-import org.constellation.ows.v110.KeywordsType;
-import org.constellation.ows.v110.LanguageStringType;
-import org.constellation.ows.v110.OnlineResourceType;
-import org.constellation.ows.v110.ResponsiblePartySubsetType;
-import org.constellation.ows.v110.ServiceIdentification;
-import org.constellation.ows.v110.ServiceProvider;
-import org.constellation.ows.v110.TelephoneType;
-import org.constellation.wcs.v100.Keywords;
-import org.constellation.wcs.v100.MetadataLinkType;
-import org.constellation.wcs.v100.ResponsiblePartyType;
-import org.constellation.wcs.v100.ServiceType;
-import org.constellation.wcs.v100.WCSCapabilitiesType;
-import org.constellation.wcs.v111.Capabilities;
+import org.geotoolkit.ows.xml.v110.AddressType;
+import org.geotoolkit.ows.xml.v110.CapabilitiesBaseType;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.ContactType;
+import org.geotoolkit.ows.xml.v110.KeywordsType;
+import org.geotoolkit.ows.xml.v110.LanguageStringType;
+import org.geotoolkit.ows.xml.v110.OnlineResourceType;
+import org.geotoolkit.ows.xml.v110.ResponsiblePartySubsetType;
+import org.geotoolkit.ows.xml.v110.ServiceIdentification;
+import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.ows.xml.v110.TelephoneType;
+import org.geotoolkit.wcs.xml.v100.Keywords;
+import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
+import org.geotoolkit.wcs.xml.v100.ResponsiblePartyType;
+import org.geotoolkit.wcs.xml.v100.ServiceType;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
+import org.geotoolkit.wcs.xml.v111.Capabilities;
 import org.constellation.util.UserData;
-import org.constellation.wms.AbstractService;
-import org.constellation.wms.v130.ContactAddress;
-import org.constellation.wms.v130.ContactInformation;
-import org.constellation.wms.v130.ContactPersonPrimary;
-import org.constellation.wms.v130.Keyword;
-import org.constellation.wms.v130.KeywordList;
-import org.constellation.wms.v130.OnlineResource;
-import org.constellation.wms.v130.Service;
-import org.constellation.wms.v111.WMT_MS_Capabilities;
-import org.constellation.wms.v130.WMSCapabilities;
+import org.geotoolkit.wms.xml.AbstractService;
+import org.geotoolkit.wms.xml.v130.ContactAddress;
+import org.geotoolkit.wms.xml.v130.ContactInformation;
+import org.geotoolkit.wms.xml.v130.ContactPersonPrimary;
+import org.geotoolkit.wms.xml.v130.Keyword;
+import org.geotoolkit.wms.xml.v130.KeywordList;
+import org.geotoolkit.wms.xml.v130.OnlineResource;
+import org.geotoolkit.wms.xml.v130.Service;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.WMSCapabilities;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
+import org.geotoolkit.gml.xml.v311modified.CodeListType;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -237,9 +237,9 @@ public class ServicesBean {
                                             WMSCapabilities.class,
                                             WMT_MS_Capabilities.class,
                                             WCSCapabilitiesType.class,
-                                            org.constellation.cat.csw.v202.Capabilities.class,
+                                            org.geotoolkit.csw.xml.v202.Capabilities.class,
                                             UserData.class,
-                                            org.constellation.sos.v100.Capabilities.class);
+                                            org.geotoolkit.sos.xml.v100.Capabilities.class);
     }
 
     /**
@@ -303,10 +303,10 @@ public class ServicesBean {
     /**
      * fill The formular with OWS 1.0.0 Object
      */
-    private void fillFormFromOWS100(org.constellation.ows.v100.CapabilitiesBaseType cap) {
+    private void fillFormFromOWS100(org.geotoolkit.ows.xml.v100.CapabilitiesBaseType cap) {
 
         //we fill the default value of Service Identification
-        org.constellation.ows.v100.ServiceIdentification SI = cap.getServiceIdentification();
+        org.geotoolkit.ows.xml.v100.ServiceIdentification SI = cap.getServiceIdentification();
         this.title = SI.getTitle();
         this._abstract = SI.getAbstract();
         if (SI.getKeywords().size() > 0) {
@@ -321,11 +321,11 @@ public class ServicesBean {
         }
 
         //we fill the value of ServiceProvider
-        org.constellation.ows.v100.ServiceProvider SP = cap.getServiceProvider();
-        org.constellation.ows.v100.ResponsiblePartySubsetType SC = SP.getServiceContact();
-        org.constellation.ows.v100.ContactType CI = SC.getContactInfo();
-        org.constellation.ows.v100.TelephoneType T = CI.getPhone();
-        org.constellation.ows.v100.AddressType A = CI.getAddress();
+        org.geotoolkit.ows.xml.v100.ServiceProvider SP = cap.getServiceProvider();
+        org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType SC = SP.getServiceContact();
+        org.geotoolkit.ows.xml.v100.ContactType CI = SC.getContactInfo();
+        org.geotoolkit.ows.xml.v100.TelephoneType T = CI.getPhone();
+        org.geotoolkit.ows.xml.v100.AddressType A = CI.getAddress();
         this.providerName = SP.getProviderName();
         this.providerSite = SP.getProviderSite().getHref();
         this.individualName = SC.getIndividualName();
@@ -428,7 +428,7 @@ public class ServicesBean {
      * @param keywords
      * @return
      */
-    private List<SelectItem> keywordsToSelectItem(org.constellation.ows.v100.KeywordsType keywords) {
+    private List<SelectItem> keywordsToSelectItem(org.geotoolkit.ows.xml.v100.KeywordsType keywords) {
         List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (String keyword : keywords.getKeyword()) {
@@ -488,18 +488,18 @@ public class ServicesBean {
         for (Object capa : capabilities) {
 
             //for OWS 1.1.0
-            if (capa instanceof org.constellation.ows.v110.CapabilitiesBaseType) {
+            if (capa instanceof org.geotoolkit.ows.xml.v110.CapabilitiesBaseType) {
                 ServiceIdentification SI = getServiceIdentification110();
                 ServiceProvider SP = getServiceProvider110();
                 ((CapabilitiesBaseType) capa).setServiceProvider(SP);
                 ((CapabilitiesBaseType) capa).setServiceIdentification(SI);
 
             // for OWS 1.0.0
-            } else if (capa instanceof org.constellation.ows.v100.CapabilitiesBaseType) {
-                org.constellation.ows.v100.ServiceIdentification SI = getServiceIdentification100();
-                org.constellation.ows.v100.ServiceProvider SP = getServiceProvider100();
-                ((org.constellation.ows.v100.CapabilitiesBaseType) capa).setServiceProvider(SP);
-                ((org.constellation.ows.v100.CapabilitiesBaseType) capa).setServiceIdentification(SI);
+            } else if (capa instanceof org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) {
+                org.geotoolkit.ows.xml.v100.ServiceIdentification SI = getServiceIdentification100();
+                org.geotoolkit.ows.xml.v100.ServiceProvider SP = getServiceProvider100();
+                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceProvider(SP);
+                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceIdentification(SI);
 
 
             // for WCS 1.0.0
@@ -556,7 +556,7 @@ public class ServicesBean {
     /**
      * Build the Service Identification object of an OWS 1.0 service.
      */
-    public org.constellation.ows.v100.ServiceIdentification getServiceIdentification100() {
+    public org.geotoolkit.ows.xml.v100.ServiceIdentification getServiceIdentification100() {
 
         List<String> listKey = new ArrayList<String>();
         for (SelectItem k : keywords) {
@@ -568,10 +568,10 @@ public class ServicesBean {
             listVers.add((String) v.getValue());
         }
 
-        org.constellation.ows.v100.ServiceIdentification SI = new org.constellation.ows.v100.ServiceIdentification(title,
+        org.geotoolkit.ows.xml.v100.ServiceIdentification SI = new org.geotoolkit.ows.xml.v100.ServiceIdentification(title,
                 _abstract,
-                new org.constellation.ows.v100.KeywordsType(listKey, null),
-                new org.constellation.ows.v100.CodeType(serviceType),
+                new org.geotoolkit.ows.xml.v100.KeywordsType(listKey, null),
+                new org.geotoolkit.ows.xml.v100.CodeType(serviceType),
                 listVers,
                 fees,
                 accessConstraints);
@@ -591,16 +591,16 @@ public class ServicesBean {
             listKey.add((String) k.getValue());
         }
 
-        org.constellation.wcs.v100.TelephoneType tel = new org.constellation.wcs.v100.TelephoneType(phoneVoice, phoneFacsimile);
+        org.geotoolkit.wcs.xml.v100.TelephoneType tel = new org.geotoolkit.wcs.xml.v100.TelephoneType(phoneVoice, phoneFacsimile);
 
-        org.constellation.wcs.v100.AddressType adr = new org.constellation.wcs.v100.AddressType(deliveryPoint,
+        org.geotoolkit.wcs.xml.v100.AddressType adr = new org.geotoolkit.wcs.xml.v100.AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
                 country,
                 electronicAddress);
 
-        org.constellation.wcs.v100.ContactType CI = new org.constellation.wcs.v100.ContactType(tel, adr, null);
+        org.geotoolkit.wcs.xml.v100.ContactType CI = new org.geotoolkit.wcs.xml.v100.ContactType(tel, adr, null);
 
         ResponsiblePartyType resp = new ResponsiblePartyType(individualName,
                 positionName,
@@ -647,22 +647,22 @@ public class ServicesBean {
         result.add(service130);
         
         // v1.1.1
-        List<org.constellation.wms.v111.Keyword> listKey111 = new ArrayList<org.constellation.wms.v111.Keyword>();
+        List<org.geotoolkit.wms.xml.v111.Keyword> listKey111 = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
         for (SelectItem k : keywords) {
-            listKey111.add(new org.constellation.wms.v111.Keyword((String) k.getValue()));
+            listKey111.add(new org.geotoolkit.wms.xml.v111.Keyword((String) k.getValue()));
         }
-        org.constellation.wms.v111.KeywordList keywordList111 = new org.constellation.wms.v111.KeywordList(listKey111);
-        org.constellation.wms.v111.ContactPersonPrimary CPP111 = new org.constellation.wms.v111.ContactPersonPrimary(individualName, providerName);
-        org.constellation.wms.v111.ContactAddress CA111 = new org.constellation.wms.v111.ContactAddress(
+        org.geotoolkit.wms.xml.v111.KeywordList keywordList111 = new org.geotoolkit.wms.xml.v111.KeywordList(listKey111);
+        org.geotoolkit.wms.xml.v111.ContactPersonPrimary CPP111 = new org.geotoolkit.wms.xml.v111.ContactPersonPrimary(individualName, providerName);
+        org.geotoolkit.wms.xml.v111.ContactAddress CA111 = new org.geotoolkit.wms.xml.v111.ContactAddress(
                 getAddressType(), deliveryPoint, city, administrativeArea, postalCode, country);
 
-        org.constellation.wms.v111.ContactInformation CI111 = new org.constellation.wms.v111.ContactInformation(CPP111, positionName,
+        org.geotoolkit.wms.xml.v111.ContactInformation CI111 = new org.geotoolkit.wms.xml.v111.ContactInformation(CPP111, positionName,
                 CA111, phoneVoice, phoneFacsimile, electronicAddress);
 
-        org.constellation.wms.v111.Service service111 = new org.constellation.wms.v111.Service(
+        org.geotoolkit.wms.xml.v111.Service service111 = new org.geotoolkit.wms.xml.v111.Service(
                 title, title, _abstract,
                 keywordList111,
-                new org.constellation.wms.v111.OnlineResource(providerSite),
+                new org.geotoolkit.wms.xml.v111.OnlineResource(providerSite),
                 CI111, fees, accessConstraints);
         result.add(service111);
         
@@ -699,28 +699,28 @@ public class ServicesBean {
     /**
      * Build the Service Provider object of an OWS 1.0 service.
      */
-    public org.constellation.ows.v100.ServiceProvider getServiceProvider100() {
+    public org.geotoolkit.ows.xml.v100.ServiceProvider getServiceProvider100() {
 
-        org.constellation.ows.v100.AddressType adr = new org.constellation.ows.v100.AddressType(deliveryPoint,
+        org.geotoolkit.ows.xml.v100.AddressType adr = new org.geotoolkit.ows.xml.v100.AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
                 country,
                 electronicAddress);
 
-        org.constellation.ows.v100.ContactType CI = new org.constellation.ows.v100.ContactType(new org.constellation.ows.v100.TelephoneType(phoneVoice, phoneFacsimile),
+        org.geotoolkit.ows.xml.v100.ContactType CI = new org.geotoolkit.ows.xml.v100.ContactType(new org.geotoolkit.ows.xml.v100.TelephoneType(phoneVoice, phoneFacsimile),
                 adr,
                 null, null, null);
 
-        org.constellation.ows.v100.ResponsiblePartySubsetType SC = new org.constellation.ows.v100.ResponsiblePartySubsetType(
+        org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType SC = new org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType(
                 individualName,
                 positionName,
                 CI,
-                new org.constellation.ows.v100.CodeType(role));
+                new org.geotoolkit.ows.xml.v100.CodeType(role));
 
-        org.constellation.ows.v100.ServiceProvider SP = new org.constellation.ows.v100.ServiceProvider(
+        org.geotoolkit.ows.xml.v100.ServiceProvider SP = new org.geotoolkit.ows.xml.v100.ServiceProvider(
                 providerName,
-                new org.constellation.ows.v100.OnlineResourceType(providerSite),
+                new org.geotoolkit.ows.xml.v100.OnlineResourceType(providerSite),
                 SC);
         return SP;
     }
@@ -1021,7 +1021,7 @@ public class ServicesBean {
         if (capabilitiesFile[0].exists()) {
             Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS100((org.constellation.ows.v100.CapabilitiesBaseType) capabilities[0]);
+            fillFormFromOWS100((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capabilities[0]);
             marshallerPool.release(unmarshaller);
 
         } else {

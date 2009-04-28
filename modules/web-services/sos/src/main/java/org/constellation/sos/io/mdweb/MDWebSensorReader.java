@@ -31,11 +31,11 @@ import javax.xml.bind.Unmarshaller;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sml.AbstractSensorML;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
@@ -111,7 +111,7 @@ public class MDWebSensorReader implements SensorReader {
             this.map           = map;
 
             //we initialize the unmarshaller
-            marshallerPool = new MarshallerPool("org.constellation.sml.v100:org.constellation.sml.v101");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
         } catch (JAXBException ex) {
             ex.printStackTrace();

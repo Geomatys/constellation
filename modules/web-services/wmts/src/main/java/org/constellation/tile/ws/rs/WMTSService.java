@@ -32,19 +32,19 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.constellation.ServiceDef;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ows.v110.SectionsType;
 import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.util.Util;
-import org.constellation.wmts.v100.GetCapabilities;
-import org.constellation.wmts.v100.GetFeatureInfo;
-import org.constellation.wmts.v100.GetTile;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.wmts.xml.v100.GetCapabilities;
+import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
+import org.geotoolkit.wmts.xml.v100.GetTile;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
@@ -76,9 +76,9 @@ public class WMTSService extends OGCWebService {
     public WMTSService() {
         super(ServiceDef.WMTS_1_0_0);
         try {
-            setXMLContext("org.constellation.wmts.v100:" +
-                          "org.constellation.ows.v110:"  +
-                          "org.constellation.gml.v311",
+            setXMLContext("org.geotoolkit.wmts.xml.v100:" +
+                          "org.geotoolkit.ows.xml.v110:"  +
+                          "org.geotoolkit.gml.xml.v311.modified",
                           "http://www.opengis.net/wmts");
             worker = new WMTSWorker();
 

@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.ogc.FilterType;
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -54,7 +54,7 @@ public class SQLFilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new SQLFilterParser();
-        pool = new MarshallerPool("org.constellation.ogc:org.constellation.gml.v311");
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110modified:org.geotoolkit.gml.xml.v311modified");
         filterUnmarshaller = pool.acquireUnmarshaller();
     }
 

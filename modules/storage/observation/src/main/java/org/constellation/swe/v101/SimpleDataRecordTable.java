@@ -25,8 +25,9 @@ import java.util.Iterator;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.SingletonTable;
-import static org.constellation.catalog.QueryType.*;
 import org.constellation.catalog.QueryType;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.util.Utilities;
 
 /**

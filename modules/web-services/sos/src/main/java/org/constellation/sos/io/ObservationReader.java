@@ -20,16 +20,15 @@ package org.constellation.sos.io;
 // J2SE dependencies
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 
 // Constellation dependencies
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.ResponseModeType;
-import org.constellation.swe.AnyResult;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.AnyResult;
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;

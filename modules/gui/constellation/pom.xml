@@ -168,24 +168,20 @@
          those bindings to marshall capabilities.
     -->
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-wms</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-wms</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-wcs</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-wcs</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-sos</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-sos</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-csw</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-csw</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.faces</groupId>

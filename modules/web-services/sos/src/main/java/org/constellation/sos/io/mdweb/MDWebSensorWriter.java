@@ -36,11 +36,11 @@ import org.xml.sax.SAXException;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sml.AbstractSensorML;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
@@ -119,7 +119,7 @@ public class MDWebSensorWriter implements SensorWriter {
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
 
             //we initialize the marshaller
-            marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.constellation.sml.v100:org.constellation.sml.v101");
+            marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
         } catch (JAXBException ex) {
             ex.printStackTrace();

@@ -25,11 +25,11 @@ import javax.ws.rs.core.UriInfo;
 
 //Constellation dependencies
 
-import org.constellation.wmts.v100.Capabilities;
-import org.constellation.wmts.v100.GetCapabilities;
-import org.constellation.wmts.v100.GetFeatureInfo;
-import org.constellation.wmts.v100.GetTile;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.wmts.xml.v100.Capabilities;
+import org.geotoolkit.wmts.xml.v100.GetCapabilities;
+import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
+import org.geotoolkit.wmts.xml.v100.GetTile;
 
 
 /**

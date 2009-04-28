@@ -29,25 +29,27 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.gml.v311.TimeInstantType;
-import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.gml.v311.TimePositionType;
 import org.constellation.metadata.MetadataTable;
-import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingFeatureTable;
-import org.constellation.sampling.SamplingPointEntry;
 import org.constellation.sampling.SamplingPointTable;
-import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 
 // OpenGis dependencies
-import org.constellation.swe.v101.DataArrayPropertyType;
-import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
+import org.geotoolkit.gml.xml.v311modified.AbstractTimeGeometricPrimitiveType;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
+import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
+import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 

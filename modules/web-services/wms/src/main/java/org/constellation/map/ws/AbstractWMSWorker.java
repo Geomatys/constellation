@@ -29,11 +29,11 @@ import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
-import org.constellation.wms.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.constellation.ws.CstlServiceException;
 
 //Geotools dependencies
-import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 
 
 /**

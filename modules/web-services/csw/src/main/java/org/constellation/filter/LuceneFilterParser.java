@@ -28,31 +28,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.cat.csw.QueryConstraint;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.LineStringType;
-import org.constellation.gml.v311.PointType;
-import org.constellation.gml.v311.AbstractGeometryType;
 import org.constellation.lucene.filter.SerialChainFilter;
 import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.ogc.AbstractIdType;
-import org.constellation.ogc.BBOXType;
-import org.constellation.ogc.BinaryComparisonOpType;
-import org.constellation.ogc.BinaryLogicOpType;
-import org.constellation.ogc.BinarySpatialOpType;
-import org.constellation.ogc.ComparisonOpsType;
-import org.constellation.ogc.DistanceBufferType;
-import org.constellation.ogc.FilterType;
-import org.constellation.ogc.LiteralType;
-import org.constellation.ogc.LogicOpsType;
-import org.constellation.ogc.PropertyIsBetweenType;
-import org.constellation.ogc.PropertyIsLikeType;
-import org.constellation.ogc.PropertyIsNullType;
-import org.constellation.ogc.PropertyNameType;
-import org.constellation.ogc.SpatialOpsType;
-import org.constellation.ogc.UnaryLogicOpType;
 import org.constellation.lucene.filter.BBOXFilter;
 import org.constellation.lucene.filter.BeyondFilter;
 import org.constellation.lucene.filter.ContainsFilter;
@@ -65,14 +44,35 @@ import org.constellation.lucene.filter.OverlapsFilter;
 import org.constellation.lucene.filter.SpatialFilterType;
 import org.constellation.lucene.filter.TouchesFilter;
 import org.constellation.lucene.filter.WithinFilter;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
 
 // geotools dependencies
+import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.gml.xml.v311modified.AbstractGeometryType;
+import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311modified.LineStringType;
+import org.geotoolkit.gml.xml.v311modified.PointType;
+import org.geotoolkit.ogc.xml.v110modified.AbstractIdType;
+import org.geotoolkit.ogc.xml.v110modified.BBOXType;
+import org.geotoolkit.ogc.xml.v110modified.BinaryComparisonOpType;
+import org.geotoolkit.ogc.xml.v110modified.BinaryLogicOpType;
+import org.geotoolkit.ogc.xml.v110modified.BinarySpatialOpType;
+import org.geotoolkit.ogc.xml.v110modified.ComparisonOpsType;
+import org.geotoolkit.ogc.xml.v110modified.DistanceBufferType;
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
+import org.geotoolkit.ogc.xml.v110modified.LiteralType;
+import org.geotoolkit.ogc.xml.v110modified.LogicOpsType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyIsBetweenType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyIsLikeType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyIsNullType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyNameType;
+import org.geotoolkit.ogc.xml.v110modified.SpatialOpsType;
+import org.geotoolkit.ogc.xml.v110modified.UnaryLogicOpType;
 import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies
@@ -92,6 +92,7 @@ public class LuceneFilterParser extends FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
+    @Override
     public SpatialQuery getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
         FilterType filter = null;
         //if the constraint is null we make a null filter
@@ -167,6 +168,7 @@ public class LuceneFilterParser extends FilterParser {
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
+    @Override
     protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException {
         List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
         StringBuilder queryBuilder    = new StringBuilder();
@@ -310,6 +312,7 @@ public class LuceneFilterParser extends FilterParser {
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
+    @Override
     protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws CstlServiceException {
         StringBuilder response = new StringBuilder();
         
@@ -475,6 +478,7 @@ public class LuceneFilterParser extends FilterParser {
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
+    @Override
     protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws CstlServiceException {
         SpatialFilter spatialfilter = null;
         

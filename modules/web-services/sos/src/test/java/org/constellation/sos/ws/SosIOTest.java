@@ -28,23 +28,23 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.constellation.gml.v311.TimeInstantType;
-import org.constellation.gml.v311.TimePeriodType;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.observation.ObservationCollectionEntry;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.ogc.BinaryTemporalOpType;
-import org.constellation.sos.v100.Capabilities;
-import org.constellation.sos.v100.EventTime;
-import org.constellation.sos.v100.GetCapabilities;
-import org.constellation.sos.v100.GetObservation;
-import org.constellation.sos.v100.GetResult;
-import org.constellation.sos.v100.GetResultResponse;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.ResponseModeType;
-import org.constellation.swe.v101.DataArrayEntry;
-import org.constellation.swe.v101.DataArrayPropertyType;
-import org.constellation.swe.v101.SimpleDataRecordEntry;
+import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
+import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
+import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.ogc.xml.v110modified.BinaryTemporalOpType;
+import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.v100.EventTime;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.v100.GetResult;
+import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSworker.*;
 
@@ -84,7 +84,7 @@ public class SosIOTest {
 
     @Before
     public void setUp() throws Exception {
-        marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.ows.v110");
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110");
         marshaller = marshallerPool.acquireMarshaller();
     }
 

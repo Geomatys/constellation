@@ -37,27 +37,27 @@ import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.gml.v311.ReferenceEntry;
 import org.constellation.gml.v311.ReferenceTable;
-import org.constellation.observation.ObservationEntry;
 import org.constellation.observation.ObservationTable;
 import org.constellation.observation.ProcessTable;
-import org.constellation.sampling.SamplingFeatureEntry;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
-import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.v100.ResponseModeType;
-import org.constellation.swe.v101.AnyResultEntry;
 import org.constellation.swe.v101.AnyResultTable;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
-import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.postgresql.ds.PGSimpleDataSource;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Default Observation reader for Postgrid O&M database.

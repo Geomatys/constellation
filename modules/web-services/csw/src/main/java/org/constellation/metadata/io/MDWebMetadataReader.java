@@ -41,24 +41,24 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
-import org.constellation.cat.csw.DomainValues;
-import org.constellation.cat.csw.ElementSet;
-import org.constellation.cat.csw.Settable;
-import org.constellation.cat.csw.v202.AbstractRecordType;
-import org.constellation.cat.csw.v202.BriefRecordType;
-import org.constellation.cat.csw.v202.DomainValuesType;
-import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.ListOfValuesType;
-import org.constellation.cat.csw.v202.SummaryRecordType;
-import org.constellation.cat.csw.v202.RecordType;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.Settable;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.csw.xml.v202.RecordType;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.dublincore.v2.elements.SimpleLiteral;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
-import org.constellation.ows.v100.BoundingBoxType;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.constellation.util.StringUtilities;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.TypeNames.*;
         
@@ -201,15 +201,15 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         
-        this.geotoolsPackage    = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing", "org.constellation.temporal",
-                                                        "org.geotools.service", "org.geotools.util", "org.geotools.feature.catalog",
-                                                        "org.constellation.metadata.fra");
+        this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
+                                                        "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
+                                                        "org.geotoolkit.metadata.fra");
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
-        this.CSWPackage         = Util.searchSubPackage("org.constellation.cat.csw.v202", "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100",
-                                                       "org.constellation.ogc");
-        this.ebrimV3Package     = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
-        this.ebrimV25Package    = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+        this.CSWPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
+                                                       "org.geotoolkit.ogc.xml");
+        this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
+        this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
@@ -231,15 +231,15 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
 
-        this.geotoolsPackage    = Util.searchSubPackage("org.geotools.metadata", "org.constellation.referencing", "org.constellation.temporal",
-                                                        "org.geotools.service", "org.geotools.util", "org.geotools.feature.catalog",
-                                                        "org.constellation.metadata.fra");
+        this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
+                                                        "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
+                                                        "org.geotoolkit.metadata.fra");
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
-        this.CSWPackage         = Util.searchSubPackage("org.constellation.cat.csw.v202", "org.constellation.dublincore.v2.elements", "org.constellation.ows.v100",
-                                                       "org.constellation.ogc");
-        this.ebrimV3Package     = Util.searchSubPackage("org.constellation.ebrim.v300", "org.constellation.cat.wrs.v100");
-        this.ebrimV25Package    = Util.searchSubPackage("org.constellation.ebrim.v250", "org.constellation.cat.wrs.v090");
+        this.CSWPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
+                                                       "org.geotoolkit.ogc.xml");
+        this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
+        this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
 
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
@@ -1076,13 +1076,13 @@ public class MDWebMetadataReader extends MetadataReader {
             
             //TODO remove this special case
             if (className.equals("RS_Identifier"))
-                packageName = "org.constellation.referencing";
+                packageName = "org.geotoolkit.referencing";
             else if (className.equals("MD_ScopeCode"))
                 packageName = "org.opengis.metadata.maintenance";
             else if (className.equals("SV_ServiceIdentification")) 
                 packageName = "org.geotools.service";
              else if (className.startsWith("FRA_")) 
-                packageName = "org.constellation.metadata.fra";
+                packageName = "org.geotoolkit.metadata.fra";
             
             String name = className;
             int nameType = 0;

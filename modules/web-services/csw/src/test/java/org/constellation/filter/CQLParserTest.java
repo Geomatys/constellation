@@ -37,13 +37,14 @@ import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.lucene.filter.TouchesFilter;
 import org.constellation.lucene.filter.WithinFilter;
-import org.constellation.ogc.FilterType;
 
 // Geotools dependencies
+import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
 import org.junit.*;
 import static org.junit.Assert.*;
 

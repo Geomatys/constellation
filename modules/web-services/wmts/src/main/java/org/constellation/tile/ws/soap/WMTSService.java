@@ -22,19 +22,18 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.util.Util;
-import org.constellation.wmts.v100.BinaryPayload;
-import org.constellation.wmts.v100.Capabilities;
-import org.constellation.wmts.v100.GetCapabilities;
-import org.constellation.wmts.v100.GetFeatureInfo;
-import org.constellation.wmts.v100.GetTile;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.geotoolkit.wmts.xml.v100.BinaryPayload;
+import org.geotoolkit.wmts.xml.v100.Capabilities;
+import org.geotoolkit.wmts.xml.v100.GetCapabilities;
+import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
+import org.geotoolkit.wmts.xml.v100.GetTile;
 
 /**
  * The SOAP facade to an OGC Web Map Tile Service, implementing the 1.0.0 version.

@@ -25,6 +25,11 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
+import org.geotoolkit.swe.xml.v101.BooleanType;
+import org.geotoolkit.swe.xml.v101.QuantityType;
+import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.util.Utilities;
 
 /**

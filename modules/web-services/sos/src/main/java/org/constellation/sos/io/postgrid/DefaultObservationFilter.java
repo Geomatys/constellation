@@ -30,17 +30,17 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.ReferenceEntry;
-import org.constellation.gml.v311.TimeInstantType;
-import org.constellation.gml.v311.TimePeriodType;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.v100.ObservationOfferingEntry;
-import org.constellation.sos.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.sos.v100.ResponseModeType.*;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
+import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
 
 /**

@@ -76,32 +76,32 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
-import org.constellation.gml.v311.CodeType;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.GridLimitsType;
-import org.constellation.gml.v311.GridType;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.ows.v110.ExceptionReport;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.BoundingBoxType;
-import org.constellation.ows.v110.SectionsType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.constellation.query.Query;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
-import org.constellation.wcs.DescribeCoverage;
-import org.constellation.wcs.DescribeCoverageResponse;
-import org.constellation.wcs.GetCapabilities;
-import org.constellation.wcs.GetCapabilitiesResponse;
-import org.constellation.wcs.GetCoverage;
-import org.constellation.wcs.v111.GridCrsType;
-import org.constellation.wcs.v111.RangeSubsetType.FieldSubset;
+import org.geotoolkit.wcs.xml.DescribeCoverage;
+import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
+import org.geotoolkit.wcs.xml.GetCapabilities;
+import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.GetCoverage;
+import org.geotoolkit.wcs.xml.v111.GridCrsType;
+import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.OGCWebService;
+import org.geotoolkit.gml.xml.v311modified.CodeType;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311modified.GridLimitsType;
+import org.geotoolkit.gml.xml.v311modified.GridType;
+import org.geotoolkit.gml.xml.v311modified.TimePositionType;
 
 
 /**
@@ -144,10 +144,10 @@ public final class WCSService extends OGCWebService {
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:" +
-                      "org.constellation.ows.v100:" +
-                      "org.constellation.wcs.v100:" +
-                      "org.constellation.wcs.v111:" +
-                      "org.constellation.gml.v311",
+                      "org.geotoolkit.ows.xml.v100:" +
+                      "org.geotoolkit.wcs.xml.v100:" +
+                      "org.geotoolkit.wcs.xml.v111:" +
+                      "org.geotoolkit.gml.xml.v311modified",
                       "http://www.opengis.net/wcs");
 
         worker = new WCSWorker(marshallerPool);
@@ -337,7 +337,7 @@ public final class WCSService extends OGCWebService {
         final ServiceDef finalVersion = getBestVersion(inputVersion);
 
         if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
-            return new org.constellation.wcs.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
+            return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
         } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
@@ -362,7 +362,7 @@ public final class WCSService extends OGCWebService {
             }
             SectionsType sections = new SectionsType(requestedSections);
             AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
-            return (GetCapabilities) new org.constellation.wcs.v111.GetCapabilitiesType(versions, sections, formats, null);
+            return (GetCapabilities) new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
@@ -382,9 +382,9 @@ public final class WCSService extends OGCWebService {
         final ServiceDef serviceDef = getVersionFromNumber(strVersion);
 
         if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
-            return new org.constellation.wcs.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
+            return new org.geotoolkit.wcs.xml.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
         } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {
-            return new org.constellation.wcs.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
+            return new org.geotoolkit.wcs.xml.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
@@ -415,13 +415,13 @@ public final class WCSService extends OGCWebService {
     
 
     /**
-     * Generate a marshallable {@linkplain org.constellation.wcs.v100.GetCoverage GetCoverage}
+     * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v100.GetCoverage GetCoverage}
      * request in version 1.0.0, from what the user specified.
      *
      * @return The GetCoverage request in version 1.0.0
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v100.GetCoverageType adaptKvpGetCoverageRequest100()
+    private org.geotoolkit.wcs.xml.v100.GetCoverageType adaptKvpGetCoverageRequest100()
                                                     throws CstlServiceException
     {
         String width  = getParameter(KEY_WIDTH,  false);
@@ -434,11 +434,11 @@ public final class WCSService extends OGCWebService {
         String resz   = getParameter(KEY_RESZ,   false);
 
         // temporal subset
-        org.constellation.wcs.v100.TimeSequenceType temporal = null;
+        org.geotoolkit.wcs.xml.v100.TimeSequenceType temporal = null;
         final String timeParameter = getParameter(KEY_TIME, false);
         if (timeParameter != null) {
             final TimePositionType time = new TimePositionType(timeParameter);
-            temporal = new org.constellation.wcs.v100.TimeSequenceType(time);
+            temporal = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(time);
         }
 
         /*
@@ -483,46 +483,46 @@ public final class WCSService extends OGCWebService {
         final GridType grid = new GridType(limits, axis);
 
         //spatial subset
-        final org.constellation.wcs.v100.SpatialSubsetType spatial =
-                new org.constellation.wcs.v100.SpatialSubsetType(envelope, grid);
+        final org.geotoolkit.wcs.xml.v100.SpatialSubsetType spatial =
+                new org.geotoolkit.wcs.xml.v100.SpatialSubsetType(envelope, grid);
 
         //domain subset
-        final org.constellation.wcs.v100.DomainSubsetType domain =
-                new org.constellation.wcs.v100.DomainSubsetType(temporal, spatial);
+        final org.geotoolkit.wcs.xml.v100.DomainSubsetType domain =
+                new org.geotoolkit.wcs.xml.v100.DomainSubsetType(temporal, spatial);
 
         //range subset (not yet used)
-        final org.constellation.wcs.v100.RangeSubsetType range = null;
+        final org.geotoolkit.wcs.xml.v100.RangeSubsetType range = null;
 
         //interpolation method
-        final org.constellation.wcs.v100.InterpolationMethod interpolation =
-                org.constellation.wcs.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
+        final org.geotoolkit.wcs.xml.v100.InterpolationMethod interpolation =
+                org.geotoolkit.wcs.xml.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
 
         //output
-        final org.constellation.wcs.v100.OutputType output =
-                new org.constellation.wcs.v100.OutputType(getParameter(KEY_FORMAT, true),
+        final org.geotoolkit.wcs.xml.v100.OutputType output =
+                new org.geotoolkit.wcs.xml.v100.OutputType(getParameter(KEY_FORMAT, true),
                                                           getParameter(KEY_RESPONSE_CRS, false));
 
-        return new org.constellation.wcs.v100.GetCoverageType(
+        return new org.geotoolkit.wcs.xml.v100.GetCoverageType(
                 getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
     }
     
 
     /**
-     * Generate a marshallable {@linkplain org.constellation.wcs.v111.GetCoverage GetCoverage}
+     * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v111.GetCoverage GetCoverage}
      * request in version 1.1.1, from what the user specified.
      *
      * @return The GetCoverage request in version 1.1.1
      * @throws CstlServiceException
      */
-    private org.constellation.wcs.v111.GetCoverageType adaptKvpGetCoverageRequest111()
+    private org.geotoolkit.wcs.xml.v111.GetCoverageType adaptKvpGetCoverageRequest111()
                                                     throws CstlServiceException
     {
         // temporal subset
-        org.constellation.wcs.v111.TimeSequenceType temporal = null;
+        org.geotoolkit.wcs.xml.v111.TimeSequenceType temporal = null;
         String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
         if (timeParameter != null) {
             if (timeParameter.indexOf('/') == -1) {
-                temporal = new org.constellation.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
+                temporal = new org.geotoolkit.wcs.xml.v111.TimeSequenceType(new TimePositionType(timeParameter));
             } else {
                 throw new CstlServiceException("The service does not handle TimePeriod",
                         INVALID_PARAMETER_VALUE);
@@ -562,11 +562,11 @@ public final class WCSService extends OGCWebService {
         }
 
         //domain subset
-        final org.constellation.wcs.v111.DomainSubsetType domain =
-                new org.constellation.wcs.v111.DomainSubsetType(temporal, envelope);
+        final org.geotoolkit.wcs.xml.v111.DomainSubsetType domain =
+                new org.geotoolkit.wcs.xml.v111.DomainSubsetType(temporal, envelope);
 
         //range subset.
-        org.constellation.wcs.v111.RangeSubsetType range = null;
+        org.geotoolkit.wcs.xml.v111.RangeSubsetType range = null;
         String rangeSubset = getParameter(KEY_RANGESUBSET, false);
         if (rangeSubset != null) {
             //for now we don't handle Axis Identifiers
@@ -590,7 +590,7 @@ public final class WCSService extends OGCWebService {
                 fields.add(new FieldSubset(rangeIdentifier, interpolation));
             }
 
-            range = new org.constellation.wcs.v111.RangeSubsetType(fields);
+            range = new org.geotoolkit.wcs.xml.v111.RangeSubsetType(fields);
         }
 
 
@@ -628,11 +628,11 @@ public final class WCSService extends OGCWebService {
         final CodeType codeCRS = new CodeType(crs);
         final GridCrsType grid = new GridCrsType(codeCRS, getParameter(KEY_GRIDBASECRS, false), gridType,
                 origin, offset, gridCS, "");
-        final org.constellation.wcs.v111.OutputType output =
-                new org.constellation.wcs.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
+        final org.geotoolkit.wcs.xml.v111.OutputType output =
+                new org.geotoolkit.wcs.xml.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
 
-        return new org.constellation.wcs.v111.GetCoverageType(
-                new org.constellation.ows.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
+        return new org.geotoolkit.wcs.xml.v111.GetCoverageType(
+                new org.geotoolkit.ows.xml.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
                 domain, range, output);
     }
 

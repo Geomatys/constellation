@@ -38,19 +38,19 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.observation.ObservationCollectionEntry;
-import org.constellation.sml.AbstractSensorML;
-import org.constellation.sos.v100.Capabilities;
-import org.constellation.sos.v100.DescribeSensor;
-import org.constellation.sos.v100.GetCapabilities;
-import org.constellation.sos.v100.GetObservation;
-import org.constellation.sos.v100.GetResult;
-import org.constellation.sos.v100.GetResultResponse;
-import org.constellation.sos.v100.InsertObservation;
-import org.constellation.sos.v100.InsertObservationResponse;
-import org.constellation.sos.v100.RegisterSensor;
-import org.constellation.sos.v100.RegisterSensorResponse;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.v100.GetResult;
+import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.v100.InsertObservation;
+import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
+import org.geotoolkit.sos.xml.v100.RegisterSensor;
+import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 
 
 /**
@@ -96,7 +96,7 @@ public class SOService {
      */
     public SOService() throws JAXBException, CstlServiceException {
        worker = new SOSworker(null);
-       JAXBContext jbcontext = JAXBContext.newInstance("org.constellation.sos.v100:org.constellation.observation");
+       JAXBContext jbcontext = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml");
        unmarshaller = jbcontext.createUnmarshaller();
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");

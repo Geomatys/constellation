@@ -26,7 +26,10 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.swe.DataBlockDefinition;
+import org.geotoolkit.swe.xml.DataBlockDefinition;
+import org.geotoolkit.swe.xml.v101.DataBlockDefinitionEntry;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 
 /**
  * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockDefintion}.

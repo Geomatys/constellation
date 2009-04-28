@@ -24,11 +24,11 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.sos.v100.OfferingPhenomenonEntry;
-import org.constellation.swe.v101.CompositePhenomenonEntry;
 import org.constellation.swe.v101.CompositePhenomenonTable;
-import org.constellation.swe.v101.PhenomenonEntry;
 import org.constellation.swe.v101.PhenomenonTable;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.Utilities;
 
 /**

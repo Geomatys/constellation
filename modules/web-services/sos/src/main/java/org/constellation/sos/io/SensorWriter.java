@@ -17,7 +17,7 @@
 
 package org.constellation.sos.io;
 
-import org.constellation.sml.AbstractSensorML;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 
 /**

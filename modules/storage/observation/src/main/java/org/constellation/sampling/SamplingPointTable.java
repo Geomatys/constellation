@@ -27,8 +27,9 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.PointType;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311modified.PointType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 
 /**
  *SamplingPointTable.java

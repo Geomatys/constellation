@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 // constellation dependencies
-import org.constellation.cat.csw.Record;
-import org.constellation.cat.csw.v202.RecordPropertyType;
-import org.constellation.dublincore.AbstractSimpleLiteral;
-import org.constellation.ebrim.EbrimInternationalString;
-import org.constellation.ebrim.RegistryObject;
+import org.geotoolkit.csw.xml.Record;
+import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
+import org.geotoolkit.ebrim.xml.EbrimInternationalString;
+import org.geotoolkit.ebrim.xml.RegistryObject;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 

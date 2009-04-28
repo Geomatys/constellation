@@ -21,22 +21,22 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import org.constellation.gml.v311.AbstractFeatureEntry;
-import org.constellation.gml.v311.BoundingShapeEntry;
-import org.constellation.gml.v311.DirectPositionType;
-import org.constellation.gml.v311.EnvelopeEntry;
-import org.constellation.gml.v311.TimePositionType;
-import org.constellation.observation.ObservationCollectionEntry;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.sml.AbstractClassification;
-import org.constellation.sml.AbstractClassifier;
-import org.constellation.sml.AbstractDerivableComponent;
-import org.constellation.sml.AbstractIdentification;
-import org.constellation.sml.AbstractIdentifier;
-import org.constellation.sml.AbstractProcess;
-import org.constellation.sml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.gml.xml.v311modified.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311modified.BoundingShapeEntry;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.sml.xml.AbstractClassification;
+import org.geotoolkit.sml.xml.AbstractClassifier;
+import org.geotoolkit.sml.xml.AbstractDerivableComponent;
+import org.geotoolkit.sml.xml.AbstractIdentification;
+import org.geotoolkit.sml.xml.AbstractIdentifier;
+import org.geotoolkit.sml.xml.AbstractProcess;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *

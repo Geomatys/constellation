@@ -38,38 +38,38 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.cat.csw.GetRecordsRequest;
-import org.constellation.cat.csw.v202.AbstractRecordType;
-import org.constellation.cat.csw.v202.Capabilities;
-import org.constellation.cat.csw.v202.ElementSetNameType;
-import org.constellation.cat.csw.v202.ElementSetType;
-import org.constellation.cat.csw.v202.GetCapabilitiesType;
-import org.constellation.cat.csw.v202.GetRecordsResponseType;
-import org.constellation.cat.csw.v202.GetRecordsType;
-import org.constellation.cat.csw.v202.QueryConstraintType;
-import org.constellation.cat.csw.v202.QueryType;
-import org.constellation.cat.csw.v202.ResultType;
-import org.constellation.cat.csw.v202.SearchResultsType;
+import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.ElementSetNameType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.ResultType;
+import org.geotoolkit.csw.xml.v202.SearchResultsType;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ogc.FilterType;
-import org.constellation.ogc.NotType;
-import org.constellation.ogc.PropertyIsLikeType;
-import org.constellation.ogc.PropertyNameType;
-import org.constellation.ows.v100.AcceptFormatsType;
-import org.constellation.ows.v100.AcceptVersionsType;
-import org.constellation.ows.v100.CapabilitiesBaseType;
-import org.constellation.ows.v100.DCP;
-import org.constellation.ows.v100.DomainType;
-import org.constellation.ows.v100.ExceptionReport;
-import org.constellation.ows.v100.ExceptionType;
-import org.constellation.ows.v100.Operation;
-import org.constellation.ows.v100.OperationsMetadata;
-import org.constellation.ows.v100.RequestMethodType;
-import org.constellation.ows.v100.SectionsType;
+import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v100.CapabilitiesBaseType;
+import org.geotoolkit.ows.xml.v100.DCP;
+import org.geotoolkit.ows.xml.v100.DomainType;
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.ows.xml.v100.ExceptionType;
+import org.geotoolkit.ows.xml.v100.Operation;
+import org.geotoolkit.ows.xml.v100.OperationsMetadata;
+import org.geotoolkit.ows.xml.v100.RequestMethodType;
+import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.constellation.util.Util;
+import org.geotoolkit.ogc.xml.v110modified.FilterType;
+import org.geotoolkit.ogc.xml.v110modified.NotType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyIsLikeType;
+import org.geotoolkit.ogc.xml.v110modified.PropertyNameType;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -90,12 +90,12 @@ public class CatalogueHarvester {
     /**
      * A getRecords request used to request another csw(2.0.0).
      */
-    private org.constellation.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200;
+    private org.geotoolkit.csw.xml.v200.GetRecordsType fullGetRecordsRequestv200;
     
     /**
      * A special getRecords request used to request another unstandardized csw (2.0.0).
      */
-    private org.constellation.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
+    private org.geotoolkit.csw.xml.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
     
     /**
      * A getCapabilities request used request another csw(2.0.2)
@@ -105,7 +105,7 @@ public class CatalogueHarvester {
     /**
      * A getCapabilities request used request another csw(2.0.0)
      */
-    private org.constellation.cat.csw.v200.GetCapabilitiesType getCapabilitiesRequestv200;
+    private org.geotoolkit.csw.xml.v200.GetCapabilitiesType getCapabilitiesRequestv200;
     
     /**
      * A global variable used during the harvest of a distant CSW.
@@ -184,23 +184,23 @@ public class CatalogueHarvester {
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
-        org.constellation.cat.csw.v200.QueryConstraintType constraint2 = new org.constellation.cat.csw.v200.QueryConstraintType(filter1, "1.1.0");
+        org.geotoolkit.csw.xml.v200.QueryConstraintType constraint2 = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter1, "1.1.0");
         List<QName> typeNames2 = new ArrayList<QName>();
         typeNames2.add(_Dataset_QNAME);
-        org.constellation.cat.csw.v200.QueryType query2 = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
-                                                                                         new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
+        org.geotoolkit.csw.xml.v200.QueryType query2 = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
+                                                                                         new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
                                                                                          constraint2); 
-        fullGetRecordsRequestv200 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw", 1, 20, query2, null);
+        fullGetRecordsRequestv200 = new org.geotoolkit.csw.xml.v200.GetRecordsType("CSW", "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw", 1, 20, query2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
-        constraint2        = new org.constellation.cat.csw.v200.QueryConstraintType(filter2, "1.0.20");
+        constraint2        = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter2, "1.0.20");
         typeNames2         = new ArrayList<QName>();
         typeNames2.add(_Dataset_QNAME);
-        query2             = new org.constellation.cat.csw.v200.QueryType(typeNames2, 
-                                                                   new org.constellation.cat.csw.v200.ElementSetNameType(org.constellation.cat.csw.v200.ElementSetType.FULL), 
+        query2             = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
+                                                                   new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
                                                                    constraint2); 
-        fullGetRecordsRequestv200_Special1 = new org.constellation.cat.csw.v200.GetRecordsType("CSW", "2.0.0", org.constellation.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, query2, null);
+        fullGetRecordsRequestv200_Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType("CSW", "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, query2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
@@ -210,7 +210,7 @@ public class CatalogueHarvester {
         getCapabilitiesRequestv202  = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.0)
-        getCapabilitiesRequestv200  = new org.constellation.cat.csw.v200.GetCapabilitiesType(versions, sections, formats, null, "CSW");
+        getCapabilitiesRequestv200  = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, "CSW");
     }
     
     
@@ -243,7 +243,7 @@ public class CatalogueHarvester {
         if (distantCapabilities instanceof Capabilities) {
             getRecordRequest = fullGetRecordsRequestv202;
             
-        } else if (distantCapabilities instanceof org.constellation.cat.csw.v200.CapabilitiesType) {
+        } else if (distantCapabilities instanceof org.geotoolkit.csw.xml.v200.CapabilitiesType) {
             getRecordRequest = fullGetRecordsRequestv200;
             
         } else {
@@ -332,15 +332,15 @@ public class CatalogueHarvester {
                     } 
                     
                 // a correct response v2.0.0
-                } else if (harvested instanceof org.constellation.cat.csw.v200.GetRecordsResponseType) {
+                } else if (harvested instanceof org.geotoolkit.csw.xml.v200.GetRecordsResponseType) {
                     succeed = true;
                     logger.info("Response of distant service:" + '\n' + harvested.toString());
-                    org.constellation.cat.csw.v200.GetRecordsResponseType serviceResponse = (org.constellation.cat.csw.v200.GetRecordsResponseType) harvested;
-                    org.constellation.cat.csw.v200.SearchResultsType results = serviceResponse.getSearchResults();
+                    org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
+                    org.geotoolkit.csw.xml.v200.SearchResultsType results = serviceResponse.getSearchResults();
             
                     //we looking for CSW record
-                    for (JAXBElement<? extends org.constellation.cat.csw.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
-                        org.constellation.cat.csw.v200.AbstractRecordType record = JBrecord.getValue();
+                    for (JAXBElement<? extends org.geotoolkit.csw.xml.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
+                        org.geotoolkit.csw.xml.v200.AbstractRecordType record = JBrecord.getValue();
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {

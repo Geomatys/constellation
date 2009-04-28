@@ -29,17 +29,17 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.ows.v110.AcceptFormatsType;
-import org.constellation.ows.v110.AcceptVersionsType;
-import org.constellation.ows.v110.SectionsType;
-import org.constellation.sml.AbstractSensorML;
-import org.constellation.sos.v100.Capabilities;
-import org.constellation.sos.v100.DescribeSensor;
-import org.constellation.sos.v100.GetCapabilities;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.junit.*;
@@ -156,7 +156,7 @@ public class SOSWorkerTest {
     @Before
     public void setUp() throws Exception {
 
-        marshallerPool = new MarshallerPool("org.constellation.sos.v100:org.constellation.observation:org.constellation.sml.v100");
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100");
         
         File configDir = new File("SOSWorkerTest");
         worker = new SOSworker(configDir);

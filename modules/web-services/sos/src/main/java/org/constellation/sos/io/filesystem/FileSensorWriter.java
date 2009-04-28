@@ -24,10 +24,10 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sml.AbstractSensorML;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -66,9 +66,8 @@ public class FileSensorWriter implements SensorWriter {
             File currentFile = new File(dataDirectory, id + ".xml");
             marshaller.marshal(sensor, currentFile);
         } catch (JAXBException ex) {
-            ex.printStackTrace();
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+                                           ex, NO_APPLICABLE_CODE);
         }
     }
 
@@ -106,7 +105,7 @@ public class FileSensorWriter implements SensorWriter {
                     maxID = curentID;
                 }
             } catch (NumberFormatException ex) {
-                throw new CstlServiceException("unable to parse the identifier:" + id, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("unable to parse the identifier:" + id, ex, NO_APPLICABLE_CODE);
             }
         }
         return maxID + 1;
@@ -118,6 +117,7 @@ public class FileSensorWriter implements SensorWriter {
             uncommittedFiles.clear();
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Filesystem Sensor Writer 0.3";
     }

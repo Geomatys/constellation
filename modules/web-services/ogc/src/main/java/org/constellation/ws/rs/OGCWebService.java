@@ -37,12 +37,12 @@ import org.constellation.ServiceDef;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ows.AbstractDCP;
-import org.constellation.ows.AbstractOnlineResourceType;
-import org.constellation.ows.AbstractOperation;
-import org.constellation.ows.OWSExceptionCode;
 
 // Geotools dependencies
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.Version;
 
 import static org.constellation.ws.ExceptionCode.*;

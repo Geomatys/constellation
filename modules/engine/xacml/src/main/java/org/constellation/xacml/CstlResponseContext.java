@@ -33,13 +33,13 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.xacml.context.ObjectFactory;
-import org.constellation.xacml.context.ResultType;
-import org.constellation.xacml.context.StatusCodeType;
-import org.constellation.xacml.context.StatusType;
-import org.constellation.xacml.policy.EffectType;
-import org.constellation.xacml.policy.ObligationType;
-import org.constellation.xacml.policy.ObligationsType;
+import org.geotoolkit.xacml.xml.context.ObjectFactory;
+import org.geotoolkit.xacml.xml.context.ResultType;
+import org.geotoolkit.xacml.xml.context.StatusCodeType;
+import org.geotoolkit.xacml.xml.context.StatusType;
+import org.geotoolkit.xacml.xml.policy.EffectType;
+import org.geotoolkit.xacml.xml.policy.ObligationType;
+import org.geotoolkit.xacml.xml.policy.ObligationsType;
 import org.constellation.xacml.api.ResponseContext;
 
 import org.w3c.dom.Document;

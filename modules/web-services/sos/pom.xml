@@ -66,9 +66,8 @@
       <artifactId>model</artifactId>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-sensorML</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-sensorML</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>

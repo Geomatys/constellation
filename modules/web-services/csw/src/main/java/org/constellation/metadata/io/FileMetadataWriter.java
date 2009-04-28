@@ -34,8 +34,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.cat.csw.v202.RecordPropertyType;
-import org.constellation.cat.csw.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.csw.xml.v202.RecordType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.CSWClassesContext;
@@ -45,7 +45,7 @@ import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.InternationalString;
-import static org.constellation.ows.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *

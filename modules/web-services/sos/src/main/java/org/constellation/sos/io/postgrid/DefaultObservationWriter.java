@@ -28,18 +28,18 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.gml.v311.DirectPositionType;
 import org.constellation.gml.v311.ReferenceTable;
 import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
-import org.constellation.sos.v100.ObservationOfferingEntry;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
-import org.constellation.sos.v100.OfferingPhenomenonEntry;
-import org.constellation.sos.v100.OfferingProcedureEntry;
-import org.constellation.sos.v100.OfferingSamplingFeatureEntry;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.ows.OWSExceptionCode.*;
+import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Measurement;

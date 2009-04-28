@@ -28,10 +28,10 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.constellation.xacml.policy.AttributeDesignatorType;
-import org.constellation.xacml.policy.AttributeValueType;
-import org.constellation.xacml.policy.SubjectAttributeDesignatorType;
 import org.constellation.xacml.XMLSchemaConstants;
+import org.geotoolkit.xacml.xml.policy.AttributeValueType;
+import org.geotoolkit.xacml.xml.policy.AttributeDesignatorType;
+import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
 
 
 /**

@@ -74,9 +74,8 @@
       <artifactId>geotk-metadata-fra</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-skos</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-skos</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
@@ -84,9 +83,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-ebrim</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ebrim</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
@@ -94,9 +92,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-csw</artifactId>
-      <version>${project.version}</version>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-csw</artifactId>
     </dependency> 
     <dependency>
       <groupId>org.constellation.web-services</groupId>

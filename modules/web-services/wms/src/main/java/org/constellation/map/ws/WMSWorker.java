@@ -64,33 +64,33 @@ import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.Util;
-import org.constellation.wms.AbstractDCP;
-import org.constellation.wms.AbstractDimension;
-import org.constellation.wms.AbstractHTTP;
-import org.constellation.wms.AbstractLayer;
-import org.constellation.wms.AbstractOperation;
-import org.constellation.wms.AbstractProtocol;
-import org.constellation.wms.AbstractRequest;
-import org.constellation.wms.AbstractWMSCapabilities;
-import org.constellation.wms.v111.LatLonBoundingBox;
-import org.constellation.wms.v130.EXGeographicBoundingBox;
-import org.constellation.wms.v130.OperationType;
+import org.geotoolkit.wms.xml.AbstractDCP;
+import org.geotoolkit.wms.xml.AbstractDimension;
+import org.geotoolkit.wms.xml.AbstractHTTP;
+import org.geotoolkit.wms.xml.AbstractLayer;
+import org.geotoolkit.wms.xml.AbstractOperation;
+import org.geotoolkit.wms.xml.AbstractProtocol;
+import org.geotoolkit.wms.xml.AbstractRequest;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
+import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
+import org.geotoolkit.wms.xml.v130.OperationType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotoolkit.internal.jaxb.v110.se.OnlineResourceType;
-import org.geotoolkit.internal.jaxb.v110.sld.DescribeLayerResponseType;
-import org.geotoolkit.internal.jaxb.v110.sld.LayerDescriptionType;
-import org.geotoolkit.internal.jaxb.v110.sld.TypeNameType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
+import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
+import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
@@ -269,8 +269,8 @@ public class WMSWorker extends AbstractWMSWorker {
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 defaut = df.format(dates.last());
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
-                    new org.constellation.wms.v111.Dimension("time", "ISO8601", defaut, null) :
-                    new org.constellation.wms.v130.Dimension("time", "ISO8601", defaut, null);
+                    new org.geotoolkit.wms.xml.v111.Dimension("time", "ISO8601", defaut, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension("time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
                 dimensions.add(dim);
             }
@@ -287,8 +287,8 @@ public class WMSWorker extends AbstractWMSWorker {
             if (elevations != null && !(elevations.isEmpty())) {
                 defaut = elevations.first().toString();
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
-                    new org.constellation.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
-                    new org.constellation.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
+                    new org.geotoolkit.wms.xml.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
                 for (Iterator<Number> it = elevations.iterator(); it.hasNext();) {
                     final Number n = it.next();
@@ -316,9 +316,9 @@ public class WMSWorker extends AbstractWMSWorker {
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
-                    new org.constellation.wms.v111.Dimension("dim_range", unit, defaut,
+                    new org.geotoolkit.wms.xml.v111.Dimension("dim_range", unit, defaut,
                                                            minRange + "," + maxRange) :
-                    new org.constellation.wms.v130.Dimension("dim_range", unit, defaut,
+                    new org.geotoolkit.wms.xml.v130.Dimension("dim_range", unit, defaut,
                                                            minRange + "," + maxRange);
                 dimensions.add(dim);
             }
@@ -338,39 +338,39 @@ public class WMSWorker extends AbstractWMSWorker {
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
                  */
-                final org.constellation.wms.v111.BoundingBox outputBBox = (inputGeoBox != null) ?
-                    new org.constellation.wms.v111.BoundingBox("EPSG:4326",
+                final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox = (inputGeoBox != null) ?
+                    new org.geotoolkit.wms.xml.v111.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion) :
                     null;
 
                 // we build The Style part
-                org.constellation.wms.v111.OnlineResource or =
-                        new org.constellation.wms.v111.OnlineResource(legendUrlPng);
-                org.constellation.wms.v111.LegendURL legendURL1 =
-                        new org.constellation.wms.v111.LegendURL(IMAGE_PNG, or);
+                org.geotoolkit.wms.xml.v111.OnlineResource or =
+                        new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
+                org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
+                        new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_PNG, or);
 
-                or = new org.constellation.wms.v111.OnlineResource(legendUrlGif);
-                org.constellation.wms.v111.LegendURL legendURL2 =
-                        new org.constellation.wms.v111.LegendURL(IMAGE_GIF, or);
+                or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
+                org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
+                        new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_GIF, or);
 
                 List<String> stylesName = layer.getFavoriteStyles();
-                List<org.constellation.wms.v111.Style> styles = new ArrayList<org.constellation.wms.v111.Style>();
+                List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
                     for (String styleName : stylesName) {
-                        org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
+                        org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
                 } else {
-                    org.constellation.wms.v111.Style style = new org.constellation.wms.v111.Style(
+                    org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 "Style1", "defaultStyle", null, null, null, legendURL1, legendURL2);
                     styles.add(style);
                 }
 
                 //we build the complete layer object
-                outputLayer = new org.constellation.wms.v111.Layer(layerName,
+                outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
                         Util.cleanSpecialCharacter(layer.getRemarks()),
                         Util.cleanSpecialCharacter(layer.getThematic()), crs,
                         new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(),
@@ -383,8 +383,8 @@ public class WMSWorker extends AbstractWMSWorker {
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
                  */
-                final org.constellation.wms.v130.BoundingBox outputBBox = (inputGeoBox != null) ?
-                    new org.constellation.wms.v130.BoundingBox("EPSG:4326",
+                final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox = (inputGeoBox != null) ?
+                    new org.geotoolkit.wms.xml.v130.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(),
                             inputGeoBox.getEastBoundLongitude(),
@@ -393,30 +393,30 @@ public class WMSWorker extends AbstractWMSWorker {
                     null;
 
                 // we build a Style Object
-                org.constellation.wms.v130.OnlineResource or =
-                        new org.constellation.wms.v130.OnlineResource(legendUrlPng);
-                org.constellation.wms.v130.LegendURL legendURL1 =
-                        new org.constellation.wms.v130.LegendURL(IMAGE_PNG, or);
+                org.geotoolkit.wms.xml.v130.OnlineResource or =
+                        new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
+                org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
+                        new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_PNG, or);
 
-                or = new org.constellation.wms.v130.OnlineResource(legendUrlGif);
-                org.constellation.wms.v130.LegendURL legendURL2 =
-                        new org.constellation.wms.v130.LegendURL(IMAGE_GIF, or);
+                or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
+                org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
+                        new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_GIF, or);
 
                 List<String> stylesName = layer.getFavoriteStyles();
-                List<org.constellation.wms.v130.Style> styles = new ArrayList<org.constellation.wms.v130.Style>();
+                List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
                     for (String styleName : stylesName) {
-                        org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
+                        org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
                 } else {
-                    org.constellation.wms.v130.Style style = new org.constellation.wms.v130.Style(
+                    org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
                     styles.add(style);
                 }
 
-                outputLayer = new org.constellation.wms.v130.Layer(layerName,
+                outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
                         Util.cleanSpecialCharacter(layer.getRemarks()),
                         Util.cleanSpecialCharacter(layer.getThematic()), crs,
                         new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(),
@@ -430,9 +430,9 @@ public class WMSWorker extends AbstractWMSWorker {
 
         //we build the general layer and add it to the document
         final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
-            new org.constellation.wms.v111.Layer("Constellation Web Map Layer",
+            new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", crs, null, layers) :
-            new org.constellation.wms.v130.Layer("Constellation Web Map Layer",
+            new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", crs, null, layers);
 
         inCapabilities.getCapability().setLayer(mainLayer);
@@ -549,7 +549,7 @@ public class WMSWorker extends AbstractWMSWorker {
     {
 
         if (version.toString().equals("1.3.0")) {
-            org.constellation.wms.v130.Request r = (org.constellation.wms.v130.Request) request;
+            org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
             List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
             for(JAXBElement<OperationType> extOp: extendedOperations) {
                 updateURL(extOp.getValue().getDCPType(), url);
@@ -557,7 +557,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
         // version 1.1.1
         } else {
-           org.constellation.wms.v111.Request r = (org.constellation.wms.v111.Request) request;
+           org.geotoolkit.wms.xml.v111.Request r = (org.geotoolkit.wms.xml.v111.Request) request;
            AbstractOperation op = r.getDescribeLayer();
            if (op != null)
                 updateURL(op.getDCPType(), url);

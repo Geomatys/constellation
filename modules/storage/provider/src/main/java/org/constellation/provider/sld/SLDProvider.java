@@ -35,13 +35,13 @@ import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.MutableUserLayer;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.SoftValueHashMap;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.style.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.style.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.style.xml.XMLUtilities;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
