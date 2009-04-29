@@ -239,10 +239,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             nbForms = forms.size();
             for (Object form : forms) {
                 if (form instanceof Form) {
-                    if (((Form)form.)isFullyValidated()) {
+                    Form ff = (Form) form;
+                    if (ff.isFullyValidated()) {
                         indexDocument(writer, (Form)form);
                     } else {
-                       logger.info("The form " + form.getId() + "is not validated we don't index it");
+                       logger.info("The form " + ff.getId() + "is not validated we don't index it");
                     }
                 } else {
                     throw new IllegalArgumentException("The objects must be forms");
