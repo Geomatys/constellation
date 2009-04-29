@@ -36,6 +36,7 @@ import org.geotoolkit.sml.xml.AbstractIdentification;
 import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -166,7 +167,7 @@ public class Utils {
         double maxx = (-Double.MAX_VALUE);
         double maxy = (-Double.MAX_VALUE);
 
-        for (ObservationEntry observation: collection.getMember()) {
+        for (Observation observation: collection.getMember()) {
             if (observation.getFeatureOfInterest() instanceof AbstractFeatureEntry) {
                 AbstractFeatureEntry feature = (AbstractFeatureEntry) observation.getFeatureOfInterest();
                 if (feature.getBoundedBy() != null) {

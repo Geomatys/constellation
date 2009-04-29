@@ -194,8 +194,8 @@ public class SosIOTest {
             ObservationCollectionEntry result    = (ObservationCollectionEntry) genericWorker.getObservation(request);
 
             assertEquals(expResult.getMember().size(), result.getMember().size());
-            ObservationEntry expObs = expResult.getMember().iterator().next();
-            ObservationEntry obs    = result.getMember().iterator().next();
+            ObservationEntry expObs = (ObservationEntry) expResult.getMember().iterator().next();
+            ObservationEntry obs    = (ObservationEntry) result.getMember().iterator().next();
             assertEquals(expObs.getDefinition(), obs.getDefinition());
             assertEquals(expObs.getFeatureOfInterest(), obs.getFeatureOfInterest());
             assertEquals(expObs.getName(), obs.getName());

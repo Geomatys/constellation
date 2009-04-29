@@ -32,6 +32,7 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -92,16 +93,16 @@ public class Normalizer {
         List<AbstractEncodingProperty>     encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
         List<DataComponentProperty>        dataAlreadySee  = new ArrayList<DataComponentProperty>();
         int index = 0;
-        for (ObservationEntry observation: collection.getMember()) {
+        for (Observation observation: collection.getMember()) {
             //we do this for the feature of interest
-            FeaturePropertyType foi = observation.getPropertyFeatureOfInterest();
+            FeaturePropertyType foi = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
             if (foiAlreadySee.contains(foi)){
                 foi.setToHref();
             } else {
                 foiAlreadySee.add(foi);
             }
             //for the phenomenon
-            PhenomenonPropertyType phenomenon = observation.getPropertyObservedProperty();
+            PhenomenonPropertyType phenomenon = ((ObservationEntry)observation).getPropertyObservedProperty();
             if (phenoAlreadySee.contains(phenomenon)){
                 phenomenon.setToHref();
             } else {
