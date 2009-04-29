@@ -147,7 +147,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 writer = new IndexWriter(getFileDirectory(), analyzer, true);
                 nbForms    =  forms.size();
                 for (Form form : forms) {
-                    indexDocument(writer, form);
+                    if (form.isFullyValidated()) {
+                        indexDocument(writer, form);
+                    } else {
+                        logger.info("The form " + form.getId() + "is not validated we don't index it");
+                    }
                 }
                 writer.optimize();
                 writer.close();
@@ -191,7 +195,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             logger.info("all form read in " + (System.currentTimeMillis() - time) + " ms.");
             nbForms = results.size();
             for (Form form : results) {
-                indexDocument(writer, form);
+                if (form.isFullyValidated()) {
+                    indexDocument(writer, form);
+                } else {
+                    logger.info("The form " + form.getId() + "is not validated we don't index it");
+                }
             }
             writer.optimize();
             writer.close();
@@ -230,10 +238,15 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
             nbForms = forms.size();
             for (Object form : forms) {
-                if (form instanceof Form)
-                    indexDocument(writer, (Form)form);
-                else
+                if (form instanceof Form) {
+                    if (((Form)form.)isFullyValidated()) {
+                        indexDocument(writer, (Form)form);
+                    } else {
+                       logger.info("The form " + form.getId() + "is not validated we don't index it");
+                    }
+                } else {
                     throw new IllegalArgumentException("The objects must be forms");
+                }
             }
             writer.optimize();
             writer.close();
