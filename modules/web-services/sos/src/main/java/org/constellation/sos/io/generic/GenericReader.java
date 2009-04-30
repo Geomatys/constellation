@@ -108,17 +108,33 @@ public abstract class GenericReader  {
     private HashMap<String, String> staticParameters;
 
     /**
+     * A flag indicating that the service is trying to reconnect the database.
+     */
+    private boolean isReconnecting = false;
+
+    /**
+     * The database informations.
+     */
+    private Automatic configuration;
+
+     /**
+     * A connection to the database.
+     */
+    private Connection connection;
+    
+    /**
      * Shared Thread Pool for parralele execution
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
     public GenericReader(Automatic configuration) throws CstlServiceException {
+        this.configuration = configuration;
         advancedJdbcDriver = true;
         try {
             BDD bdd = configuration.getBdd();
             if (bdd != null) {
-                Connection connection = bdd.getConnection();
-                initStatement(connection, configuration);
+                this.connection = bdd.getConnection();
+                initStatement();
             } else {
                 throw new CstlServiceException("The database par of the generic configuration file is null", NO_APPLICABLE_CODE);
             }
@@ -150,7 +166,7 @@ public abstract class GenericReader  {
      *
      * @throws java.sql.SQLException
      */
-    private final void initStatement(Connection connection, Automatic configuration) throws SQLException {
+    private final void initStatement() throws SQLException {
         // no main query in sos
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
@@ -211,7 +227,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable) {
+    protected Values loadData(String variable) throws CstlServiceException {
         return loadData(Arrays.asList(variable), new ArrayList<String>());
     }
 
@@ -219,7 +235,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, String parameter) {
+    protected Values loadData(String variable, String parameter) throws CstlServiceException {
         return loadData(Arrays.asList(variable), Arrays.asList(parameter));
     }
 
@@ -227,7 +243,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, String parameter) {
+    protected Values loadData(List<String> variables, String parameter) throws CstlServiceException {
         return loadData(variables, Arrays.asList(parameter));
     }
 
@@ -235,7 +251,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, List<String> parameter) {
+    protected Values loadData(String variable, List<String> parameter) throws CstlServiceException {
         return loadData(Arrays.asList(variable), parameter);
     }
 
@@ -243,7 +259,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables) {
+    protected Values loadData(List<String> variables) throws CstlServiceException {
         return loadData(variables, new ArrayList<String>());
     }
 
@@ -251,7 +267,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, List<String> parameters) {
+    protected Values loadData(List<String> variables, List<String> parameters) throws CstlServiceException {
 
         Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
         Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
@@ -311,7 +327,7 @@ public abstract class GenericReader  {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values sequentialLoading(List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private Values sequentialLoading(List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
         Values values = new Values();
         
         //we extract the single values
@@ -320,6 +336,9 @@ public abstract class GenericReader  {
                 fillStatement(stmt, parameters);
                 fillSingleValues(stmt, values);
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 17008) {
+                    reloadConnection();
+                }
                 logError(singleStatements.get(stmt), ex, stmt);
             } catch (IllegalArgumentException ex) {
                 logError(singleStatements.get(stmt), ex, stmt);
@@ -333,6 +352,9 @@ public abstract class GenericReader  {
                 fillMultipleValues(stmt, values);
                 
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 17008) {
+                    reloadConnection();
+                }
                 logError(multipleStatements.get(stmt), ex, stmt);
             } catch (IllegalArgumentException ex) {
                 logError(multipleStatements.get(stmt), ex, stmt);
@@ -347,7 +369,7 @@ public abstract class GenericReader  {
      *
      * @param identifier
      */
-    private Values paraleleLoading(final List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) {
+    private Values paraleleLoading(final List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
         final Values values = new Values();
 
         //we extract the single values
@@ -355,12 +377,15 @@ public abstract class GenericReader  {
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
-                public Object call() {
+                public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, parameters);
                         fillSingleValues(stmt, values);
 
                     } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 17008) {
+                            reloadConnection();
+                        }
                         logError(singleStatements.get(stmt), ex, stmt);
                     } catch (IllegalArgumentException ex) {
                         logError(singleStatements.get(stmt), ex, stmt);
@@ -376,7 +401,11 @@ public abstract class GenericReader  {
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                    throw (CstlServiceException) ex.getCause();
+                } else {
+                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                }
             } 
         }
         //we extract the multiple values
@@ -384,12 +413,15 @@ public abstract class GenericReader  {
         for (final PreparedStatement stmt : subMultiStmts) {
             cs.submit(new Callable() {
 
-                public Object call() {
+                public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, parameters);
                         fillMultipleValues(stmt, values);
                         
                     } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 17008) {
+                            reloadConnection();
+                        }
                         logError(multipleStatements.get(stmt), ex, stmt);
                     } catch (IllegalArgumentException ex) {
                         logError(multipleStatements.get(stmt), ex, stmt);
@@ -405,7 +437,11 @@ public abstract class GenericReader  {
             } catch (InterruptedException ex) {
                logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                    throw (CstlServiceException) ex.getCause();
+                } else {
+                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                }
             }
         }
         return values;
@@ -532,6 +568,28 @@ public abstract class GenericReader  {
                       "for variable: " + varlist                 + '\n');
     }
 
+    /**
+     * Try to reconnect to the database if the connection have been lost.
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    public void reloadConnection() throws CstlServiceException {
+        if (!isReconnecting) {
+            try {
+               logger.info("refreshing the connection");
+               BDD db          = configuration.getBdd();
+               this.connection = db.getConnection();
+               initStatement();
+               isReconnecting = false;
+
+            } catch(SQLException ex) {
+                logger.severe("SQLException while restarting the connection:" + ex);
+                isReconnecting = false;
+            }
+        }
+        throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
+    }
+    
     public void destroy() {
         logger.info("destroying generic reader");
         try {
