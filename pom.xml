@@ -321,7 +321,7 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gtm-postgis</artifactId>
+        <artifactId>gtm-jdbc-postgis</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>

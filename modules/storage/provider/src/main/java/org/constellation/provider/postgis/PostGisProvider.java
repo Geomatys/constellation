@@ -42,9 +42,10 @@ import org.constellation.resources.ArraySet;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.postgis.PostgisDataStoreFactory;
+//import org.geotools.data.postgis.PostgisDataStoreFactory;
 
 import org.geotoolkit.map.ElevationModel;
+import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -62,20 +63,20 @@ import org.xml.sax.SAXException;
 public class PostGisProvider implements LayerProvider{
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
-    public static final String KEY_DBTYPE          = PostgisDataStoreFactory.DBTYPE.key;
-    public static final String KEY_HOST            = PostgisDataStoreFactory.HOST.key;
-    public static final String KEY_PORT            = PostgisDataStoreFactory.PORT.key;
-    public static final String KEY_SCHEMA          = PostgisDataStoreFactory.SCHEMA.key;
-    public static final String KEY_DATABASE        = PostgisDataStoreFactory.DATABASE.key;
-    public static final String KEY_USER            = PostgisDataStoreFactory.USER.key;
-    public static final String KEY_PASSWD          = PostgisDataStoreFactory.PASSWD.key;
-    public static final String KEY_MAXCONN         = PostgisDataStoreFactory.MAXCONN.key;
-    public static final String KEY_MINCONN         = PostgisDataStoreFactory.MINCONN.key;
-    public static final String KEY_NAMESPACE       = PostgisDataStoreFactory.NAMESPACE.key;
-    public static final String KEY_VALIDATECONN    = PostgisDataStoreFactory.VALIDATECONN.key;
-    public static final String KEY_ESTIMATEDEXTENT = PostgisDataStoreFactory.ESTIMATEDEXTENT.key;
-    public static final String KEY_LOOSEBBOX       = PostgisDataStoreFactory.LOOSEBBOX.key;
-    public static final String KEY_WKBENABLED      = PostgisDataStoreFactory.WKBENABLED.key;
+    public static final String KEY_DBTYPE          = PostgisNGDataStoreFactory.DBTYPE.key;
+    public static final String KEY_HOST            = PostgisNGDataStoreFactory.HOST.key;
+    public static final String KEY_PORT            = PostgisNGDataStoreFactory.PORT.key;
+    public static final String KEY_SCHEMA          = PostgisNGDataStoreFactory.SCHEMA.key;
+    public static final String KEY_DATABASE        = PostgisNGDataStoreFactory.DATABASE.key;
+    public static final String KEY_USER            = PostgisNGDataStoreFactory.USER.key;
+    public static final String KEY_PASSWD          = PostgisNGDataStoreFactory.PASSWD.key;
+    public static final String KEY_MAXCONN         = PostgisNGDataStoreFactory.MAXCONN.key;
+    public static final String KEY_MINCONN         = PostgisNGDataStoreFactory.MINCONN.key;
+    public static final String KEY_NAMESPACE       = PostgisNGDataStoreFactory.NAMESPACE.key;
+    public static final String KEY_VALIDATECONN    = PostgisNGDataStoreFactory.VALIDATECONN.key;
+//    public static final String KEY_ESTIMATEDEXTENT = PostgisNGDataStoreFactory.ESTIMATEDEXTENT.key;
+    public static final String KEY_LOOSEBBOX       = PostgisNGDataStoreFactory.LOOSEBBOX.key;
+//    public static final String KEY_WKBENABLED      = PostgisNGDataStoreFactory.WKBENABLED.key;
 
     private final Map<String,Object> params = new HashMap<String,Object>();
     private final List<String> index = new ArrayList<String>();

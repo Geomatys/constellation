@@ -72,7 +72,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gtm-postgis</artifactId>
+      <artifactId>gtm-jdbc-postgis</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
