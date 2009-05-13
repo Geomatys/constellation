@@ -365,6 +365,11 @@
       <!-- Geotoolkit pending version -->
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-filter</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-go2</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>

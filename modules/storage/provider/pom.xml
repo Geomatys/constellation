@@ -56,15 +56,15 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-filter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-go2</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-go2-style-extension</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-shapefile</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
@@ -73,6 +73,10 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gtm-postgis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gtm-shapefile</artifactId>
     </dependency>
   </dependencies>
 
