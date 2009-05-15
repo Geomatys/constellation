@@ -97,6 +97,11 @@
     <module>observation</module>
     <module>postgrid</module>
     <module>provider</module>
+    <module>provider-data-postgis</module>
+    <module>provider-data-postgrid</module>
+    <module>provider-data-shapefile</module>
+    <module>provider-style-sld</module>
+    <module>provider-style-unnormalize</module>
   </modules>
 
 </project>

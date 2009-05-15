@@ -86,6 +86,31 @@
       <artifactId>cstl-web-wcs</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-postgis</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-sld</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-unnormalize</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--  For the embedded service. -->
     <dependency>
       <groupId>com.sun.grizzly</groupId>

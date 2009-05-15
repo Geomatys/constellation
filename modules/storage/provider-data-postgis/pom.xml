@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-store-provider</artifactId>
+  <artifactId>cstl-store-data-postgis</artifactId>
   <packaging>jar</packaging>
-  <name>Storage using the provider system</name>
+  <name>Provider for data : postgis</name>
   <description>
-    These packages provide access to data of various formats.
+    These packages provide access to postgis datas.
   </description>
 
 
@@ -50,17 +50,13 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-postgrid</artifactId>
-      <version>${project.version}</version>
+        <groupId>org.constellation.storage</groupId>
+        <artifactId>cstl-store-provider</artifactId>
+        <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-filter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-go2</artifactId>
+      <groupId>org.geotools</groupId>
+      <artifactId>gtm-jdbc-postgis</artifactId>
     </dependency>
   </dependencies>
 

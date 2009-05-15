@@ -42,32 +42,60 @@ public class GO2StyleProvider implements StyleProvider{
     protected GO2StyleProvider(){
         visit();
     }
-    
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public Class<MutableStyle> getValueClass() {
         return MutableStyle.class;
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public Set<String> getKeys() {
         return index.keySet();
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public boolean contains(String key) {
         return index.containsKey(key);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public MutableStyle get(String key) {
         return index.get(key);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void reload() {
         index.clear();
         visit();
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void dispose() {
         index.clear();
     }

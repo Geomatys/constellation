@@ -44,16 +44,25 @@ public class GO2StyleProviderService implements StyleProviderService {
 
     private static File CONFIG_FILE = null;
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<GO2StyleProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void init(File file) {
         if(file == null){
@@ -70,6 +79,9 @@ public class GO2StyleProviderService implements StyleProviderService {
 
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void init(ProviderConfig config) {
         PROVIDERS.clear();
