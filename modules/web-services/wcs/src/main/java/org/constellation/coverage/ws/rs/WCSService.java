@@ -294,14 +294,14 @@ public final class WCSService extends OGCWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
+        final String locator = ex.getLocator();
         if (isOWS(serviceDef)) {
             final String code = Util.transformCodeName(ex.getExceptionCode().name());
-            report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
-                                         serviceDef.exceptionVersion.toString());
+            report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
             report = new ServiceExceptionReport(serviceDef.exceptionVersion,
-                    new ServiceExceptionType(ex.getMessage(),
-                    (ExceptionCode) ex.getExceptionCode()));
+                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()) :
+                                             new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode(), locator));
         }
         StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);

@@ -211,8 +211,10 @@ public class WMSService extends OGCWebService {
             serviceDef = getBestVersion(null);
         }
         final Version version = serviceDef.exceptionVersion;
+        final String locator = ex.getLocator();
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
-                new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()));
+                (locator == null) ? new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()) :
+                                    new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode(), locator));
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
@@ -295,8 +297,19 @@ public class WMSService extends OGCWebService {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
-        final int x = StringUtilities.toInt(strX);
-        final int y = StringUtilities.toInt(strY);
+        final int x, y;
+        try {
+            x = StringUtilities.toInt(strX);
+        } catch (NumberFormatException ex) {
+            throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
+                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_v111 : KEY_I_v130);
+        }
+        try {
+            y = StringUtilities.toInt(strY);
+        } catch (NumberFormatException ex) {
+            throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
+                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_v111 : KEY_J_v130);
+        }
         final Integer featureCount;
         if (strFeatureCount == null || strFeatureCount.equals("")) {
             featureCount = null;

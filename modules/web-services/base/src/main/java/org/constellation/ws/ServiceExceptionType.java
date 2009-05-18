@@ -87,8 +87,8 @@ public final class ServiceExceptionType {
      * @param code A standard code for exception (OWS).
      * @param locator The method where the error occured.
      */
-    public ServiceExceptionType(final String value, final ExceptionCode code, final String locator) {
-        this.message = value;
+    public ServiceExceptionType(final String message, final ExceptionCode code, final String locator) {
+        this.message = message;
         this.code    = code.name();
         this.locator = locator;
     }
