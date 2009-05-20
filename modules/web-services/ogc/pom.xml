@@ -104,10 +104,6 @@
       <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
-      <groupId>ojdbc</groupId>
-      <artifactId>ojdbc</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sld</artifactId>
     </dependency>
