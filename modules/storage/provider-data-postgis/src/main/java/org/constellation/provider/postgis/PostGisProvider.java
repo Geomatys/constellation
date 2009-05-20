@@ -86,7 +86,7 @@ public class PostGisProvider implements LayerProvider{
 
     protected PostGisProvider(ProviderSource source) throws IOException {
         this.source = source;
-        params.put(KEY_DBTYPE, "postgis");
+        params.put(KEY_DBTYPE, "PostGIS2");
 
         // HOST ----------------------------------------------------------------
         final String host = source.parameters.get(KEY_HOST);        
