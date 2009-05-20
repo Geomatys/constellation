@@ -19,7 +19,7 @@ package org.constellation.coverage.catalog;
 import java.util.Arrays;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -30,7 +30,7 @@ import org.geotoolkit.referencing.operation.matrix.MatrixFactory;
 import org.geotoolkit.referencing.operation.transform.ProjectiveTransform;
 import org.geotoolkit.referencing.operation.transform.ConcatenatedTransform;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotoolkit.coverage.grid.GeneralGridEnvelope;
 import org.geotoolkit.coverage.grid.InvalidGridGeometryException;
 
 
@@ -105,7 +105,7 @@ final class GridGeometryIO extends GridGeometry2D {
      * call in constructors").
      */
     @SuppressWarnings("fallthrough")
-    private static GridRange createGridRange(final int dimension,
+    private static GridEnvelope createGridRange(final int dimension,
             final Rectangle sourceRegion, final Dimension subsampling)
     {
         final int[] lower = new int[dimension];
@@ -116,7 +116,7 @@ final class GridGeometryIO extends GridGeometry2D {
             case 1:  upper[0] = sourceRegion.width  / subsampling.width;  // Fall through
             case 0:  break;
         }
-        return new GeneralGridRange(lower, upper);
+        return new GeneralGridEnvelope(lower, upper, false);
     }
 
     /**

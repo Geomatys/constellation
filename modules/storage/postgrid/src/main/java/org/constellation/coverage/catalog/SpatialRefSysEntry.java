@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
-import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.SingleCRS;
@@ -35,7 +35,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.XArrays;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotoolkit.coverage.grid.GeneralGridEnvelope;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.referencing.AbstractIdentifiedObject;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
@@ -216,7 +216,7 @@ final class SpatialRefSysEntry {
         }
         upper[0] = size.width;
         upper[1] = size.height;
-        final GridRange gridRange = new GeneralGridRange(lower, upper);
+        final GridEnvelope gridRange = new GeneralGridEnvelope(lower, upper, false);
         return new GeneralGridGeometry(gridRange, GridGeometryIO.PIXEL_IN_CELL,
                 ProjectiveTransform.create(gridToCRS), crs);
     }
