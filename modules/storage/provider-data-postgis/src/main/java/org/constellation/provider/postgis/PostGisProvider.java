@@ -86,7 +86,7 @@ public class PostGisProvider implements LayerProvider{
 
     protected PostGisProvider(ProviderSource source) throws IOException {
         this.source = source;
-        params.put(KEY_DBTYPE, "PostGIS2");
+        params.put(KEY_DBTYPE, "postgisng");
 
         // HOST ----------------------------------------------------------------
         final String host = source.parameters.get(KEY_HOST);        
@@ -117,15 +117,6 @@ public class PostGisProvider implements LayerProvider{
         params.put(KEY_DATABASE, database);
         params.put(KEY_USER, user);
         params.put(KEY_PASSWD, passwd);
-
-        //TODO Handle thoses when we think it is necessary
-//            final Integer maxconn    = source.parameters.get(KEY_MAXCONN);
-//            final Integer minconn    = source.parameters.get(KEY_MINCONN);
-//            final String namespace  = source.parameters.get(KEY_NAMESPACE);
-//            final Boolean validate   = source.parameters.get(KEY_VALIDATECONN);
-//            final Boolean estimated  = source.parameters.get(KEY_ESTIMATEDEXTENT);
-//            final Boolean bbox       = source.parameters.get(KEY_LOOSEBBOX);
-//            final Boolean wkb        = source.parameters.get(KEY_WKBENABLED);
 
         store = DataStoreFinder.getDataStore(params);
         visit();
