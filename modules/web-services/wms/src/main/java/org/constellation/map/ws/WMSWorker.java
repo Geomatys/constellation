@@ -589,7 +589,7 @@ public class WMSWorker extends AbstractWMSWorker {
     	//
         // 1. SCENE
         //       -- get the List of layer references
-        final List<String> layerNames = getFI.getLayers();
+        final List<String> layerNames = getFI.getQueryLayers();
         final List<LayerDetails> layerRefs;
         layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
 
