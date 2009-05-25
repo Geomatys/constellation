@@ -47,6 +47,10 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
 
     public CSVGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
+
+        for(String key : gfi.getQueryLayers()){
+            values.put(key, new ArrayList<String>());
+        }
     }
 
     /**
@@ -143,8 +147,14 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
 
         for(final String layerName : values.keySet()){
             builder.append(layerName).append("\n");
-            for(final String record : values.get(layerName)){
-                builder.append(record).append("\n");
+            final List<String> features = values.get(layerName);
+
+            if(features.isEmpty()){
+                builder.append("No values.").append("\n");
+            }else{
+                for(final String record : values.get(layerName)){
+                    builder.append(record).append("\n");
+                }
             }
         }
 

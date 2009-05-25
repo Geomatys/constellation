@@ -45,6 +45,10 @@ public class HTMLGraphicVisitor extends TextGraphicVisitor{
 
     public HTMLGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
+
+        for(String key : gfi.getQueryLayers()){
+            values.put(key, new ArrayList<String>());
+        }
     }
 
     /**
@@ -149,12 +153,21 @@ public class HTMLGraphicVisitor extends TextGraphicVisitor{
                     .append("           <th>").append(layer).append("</th>")
                     .append("       </tr>");
             final List<String> record = values.get(layer);
-            for (String value : record) {
+
+            if(record.isEmpty()){
                 response.append("       <tr>")
                         .append("           <th>")
-                        .append(value)
+                        .append("               No values.")
                         .append("           </th>")
                         .append("       </tr>");
+            }else{
+                for (String value : record) {
+                    response.append("       <tr>")
+                            .append("           <th>")
+                            .append(value)
+                            .append("           </th>")
+                            .append("       </tr>");
+                }
             }
         }
         response.append("    </table>\n")
