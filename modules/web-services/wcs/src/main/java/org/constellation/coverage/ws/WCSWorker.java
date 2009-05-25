@@ -664,9 +664,7 @@ public final class WCSWorker {
             staticCapabilities = (Capabilities) getStaticCapabilitiesObject(
                     servletContext.getRealPath("WEB-INF"), ServiceDef.WCS_1_1_1.version.toString());
         } catch (IOException e) {
-            throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    NO_APPLICABLE_CODE);
-
+            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         }
 
         ServiceIdentification si = null;

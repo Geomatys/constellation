@@ -195,11 +195,9 @@ public class WMSWorker extends AbstractWMSWorker {
             inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(
                     servletContext.getRealPath("WEB-INF"), queryVersion);
         } catch (IOException e) {
-            throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    e.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            throw new CstlServiceException("IO exception while getting Services Metadata:" +
-                    ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         final String url = uriContext.getBaseUri().toString();
         inCapabilities.getService().getOnlineResource().setHref(url + "wms");
