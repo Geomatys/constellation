@@ -98,11 +98,6 @@ public class CSWService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
-     * The maximum number of elements in a queue of marshallers and unmarshallers.
-     */
-    private static final int MAX_QUEUE_SIZE = 4;
-
-    /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
     private MarshallerPool marshallerPool;
@@ -127,7 +122,7 @@ public class CSWService {
 
            worker = new CSWworker("", marshallerPool);
            //TODO find real url
-           worker.setServiceURL("http://localhost:8080/SOServer/SOService");
+           worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
        } catch (JAXBException ex){
            logger.severe("The CSW service is not running."       + '\n' +
                          " cause  : Error creating XML context." + '\n' +
