@@ -17,13 +17,16 @@
 package org.constellation.provider.configuration;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
+import org.constellation.util.Util;
 
 /**
  * Temporary copy of static methods from the WebService class (in module web-base),
@@ -72,15 +75,15 @@ public final class ConfigDirectory {
                         folder.createNewFile();
                         return folder;
                     } catch (IOException ex) {
-                        LOGGER.log(Level.FINE,"", ex);
+                        LOGGER.log(Level.INFO,"", ex);
                     }
                 }
-            }else{
-                LOGGER.log(Level.FINE,"config_dir is not defined in the Constelaltion JNDI resource.");
+            } else {
+                LOGGER.log(Level.INFO,"config_dir is not defined in the Constellation JNDI resource.");
             }
 
         } catch (NamingException ex) {
-            LOGGER.log(Level.FINE,"", ex);
+            LOGGER.log(Level.INFO,"", ex);
         }
 
         return getSicadeDirectory();
@@ -154,5 +157,36 @@ public final class ConfigDirectory {
         }
 
         return value;
+    }
+
+    public static File getWarPackagedConfig() {
+        /* Ifremer's server does not contain any .sicade directory, so the
+         * configuration file is put under the WEB-INF/classes directory of constellation.
+         */
+        LOGGER.warning("Connecting to the database using WAR packaged config.xml file !");
+
+
+        InputStream is = Util.getResourceAsStream("/config.xml");
+        if (is != null) {
+            int i;
+            try {
+
+                File configFile = File.createTempFile("temp", ".xml");
+
+                FileOutputStream fos = new FileOutputStream(configFile);
+                while ((i = is.read()) != -1) {
+                    fos.write(i);
+                }
+                fos.close();
+                return configFile;
+
+            } catch (IOException ex) {
+                Logger.getLogger(ConfigDirectory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            LOGGER.info("no config resource found");
+        }
+        return null;
     }
 }

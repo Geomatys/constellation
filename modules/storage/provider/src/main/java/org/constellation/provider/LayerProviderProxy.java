@@ -17,6 +17,9 @@
 package org.constellation.provider;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,8 +28,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.Util;
 import org.geotoolkit.map.ElevationModel;
 
 /**
@@ -196,7 +201,13 @@ public class LayerProviderProxy implements LayerProvider{
         for(final LayerProviderService service : loader){
             final String name = service.getName();
             final String path = CONFIG_PATH + name + ".xml";
-            final File configFile = new File(path);
+            File configFile = new File(path);
+            /*
+             * HACK for ifremer.
+             */
+            if (!configFile.exists() && name.equals("postgrid")) {
+                configFile = ConfigDirectory.getWarPackagedConfig();
+            } 
             
             service.init(configFile);
 
