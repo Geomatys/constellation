@@ -110,6 +110,7 @@ public class WMSService extends OGCWebService {
                       "");
 
         worker = new WMSWorker(marshallerPool);
+        setFullRequestLog(true);
         LOGGER.info("WMS service running");
     }
 

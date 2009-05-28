@@ -136,11 +136,6 @@ public abstract class WebService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
-     * The maximum number of elements in a queue of marshallers and unmarshallers.
-     */
-    private static final int MAX_QUEUE_SIZE = 4;
-
-    /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
     protected MarshallerPool marshallerPool;
@@ -176,8 +171,17 @@ public abstract class WebService {
     private String serviceURL;
 
 
+    /**
+     * A flag indicating if the JAXBContext is properly build.
+     */
     protected boolean workingContext = true;
-    
+
+    /**
+     * If this flag is set the method logParameters() will path the entire request in the logs
+     * instead of the parameters map.
+     */
+    private boolean fullRequestLog   = false;
+
     /**
      * Initialize the basic attribute of a web service.
      */
@@ -405,8 +409,14 @@ public abstract class WebService {
      */
     protected void logParameters() throws CstlServiceException {
         final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
-        if (!parameters.isEmpty())
-            LOGGER.info(parameters.toString());
+        if (!fullRequestLog) {
+            if (!parameters.isEmpty())
+                LOGGER.info(parameters.toString());
+        } else {
+            if (uriContext != null) {
+                LOGGER.info(uriContext.getRequestUri().toString());
+            }
+        }
     }
 
     /**
@@ -583,5 +593,19 @@ public abstract class WebService {
         }
 
         return value;
+    }
+
+    /**
+     * @return the fullRequestLog
+     */
+    public boolean isFullRequestLog() {
+        return fullRequestLog;
+    }
+
+    /**
+     * @param fullRequestLog the fullRequestLog to set
+     */
+    public void setFullRequestLog(boolean fullRequestLog) {
+        this.fullRequestLog = fullRequestLog;
     }
 }
