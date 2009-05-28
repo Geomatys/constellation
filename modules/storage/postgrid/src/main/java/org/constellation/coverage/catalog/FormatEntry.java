@@ -681,6 +681,11 @@ final class FormatEntry extends Entry implements Format {
         final ColorRamp legend = new ColorRamp();
         legend.setColors(band);
         legend.setSize(dimension);
+        /* TODO: since Constellation WMS is not aware of the dim_range parameter for
+         * a GetLegendGraphic request, the label graduation is disabled in order to not
+         * write wrong numbers.
+         */
+        legend.setLabelVisibles(false);
         return legend.toImage();
     }
 
