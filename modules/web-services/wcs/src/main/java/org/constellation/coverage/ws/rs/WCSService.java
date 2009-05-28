@@ -142,6 +142,7 @@ public final class WCSService extends OGCWebService {
 
         super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
 
+        setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:" +
                       "org.geotoolkit.ows.xml.v100:" +

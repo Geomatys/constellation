@@ -413,7 +413,7 @@ public abstract class WebService {
             if (!parameters.isEmpty())
                 LOGGER.info(parameters.toString());
         } else {
-            if (uriContext != null) {
+            if (uriContext != null && uriContext.getRequestUri() != null) {
                 LOGGER.info(uriContext.getRequestUri().toString());
             }
         }
